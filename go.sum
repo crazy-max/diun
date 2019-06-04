@@ -34,8 +34,8 @@ github.com/docker/distribution v2.7.1+incompatible h1:a5mlkVzth6W5A4fOsS3D2EO5BU
 github.com/docker/distribution v2.7.1+incompatible/go.mod h1:J2gT2udsDAN96Uj4KfcMRqY0/ypR+oyYUYmja8H+y+w=
 github.com/docker/docker-credential-helpers v0.6.2 h1:CrW9H1VMf3a4GrtyAi7IUJjkJVpwBBpX0+mvkvYJaus=
 github.com/docker/docker-credential-helpers v0.6.2/go.mod h1:WRaJzqw3CTB9bk10avuGsjVBZsD05qeibJ1/TYlvc0Y=
-github.com/docker/engine v0.0.0-20180718150940-a3ef7e9a9bda h1:v1VUX0+ILrFSsGTp2FUvfgHSiQ6wmI1NnCho1MQ9CYU=
-github.com/docker/engine v0.0.0-20180718150940-a3ef7e9a9bda/go.mod h1:3CPr2caMgTHxxIAZgEMd3uLYPDlRvPqCpyeRf6ncPcY=
+github.com/docker/engine v0.0.0-20190423201726-d2cfbce3f3b0 h1:iGwxNO/hvGZF2mk+u3UcOvF9I/zHTZMuiQ+qzjvjQDo=
+github.com/docker/engine v0.0.0-20190423201726-d2cfbce3f3b0/go.mod h1:3CPr2caMgTHxxIAZgEMd3uLYPDlRvPqCpyeRf6ncPcY=
 github.com/docker/go-connections v0.4.0 h1:El9xVISelRB7BuFusrZozjnkIM5YnzCViNKohAFqRJQ=
 github.com/docker/go-connections v0.4.0/go.mod h1:Gbd7IOopHjR8Iph03tsViu4nIes5XhDvyHbTtUxmeec=
 github.com/docker/go-metrics v0.0.0-20181218153428-b84716841b82 h1:X0fj836zx99zFu83v/M79DuBn84IL/Syx1SY6Y5ZEMA=
