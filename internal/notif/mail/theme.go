@@ -74,7 +74,7 @@ func (t *Theme) HTMLTemplate() string {
       text-shadow: 0 1px 0 white;
     }
     .email-logo {
-      max-height: 50px;
+      max-height: 128px;
     }
     /* Body ------------------------------ */
     .email-body {
