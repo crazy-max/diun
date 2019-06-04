@@ -78,7 +78,6 @@ func (di *Diun) Run() {
 
 		if err := di.analyzeImage(item, opts); err != nil {
 			log.Error().Err(err).Str("image", opts.Image.String()).Msg("Cannot analyze image")
-			continue
 		}
 
 		if item.WatchRepo {
