@@ -1,0 +1,14 @@
+version: "3.2"
+
+services:
+  diun:
+    image: crazymax/diun:latest
+    container_name: diun
+    volumes:
+      - "./diun.yml:/diun.yml:ro"
+    environment:
+      - "TZ=Europe/Paris"
+      - "LOG_LEVEL=info"
+      - "LOG_JSON=false"
+      - "RUN_ONCE=false"
+    restart: always
