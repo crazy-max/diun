@@ -3,8 +3,8 @@
 <p align="center">
   <a href="https://github.com/crazy-max/diun/releases/latest"><img src="https://img.shields.io/github/release/crazy-max/diun.svg?style=flat-square" alt="GitHub release"></a>
   <a href="https://github.com/crazy-max/diun/releases/latest"><img src="https://img.shields.io/github/downloads/crazy-max/diun/total.svg?style=flat-square" alt="Total downloads"></a>
-  <a href="https://hub.docker.com/r/crazymax/diun/"><img src="https://img.shields.io/badge/dynamic/json.svg?label=tag&query=$.results[1].name&url=https://hub.docker.com/v2/repositories/crazymax/diun/tags&style=flat-square" alt="Latest Version"></a>
   <a href="https://travis-ci.com/crazy-max/diun"><img src="https://img.shields.io/travis/com/crazy-max/diun/master.svg?style=flat-square" alt="Build Status"></a>
+  <a href="https://hub.docker.com/r/crazymax/diun/"><img src="https://img.shields.io/badge/dynamic/json.svg?label=docker%20tag&query=$.results[1].name&url=https://hub.docker.com/v2/repositories/crazymax/diun/tags&style=flat-square" alt="Docker Tag"></a>
   <a href="https://hub.docker.com/r/crazymax/diun/"><img src="https://img.shields.io/docker/stars/crazymax/diun.svg?style=flat-square" alt="Docker Stars"></a>
   <a href="https://hub.docker.com/r/crazymax/diun/"><img src="https://img.shields.io/docker/pulls/crazymax/diun.svg?style=flat-square" alt="Docker Pulls"></a>
   <br /><a href="https://quay.io/repository/crazymax/diun"><img src="https://quay.io/repository/crazymax/diun/status?style=flat-square" alt="Docker Repository on Quay"></a>
