@@ -5,6 +5,7 @@ services:
     image: crazymax/diun:latest
     container_name: diun
     volumes:
+      - "./data:/data"
       - "./diun.yml:/diun.yml:ro"
     environment:
       - "TZ=Europe/Paris"

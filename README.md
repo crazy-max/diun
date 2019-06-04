@@ -185,6 +185,7 @@ $ docker run -d --name diun \
   -e "LOG_LEVEL=info" \
   -e "LOG_JSON=false" \
   -e "RUN_ONCE=false" \
+  -v "$(pwd)/data:/data" \
   -v "$(pwd)/diun.yml:/diun.yml:ro" \
   crazymax/diun:latest
 ```
