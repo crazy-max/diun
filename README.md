@@ -157,7 +157,7 @@ items:
   * `watch_repo`: Watch all tags of this `image` repository (default: `false`).
   * `include_tags`: List of regular expressions to include tags. Can be useful if you use `watch_repo`.
   * `exclude_tags`: List of regular expressions to exclude tags. Can be useful if you use `watch_repo`.
-  * `timeout`: Timeout is the maximum amount of time for the TCP connection to establish (default: `5`).
+  * `timeout`: Timeout is the maximum amount of time for the TCP connection to establish. 0 means no timeout (default: `10`).
 
 ## Docker
 

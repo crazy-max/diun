@@ -117,7 +117,7 @@ func (cfg *Config) Check() error {
 		}
 
 		if err := mergo.Merge(&cfg.Items[key], model.Item{
-			Timeout: 5,
+			Timeout: 10,
 		}); err != nil {
 			return err
 		}

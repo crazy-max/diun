@@ -31,8 +31,6 @@ func (c *Client) timeoutContext(timeout time.Duration) (context.Context, context
 	var cancel context.CancelFunc = func() {}
 	if timeout > 0 {
 		ctx, cancel = context.WithTimeout(ctx, timeout)
-	} else {
-		ctx, cancel = context.WithTimeout(ctx, 5*time.Second)
 	}
 	return ctx, cancel
 }
