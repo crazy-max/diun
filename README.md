@@ -189,6 +189,10 @@ $ docker run -d --name diun \
   crazymax/diun:latest
 ```
 
+## Mail notification sample
+
+![](.res/notif-mail.png)
+
 ## TODO
 
 * [ ] Scan Dockerfile
