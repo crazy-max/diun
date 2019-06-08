@@ -63,7 +63,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 
 Docker 🐳 tag **{{ .Image.Domain }}/{{ .Image.Path }}:{{ .Image.Tag }}** which you subscribed to has been {{ if (eq .Status "new") }}newly added{{ else }}updated{{ end }}.
 
-This image has been {{ if (eq .Status "new") }}created{{ else }}updated{{ end }} at <code>{{ .Analysis.Created }}</code> with digest <code>{{ .Analysis.Digest }}</code> for <code>{{ .Analysis.Os }}/{{ .Analysis.Architecture }}</code> platform.
+This image has been {{ if (eq .Status "new") }}created{{ else }}updated{{ end }} at <code>{{ .Manifest.Created }}</code> with digest <code>{{ .Manifest.Digest }}</code> for <code>{{ .Manifest.Os }}/{{ .Manifest.Architecture }}</code> platform.
 
 Need help, or have questions? Go to https://github.com/crazy-max/diun and leave an issue.
 
