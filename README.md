@@ -37,7 +37,7 @@ Choose the archive matching the destination platform and extract diun:
 
 ```
 $ cd /opt
-$ wget -qO- https://github.com/crazy-max/diun/releases/download/v0.4.0/diun_0.4.0_linux_x86_64.tar.gz | tar -zxvf - diun
+$ wget -qO- https://github.com/crazy-max/diun/releases/download/v0.4.1/diun_0.4.1_linux_x86_64.tar.gz | tar -zxvf - diun
 ```
 
 After getting the binary, it can be tested with `./diun --help` or moved to a permanent location.
@@ -141,7 +141,7 @@ items:
     watch_repo: true
     max_tags: 10
     include_tags:
-      - ^(0|[1-9]\d*)\.*
+      - ^(0|[1-9]\d*)\..*
 ```
 
 * `db`

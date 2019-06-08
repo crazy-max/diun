@@ -87,10 +87,10 @@ func (di *Diun) analyzeImage(imageStr string, item model.Item, reg *docker.Regis
 		return registry.Image{}, fmt.Errorf("cannot parse image name %s: %v", item.Image, err)
 	}
 
-	if !di.isIncluded(image.Tag, item.IncludeTags) {
+	if !utl.IsIncluded(image.Tag, item.IncludeTags) {
 		log.Warn().Str("image", image.String()).Msgf("Tag %s not included", image.Tag)
 		return image, nil
-	} else if di.isExcluded(image.Tag, item.ExcludeTags) {
+	} else if utl.IsExcluded(image.Tag, item.ExcludeTags) {
 		log.Warn().Str("image", image.String()).Msgf("Tag %s excluded", image.Tag)
 		return image, nil
 	}
@@ -135,14 +135,25 @@ func (di *Diun) analyzeImage(imageStr string, item model.Item, reg *docker.Regis
 }
 
 func (di *Diun) analyzeRepo(image registry.Image, item model.Item, reg *docker.RegistryClient) {
-	tags, tagsCount, err := reg.Tags(image, item.MaxTags)
+	tags, err := reg.Tags(docker.TagsOptions{
+		Image:   image,
+		Max:     item.MaxTags,
+		Include: item.IncludeTags,
+		Exclude: item.ExcludeTags,
+	})
 	if err != nil {
 		log.Error().Err(err).Str("image", image.String()).Msg("Cannot retrieve tags")
 		return
 	}
-	log.Debug().Str("image", image.String()).Msgf("%d tag(s) found in repository. %d will be analyzed.", tagsCount, len(tags))
+	log.Debug().Str("image", image.String()).Msgf("%d tag(s) found in repository. %d will be analyzed (%d max, %d not included, %d excluded).",
+		tags.Total,
+		len(tags.List),
+		item.MaxTags,
+		tags.NotIncluded,
+		tags.Excluded,
+	)
 
-	for _, tag := range tags {
+	for _, tag := range tags.List {
 		imageStr := fmt.Sprintf("%s/%s:%s", image.Domain, image.Path, tag)
 		if _, err := di.analyzeImage(imageStr, item, reg); err != nil {
 			log.Error().Err(err).Str("image", imageStr).Msg("Cannot analyze image")
@@ -156,30 +167,6 @@ func (di *Diun) Close() {
 	if err := di.db.Close(); err != nil {
 		log.Warn().Err(err).Msg("Cannot close database")
 	}
-}
-
-func (di *Diun) isIncluded(tag string, includes []string) bool {
-	if len(includes) == 0 {
-		return true
-	}
-	for _, include := range includes {
-		if utl.MatchString(include, tag) {
-			return true
-		}
-	}
-	return false
-}
-
-func (di *Diun) isExcluded(tag string, excludes []string) bool {
-	if len(excludes) == 0 {
-		return false
-	}
-	for _, exclude := range excludes {
-		if utl.MatchString(exclude, tag) {
-			return true
-		}
-	}
-	return false
 }
 
 func (di *Diun) trackTime(start time.Time, prefix string) {

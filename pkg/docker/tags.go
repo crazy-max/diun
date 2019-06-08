@@ -2,36 +2,67 @@ package docker
 
 import (
 	"github.com/containers/image/docker"
+	"github.com/crazy-max/diun/internal/utl"
 	"github.com/crazy-max/diun/pkg/docker/registry"
 )
 
-type Tags []string
+type Tags struct {
+	List        []string
+	NotIncluded int
+	Excluded    int
+	Total       int
+}
+
+type TagsOptions struct {
+	Image   registry.Image
+	Max     int
+	Include []string
+	Exclude []string
+}
 
 // Tags returns tags of a Docker repository
-func (c *RegistryClient) Tags(image registry.Image, max int) (Tags, int, error) {
+func (c *RegistryClient) Tags(opts TagsOptions) (*Tags, error) {
 	ctx, cancel := c.timeoutContext()
 	defer cancel()
 
-	imgCls, err := c.newImage(ctx, image.String())
+	imgCls, err := c.newImage(ctx, opts.Image.String())
 	if err != nil {
-		return nil, 0, err
+		return nil, err
 	}
 	defer imgCls.Close()
 
 	tags, err := docker.GetRepositoryTags(ctx, c.sysCtx, imgCls.Reference())
 	if err != nil {
-		return nil, 0, err
+		return nil, err
+	}
+
+	res := &Tags{
+		NotIncluded: 0,
+		Excluded:    0,
+		Total:       len(tags),
+	}
+
+	// Filter
+	for _, tag := range tags {
+		if !utl.IsIncluded(tag, opts.Include) {
+			res.NotIncluded++
+			continue
+		} else if utl.IsExcluded(tag, opts.Exclude) {
+			res.Excluded++
+			continue
+		}
+		res.List = append(res.List, tag)
 	}
 
 	// Reverse order (latest tags first)
-	for i := len(tags)/2 - 1; i >= 0; i-- {
-		opp := len(tags) - 1 - i
-		tags[i], tags[opp] = tags[opp], tags[i]
+	for i := len(res.List)/2 - 1; i >= 0; i-- {
+		opp := len(res.List) - 1 - i
+		res.List[i], res.List[opp] = res.List[opp], res.List[i]
 	}
 
-	if max > 0 && len(tags) >= max {
-		return Tags(tags[:max]), len(tags), nil
+	if opts.Max > 0 && len(res.List) >= opts.Max {
+		res.List = res.List[:opts.Max]
 	}
 
-	return Tags(tags), len(tags), nil
+	return res, nil
 }

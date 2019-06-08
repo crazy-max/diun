@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.1 (2019/06/08)
+
+* Filter tags before return them
+
 ## 0.4.0 (2019/06/08)
 
 * Add option to set the maximum number of tags to watch for an item if `watch_repo` is enabled
