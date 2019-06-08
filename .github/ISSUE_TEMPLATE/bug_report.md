@@ -31,5 +31,5 @@ about: Create a report to help us improve
 ### Logs
 
 ```
-# paste logs here (set log level to debug first)
+# paste logs here (set log-level to debug and enable log-caller)
 ```
