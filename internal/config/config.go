@@ -102,6 +102,17 @@ func (cfg *Config) Check() error {
 	}
 
 	for key, item := range cfg.Items {
+		if item.Image == "" {
+			return fmt.Errorf("image is required for item %d", key)
+		}
+
+		if err := mergo.Merge(&item, model.Item{
+			WatchRepo: false,
+			MaxTags:   25,
+		}); err != nil {
+			return fmt.Errorf("cannot set default item values for %s: %v", item.Image, err)
+		}
+
 		if item.RegistryID != "" {
 			reg, found := cfg.Registries[item.RegistryID]
 			if !found {

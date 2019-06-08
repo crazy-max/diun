@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.0 (2019/06/08)
+
+* Add option to set the maximum number of tags to watch for an item if `watch_repo` is enabled
+
 ## 0.3.2 (2019/06/08)
 
 * Fix registry client context

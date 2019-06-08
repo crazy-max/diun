@@ -135,12 +135,12 @@ func (di *Diun) analyzeImage(imageStr string, item model.Item, reg *docker.Regis
 }
 
 func (di *Diun) analyzeRepo(image registry.Image, item model.Item, reg *docker.RegistryClient) {
-	tags, err := reg.Tags(image)
+	tags, tagsCount, err := reg.Tags(image, item.MaxTags)
 	if err != nil {
 		log.Error().Err(err).Str("image", image.String()).Msg("Cannot retrieve tags")
 		return
 	}
-	log.Debug().Str("image", image.String()).Msgf("%d tag(s) found in repository", len(tags))
+	log.Debug().Str("image", image.String()).Msgf("%d tag(s) found in repository. %d will be analyzed.", tagsCount, len(tags))
 
 	for _, tag := range tags {
 		imageStr := fmt.Sprintf("%s/%s:%s", image.Domain, image.Path, tag)
