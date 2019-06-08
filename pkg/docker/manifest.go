@@ -1,13 +1,14 @@
-package registry
+package docker
 
 import (
 	"time"
 
 	"github.com/containers/image/manifest"
+	"github.com/crazy-max/diun/pkg/docker/registry"
 	"github.com/opencontainers/go-digest"
 )
 
-type Inspect struct {
+type Manifest struct {
 	Name          string
 	Tag           string
 	MIMEType      string
@@ -20,39 +21,38 @@ type Inspect struct {
 	Layers        []string
 }
 
-// Inspect inspects a Docker image
-func (c *Client) Inspect(opts *Options) (Inspect, error) {
-	ctx, cancel := c.timeoutContext(opts.Timeout)
-	defer cancel()
+// Manifest returns the manifest for a specific image
+func (c *RegistryClient) Manifest(image registry.Image) (Manifest, error) {
+	defer c.cancel()
 
-	img, _, err := c.newImage(ctx, opts)
+	imgCls, err := c.newImage(image.String())
 	if err != nil {
-		return Inspect{}, err
+		return Manifest{}, err
 	}
-	defer img.Close()
+	defer imgCls.Close()
 
-	rawManifest, _, err := img.Manifest(ctx)
+	rawManifest, _, err := imgCls.Manifest(c.ctx)
 	if err != nil {
-		return Inspect{}, err
+		return Manifest{}, err
 	}
 
-	imgInspect, err := img.Inspect(ctx)
+	imgInspect, err := imgCls.Inspect(c.ctx)
 	if err != nil {
-		return Inspect{}, err
+		return Manifest{}, err
 	}
 
 	imgDigest, err := manifest.Digest(rawManifest)
 	if err != nil {
-		return Inspect{}, err
+		return Manifest{}, err
 	}
 
 	imgTag := imgInspect.Tag
 	if imgTag == "" {
-		imgTag = opts.Image.Tag
+		imgTag = image.Tag
 	}
 
-	return Inspect{
-		Name:          img.Reference().DockerReference().Name(),
+	return Manifest{
+		Name:          imgCls.Reference().DockerReference().Name(),
 		Tag:           imgTag,
 		MIMEType:      manifest.GuessMIMEType(rawManifest),
 		Digest:        imgDigest,

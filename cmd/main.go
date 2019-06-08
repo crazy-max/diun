@@ -31,7 +31,7 @@ func main() {
 	kingpin.Flag("timezone", "Timezone assigned to Diun.").Envar("TZ").Default("UTC").StringVar(&flags.Timezone)
 	kingpin.Flag("log-level", "Set log level.").Envar("LOG_LEVEL").Default("info").StringVar(&flags.LogLevel)
 	kingpin.Flag("log-json", "Enable JSON logging output.").Envar("LOG_JSON").Default("false").BoolVar(&flags.LogJson)
-	kingpin.Flag("run-once", "Run once on startup.").Envar("RUN_ONCE").Default("false").BoolVar(&flags.RunOnce)
+	kingpin.Flag("run-startup", "Run on startup.").Envar("RUN_STARTUP").Default("false").BoolVar(&flags.RunStartup)
 	kingpin.Flag("docker", "Enable Docker mode.").Envar("DOCKER").Default("false").BoolVar(&flags.Docker)
 	kingpin.UsageTemplate(kingpin.CompactUsageTemplate).Version(version).Author("CrazyMax")
 	kingpin.CommandLine.Name = "diun"
@@ -77,8 +77,8 @@ func main() {
 		log.Fatal().Err(err).Msg("Cannot initialize Diun")
 	}
 
-	// Run once
-	if flags.RunOnce {
+	// Run on startup
+	if flags.RunStartup {
 		diun.Run()
 	}
 

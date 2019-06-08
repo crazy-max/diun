@@ -1,5 +1,3 @@
-// Source: https://github.com/genuinetools/reg/blob/master/registry/image.go
-
 package registry
 
 import (

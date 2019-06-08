@@ -28,7 +28,7 @@ func Configure(fl *model.Flags, location *time.Location) {
 		w = os.Stdout
 	}
 
-	log.Logger = zerolog.New(w).With().Timestamp().Logger()
+	log.Logger = zerolog.New(w).With().Caller().Timestamp().Logger()
 
 	logLevel, err := zerolog.ParseLevel(fl.LogLevel)
 	if err != nil {

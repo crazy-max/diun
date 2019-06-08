@@ -1,6 +1,7 @@
 package app
 
 import (
+	"encoding/json"
 	"fmt"
 	"sync/atomic"
 	"time"
@@ -10,7 +11,8 @@ import (
 	"github.com/crazy-max/diun/internal/model"
 	"github.com/crazy-max/diun/internal/notif"
 	"github.com/crazy-max/diun/internal/utl"
-	"github.com/crazy-max/diun/pkg/registry"
+	"github.com/crazy-max/diun/pkg/docker"
+	"github.com/crazy-max/diun/pkg/docker/registry"
 	"github.com/hako/durafmt"
 	"github.com/rs/zerolog/log"
 )
@@ -18,7 +20,6 @@ import (
 // Diun represents an active diun object
 type Diun struct {
 	cfg    *config.Config
-	reg    *registry.Client
 	db     *db.Client
 	notif  *notif.Client
 	locker uint32
@@ -26,12 +27,6 @@ type Diun struct {
 
 // New creates new diun instance
 func New(cfg *config.Config) (*Diun, error) {
-	// Registry client
-	regcli, err := registry.New()
-	if err != nil {
-		return nil, err
-	}
-
 	// DB client
 	dbcli, err := db.New(cfg.Db)
 	if err != nil {
@@ -46,7 +41,6 @@ func New(cfg *config.Config) (*Diun, error) {
 
 	return &Diun{
 		cfg:   cfg,
-		reg:   regcli,
 		db:    dbcli,
 		notif: notifcli,
 	}, nil
@@ -63,104 +57,95 @@ func (di *Diun) Run() {
 
 	// Iterate items
 	for _, item := range di.cfg.Items {
-		image, err := registry.ParseImage(item.Image)
+		reg, err := docker.NewRegistryClient(docker.RegistryOptions{
+			Os:          di.cfg.Watch.Os,
+			Arch:        di.cfg.Watch.Arch,
+			Username:    item.Registry.Username,
+			Password:    item.Registry.Password,
+			Timeout:     time.Duration(item.Registry.Timeout) * time.Second,
+			InsecureTLS: item.Registry.InsecureTLS,
+		})
 		if err != nil {
-			log.Error().Err(err).Str("image", item.Image).Msg("Cannot parse image")
+			log.Error().Err(err).Str("image", item.Image).Msg("Cannot create registry client")
 			continue
 		}
 
-		opts := &registry.Options{
-			Image:       image,
-			Username:    item.RegCred.Username,
-			Password:    item.RegCred.Password,
-			InsecureTLS: item.InsecureTLS,
+		image, err := di.analyzeImage(item.Image, item, reg)
+		if err != nil {
+			log.Error().Err(err).Str("image", item.Image).Msg("Cannot analyze image")
 		}
 
-		if err := di.analyzeImage(item, opts); err != nil {
-			log.Error().Err(err).Str("image", opts.Image.String()).Msg("Cannot analyze image")
-		}
-
-		if item.WatchRepo {
-			di.analyzeRepo(item, opts)
+		if image.Domain != "" && item.WatchRepo {
+			di.analyzeRepo(image, item, reg)
 		}
 	}
 }
 
-func (di *Diun) analyzeImage(item model.Item, opts *registry.Options) error {
-	if !di.isIncluded(opts.Image.Tag, item.IncludeTags) {
-		log.Warn().Str("image", opts.Image.String()).Msgf("Tag %s not included", opts.Image.Tag)
-		return nil
-	} else if di.isExcluded(opts.Image.Tag, item.ExcludeTags) {
-		log.Warn().Str("image", opts.Image.String()).Msgf("Tag %s excluded", opts.Image.Tag)
-		return nil
+func (di *Diun) analyzeImage(imageStr string, item model.Item, reg *docker.RegistryClient) (registry.Image, error) {
+	image, err := registry.ParseImage(imageStr)
+	if err != nil {
+		return registry.Image{}, fmt.Errorf("cannot parse image name %s: %v", item.Image, err)
 	}
 
-	log.Debug().Str("image", opts.Image.String()).Msgf("Analyzing")
-	liveAna, err := di.reg.Inspect(opts)
-	if err != nil {
-		return err
+	if !di.isIncluded(image.Tag, item.IncludeTags) {
+		log.Warn().Str("image", image.String()).Msgf("Tag %s not included", image.Tag)
+		return image, nil
+	} else if di.isExcluded(image.Tag, item.ExcludeTags) {
+		log.Warn().Str("image", image.String()).Msgf("Tag %s excluded", image.Tag)
+		return image, nil
 	}
 
-	dbAna, err := di.db.GetAnalysis(opts.Image)
+	log.Debug().Str("image", image.String()).Msgf("Fetching manifest")
+	liveManifest, err := reg.Manifest(image)
 	if err != nil {
-		return err
+		return image, err
+	}
+	b, _ := json.MarshalIndent(liveManifest, "", "  ")
+	log.Debug().Msg(string(b))
+
+	dbManifest, err := di.db.GetManifest(image)
+	if err != nil {
+		return image, err
 	}
 
 	status := model.ImageStatusUnchange
-	if dbAna.Name == "" {
+	if dbManifest.Name == "" {
 		status = model.ImageStatusNew
-		log.Info().Str("image", opts.Image.String()).Msgf("New image found")
-	} else if !liveAna.Created.Equal(*dbAna.Created) {
+		log.Info().Str("image", image.String()).Msgf("New image found")
+	} else if !liveManifest.Created.Equal(*dbManifest.Created) {
 		status = model.ImageStatusUpdate
-		log.Info().Str("image", opts.Image.String()).Msgf("Image update found")
+		log.Info().Str("image", image.String()).Msgf("Image update found")
 	} else {
-		log.Debug().Str("image", opts.Image.String()).Msgf("No changes")
-		return nil
+		log.Debug().Str("image", image.String()).Msgf("No changes")
+		return image, nil
 	}
 
-	if err := di.db.PutAnalysis(opts.Image, liveAna); err != nil {
-		return err
+	if err := di.db.PutManifest(image, liveManifest); err != nil {
+		return image, err
 	}
-	log.Debug().Str("image", opts.Image.String()).Msg("Analysis saved to database")
+	log.Debug().Str("image", image.String()).Msg("Manifest saved to database")
 
 	di.notif.Send(model.NotifEntry{
 		Status:   status,
-		Image:    opts.Image,
-		Analysis: liveAna,
+		Image:    image,
+		Manifest: liveManifest,
 	})
 
-	return nil
+	return image, nil
 }
 
-func (di *Diun) analyzeRepo(item model.Item, opts *registry.Options) {
-	tags, err := di.reg.Tags(opts)
+func (di *Diun) analyzeRepo(image registry.Image, item model.Item, reg *docker.RegistryClient) {
+	tags, err := reg.Tags(image)
 	if err != nil {
-		log.Error().Err(err).Str("image", opts.Image.String()).Msg("Cannot retrieve tags")
+		log.Error().Err(err).Str("image", image.String()).Msg("Cannot retrieve tags")
 		return
 	}
-	log.Debug().Str("image", opts.Image.String()).Msgf("%d tag(s) found", len(tags))
+	log.Debug().Str("image", image.String()).Msgf("%d tag(s) found in repository", len(tags))
 
 	for _, tag := range tags {
-		if tag == opts.Image.Tag {
-			continue
-		}
-
-		simage := fmt.Sprintf("%s/%s:%s", opts.Image.Domain, opts.Image.Path, tag)
-		image, err := registry.ParseImage(simage)
-		if err != nil {
-			log.Error().Err(err).Str("image", simage).Msg("Cannot parse image")
-			continue
-		}
-
-		opts := &registry.Options{
-			Image:       image,
-			Username:    opts.Username,
-			Password:    opts.Password,
-			InsecureTLS: opts.InsecureTLS,
-		}
-
-		if err := di.analyzeImage(item, opts); err != nil {
-			log.Error().Err(err).Str("image", image.String()).Msg("Cannot analyze image")
+		imageStr := fmt.Sprintf("%s/%s:%s", image.Domain, image.Path, tag)
+		if _, err := di.analyzeImage(imageStr, item, reg); err != nil {
+			log.Error().Err(err).Str("image", imageStr).Msg("Cannot analyze image")
 			continue
 		}
 	}

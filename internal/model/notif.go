@@ -1,6 +1,9 @@
 package model
 
-import "github.com/crazy-max/diun/pkg/registry"
+import (
+	"github.com/crazy-max/diun/pkg/docker"
+	"github.com/crazy-max/diun/pkg/docker/registry"
+)
 
 // Notif holds data necessary for notification configuration
 type Notif struct {
@@ -10,7 +13,7 @@ type Notif struct {
 
 // NotifEntry represents a notification entry
 type NotifEntry struct {
-	Status   ImageStatus      `json:"status,omitempty"`
-	Image    registry.Image   `json:"image,omitempty"`
-	Analysis registry.Inspect `json:"analysis,omitempty"`
+	Status   ImageStatus     `json:"status,omitempty"`
+	Image    registry.Image  `json:"image,omitempty"`
+	Manifest docker.Manifest `json:"manifest,omitempty"`
 }

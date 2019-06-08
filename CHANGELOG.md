@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.0 (2019/06/08)
+
+* Allow overriding os and architecture when watching
+* Move `insecure_tls` and `timeout` options to registry option
+* Rename Bolt bucket
+* Change default schedule
+* Review registry client
+
 ## 0.2.0 (2019/06/05)
 
 * Don't skip repo analysis if default tag not found

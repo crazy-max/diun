@@ -6,7 +6,8 @@ import (
 	"time"
 
 	"github.com/crazy-max/diun/internal/model"
-	"github.com/crazy-max/diun/pkg/registry"
+	"github.com/crazy-max/diun/pkg/docker"
+	"github.com/crazy-max/diun/pkg/docker/registry"
 	"github.com/rs/zerolog/log"
 	bolt "go.etcd.io/bbolt"
 )
@@ -17,7 +18,7 @@ type Client struct {
 	cfg model.Db
 }
 
-const bucket = "analysis"
+const bucket = "manifest"
 
 // New creates new db instance
 func New(cfg model.Db) (*Client, error) {
@@ -52,24 +53,24 @@ func (c *Client) Close() error {
 	return c.DB.Close()
 }
 
-// GetAnalysis returns Docker image analysis
-func (c *Client) GetAnalysis(image registry.Image) (registry.Inspect, error) {
-	var ana registry.Inspect
+// GetManifest returns Docker image manifest
+func (c *Client) GetManifest(image registry.Image) (docker.Manifest, error) {
+	var manifest docker.Manifest
 
 	err := c.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(bucket))
 		if entryBytes := b.Get([]byte(image.String())); entryBytes != nil {
-			return json.Unmarshal(entryBytes, &ana)
+			return json.Unmarshal(entryBytes, &manifest)
 		}
 		return nil
 	})
 
-	return ana, err
+	return manifest, err
 }
 
-// PutAnalysis add Docker image analysis in db
-func (c *Client) PutAnalysis(image registry.Image, analysis registry.Inspect) error {
-	entryBytes, _ := json.Marshal(analysis)
+// PutManifest add Docker image manifest in db
+func (c *Client) PutManifest(image registry.Image, manifest docker.Manifest) error {
+	entryBytes, _ := json.Marshal(manifest)
 
 	err := c.Update(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(bucket))

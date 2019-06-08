@@ -22,6 +22,7 @@
 * Allow to watch a full Docker repository and report new tags
 * Include and exclude filters with regular expression for tags
 * Internal cron implementation through go routines
+* Allow overriding os and architecture when watching
 * Beautiful email report
 * Webhook notification
 * Enhanced logging
@@ -54,7 +55,7 @@ Flags:
   --timezone="UTC"    Timezone assigned to Diun.
   --log-level="info"  Set log level.
   --log-json          Enable JSON logging output.
-  --run-once          Run once on startup.
+  --run-startup       Run on startup.
   --docker            Enable Docker mode.
   --version           Show application version.
 ```
@@ -69,7 +70,7 @@ Flags:
 * `--timezone <timezone>` : Timezone assigned to Diun. _Optional_. (default: `UTC`).
 * `--log-level <level>` : Log level output. _Optional_. (default: `info`).
 * `--log-json` : Enable JSON logging output. _Optional_. (default: `false`).
-* `--run-once` : Run once on startup. _Optional_. (default: `false`).
+* `--run-startup` : Run on startup. _Optional_. (default: `false`).
 
 ## Configuration
 
@@ -80,7 +81,9 @@ db:
   path: diun.db
 
 watch:
-  schedule: 0 */30 * * * *
+  schedule: 0 0 * * * *
+  os: linux
+  arch: amd64
 
 notif:
   mail:
@@ -102,21 +105,23 @@ notif:
       Authorization: Token123456
     timeout: 10
 
-reg_creds:
-  aregistrycred:
+registries:
+  someregistryoptions:
     username: foo
     password: bar
-  another:
+    timeout: 20
+  onemore:
     username: foo2
     password: bar2
+    insecure_tls: true
 
 items:
   -
     image: docker.io/crazymax/nextcloud:latest
-    reg_cred_id: aregistrycred
+    registry_id: someregistryoptions
   -
     image: jfrog-docker-reg2.bintray.io/jfrog/artifactory-oss:4.0.0
-    reg_cred_id: another
+    registry_id: onemore
   -
     image: quay.io/coreos/hyperkube
   -
@@ -129,7 +134,9 @@ items:
 * `db`
   * `path`: Path to Bolt database file where images analysis are stored. Flag `--docker` force this path to `/data/diun.db` (default: `diun.db`).
 * `watch`
-  * `schedule`: [CRON expression](https://godoc.org/github.com/crazy-max/cron#hdr-CRON_Expression_Format) to schedule Diun watcher. _Optional_. (default: `0 */30 * * * *`).
+  * `schedule`: [CRON expression](https://godoc.org/github.com/crazy-max/cron#hdr-CRON_Expression_Format) to schedule Diun watcher. _Optional_. (default: `0 0 * * * *`).
+  * `os`: OS to use for choosing images. _Optional_. (default: `linux`).
+  * `arch`: Architecture to use for choosing images. _Optional_. (default: `amd64`).
 * `notif`
   * `mail`
     * `enable`: Enable email reports (default: `false`).
@@ -147,17 +154,17 @@ items:
     * `method`: HTTP method (default: `GET`). **required**
     * `headers`: Map of additional headers to be sent.
     * `timeout`: Timeout specifies a time limit for the request to be made. (default: `10`).
-* `reg_creds`: Map of registry credentials to use with items. Key is the ID and value is a struct with the following fields:
+* `registries`: Map of registry options to use with items. Key is the ID and value is a struct with the following fields:
   * `username`: Registry username.
   * `password`: Registry password.
+  * `timeout`: Timeout is the maximum amount of time for the TCP connection to establish. 0 means no timeout (default: `10`).
+  * `insecure_tls`: Allow contacting docker registry over HTTP, or HTTPS with failed TLS verification (default: `false`).
 * `items`: Slice of items to watch with the following fields:
   * `image`: Docker image to watch using `registry/path:tag` format. If registry is omitted, `docker.io` will be used. If tag is omitted, `latest` will be used. **required**
-  * `reg_cred_id`: Registry credential ID from `reg_creds` to use.
-  * `insecure_tls`: Allow contacting docker registries over HTTP, or HTTPS with failed TLS verification (default: `false`).
+  * `registry_id`: Registry ID from `registries` to use.
   * `watch_repo`: Watch all tags of this `image` repository (default: `false`).
-  * `include_tags`: List of regular expressions to include tags. Can be useful if you use `watch_repo`.
-  * `exclude_tags`: List of regular expressions to exclude tags. Can be useful if you use `watch_repo`.
-  * `timeout`: Timeout is the maximum amount of time for the TCP connection to establish. 0 means no timeout (default: `10`).
+  * `include_tags`: List of regular expressions to include tags. Can be useful if you enable `watch_repo`.
+  * `exclude_tags`: List of regular expressions to exclude tags. Can be useful if you enable `watch_repo`.
 
 ## Docker
 
@@ -168,7 +175,7 @@ Environment variables can be used within your container :
 * `TZ` : Timezone assigned
 * `LOG_LEVEL` : Log level output (default `info`)
 * `LOG_JSON`: Enable JSON logging output (default `false`)
-* `RUN_ONCE`: Run once on startup (default `false`)
+* `RUN_STARTUP`: Run on startup (default `false`)
 
 Docker compose is the recommended way to run this image. Copy the content of folder [.res/compose](.res/compose) in `/opt/diun/` on your host for example. Edit the compose and config file with your preferences and run the following commands :
 
@@ -184,20 +191,39 @@ $ docker run -d --name diun \
   -e "TZ=Europe/Paris" \
   -e "LOG_LEVEL=info" \
   -e "LOG_JSON=false" \
-  -e "RUN_ONCE=false" \
+  -e "RUN_STARTUP=false" \
   -v "$(pwd)/data:/data" \
   -v "$(pwd)/diun.yml:/diun.yml:ro" \
   crazymax/diun:latest
 ```
 
-## Mail notification sample
+## Notifications
+
+If you choose `webhook` notification, a HTTP request is sent with a JSON format response that looks like:
+
+```json
+{
+  "diun_version": "0.3.0",
+  "status": "new",
+  "image": "docker.io/crazymax/swarm-cronjob:0.2.1",
+  "mime_type": "application/vnd.docker.distribution.manifest.v2+json",
+  "digest": "sha256:5913d4b5e8dc15430c2f47f40e43ab2ca7f2b8df5eee5db4d5c42311e08dfb79",
+  "created": "2019-01-24T10:26:49.152006005Z",
+  "architecture": "amd64",
+  "os": "linux"
+}
+```
+
+And here is an email sample if you add `mail` notification:
 
 ![](.res/notif-mail.png)
 
 ## TODO
 
-* [ ] Scan Dockerfile
+* [ ] Watch images inside Dockerfile and Compose files
 * [ ] Watch images from Docker daemon
+* [ ] Watch starred repo on DockerHub and Quay
+* [ ] Fetch image size
 
 ## How can I help ?
 

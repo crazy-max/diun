@@ -41,23 +41,23 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	}
 
 	body, err := json.Marshal(struct {
-		Version      string        `json:"diun_version,omitempty"`
-		Status       string        `json:"status,omitempty"`
-		Image        string        `json:"image,omitempty"`
-		MIMEType     string        `json:"mime_type,omitempty"`
-		Digest       digest.Digest `json:"digest,omitempty"`
-		Date         *time.Time    `json:"date,omitempty"`
-		Architecture string        `json:"architecture,omitempty"`
-		Os           string        `json:"os,omitempty"`
+		Version      string        `json:"diun_version"`
+		Status       string        `json:"status"`
+		Image        string        `json:"image"`
+		MIMEType     string        `json:"mime_type"`
+		Digest       digest.Digest `json:"digest"`
+		Created      *time.Time    `json:"created"`
+		Architecture string        `json:"architecture"`
+		Os           string        `json:"os"`
 	}{
 		Version:      c.app.Version,
 		Status:       string(entry.Status),
 		Image:        entry.Image.String(),
-		MIMEType:     entry.Analysis.MIMEType,
-		Digest:       entry.Analysis.Digest,
-		Date:         entry.Analysis.Created,
-		Architecture: entry.Analysis.Architecture,
-		Os:           entry.Analysis.Os,
+		MIMEType:     entry.Manifest.MIMEType,
+		Digest:       entry.Manifest.Digest,
+		Created:      entry.Manifest.Created,
+		Architecture: entry.Manifest.Architecture,
+		Os:           entry.Manifest.Os,
 	})
 	if err != nil {
 		return err

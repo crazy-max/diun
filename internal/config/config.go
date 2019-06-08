@@ -18,13 +18,13 @@ import (
 
 // Config holds configuration details
 type Config struct {
-	Flags    model.Flags
-	App      model.App
-	Db       model.Db                 `yaml:"db,omitempty"`
-	Watch    model.Watch              `yaml:"watch,omitempty"`
-	Notif    model.Notif              `yaml:"notif,omitempty"`
-	RegCreds map[string]model.RegCred `yaml:"reg_creds,omitempty"`
-	Items    []model.Item             `yaml:"items,omitempty"`
+	Flags      model.Flags
+	App        model.App
+	Db         model.Db                  `yaml:"db,omitempty"`
+	Watch      model.Watch               `yaml:"watch,omitempty"`
+	Notif      model.Notif               `yaml:"notif,omitempty"`
+	Registries map[string]model.Registry `yaml:"registries,omitempty"`
+	Items      []model.Item              `yaml:"items,omitempty"`
 }
 
 // Load returns Configuration struct
@@ -44,7 +44,9 @@ func Load(fl model.Flags, version string) (*Config, error) {
 			Path: "diun.db",
 		},
 		Watch: model.Watch{
-			Schedule: "0 */30 * * * *",
+			Schedule: "0 0 * * * *",
+			Os:       "linux",
+			Arch:     "amd64",
 		},
 		Notif: model.Notif{
 			Mail: model.Mail{
@@ -89,19 +91,23 @@ func (cfg *Config) Check() error {
 	}
 	cfg.Db.Path = path.Clean(cfg.Db.Path)
 
-	for id, regCred := range cfg.RegCreds {
-		if regCred.Username == "" || regCred.Password == "" {
-			return fmt.Errorf("username and password required for registry credentials '%s'", id)
+	for id, reg := range cfg.Registries {
+		if err := mergo.Merge(&reg, model.Registry{
+			InsecureTLS: false,
+			Timeout:     10,
+		}); err != nil {
+			return fmt.Errorf("cannot set default registry values for %s: %v", id, err)
 		}
+		cfg.Registries[id] = reg
 	}
 
 	for key, item := range cfg.Items {
-		if item.RegCredID != "" {
-			regCred, found := cfg.RegCreds[item.RegCredID]
+		if item.RegistryID != "" {
+			reg, found := cfg.Registries[item.RegistryID]
 			if !found {
-				return fmt.Errorf("registry credentials '%s' not found", item.RegCredID)
+				return fmt.Errorf("registry ID '%s' not found", item.RegistryID)
 			}
-			cfg.Items[key].RegCred = regCred
+			cfg.Items[key].Registry = reg
 		}
 
 		for _, includeTag := range item.IncludeTags {
@@ -116,9 +122,7 @@ func (cfg *Config) Check() error {
 			}
 		}
 
-		if err := mergo.Merge(&cfg.Items[key], model.Item{
-			Timeout: 10,
-		}); err != nil {
+		if err := mergo.Merge(&cfg.Items[key], item); err != nil {
 			return err
 		}
 	}

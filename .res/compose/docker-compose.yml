@@ -11,5 +11,5 @@ services:
       - "TZ=Europe/Paris"
       - "LOG_LEVEL=info"
       - "LOG_JSON=false"
-      - "RUN_ONCE=false"
+      - "RUN_STARTUP=false"
     restart: always
