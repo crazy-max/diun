@@ -7,6 +7,7 @@ type Flags struct {
 	Timezone   string
 	LogLevel   string
 	LogJson    bool
+	LogCaller  bool
 	RunStartup bool
 	Docker     bool
 }
