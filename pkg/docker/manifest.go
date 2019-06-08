@@ -23,20 +23,21 @@ type Manifest struct {
 
 // Manifest returns the manifest for a specific image
 func (c *RegistryClient) Manifest(image registry.Image) (Manifest, error) {
-	defer c.cancel()
+	ctx, cancel := c.timeoutContext()
+	defer cancel()
 
-	imgCls, err := c.newImage(image.String())
+	imgCls, err := c.newImage(ctx, image.String())
 	if err != nil {
 		return Manifest{}, err
 	}
 	defer imgCls.Close()
 
-	rawManifest, _, err := imgCls.Manifest(c.ctx)
+	rawManifest, _, err := imgCls.Manifest(ctx)
 	if err != nil {
 		return Manifest{}, err
 	}
 
-	imgInspect, err := imgCls.Inspect(c.ctx)
+	imgInspect, err := imgCls.Inspect(ctx)
 	if err != nil {
 		return Manifest{}, err
 	}

@@ -1,6 +1,7 @@
 package docker
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
@@ -8,7 +9,7 @@ import (
 	"github.com/containers/image/types"
 )
 
-func (c *RegistryClient) newImage(imageStr string) (types.ImageCloser, error) {
+func (c *RegistryClient) newImage(ctx context.Context, imageStr string) (types.ImageCloser, error) {
 	if !strings.HasPrefix(imageStr, "//") {
 		imageStr = fmt.Sprintf("//%s", imageStr)
 	}
@@ -18,7 +19,7 @@ func (c *RegistryClient) newImage(imageStr string) (types.ImageCloser, error) {
 		return nil, fmt.Errorf("invalid image name %s: %v", imageStr, err)
 	}
 
-	img, err := ref.NewImage(c.ctx, c.sysCtx)
+	img, err := ref.NewImage(ctx, c.sysCtx)
 	if err != nil {
 		return nil, err
 	}

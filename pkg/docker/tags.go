@@ -9,15 +9,16 @@ type Tags []string
 
 // Tags returns tags of a Docker repository
 func (c *RegistryClient) Tags(image registry.Image) (Tags, error) {
-	defer c.cancel()
+	ctx, cancel := c.timeoutContext()
+	defer cancel()
 
-	imgCls, err := c.newImage(image.String())
+	imgCls, err := c.newImage(ctx, image.String())
 	if err != nil {
 		return nil, err
 	}
 	defer imgCls.Close()
 
-	tags, err := docker.GetRepositoryTags(c.ctx, c.sysCtx, imgCls.Reference())
+	tags, err := docker.GetRepositoryTags(ctx, c.sysCtx, imgCls.Reference())
 	if err != nil {
 		return nil, err
 	}

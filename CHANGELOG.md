@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.2 (2019/06/08)
+
+* Fix registry client context
+
 ## 0.3.1 (2019/06/08)
 
 * Fix email template

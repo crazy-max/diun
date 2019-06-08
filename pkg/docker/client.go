@@ -9,8 +9,7 @@ import (
 
 // RegistryClient represents an active docker registry object
 type RegistryClient struct {
-	ctx    context.Context
-	cancel context.CancelFunc
+	opts   RegistryOptions
 	sysCtx *types.SystemContext
 }
 
@@ -26,13 +25,6 @@ type RegistryOptions struct {
 
 // NewRegistryClient creates new docker registry client instance
 func NewRegistryClient(opts RegistryOptions) (*RegistryClient, error) {
-	// Context
-	ctx := context.Background()
-	var cancel context.CancelFunc = func() {}
-	if opts.Timeout > 0 {
-		ctx, cancel = context.WithTimeout(ctx, opts.Timeout)
-	}
-
 	// Auth
 	auth := &types.DockerAuthConfig{}
 	if opts.Username != "" {
@@ -52,8 +44,15 @@ func NewRegistryClient(opts RegistryOptions) (*RegistryClient, error) {
 	}
 
 	return &RegistryClient{
-		ctx:    ctx,
-		cancel: cancel,
 		sysCtx: sysCtx,
 	}, nil
+}
+
+func (c *RegistryClient) timeoutContext() (context.Context, context.CancelFunc) {
+	ctx := context.Background()
+	var cancel context.CancelFunc = func() {}
+	if c.opts.Timeout > 0 {
+		ctx, cancel = context.WithTimeout(ctx, c.opts.Timeout)
+	}
+	return ctx, cancel
 }
