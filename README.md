@@ -116,19 +116,32 @@ registries:
     insecure_tls: true
 
 items:
+  # Watch latest tag of crazymax/nextcloud image on docker.io (DockerHub) with registry ID 'someregistryoptions'.
   -
     image: docker.io/crazymax/nextcloud:latest
     registry_id: someregistryoptions
+  # Watch 4.0.0 tag of jfrog/artifactory-oss image on frog-docker-reg2.bintray.io (Bintray) with registry ID 'onemore'.
   -
     image: jfrog-docker-reg2.bintray.io/jfrog/artifactory-oss:4.0.0
     registry_id: onemore
+  # Watch coreos/hyperkube image on quay.io (Quay). Assume latest tag.
   -
     image: quay.io/coreos/hyperkube
+  # Watch crazymax/swarm-cronjob image and assume docker.io regsitry and latest tag.
+  # Only include tags matching regexp ^1.2.*
   -
     image: crazymax/swarm-cronjob
     watch_repo: true
     include_tags:
       - ^1.2.*
+  # Watch portainer/portainer image on docker.io (DockerHub) and assume latest tag
+  # Only watch latest 10 tags and include tags matching regexp ^(0|[1-9]\d*)\.*
+  -
+    image: docker.io/portainer/portainer
+    watch_repo: true
+    max_tags: 10
+    include_tags:
+      - ^(0|[1-9]\d*)\.*
 ```
 
 * `db`
@@ -222,10 +235,10 @@ And here is an email sample if you add `mail` notification:
 
 ## TODO
 
+* [ ] Create a worker pool to parallelize the analyses
 * [ ] Watch images inside Dockerfile and Compose files
 * [ ] Watch images from Docker daemon
 * [ ] Watch starred repo on DockerHub and Quay
-* [ ] Fetch image size
 
 ## How can I help ?
 
