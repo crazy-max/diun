@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.1 (2019/06/08)
+
+* Fix email template
+* Add flag to log caller
+
 ## 0.3.0 (2019/06/08)
 
 * Allow overriding os and architecture when watching
