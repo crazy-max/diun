@@ -85,7 +85,7 @@ func main() {
 
 	// Start scheduler
 	c = cron.NewWithLocation(location)
-	log.Info().Msgf("Start watcher with schedule %s", cfg.Watch.Schedule)
+	log.Info().Msgf("Watcher initialized with schedule %s", cfg.Watch.Schedule)
 	if err := c.AddJob(cfg.Watch.Schedule, diun); err != nil {
 		log.Fatal().Err(err).Msg("Cannot create cron task")
 	}

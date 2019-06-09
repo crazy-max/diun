@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.0 (2019/06/09)
+
+* Add worker pool to parallelize analyses
+
 ## 0.4.1 (2019/06/08)
 
 * Filter tags before return them

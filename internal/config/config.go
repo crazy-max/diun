@@ -44,6 +44,7 @@ func Load(fl model.Flags, version string) (*Config, error) {
 			Path: "diun.db",
 		},
 		Watch: model.Watch{
+			Workers:  10,
 			Schedule: "0 0 * * * *",
 			Os:       "linux",
 			Arch:     "amd64",

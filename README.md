@@ -22,6 +22,7 @@
 * Allow to watch a full Docker repository and report new tags
 * Include and exclude filters with regular expression for tags
 * Internal cron implementation through go routines
+* Worker pool to parallelize analyses
 * Allow overriding os and architecture when watching
 * Beautiful email report
 * Webhook notification
@@ -81,6 +82,7 @@ db:
   path: diun.db
 
 watch:
+  workers: 10
   schedule: 0 0 * * * *
   os: linux
   arch: amd64
@@ -128,14 +130,14 @@ items:
   -
     image: quay.io/coreos/hyperkube
   # Watch crazymax/swarm-cronjob image and assume docker.io regsitry and latest tag.
-  # Only include tags matching regexp ^1.2.*
+  # Only include tags matching regexp ^1\.2\..*
   -
     image: crazymax/swarm-cronjob
     watch_repo: true
     include_tags:
-      - ^1.2.*
+      - ^1\.2\..*
   # Watch portainer/portainer image on docker.io (DockerHub) and assume latest tag
-  # Only watch latest 10 tags and include tags matching regexp ^(0|[1-9]\d*)\.*
+  # Only watch latest 10 tags and include tags matching regexp ^(0|[1-9]\d*)\..*
   -
     image: docker.io/portainer/portainer
     watch_repo: true
@@ -147,6 +149,7 @@ items:
 * `db`
   * `path`: Path to Bolt database file where images manifests are stored. Flag `--docker` force this path to `/data/diun.db` (default: `diun.db`).
 * `watch`
+  * `workers`: Maximum number of workers that will execute tasks concurrently. _Optional_. (default: `10`).
   * `schedule`: [CRON expression](https://godoc.org/github.com/crazy-max/cron#hdr-CRON_Expression_Format) to schedule Diun watcher. _Optional_. (default: `0 0 * * * *`).
   * `os`: OS to use for choosing images. _Optional_. (default: `linux`).
   * `arch`: Architecture to use for choosing images. _Optional_. (default: `amd64`).
@@ -235,7 +238,6 @@ And here is an email sample if you add `mail` notification:
 
 ## TODO
 
-* [ ] Create a worker pool to parallelize the analyses
 * [ ] Watch images inside Dockerfile and Compose files
 * [ ] Watch images from Docker daemon
 * [ ] Watch starred repo on DockerHub and Quay

@@ -18,7 +18,6 @@ require (
 	github.com/go-gomail/gomail v0.0.0-20160411212932-81ebce5c23df
 	github.com/google/go-cmp v0.3.0 // indirect
 	github.com/gorilla/mux v1.7.2 // indirect
-	github.com/hako/durafmt v0.0.0-20180520121703-7b7ae1e72ead
 	github.com/imdario/mergo v0.3.7
 	github.com/matcornic/hermes/v2 v2.0.2
 	github.com/opencontainers/go-digest v1.0.0-rc1
