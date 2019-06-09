@@ -179,7 +179,7 @@ items:
   * `image`: Docker image to watch using `registry/path:tag` format. If registry is omitted, `docker.io` will be used and if tag is omitted, `latest` will be used. **required**
   * `registry_id`: Registry ID from `registries` to use.
   * `watch_repo`: Watch all tags of this `image` repository (default: `false`).
-  * `max_tags`: Maximum number of tags to watch if `watch_repo` enabled. 0 means all of them (default: `25`).
+  * `max_tags`: Maximum number of tags to watch if `watch_repo` enabled. -1 means all of them (default: `25`).
   * `include_tags`: List of regular expressions to include tags. Can be useful if you enable `watch_repo`.
   * `exclude_tags`: List of regular expressions to exclude tags. Can be useful if you enable `watch_repo`.
 
