@@ -16,6 +16,7 @@ type Job struct {
 }
 
 type worker struct {
+	id         int
 	diun       *Diun
 	workerPool chan chan Job
 	jobChannel chan Job
@@ -29,8 +30,11 @@ func (w *worker) Start() {
 			w.workerPool <- w.jobChannel
 			select {
 			case job := <-w.jobChannel:
-				if err := w.diun.analyze(job); err != nil {
-					log.Error().Err(err).Str("image", job.ImageStr).Msg("Error analyzing image")
+				if err := w.diun.analyze(job, w.id); err != nil {
+					log.Error().Err(err).
+						Str("image", job.ImageStr).
+						Int("worker_id", w.id).
+						Msg("Error analyzing image")
 				}
 			case <-w.end:
 				return

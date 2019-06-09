@@ -20,6 +20,7 @@ func (di *Diun) StartDispatcher(workerCount int) Collector {
 	for i < workerCount {
 		i++
 		worker := worker{
+			id:         i,
 			diun:       di,
 			workerPool: workerChannel,
 			jobChannel: make(chan Job),

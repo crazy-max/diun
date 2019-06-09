@@ -122,7 +122,7 @@ func (di *Diun) Run() {
 	wg.Wait()
 }
 
-func (di *Diun) analyze(job Job) error {
+func (di *Diun) analyze(job Job, workerID int) error {
 	defer job.Wg.Done()
 	image, err := registry.ParseImage(job.ImageStr)
 	if err != nil {
@@ -130,10 +130,10 @@ func (di *Diun) analyze(job Job) error {
 	}
 
 	if !utl.IsIncluded(image.Tag, job.Item.IncludeTags) {
-		log.Warn().Str("image", image.String()).Msg("Tag not included")
+		log.Warn().Str("image", image.String()).Int("worker_id", workerID).Msg("Tag not included")
 		return nil
 	} else if utl.IsExcluded(image.Tag, job.Item.ExcludeTags) {
-		log.Warn().Str("image", image.String()).Msg("Tag excluded")
+		log.Warn().Str("image", image.String()).Int("worker_id", workerID).Msg("Tag excluded")
 		return nil
 	}
 
@@ -152,19 +152,19 @@ func (di *Diun) analyze(job Job) error {
 	status := model.ImageStatusUnchange
 	if dbManifest.Name == "" {
 		status = model.ImageStatusNew
-		log.Info().Str("image", image.String()).Msg("New image found")
+		log.Info().Str("image", image.String()).Int("worker_id", workerID).Msg("New image found")
 	} else if !liveManifest.Created.Equal(*dbManifest.Created) {
 		status = model.ImageStatusUpdate
-		log.Info().Str("image", image.String()).Msg("Image update found")
+		log.Info().Str("image", image.String()).Int("worker_id", workerID).Msg("Image update found")
 	} else {
-		log.Debug().Str("image", image.String()).Msg("No changes")
+		log.Debug().Str("image", image.String()).Int("worker_id", workerID).Msg("No changes")
 		return nil
 	}
 
 	if err := di.db.PutManifest(image, liveManifest); err != nil {
 		return err
 	}
-	log.Debug().Str("image", image.String()).Msg("Manifest saved to database")
+	log.Debug().Str("image", image.String()).Int("worker_id", workerID).Msg("Manifest saved to database")
 
 	di.notif.Send(model.NotifEntry{
 		Status:   status,
