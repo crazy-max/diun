@@ -38,7 +38,7 @@ Choose the archive matching the destination platform and extract diun:
 
 ```
 $ cd /opt
-$ wget -qO- https://github.com/crazy-max/diun/releases/download/v0.4.1/diun_0.4.1_linux_x86_64.tar.gz | tar -zxvf - diun
+$ wget -qO- https://github.com/crazy-max/diun/releases/download/v0.5.0/diun_0.5.0_linux_x86_64.tar.gz | tar -zxvf - diun
 ```
 
 After getting the binary, it can be tested with `./diun --help` or moved to a permanent location.
@@ -56,6 +56,7 @@ Flags:
   --timezone="UTC"    Timezone assigned to Diun.
   --log-level="info"  Set log level.
   --log-json          Enable JSON logging output.
+  --log-caller        Enable to add file:line of the caller.
   --run-startup       Run on startup.
   --docker            Enable Docker mode.
   --version           Show application version.
@@ -71,6 +72,7 @@ Flags:
 * `--timezone <timezone>` : Timezone assigned to Diun. _Optional_. (default: `UTC`).
 * `--log-level <level>` : Log level output. _Optional_. (default: `info`).
 * `--log-json` : Enable JSON logging output. _Optional_. (default: `false`).
+* `--log-caller` : Enable to add file:line of the caller. _Optional_. (default: `false`).
 * `--run-startup` : Run on startup. _Optional_. (default: `false`).
 
 ## Configuration
