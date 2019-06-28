@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.0 (2019/06/28)
+
+* Review config file structure
+* Improve worker pool
+
 ## 0.5.0 (2019/06/09)
 
 * Add worker pool to parallelize analyses

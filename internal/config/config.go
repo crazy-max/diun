@@ -18,20 +18,20 @@ import (
 
 // Config holds configuration details
 type Config struct {
-	Flags      model.Flags
-	App        model.App
-	Db         model.Db                  `yaml:"db,omitempty"`
-	Watch      model.Watch               `yaml:"watch,omitempty"`
-	Notif      model.Notif               `yaml:"notif,omitempty"`
-	Registries map[string]model.Registry `yaml:"registries,omitempty"`
-	Items      []model.Item              `yaml:"items,omitempty"`
+	Flags   model.Flags
+	App     model.App
+	Db      model.Db                 `yaml:"db,omitempty"`
+	Watch   model.Watch              `yaml:"watch,omitempty"`
+	Notif   model.Notif              `yaml:"notif,omitempty"`
+	RegOpts map[string]model.RegOpts `yaml:"regopts,omitempty"`
+	Image   []model.Image            `yaml:"image,omitempty"`
 }
 
 // Load returns Configuration struct
-func Load(fl model.Flags, version string) (*Config, error) {
+func Load(flags model.Flags, version string) (*Config, error) {
 	var err error
 	var cfg = Config{
-		Flags: fl,
+		Flags: flags,
 		App: model.App{
 			ID:      "diun",
 			Name:    "Diun",
@@ -65,24 +65,27 @@ func Load(fl model.Flags, version string) (*Config, error) {
 		},
 	}
 
-	if _, err = os.Lstat(fl.Cfgfile); err != nil {
+	if _, err = os.Lstat(flags.Cfgfile); err != nil {
 		return nil, fmt.Errorf("unable to open config file, %s", err)
 	}
 
-	bytes, err := ioutil.ReadFile(fl.Cfgfile)
+	bytes, err := ioutil.ReadFile(flags.Cfgfile)
 	if err != nil {
 		return nil, fmt.Errorf("unable to read config file, %s", err)
 	}
 
-	if err := yaml.Unmarshal(bytes, &cfg); err != nil {
+	if err := yaml.UnmarshalStrict(bytes, &cfg); err != nil {
 		return nil, fmt.Errorf("unable to decode into struct, %v", err)
+	}
+
+	if err := cfg.validate(); err != nil {
+		return nil, err
 	}
 
 	return &cfg, nil
 }
 
-// Check verifies Config values
-func (cfg *Config) Check() error {
+func (cfg *Config) validate() error {
 	if cfg.Flags.Docker {
 		cfg.Db.Path = "/data/diun.db"
 	}
@@ -92,49 +95,14 @@ func (cfg *Config) Check() error {
 	}
 	cfg.Db.Path = path.Clean(cfg.Db.Path)
 
-	for id, reg := range cfg.Registries {
-		if err := mergo.Merge(&reg, model.Registry{
-			InsecureTLS: false,
-			Timeout:     10,
-		}); err != nil {
-			return fmt.Errorf("cannot set default registry values for %s: %v", id, err)
+	for id, regopts := range cfg.RegOpts {
+		if err := cfg.validateRegOpts(id, regopts); err != nil {
+			return err
 		}
-		cfg.Registries[id] = reg
 	}
 
-	for key, item := range cfg.Items {
-		if item.Image == "" {
-			return fmt.Errorf("image is required for item %d", key)
-		}
-
-		if err := mergo.Merge(&item, model.Item{
-			WatchRepo: false,
-			MaxTags:   25,
-		}); err != nil {
-			return fmt.Errorf("cannot set default item values for %s: %v", item.Image, err)
-		}
-
-		if item.RegistryID != "" {
-			reg, found := cfg.Registries[item.RegistryID]
-			if !found {
-				return fmt.Errorf("registry ID '%s' not found", item.RegistryID)
-			}
-			cfg.Items[key].Registry = reg
-		}
-
-		for _, includeTag := range item.IncludeTags {
-			if _, err := regexp.Compile(includeTag); err != nil {
-				return fmt.Errorf("include tag regex '%s' for '%s' image cannot compile, %v", item.Image, includeTag, err)
-			}
-		}
-
-		for _, excludeTag := range item.ExcludeTags {
-			if _, err := regexp.Compile(excludeTag); err != nil {
-				return fmt.Errorf("exclude tag regex '%s' for '%s' image cannot compile, %v", item.Image, excludeTag, err)
-			}
-		}
-
-		if err := mergo.Merge(&cfg.Items[key], item); err != nil {
+	for key, img := range cfg.Image {
+		if err := cfg.validateImage(key, img); err != nil {
 			return err
 		}
 	}
@@ -148,6 +116,59 @@ func (cfg *Config) Check() error {
 		}
 	}
 
+	return nil
+}
+
+func (cfg *Config) validateRegOpts(id string, regopts model.RegOpts) error {
+	defTimeout := 10
+	if regopts.Timeout <= 0 {
+		defTimeout = 0
+	}
+
+	if err := mergo.Merge(&regopts, model.RegOpts{
+		InsecureTLS: false,
+		Timeout:     defTimeout,
+	}); err != nil {
+		return fmt.Errorf("cannot set default registry options values for %s: %v", id, err)
+	}
+
+	cfg.RegOpts[id] = regopts
+	return nil
+}
+
+func (cfg *Config) validateImage(key int, img model.Image) error {
+	if img.Name == "" {
+		return fmt.Errorf("name is required for image %d", key)
+	}
+
+	if err := mergo.Merge(&img, model.Image{
+		WatchRepo: false,
+		MaxTags:   0,
+	}); err != nil {
+		return fmt.Errorf("cannot set default image values for %s: %v", img.Name, err)
+	}
+
+	if img.RegOptsID != "" {
+		regopts, found := cfg.RegOpts[img.RegOptsID]
+		if !found {
+			return fmt.Errorf("registry options %s not found for %s", img.RegOptsID, img.Name)
+		}
+		cfg.Image[key].RegOpts = regopts
+	}
+
+	for _, includeTag := range img.IncludeTags {
+		if _, err := regexp.Compile(includeTag); err != nil {
+			return fmt.Errorf("include tag regex '%s' for %s cannot compile, %v", includeTag, img.Name, err)
+		}
+	}
+
+	for _, excludeTag := range img.ExcludeTags {
+		if _, err := regexp.Compile(excludeTag); err != nil {
+			return fmt.Errorf("exclude tag regex '%s' for '%s' image cannot compile, %v", img.Name, excludeTag, err)
+		}
+	}
+
+	cfg.Image[key] = img
 	return nil
 }
 
