@@ -51,7 +51,7 @@ Choose the archive matching the destination platform and extract diun:
 
 ```
 $ cd /opt
-$ wget -qO- https://github.com/crazy-max/diun/releases/download/v1.0.0/diun_1.0.0_linux_x86_64.tar.gz | tar -zxvf - diun
+$ wget -qO- https://github.com/crazy-max/diun/releases/download/v1.0.1/diun_1.0.1_linux_x86_64.tar.gz | tar -zxvf - diun
 ```
 
 After getting the binary, it can be tested with `./diun --help` or moved to a permanent location.
