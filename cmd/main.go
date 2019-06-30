@@ -30,7 +30,6 @@ func main() {
 	kingpin.Flag("log-level", "Set log level.").Envar("LOG_LEVEL").Default("info").StringVar(&flags.LogLevel)
 	kingpin.Flag("log-json", "Enable JSON logging output.").Envar("LOG_JSON").Default("false").BoolVar(&flags.LogJson)
 	kingpin.Flag("log-caller", "Enable to add file:line of the caller.").Envar("LOG_CALLER").Default("false").BoolVar(&flags.LogCaller)
-	kingpin.Flag("run-startup", "Run on startup.").Envar("RUN_STARTUP").Default("false").BoolVar(&flags.RunStartup)
 	kingpin.Flag("docker", "Enable Docker mode.").Envar("DOCKER").Default("false").BoolVar(&flags.Docker)
 	kingpin.UsageTemplate(kingpin.CompactUsageTemplate).Version(version).Author("CrazyMax")
 	kingpin.CommandLine.Name = "diun"

@@ -70,7 +70,6 @@ Flags:
   --log-level="info"  Set log level.
   --log-json          Enable JSON logging output.
   --log-caller        Enable to add file:line of the caller.
-  --run-startup       Run on startup.
   --docker            Enable Docker mode.
   --version           Show application version.
 ```
@@ -86,7 +85,6 @@ Flags:
 * `--log-level <level>` : Log level output. _Optional_. (default: `info`).
 * `--log-json` : Enable JSON logging output. _Optional_. (default: `false`).
 * `--log-caller` : Enable to add file:line of the caller. _Optional_. (default: `false`).
-* `--run-startup` : Run on startup. _Optional_. (default: `false`).
 
 ## Configuration
 
@@ -221,7 +219,6 @@ Environment variables can be used within your container :
 * `LOG_LEVEL` : Log level output (default `info`)
 * `LOG_JSON`: Enable JSON logging output (default `false`)
 * `LOG_CALLER`: Enable to add file:line of the caller (default `false`)
-* `RUN_STARTUP`: Run on startup (default `false`)
 
 Docker compose is the recommended way to run this image. Copy the content of folder [.res/compose](.res/compose) in `/opt/diun/` on your host for example. Edit the compose and config file with your preferences and run the following commands :
 
@@ -237,7 +234,6 @@ $ docker run -d --name diun \
   -e "TZ=Europe/Paris" \
   -e "LOG_LEVEL=info" \
   -e "LOG_JSON=false" \
-  -e "RUN_STARTUP=false" \
   -v "$(pwd)/data:/data" \
   -v "$(pwd)/diun.yml:/diun.yml:ro" \
   crazymax/diun:latest

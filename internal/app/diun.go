@@ -53,9 +53,7 @@ func (di *Diun) Start() error {
 	var err error
 
 	// Run on startup
-	if di.cfg.Flags.RunStartup {
-		di.Run()
-	}
+	di.Run()
 
 	// Init scheduler
 	di.jobID, err = di.cron.AddJob(di.cfg.Watch.Schedule, di)
