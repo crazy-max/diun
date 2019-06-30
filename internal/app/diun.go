@@ -78,9 +78,11 @@ func (di *Diun) Run() {
 		return
 	}
 	defer atomic.StoreUint32(&di.locker, 0)
-	defer log.Info().Msgf("Next run in %s (%s)",
-		durafmt.ParseShort(di.cron.Entry(di.jobID).Next.Sub(time.Now())).String(),
-		di.cron.Entry(di.jobID).Next)
+	if di.jobID > 0 {
+		defer log.Info().Msgf("Next run in %s (%s)",
+			durafmt.ParseShort(di.cron.Entry(di.jobID).Next.Sub(time.Now())).String(),
+			di.cron.Entry(di.jobID).Next)
+	}
 
 	log.Info().Msg("Starting Diun...")
 	di.wg = new(sync.WaitGroup)

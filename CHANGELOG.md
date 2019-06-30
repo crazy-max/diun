@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.1 (2019/07/01)
+
+* Fix runtime error
+
 ## 1.0.0 (2019/07/01)
 
 * Always run on startup. Flag `--run-startup` removed.
