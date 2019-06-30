@@ -1,8 +1,13 @@
 # Changelog
 
-## 1.0.0 (2019/06/28)
+## 1.0.0 (2019/07/01)
 
-* Review config file structure
+* Always run on startup
+* Display next execution time
+* Use v3 robfig/cron
+* Move `Os` and `Arch` filters to image
+* Retrieve all tags by default
+* Review config file structure to allow other impl
 * Improve worker pool
 
 ## 0.5.0 (2019/06/09)
