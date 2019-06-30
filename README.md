@@ -36,7 +36,7 @@
 * Include and exclude filters with regular expression for tags
 * Internal cron implementation through go routines
 * Worker pool to parallelize analyses
-* Allow overriding os and architecture when watching
+* Allow overriding image os and architecture
 * Beautiful email report
 * Webhook notification
 * Enhanced logging
@@ -51,7 +51,7 @@ Choose the archive matching the destination platform and extract diun:
 
 ```
 $ cd /opt
-$ wget -qO- https://github.com/crazy-max/diun/releases/download/v0.5.0/diun_0.5.0_linux_x86_64.tar.gz | tar -zxvf - diun
+$ wget -qO- https://github.com/crazy-max/diun/releases/download/v1.0.0/diun_1.0.0_linux_x86_64.tar.gz | tar -zxvf - diun
 ```
 
 After getting the binary, it can be tested with `./diun --help` or moved to a permanent location.
