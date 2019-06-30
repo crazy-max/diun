@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.2 (2019/07/01)
+
+* Worker pool can be full while retrieving tags
+
 ## 1.0.1 (2019/07/01)
 
 * Fix runtime error

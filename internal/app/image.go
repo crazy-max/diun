@@ -12,7 +12,6 @@ import (
 )
 
 type imageJob struct {
-	origin   bool
 	image    model.Image
 	registry *docker.RegistryClient
 }
@@ -33,14 +32,54 @@ func (di *Diun) procImages() {
 			continue
 		}
 
+		image, err := registry.ParseImage(img.Name)
+		if err != nil {
+			log.Error().Err(err).Str("image", img.Name).Msg("Cannot parse image")
+			continue
+		}
+
 		di.wg.Add(1)
 		err = di.pool.Invoke(imageJob{
-			origin:   true,
 			image:    img,
 			registry: reg,
 		})
 		if err != nil {
 			log.Error().Err(err).Msgf("Invoking image job")
+		}
+
+		if !img.WatchRepo || image.Domain == "" {
+			continue
+		}
+
+		tags, err := reg.Tags(docker.TagsOptions{
+			Image:   image,
+			Max:     img.MaxTags,
+			Include: img.IncludeTags,
+			Exclude: img.ExcludeTags,
+		})
+		if err != nil {
+			log.Error().Err(err).Str("image", image.String()).Msg("Cannot retrieve tags")
+			continue
+		}
+
+		log.Debug().Str("image", image.String()).Msgf("%d tag(s) found in repository. %d will be analyzed (%d max, %d not included, %d excluded).",
+			tags.Total,
+			len(tags.List),
+			img.MaxTags,
+			tags.NotIncluded,
+			tags.Excluded,
+		)
+
+		for _, tag := range tags.List {
+			img.Name = fmt.Sprintf("%s/%s:%s", image.Domain, image.Path, tag)
+			di.wg.Add(1)
+			err = di.pool.Invoke(imageJob{
+				image:    img,
+				registry: reg,
+			})
+			if err != nil {
+				log.Error().Err(err).Msgf("Invoking image job (tag)")
+			}
 		}
 	}
 }
@@ -93,47 +132,6 @@ func (di *Diun) imageJob(job imageJob) error {
 		Image:    image,
 		Manifest: liveManifest,
 	})
-
-	return nil
-}
-
-func (di *Diun) imageRepoJob(job imageJob) error {
-	image, err := registry.ParseImage(job.image.Name)
-	if err != nil {
-		return err
-	}
-
-	if !job.origin || image.Domain == "" || !job.image.WatchRepo {
-		return nil
-	}
-
-	tags, err := job.registry.Tags(docker.TagsOptions{
-		Image:   image,
-		Max:     job.image.MaxTags,
-		Include: job.image.IncludeTags,
-		Exclude: job.image.ExcludeTags,
-	})
-	if err != nil {
-		return err
-	}
-
-	log.Debug().Str("image", image.String()).Msgf("%d tag(s) found in repository. %d will be analyzed (%d max, %d not included, %d excluded).",
-		tags.Total,
-		len(tags.List),
-		job.image.MaxTags,
-		tags.NotIncluded,
-		tags.Excluded,
-	)
-
-	job.origin = false
-	for _, tag := range tags.List {
-		job.image.Name = fmt.Sprintf("%s/%s:%s", image.Domain, image.Path, tag)
-		di.wg.Add(1)
-		err = di.pool.Invoke(job)
-		if err != nil {
-			log.Error().Err(err).Msgf("Invoking repo image job")
-		}
-	}
 
 	return nil
 }

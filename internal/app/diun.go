@@ -94,10 +94,6 @@ func (di *Diun) Run() {
 			if err != nil {
 				log.Error().Err(err).Msg("Job image error")
 			}
-			err = di.imageRepoJob(t)
-			if err != nil {
-				log.Error().Err(err).Msg("Job image repo error")
-			}
 		}
 		di.wg.Done()
 	})
