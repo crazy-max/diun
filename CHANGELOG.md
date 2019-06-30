@@ -2,13 +2,22 @@
 
 ## 1.0.0 (2019/07/01)
 
-* Always run on startup
+* Always run on startup. Flag `--run-startup` removed.
 * Display next execution time
 * Use v3 robfig/cron
 * Move `Os` and `Arch` filters to image
 * Retrieve all tags by default
-* Review config file structure to allow other impl
+* Review config file structure
 * Improve worker pool
+
+> :warning: **BREAKING CHANGES**
+> Some fields in configuration file has been changed :
+> * `registries` renamed `regopts`
+> * `items` renamed `image`
+> * `items[].image` renamed `image[].name`
+> * `items[].registry_id` renamed `image[].regopts_id`
+> * `watch.os` and `watch.arch` moved to `image[].os` and `image[].arch`
+> See README for more info.
 
 ## 0.5.0 (2019/06/09)
 
