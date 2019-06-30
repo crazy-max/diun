@@ -6,7 +6,6 @@ require (
 	github.com/containerd/continuity v0.0.0-20190426062206-aaeac12a7ffc // indirect
 	github.com/containers/image v2.0.0+incompatible
 	github.com/containers/storage v1.12.9 // indirect
-	github.com/crazy-max/cron v1.2.2
 	github.com/docker/distribution v2.7.1+incompatible // indirect
 	github.com/docker/docker v1.13.1 // indirect
 	github.com/docker/docker-credential-helpers v0.6.2 // indirect
@@ -26,6 +25,7 @@ require (
 	github.com/opencontainers/runc v0.1.1 // indirect
 	github.com/panjf2000/ants v1.0.0
 	github.com/prometheus/client_golang v0.9.4 // indirect
+	github.com/robfig/cron/v3 v3.0.0-rc1
 	github.com/rs/zerolog v1.14.3
 	github.com/sirupsen/logrus v1.4.2 // indirect
 	github.com/stretchr/testify v1.3.0

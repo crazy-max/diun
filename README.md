@@ -98,7 +98,7 @@ db:
 
 watch:
   workers: 10
-  schedule: 0 0 * * * *
+  schedule: "0 0 * * * *"
 
 notif:
   mail:

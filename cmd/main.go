@@ -7,7 +7,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/crazy-max/cron"
 	"github.com/crazy-max/diun/internal/app"
 	"github.com/crazy-max/diun/internal/config"
 	"github.com/crazy-max/diun/internal/logging"
@@ -19,7 +18,6 @@ import (
 var (
 	diun    *app.Diun
 	flags   model.Flags
-	c       *cron.Cron
 	version = "dev"
 )
 
@@ -54,9 +52,6 @@ func main() {
 	signal.Notify(channel, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		sig := <-channel
-		if c != nil {
-			c.Stop()
-		}
 		diun.Close()
 		log.Warn().Msgf("Caught signal %v", sig)
 		os.Exit(0)
@@ -70,22 +65,12 @@ func main() {
 	cfg.Display()
 
 	// Init
-	if diun, err = app.New(cfg); err != nil {
+	if diun, err = app.New(cfg, location); err != nil {
 		log.Fatal().Err(err).Msg("Cannot initialize Diun")
 	}
 
-	// Run on startup
-	if flags.RunStartup {
-		diun.Run()
+	// Start
+	if err = diun.Start(); err != nil {
+		log.Fatal().Err(err).Msg("Cannot start Diun")
 	}
-
-	// Start scheduler
-	c = cron.NewWithLocation(location)
-	log.Info().Msgf("Cron initialized with schedule %s", cfg.Watch.Schedule)
-	if err := c.AddJob(cfg.Watch.Schedule, diun); err != nil {
-		log.Fatal().Err(err).Msg("Cannot create cron task")
-	}
-	c.Start()
-
-	select {}
 }
