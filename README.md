@@ -13,9 +13,22 @@
   <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=X2NYRW7D9KL4E"><img src="https://img.shields.io/badge/donate-paypal-7057ff.svg?style=flat-square" alt="Donate Paypal"></a>
 </p>
 
-## About
-
 **Diun** :bell: is a CLI application written in [Go](https://golang.org/) to  receive notifications :inbox_tray: when a Docker :whale: image is updated on a Docker registry. With Go, this app can be used across many platforms :game_die: and architectures. This support includes Linux, FreeBSD, macOS and Windows on architectures like amd64, i386, ARM and others.
+
+* [Features](#features)
+* [Download](#download)
+* [Usage](#usage)
+* [Configuration](#configuration)
+  * [db](#db)
+  * [watch](#watch)
+  * [notif](#notif)
+  * [regopts](#regopts)
+  * [image](#image)
+* [Docker](#docker)
+* [Notifications](#notifications)
+* [TODO](#todo)
+* [How can I help ?](#how-can-i-help-)
+* [License](#license)
 
 ## Features
 
@@ -109,7 +122,7 @@ notif:
       Authorization: Token123456
     timeout: 10
 
-registries:
+regopts:
   someregistryoptions:
     username: foo
     password: bar
@@ -119,42 +132,45 @@ registries:
     password: bar2
     insecure_tls: true
 
-items:
+image:
   # Watch latest tag of crazymax/nextcloud image on docker.io (DockerHub) with registry ID 'someregistryoptions'.
-  -
-    image: docker.io/crazymax/nextcloud:latest
-    registry_id: someregistryoptions
+  - name: docker.io/crazymax/nextcloud:latest
+    regopts_id: someregistryoptions
   # Watch 4.0.0 tag of jfrog/artifactory-oss image on frog-docker-reg2.bintray.io (Bintray) with registry ID 'onemore'.
-  -
-    image: jfrog-docker-reg2.bintray.io/jfrog/artifactory-oss:4.0.0
-    registry_id: onemore
+  - name: jfrog-docker-reg2.bintray.io/jfrog/artifactory-oss:4.0.0
+    regopts_id: onemore
   # Watch coreos/hyperkube image on quay.io (Quay). Assume latest tag.
-  -
-    image: quay.io/coreos/hyperkube
+  - name: quay.io/coreos/hyperkube
   # Watch crazymax/swarm-cronjob image and assume docker.io regsitry and latest tag.
   # Only include tags matching regexp ^1\.2\..*
-  -
-    image: crazymax/swarm-cronjob
+  - name: crazymax/swarm-cronjob
     watch_repo: true
     include_tags:
       - ^1\.2\..*
   # Watch portainer/portainer image on docker.io (DockerHub) and assume latest tag
   # Only watch latest 10 tags and include tags matching regexp ^(0|[1-9]\d*)\..*
-  -
-    image: docker.io/portainer/portainer
+  - name: docker.io/portainer/portainer
     watch_repo: true
     max_tags: 10
     include_tags:
       - ^(0|[1-9]\d*)\..*
 ```
 
+### db
+
 * `db`
   * `path`: Path to Bolt database file where images manifests are stored. Flag `--docker` force this path to `/data/diun.db` (default: `diun.db`).
+
+### watch
+
 * `watch`
   * `workers`: Maximum number of workers that will execute tasks concurrently. _Optional_. (default: `10`).
   * `schedule`: [CRON expression](https://godoc.org/github.com/crazy-max/cron#hdr-CRON_Expression_Format) to schedule Diun watcher. _Optional_. (default: `0 0 * * * *`).
   * `os`: OS to use for choosing images. _Optional_. (default: `linux`).
   * `arch`: Architecture to use for choosing images. _Optional_. (default: `amd64`).
+
+### notif
+
 * `notif`
   * `mail`
     * `enable`: Enable email reports (default: `false`).
@@ -172,16 +188,22 @@ items:
     * `method`: HTTP method (default: `GET`). **required**
     * `headers`: Map of additional headers to be sent.
     * `timeout`: Timeout specifies a time limit for the request to be made. (default: `10`).
-* `registries`: Map of registry options to use with items. Key is the ID and value is a struct with the following fields:
+
+### regopts
+
+* `regopts`: Map of registry options to use with images. Key is the ID and value is a struct with the following fields:
   * `username`: Registry username.
   * `password`: Registry password.
   * `timeout`: Timeout is the maximum amount of time for the TCP connection to establish. 0 means no timeout (default: `10`).
   * `insecure_tls`: Allow contacting docker registry over HTTP, or HTTPS with failed TLS verification (default: `false`).
-* `items`: Slice of items to watch with the following fields:
-  * `image`: Docker image to watch using `registry/path:tag` format. If registry is omitted, `docker.io` will be used and if tag is omitted, `latest` will be used. **required**
-  * `registry_id`: Registry ID from `registries` to use.
+
+### image
+
+* `image`: Slice of image to watch with the following fields:
+  * `name`: Docker image name to watch using `registry/path:tag` format. If registry is omitted, `docker.io` will be used and if tag is omitted, `latest` will be used. **required**
+  * `regopts_id`: Registry options ID from `regopts` to use.
   * `watch_repo`: Watch all tags of this `image` repository (default: `false`).
-  * `max_tags`: Maximum number of tags to watch if `watch_repo` enabled. -1 means all of them (default: `25`).
+  * `max_tags`: Maximum number of tags to watch if `watch_repo` enabled. 0 means all of them (default: `0`).
   * `include_tags`: List of regular expressions to include tags. Can be useful if you enable `watch_repo`.
   * `exclude_tags`: List of regular expressions to exclude tags. Can be useful if you enable `watch_repo`.
 
