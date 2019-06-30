@@ -21,8 +21,8 @@ func (di *Diun) procImages() {
 	// Iterate images
 	for _, img := range di.cfg.Image {
 		reg, err := docker.NewRegistryClient(docker.RegistryOptions{
-			Os:          di.cfg.Watch.Os,
-			Arch:        di.cfg.Watch.Arch,
+			Os:          img.Os,
+			Arch:        img.Arch,
 			Username:    img.RegOpts.Username,
 			Password:    img.RegOpts.Password,
 			Timeout:     time.Duration(img.RegOpts.Timeout) * time.Second,

@@ -99,8 +99,6 @@ db:
 watch:
   workers: 10
   schedule: 0 0 * * * *
-  os: linux
-  arch: amd64
 
 notif:
   mail:
@@ -139,9 +137,9 @@ image:
   # Watch 4.0.0 tag of jfrog/artifactory-oss image on frog-docker-reg2.bintray.io (Bintray) with registry ID 'onemore'.
   - name: jfrog-docker-reg2.bintray.io/jfrog/artifactory-oss:4.0.0
     regopts_id: onemore
-  # Watch coreos/hyperkube image on quay.io (Quay). Assume latest tag.
+  # Watch coreos/hyperkube image on quay.io (Quay) and assume latest tag.
   - name: quay.io/coreos/hyperkube
-  # Watch crazymax/swarm-cronjob image and assume docker.io regsitry and latest tag.
+  # Watch crazymax/swarm-cronjob image and assume docker.io registry and latest tag.
   # Only include tags matching regexp ^1\.2\..*
   - name: crazymax/swarm-cronjob
     watch_repo: true
@@ -154,6 +152,12 @@ image:
     max_tags: 10
     include_tags:
       - ^(0|[1-9]\d*)\..*
+  # Watch alpine image (library) and assume docker.io registry and latest tag.
+  # Only check linux/arm64v8 image
+  - name: alpine
+    watch_repo: true
+    os: linux
+    arch: arm64v8
 ```
 
 ### db
@@ -166,8 +170,6 @@ image:
 * `watch`
   * `workers`: Maximum number of workers that will execute tasks concurrently. _Optional_. (default: `10`).
   * `schedule`: [CRON expression](https://godoc.org/github.com/crazy-max/cron#hdr-CRON_Expression_Format) to schedule Diun watcher. _Optional_. (default: `0 0 * * * *`).
-  * `os`: OS to use for choosing images. _Optional_. (default: `linux`).
-  * `arch`: Architecture to use for choosing images. _Optional_. (default: `amd64`).
 
 ### notif
 
@@ -201,6 +203,8 @@ image:
 
 * `image`: Slice of image to watch with the following fields:
   * `name`: Docker image name to watch using `registry/path:tag` format. If registry is omitted, `docker.io` will be used and if tag is omitted, `latest` will be used. **required**
+  * `os`: OS to use. _Optional_. (default: `linux`).
+  * `arch`: Architecture to use. _Optional_. (default: `amd64`).
   * `regopts_id`: Registry options ID from `regopts` to use.
   * `watch_repo`: Watch all tags of this `image` repository (default: `false`).
   * `max_tags`: Maximum number of tags to watch if `watch_repo` enabled. 0 means all of them (default: `0`).

@@ -4,6 +4,4 @@ package model
 type Watch struct {
 	Workers  int    `yaml:"workers,omitempty"`
 	Schedule string `yaml:"schedule,omitempty"`
-	Os       string `yaml:"os,omitempty"`
-	Arch     string `yaml:"arch,omitempty"`
 }

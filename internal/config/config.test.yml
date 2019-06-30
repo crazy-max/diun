@@ -4,8 +4,6 @@ db:
 watch:
   workers: 100
   schedule: "*/30 * * * * *"
-  os: linux
-  arch: amd64
 
 notif:
   mail:
@@ -54,6 +52,9 @@ image:
       - ^(0|[1-9]\d*)\..*
   - name: traefik
     watch_repo: true
+  - name: alpine
+    os: linux
+    arch: arm64v8
   - name: docker.io/graylog/graylog:3.2.0
   - name: jacobalberty/unifi:5.9
   - name: quay.io/coreos/hyperkube:v1.1.7-coreos.1

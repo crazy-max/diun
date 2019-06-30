@@ -46,8 +46,6 @@ func Load(flags model.Flags, version string) (*Config, error) {
 		Watch: model.Watch{
 			Workers:  10,
 			Schedule: "0 0 * * * *",
-			Os:       "linux",
-			Arch:     "amd64",
 		},
 		Notif: model.Notif{
 			Mail: model.Mail{
@@ -142,6 +140,8 @@ func (cfg *Config) validateImage(key int, img model.Image) error {
 	}
 
 	if err := mergo.Merge(&img, model.Image{
+		Os:        "linux",
+		Arch:      "amd64",
 		WatchRepo: false,
 		MaxTags:   0,
 	}); err != nil {
