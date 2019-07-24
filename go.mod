@@ -25,11 +25,11 @@ require (
 	github.com/opencontainers/runc v0.1.1 // indirect
 	github.com/panjf2000/ants v1.0.0
 	github.com/prometheus/client_golang v0.9.4 // indirect
-	github.com/robfig/cron/v3 v3.0.0-rc1
+	github.com/robfig/cron/v3 v3.0.0
 	github.com/rs/zerolog v1.14.3
 	github.com/sirupsen/logrus v1.4.2 // indirect
 	github.com/stretchr/testify v1.3.0
-	go.etcd.io/bbolt v1.3.2
+	go.etcd.io/bbolt v1.3.3
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df // indirect
