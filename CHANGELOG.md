@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.0 (2019/07/24)
+
+* Update libs
+
 ## 1.0.2 (2019/07/01)
 
 * Worker pool can be full while retrieving tags
