@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.0 (2019/08/18)
+
+* Update libs
+* Display containers/image logs
+* Fix registry options not setted (Issue #5)
+
 ## 1.1.0 (2019/07/24)
 
 * Update libs
