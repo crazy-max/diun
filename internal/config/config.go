@@ -153,7 +153,7 @@ func (cfg *Config) validateImage(key int, img model.Image) error {
 		if !found {
 			return fmt.Errorf("registry options %s not found for %s", img.RegOptsID, img.Name)
 		}
-		cfg.Image[key].RegOpts = regopts
+		img.RegOpts = regopts
 	}
 
 	for _, includeTag := range img.IncludeTags {
