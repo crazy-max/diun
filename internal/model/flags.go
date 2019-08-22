@@ -7,5 +7,4 @@ type Flags struct {
 	LogLevel  string
 	LogJson   bool
 	LogCaller bool
-	Docker    bool
 }

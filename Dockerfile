@@ -41,6 +41,8 @@ RUN apk --update --no-cache add \
 COPY --from=builder /app/diun /usr/local/bin/diun
 COPY --from=builder /app/zoneinfo.zip /usr/local/go/lib/time/zoneinfo.zip
 
+ENV DIUN_DB="/data/diun.db"
+
 VOLUME [ "/data" ]
 
-CMD [ "diun", "--config", "/diun.yml", "--docker" ]
+CMD [ "diun", "--config", "/diun.yml" ]

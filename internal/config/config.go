@@ -85,10 +85,6 @@ func Load(flags model.Flags, version string) (*Config, error) {
 }
 
 func (cfg *Config) validate() error {
-	if cfg.Flags.Docker {
-		cfg.Db.Path = "/data/diun.db"
-	}
-
 	cfg.Db.Path = utl.GetEnv("DIUN_DB", cfg.Db.Path)
 	if cfg.Db.Path == "" {
 		return errors.New("database path is required")
