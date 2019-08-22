@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.3.0 (2019/08/22)
+
+* Add Linux service doc and sample
+* Move documentation
+* Fix go mod
+* Remove `--docker` flag
+* Allow to override database path through `DIUN_DB` env var
+
 ## 1.2.0 (2019/08/18)
 
 * Update libs
