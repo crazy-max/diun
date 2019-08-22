@@ -11,6 +11,7 @@ import (
 	"regexp"
 
 	"github.com/crazy-max/diun/internal/model"
+	"github.com/crazy-max/diun/internal/utl"
 	"github.com/imdario/mergo"
 	"github.com/rs/zerolog/log"
 	"gopkg.in/yaml.v2"
@@ -88,6 +89,7 @@ func (cfg *Config) validate() error {
 		cfg.Db.Path = "/data/diun.db"
 	}
 
+	cfg.Db.Path = utl.GetEnv("DIUN_DB", cfg.Db.Path)
 	if cfg.Db.Path == "" {
 		return errors.New("database path is required")
 	}
