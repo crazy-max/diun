@@ -82,7 +82,7 @@ See how to create [Linux service](linux-service.md) to start Diun automatically.
 ### 2. Running from command-line/terminal
 
 ```
-/usr/local/bin/diun --config /etc/diun/diun.yml --schedule "0 */30 * * * *"
+DIUN_DB=/var/lib/diun/diun.db /usr/local/bin/diun --config /etc/diun/diun.yml
 ```
 
 ## Updating to a new version
