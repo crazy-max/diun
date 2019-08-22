@@ -14,22 +14,9 @@
   <a href="https://www.paypal.me/crazyws"><img src="https://img.shields.io/badge/donate-paypal-7057ff.svg?style=flat-square" alt="Donate Paypal"></a>
 </p>
 
-**Diun** :bell: is a CLI application written in [Go](https://golang.org/) to  receive notifications :inbox_tray: when a Docker :whale: image is updated on a Docker registry. With Go, this app can be used across many platforms :game_die: and architectures. This support includes Linux, FreeBSD, macOS and Windows on architectures like amd64, i386, ARM and others.
+## About
 
-* [Features](#features)
-* [Download](#download)
-* [Usage](#usage)
-* [Configuration](#configuration)
-  * [db](#db)
-  * [watch](#watch)
-  * [notif](#notif)
-  * [regopts](#regopts)
-  * [image](#image)
-* [Docker](#docker)
-* [Notifications](#notifications)
-* [TODO](#todo)
-* [How can I help ?](#how-can-i-help-)
-* [License](#license)
+**Diun** :bell: is a CLI application written in [Go](https://golang.org/) to  receive notifications :inbox_tray: when a Docker :whale: image is updated on a Docker registry. With Go, this app can be used across many platforms :game_die: and architectures. This support includes Linux, FreeBSD, macOS and Windows on architectures like amd64, i386, ARM and others.
 
 ## Features
 
