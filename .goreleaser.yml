@@ -1,6 +1,11 @@
+env:
+  - GO111MODULE=on
+  - GOPROXY=https://goproxy.io
+
 before:
   hooks:
     - go mod download
+
 builds:
   -
     main: ./cmd/main.go
@@ -26,6 +31,7 @@ builds:
         goarch: arm
       - goos: freebsd
         goarch: arm64
+
 archives:
   -
     replacements:
@@ -38,5 +44,6 @@ archives:
       - LICENSE
       - README.md
       - CHANGELOG.md
+
 checksum:
   name_template: 'checksums.txt'
