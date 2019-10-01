@@ -4,7 +4,7 @@
 
 * Multi-platform Docker image
 * Switch to GitHub Actions
-* Run container as non-root user
+* Run Docker container as non-root user
 * Stop publishing Docker image on Quay
 * Go 1.12.10
 * Use GOPROXY

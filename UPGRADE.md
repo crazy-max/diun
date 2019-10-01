@@ -1,6 +1,6 @@
 ## 1.3.0 > 1.4.0
 
-As the container runs as a non-root user, you have to first stop the container and change permissions to `data` volume:
+As the Docker container runs as a non-root user, you have to first stop the container and change permissions to `data` volume:
 
 ```
 docker-compose stop
