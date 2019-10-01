@@ -4,9 +4,13 @@
 
 * Multi-platform Docker image
 * Switch to GitHub Actions
+* Run container as non-root user
 * Stop publishing Docker image on Quay
 * Go 1.12.10
 * Use GOPROXY
+
+> :warning: **BREAKING CHANGES**
+> See [UPGRADE notes](UPGRADE.md#130--140) for more info.
 
 ## 1.3.0 (2019/08/22)
 
