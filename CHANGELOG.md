@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.4.0 (2019/10/01)
+
+* Multi-platform Docker image
+* Switch to GitHub Actions
+* Stop publishing Docker image on Quay
+* Go 1.12.10
+* Use GOPROXY
+
 ## 1.3.0 (2019/08/22)
 
 * Add Linux service doc and sample
