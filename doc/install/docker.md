@@ -1,15 +1,31 @@
 # Installation with Docker
 
-Diun provides automatically updated Docker :whale: images within [Docker Hub](https://hub.docker.com/r/crazymax/diun) and [Quay](https://quay.io/repository/crazymax/diun). It is possible to always use the latest stable tag or to use another service that handles updating Docker images.
+Diun provides automatically updated Docker :whale: images within [Docker Hub](https://hub.docker.com/r/crazymax/diun). It is possible to always use the latest stable tag or to use another service that handles updating Docker images.
 
-Environment variables can be used within your container :
+Following platforms for this image are available:
+
+```
+$ docker run --rm mplatform/mquery crazymax/diun:latest
+Image: crazymax/diun:latest
+ * Manifest List: Yes
+ * Supported platforms:
+   - linux/amd64
+   - linux/arm/v6
+   - linux/arm/v7
+   - linux/arm64
+   - linux/386
+   - linux/ppc64le
+   - linux/s390x
+```
+
+Environment variables can be used within your container:
 
 * `TZ` : Timezone assigned
 * `LOG_LEVEL` : Log level output (default `info`)
 * `LOG_JSON`: Enable JSON logging output (default `false`)
 * `LOG_CALLER`: Enable to add file:line of the caller (default `false`)
 
-Docker compose is the recommended way to run this image. Copy the content of folder [.res/compose](../../.res/compose) in `/opt/diun/` on your host for example. Edit the compose and config file with your preferences and run the following commands :
+Docker compose is the recommended way to run this image. Copy the content of folder [.res/compose](../../.res/compose) in `/opt/diun/` on your host for example. Edit the compose and config file with your preferences and run the following commands:
 
 ```
 docker-compose up -d
