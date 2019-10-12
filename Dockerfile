@@ -47,8 +47,6 @@ RUN apk --update --no-cache add \
     libressl \
     shadow \
     tzdata \
-  && addgroup -g 1000 diun \
-  && adduser -u 1000 -G diun -s /sbin/nologin -D diun \
   && rm -rf /tmp/* /var/cache/apk/*
 
 COPY --from=builder /app/diun /usr/local/bin/diun
@@ -57,7 +55,8 @@ RUN diun --version
 
 ENV DIUN_DB="/data/diun.db"
 
-USER diun
+# Required for access to /var/run/docker.sock
+USER root
 
 VOLUME [ "/data" ]
 
