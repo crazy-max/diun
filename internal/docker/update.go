@@ -142,7 +142,6 @@ func container2image(container types.Container) model.Image {
 func name(n []string, id string) string {
 	if len(n) > 0 {
 		return n[0]
-	} else {
-		return id[:11]
 	}
+	return id[:11]
 }

@@ -37,8 +37,8 @@ var shouldStop = make(chan bool)
 var hasStopped = make(chan bool)
 var stopped = false
 
+// Stop terminates the update loop, notifies watch() that it should stop, and wait until it has stopped
 func Stop() {
-	// Stop the update loop, notify watch() that it should stop, and wait until it has stopped
 	if stopped {
 		return
 	}
