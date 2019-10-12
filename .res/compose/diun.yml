@@ -1,0 +1,19 @@
+# Documentation for this file is available at https://github.com/crazy-max/diun/blob/master/doc/configuration.md
+
+watch:
+  workers: 10
+  schedule: "0 0 * * * *"
+  docker: true
+  unlabeled-containers: true
+  stopped-containers: true
+
+notif:
+  mail:
+    enable: true
+    host: "" # Enable direct SMTP
+    from: diun@crazy-max.github.io
+    to: '${EMAIL}'
+
+db: { path: diun.db }
+regopts: {}
+image: []

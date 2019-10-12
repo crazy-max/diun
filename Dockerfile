@@ -58,6 +58,7 @@ ENV DIUN_DB="/data/diun.db"
 # Required for access to /var/run/docker.sock
 USER root
 
+COPY .res/compose/diun.yml /diun.yml
 VOLUME [ "/data" ]
 
 ENTRYPOINT [ "diun" ]

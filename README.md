@@ -42,6 +42,20 @@
 * [Notifications](doc/notifications.md)
 * [TODO](doc/todo.md)
 
+## Quick Start
+
+This example is the quickest way to try out Diun on a hosted server - just make sure to put in your own email address.
+It sends emails through [direct SMTP](doc/configuration.md#notif), and watches all docker containers unless they have the [`diun.enable=false` label](doc/labels.md) set.
+
+```bash
+docker run --restart=always --name=diun \
+  -e EMAIL=mail@example.org \
+  -e HELO="$HOSTNAME" \
+  -v "/var/lib/diun:/data" \
+  -v "/var/run/docker.sock:/var/run/docker.sock" \
+  crazymax/diun:latest
+```
+
 ## How can I help ?
 
 All kinds of contributions are welcome :raised_hands:!<br />

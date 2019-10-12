@@ -3,12 +3,15 @@ version: "3.2"
 services:
   diun:
     image: crazymax/diun:latest
+    restart: always
     container_name: diun
     volumes:
       - "./data:/data"
       - "./diun.yml:/diun.yml:ro"
+      - "/var/run/docker.sock:/var/run/docker.sock"
     environment:
       - "TZ=Europe/Paris"
       - "LOG_LEVEL=info"
       - "LOG_JSON=false"
-    restart: always
+      - "EMAIL=mail@example.org"
+      - "HELO=${HOSTNAME}"
