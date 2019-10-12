@@ -5,6 +5,7 @@
 /.git
 /.github
 /.res
+!/.res/compose/diun.yml
 /bin
 /dist
 /doc
