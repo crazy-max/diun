@@ -32,7 +32,7 @@ func main() {
 	kingpin.Flag("log-caller", "Enable to add file:line of the caller.").Envar("LOG_CALLER").Default("false").BoolVar(&flags.LogCaller)
 	kingpin.UsageTemplate(kingpin.CompactUsageTemplate).Version(version).Author("CrazyMax")
 	kingpin.CommandLine.Name = "diun"
-	kingpin.CommandLine.Help = `Docker image update notifier. More info on https://github.com/crazy-max/diun`
+	kingpin.CommandLine.Help = `Docker image update notifier.\nMore info: https://github.com/crazy-max/diun`
 	kingpin.Parse()
 
 	// Load timezone location
