@@ -151,7 +151,7 @@ func (cfg *Config) validateRegOpts(id string, regopts model.RegOpts) (model.RegO
 	return model.RegOpts{}, nil
 }
 
-// PutImage validates and adds/updates a RegOpts object to the configuration
+// PutRegOpts validates and adds/updates a RegOpts object to the configuration
 func (cfg *Config) PutRegOpts(id string, regopts model.RegOpts) error {
 	regopts, err := cfg.validateRegOpts(id, regopts)
 	if err != nil {
