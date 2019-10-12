@@ -9,6 +9,9 @@ db:
 watch:
   workers: 10
   schedule: "0 0 * * * *"
+  docker: true
+  unlabeled-containers: true
+  stopped-containers: true
 
 notif:
   mail:
@@ -80,6 +83,9 @@ image:
 * `watch`
   * `workers`: Maximum number of workers that will execute tasks concurrently. _Optional_. (default: `10`).
   * `schedule`: [CRON expression](https://godoc.org/github.com/crazy-max/cron#hdr-CRON_Expression_Format) to schedule Diun watcher. _Optional_. (default: `0 0 * * * *`).
+  * `docker`: If `true`, connect to the docker daemon and watch for container changes. The socket path can be specified using the `DOCKER_HOST` environment variable. _Optional_. (default: `false`)
+  * `unlabeled-containers`: Should all containers be watched by default? If `false`, [labels](labels.md) have to be specified for a container to be watched. _Optional_. (default: `false`)
+  * `stopped-containers`: Should stopped containers be watched? _Optional_. (default: `false`)
 
 ## notif
 

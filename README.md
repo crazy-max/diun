@@ -18,6 +18,7 @@
 
 ## Features
 
+* :new: Watch images used by currently running containers
 * Allow to watch a full Docker repository and report new tags
 * Include and exclude filters with regular expression for tags
 * Internal cron implementation through go routines
@@ -32,11 +33,12 @@
 ## Documentation
 
 * Install
-  * [With Docker](doc/install/docker.md)
+  * [With Docker (recommended)](doc/install/docker.md)
   * [From binary](doc/install/binary.md)
   * [Linux service](doc/install/linux-service.md)
 * [Usage](doc/usage.md)
 * [Configuration](doc/configuration.md)
+* [Container Labels](doc/labels.md)
 * [Notifications](doc/notifications.md)
 * [TODO](doc/todo.md)
 
