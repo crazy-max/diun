@@ -82,7 +82,7 @@ func Load(flags model.Flags, version string) (*Config, error) {
 		if len(parts) > 1 {
 			value = parts[1]
 		}
-		bytes.ReplaceAll(cfgBytes, []byte("${" + parts[0] + "}"), []byte(value))
+		cfgBytes = bytes.ReplaceAll(cfgBytes, []byte("${" + parts[0] + "}"), []byte(value))
 	}
 
 	if err := yaml.UnmarshalStrict(cfgBytes, &cfg); err != nil {
