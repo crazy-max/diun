@@ -7,6 +7,7 @@ import (
 
 	"github.com/crazy-max/diun/internal/config"
 	"github.com/crazy-max/diun/internal/db"
+	"github.com/crazy-max/diun/internal/docker"
 	"github.com/crazy-max/diun/internal/notif"
 	"github.com/hako/durafmt"
 	"github.com/panjf2000/ants"
@@ -30,6 +31,12 @@ type Diun struct {
 func New(cfg *config.Config, location *time.Location) (*Diun, error) {
 	// DB client
 	dbcli, err := db.New(cfg.Db)
+	if err != nil {
+		return nil, err
+	}
+
+	// Docker Watcher
+	err = docker.New(cfg)
 	if err != nil {
 		return nil, err
 	}
@@ -112,6 +119,7 @@ func (di *Diun) Close() {
 	if di.cron != nil {
 		di.cron.Stop()
 	}
+	docker.Stop()
 	if err := di.db.Close(); err != nil {
 		log.Warn().Err(err).Msg("Cannot close database")
 	}
