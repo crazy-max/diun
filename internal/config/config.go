@@ -103,20 +103,20 @@ func (cfg *Config) validate() error {
 	}
 	cfg.Db.Path = path.Clean(cfg.Db.Path)
 
+	var err error
+
 	for id, regopts := range cfg.RegOpts {
-		if regopts, err := cfg.validateRegOpts(id, regopts); err != nil {
+		if regopts, err = cfg.validateRegOpts(id, regopts); err != nil {
 			return err
-		} else {
-			cfg.RegOpts[id] = regopts
 		}
+		cfg.RegOpts[id] = regopts
 	}
 
 	for key, img := range cfg.Image {
-		if img, err := cfg.validateImage(key, img); err != nil {
+		if img, err = cfg.validateImage(key, img); err != nil {
 			return err
-		} else {
-			cfg.Image[key] = img
 		}
+		cfg.Image[key] = img
 	}
 
 	if cfg.Notif.Mail.Enable {
@@ -151,6 +151,7 @@ func (cfg *Config) validateRegOpts(id string, regopts model.RegOpts) (model.RegO
 	return model.RegOpts{}, nil
 }
 
+// PutImage validates and adds/updates a RegOpts object to the configuration
 func (cfg *Config) PutRegOpts(id string, regopts model.RegOpts) error {
 	regopts, err := cfg.validateRegOpts(id, regopts)
 	if err != nil {
@@ -159,6 +160,7 @@ func (cfg *Config) PutRegOpts(id string, regopts model.RegOpts) error {
 	cfg.RegOpts[id] = regopts
 	return nil
 }
+// RemoveRegOpts removes a RegOpts object from the configuration by its ID
 func (cfg *Config) RemoveRegOpts(id string) error {
 	if _, ok := cfg.RegOpts[id]; !ok {
 		return errors.New("no entry with this id")
@@ -204,6 +206,7 @@ func (cfg *Config) validateImage(key int, img model.Image) (model.Image, error) 
 	return img, nil
 }
 
+// AddImage validates and adds a new image to the configuration
 func (cfg *Config) AddImage(img model.Image) error {
 	img, err := cfg.validateImage(len(cfg.Image), img)
 	if err != nil {
@@ -212,6 +215,7 @@ func (cfg *Config) AddImage(img model.Image) error {
 	cfg.Image = append(cfg.Image, img)
 	return nil
 }
+// SetImage validates and updates an image in the configuration at a specific index
 func (cfg *Config) SetImage(key int, img model.Image) error {
 	img, err := cfg.validateImage(key, img)
 	if err != nil {
@@ -220,6 +224,7 @@ func (cfg *Config) SetImage(key int, img model.Image) error {
 	cfg.Image[key] = img
 	return nil
 }
+// RemoveImage removes an image from the configuration at a specific index
 func (cfg *Config) RemoveImage(key int) error {
 	if key < 0 || key >= len(cfg.Image) {
 		return errors.New("index out of range")
