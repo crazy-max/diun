@@ -1,6 +1,7 @@
 package config
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -9,6 +10,7 @@ import (
 	"os"
 	"path"
 	"regexp"
+	"strings"
 
 	"github.com/crazy-max/diun/internal/model"
 	"github.com/crazy-max/diun/internal/utl"
@@ -68,12 +70,22 @@ func Load(flags model.Flags, version string) (*Config, error) {
 		return nil, fmt.Errorf("unable to open config file, %s", err)
 	}
 
-	bytes, err := ioutil.ReadFile(flags.Cfgfile)
+	cfgBytes, err := ioutil.ReadFile(flags.Cfgfile)
 	if err != nil {
 		return nil, fmt.Errorf("unable to read config file, %s", err)
 	}
 
-	if err := yaml.UnmarshalStrict(bytes, &cfg); err != nil {
+	// Replace environment variables in configuration file
+	for _, env := range os.Environ() {
+		parts := strings.SplitN(env, "=", 2)
+		value := ""
+		if len(parts) > 1 {
+			value = parts[1]
+		}
+		bytes.ReplaceAll(cfgBytes, []byte("${" + parts[0] + "}"), []byte(value))
+	}
+
+	if err := yaml.UnmarshalStrict(cfgBytes, &cfg); err != nil {
 		return nil, fmt.Errorf("unable to decode into struct, %v", err)
 	}
 
