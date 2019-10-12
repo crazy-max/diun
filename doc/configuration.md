@@ -73,6 +73,8 @@ image:
     arch: arm64v8
 ```
 
+Environment variables written like `${VARIABLE}` are directly substituted before the file is parsed, and can be used e.g. for secrets.
+
 ## db
 
 * `db`
