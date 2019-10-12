@@ -92,8 +92,8 @@ image:
 * `notif`
   * `mail`
     * `enable`: Enable email reports (default: `false`).
-    * `host`: SMTP server host (default: `localhost`). **required**
-    * `port`: SMTP server port (default: `25`). **required**
+    * `host`: SMTP server host (default: direct SMTP).
+    * `port`: SMTP server port (default: `25`).
     * `ssl`: SSL defines whether an SSL connection is used. Should be false in most cases since the auth mechanism should use STARTTLS (default: `false`).
     * `insecure_skip_verify`: Controls whether a client verifies the server's certificate chain and host name (default: `false`).
     * `username`: SMTP username.
@@ -106,6 +106,16 @@ image:
     * `method`: HTTP method (default: `GET`). **required**
     * `headers`: Map of additional headers to be sent.
     * `timeout`: Timeout specifies a time limit for the request to be made. (default: `10`).
+
+### Direct SMTP
+If the `host` field is empty or missing, direct SMTP is being used. That means, the email is directly sent to the receiver's email server.
+This should only be used for testing, and comes with some challenges, so in most cases you probably want to use your own SMTP server for better reliability.
+
+For most email providers, you need a valid `HELO` hostname, which can be set using the `HELO` environment variable (or `HOSTNAME`, if `HELO` is not set).  
+This hostname has to point to the static IP address of the server Diun is running on, and the IP address should have its PTR record set to this hostname.
+This makes direct SMTP unsuitable for development machines or in a homelab environment.
+
+More information on this topic is available at https://www.linuxmagic.com/best_practices/valid_helo_domain.html.
 
 ## regopts
 

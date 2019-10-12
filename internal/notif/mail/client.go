@@ -4,6 +4,9 @@ import (
 	"bytes"
 	"crypto/tls"
 	"fmt"
+	"github.com/crazy-max/diun/internal/utl"
+	"net"
+	"strings"
 	"text/template"
 	"time"
 
@@ -112,6 +115,24 @@ Need help, or have questions? Go to https://github.com/crazy-max/diun and leave 
 		Password:  c.cfg.Password,
 		SSL:       c.cfg.SSL,
 		TLSConfig: tlsConfig,
+	}
+
+	if c.cfg.Host == "" {
+		a := strings.Split(c.cfg.To, "@")
+		mx, err := net.LookupMX(a[len(a)-1])
+		if err != nil {
+			return fmt.Errorf("direct smtp: %s", err)
+		}
+		if len(mx) == 0 {
+			return fmt.Errorf("direct smtp: no MX record found")
+		}
+		dialer.Host = mx[0].Host
+		dialer.Port = 25
+		dialer.Username = ""
+		dialer.Password = ""
+		dialer.SSL = false
+		dialer.TLSConfig = nil
+		dialer.LocalName = utl.GetEnv("HELO", utl.GetEnv("HOSTNAME", "localhost"))
 	}
 
 	return dialer.DialAndSend(msg)

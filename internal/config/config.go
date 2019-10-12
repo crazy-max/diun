@@ -120,6 +120,9 @@ func (cfg *Config) validate() error {
 	}
 
 	if cfg.Notif.Mail.Enable {
+		if cfg.Notif.Mail.Host == "" {
+			log.Warn().Msg("You're using direct SMTP! This is okay for testing Diun on a real server, but for production or in a homelab, you will need to use your own SMTP server. More information: https://github.com/crazy-max/diun/blob/master/doc/configuration.md#notif")
+		}
 		if _, err := mail.ParseAddress(cfg.Notif.Mail.From); err != nil {
 			return fmt.Errorf("cannot parse sender mail address, %v", err)
 		}
