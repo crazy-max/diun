@@ -92,14 +92,18 @@ func (cfg *Config) validate() error {
 	cfg.Db.Path = path.Clean(cfg.Db.Path)
 
 	for id, regopts := range cfg.RegOpts {
-		if err := cfg.validateRegOpts(id, regopts); err != nil {
+		if regopts, err := cfg.validateRegOpts(id, regopts); err != nil {
 			return err
+		} else {
+			cfg.RegOpts[id] = regopts
 		}
 	}
 
 	for key, img := range cfg.Image {
-		if err := cfg.validateImage(key, img); err != nil {
+		if img, err := cfg.validateImage(key, img); err != nil {
 			return err
+		} else {
+			cfg.Image[key] = img
 		}
 	}
 
@@ -115,7 +119,7 @@ func (cfg *Config) validate() error {
 	return nil
 }
 
-func (cfg *Config) validateRegOpts(id string, regopts model.RegOpts) error {
+func (cfg *Config) validateRegOpts(id string, regopts model.RegOpts) (model.RegOpts, error) {
 	defTimeout := 10
 	if regopts.Timeout <= 0 {
 		defTimeout = 0
@@ -125,16 +129,32 @@ func (cfg *Config) validateRegOpts(id string, regopts model.RegOpts) error {
 		InsecureTLS: false,
 		Timeout:     defTimeout,
 	}); err != nil {
-		return fmt.Errorf("cannot set default registry options values for %s: %v", id, err)
+		return model.RegOpts{}, fmt.Errorf("cannot set default registry options values for %s: %v", id, err)
 	}
 
 	cfg.RegOpts[id] = regopts
+	return model.RegOpts{}, nil
+}
+
+func (cfg *Config) PutRegOpts(id string, regopts model.RegOpts) error {
+	regopts, err := cfg.validateRegOpts(id, regopts)
+	if err != nil {
+		return err
+	}
+	cfg.RegOpts[id] = regopts
+	return nil
+}
+func (cfg *Config) RemoveRegOpts(id string) error {
+	if _, ok := cfg.RegOpts[id]; !ok {
+		return errors.New("no entry with this id")
+	}
+	delete(cfg.RegOpts, id)
 	return nil
 }
 
-func (cfg *Config) validateImage(key int, img model.Image) error {
+func (cfg *Config) validateImage(key int, img model.Image) (model.Image, error) {
 	if img.Name == "" {
-		return fmt.Errorf("name is required for image %d", key)
+		return model.Image{}, fmt.Errorf("name is required for image %d", key)
 	}
 
 	if err := mergo.Merge(&img, model.Image{
@@ -143,30 +163,53 @@ func (cfg *Config) validateImage(key int, img model.Image) error {
 		WatchRepo: false,
 		MaxTags:   0,
 	}); err != nil {
-		return fmt.Errorf("cannot set default image values for %s: %v", img.Name, err)
+		return model.Image{}, fmt.Errorf("cannot set default image values for %s: %v", img.Name, err)
 	}
 
 	if img.RegOptsID != "" {
 		regopts, found := cfg.RegOpts[img.RegOptsID]
 		if !found {
-			return fmt.Errorf("registry options %s not found for %s", img.RegOptsID, img.Name)
+			return model.Image{}, fmt.Errorf("registry options %s not found for %s", img.RegOptsID, img.Name)
 		}
 		img.RegOpts = regopts
 	}
 
 	for _, includeTag := range img.IncludeTags {
 		if _, err := regexp.Compile(includeTag); err != nil {
-			return fmt.Errorf("include tag regex '%s' for %s cannot compile, %v", includeTag, img.Name, err)
+			return model.Image{}, fmt.Errorf("include tag regex '%s' for %s cannot compile, %v", includeTag, img.Name, err)
 		}
 	}
 
 	for _, excludeTag := range img.ExcludeTags {
 		if _, err := regexp.Compile(excludeTag); err != nil {
-			return fmt.Errorf("exclude tag regex '%s' for '%s' image cannot compile, %v", img.Name, excludeTag, err)
+			return model.Image{}, fmt.Errorf("exclude tag regex '%s' for '%s' image cannot compile, %v", img.Name, excludeTag, err)
 		}
 	}
 
+	return img, nil
+}
+
+func (cfg *Config) AddImage(img model.Image) error {
+	img, err := cfg.validateImage(len(cfg.Image), img)
+	if err != nil {
+		return err
+	}
+	cfg.Image = append(cfg.Image, img)
+	return nil
+}
+func (cfg *Config) SetImage(key int, img model.Image) error {
+	img, err := cfg.validateImage(key, img)
+	if err != nil {
+		return err
+	}
 	cfg.Image[key] = img
+	return nil
+}
+func (cfg *Config) RemoveImage(key int) error {
+	if key < 0 || key >= len(cfg.Image) {
+		return errors.New("index out of range")
+	}
+	cfg.Image = append(cfg.Image[:key], cfg.Image[key+1:]...)
 	return nil
 }
 
