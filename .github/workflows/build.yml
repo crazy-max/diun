@@ -37,7 +37,7 @@ jobs:
       -
         # https://github.com/goreleaser/goreleaser-action
         name: GoReleaser
-        uses: goreleaser/goreleaser-action@master
+        uses: goreleaser/goreleaser-action@v1
         with:
           version: latest
           args: release --skip-publish --rm-dist
@@ -75,7 +75,7 @@ jobs:
       -
         # https://github.com/crazy-max/ghaction-docker-buildx
         name: Set up Docker Buildx
-        uses: crazy-max/ghaction-docker-buildx@master
+        uses: crazy-max/ghaction-docker-buildx@v1
         with:
           version: latest
       -
