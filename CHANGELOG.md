@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.4.1 (2019/10/20)
+
+* Update libs
+* Fix Docker labels
+
 ## 1.4.0 (2019/10/01)
 
 * Multi-platform Docker image
