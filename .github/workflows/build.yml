@@ -88,9 +88,9 @@ jobs:
           docker buildx build --platform ${{ steps.prepare.outputs.docker_platforms }} \
             --output "type=image,push=false" \
             --build-arg "VERSION=${{ steps.prepare.outputs.version }}" \
-            --label "org.label-schema.build-date=${{ steps.prepare.outputs.build_date }}" \
-            --label "org.label-schema.version=${{ steps.prepare.outputs.version }}" \
-            --label "org.label-schema.vcs-ref=${GITHUB_SHA::8}" \
+            --build-arg "BUILD_DATE=${{ steps.prepare.outputs.build_date }}" \
+            --build-arg "VCS_REF=${GITHUB_SHA::8}" \
+            --build-arg "VERSION=${{ steps.prepare.outputs.version }}" \
             --tag "${{ steps.prepare.outputs.docker_image }}:latest" \
             --tag "${{ steps.prepare.outputs.docker_image }}:${{ steps.prepare.outputs.version }}" \
             --file Dockerfile .
@@ -108,9 +108,9 @@ jobs:
           docker buildx build --platform ${{ steps.prepare.outputs.docker_platforms }} \
             --output "type=image,push=true" \
             --build-arg "VERSION=${{ steps.prepare.outputs.version }}" \
-            --label "org.label-schema.build-date=${{ steps.prepare.outputs.build_date }}" \
-            --label "org.label-schema.version=${{ steps.prepare.outputs.version }}" \
-            --label "org.label-schema.vcs-ref=${GITHUB_SHA::8}" \
+            --build-arg "BUILD_DATE=${{ steps.prepare.outputs.build_date }}" \
+            --build-arg "VCS_REF=${GITHUB_SHA::8}" \
+            --build-arg "VERSION=${{ steps.prepare.outputs.version }}" \
             --tag "${{ steps.prepare.outputs.docker_image }}:${{ steps.prepare.outputs.version }}" \
             --tag "${{ steps.prepare.outputs.docker_image }}:latest" \
             --file Dockerfile .
