@@ -18,7 +18,7 @@ require (
 	github.com/matcornic/hermes/v2 v2.0.2
 	github.com/opencontainers/go-digest v1.0.0-rc1
 	github.com/opencontainers/image-spec v1.0.1 // indirect
-	github.com/panjf2000/ants v1.0.0
+	github.com/panjf2000/ants v1.2.0
 	github.com/robfig/cron/v3 v3.0.0
 	github.com/rs/zerolog v1.16.0
 	github.com/sirupsen/logrus v1.4.2
