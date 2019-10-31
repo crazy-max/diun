@@ -3,9 +3,25 @@ name: build
 on:
   pull_request:
     branches: master
+    paths:
+      - '.github/workflows/build.yml'
+      - 'cmd/**'
+      - 'internal/**'
+      - 'pkg/**'
+      - '.goreleaser.yml'
+      - 'Dockerfile'
+      - 'go.*'
   push:
     branches: master
     tags: v*
+    paths:
+      - '.github/workflows/build.yml'
+      - 'cmd/**'
+      - 'internal/**'
+      - 'pkg/**'
+      - '.goreleaser.yml'
+      - 'Dockerfile'
+      - 'go.*'
 
 jobs:
   go:
