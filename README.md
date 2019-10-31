@@ -1,4 +1,4 @@
-<p align="center"><a href="https://github.com/crazy-max/diun" target="_blank"><img height="128"src="https://raw.githubusercontent.com/crazy-max/diun/master/.res/diun.png"></a></p>
+<p align="center"><a href="https://github.com/crazy-max/diun" target="_blank"><img height="128" src="https://raw.githubusercontent.com/crazy-max/diun/master/.res/diun.png"></a></p>
 
 <p align="center">
   <a href="https://github.com/crazy-max/diun/releases/latest"><img src="https://img.shields.io/github/release/crazy-max/diun.svg?style=flat-square" alt="GitHub release"></a>

@@ -7,6 +7,10 @@
   name: ":bug: bug"
   color: "b60205"
   description: ""
+- # dependencies
+  name: ":game_die: dependencies"
+  color: "0366d6"
+  description: ""
 - # documentation
   name: ":memo: documentation"
   color: "c5def5"
