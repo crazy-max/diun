@@ -10,7 +10,8 @@ on:
       - 'pkg/**'
       - '.goreleaser.yml'
       - 'Dockerfile'
-      - 'go.*'
+      - 'go.mod'
+      - 'go.sum'
   push:
     branches: master
     tags: v*
@@ -21,7 +22,8 @@ on:
       - 'pkg/**'
       - '.goreleaser.yml'
       - 'Dockerfile'
-      - 'go.*'
+      - 'go.mod'
+      - 'go.sum'
 
 jobs:
   go:
