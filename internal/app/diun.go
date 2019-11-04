@@ -9,7 +9,7 @@ import (
 	"github.com/crazy-max/diun/internal/db"
 	"github.com/crazy-max/diun/internal/notif"
 	"github.com/hako/durafmt"
-	"github.com/panjf2000/ants"
+	"github.com/panjf2000/ants/v2"
 	"github.com/robfig/cron/v3"
 	"github.com/rs/zerolog/log"
 )
@@ -97,11 +97,7 @@ func (di *Diun) Run() {
 		}
 		di.wg.Done()
 	})
-	defer func() {
-		if err := di.pool.Release(); err != nil {
-			log.Warn().Err(err).Msg("Cannot release pool")
-		}
-	}()
+	defer di.pool.Release()
 
 	di.procImages()
 	di.wg.Wait()
