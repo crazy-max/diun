@@ -1,5 +1,7 @@
 module github.com/crazy-max/diun
 
+go 1.12
+
 require (
 	github.com/alecthomas/kingpin v0.0.0-20190816080609-dce89ec0b9f1
 	github.com/containerd/continuity v0.0.0-20190827140505-75bee3e2ccb6 // indirect
