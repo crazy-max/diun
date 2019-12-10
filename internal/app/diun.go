@@ -41,8 +41,10 @@ func New(cfg *config.Config, location *time.Location) (*Diun, error) {
 	}
 
 	return &Diun{
-		cfg:   cfg,
-		cron:  cron.New(cron.WithLocation(location), cron.WithSeconds()),
+		cfg: cfg,
+		cron: cron.New(cron.WithLocation(location), cron.WithParser(cron.NewParser(
+			cron.SecondOptional|cron.Minute|cron.Hour|cron.Dom|cron.Month|cron.Dow|cron.Descriptor),
+		)),
 		db:    dbcli,
 		notif: notifcli,
 	}, nil

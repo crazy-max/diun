@@ -49,7 +49,7 @@ func TestLoad(t *testing.T) {
 				},
 				Watch: model.Watch{
 					Workers:  100,
-					Schedule: "*/30 * * * * *",
+					Schedule: "*/30 * * * *",
 				},
 				Notif: model.Notif{
 					Mail: model.Mail{

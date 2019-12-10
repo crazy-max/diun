@@ -8,7 +8,7 @@ db:
 
 watch:
   workers: 10
-  schedule: "0 0 * * * *"
+  schedule: "0 * * * *"
 
 notif:
   mail:
@@ -79,7 +79,7 @@ image:
 
 * `watch`
   * `workers`: Maximum number of workers that will execute tasks concurrently. _Optional_. (default: `10`).
-  * `schedule`: [CRON expression](https://godoc.org/github.com/crazy-max/cron#hdr-CRON_Expression_Format) to schedule Diun watcher. _Optional_. (default: `0 0 * * * *`).
+  * `schedule`: [CRON expression](https://godoc.org/github.com/robfig/cron#hdr-CRON_Expression_Format) to schedule Diun watcher. _Optional_. (default: `0 * * * *`).
 
 ## notif
 

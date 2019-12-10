@@ -46,7 +46,7 @@ func Load(flags model.Flags, version string) (*Config, error) {
 		},
 		Watch: model.Watch{
 			Workers:  10,
-			Schedule: "0 0 * * * *",
+			Schedule: "0 * * * *",
 		},
 		Notif: model.Notif{
 			Mail: model.Mail{
