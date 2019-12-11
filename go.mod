@@ -1,6 +1,6 @@
 module github.com/crazy-max/diun
 
-go 1.12
+go 1.13
 
 require (
 	github.com/alecthomas/kingpin v0.0.0-20190816080609-dce89ec0b9f1
