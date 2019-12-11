@@ -11,9 +11,13 @@ type Client struct {
 	Api *client.Client
 }
 
-// NewEnvClient initializes a new Docker API client based on environment variables
-func NewEnvClient() (*Client, error) {
-	d, err := client.NewClientWithOpts(client.FromEnv, client.WithVersion("1.12"))
+// NewClient initializes a new Docker API client with default values
+func NewClient(endpoint string, apiVersion string, caFile string, certFile string, keyFile string) (*Client, error) {
+	d, err := client.NewClientWithOpts(
+		client.WithHost(endpoint),
+		client.WithVersion(apiVersion),
+		client.WithTLSClientConfig(caFile, certFile, keyFile),
+	)
 	if err != nil {
 		return nil, err
 	}

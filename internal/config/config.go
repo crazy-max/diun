@@ -101,8 +101,14 @@ func (cfg *Config) validate() error {
 		}
 	}
 
+	for key, dock := range cfg.Providers.Docker {
+		if err := cfg.validateDockerProvider(key, dock); err != nil {
+			return err
+		}
+	}
+
 	for key, img := range cfg.Providers.Image {
-		if err := cfg.validateImage(key, img); err != nil {
+		if err := cfg.validateImageProvider(key, img); err != nil {
 			return err
 		}
 	}
@@ -136,9 +142,29 @@ func (cfg *Config) validateRegOpts(id string, regopts model.RegOpts) error {
 	return nil
 }
 
-func (cfg *Config) validateImage(key int, img provider.Image) error {
+func (cfg *Config) validateDockerProvider(key int, dock provider.Docker) error {
+	if dock.ID == "" {
+		return fmt.Errorf("ID is required for docker provider %d", key)
+	}
+
+	if err := mergo.Merge(&dock, provider.Docker{
+		Endpoint:     os.Getenv("DOCKER_HOST"),
+		ApiVersion:   os.Getenv("DOCKER_API_VERSION"),
+		CertPath:     os.Getenv("DOCKER_CERT_PATH"),
+		TLSVerify:    os.Getenv("DOCKER_TLS_VERIFY"),
+		SwarmMode:    false,
+		WatchStopped: false,
+	}); err != nil {
+		return fmt.Errorf("cannot set default docker provider values for %s: %v", dock.ID, err)
+	}
+
+	cfg.Providers.Docker[key] = dock
+	return nil
+}
+
+func (cfg *Config) validateImageProvider(key int, img provider.Image) error {
 	if img.Name == "" {
-		return fmt.Errorf("name is required for image %d", key)
+		return fmt.Errorf("name is required for image provider %d", key)
 	}
 
 	if err := mergo.Merge(&img, provider.Image{
@@ -147,7 +173,7 @@ func (cfg *Config) validateImage(key int, img provider.Image) error {
 		WatchRepo: false,
 		MaxTags:   0,
 	}); err != nil {
-		return fmt.Errorf("cannot set default image values for %s: %v", img.Name, err)
+		return fmt.Errorf("cannot set default image image values for %s: %v", img.Name, err)
 	}
 
 	if img.RegOptsID != "" {

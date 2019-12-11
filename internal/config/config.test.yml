@@ -33,6 +33,11 @@ regopts:
     password: bar
 
 providers:
+  docker:
+    - id: swarm
+      endpoint: unix:///var/run/docker.sock
+      api_version: 1.13
+      swarm_mode: true
   image:
     - name: docker.io/crazymax/nextcloud:latest
       regopts_id: someregopts

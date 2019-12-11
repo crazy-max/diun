@@ -4,5 +4,6 @@ import "github.com/crazy-max/diun/internal/model/provider"
 
 // Providers represents a provider configuration
 type Providers struct {
-	Image []provider.Image `yaml:"image,omitempty" json:",omitempty"`
+	Image  []provider.Image  `yaml:"image,omitempty" json:",omitempty"`
+	Docker []provider.Docker `yaml:"docker,omitempty" json:",omitempty"`
 }

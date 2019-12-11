@@ -81,6 +81,14 @@ func TestLoad(t *testing.T) {
 					},
 				},
 				Providers: model.Providers{
+					Docker: []provider.Docker{
+						{
+							ID:         "swarm",
+							Endpoint:   "unix:///var/run/docker.sock",
+							ApiVersion: "1.13",
+							SwarmMode:  true,
+						},
+					},
 					Image: []provider.Image{
 						{
 							Name:      "docker.io/crazymax/nextcloud:latest",
