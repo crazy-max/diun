@@ -1,4 +1,4 @@
-package _dev
+package docker
 
 import (
 	"context"
@@ -8,7 +8,7 @@ import (
 
 // Client represents an active docker object
 type Client struct {
-	Cli *client.Client
+	Api *client.Client
 }
 
 // NewEnvClient initializes a new Docker API client based on environment variables
@@ -23,5 +23,5 @@ func NewEnvClient() (*Client, error) {
 		return nil, err
 	}
 
-	return &Client{Cli: d}, err
+	return &Client{Api: d}, err
 }

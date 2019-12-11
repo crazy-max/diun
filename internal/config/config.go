@@ -11,6 +11,7 @@ import (
 	"regexp"
 
 	"github.com/crazy-max/diun/internal/model"
+	"github.com/crazy-max/diun/internal/model/provider"
 	"github.com/crazy-max/diun/internal/utl"
 	"github.com/imdario/mergo"
 	"github.com/rs/zerolog/log"
@@ -19,13 +20,13 @@ import (
 
 // Config holds configuration details
 type Config struct {
-	Flags   model.Flags
-	App     model.App
-	Db      model.Db                 `yaml:"db,omitempty"`
-	Watch   model.Watch              `yaml:"watch,omitempty"`
-	Notif   model.Notif              `yaml:"notif,omitempty"`
-	RegOpts map[string]model.RegOpts `yaml:"regopts,omitempty"`
-	Image   []model.Image            `yaml:"image,omitempty"`
+	Flags     model.Flags
+	App       model.App
+	Db        model.Db                 `yaml:"db,omitempty"`
+	Watch     model.Watch              `yaml:"watch,omitempty"`
+	Notif     model.Notif              `yaml:"notif,omitempty"`
+	RegOpts   map[string]model.RegOpts `yaml:"regopts,omitempty"`
+	Providers model.Providers          `yaml:"providers,omitempty"`
 }
 
 // Load returns Configuration struct
@@ -62,6 +63,9 @@ func Load(flags model.Flags, version string) (*Config, error) {
 				Timeout: 10,
 			},
 		},
+		Providers: model.Providers{
+			Image: []provider.Image{},
+		},
 	}
 
 	if _, err = os.Lstat(flags.Cfgfile); err != nil {
@@ -97,7 +101,7 @@ func (cfg *Config) validate() error {
 		}
 	}
 
-	for key, img := range cfg.Image {
+	for key, img := range cfg.Providers.Image {
 		if err := cfg.validateImage(key, img); err != nil {
 			return err
 		}
@@ -132,12 +136,12 @@ func (cfg *Config) validateRegOpts(id string, regopts model.RegOpts) error {
 	return nil
 }
 
-func (cfg *Config) validateImage(key int, img model.Image) error {
+func (cfg *Config) validateImage(key int, img provider.Image) error {
 	if img.Name == "" {
 		return fmt.Errorf("name is required for image %d", key)
 	}
 
-	if err := mergo.Merge(&img, model.Image{
+	if err := mergo.Merge(&img, provider.Image{
 		Os:        "linux",
 		Arch:      "amd64",
 		WatchRepo: false,
@@ -147,11 +151,10 @@ func (cfg *Config) validateImage(key int, img model.Image) error {
 	}
 
 	if img.RegOptsID != "" {
-		regopts, found := cfg.RegOpts[img.RegOptsID]
+		_, found := cfg.RegOpts[img.RegOptsID]
 		if !found {
 			return fmt.Errorf("registry options %s not found for %s", img.RegOptsID, img.Name)
 		}
-		img.RegOpts = regopts
 	}
 
 	for _, includeTag := range img.IncludeTags {
@@ -166,7 +169,7 @@ func (cfg *Config) validateImage(key int, img model.Image) error {
 		}
 	}
 
-	cfg.Image[key] = img
+	cfg.Providers.Image[key] = img
 	return nil
 }
 

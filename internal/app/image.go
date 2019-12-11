@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/crazy-max/diun/internal/model"
+	"github.com/crazy-max/diun/internal/model/provider"
 	"github.com/crazy-max/diun/internal/utl"
 	"github.com/crazy-max/diun/pkg/docker"
 	"github.com/crazy-max/diun/pkg/docker/registry"
@@ -12,20 +13,21 @@ import (
 )
 
 type imageJob struct {
-	image    model.Image
+	image    provider.Image
 	registry *docker.RegistryClient
 }
 
 func (di *Diun) procImages() {
 	// Iterate images
-	for _, img := range di.cfg.Image {
+	for _, img := range di.cfg.Providers.Image {
+		regOpts := di.cfg.RegOpts[img.RegOptsID]
 		reg, err := docker.NewRegistryClient(docker.RegistryOptions{
 			Os:          img.Os,
 			Arch:        img.Arch,
-			Username:    img.RegOpts.Username,
-			Password:    img.RegOpts.Password,
-			Timeout:     time.Duration(img.RegOpts.Timeout) * time.Second,
-			InsecureTLS: img.RegOpts.InsecureTLS,
+			Username:    regOpts.Username,
+			Password:    regOpts.Password,
+			Timeout:     time.Duration(regOpts.Timeout) * time.Second,
+			InsecureTLS: regOpts.InsecureTLS,
 		})
 		if err != nil {
 			log.Error().Err(err).Str("image", img.Name).Msg("Cannot create registry client")
@@ -102,8 +104,6 @@ func (di *Diun) imageJob(job imageJob) error {
 	if err != nil {
 		return err
 	}
-	/*b, _ := json.MarshalIndent(liveManifest, "", "  ")
-	log.Debug().Msg(string(b))*/
 
 	dbManifest, err := di.db.GetManifest(image)
 	if err != nil {

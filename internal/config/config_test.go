@@ -5,6 +5,7 @@ import (
 
 	"github.com/crazy-max/diun/internal/config"
 	"github.com/crazy-max/diun/internal/model"
+	"github.com/crazy-max/diun/internal/model/provider"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -79,83 +80,85 @@ func TestLoad(t *testing.T) {
 						Password: "bar",
 					},
 				},
-				Image: []model.Image{
-					{
-						Name:      "docker.io/crazymax/nextcloud:latest",
-						Os:        "linux",
-						Arch:      "amd64",
-						RegOptsID: "someregopts",
-					},
-					{
-						Name:      "crazymax/swarm-cronjob",
-						Os:        "linux",
-						Arch:      "amd64",
-						WatchRepo: true,
-						IncludeTags: []string{
-							`^1\.2\..*`,
+				Providers: model.Providers{
+					Image: []provider.Image{
+						{
+							Name:      "docker.io/crazymax/nextcloud:latest",
+							Os:        "linux",
+							Arch:      "amd64",
+							RegOptsID: "someregopts",
 						},
-					},
-					{
-						Name:      "jfrog-docker-reg2.bintray.io/jfrog/artifactory-oss:4.0.0",
-						Os:        "linux",
-						Arch:      "amd64",
-						RegOptsID: "bintrayoptions",
-					},
-					{
-						Name:      "docker.bintray.io/jfrog/xray-server:2.8.6",
-						Os:        "linux",
-						Arch:      "amd64",
-						WatchRepo: true,
-						MaxTags:   50,
-					},
-					{
-						Name: "quay.io/coreos/hyperkube",
-						Os:   "linux",
-						Arch: "amd64",
-					},
-					{
-						Name:      "docker.io/portainer/portainer",
-						Os:        "linux",
-						Arch:      "amd64",
-						WatchRepo: true,
-						MaxTags:   10,
-						IncludeTags: []string{
-							`^(0|[1-9]\d*)\..*`,
+						{
+							Name:      "crazymax/swarm-cronjob",
+							Os:        "linux",
+							Arch:      "amd64",
+							WatchRepo: true,
+							IncludeTags: []string{
+								`^1\.2\..*`,
+							},
 						},
-					},
-					{
-						Name:      "traefik",
-						Os:        "linux",
-						Arch:      "amd64",
-						WatchRepo: true,
-					},
-					{
-						Name: "alpine",
-						Os:   "linux",
-						Arch: "arm64v8",
-					},
-					{
-						Name: "docker.io/graylog/graylog:3.2.0",
-						Os:   "linux",
-						Arch: "amd64",
-					},
-					{
-						Name: "jacobalberty/unifi:5.9",
-						Os:   "linux",
-						Arch: "amd64",
-					},
-					{
-						Name: "quay.io/coreos/hyperkube:v1.1.7-coreos.1",
-						Os:   "linux",
-						Arch: "amd64",
-					},
-					{
-						Name:      "crazymax/ddns-route53",
-						Os:        "linux",
-						Arch:      "amd64",
-						WatchRepo: true,
-						IncludeTags: []string{
-							`^1\..*`,
+						{
+							Name:      "jfrog-docker-reg2.bintray.io/jfrog/artifactory-oss:4.0.0",
+							Os:        "linux",
+							Arch:      "amd64",
+							RegOptsID: "bintrayoptions",
+						},
+						{
+							Name:      "docker.bintray.io/jfrog/xray-server:2.8.6",
+							Os:        "linux",
+							Arch:      "amd64",
+							WatchRepo: true,
+							MaxTags:   50,
+						},
+						{
+							Name: "quay.io/coreos/hyperkube",
+							Os:   "linux",
+							Arch: "amd64",
+						},
+						{
+							Name:      "docker.io/portainer/portainer",
+							Os:        "linux",
+							Arch:      "amd64",
+							WatchRepo: true,
+							MaxTags:   10,
+							IncludeTags: []string{
+								`^(0|[1-9]\d*)\..*`,
+							},
+						},
+						{
+							Name:      "traefik",
+							Os:        "linux",
+							Arch:      "amd64",
+							WatchRepo: true,
+						},
+						{
+							Name: "alpine",
+							Os:   "linux",
+							Arch: "arm64v8",
+						},
+						{
+							Name: "docker.io/graylog/graylog:3.2.0",
+							Os:   "linux",
+							Arch: "amd64",
+						},
+						{
+							Name: "jacobalberty/unifi:5.9",
+							Os:   "linux",
+							Arch: "amd64",
+						},
+						{
+							Name: "quay.io/coreos/hyperkube:v1.1.7-coreos.1",
+							Os:   "linux",
+							Arch: "amd64",
+						},
+						{
+							Name:      "crazymax/ddns-route53",
+							Os:        "linux",
+							Arch:      "amd64",
+							WatchRepo: true,
+							IncludeTags: []string{
+								`^1\..*`,
+							},
 						},
 					},
 				},
