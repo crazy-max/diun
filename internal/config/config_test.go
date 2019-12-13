@@ -5,7 +5,6 @@ import (
 
 	"github.com/crazy-max/diun/internal/config"
 	"github.com/crazy-max/diun/internal/model"
-	"github.com/crazy-max/diun/internal/model/provider"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -81,15 +80,13 @@ func TestLoad(t *testing.T) {
 					},
 				},
 				Providers: model.Providers{
-					Docker: []provider.Docker{
+					Docker: []model.PrdDocker{
 						{
-							ID:         "swarm",
-							Endpoint:   "unix:///var/run/docker.sock",
-							ApiVersion: "1.13",
-							SwarmMode:  true,
+							ID:             "local",
+							WatchByDefault: true,
 						},
 					},
-					Image: []provider.Image{
+					Image: []model.PrdImage{
 						{
 							Name:      "docker.io/crazymax/nextcloud:latest",
 							Os:        "linux",

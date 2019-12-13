@@ -7,7 +7,10 @@ import (
 
 	"github.com/crazy-max/diun/internal/config"
 	"github.com/crazy-max/diun/internal/db"
+	"github.com/crazy-max/diun/internal/model"
 	"github.com/crazy-max/diun/internal/notif"
+	dockerPrd "github.com/crazy-max/diun/internal/provider/docker"
+	imagePrd "github.com/crazy-max/diun/internal/provider/image"
 	"github.com/hako/durafmt"
 	"github.com/panjf2000/ants/v2"
 	"github.com/robfig/cron/v3"
@@ -73,7 +76,7 @@ func (di *Diun) Start() error {
 	select {}
 }
 
-// Run runs diun process
+// Run starts diun
 func (di *Diun) Run() {
 	if !atomic.CompareAndSwapUint32(&di.locker, 0, 1) {
 		log.Warn().Msg("Already running")
@@ -89,19 +92,27 @@ func (di *Diun) Run() {
 	log.Info().Msg("Starting Diun...")
 	di.wg = new(sync.WaitGroup)
 	di.pool, _ = ants.NewPoolWithFunc(di.cfg.Watch.Workers, func(i interface{}) {
-		var err error
-		switch t := i.(type) {
-		case imageJob:
-			err = di.imageJob(t)
-			if err != nil {
-				log.Error().Err(err).Msg("Job image error")
-			}
+		job := i.(model.Job)
+		if err := di.runJob(job); err != nil {
+			log.Error().Err(err).
+				Str("provider", job.Provider).
+				Str("id", job.ID).
+				Msg("Cannot run job")
 		}
 		di.wg.Done()
 	})
 	defer di.pool.Release()
 
-	di.procImages()
+	// Docker provider
+	for _, job := range dockerPrd.New(di.cfg.Providers.Docker).ListJob() {
+		di.createJob(job)
+	}
+
+	// Image provider
+	for _, job := range imagePrd.New(di.cfg.Providers.Image).ListJob() {
+		di.createJob(job)
+	}
+
 	di.wg.Wait()
 }
 

@@ -11,7 +11,6 @@ import (
 	"regexp"
 
 	"github.com/crazy-max/diun/internal/model"
-	"github.com/crazy-max/diun/internal/model/provider"
 	"github.com/crazy-max/diun/internal/utl"
 	"github.com/imdario/mergo"
 	"github.com/rs/zerolog/log"
@@ -64,7 +63,7 @@ func Load(flags model.Flags, version string) (*Config, error) {
 			},
 		},
 		Providers: model.Providers{
-			Image: []provider.Image{},
+			Image: []model.PrdImage{},
 		},
 	}
 
@@ -142,18 +141,15 @@ func (cfg *Config) validateRegOpts(id string, regopts model.RegOpts) error {
 	return nil
 }
 
-func (cfg *Config) validateDockerProvider(key int, dock provider.Docker) error {
+func (cfg *Config) validateDockerProvider(key int, dock model.PrdDocker) error {
 	if dock.ID == "" {
 		return fmt.Errorf("ID is required for docker provider %d", key)
 	}
 
-	if err := mergo.Merge(&dock, provider.Docker{
-		Endpoint:     os.Getenv("DOCKER_HOST"),
-		ApiVersion:   os.Getenv("DOCKER_API_VERSION"),
-		CertPath:     os.Getenv("DOCKER_CERT_PATH"),
-		TLSVerify:    os.Getenv("DOCKER_TLS_VERIFY"),
-		SwarmMode:    false,
-		WatchStopped: false,
+	if err := mergo.Merge(&dock, model.PrdDocker{
+		SwarmMode:      false,
+		WatchByDefault: false,
+		WatchStopped:   false,
 	}); err != nil {
 		return fmt.Errorf("cannot set default docker provider values for %s: %v", dock.ID, err)
 	}
@@ -162,25 +158,18 @@ func (cfg *Config) validateDockerProvider(key int, dock provider.Docker) error {
 	return nil
 }
 
-func (cfg *Config) validateImageProvider(key int, img provider.Image) error {
+func (cfg *Config) validateImageProvider(key int, img model.PrdImage) error {
 	if img.Name == "" {
 		return fmt.Errorf("name is required for image provider %d", key)
 	}
 
-	if err := mergo.Merge(&img, provider.Image{
+	if err := mergo.Merge(&img, model.PrdImage{
 		Os:        "linux",
 		Arch:      "amd64",
 		WatchRepo: false,
 		MaxTags:   0,
 	}); err != nil {
 		return fmt.Errorf("cannot set default image image values for %s: %v", img.Name, err)
-	}
-
-	if img.RegOptsID != "" {
-		_, found := cfg.RegOpts[img.RegOptsID]
-		if !found {
-			return fmt.Errorf("registry options %s not found for %s", img.RegOptsID, img.Name)
-		}
 	}
 
 	for _, includeTag := range img.IncludeTags {

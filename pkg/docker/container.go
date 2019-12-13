@@ -8,15 +8,10 @@ import (
 	"github.com/docker/docker/api/types/filters"
 )
 
-// ContainerOptions holds docker container object options
-type ContainerOptions struct {
-	IncludeStopped bool
-}
-
-// ContainerList return container list.
-func (c *Client) ContainerList(filterArgs ...filters.KeyValuePair) ([]types.Container, error) {
+// Containers return containers based on filters
+func (c *Client) Containers(filterArgs filters.Args) ([]types.Container, error) {
 	containers, err := c.Api.ContainerList(context.Background(), types.ContainerListOptions{
-		Filters: filters.NewArgs(filterArgs...),
+		Filters: filterArgs,
 	})
 	if err != nil {
 		return nil, err

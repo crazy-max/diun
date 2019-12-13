@@ -34,10 +34,8 @@ regopts:
 
 providers:
   docker:
-    - id: swarm
-      endpoint: unix:///var/run/docker.sock
-      api_version: 1.13
-      swarm_mode: true
+    - id: local
+      watch_by_default: true
   image:
     - name: docker.io/crazymax/nextcloud:latest
       regopts_id: someregopts
