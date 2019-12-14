@@ -14,7 +14,9 @@
 
 ## About
 
-**Diun** :bell: is a CLI application written in [Go](https://golang.org/) to  receive notifications :inbox_tray: when a Docker :whale: image is updated on a Docker registry. With Go, this app can be used across many platforms :game_die: and architectures. This support includes Linux, FreeBSD, macOS and Windows on architectures like amd64, i386, ARM and others.
+**Diun** :bell: is a CLI application written in [Go](https://golang.org/) to receive notifications :inbox_tray: when a Docker :whale: image is updated on a Docker registry. With Go, this app can be used across many platforms :game_die: and architectures. This support includes Linux, FreeBSD, macOS and Windows on architectures like amd64, i386, ARM and others.
+
+![](.res/screenshot.png)
 
 ## Features
 
@@ -23,11 +25,12 @@
 * Internal cron implementation through go routines
 * Worker pool to parallelize analyses
 * Allow overriding image os and architecture
+* Multi providers available like [Docker](doc/providers/docker.md), [Swarm](doc/providers/swarm.md), [Static](doc/providers/static.md)...
 * Beautiful email report
 * Webhook notification
 * Enhanced logging
 * Timezone can be changed
-* :whale: Official [Docker image available](doc/install/docker.md)
+* Official [Docker image available](doc/install/docker.md)
 
 ## Documentation
 
@@ -37,8 +40,11 @@
   * [Linux service](doc/install/linux-service.md)
 * [Usage](doc/usage.md)
 * [Configuration](doc/configuration.md)
+* Providers
+  * [Docker](doc/providers/docker.md)
+  * [Swarm](doc/providers/swarm.md)
+  * [Static](doc/providers/static.md)
 * [Notifications](doc/notifications.md)
-* [TODO](doc/todo.md)
 
 ## How can I help ?
 
