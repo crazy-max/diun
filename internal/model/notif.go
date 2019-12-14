@@ -14,6 +14,7 @@ type Notif struct {
 // NotifEntry represents a notification entry
 type NotifEntry struct {
 	Status   ImageStatus     `json:"status,omitempty"`
+	Provider string          `json:"provider,omitempty"`
 	Image    registry.Image  `json:"image,omitempty"`
 	Manifest docker.Manifest `json:"manifest,omitempty"`
 }

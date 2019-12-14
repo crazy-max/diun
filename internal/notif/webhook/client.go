@@ -43,6 +43,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	body, err := json.Marshal(struct {
 		Version      string        `json:"diun_version"`
 		Status       string        `json:"status"`
+		Provider     string        `json:"provider"`
 		Image        string        `json:"image"`
 		MIMEType     string        `json:"mime_type"`
 		Digest       digest.Digest `json:"digest"`
@@ -52,6 +53,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	}{
 		Version:      c.app.Version,
 		Status:       string(entry.Status),
+		Provider:     entry.Provider,
 		Image:        entry.Image.String(),
 		MIMEType:     entry.Manifest.MIMEType,
 		Digest:       entry.Manifest.Digest,

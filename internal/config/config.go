@@ -8,10 +8,9 @@ import (
 	"net/mail"
 	"os"
 	"path"
-	"regexp"
 
 	"github.com/crazy-max/diun/internal/model"
-	"github.com/crazy-max/diun/internal/utl"
+	"github.com/crazy-max/diun/pkg/utl"
 	"github.com/imdario/mergo"
 	"github.com/rs/zerolog/log"
 	"gopkg.in/yaml.v2"
@@ -19,13 +18,13 @@ import (
 
 // Config holds configuration details
 type Config struct {
-	Flags   model.Flags
-	App     model.App
-	Db      model.Db                 `yaml:"db,omitempty"`
-	Watch   model.Watch              `yaml:"watch,omitempty"`
-	Notif   model.Notif              `yaml:"notif,omitempty"`
-	RegOpts map[string]model.RegOpts `yaml:"regopts,omitempty"`
-	Image   []model.Image            `yaml:"image,omitempty"`
+	Flags     model.Flags
+	App       model.App
+	Db        model.Db                 `yaml:"db,omitempty"`
+	Watch     model.Watch              `yaml:"watch,omitempty"`
+	Notif     model.Notif              `yaml:"notif,omitempty"`
+	RegOpts   map[string]model.RegOpts `yaml:"regopts,omitempty"`
+	Providers model.Providers          `yaml:"providers,omitempty"`
 }
 
 // Load returns Configuration struct
@@ -46,7 +45,7 @@ func Load(flags model.Flags, version string) (*Config, error) {
 		},
 		Watch: model.Watch{
 			Workers:  10,
-			Schedule: "0 0 * * * *",
+			Schedule: "0 * * * *",
 		},
 		Notif: model.Notif{
 			Mail: model.Mail{
@@ -97,8 +96,20 @@ func (cfg *Config) validate() error {
 		}
 	}
 
-	for key, img := range cfg.Image {
-		if err := cfg.validateImage(key, img); err != nil {
+	for id, prdDocker := range cfg.Providers.Docker {
+		if err := cfg.validateDockerProvider(id, prdDocker); err != nil {
+			return err
+		}
+	}
+
+	for id, prdSwarm := range cfg.Providers.Swarm {
+		if err := cfg.validateSwarmProvider(id, prdSwarm); err != nil {
+			return err
+		}
+	}
+
+	for key, prdStatic := range cfg.Providers.Static {
+		if err := cfg.validateStaticProvider(key, prdStatic); err != nil {
 			return err
 		}
 	}
@@ -125,48 +136,44 @@ func (cfg *Config) validateRegOpts(id string, regopts model.RegOpts) error {
 		InsecureTLS: false,
 		Timeout:     defTimeout,
 	}); err != nil {
-		return fmt.Errorf("cannot set default registry options values for %s: %v", id, err)
+		return fmt.Errorf("cannot set default values for registry options %s: %v", id, err)
 	}
 
 	cfg.RegOpts[id] = regopts
 	return nil
 }
 
-func (cfg *Config) validateImage(key int, img model.Image) error {
-	if img.Name == "" {
-		return fmt.Errorf("name is required for image %d", key)
-	}
-
-	if err := mergo.Merge(&img, model.Image{
-		Os:        "linux",
-		Arch:      "amd64",
-		WatchRepo: false,
-		MaxTags:   0,
+func (cfg *Config) validateDockerProvider(id string, prdDocker model.PrdDocker) error {
+	if err := mergo.Merge(&prdDocker, model.PrdDocker{
+		TLSVerify:      true,
+		WatchByDefault: false,
+		WatchStopped:   false,
 	}); err != nil {
-		return fmt.Errorf("cannot set default image values for %s: %v", img.Name, err)
+		return fmt.Errorf("cannot set default values for docker %s provider: %v", id, err)
 	}
 
-	if img.RegOptsID != "" {
-		regopts, found := cfg.RegOpts[img.RegOptsID]
-		if !found {
-			return fmt.Errorf("registry options %s not found for %s", img.RegOptsID, img.Name)
-		}
-		img.RegOpts = regopts
+	cfg.Providers.Docker[id] = prdDocker
+	return nil
+}
+
+func (cfg *Config) validateSwarmProvider(id string, prdSwarm model.PrdSwarm) error {
+	if err := mergo.Merge(&prdSwarm, model.PrdSwarm{
+		TLSVerify:      true,
+		WatchByDefault: false,
+	}); err != nil {
+		return fmt.Errorf("cannot set default values for swarm %s provider: %v", id, err)
 	}
 
-	for _, includeTag := range img.IncludeTags {
-		if _, err := regexp.Compile(includeTag); err != nil {
-			return fmt.Errorf("include tag regex '%s' for %s cannot compile, %v", includeTag, img.Name, err)
-		}
+	cfg.Providers.Swarm[id] = prdSwarm
+	return nil
+}
+
+func (cfg *Config) validateStaticProvider(key int, prdStatic model.PrdStatic) error {
+	if prdStatic.Name == "" {
+		return fmt.Errorf("name is required for static provider %d", key)
 	}
 
-	for _, excludeTag := range img.ExcludeTags {
-		if _, err := regexp.Compile(excludeTag); err != nil {
-			return fmt.Errorf("exclude tag regex '%s' for '%s' image cannot compile, %v", img.Name, excludeTag, err)
-		}
-	}
-
-	cfg.Image[key] = img
+	cfg.Providers.Static[key] = prdStatic
 	return nil
 }
 

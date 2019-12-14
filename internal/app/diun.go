@@ -7,7 +7,11 @@ import (
 
 	"github.com/crazy-max/diun/internal/config"
 	"github.com/crazy-max/diun/internal/db"
+	"github.com/crazy-max/diun/internal/model"
 	"github.com/crazy-max/diun/internal/notif"
+	dockerPrd "github.com/crazy-max/diun/internal/provider/docker"
+	staticPrd "github.com/crazy-max/diun/internal/provider/static"
+	swarmPrd "github.com/crazy-max/diun/internal/provider/swarm"
 	"github.com/hako/durafmt"
 	"github.com/panjf2000/ants/v2"
 	"github.com/robfig/cron/v3"
@@ -41,8 +45,10 @@ func New(cfg *config.Config, location *time.Location) (*Diun, error) {
 	}
 
 	return &Diun{
-		cfg:   cfg,
-		cron:  cron.New(cron.WithLocation(location), cron.WithSeconds()),
+		cfg: cfg,
+		cron: cron.New(cron.WithLocation(location), cron.WithParser(cron.NewParser(
+			cron.SecondOptional|cron.Minute|cron.Hour|cron.Dom|cron.Month|cron.Dow|cron.Descriptor),
+		)),
 		db:    dbcli,
 		notif: notifcli,
 	}, nil
@@ -71,7 +77,7 @@ func (di *Diun) Start() error {
 	select {}
 }
 
-// Run runs diun process
+// Run starts diun
 func (di *Diun) Run() {
 	if !atomic.CompareAndSwapUint32(&di.locker, 0, 1) {
 		log.Warn().Msg("Already running")
@@ -84,22 +90,34 @@ func (di *Diun) Run() {
 			di.cron.Entry(di.jobID).Next)
 	}
 
-	log.Info().Msg("Starting Diun...")
+	log.Info().Msg("Cron triggered")
 	di.wg = new(sync.WaitGroup)
 	di.pool, _ = ants.NewPoolWithFunc(di.cfg.Watch.Workers, func(i interface{}) {
-		var err error
-		switch t := i.(type) {
-		case imageJob:
-			err = di.imageJob(t)
-			if err != nil {
-				log.Error().Err(err).Msg("Job image error")
-			}
+		job := i.(model.Job)
+		if err := di.runJob(job); err != nil {
+			log.Error().Err(err).
+				Str("provider", job.Provider).
+				Msg("Cannot run job")
 		}
 		di.wg.Done()
 	})
 	defer di.pool.Release()
 
-	di.procImages()
+	// Docker provider
+	for _, job := range dockerPrd.New(di.cfg.Providers.Docker).ListJob() {
+		di.createJob(job)
+	}
+
+	// Swarm provider
+	for _, job := range swarmPrd.New(di.cfg.Providers.Swarm).ListJob() {
+		di.createJob(job)
+	}
+
+	// Static provider
+	for _, job := range staticPrd.New(di.cfg.Providers.Static).ListJob() {
+		di.createJob(job)
+	}
+
 	di.wg.Wait()
 }
 

@@ -9,12 +9,3 @@ type App struct {
 	Author  string
 	Version string
 }
-
-const (
-	ImageStatusNew      = ImageStatus("new")
-	ImageStatusUpdate   = ImageStatus("update")
-	ImageStatusUnchange = ImageStatus("unchange")
-)
-
-// ImageStatus holds Docker image status analysis
-type ImageStatus string

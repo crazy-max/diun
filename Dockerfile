@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:experimental
-FROM --platform=${BUILDPLATFORM:-linux/amd64} golang:1.12.10-alpine as builder
+FROM --platform=${BUILDPLATFORM:-linux/amd64} golang:1.13.5-alpine as builder
 
 ARG BUILD_DATE
 ARG VCS_REF
@@ -59,10 +59,7 @@ LABEL maintainer="CrazyMax" \
 RUN apk --update --no-cache add \
     ca-certificates \
     libressl \
-    shadow \
     tzdata \
-  && addgroup -g 1000 diun \
-  && adduser -u 1000 -G diun -s /sbin/nologin -D diun \
   && rm -rf /tmp/* /var/cache/apk/*
 
 COPY --from=builder /app/diun /usr/local/bin/diun
@@ -70,8 +67,6 @@ COPY --from=builder /usr/local/go/lib/time/zoneinfo.zip /usr/local/go/lib/time/z
 RUN diun --version
 
 ENV DIUN_DB="/data/diun.db"
-
-USER diun
 
 VOLUME [ "/data" ]
 

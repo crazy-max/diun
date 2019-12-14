@@ -3,7 +3,7 @@ db:
 
 watch:
   workers: 100
-  schedule: "*/30 * * * * *"
+  schedule: "*/30 * * * *"
 
 notif:
   mail:
@@ -13,7 +13,9 @@ notif:
     ssl: false
     insecure_skip_verify: false
     username:
+    username_file:
     password:
+    password_file:
     from:
     to:
   webhook:
@@ -31,34 +33,45 @@ regopts:
   bintrayoptions:
     username: foo
     password: bar
+  sensitive:
+    username_file: /run/secrets/username
+    password_file: /run/secrets/password
 
-image:
-  - name: docker.io/crazymax/nextcloud:latest
-    regopts_id: someregopts
-  - name: crazymax/swarm-cronjob
-    watch_repo: true
-    include_tags:
-      - ^1\.2\..*
-  - name: jfrog-docker-reg2.bintray.io/jfrog/artifactory-oss:4.0.0
-    regopts_id: bintrayoptions
-  - name: docker.bintray.io/jfrog/xray-server:2.8.6
-    watch_repo: true
-    max_tags: 50
-  - name: quay.io/coreos/hyperkube
-  - name: docker.io/portainer/portainer
-    watch_repo: true
-    max_tags: 10
-    include_tags:
-      - ^(0|[1-9]\d*)\..*
-  - name: traefik
-    watch_repo: true
-  - name: alpine
-    os: linux
-    arch: arm64v8
-  - name: docker.io/graylog/graylog:3.2.0
-  - name: jacobalberty/unifi:5.9
-  - name: quay.io/coreos/hyperkube:v1.1.7-coreos.1
-  - name: crazymax/ddns-route53
-    watch_repo: true
-    include_tags:
-      - ^1\..*
+providers:
+  docker:
+    standalone:
+      watch_by_default: true
+      watch_stopped: true
+  swarm:
+    local_swarm:
+      watch_by_default: true
+  static:
+    - name: docker.io/crazymax/nextcloud:latest
+      regopts_id: someregopts
+    - name: crazymax/swarm-cronjob
+      watch_repo: true
+      include_tags:
+        - ^1\.2\..*
+    - name: jfrog-docker-reg2.bintray.io/jfrog/artifactory-oss:4.0.0
+      regopts_id: bintrayoptions
+    - name: docker.bintray.io/jfrog/xray-server:2.8.6
+      watch_repo: true
+      max_tags: 50
+    - name: quay.io/coreos/hyperkube
+    - name: docker.io/portainer/portainer
+      watch_repo: true
+      max_tags: 10
+      include_tags:
+        - ^(0|[1-9]\d*)\..*
+    - name: traefik
+      watch_repo: true
+    - name: alpine
+      os: linux
+      arch: arm64v8
+    - name: docker.io/graylog/graylog:3.2.0
+    - name: jacobalberty/unifi:5.9
+    - name: quay.io/coreos/hyperkube:v1.1.7-coreos.1
+    - name: crazymax/ddns-route53
+      watch_repo: true
+      include_tags:
+        - ^1\..*
