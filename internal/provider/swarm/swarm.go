@@ -1,4 +1,4 @@
-package docker
+package swarm
 
 import (
 	"github.com/crazy-max/diun/internal/model"
@@ -6,14 +6,14 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-// Client represents an active docker provider object
+// Client represents an active swarm provider object
 type Client struct {
 	*provider.Client
-	elts []model.PrdDocker
+	elts []model.PrdSwarm
 }
 
-// New creates new docker provider instance
-func New(elts []model.PrdDocker) *provider.Client {
+// New creates new swarm provider instance
+func New(elts []model.PrdSwarm) *provider.Client {
 	return &provider.Client{Handler: &Client{
 		elts: elts,
 	}}
@@ -25,12 +25,12 @@ func (c *Client) ListJob() []model.Job {
 		return []model.Job{}
 	}
 
-	log.Info().Msgf("Found %d docker provider(s) to analyze...", len(c.elts))
+	log.Info().Msgf("Found %d swarm provider(s) to analyze...", len(c.elts))
 	var list []model.Job
 	for _, elt := range c.elts {
-		for _, img := range c.listContainerImage(elt) {
+		for _, img := range c.listServiceImage(elt) {
 			list = append(list, model.Job{
-				Provider: "docker",
+				Provider: "swarm",
 				ID:       elt.ID,
 				Image:    img,
 			})

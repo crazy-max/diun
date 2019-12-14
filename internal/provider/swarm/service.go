@@ -1,4 +1,4 @@
-package docker
+package swarm
 
 import (
 	"reflect"
@@ -10,9 +10,9 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func (c *Client) listContainerImage(elt model.PrdDocker) []model.Image {
+func (c *Client) listServiceImage(elt model.PrdSwarm) []model.Image {
 	sublog := log.With().
-		Str("provider", "docker").
+		Str("provider", "swarm").
 		Str("id", elt.ID).
 		Logger()
 
@@ -22,27 +22,20 @@ func (c *Client) listContainerImage(elt model.PrdDocker) []model.Image {
 		return []model.Image{}
 	}
 
-	ctnFilter := filters.NewArgs()
-	ctnFilter.Add("status", "running")
-	if elt.WatchStopped {
-		ctnFilter.Add("status", "created")
-		ctnFilter.Add("status", "exited")
-	}
-
-	ctns, err := cli.ContainerList(ctnFilter)
+	svcs, err := cli.ServiceList(filters.NewArgs())
 	if err != nil {
-		sublog.Error().Err(err).Msg("Cannot list Docker containers")
+		sublog.Error().Err(err).Msg("Cannot list Swarm services")
 		return []model.Image{}
 	}
 
 	var list []model.Image
-	for _, ctn := range ctns {
-		image, err := provider.ValidateContainerImage(ctn.Image, ctn.Labels, elt.WatchByDefault)
+	for _, svc := range svcs {
+		image, err := provider.ValidateContainerImage(svc.Spec.TaskTemplate.ContainerSpec.Image, svc.Spec.Labels, elt.WatchByDefault)
 		if err != nil {
-			sublog.Error().Err(err).Msgf("Cannot get image from container %s", ctn.ID)
+			sublog.Error().Err(err).Msgf("Cannot get image from service %s", svc.ID)
 			continue
 		} else if reflect.DeepEqual(image, model.Image{}) {
-			sublog.Debug().Msgf("Watch disabled for container %s", ctn.ID)
+			sublog.Debug().Msgf("Watch disabled for service %s", svc.ID)
 			continue
 		}
 		list = append(list, image)

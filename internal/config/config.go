@@ -63,6 +63,7 @@ func Load(flags model.Flags, version string) (*Config, error) {
 		},
 		Providers: model.Providers{
 			Docker: []model.PrdDocker{},
+			Swarm:  []model.PrdSwarm{},
 			Image:  []model.PrdImage{},
 		},
 	}
@@ -100,14 +101,20 @@ func (cfg *Config) validate() error {
 		}
 	}
 
-	for key, dock := range cfg.Providers.Docker {
-		if err := cfg.validateDockerProvider(key, dock); err != nil {
+	for key, prdDocker := range cfg.Providers.Docker {
+		if err := cfg.validateDockerProvider(key, prdDocker); err != nil {
 			return err
 		}
 	}
 
-	for key, img := range cfg.Providers.Image {
-		if err := cfg.validateImageProvider(key, img); err != nil {
+	for key, prdSwarm := range cfg.Providers.Swarm {
+		if err := cfg.validateSwarmProvider(key, prdSwarm); err != nil {
+			return err
+		}
+	}
+
+	for key, prdImage := range cfg.Providers.Image {
+		if err := cfg.validateImageProvider(key, prdImage); err != nil {
 			return err
 		}
 	}
@@ -134,37 +141,52 @@ func (cfg *Config) validateRegOpts(id string, regopts model.RegOpts) error {
 		InsecureTLS: false,
 		Timeout:     defTimeout,
 	}); err != nil {
-		return fmt.Errorf("cannot set default registry options values for %s: %v", id, err)
+		return fmt.Errorf("cannot set default values for registry options %s: %v", id, err)
 	}
 
 	cfg.RegOpts[id] = regopts
 	return nil
 }
 
-func (cfg *Config) validateDockerProvider(key int, dock model.PrdDocker) error {
-	if dock.ID == "" {
+func (cfg *Config) validateDockerProvider(key int, prdDocker model.PrdDocker) error {
+	if prdDocker.ID == "" {
 		return fmt.Errorf("id is required for docker provider %d", key)
 	}
 
-	if err := mergo.Merge(&dock, model.PrdDocker{
+	if err := mergo.Merge(&prdDocker, model.PrdDocker{
 		TLSVerify:      true,
-		SwarmMode:      false,
 		WatchByDefault: false,
 		WatchStopped:   false,
 	}); err != nil {
-		return fmt.Errorf("cannot set default docker provider values for %s: %v", dock.ID, err)
+		return fmt.Errorf("cannot set default values for docker provider %s: %v", prdDocker.ID, err)
 	}
 
-	cfg.Providers.Docker[key] = dock
+	cfg.Providers.Docker[key] = prdDocker
 	return nil
 }
 
-func (cfg *Config) validateImageProvider(key int, img model.PrdImage) error {
-	if img.Name == "" {
+func (cfg *Config) validateSwarmProvider(key int, prdSwarm model.PrdSwarm) error {
+	if prdSwarm.ID == "" {
+		return fmt.Errorf("id is required for swarm provider %d", key)
+	}
+
+	if err := mergo.Merge(&prdSwarm, model.PrdSwarm{
+		TLSVerify:      true,
+		WatchByDefault: false,
+	}); err != nil {
+		return fmt.Errorf("cannot set default values for swarm provider %s: %v", prdSwarm.ID, err)
+	}
+
+	cfg.Providers.Swarm[key] = prdSwarm
+	return nil
+}
+
+func (cfg *Config) validateImageProvider(key int, prdImage model.PrdImage) error {
+	if prdImage.Name == "" {
 		return fmt.Errorf("name is required for image provider %d", key)
 	}
 
-	cfg.Providers.Image[key] = img
+	cfg.Providers.Image[key] = prdImage
 	return nil
 }
 

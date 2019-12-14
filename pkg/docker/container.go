@@ -1,16 +1,15 @@
 package docker
 
 import (
-	"context"
 	"sort"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
 )
 
-// Containers return containers based on filters
-func (c *Client) Containers(filterArgs filters.Args) ([]types.Container, error) {
-	containers, err := c.Api.ContainerList(context.Background(), types.ContainerListOptions{
+// ContainerList returns Docker containers
+func (c *Client) ContainerList(filterArgs filters.Args) ([]types.Container, error) {
+	containers, err := c.Api.ContainerList(c.ctx, types.ContainerListOptions{
 		Filters: filterArgs,
 	})
 	if err != nil {

@@ -11,6 +11,7 @@ import (
 	"github.com/crazy-max/diun/internal/notif"
 	dockerPrd "github.com/crazy-max/diun/internal/provider/docker"
 	imagePrd "github.com/crazy-max/diun/internal/provider/image"
+	swarmPrd "github.com/crazy-max/diun/internal/provider/swarm"
 	"github.com/hako/durafmt"
 	"github.com/panjf2000/ants/v2"
 	"github.com/robfig/cron/v3"
@@ -105,6 +106,11 @@ func (di *Diun) Run() {
 
 	// Docker provider
 	for _, job := range dockerPrd.New(di.cfg.Providers.Docker).ListJob() {
+		di.createJob(job)
+	}
+
+	// Swarm provider
+	for _, job := range swarmPrd.New(di.cfg.Providers.Swarm).ListJob() {
 		di.createJob(job)
 	}
 
