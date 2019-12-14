@@ -8,7 +8,9 @@ type Mail struct {
 	SSL                bool   `yaml:"ssl,omitempty"`
 	InsecureSkipVerify bool   `yaml:"insecure_skip_verify,omitempty"`
 	Username           string `yaml:"username,omitempty"`
+	UsernameFile       string `yaml:"username_file,omitempty"`
 	Password           string `yaml:"password,omitempty"`
+	PasswordFile       string `yaml:"password_file,omitempty"`
 	From               string `yaml:"from,omitempty"`
 	To                 string `yaml:"to,omitempty"`
 }

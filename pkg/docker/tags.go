@@ -2,8 +2,8 @@ package docker
 
 import (
 	"github.com/containers/image/docker"
-	"github.com/crazy-max/diun/internal/utl"
 	"github.com/crazy-max/diun/pkg/docker/registry"
+	"github.com/crazy-max/diun/pkg/utl"
 )
 
 type Tags struct {

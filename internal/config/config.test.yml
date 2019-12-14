@@ -13,7 +13,9 @@ notif:
     ssl: false
     insecure_skip_verify: false
     username:
+    username_file:
     password:
+    password_file:
     from:
     to:
   webhook:
@@ -31,6 +33,9 @@ regopts:
   bintrayoptions:
     username: foo
     password: bar
+  sensitive:
+    username_file: /run/secrets/username
+    password_file: /run/secrets/password
 
 providers:
   docker:

@@ -78,6 +78,10 @@ func TestLoad(t *testing.T) {
 						Username: "foo",
 						Password: "bar",
 					},
+					"sensitive": {
+						UsernameFile: "/run/secrets/username",
+						PasswordFile: "/run/secrets/password",
+					},
 				},
 				Providers: model.Providers{
 					Docker: []model.PrdDocker{

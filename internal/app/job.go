@@ -5,9 +5,9 @@ import (
 	"time"
 
 	"github.com/crazy-max/diun/internal/model"
-	"github.com/crazy-max/diun/internal/utl"
 	"github.com/crazy-max/diun/pkg/docker"
 	"github.com/crazy-max/diun/pkg/docker/registry"
+	"github.com/crazy-max/diun/pkg/utl"
 	"github.com/rs/zerolog/log"
 )
 
@@ -23,11 +23,20 @@ func (di *Diun) createJob(job model.Job) {
 		sublog.Warn().Err(err).Msg("Registry options")
 	}
 
+	regUser, err := utl.GetSecret(regOpts.Username, regOpts.UsernameFile)
+	if err != nil {
+		log.Warn().Err(err).Msgf("Cannot retrieve username secret for regopts %s", job.Image.RegOptsID)
+	}
+	regPassword, err := utl.GetSecret(regOpts.Password, regOpts.PasswordFile)
+	if err != nil {
+		log.Warn().Err(err).Msgf("Cannot retrieve password secret for regopts %s", job.Image.RegOptsID)
+	}
+
 	job.Registry, err = docker.NewRegistryClient(docker.RegistryOptions{
 		Os:          job.Image.Os,
 		Arch:        job.Image.Arch,
-		Username:    regOpts.Username,
-		Password:    regOpts.Password,
+		Username:    regUser,
+		Password:    regPassword,
 		Timeout:     time.Duration(regOpts.Timeout) * time.Second,
 		InsecureTLS: regOpts.InsecureTLS,
 	})

@@ -11,7 +11,7 @@ import (
 	"regexp"
 
 	"github.com/crazy-max/diun/internal/model"
-	"github.com/crazy-max/diun/internal/utl"
+	"github.com/crazy-max/diun/pkg/utl"
 	"github.com/imdario/mergo"
 	"github.com/rs/zerolog/log"
 	"gopkg.in/yaml.v2"
@@ -63,7 +63,8 @@ func Load(flags model.Flags, version string) (*Config, error) {
 			},
 		},
 		Providers: model.Providers{
-			Image: []model.PrdImage{},
+			Docker: []model.PrdDocker{},
+			Image:  []model.PrdImage{},
 		},
 	}
 
