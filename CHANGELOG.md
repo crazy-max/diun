@@ -14,9 +14,9 @@
 * Go 1.13.5
 * Seconds field optional for schedule
 
-> :warning: **BREAKING CHANGES**
-> `image` field has been moved to `providers.static` in configuration file.
-> See [poviders configuration](doc/configuration.md#providers) for more info.
+> :warning: **BREAKING CHANGES**<br />
+> `image` field has been moved to `providers.static` in configuration file.<br />
+> See [providers configuration](doc/configuration.md#providers) for more info.
 
 ## 1.4.1 (2019/10/20)
 
@@ -78,7 +78,7 @@
 * Improve worker pool
 
 > :warning: **BREAKING CHANGES**
-> Some fields in configuration file has been changed :
+> Some fields in configuration file has been changed:
 > * `registries` renamed `regopts`
 > * `items` renamed `image`
 > * `items[].image` renamed `image[].name`
