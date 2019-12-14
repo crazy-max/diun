@@ -90,7 +90,7 @@ func (di *Diun) Run() {
 			di.cron.Entry(di.jobID).Next)
 	}
 
-	log.Info().Msg("Starting Diun...")
+	log.Info().Msg("Cron triggered")
 	di.wg = new(sync.WaitGroup)
 	di.pool, _ = ants.NewPoolWithFunc(di.cfg.Watch.Workers, func(i interface{}) {
 		job := i.(model.Job)
