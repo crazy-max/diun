@@ -8,7 +8,6 @@ import (
 	"net/mail"
 	"os"
 	"path"
-	"regexp"
 
 	"github.com/crazy-max/diun/internal/model"
 	"github.com/crazy-max/diun/pkg/utl"
@@ -144,7 +143,7 @@ func (cfg *Config) validateRegOpts(id string, regopts model.RegOpts) error {
 
 func (cfg *Config) validateDockerProvider(key int, dock model.PrdDocker) error {
 	if dock.ID == "" {
-		return fmt.Errorf("ID is required for docker provider %d", key)
+		return fmt.Errorf("id is required for docker provider %d", key)
 	}
 
 	if err := mergo.Merge(&dock, model.PrdDocker{
@@ -163,27 +162,6 @@ func (cfg *Config) validateDockerProvider(key int, dock model.PrdDocker) error {
 func (cfg *Config) validateImageProvider(key int, img model.PrdImage) error {
 	if img.Name == "" {
 		return fmt.Errorf("name is required for image provider %d", key)
-	}
-
-	if err := mergo.Merge(&img, model.PrdImage{
-		Os:        "linux",
-		Arch:      "amd64",
-		WatchRepo: false,
-		MaxTags:   0,
-	}); err != nil {
-		return fmt.Errorf("cannot set default image image values for %s: %v", img.Name, err)
-	}
-
-	for _, includeTag := range img.IncludeTags {
-		if _, err := regexp.Compile(includeTag); err != nil {
-			return fmt.Errorf("include tag regex '%s' for %s cannot compile, %v", includeTag, img.Name, err)
-		}
-	}
-
-	for _, excludeTag := range img.ExcludeTags {
-		if _, err := regexp.Compile(excludeTag); err != nil {
-			return fmt.Errorf("exclude tag regex '%s' for '%s' image cannot compile, %v", img.Name, excludeTag, err)
-		}
 	}
 
 	cfg.Providers.Image[key] = img

@@ -2,22 +2,34 @@ package app
 
 import (
 	"fmt"
+	"regexp"
 	"time"
 
 	"github.com/crazy-max/diun/internal/model"
 	"github.com/crazy-max/diun/pkg/docker"
 	"github.com/crazy-max/diun/pkg/docker/registry"
 	"github.com/crazy-max/diun/pkg/utl"
+	"github.com/imdario/mergo"
 	"github.com/rs/zerolog/log"
 )
 
 func (di *Diun) createJob(job model.Job) {
+	var err error
+
 	sublog := log.With().
 		Str("provider", job.Provider).
 		Str("id", job.ID).
 		Str("image", job.Image.Name).
 		Logger()
 
+	// Validate image
+	job.RegImage, err = registry.ParseImage(job.Image.Name)
+	if err != nil {
+		sublog.Error().Err(err).Msg("Cannot parse image")
+		return
+	}
+
+	// Registry options
 	regOpts, err := di.getRegOpts(job.Image.RegOptsID)
 	if err != nil {
 		sublog.Warn().Err(err).Msg("Registry options")
@@ -30,6 +42,31 @@ func (di *Diun) createJob(job model.Job) {
 	regPassword, err := utl.GetSecret(regOpts.Password, regOpts.PasswordFile)
 	if err != nil {
 		log.Warn().Err(err).Msgf("Cannot retrieve password secret for regopts %s", job.Image.RegOptsID)
+	}
+
+	// Set defaults
+	if err := mergo.Merge(&job.Image, model.Image{
+		Os:        "linux",
+		Arch:      "amd64",
+		WatchRepo: false,
+		MaxTags:   0,
+	}); err != nil {
+		sublog.Error().Err(err).Msg("Cannot set default values")
+		return
+	}
+
+	// Validate include/exclude tags
+	for _, includeTag := range job.Image.IncludeTags {
+		if _, err := regexp.Compile(includeTag); err != nil {
+			sublog.Error().Err(err).Msg("Include tag regex '%s' cannot compile")
+			return
+		}
+	}
+	for _, excludeTag := range job.Image.ExcludeTags {
+		if _, err := regexp.Compile(excludeTag); err != nil {
+			sublog.Error().Err(err).Msg("Exclude tag regex '%s' cannot compile")
+			return
+		}
 	}
 
 	job.Registry, err = docker.NewRegistryClient(docker.RegistryOptions{
@@ -45,24 +82,18 @@ func (di *Diun) createJob(job model.Job) {
 		return
 	}
 
-	regimg, err := registry.ParseImage(job.Image.Name)
-	if err != nil {
-		sublog.Error().Err(err).Msg("Cannot parse image")
-		return
-	}
-
 	di.wg.Add(1)
 	err = di.pool.Invoke(job)
 	if err != nil {
 		sublog.Error().Err(err).Msgf("Invoking job")
 	}
 
-	if !job.Image.WatchRepo || regimg.Domain == "" {
+	if !job.Image.WatchRepo || job.RegImage.Domain == "" {
 		return
 	}
 
 	tags, err := job.Registry.Tags(docker.TagsOptions{
-		Image:   regimg,
+		Image:   job.RegImage,
 		Max:     job.Image.MaxTags,
 		Include: job.Image.IncludeTags,
 		Exclude: job.Image.ExcludeTags,
@@ -72,7 +103,7 @@ func (di *Diun) createJob(job model.Job) {
 		return
 	}
 
-	log.Debug().Str("image", regimg.String()).Msgf("%d tag(s) found in repository. %d will be analyzed (%d max, %d not included, %d excluded).",
+	log.Debug().Str("image", job.RegImage.String()).Msgf("%d tag(s) found in repository. %d will be analyzed (%d max, %d not included, %d excluded).",
 		tags.Total,
 		len(tags.List),
 		job.Image.MaxTags,
@@ -81,7 +112,7 @@ func (di *Diun) createJob(job model.Job) {
 	)
 
 	for _, tag := range tags.List {
-		job.Image.Name = fmt.Sprintf("%s/%s:%s", regimg.Domain, regimg.Path, tag)
+		job.Image.Name = fmt.Sprintf("%s/%s:%s", job.RegImage.Domain, job.RegImage.Path, tag)
 		di.wg.Add(1)
 		err = di.pool.Invoke(job)
 		if err != nil {
@@ -91,31 +122,26 @@ func (di *Diun) createJob(job model.Job) {
 }
 
 func (di *Diun) runJob(job model.Job) error {
-	image, err := registry.ParseImage(job.Image.Name)
-	if err != nil {
-		return err
-	}
-
 	sublog := log.With().
 		Str("provider", job.Provider).
 		Str("id", job.ID).
-		Str("image", image.String()).
+		Str("image", job.RegImage.String()).
 		Logger()
 
-	if !utl.IsIncluded(image.Tag, job.Image.IncludeTags) {
+	if !utl.IsIncluded(job.RegImage.Tag, job.Image.IncludeTags) {
 		sublog.Warn().Msg("Tag not included")
 		return nil
-	} else if utl.IsExcluded(image.Tag, job.Image.ExcludeTags) {
+	} else if utl.IsExcluded(job.RegImage.Tag, job.Image.ExcludeTags) {
 		sublog.Warn().Msg("Tag excluded")
 		return nil
 	}
 
-	liveManifest, err := job.Registry.Manifest(image)
+	liveManifest, err := job.Registry.Manifest(job.RegImage)
 	if err != nil {
 		return err
 	}
 
-	dbManifest, err := di.db.GetManifest(image)
+	dbManifest, err := di.db.GetManifest(job.RegImage)
 	if err != nil {
 		return err
 	}
@@ -132,14 +158,14 @@ func (di *Diun) runJob(job model.Job) error {
 		return nil
 	}
 
-	if err := di.db.PutManifest(image, liveManifest); err != nil {
+	if err := di.db.PutManifest(job.RegImage, liveManifest); err != nil {
 		return err
 	}
 	sublog.Debug().Msg("Manifest saved to database")
 
 	di.notif.Send(model.NotifEntry{
 		Status:   status,
-		Image:    image,
+		Image:    job.RegImage,
 		Manifest: liveManifest,
 	})
 
