@@ -18,7 +18,6 @@ func (di *Diun) createJob(job model.Job) {
 
 	sublog := log.With().
 		Str("provider", job.Provider).
-		Str("id", job.ID).
 		Str("image", job.Image.Name).
 		Logger()
 
@@ -129,7 +128,6 @@ func (di *Diun) createJob(job model.Job) {
 func (di *Diun) runJob(job model.Job) error {
 	sublog := log.With().
 		Str("provider", job.Provider).
-		Str("id", job.ID).
 		Str("image", job.RegImage.String()).
 		Logger()
 
@@ -170,6 +168,7 @@ func (di *Diun) runJob(job model.Job) error {
 
 	di.notif.Send(model.NotifEntry{
 		Status:   status,
+		Provider: job.Provider,
 		Image:    job.RegImage,
 		Manifest: liveManifest,
 	})

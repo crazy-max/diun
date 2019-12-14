@@ -1,6 +1,7 @@
 package docker
 
 import (
+	"fmt"
 	"reflect"
 
 	"github.com/crazy-max/diun/internal/model"
@@ -12,8 +13,7 @@ import (
 
 func (c *Client) listContainerImage(elt model.PrdDocker) []model.Image {
 	sublog := log.With().
-		Str("provider", "docker").
-		Str("id", elt.ID).
+		Str("provider", fmt.Sprintf("docker-%s", elt.ID)).
 		Logger()
 
 	cli, err := docker.NewClient(elt.Endpoint, elt.ApiVersion, elt.TLSCertsPath, elt.TLSVerify)

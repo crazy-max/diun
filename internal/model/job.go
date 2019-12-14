@@ -8,7 +8,6 @@ import (
 // Job holds job configuration
 type Job struct {
 	Provider string
-	ID       string
 	Image    Image
 	RegImage registry.Image
 	Registry *docker.RegistryClient

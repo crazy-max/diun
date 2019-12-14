@@ -97,7 +97,6 @@ func (di *Diun) Run() {
 		if err := di.runJob(job); err != nil {
 			log.Error().Err(err).
 				Str("provider", job.Provider).
-				Str("id", job.ID).
 				Msg("Cannot run job")
 		}
 		di.wg.Done()

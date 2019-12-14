@@ -1,6 +1,8 @@
 package docker
 
 import (
+	"fmt"
+
 	"github.com/crazy-max/diun/internal/model"
 	"github.com/crazy-max/diun/internal/provider"
 	"github.com/rs/zerolog/log"
@@ -30,8 +32,7 @@ func (c *Client) ListJob() []model.Job {
 	for _, elt := range c.elts {
 		for _, img := range c.listContainerImage(elt) {
 			list = append(list, model.Job{
-				Provider: "docker",
-				ID:       elt.ID,
+				Provider: fmt.Sprintf("docker-%s", elt.ID),
 				Image:    img,
 			})
 		}

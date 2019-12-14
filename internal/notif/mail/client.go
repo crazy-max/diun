@@ -63,7 +63,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	var emailBuf bytes.Buffer
 	emailTpl := template.Must(template.New("email").Parse(`
 
-Docker 🐳 tag **{{ .Image.Domain }}/{{ .Image.Path }}:{{ .Image.Tag }}** which you subscribed to has been {{ if (eq .Status "new") }}newly added{{ else }}updated{{ end }}.
+Docker 🐳 tag **{{ .Image.Domain }}/{{ .Image.Path }}:{{ .Image.Tag }}** which you subscribed to through **{{ .Provider }}** provider has been {{ if (eq .Status "new") }}newly added{{ else }}updated{{ end }}.
 
 This image has been {{ if (eq .Status "new") }}created{{ else }}updated{{ end }} at <code>{{ .Manifest.Created }}</code> with digest <code>{{ .Manifest.Digest }}</code> for <code>{{ .Manifest.Os }}/{{ .Manifest.Architecture }}</code> platform.
 

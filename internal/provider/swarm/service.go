@@ -1,6 +1,7 @@
 package swarm
 
 import (
+	"fmt"
 	"reflect"
 
 	"github.com/crazy-max/diun/internal/model"
@@ -12,8 +13,7 @@ import (
 
 func (c *Client) listServiceImage(elt model.PrdSwarm) []model.Image {
 	sublog := log.With().
-		Str("provider", "swarm").
-		Str("id", elt.ID).
+		Str("provider", fmt.Sprintf("swarm-%s", elt.ID)).
 		Logger()
 
 	cli, err := docker.NewClient(elt.Endpoint, elt.ApiVersion, elt.TLSCertsPath, elt.TLSVerify)
