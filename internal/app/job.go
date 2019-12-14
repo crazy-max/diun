@@ -113,6 +113,11 @@ func (di *Diun) createJob(job model.Job) {
 
 	for _, tag := range tags.List {
 		job.Image.Name = fmt.Sprintf("%s/%s:%s", job.RegImage.Domain, job.RegImage.Path, tag)
+		job.RegImage, err = registry.ParseImage(job.Image.Name)
+		if err != nil {
+			sublog.Error().Err(err).Msg("Cannot parse image (tag)")
+			continue
+		}
 		di.wg.Add(1)
 		err = di.pool.Invoke(job)
 		if err != nil {
