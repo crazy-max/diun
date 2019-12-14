@@ -45,7 +45,7 @@ providers:
   swarm:
     - id: local_swarm
       watch_by_default: true
-  image:
+  static:
     - name: docker.io/crazymax/nextcloud:latest
       regopts_id: someregopts
     - name: crazymax/swarm-cronjob

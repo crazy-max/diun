@@ -10,7 +10,7 @@ import (
 	"github.com/crazy-max/diun/internal/model"
 	"github.com/crazy-max/diun/internal/notif"
 	dockerPrd "github.com/crazy-max/diun/internal/provider/docker"
-	imagePrd "github.com/crazy-max/diun/internal/provider/image"
+	staticPrd "github.com/crazy-max/diun/internal/provider/static"
 	swarmPrd "github.com/crazy-max/diun/internal/provider/swarm"
 	"github.com/hako/durafmt"
 	"github.com/panjf2000/ants/v2"
@@ -114,8 +114,8 @@ func (di *Diun) Run() {
 		di.createJob(job)
 	}
 
-	// Image provider
-	for _, job := range imagePrd.New(di.cfg.Providers.Image).ListJob() {
+	// Static provider
+	for _, job := range staticPrd.New(di.cfg.Providers.Static).ListJob() {
 		di.createJob(job)
 	}
 

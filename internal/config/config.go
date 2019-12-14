@@ -64,7 +64,7 @@ func Load(flags model.Flags, version string) (*Config, error) {
 		Providers: model.Providers{
 			Docker: []model.PrdDocker{},
 			Swarm:  []model.PrdSwarm{},
-			Image:  []model.PrdImage{},
+			Static: []model.PrdStatic{},
 		},
 	}
 
@@ -113,8 +113,8 @@ func (cfg *Config) validate() error {
 		}
 	}
 
-	for key, prdImage := range cfg.Providers.Image {
-		if err := cfg.validateImageProvider(key, prdImage); err != nil {
+	for key, prdStatic := range cfg.Providers.Static {
+		if err := cfg.validateStaticProvider(key, prdStatic); err != nil {
 			return err
 		}
 	}
@@ -181,12 +181,12 @@ func (cfg *Config) validateSwarmProvider(key int, prdSwarm model.PrdSwarm) error
 	return nil
 }
 
-func (cfg *Config) validateImageProvider(key int, prdImage model.PrdImage) error {
-	if prdImage.Name == "" {
-		return fmt.Errorf("name is required for image provider %d", key)
+func (cfg *Config) validateStaticProvider(key int, prdStatic model.PrdStatic) error {
+	if prdStatic.Name == "" {
+		return fmt.Errorf("name is required for static provider %d", key)
 	}
 
-	cfg.Providers.Image[key] = prdImage
+	cfg.Providers.Static[key] = prdStatic
 	return nil
 }
 

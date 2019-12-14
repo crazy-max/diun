@@ -99,7 +99,7 @@ func TestLoad(t *testing.T) {
 							WatchByDefault: true,
 						},
 					},
-					Image: []model.PrdImage{
+					Static: []model.PrdStatic{
 						{
 							Name:      "docker.io/crazymax/nextcloud:latest",
 							RegOptsID: "someregopts",

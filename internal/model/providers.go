@@ -4,7 +4,7 @@ package model
 type Providers struct {
 	Docker []PrdDocker `yaml:"docker,omitempty" json:",omitempty"`
 	Swarm  []PrdSwarm  `yaml:"swarm,omitempty" json:",omitempty"`
-	Image  []PrdImage  `yaml:"image,omitempty" json:",omitempty"`
+	Static []PrdStatic `yaml:"static,omitempty" json:",omitempty"`
 }
 
 // PrdDocker holds docker provider configuration
@@ -28,5 +28,5 @@ type PrdSwarm struct {
 	WatchByDefault bool   `yaml:"watch_by_default,omitempty" json:",omitempty"`
 }
 
-// PrdImage holds image provider configuration
-type PrdImage Image
+// PrdStatic holds static provider configuration
+type PrdStatic Image

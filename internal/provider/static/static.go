@@ -1,4 +1,4 @@
-package image
+package static
 
 import (
 	"github.com/crazy-max/diun/internal/model"
@@ -6,14 +6,14 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-// Client represents an active image provider object
+// Client represents an active static provider object
 type Client struct {
 	*provider.Client
-	elts []model.PrdImage
+	elts []model.PrdStatic
 }
 
-// New creates new image provider instance
-func New(elts []model.PrdImage) *provider.Client {
+// New creates new static provider instance
+func New(elts []model.PrdStatic) *provider.Client {
 	return &provider.Client{Handler: &Client{
 		elts: elts,
 	}}
@@ -25,11 +25,11 @@ func (c *Client) ListJob() []model.Job {
 		return []model.Job{}
 	}
 
-	log.Info().Msgf("Found %d image provider(s) to analyze...", len(c.elts))
+	log.Info().Msgf("Found %d static provider(s) to analyze...", len(c.elts))
 	var list []model.Job
 	for _, elt := range c.elts {
 		list = append(list, model.Job{
-			Provider: "image",
+			Provider: "static",
 			ID:       elt.Name,
 			Image:    model.Image(elt),
 		})
