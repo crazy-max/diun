@@ -1,5 +1,19 @@
 # Changelog
 
+## 2.0.0 (2019/12/14)
+
+* Include provider in notifications
+* Add providers documentation
+* Move image validation and improve job execution
+* Add Swarm provider
+* Add fields to load sensitive values from file (#7)
+* Add Docker provider (#3)
+* Docker client v19.03.5
+* Move `image` field to providers layer and rename it `static`
+* Update libs
+* Go 1.13.5
+* Seconds field optional for schedule
+
 ## 1.4.1 (2019/10/20)
 
 * Update libs
