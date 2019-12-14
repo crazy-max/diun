@@ -10,7 +10,7 @@ import (
 
 // ServiceList returns Swarm services
 func (c *Client) ServiceList(filterArgs filters.Args) ([]swarm.Service, error) {
-	services, err := c.Api.ServiceList(c.ctx, types.ServiceListOptions{
+	services, err := c.API.ServiceList(c.ctx, types.ServiceListOptions{
 		Filters: filterArgs,
 	})
 	if err != nil {

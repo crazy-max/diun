@@ -8,6 +8,7 @@ import (
 	"github.com/crazy-max/diun/internal/model"
 )
 
+// ValidateContainerImage returns a standard image through Docker labels
 func ValidateContainerImage(image string, labels map[string]string, watchByDef bool) (img model.Image, err error) {
 	if i := strings.Index(image, "@sha256:"); i > 0 {
 		image = image[:i]

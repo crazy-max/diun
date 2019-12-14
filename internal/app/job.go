@@ -182,7 +182,6 @@ func (di *Diun) getRegOpts(id string) (model.RegOpts, error) {
 	}
 	if regopts, ok := di.cfg.RegOpts[id]; ok {
 		return regopts, nil
-	} else {
-		return model.RegOpts{}, fmt.Errorf("%s not found", id)
 	}
+	return model.RegOpts{}, fmt.Errorf("%s not found", id)
 }

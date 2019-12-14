@@ -16,7 +16,7 @@ func (c *Client) listContainerImage(id string, elt model.PrdDocker) []model.Imag
 		Str("provider", fmt.Sprintf("docker-%s", id)).
 		Logger()
 
-	cli, err := docker.NewClient(elt.Endpoint, elt.ApiVersion, elt.TLSCertsPath, elt.TLSVerify)
+	cli, err := docker.NewClient(elt.Endpoint, elt.APIVersion, elt.TLSCertsPath, elt.TLSVerify)
 	if err != nil {
 		sublog.Error().Err(err).Msg("Cannot create Docker client")
 		return []model.Image{}

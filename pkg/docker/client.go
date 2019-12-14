@@ -13,7 +13,7 @@ import (
 // Client represents an active docker object
 type Client struct {
 	ctx context.Context
-	Api *client.Client
+	API *client.Client
 }
 
 // NewClient initializes a new Docker API client with default values
@@ -56,6 +56,6 @@ func NewClient(endpoint, apiVersion, tlsCertsPath string, tlsVerify bool) (*Clie
 
 	return &Client{
 		ctx: ctx,
-		Api: cli,
+		API: cli,
 	}, err
 }

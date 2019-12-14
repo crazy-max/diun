@@ -10,7 +10,7 @@ type Providers struct {
 // PrdDocker holds docker provider configuration
 type PrdDocker struct {
 	Endpoint       string `yaml:"endpoint,omitempty" json:",omitempty"`
-	ApiVersion     string `yaml:"api_version,omitempty" json:",omitempty"`
+	APIVersion     string `yaml:"api_version,omitempty" json:",omitempty"`
 	TLSCertsPath   string `yaml:"tls_certs_path,omitempty" json:",omitempty"`
 	TLSVerify      bool   `yaml:"tls_verify,omitempty" json:",omitempty"`
 	WatchByDefault bool   `yaml:"watch_by_default,omitempty" json:",omitempty"`
@@ -20,7 +20,7 @@ type PrdDocker struct {
 // PrdSwarm holds swarm provider configuration
 type PrdSwarm struct {
 	Endpoint       string `yaml:"endpoint,omitempty" json:",omitempty"`
-	ApiVersion     string `yaml:"api_version,omitempty" json:",omitempty"`
+	APIVersion     string `yaml:"api_version,omitempty" json:",omitempty"`
 	TLSCertsPath   string `yaml:"tls_certs_path,omitempty" json:",omitempty"`
 	TLSVerify      bool   `yaml:"tls_verify,omitempty" json:",omitempty"`
 	WatchByDefault bool   `yaml:"watch_by_default,omitempty" json:",omitempty"`

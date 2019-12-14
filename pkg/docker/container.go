@@ -9,7 +9,7 @@ import (
 
 // ContainerList returns Docker containers
 func (c *Client) ContainerList(filterArgs filters.Args) ([]types.Container, error) {
-	containers, err := c.Api.ContainerList(c.ctx, types.ContainerListOptions{
+	containers, err := c.API.ContainerList(c.ctx, types.ContainerListOptions{
 		Filters: filterArgs,
 	})
 	if err != nil {

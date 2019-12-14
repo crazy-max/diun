@@ -12,6 +12,7 @@ type Image struct {
 	ExcludeTags []string `yaml:"exclude_tags,omitempty" json:",omitempty"`
 }
 
+// Image status constants
 const (
 	ImageStatusNew      = ImageStatus("new")
 	ImageStatusUpdate   = ImageStatus("update")
