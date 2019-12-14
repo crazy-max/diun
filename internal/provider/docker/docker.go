@@ -11,11 +11,11 @@ import (
 // Client represents an active docker provider object
 type Client struct {
 	*provider.Client
-	elts []model.PrdDocker
+	elts map[string]model.PrdDocker
 }
 
 // New creates new docker provider instance
-func New(elts []model.PrdDocker) *provider.Client {
+func New(elts map[string]model.PrdDocker) *provider.Client {
 	return &provider.Client{Handler: &Client{
 		elts: elts,
 	}}
@@ -29,10 +29,10 @@ func (c *Client) ListJob() []model.Job {
 
 	log.Info().Msgf("Found %d docker provider(s) to analyze...", len(c.elts))
 	var list []model.Job
-	for _, elt := range c.elts {
-		for _, img := range c.listContainerImage(elt) {
+	for id, elt := range c.elts {
+		for _, img := range c.listContainerImage(id, elt) {
 			list = append(list, model.Job{
-				Provider: fmt.Sprintf("docker-%s", elt.ID),
+				Provider: fmt.Sprintf("docker-%s", id),
 				Image:    img,
 			})
 		}

@@ -11,11 +11,11 @@ import (
 // Client represents an active swarm provider object
 type Client struct {
 	*provider.Client
-	elts []model.PrdSwarm
+	elts map[string]model.PrdSwarm
 }
 
 // New creates new swarm provider instance
-func New(elts []model.PrdSwarm) *provider.Client {
+func New(elts map[string]model.PrdSwarm) *provider.Client {
 	return &provider.Client{Handler: &Client{
 		elts: elts,
 	}}
@@ -29,10 +29,10 @@ func (c *Client) ListJob() []model.Job {
 
 	log.Info().Msgf("Found %d swarm provider(s) to analyze...", len(c.elts))
 	var list []model.Job
-	for _, elt := range c.elts {
-		for _, img := range c.listServiceImage(elt) {
+	for id, elt := range c.elts {
+		for _, img := range c.listServiceImage(id, elt) {
 			list = append(list, model.Job{
-				Provider: fmt.Sprintf("swarm-%s", elt.ID),
+				Provider: fmt.Sprintf("swarm-%s", id),
 				Image:    img,
 			})
 		}

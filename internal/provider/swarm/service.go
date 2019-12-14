@@ -11,9 +11,9 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func (c *Client) listServiceImage(elt model.PrdSwarm) []model.Image {
+func (c *Client) listServiceImage(id string, elt model.PrdSwarm) []model.Image {
 	sublog := log.With().
-		Str("provider", fmt.Sprintf("swarm-%s", elt.ID)).
+		Str("provider", fmt.Sprintf("swarm-%s", id)).
 		Logger()
 
 	cli, err := docker.NewClient(elt.Endpoint, elt.ApiVersion, elt.TLSCertsPath, elt.TLSVerify)

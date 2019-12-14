@@ -39,11 +39,11 @@ regopts:
 
 providers:
   docker:
-    - id: standalone
+    standalone:
       watch_by_default: true
       watch_stopped: true
   swarm:
-    - id: local_swarm
+    local_swarm:
       watch_by_default: true
   static:
     - name: docker.io/crazymax/nextcloud:latest

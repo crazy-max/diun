@@ -2,14 +2,13 @@ package model
 
 // Providers represents a provider configuration
 type Providers struct {
-	Docker []PrdDocker `yaml:"docker,omitempty" json:",omitempty"`
-	Swarm  []PrdSwarm  `yaml:"swarm,omitempty" json:",omitempty"`
-	Static []PrdStatic `yaml:"static,omitempty" json:",omitempty"`
+	Docker map[string]PrdDocker `yaml:"docker,omitempty" json:",omitempty"`
+	Swarm  map[string]PrdSwarm  `yaml:"swarm,omitempty" json:",omitempty"`
+	Static []PrdStatic          `yaml:"static,omitempty" json:",omitempty"`
 }
 
 // PrdDocker holds docker provider configuration
 type PrdDocker struct {
-	ID             string `yaml:"id,omitempty" json:",omitempty"`
 	Endpoint       string `yaml:"endpoint,omitempty" json:",omitempty"`
 	ApiVersion     string `yaml:"api_version,omitempty" json:",omitempty"`
 	TLSCertsPath   string `yaml:"tls_certs_path,omitempty" json:",omitempty"`
@@ -20,7 +19,6 @@ type PrdDocker struct {
 
 // PrdSwarm holds swarm provider configuration
 type PrdSwarm struct {
-	ID             string `yaml:"id,omitempty" json:",omitempty"`
 	Endpoint       string `yaml:"endpoint,omitempty" json:",omitempty"`
 	ApiVersion     string `yaml:"api_version,omitempty" json:",omitempty"`
 	TLSCertsPath   string `yaml:"tls_certs_path,omitempty" json:",omitempty"`

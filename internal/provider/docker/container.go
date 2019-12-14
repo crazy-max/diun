@@ -11,9 +11,9 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func (c *Client) listContainerImage(elt model.PrdDocker) []model.Image {
+func (c *Client) listContainerImage(id string, elt model.PrdDocker) []model.Image {
 	sublog := log.With().
-		Str("provider", fmt.Sprintf("docker-%s", elt.ID)).
+		Str("provider", fmt.Sprintf("docker-%s", id)).
 		Logger()
 
 	cli, err := docker.NewClient(elt.Endpoint, elt.ApiVersion, elt.TLSCertsPath, elt.TLSVerify)

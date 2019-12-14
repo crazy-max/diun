@@ -84,17 +84,15 @@ func TestLoad(t *testing.T) {
 					},
 				},
 				Providers: model.Providers{
-					Docker: []model.PrdDocker{
-						{
-							ID:             "standalone",
+					Docker: map[string]model.PrdDocker{
+						"standalone": {
 							TLSVerify:      true,
 							WatchByDefault: true,
 							WatchStopped:   true,
 						},
 					},
-					Swarm: []model.PrdSwarm{
-						{
-							ID:             "local_swarm",
+					Swarm: map[string]model.PrdSwarm{
+						"local_swarm": {
 							TLSVerify:      true,
 							WatchByDefault: true,
 						},

@@ -61,11 +61,6 @@ func Load(flags model.Flags, version string) (*Config, error) {
 				Timeout: 10,
 			},
 		},
-		Providers: model.Providers{
-			Docker: []model.PrdDocker{},
-			Swarm:  []model.PrdSwarm{},
-			Static: []model.PrdStatic{},
-		},
 	}
 
 	if _, err = os.Lstat(flags.Cfgfile); err != nil {
@@ -101,14 +96,14 @@ func (cfg *Config) validate() error {
 		}
 	}
 
-	for key, prdDocker := range cfg.Providers.Docker {
-		if err := cfg.validateDockerProvider(key, prdDocker); err != nil {
+	for id, prdDocker := range cfg.Providers.Docker {
+		if err := cfg.validateDockerProvider(id, prdDocker); err != nil {
 			return err
 		}
 	}
 
-	for key, prdSwarm := range cfg.Providers.Swarm {
-		if err := cfg.validateSwarmProvider(key, prdSwarm); err != nil {
+	for id, prdSwarm := range cfg.Providers.Swarm {
+		if err := cfg.validateSwarmProvider(id, prdSwarm); err != nil {
 			return err
 		}
 	}
@@ -148,36 +143,28 @@ func (cfg *Config) validateRegOpts(id string, regopts model.RegOpts) error {
 	return nil
 }
 
-func (cfg *Config) validateDockerProvider(key int, prdDocker model.PrdDocker) error {
-	if prdDocker.ID == "" {
-		return fmt.Errorf("id is required for docker provider %d", key)
-	}
-
+func (cfg *Config) validateDockerProvider(id string, prdDocker model.PrdDocker) error {
 	if err := mergo.Merge(&prdDocker, model.PrdDocker{
 		TLSVerify:      true,
 		WatchByDefault: false,
 		WatchStopped:   false,
 	}); err != nil {
-		return fmt.Errorf("cannot set default values for docker provider %s: %v", prdDocker.ID, err)
+		return fmt.Errorf("cannot set default values for docker %s provider: %v", id, err)
 	}
 
-	cfg.Providers.Docker[key] = prdDocker
+	cfg.Providers.Docker[id] = prdDocker
 	return nil
 }
 
-func (cfg *Config) validateSwarmProvider(key int, prdSwarm model.PrdSwarm) error {
-	if prdSwarm.ID == "" {
-		return fmt.Errorf("id is required for swarm provider %d", key)
-	}
-
+func (cfg *Config) validateSwarmProvider(id string, prdSwarm model.PrdSwarm) error {
 	if err := mergo.Merge(&prdSwarm, model.PrdSwarm{
 		TLSVerify:      true,
 		WatchByDefault: false,
 	}); err != nil {
-		return fmt.Errorf("cannot set default values for swarm provider %s: %v", prdSwarm.ID, err)
+		return fmt.Errorf("cannot set default values for swarm %s provider: %v", id, err)
 	}
 
-	cfg.Providers.Swarm[key] = prdSwarm
+	cfg.Providers.Swarm[id] = prdSwarm
 	return nil
 }
 
