@@ -148,6 +148,7 @@ func (cfg *Config) validateDockerProvider(key int, dock model.PrdDocker) error {
 	}
 
 	if err := mergo.Merge(&dock, model.PrdDocker{
+		TLSVerify:      true,
 		SwarmMode:      false,
 		WatchByDefault: false,
 		WatchStopped:   false,

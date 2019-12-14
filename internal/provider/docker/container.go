@@ -19,7 +19,7 @@ func (c *Client) listContainerImage(elt model.PrdDocker) []model.Image {
 		Str("id", elt.ID).
 		Logger()
 
-	cli, err := docker.NewClient(elt.Endpoint, elt.ApiVersion, elt.CAFile, elt.CertFile, elt.KeyFile)
+	cli, err := docker.NewClient(elt.Endpoint, elt.ApiVersion, elt.TLSCertsPath, elt.TLSVerify)
 	if err != nil {
 		sublog.Error().Err(err).Msg("Cannot create Docker client")
 		return []model.Image{}
