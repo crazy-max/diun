@@ -16,7 +16,7 @@
 
 **Diun** :bell: is a CLI application written in [Go](https://golang.org/) to receive notifications :inbox_tray: when a Docker :whale: image is updated on a Docker registry. With Go, this app can be used across many platforms :game_die: and architectures. This support includes Linux, FreeBSD, macOS and Windows on architectures like amd64, i386, ARM and others.
 
-![](.res/screenshot.png)
+![](.res/notif-slack.png)
 
 ## Features
 
