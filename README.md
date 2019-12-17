@@ -28,6 +28,7 @@
 * Multi providers available like [Docker](doc/providers/docker.md), [Swarm](doc/providers/swarm.md), [Static](doc/providers/static.md)...
 * Beautiful email report
 * Webhook notification
+* Slack incoming webhook notification
 * Enhanced logging
 * Timezone can be changed
 * Official [Docker image available](doc/install/docker.md)
