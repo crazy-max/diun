@@ -21,6 +21,9 @@ notif:
     password:
     from:
     to:
+  slack:
+    enable: false
+    webhook_url: https://hooks.slack.com/services/ABCD12EFG/HIJK34LMN/01234567890abcdefghij
   webhook:
     enable: false
     endpoint: http://webhook.foo.com/sd54qad89azd5a
@@ -106,6 +109,10 @@ providers:
   * `password_file`: Use content of secret file as SMTP password if `password` not defined.
   * `from`: Sender email address. **required**
   * `to`: Recipient email address. **required**
+
+* `slack`
+  * `enable`: Enable slack notification (default: `false`).
+  * `webhook_url`: Slack [incoming webhook URL](https://api.slack.com/messaging/webhooks). **required**
 
 * `webhook`
   * `enable`: Enable webhook notification (default: `false`).

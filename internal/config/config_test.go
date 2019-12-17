@@ -52,14 +52,18 @@ func TestLoad(t *testing.T) {
 					Schedule: "*/30 * * * *",
 				},
 				Notif: model.Notif{
-					Mail: model.Mail{
+					Mail: model.NotifMail{
 						Enable:             false,
 						Host:               "localhost",
 						Port:               25,
 						SSL:                false,
 						InsecureSkipVerify: false,
 					},
-					Webhook: model.Webhook{
+					Slack: model.NotifSlack{
+						Enable:     false,
+						WebhookURL: "https://hooks.slack.com/services/ABCD12EFG/HIJK34LMN/01234567890abcdefghij",
+					},
+					Webhook: model.NotifWebhook{
 						Enable:   false,
 						Endpoint: "http://webhook.foo.com/sd54qad89azd5a",
 						Method:   "GET",

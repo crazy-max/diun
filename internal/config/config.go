@@ -48,14 +48,17 @@ func Load(flags model.Flags, version string) (*Config, error) {
 			Schedule: "0 * * * *",
 		},
 		Notif: model.Notif{
-			Mail: model.Mail{
+			Mail: model.NotifMail{
 				Enable:             false,
 				Host:               "localhost",
 				Port:               25,
 				SSL:                false,
 				InsecureSkipVerify: false,
 			},
-			Webhook: model.Webhook{
+			Slack: model.NotifSlack{
+				Enable: false,
+			},
+			Webhook: model.NotifWebhook{
 				Enable:  false,
 				Method:  "GET",
 				Timeout: 10,

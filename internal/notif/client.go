@@ -4,6 +4,7 @@ import (
 	"github.com/crazy-max/diun/internal/model"
 	"github.com/crazy-max/diun/internal/notif/mail"
 	"github.com/crazy-max/diun/internal/notif/notifier"
+	"github.com/crazy-max/diun/internal/notif/slack"
 	"github.com/crazy-max/diun/internal/notif/webhook"
 	"github.com/rs/zerolog/log"
 )
@@ -26,6 +27,9 @@ func New(config model.Notif, app model.App) (*Client, error) {
 	// Add notifiers
 	if config.Mail.Enable {
 		c.notifiers = append(c.notifiers, mail.New(config.Mail, app))
+	}
+	if config.Slack.Enable {
+		c.notifiers = append(c.notifiers, slack.New(config.Slack, app))
 	}
 	if config.Webhook.Enable {
 		c.notifiers = append(c.notifiers, webhook.New(config.Webhook, app))

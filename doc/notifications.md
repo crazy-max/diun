@@ -1,6 +1,7 @@
 # Notifications
 
 * [Mail](#mail)
+* [Slack](#slack)
 * [Webhook](#webhook)
 
 ## Mail
@@ -8,6 +9,12 @@
 Here is an email sample if you add `mail` notification:
 
 ![](../.res/notif-mail.png)
+
+## Slack
+
+You can send notifications to your slack channel using an [incoming webhook URL](https://api.slack.com/messaging/webhooks):
+
+![](../.res/notif-slack.png)
 
 ## Webhook
 

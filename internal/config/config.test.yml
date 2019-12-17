@@ -18,6 +18,9 @@ notif:
     password_file:
     from:
     to:
+  slack:
+    enable: false
+    webhook_url: https://hooks.slack.com/services/ABCD12EFG/HIJK34LMN/01234567890abcdefghij
   webhook:
     enable: false
     endpoint: http://webhook.foo.com/sd54qad89azd5a

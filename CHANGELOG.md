@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.1.0 (2019/12/17)
+
+* Add Slack notifier (#8)
+
 ## 2.0.0 (2019/12/14)
 
 * Include provider in notifications

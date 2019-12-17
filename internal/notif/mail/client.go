@@ -18,12 +18,12 @@ import (
 // Client represents an active mail notification object
 type Client struct {
 	*notifier.Notifier
-	cfg model.Mail
+	cfg model.NotifMail
 	app model.App
 }
 
 // New creates a new mail notification instance
-func New(config model.Mail, app model.App) notifier.Notifier {
+func New(config model.NotifMail, app model.App) notifier.Notifier {
 	return notifier.Notifier{
 		Handler: &Client{
 			cfg: config,
@@ -65,7 +65,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 
 Docker 🐳 tag **{{ .Image.Domain }}/{{ .Image.Path }}:{{ .Image.Tag }}** which you subscribed to through **{{ .Provider }}** provider has been {{ if (eq .Status "new") }}newly added{{ else }}updated{{ end }}.
 
-This image has been {{ if (eq .Status "new") }}created{{ else }}updated{{ end }} at <code>{{ .Manifest.Created }}</code> with digest <code>{{ .Manifest.Digest }}</code> for <code>{{ .Manifest.Os }}/{{ .Manifest.Architecture }}</code> platform.
+This image has been {{ if (eq .Status "new") }}created{{ else }}updated{{ end }} at <code>{{ .Manifest.Created.Format "Jan 02, 2006 15:04:05 UTC" }}</code> with digest <code>{{ .Manifest.Digest }}</code> for <code>{{ .Manifest.Os }}/{{ .Manifest.Architecture }}</code> platform.
 
 Need help, or have questions? Go to https://github.com/crazy-max/diun and leave an issue.
 
