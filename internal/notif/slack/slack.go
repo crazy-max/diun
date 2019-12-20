@@ -35,7 +35,7 @@ func (c *Client) Name() string {
 	return "slack"
 }
 
-// Send creates and sends a webhook notification with an entry
+// Send creates and sends a slack notification with an entry
 func (c *Client) Send(entry model.NotifEntry) error {
 	var textBuf bytes.Buffer
 	textTpl := template.Must(template.New("text").Parse("<!channel> Docker tag `{{ .Image.Domain }}/{{ .Image.Path }}:{{ .Image.Tag }}` {{ if (eq .Status \"new\") }}newly added{{ else }}updated{{ end }}."))
