@@ -3,7 +3,7 @@
 ## 2.2.0 (2019/12/22)
 
 * Add option to skip notification at the very first analysis of an image (#10)
-* Skip analysis on locally built image
+* Skip analysis of locally built image
 
 ## 2.1.0 (2019/12/17)
 
