@@ -1,28 +1,10 @@
 package docker
 
-import (
-	"context"
-	"fmt"
-	"strings"
-
-	"github.com/containers/image/docker"
-	"github.com/containers/image/types"
-)
-
-func (c *RegistryClient) newImage(ctx context.Context, imageStr string) (types.ImageCloser, error) {
-	if !strings.HasPrefix(imageStr, "//") {
-		imageStr = fmt.Sprintf("//%s", imageStr)
-	}
-
-	ref, err := docker.ParseReference(imageStr)
+// IsLocalImage checks if the image has been built locally
+func (c *Client) IsLocalImage(image string) (bool, error) {
+	raw, _, err := c.API.ImageInspectWithRaw(c.ctx, image)
 	if err != nil {
-		return nil, fmt.Errorf("invalid image name %s: %v", imageStr, err)
+		return false, err
 	}
-
-	img, err := ref.NewImage(ctx, c.sysCtx)
-	if err != nil {
-		return nil, err
-	}
-
-	return img, nil
+	return len(raw.RepoDigests) == 0, nil
 }

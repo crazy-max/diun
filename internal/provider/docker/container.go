@@ -37,6 +37,14 @@ func (c *Client) listContainerImage(id string, elt model.PrdDocker) []model.Imag
 
 	var list []model.Image
 	for _, ctn := range ctns {
+		local, err := cli.IsLocalImage(ctn.Image)
+		if err != nil {
+			sublog.Error().Err(err).Msgf("Cannot inspect image from container %s", ctn.ID)
+			continue
+		} else if local {
+			sublog.Debug().Msgf("Skip locally built image for container %s", ctn.ID)
+			continue
+		}
 		image, err := provider.ValidateContainerImage(ctn.Image, ctn.Labels, elt.WatchByDefault)
 		if err != nil {
 			sublog.Error().Err(err).Msgf("Cannot get image from container %s", ctn.ID)
