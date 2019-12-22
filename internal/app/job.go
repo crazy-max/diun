@@ -28,6 +28,13 @@ func (di *Diun) createJob(job model.Job) {
 		return
 	}
 
+	// First check?
+	job.FirstCheck, err = di.db.First(job.RegImage)
+	if err != nil {
+		sublog.Error().Err(err).Msg("Cannot check first")
+		return
+	}
+
 	// Registry options
 	regOpts, err := di.getRegOpts(job.Image.RegOptsID)
 	if err != nil {
@@ -165,6 +172,11 @@ func (di *Diun) runJob(job model.Job) error {
 		return err
 	}
 	sublog.Debug().Msg("Manifest saved to database")
+
+	if job.FirstCheck && !di.cfg.Watch.FirstCheckNotif {
+		sublog.Debug().Msg("Skipping notification (first check)")
+		return nil
+	}
 
 	di.notif.Send(model.NotifEntry{
 		Status:   status,

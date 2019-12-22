@@ -4,6 +4,7 @@ db:
 watch:
   workers: 100
   schedule: "*/30 * * * *"
+  first_check_notif: false
 
 notif:
   mail:

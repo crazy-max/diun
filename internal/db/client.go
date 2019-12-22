@@ -1,6 +1,7 @@
 package db
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"time"
@@ -51,6 +52,23 @@ func New(cfg model.Db) (*Client, error) {
 // Close closes db connection
 func (c *Client) Close() error {
 	return c.DB.Close()
+}
+
+// First checks if a Docker image has ever been analyzed
+func (c *Client) First(image registry.Image) (bool, error) {
+	found := false
+
+	err := c.View(func(tx *bolt.Tx) error {
+		c := tx.Bucket([]byte(bucket)).Cursor()
+		name := []byte(image.Name())
+		for k, _ := c.Seek(name); k != nil && bytes.HasPrefix(k, name); k, _ = c.Next() {
+			found = true
+			return nil
+		}
+		return nil
+	})
+
+	return !found, err
 }
 
 // GetManifest returns Docker image manifest

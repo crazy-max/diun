@@ -44,8 +44,9 @@ func Load(flags model.Flags, version string) (*Config, error) {
 			Path: "diun.db",
 		},
 		Watch: model.Watch{
-			Workers:  10,
-			Schedule: "0 * * * *",
+			Workers:         10,
+			Schedule:        "0 * * * *",
+			FirstCheckNotif: false,
 		},
 		Notif: model.Notif{
 			Mail: model.NotifMail{

@@ -9,6 +9,7 @@ db:
 watch:
   workers: 10
   schedule: "0 * * * *"
+  first_check_notif: false
 
 notif:
   mail:
@@ -94,6 +95,7 @@ providers:
 
 * `workers`: Maximum number of workers that will execute tasks concurrently. _Optional_. (default: `10`).
 * `schedule`: [CRON expression](https://godoc.org/github.com/robfig/cron#hdr-CRON_Expression_Format) to schedule Diun watcher. _Optional_. (default: `0 * * * *`).
+* `first_check_notif`: Send notification at the very first analysis of an image. _Optional_. (default: `false`).
 
 ## notif
 
