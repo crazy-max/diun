@@ -29,7 +29,7 @@ require (
 	github.com/opencontainers/image-spec v1.0.1 // indirect
 	github.com/panjf2000/ants/v2 v2.2.2
 	github.com/pkg/errors v0.8.1
-	github.com/robfig/cron/v3 v3.0.0
+	github.com/robfig/cron/v3 v3.0.1
 	github.com/rs/zerolog v1.17.2
 	github.com/sirupsen/logrus v1.4.2
 	github.com/stretchr/testify v1.4.0
