@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.2.1 (2020/01/07)
+
+* Set user agent for Docker registry client
+* Update deps
+
 ## 2.2.0 (2019/12/22)
 
 * Add option to skip notification at the very first analysis of an image (#10)
