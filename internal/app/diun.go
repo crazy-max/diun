@@ -1,6 +1,9 @@
 package app
 
 import (
+	"fmt"
+	"runtime"
+	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -20,14 +23,15 @@ import (
 
 // Diun represents an active diun object
 type Diun struct {
-	cfg    *config.Config
-	cron   *cron.Cron
-	db     *db.Client
-	notif  *notif.Client
-	jobID  cron.EntryID
-	locker uint32
-	pool   *ants.PoolWithFunc
-	wg     *sync.WaitGroup
+	cfg       *config.Config
+	cron      *cron.Cron
+	db        *db.Client
+	notif     *notif.Client
+	userAgent string
+	jobID     cron.EntryID
+	locker    uint32
+	pool      *ants.PoolWithFunc
+	wg        *sync.WaitGroup
 }
 
 // New creates new diun instance
@@ -49,8 +53,9 @@ func New(cfg *config.Config, location *time.Location) (*Diun, error) {
 		cron: cron.New(cron.WithLocation(location), cron.WithParser(cron.NewParser(
 			cron.SecondOptional|cron.Minute|cron.Hour|cron.Dom|cron.Month|cron.Dow|cron.Descriptor),
 		)),
-		db:    dbcli,
-		notif: notifcli,
+		db:        dbcli,
+		notif:     notifcli,
+		userAgent: fmt.Sprintf("diun/%s go/%s %s", cfg.App.Version, runtime.Version()[2:], strings.Title(runtime.GOOS)),
 	}, nil
 }
 

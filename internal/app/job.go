@@ -82,6 +82,7 @@ func (di *Diun) createJob(job model.Job) {
 		Password:    regPassword,
 		Timeout:     time.Duration(regOpts.Timeout) * time.Second,
 		InsecureTLS: regOpts.InsecureTLS,
+		UserAgent:   di.userAgent,
 	})
 	if err != nil {
 		sublog.Error().Err(err).Msg("Cannot create registry client")

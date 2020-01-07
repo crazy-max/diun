@@ -24,6 +24,7 @@ type RegistryOptions struct {
 	Password    string
 	InsecureTLS bool
 	Timeout     time.Duration
+	UserAgent   string
 }
 
 // NewRegistryClient creates new docker registry client instance
@@ -44,6 +45,7 @@ func NewRegistryClient(opts RegistryOptions) (*RegistryClient, error) {
 		DockerAuthConfig:                  auth,
 		DockerDaemonInsecureSkipTLSVerify: opts.InsecureTLS,
 		DockerInsecureSkipTLSVerify:       types.NewOptionalBool(opts.InsecureTLS),
+		DockerRegistryUserAgent:           opts.UserAgent,
 	}
 
 	return &RegistryClient{
