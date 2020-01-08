@@ -6,8 +6,7 @@ import (
 	"time"
 
 	"github.com/crazy-max/diun/internal/model"
-	"github.com/crazy-max/diun/pkg/docker"
-	"github.com/crazy-max/diun/pkg/docker/registry"
+	"github.com/crazy-max/diun/pkg/registry"
 	"github.com/crazy-max/diun/pkg/utl"
 	"github.com/imdario/mergo"
 	"github.com/rs/zerolog/log"
@@ -75,7 +74,7 @@ func (di *Diun) createJob(job model.Job) {
 		}
 	}
 
-	job.Registry, err = docker.NewRegistryClient(docker.RegistryOptions{
+	job.Registry, err = registry.New(registry.Options{
 		Os:          job.Image.Os,
 		Arch:        job.Image.Arch,
 		Username:    regUser,
@@ -99,7 +98,7 @@ func (di *Diun) createJob(job model.Job) {
 		return
 	}
 
-	tags, err := job.Registry.Tags(docker.TagsOptions{
+	tags, err := job.Registry.Tags(registry.TagsOptions{
 		Image:   job.RegImage,
 		Max:     job.Image.MaxTags,
 		Include: job.Image.IncludeTags,

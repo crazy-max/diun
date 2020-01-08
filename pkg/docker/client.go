@@ -16,21 +16,29 @@ type Client struct {
 	API *client.Client
 }
 
-// NewClient initializes a new Docker API client with default values
-func NewClient(endpoint, apiVersion, tlsCertsPath string, tlsVerify bool) (*Client, error) {
-	var opts []client.Opt
-	if endpoint != "" {
-		opts = append(opts, client.WithHost(endpoint))
+// Options holds docker client object options
+type Options struct {
+	Endpoint    string
+	APIVersion  string
+	TLSCertPath string
+	TLSVerify   bool
+}
+
+// New initializes a new Docker API client with default values
+func New(opts Options) (*Client, error) {
+	var dockerOpts []client.Opt
+	if opts.Endpoint != "" {
+		dockerOpts = append(dockerOpts, client.WithHost(opts.Endpoint))
 	}
-	if apiVersion != "" {
-		opts = append(opts, client.WithVersion(apiVersion))
+	if opts.APIVersion != "" {
+		dockerOpts = append(dockerOpts, client.WithVersion(opts.APIVersion))
 	}
-	if tlsCertsPath != "" {
+	if opts.TLSCertPath != "" {
 		options := tlsconfig.Options{
-			CAFile:             filepath.Join(tlsCertsPath, "ca.pem"),
-			CertFile:           filepath.Join(tlsCertsPath, "cert.pem"),
-			KeyFile:            filepath.Join(tlsCertsPath, "key.pem"),
-			InsecureSkipVerify: !tlsVerify,
+			CAFile:             filepath.Join(opts.TLSCertPath, "ca.pem"),
+			CertFile:           filepath.Join(opts.TLSCertPath, "cert.pem"),
+			KeyFile:            filepath.Join(opts.TLSCertPath, "key.pem"),
+			InsecureSkipVerify: !opts.TLSVerify,
 		}
 		tlsc, err := tlsconfig.Client(options)
 		if err != nil {
@@ -40,10 +48,10 @@ func NewClient(endpoint, apiVersion, tlsCertsPath string, tlsVerify bool) (*Clie
 			Transport:     &http.Transport{TLSClientConfig: tlsc},
 			CheckRedirect: client.CheckRedirect,
 		}
-		opts = append(opts, client.WithHTTPClient(httpCli))
+		dockerOpts = append(dockerOpts, client.WithHTTPClient(httpCli))
 	}
 
-	cli, err := client.NewClientWithOpts(opts...)
+	cli, err := client.NewClientWithOpts(dockerOpts...)
 	if err != nil {
 		return nil, err
 	}

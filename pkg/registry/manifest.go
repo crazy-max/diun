@@ -1,10 +1,9 @@
-package docker
+package registry
 
 import (
 	"time"
 
 	"github.com/containers/image/manifest"
-	"github.com/crazy-max/diun/pkg/docker/registry"
 	"github.com/opencontainers/go-digest"
 )
 
@@ -22,7 +21,7 @@ type Manifest struct {
 }
 
 // Manifest returns the manifest for a specific image
-func (c *RegistryClient) Manifest(image registry.Image) (Manifest, error) {
+func (c *Client) Manifest(image Image) (Manifest, error) {
 	ctx, cancel := c.timeoutContext()
 	defer cancel()
 

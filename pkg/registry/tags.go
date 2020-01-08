@@ -1,8 +1,7 @@
-package docker
+package registry
 
 import (
 	"github.com/containers/image/docker"
-	"github.com/crazy-max/diun/pkg/docker/registry"
 	"github.com/crazy-max/diun/pkg/utl"
 )
 
@@ -14,14 +13,14 @@ type Tags struct {
 }
 
 type TagsOptions struct {
-	Image   registry.Image
+	Image   Image
 	Max     int
 	Include []string
 	Exclude []string
 }
 
 // Tags returns tags of a Docker repository
-func (c *RegistryClient) Tags(opts TagsOptions) (*Tags, error) {
+func (c *Client) Tags(opts TagsOptions) (*Tags, error) {
 	ctx, cancel := c.timeoutContext()
 	defer cancel()
 

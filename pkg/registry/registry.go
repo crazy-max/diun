@@ -1,4 +1,4 @@
-package docker
+package registry
 
 import (
 	"context"
@@ -10,14 +10,14 @@ import (
 	"github.com/containers/image/types"
 )
 
-// RegistryClient represents an active docker registry object
-type RegistryClient struct {
-	opts   RegistryOptions
+// Client represents an active docker registry object
+type Client struct {
+	opts   Options
 	sysCtx *types.SystemContext
 }
 
-// RegistryOptions holds docker registry object options
-type RegistryOptions struct {
+// Options holds docker registry object options
+type Options struct {
 	Os          string
 	Arch        string
 	Username    string
@@ -27,8 +27,8 @@ type RegistryOptions struct {
 	UserAgent   string
 }
 
-// NewRegistryClient creates new docker registry client instance
-func NewRegistryClient(opts RegistryOptions) (*RegistryClient, error) {
+// New creates new docker registry client instance
+func New(opts Options) (*Client, error) {
 	// Auth
 	auth := &types.DockerAuthConfig{}
 	if opts.Username != "" {
@@ -48,12 +48,12 @@ func NewRegistryClient(opts RegistryOptions) (*RegistryClient, error) {
 		DockerRegistryUserAgent:           opts.UserAgent,
 	}
 
-	return &RegistryClient{
+	return &Client{
 		sysCtx: sysCtx,
 	}, nil
 }
 
-func (c *RegistryClient) timeoutContext() (context.Context, context.CancelFunc) {
+func (c *Client) timeoutContext() (context.Context, context.CancelFunc) {
 	ctx := context.Background()
 	var cancel context.CancelFunc = func() {}
 	if c.opts.Timeout > 0 {
@@ -62,7 +62,7 @@ func (c *RegistryClient) timeoutContext() (context.Context, context.CancelFunc) 
 	return ctx, cancel
 }
 
-func (c *RegistryClient) newImage(ctx context.Context, imageStr string) (types.ImageCloser, error) {
+func (c *Client) newImage(ctx context.Context, imageStr string) (types.ImageCloser, error) {
 	if !strings.HasPrefix(imageStr, "//") {
 		imageStr = fmt.Sprintf("//%s", imageStr)
 	}

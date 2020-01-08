@@ -7,8 +7,7 @@ import (
 	"time"
 
 	"github.com/crazy-max/diun/internal/model"
-	"github.com/crazy-max/diun/pkg/docker"
-	"github.com/crazy-max/diun/pkg/docker/registry"
+	"github.com/crazy-max/diun/pkg/registry"
 	"github.com/rs/zerolog/log"
 	bolt "go.etcd.io/bbolt"
 )
@@ -72,8 +71,8 @@ func (c *Client) First(image registry.Image) (bool, error) {
 }
 
 // GetManifest returns Docker image manifest
-func (c *Client) GetManifest(image registry.Image) (docker.Manifest, error) {
-	var manifest docker.Manifest
+func (c *Client) GetManifest(image registry.Image) (registry.Manifest, error) {
+	var manifest registry.Manifest
 
 	err := c.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(bucket))
@@ -87,7 +86,7 @@ func (c *Client) GetManifest(image registry.Image) (docker.Manifest, error) {
 }
 
 // PutManifest add Docker image manifest in db
-func (c *Client) PutManifest(image registry.Image, manifest docker.Manifest) error {
+func (c *Client) PutManifest(image registry.Image, manifest registry.Manifest) error {
 	entryBytes, _ := json.Marshal(manifest)
 
 	err := c.Update(func(tx *bolt.Tx) error {

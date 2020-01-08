@@ -1,16 +1,15 @@
 package model
 
 import (
-	"github.com/crazy-max/diun/pkg/docker"
-	"github.com/crazy-max/diun/pkg/docker/registry"
+	"github.com/crazy-max/diun/pkg/registry"
 )
 
 // NotifEntry represents a notification entry
 type NotifEntry struct {
-	Status   ImageStatus     `json:"status,omitempty"`
-	Provider string          `json:"provider,omitempty"`
-	Image    registry.Image  `json:"image,omitempty"`
-	Manifest docker.Manifest `json:"manifest,omitempty"`
+	Status   ImageStatus       `json:"status,omitempty"`
+	Provider string            `json:"provider,omitempty"`
+	Image    registry.Image    `json:"image,omitempty"`
+	Manifest registry.Manifest `json:"manifest,omitempty"`
 }
 
 // Notif holds data necessary for notification configuration

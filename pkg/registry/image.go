@@ -17,6 +17,11 @@ type Image struct {
 	named  reference.Named
 }
 
+// Name returns the full name representation of an image.
+func (i Image) Name() string {
+	return i.named.Name()
+}
+
 // String returns the string representation of an image.
 func (i Image) String() string {
 	return i.named.String()
