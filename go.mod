@@ -38,7 +38,7 @@ require (
 	google.golang.org/grpc v1.25.1 // indirect
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df // indirect
-	gopkg.in/yaml.v2 v2.2.7
+	gopkg.in/yaml.v2 v2.2.8
 )
 
 replace github.com/docker/docker => github.com/docker/engine v1.4.2-0.20191113042239-ea84732a7725
