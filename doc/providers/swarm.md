@@ -6,7 +6,7 @@
 
 ## About
 
-The Swarm provider is closely linked to the [Docker provider](docker.md) except that it allows you to analyze the services of your Swarm cluster defined in the [Diun configuration](../configuration.md) to extract the images found and check for updates on the registry.
+The Swarm provider is closely linked to the [Docker provider](docker.md) except that it allows you to analyze the services of your Swarm cluster defined in the [Diun configuration](../configuration.md#providers) to extract the images found and check for updates on the registry.
 
 ## Quick start
 

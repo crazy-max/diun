@@ -1,5 +1,15 @@
 # Configuration
 
+* [Overview](#overview)
+* [Reference](#reference)
+  * [db](#db)
+  * [watch](#watch)
+  * [notif](#notif)
+  * [regopts](#regopts)
+  * [providers](#providers)
+
+## Overview
+
 Here is a YAML structure example:
 
 ```yml
@@ -93,17 +103,19 @@ providers:
       arch: arm64v8
 ```
 
-## db
+## Reference
+
+### db
 
 * `path`: Path to Bolt database file where images manifests are stored (default: `diun.db`). Environment var `DIUN_DB` override this value.
 
-## watch
+### watch
 
 * `workers`: Maximum number of workers that will execute tasks concurrently. _Optional_. (default: `10`).
 * `schedule`: [CRON expression](https://godoc.org/github.com/robfig/cron#hdr-CRON_Expression_Format) to schedule Diun watcher. _Optional_. (default: `0 * * * *`).
 * `first_check_notif`: Send notification at the very first analysis of an image. _Optional_. (default: `false`).
 
-## notif
+### notif
 
 * `mail`
   * `enable`: Enable email reports (default: `false`).
@@ -134,7 +146,7 @@ providers:
   * `headers`: Map of additional headers to be sent.
   * `timeout`: Timeout specifies a time limit for the request to be made. (default: `10`).
 
-## regopts
+### regopts
 
 * `username`: Registry username.
 * `username_file`: Use content of secret file as registry username if `username` not defined.
@@ -143,7 +155,7 @@ providers:
 * `timeout`: Timeout is the maximum amount of time for the TCP connection to establish. 0 means no timeout (default: `10`).
 * `insecure_tls`: Allow contacting docker registry over HTTP, or HTTPS with failed TLS verification (default: `false`).
 
-## providers
+### providers
 
 * `docker`: Map of Docker standalone engines to watch
   * `<key>`: An unique identifier for this provider.

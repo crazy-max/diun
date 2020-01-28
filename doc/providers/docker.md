@@ -6,7 +6,7 @@
 
 ## About
 
-The Docker provider allows you to analyze the containers of your standalone Docker instance defined in the [Diun configuration](../configuration.md) to extract the images found and check for updates on the registry.
+The Docker provider allows you to analyze the containers of your standalone Docker instance defined in the [Diun configuration](../configuration.md#providers) to extract the images found and check for updates on the registry.
 
 ## Quick start
 

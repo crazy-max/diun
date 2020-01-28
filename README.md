@@ -26,9 +26,7 @@
 * Worker pool to parallelize analyses
 * Allow overriding image os and architecture
 * Multi providers available like [Docker](doc/providers/docker.md), [Swarm](doc/providers/swarm.md), [Static](doc/providers/static.md)...
-* Beautiful email report
-* Webhook notification
-* Slack incoming webhook notification
+* Get notified through Slack, Mail, Telegram and [more](doc/notifications.md)
 * Enhanced logging
 * Timezone can be changed
 * Official [Docker image available](doc/install/docker.md)
