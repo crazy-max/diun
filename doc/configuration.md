@@ -25,6 +25,12 @@ notif:
   slack:
     enable: false
     webhook_url: https://hooks.slack.com/services/ABCD12EFG/HIJK34LMN/01234567890abcdefghij
+  telegram:
+    enable: false
+    token: aabbccdd:11223344
+    chat_ids:
+      - 123456789
+      - 987654321
   webhook:
     enable: false
     endpoint: http://webhook.foo.com/sd54qad89azd5a
@@ -115,6 +121,11 @@ providers:
 * `slack`
   * `enable`: Enable slack notification (default: `false`).
   * `webhook_url`: Slack [incoming webhook URL](https://api.slack.com/messaging/webhooks). **required**
+
+* `telegram`
+  * `enable`: Enable Telegram notification (default: `false`).
+  * `token`: Telegram bot token. **required**
+  * `chat_ids`: List of chat IDs to send notifications to. **required**
 
 * `webhook`
   * `enable`: Enable webhook notification (default: `false`).

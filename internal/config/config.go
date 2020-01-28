@@ -59,6 +59,9 @@ func Load(flags model.Flags, version string) (*Config, error) {
 			Slack: model.NotifSlack{
 				Enable: false,
 			},
+			Telegram: model.NotifTelegram{
+				Enable: false,
+			},
 			Webhook: model.NotifWebhook{
 				Enable:  false,
 				Method:  "GET",
