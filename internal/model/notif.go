@@ -14,9 +14,10 @@ type NotifEntry struct {
 
 // Notif holds data necessary for notification configuration
 type Notif struct {
-	Mail    NotifMail    `yaml:"mail,omitempty"`
-	Slack   NotifSlack   `yaml:"slack,omitempty"`
-	Webhook NotifWebhook `yaml:"webhook,omitempty"`
+	Mail     NotifMail     `yaml:"mail,omitempty"`
+	Slack    NotifSlack    `yaml:"slack,omitempty"`
+	Telegram NotifTelegram `yaml:"telegram,omitempty"`
+	Webhook  NotifWebhook  `yaml:"webhook,omitempty"`
 }
 
 // NotifMail holds mail notification configuration details
@@ -38,6 +39,13 @@ type NotifMail struct {
 type NotifSlack struct {
 	Enable     bool   `yaml:"enable,omitempty"`
 	WebhookURL string `yaml:"webhook_url,omitempty"`
+}
+
+// NotifTelegram holds Telegram notification configuration details
+type NotifTelegram struct {
+	Enable   bool    `yaml:"enable,omitempty"`
+	BotToken string  `yaml:"token,omitempty"`
+	ChatIDs  []int64 `yaml:"chat_ids,omitempty"`
 }
 
 // NotifWebhook holds webhook notification configuration details

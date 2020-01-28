@@ -63,6 +63,11 @@ func TestLoad(t *testing.T) {
 						Enable:     false,
 						WebhookURL: "https://hooks.slack.com/services/ABCD12EFG/HIJK34LMN/01234567890abcdefghij",
 					},
+					Telegram: model.NotifTelegram{
+						Enable:   false,
+						BotToken: "abcdef123456",
+						ChatIDs:  []int64{8547439, 1234567},
+					},
 					Webhook: model.NotifWebhook{
 						Enable:   false,
 						Endpoint: "http://webhook.foo.com/sd54qad89azd5a",

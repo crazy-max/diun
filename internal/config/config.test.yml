@@ -22,6 +22,12 @@ notif:
   slack:
     enable: false
     webhook_url: https://hooks.slack.com/services/ABCD12EFG/HIJK34LMN/01234567890abcdefghij
+  telegram:
+    enable: false
+    token: abcdef123456
+    chat_ids:
+      - 8547439
+      - 1234567
   webhook:
     enable: false
     endpoint: http://webhook.foo.com/sd54qad89azd5a
