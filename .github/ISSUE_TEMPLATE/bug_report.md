@@ -23,6 +23,7 @@ about: Create a report to help us improve
 
 * Diun version : 
 * Platform (windows/linux) :
+* System info (type `uname -a`) : 
 
 ```yml
 # paste your YAML configuration file here and remove sensitive data
