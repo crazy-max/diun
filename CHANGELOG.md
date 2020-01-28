@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.3.0 (2020/01/28)
+
+* Add Telegram notifier (#30)
+* Docker client struct options
+* Move registry client to a dedicated package
+
 ## 2.2.1 (2020/01/07)
 
 * Set user agent for Docker registry client
