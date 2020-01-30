@@ -23,7 +23,7 @@ require (
 	github.com/gorilla/mux v1.7.3 // indirect
 	github.com/hako/durafmt v0.0.0-20190612201238-650ed9f29a84
 	github.com/imdario/mergo v0.3.8
-	github.com/matcornic/hermes/v2 v2.0.2
+	github.com/matcornic/hermes/v2 v2.1.0
 	github.com/morikuni/aec v1.0.0 // indirect
 	github.com/nlopes/slack v0.6.0
 	github.com/opencontainers/go-digest v1.0.0-rc1
