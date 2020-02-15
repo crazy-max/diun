@@ -36,6 +36,11 @@ notif:
       Content-Type: application/json
       Authorization: Token123456
     timeout: 10
+  gotify:
+    enable: false
+    host: http://localhost
+    token: Token123456
+    timeout: 10
 
 regopts:
   someregopts:
