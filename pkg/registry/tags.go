@@ -1,7 +1,7 @@
 package registry
 
 import (
-	"github.com/containers/image/docker"
+	"github.com/containers/image/v5/docker"
 	"github.com/crazy-max/diun/pkg/utl"
 )
 
