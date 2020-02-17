@@ -3,7 +3,7 @@ package registry
 import (
 	"time"
 
-	"github.com/containers/image/manifest"
+	"github.com/containers/image/v5/manifest"
 	"github.com/opencontainers/go-digest"
 )
 

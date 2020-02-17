@@ -4,7 +4,7 @@ package registry
 import (
 	"fmt"
 
-	"github.com/containers/image/docker/reference"
+	"github.com/containers/image/v5/docker/reference"
 	digest "github.com/opencontainers/go-digest"
 )
 
