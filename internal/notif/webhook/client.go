@@ -65,7 +65,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		return err
 	}
 
-	req, err := http.NewRequest(c.cfg.Method, c.cfg.Endpoint, bytes.NewBuffer([]byte(body)))
+	req, err := http.NewRequest(c.cfg.Method, c.cfg.Endpoint, bytes.NewBuffer(body))
 	if err != nil {
 		return err
 	}
