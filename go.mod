@@ -12,14 +12,15 @@ require (
 	github.com/go-telegram-bot-api/telegram-bot-api v4.6.4+incompatible
 	github.com/hako/durafmt v0.0.0-20190612201238-650ed9f29a84
 	github.com/imdario/mergo v0.3.8
-	github.com/matcornic/hermes/v2 v2.0.2
+	github.com/matcornic/hermes/v2 v2.1.0
 	github.com/morikuni/aec v1.0.0 // indirect
 	github.com/nlopes/slack v0.6.0
 	github.com/opencontainers/go-digest v1.0.0-rc1
-	github.com/panjf2000/ants/v2 v2.2.2
+	github.com/opencontainers/image-spec v1.0.1 // indirect
+	github.com/panjf2000/ants/v2 v2.3.0
 	github.com/pkg/errors v0.9.1
 	github.com/robfig/cron/v3 v3.0.1
-	github.com/rs/zerolog v1.17.2
+	github.com/rs/zerolog v1.18.0
 	github.com/sirupsen/logrus v1.4.2
 	github.com/stretchr/testify v1.4.0
 	github.com/technoweenie/multipartstreamer v1.0.1 // indirect
