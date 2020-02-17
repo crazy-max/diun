@@ -51,10 +51,10 @@ notif:
     timeout: 10
   gotify:
     enable: false
-    host: http://localhost
+    endpoint: http://gotify.foo.com
     token: Token123456
+    priority: 1
     timeout: 10
-
 
 regopts:
   someregistryoptions:
@@ -154,8 +154,9 @@ providers:
 
 * `gotify`
   * `enable`: Enable gotify notification (default: `false`).
-  * `host`: URL of host including `http://` or `https://`. **required**
+  * `endpoint`: Gotify base URL (e.g. `http://gotify.foo.com`). **required**
   * `token`: Application token. **required**
+  * `priority`: The priority of the message.
   * `timeout`: Timeout specifies a time limit for the request to be made. (default: `10`).
 
 ### regopts

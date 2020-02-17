@@ -60,8 +60,9 @@ type NotifWebhook struct {
 
 // NotifGotify holds gotify notification configuration details
 type NotifGotify struct {
-	Enable  bool   `yaml:"enable,omitempty"`
-	Host    string `yaml:"host,omitempty"`
-	Token   string `yaml:"token,omitempty"`
-	Timeout int    `yaml:"timeout,omitempty"`
+	Enable   bool   `yaml:"enable,omitempty"`
+	Endpoint string `yaml:"endpoint,omitempty"`
+	Token    string `yaml:"token,omitempty"`
+	Priority int    `yaml:"priority,omitempty"`
+	Timeout  int    `yaml:"timeout,omitempty"`
 }

@@ -1,10 +1,16 @@
 # Notifications
 
+* [Gotify](#gotify)
 * [Mail](#mail)
 * [Slack](#slack)
 * [Telegram](#telegram)
 * [Webhook](#webhook)
-* [Gotify](#gotify)
+
+## Gotify
+
+Notifications can be sent using a [Gotify](https://gotify.net/) instance. [Follow the instructions](https://gotify.net/docs/install) to set up a Gotify server.
+
+![](../.res/notif-gotify.png)
 
 ## Mail
 
@@ -46,8 +52,3 @@ If you choose `webhook` notification, a HTTP request is sent with a JSON format 
   "os": "linux"
 }
 ```
-## Gotify
-
-Notifications can be sent using a [Gotify](https://gotify.net/) instance.
-
-Follow the instruction to set up a server and aquiere an application token.

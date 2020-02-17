@@ -38,8 +38,9 @@ notif:
     timeout: 10
   gotify:
     enable: false
-    host: http://localhost
+    endpoint: http://gotify.foo.com
     token: Token123456
+    priority: 1
     timeout: 10
 
 regopts:
