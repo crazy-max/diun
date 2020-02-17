@@ -67,6 +67,10 @@ func Load(flags model.Flags, version string) (*Config, error) {
 				Method:  "GET",
 				Timeout: 10,
 			},
+			Gotify: model.NotifGotify{
+				Enable:  false,
+				Timeout: 10,
+			},
 		},
 	}
 

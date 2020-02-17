@@ -49,6 +49,12 @@ notif:
       Content-Type: application/json
       Authorization: Token123456
     timeout: 10
+  gotify:
+    enable: false
+    endpoint: http://gotify.foo.com
+    token: Token123456
+    priority: 1
+    timeout: 10
 
 regopts:
   someregistryoptions:
@@ -144,6 +150,13 @@ providers:
   * `endpoint`: URL of the HTTP request. **required**
   * `method`: HTTP method (default: `GET`). **required**
   * `headers`: Map of additional headers to be sent.
+  * `timeout`: Timeout specifies a time limit for the request to be made. (default: `10`).
+
+* `gotify`
+  * `enable`: Enable gotify notification (default: `false`).
+  * `endpoint`: Gotify base URL (e.g. `http://gotify.foo.com`). **required**
+  * `token`: Application token. **required**
+  * `priority`: The priority of the message.
   * `timeout`: Timeout specifies a time limit for the request to be made. (default: `10`).
 
 ### regopts

@@ -2,6 +2,7 @@ package notif
 
 import (
 	"github.com/crazy-max/diun/internal/model"
+	"github.com/crazy-max/diun/internal/notif/gotify"
 	"github.com/crazy-max/diun/internal/notif/mail"
 	"github.com/crazy-max/diun/internal/notif/notifier"
 	"github.com/crazy-max/diun/internal/notif/slack"
@@ -37,6 +38,9 @@ func New(config model.Notif, app model.App) (*Client, error) {
 	}
 	if config.Webhook.Enable {
 		c.notifiers = append(c.notifiers, webhook.New(config.Webhook, app))
+	}
+	if config.Gotify.Enable {
+		c.notifiers = append(c.notifiers, gotify.New(config.Gotify, app))
 	}
 
 	log.Debug().Msgf("%d notifier(s) created", len(c.notifiers))

@@ -78,6 +78,13 @@ func TestLoad(t *testing.T) {
 						},
 						Timeout: 10,
 					},
+					Gotify: model.NotifGotify{
+						Enable:   false,
+						Endpoint: "http://gotify.foo.com",
+						Token:    "Token123456",
+						Priority: 1,
+						Timeout:  10,
+					},
 				},
 				RegOpts: map[string]model.RegOpts{
 					"someregopts": {

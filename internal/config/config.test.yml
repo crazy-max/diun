@@ -36,6 +36,12 @@ notif:
       Content-Type: application/json
       Authorization: Token123456
     timeout: 10
+  gotify:
+    enable: false
+    endpoint: http://gotify.foo.com
+    token: Token123456
+    priority: 1
+    timeout: 10
 
 regopts:
   someregopts:
