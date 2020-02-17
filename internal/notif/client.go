@@ -19,7 +19,7 @@ type Client struct {
 }
 
 // New creates a new notification instance
-func New(config model.Notif, app model.App) (*Client, error) {
+func New(config model.Notif, app model.App, userAgent string) (*Client, error) {
 	var c = &Client{
 		cfg:       config,
 		app:       app,
@@ -37,10 +37,10 @@ func New(config model.Notif, app model.App) (*Client, error) {
 		c.notifiers = append(c.notifiers, telegram.New(config.Telegram, app))
 	}
 	if config.Webhook.Enable {
-		c.notifiers = append(c.notifiers, webhook.New(config.Webhook, app))
+		c.notifiers = append(c.notifiers, webhook.New(config.Webhook, app, userAgent))
 	}
 	if config.Gotify.Enable {
-		c.notifiers = append(c.notifiers, gotify.New(config.Gotify, app))
+		c.notifiers = append(c.notifiers, gotify.New(config.Gotify, app, userAgent))
 	}
 
 	log.Debug().Msgf("%d notifier(s) created", len(c.notifiers))

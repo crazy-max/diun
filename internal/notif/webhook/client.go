@@ -3,7 +3,6 @@ package webhook
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -15,16 +14,18 @@ import (
 // Client represents an active webhook notification object
 type Client struct {
 	*notifier.Notifier
-	cfg model.NotifWebhook
-	app model.App
+	cfg       model.NotifWebhook
+	app       model.App
+	userAgent string
 }
 
 // New creates a new webhook notification instance
-func New(config model.NotifWebhook, app model.App) notifier.Notifier {
+func New(config model.NotifWebhook, app model.App, userAgent string) notifier.Notifier {
 	return notifier.Notifier{
 		Handler: &Client{
-			cfg: config,
-			app: app,
+			cfg:       config,
+			app:       app,
+			userAgent: userAgent,
 		},
 	}
 }
@@ -76,7 +77,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		}
 	}
 
-	req.Header.Set("User-Agent", fmt.Sprintf("%s %s", c.app.Name, c.app.Version))
+	req.Header.Set("User-Agent", c.userAgent)
 
 	_, err = hc.Do(req)
 	return err

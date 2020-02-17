@@ -42,8 +42,11 @@ func New(cfg *config.Config, location *time.Location) (*Diun, error) {
 		return nil, err
 	}
 
+	// User-Agent
+	userAgent := fmt.Sprintf("diun/%s go/%s %s", cfg.App.Version, runtime.Version()[2:], strings.Title(runtime.GOOS))
+
 	// Notification client
-	notifcli, err := notif.New(cfg.Notif, cfg.App)
+	notifcli, err := notif.New(cfg.Notif, cfg.App, userAgent)
 	if err != nil {
 		return nil, err
 	}
@@ -55,7 +58,7 @@ func New(cfg *config.Config, location *time.Location) (*Diun, error) {
 		)),
 		db:        dbcli,
 		notif:     notifcli,
-		userAgent: fmt.Sprintf("diun/%s go/%s %s", cfg.App.Version, runtime.Version()[2:], strings.Title(runtime.GOOS)),
+		userAgent: userAgent,
 	}, nil
 }
 

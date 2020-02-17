@@ -19,16 +19,18 @@ import (
 // Client represents an active gotify notification object
 type Client struct {
 	*notifier.Notifier
-	cfg model.NotifGotify
-	app model.App
+	cfg       model.NotifGotify
+	app       model.App
+	userAgent string
 }
 
 // New creates a new gotify notification instance
-func New(config model.NotifGotify, app model.App) notifier.Notifier {
+func New(config model.NotifGotify, app model.App, userAgent string) notifier.Notifier {
 	return notifier.Notifier{
 		Handler: &Client{
-			cfg: config,
-			app: app,
+			cfg:       config,
+			app:       app,
+			userAgent: userAgent,
 		},
 	}
 }
@@ -77,7 +79,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Add("Content-Length", strconv.Itoa(len(data.Encode())))
-	req.Header.Set("User-Agent", fmt.Sprintf("%s %s", c.app.Name, c.app.Version))
+	req.Header.Set("User-Agent", c.userAgent)
 
 	resp, err := hc.Do(req)
 	if err != nil {
