@@ -41,7 +41,7 @@ jobs:
         name: Set up Go
         uses: actions/setup-go@master
         with:
-          go-version: 1.13.5
+          go-version: 1.13
       -
         name: Set GOPATH
         # temporary fix (see https://github.com/actions/setup-go/issues/14)
