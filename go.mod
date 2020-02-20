@@ -21,7 +21,7 @@ require (
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/rs/zerolog v1.18.0
 	github.com/sirupsen/logrus v1.4.2
-	github.com/stretchr/testify v1.5.0
+	github.com/stretchr/testify v1.5.1
 	github.com/technoweenie/multipartstreamer v1.0.1 // indirect
 	go.etcd.io/bbolt v1.3.3
 	golang.org/x/time v0.0.0-20191024005414-555d28b269f0 // indirect
