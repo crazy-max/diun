@@ -49,6 +49,10 @@ func Load(flags model.Flags, version string) (*Config, error) {
 			FirstCheckNotif: false,
 		},
 		Notif: model.Notif{
+			Gotify: model.NotifGotify{
+				Enable:  false,
+				Timeout: 10,
+			},
 			Mail: model.NotifMail{
 				Enable:             false,
 				Host:               "localhost",
@@ -65,10 +69,6 @@ func Load(flags model.Flags, version string) (*Config, error) {
 			Webhook: model.NotifWebhook{
 				Enable:  false,
 				Method:  "GET",
-				Timeout: 10,
-			},
-			Gotify: model.NotifGotify{
-				Enable:  false,
 				Timeout: 10,
 			},
 		},

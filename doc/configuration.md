@@ -22,6 +22,12 @@ watch:
   first_check_notif: false
 
 notif:
+  gotify:
+    enable: false
+    endpoint: http://gotify.foo.com
+    token: Token123456
+    priority: 1
+    timeout: 10
   mail:
     enable: false
     host: localhost
@@ -48,12 +54,6 @@ notif:
     headers:
       Content-Type: application/json
       Authorization: Token123456
-    timeout: 10
-  gotify:
-    enable: false
-    endpoint: http://gotify.foo.com
-    token: Token123456
-    priority: 1
     timeout: 10
 
 regopts:
@@ -123,6 +123,13 @@ providers:
 
 ### notif
 
+* `gotify`
+  * `enable`: Enable gotify notification (default: `false`).
+  * `endpoint`: Gotify base URL (e.g. `http://gotify.foo.com`). **required**
+  * `token`: Application token. **required**
+  * `priority`: The priority of the message.
+  * `timeout`: Timeout specifies a time limit for the request to be made. (default: `10`).
+
 * `mail`
   * `enable`: Enable email reports (default: `false`).
   * `host`: SMTP server host (default: `localhost`). **required**
@@ -150,13 +157,6 @@ providers:
   * `endpoint`: URL of the HTTP request. **required**
   * `method`: HTTP method (default: `GET`). **required**
   * `headers`: Map of additional headers to be sent.
-  * `timeout`: Timeout specifies a time limit for the request to be made. (default: `10`).
-
-* `gotify`
-  * `enable`: Enable gotify notification (default: `false`).
-  * `endpoint`: Gotify base URL (e.g. `http://gotify.foo.com`). **required**
-  * `token`: Application token. **required**
-  * `priority`: The priority of the message.
   * `timeout`: Timeout specifies a time limit for the request to be made. (default: `10`).
 
 ### regopts

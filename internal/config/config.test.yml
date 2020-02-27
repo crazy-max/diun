@@ -7,6 +7,12 @@ watch:
   first_check_notif: false
 
 notif:
+  gotify:
+    enable: false
+    endpoint: http://gotify.foo.com
+    token: Token123456
+    priority: 1
+    timeout: 10
   mail:
     enable: false
     host: localhost
@@ -35,12 +41,6 @@ notif:
     headers:
       Content-Type: application/json
       Authorization: Token123456
-    timeout: 10
-  gotify:
-    enable: false
-    endpoint: http://gotify.foo.com
-    token: Token123456
-    priority: 1
     timeout: 10
 
 regopts:
