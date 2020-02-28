@@ -5,6 +5,6 @@ type Flags struct {
 	Cfgfile   string
 	Timezone  string
 	LogLevel  string
-	LogJson   bool
+	LogJSON   bool
 	LogCaller bool
 }

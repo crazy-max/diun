@@ -5,6 +5,7 @@ import (
 	"github.com/crazy-max/diun/pkg/utl"
 )
 
+// Tags holds information about image tags.
 type Tags struct {
 	List        []string
 	NotIncluded int
@@ -12,6 +13,7 @@ type Tags struct {
 	Total       int
 }
 
+// TagsOptions holds docker tags image options
 type TagsOptions struct {
 	Image   Image
 	Max     int
