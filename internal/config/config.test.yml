@@ -25,6 +25,13 @@ notif:
     password_file:
     from:
     to:
+  rocketchat:
+    enable: false
+    endpoint: http://rocket.foo.com:3000
+    channel: "#general"
+    user_id: abcdEFGH012345678
+    token: Token123456
+    timeout: 10
   slack:
     enable: false
     webhook_url: https://hooks.slack.com/services/ABCD12EFG/HIJK34LMN/01234567890abcdefghij

@@ -66,6 +66,14 @@ func TestLoad(t *testing.T) {
 						SSL:                false,
 						InsecureSkipVerify: false,
 					},
+					RocketChat: model.NotifRocketChat{
+						Enable:   false,
+						Endpoint: "http://rocket.foo.com:3000",
+						Channel:  "#general",
+						UserID:   "abcdEFGH012345678",
+						Token:    "Token123456",
+						Timeout:  10,
+					},
 					Slack: model.NotifSlack{
 						Enable:     false,
 						WebhookURL: "https://hooks.slack.com/services/ABCD12EFG/HIJK34LMN/01234567890abcdefghij",

@@ -2,6 +2,7 @@
 
 * [Gotify](#gotify)
 * [Mail](#mail)
+* [Rocket.Chat](#rocketchat)
 * [Slack](#slack)
 * [Telegram](#telegram)
 * [Webhook](#webhook)
@@ -18,9 +19,15 @@ Here is an email sample if you add `mail` notification:
 
 ![](../.res/notif-mail.png)
 
+## Rocket.Chat
+
+To be able to send notifications to your Rocket.Chat channel, you must first create a Personal Access Token through your account settings:
+
+![](../.res/notif-rocketchat.png)
+
 ## Slack
 
-You can send notifications to your slack channel using an [incoming webhook URL](https://api.slack.com/messaging/webhooks):
+You can send notifications to your Slack channel using an [incoming webhook URL](https://api.slack.com/messaging/webhooks):
 
 ![](../.res/notif-slack.png)
 

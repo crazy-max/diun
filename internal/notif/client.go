@@ -5,6 +5,7 @@ import (
 	"github.com/crazy-max/diun/internal/notif/gotify"
 	"github.com/crazy-max/diun/internal/notif/mail"
 	"github.com/crazy-max/diun/internal/notif/notifier"
+	"github.com/crazy-max/diun/internal/notif/rocketchat"
 	"github.com/crazy-max/diun/internal/notif/slack"
 	"github.com/crazy-max/diun/internal/notif/telegram"
 	"github.com/crazy-max/diun/internal/notif/webhook"
@@ -32,6 +33,9 @@ func New(config model.Notif, app model.App, userAgent string) (*Client, error) {
 	}
 	if config.Mail.Enable {
 		c.notifiers = append(c.notifiers, mail.New(config.Mail, app))
+	}
+	if config.RocketChat.Enable {
+		c.notifiers = append(c.notifiers, rocketchat.New(config.RocketChat, app, userAgent))
 	}
 	if config.Slack.Enable {
 		c.notifiers = append(c.notifiers, slack.New(config.Slack, app))

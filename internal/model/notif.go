@@ -14,11 +14,12 @@ type NotifEntry struct {
 
 // Notif holds data necessary for notification configuration
 type Notif struct {
-	Gotify   NotifGotify   `yaml:"gotify,omitempty"`
-	Mail     NotifMail     `yaml:"mail,omitempty"`
-	Slack    NotifSlack    `yaml:"slack,omitempty"`
-	Telegram NotifTelegram `yaml:"telegram,omitempty"`
-	Webhook  NotifWebhook  `yaml:"webhook,omitempty"`
+	Gotify     NotifGotify     `yaml:"gotify,omitempty"`
+	Mail       NotifMail       `yaml:"mail,omitempty"`
+	RocketChat NotifRocketChat `yaml:"rocketchat,omitempty"`
+	Slack      NotifSlack      `yaml:"slack,omitempty"`
+	Telegram   NotifTelegram   `yaml:"telegram,omitempty"`
+	Webhook    NotifWebhook    `yaml:"webhook,omitempty"`
 }
 
 // NotifGotify holds gotify notification configuration details
@@ -43,6 +44,16 @@ type NotifMail struct {
 	PasswordFile       string `yaml:"password_file,omitempty"`
 	From               string `yaml:"from,omitempty"`
 	To                 string `yaml:"to,omitempty"`
+}
+
+// NotifRocketChat holds Rocket.Chat notification configuration details
+type NotifRocketChat struct {
+	Enable   bool   `yaml:"enable,omitempty"`
+	Endpoint string `yaml:"endpoint,omitempty"`
+	Channel  string `yaml:"channel,omitempty"`
+	UserID   string `yaml:"user_id,omitempty"`
+	Token    string `yaml:"token,omitempty"`
+	Timeout  int    `yaml:"timeout,omitempty"`
 }
 
 // NotifSlack holds slack notification configuration details

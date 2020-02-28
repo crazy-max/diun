@@ -60,6 +60,10 @@ func Load(flags model.Flags, version string) (*Config, error) {
 				SSL:                false,
 				InsecureSkipVerify: false,
 			},
+			RocketChat: model.NotifRocketChat{
+				Enable:  false,
+				Timeout: 10,
+			},
 			Slack: model.NotifSlack{
 				Enable: false,
 			},

@@ -38,6 +38,13 @@ notif:
     password:
     from:
     to:
+  rocketchat:
+    enable: false
+    endpoint: http://rocket.foo.com:3000
+    channel: "#general"
+    user_id: abcdEFGH012345678
+    token: Token123456
+    timeout: 10
   slack:
     enable: false
     webhook_url: https://hooks.slack.com/services/ABCD12EFG/HIJK34LMN/01234567890abcdefghij
@@ -142,6 +149,14 @@ providers:
   * `password_file`: Use content of secret file as SMTP password if `password` not defined.
   * `from`: Sender email address. **required**
   * `to`: Recipient email address. **required**
+
+* `rocketchat`
+  * `enable`: Enable Rocket.Chat notification (default: `false`).
+  * `endpoint`: Rocket.Chat base URL (e.g. `http://rocket.foo.com:3000`). **required**
+  * `channel`: Channel name with the prefix in front of it. **required**
+  * `user_id`: User ID. **required**
+  * `token`: Authentication token. **required**
+  * `timeout`: Timeout specifies a time limit for the request to be made. (default: `10`).
 
 * `slack`
   * `enable`: Enable slack notification (default: `false`).

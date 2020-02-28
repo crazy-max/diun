@@ -49,37 +49,39 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	}
 
 	return slack.PostWebhook(c.cfg.WebhookURL, &slack.WebhookMessage{
-		Attachments: []slack.Attachment{slack.Attachment{
-			Color:         color,
-			AuthorName:    "Diun",
-			AuthorSubname: "github.com/crazy-max/diun",
-			AuthorLink:    "https://github.com/crazy-max/diun",
-			AuthorIcon:    "https://raw.githubusercontent.com/crazy-max/diun/master/.res/diun.png",
-			Text:          textBuf.String(),
-			Footer:        fmt.Sprintf("%s © %d %s %s", c.app.Author, time.Now().Year(), c.app.Name, c.app.Version),
-			Fields: []slack.AttachmentField{
-				{
-					Title: "Provider",
-					Value: entry.Provider,
-					Short: false,
+		Attachments: []slack.Attachment{
+			{
+				Color:         color,
+				AuthorName:    "Diun",
+				AuthorSubname: "github.com/crazy-max/diun",
+				AuthorLink:    "https://github.com/crazy-max/diun",
+				AuthorIcon:    "https://raw.githubusercontent.com/crazy-max/diun/master/.res/diun.png",
+				Text:          textBuf.String(),
+				Footer:        fmt.Sprintf("%s © %d %s %s", c.app.Author, time.Now().Year(), c.app.Name, c.app.Version),
+				Fields: []slack.AttachmentField{
+					{
+						Title: "Provider",
+						Value: entry.Provider,
+						Short: false,
+					},
+					{
+						Title: "Created",
+						Value: entry.Manifest.Created.Format("Jan 02, 2006 15:04:05 UTC"),
+						Short: false,
+					},
+					{
+						Title: "Digest",
+						Value: entry.Manifest.Digest.String(),
+						Short: false,
+					},
+					{
+						Title: "Platform",
+						Value: fmt.Sprintf("%s/%s", entry.Manifest.Os, entry.Manifest.Architecture),
+						Short: false,
+					},
 				},
-				{
-					Title: "Created",
-					Value: entry.Manifest.Created.Format("Jan 02, 2006 15:04:05 UTC"),
-					Short: false,
-				},
-				{
-					Title: "Digest",
-					Value: entry.Manifest.Digest.String(),
-					Short: false,
-				},
-				{
-					Title: "Platform",
-					Value: fmt.Sprintf("%s/%s", entry.Manifest.Os, entry.Manifest.Architecture),
-					Short: false,
-				},
+				Ts: json.Number(strconv.FormatInt(time.Now().Unix(), 10)),
 			},
-			Ts: json.Number(strconv.FormatInt(time.Now().Unix(), 10)),
-		}},
+		},
 	})
 }
