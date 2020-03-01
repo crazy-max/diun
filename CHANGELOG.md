@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.5.0 (2020/03/01)
+
+* Add Rocket.Chat notifier (#44)
+
 ## 2.4.0 (2020/02/17)
 
 * Add Gotify notification client (#36)
