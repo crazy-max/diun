@@ -7,6 +7,12 @@ watch:
   first_check_notif: false
 
 notif:
+  gotify:
+    enable: false
+    endpoint: http://gotify.foo.com
+    token: Token123456
+    priority: 1
+    timeout: 10
   mail:
     enable: false
     host: localhost
@@ -19,6 +25,13 @@ notif:
     password_file:
     from:
     to:
+  rocketchat:
+    enable: false
+    endpoint: http://rocket.foo.com:3000
+    channel: "#general"
+    user_id: abcdEFGH012345678
+    token: Token123456
+    timeout: 10
   slack:
     enable: false
     webhook_url: https://hooks.slack.com/services/ABCD12EFG/HIJK34LMN/01234567890abcdefghij
@@ -35,12 +48,6 @@ notif:
     headers:
       Content-Type: application/json
       Authorization: Token123456
-    timeout: 10
-  gotify:
-    enable: false
-    endpoint: http://gotify.foo.com
-    token: Token123456
-    priority: 1
     timeout: 10
 
 regopts:

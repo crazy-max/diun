@@ -52,12 +52,27 @@ func TestLoad(t *testing.T) {
 					Schedule: "*/30 * * * *",
 				},
 				Notif: model.Notif{
+					Gotify: model.NotifGotify{
+						Enable:   false,
+						Endpoint: "http://gotify.foo.com",
+						Token:    "Token123456",
+						Priority: 1,
+						Timeout:  10,
+					},
 					Mail: model.NotifMail{
 						Enable:             false,
 						Host:               "localhost",
 						Port:               25,
 						SSL:                false,
 						InsecureSkipVerify: false,
+					},
+					RocketChat: model.NotifRocketChat{
+						Enable:   false,
+						Endpoint: "http://rocket.foo.com:3000",
+						Channel:  "#general",
+						UserID:   "abcdEFGH012345678",
+						Token:    "Token123456",
+						Timeout:  10,
 					},
 					Slack: model.NotifSlack{
 						Enable:     false,
@@ -77,13 +92,6 @@ func TestLoad(t *testing.T) {
 							"Authorization": "Token123456",
 						},
 						Timeout: 10,
-					},
-					Gotify: model.NotifGotify{
-						Enable:   false,
-						Endpoint: "http://gotify.foo.com",
-						Token:    "Token123456",
-						Priority: 1,
-						Timeout:  10,
 					},
 				},
 				RegOpts: map[string]model.RegOpts{

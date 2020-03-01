@@ -1,4 +1,3 @@
-// Source: https://github.com/genuinetools/reg/blob/f3a9b00ec86f334702381edf842f03b3a9243a0a/registry/image.go
 package registry
 
 import (
@@ -7,6 +6,8 @@ import (
 	"github.com/containers/image/v5/docker/reference"
 	digest "github.com/opencontainers/go-digest"
 )
+
+// Source: https://github.com/genuinetools/reg/blob/f3a9b00ec86f334702381edf842f03b3a9243a0a/registry/image.go
 
 // Image holds information about an image.
 type Image struct {

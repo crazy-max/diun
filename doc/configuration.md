@@ -22,6 +22,12 @@ watch:
   first_check_notif: false
 
 notif:
+  gotify:
+    enable: false
+    endpoint: http://gotify.foo.com
+    token: Token123456
+    priority: 1
+    timeout: 10
   mail:
     enable: false
     host: localhost
@@ -32,6 +38,13 @@ notif:
     password:
     from:
     to:
+  rocketchat:
+    enable: false
+    endpoint: http://rocket.foo.com:3000
+    channel: "#general"
+    user_id: abcdEFGH012345678
+    token: Token123456
+    timeout: 10
   slack:
     enable: false
     webhook_url: https://hooks.slack.com/services/ABCD12EFG/HIJK34LMN/01234567890abcdefghij
@@ -48,12 +61,6 @@ notif:
     headers:
       Content-Type: application/json
       Authorization: Token123456
-    timeout: 10
-  gotify:
-    enable: false
-    endpoint: http://gotify.foo.com
-    token: Token123456
-    priority: 1
     timeout: 10
 
 regopts:
@@ -123,6 +130,13 @@ providers:
 
 ### notif
 
+* `gotify`
+  * `enable`: Enable gotify notification (default: `false`).
+  * `endpoint`: Gotify base URL (e.g. `http://gotify.foo.com`). **required**
+  * `token`: Application token. **required**
+  * `priority`: The priority of the message.
+  * `timeout`: Timeout specifies a time limit for the request to be made. (default: `10`).
+
 * `mail`
   * `enable`: Enable email reports (default: `false`).
   * `host`: SMTP server host (default: `localhost`). **required**
@@ -135,6 +149,14 @@ providers:
   * `password_file`: Use content of secret file as SMTP password if `password` not defined.
   * `from`: Sender email address. **required**
   * `to`: Recipient email address. **required**
+
+* `rocketchat`
+  * `enable`: Enable Rocket.Chat notification (default: `false`).
+  * `endpoint`: Rocket.Chat base URL (e.g. `http://rocket.foo.com:3000`). **required**
+  * `channel`: Channel name with the prefix in front of it. **required**
+  * `user_id`: User ID. **required**
+  * `token`: Authentication token. **required**
+  * `timeout`: Timeout specifies a time limit for the request to be made. (default: `10`).
 
 * `slack`
   * `enable`: Enable slack notification (default: `false`).
@@ -150,13 +172,6 @@ providers:
   * `endpoint`: URL of the HTTP request. **required**
   * `method`: HTTP method (default: `GET`). **required**
   * `headers`: Map of additional headers to be sent.
-  * `timeout`: Timeout specifies a time limit for the request to be made. (default: `10`).
-
-* `gotify`
-  * `enable`: Enable gotify notification (default: `false`).
-  * `endpoint`: Gotify base URL (e.g. `http://gotify.foo.com`). **required**
-  * `token`: Application token. **required**
-  * `priority`: The priority of the message.
   * `timeout`: Timeout specifies a time limit for the request to be made. (default: `10`).
 
 ### regopts

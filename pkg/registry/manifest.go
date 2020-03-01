@@ -7,6 +7,7 @@ import (
 	"github.com/opencontainers/go-digest"
 )
 
+// Manifest is the Docker image manifest information
 type Manifest struct {
 	Name          string
 	Tag           string
