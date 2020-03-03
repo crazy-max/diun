@@ -18,6 +18,7 @@ type Notif struct {
 	Mail       NotifMail       `yaml:"mail,omitempty"`
 	RocketChat NotifRocketChat `yaml:"rocketchat,omitempty"`
 	Slack      NotifSlack      `yaml:"slack,omitempty"`
+	Teams      NotifTeams      `yaml:"teams,omitempty"`
 	Telegram   NotifTelegram   `yaml:"telegram,omitempty"`
 	Webhook    NotifWebhook    `yaml:"webhook,omitempty"`
 }
@@ -58,6 +59,12 @@ type NotifRocketChat struct {
 
 // NotifSlack holds slack notification configuration details
 type NotifSlack struct {
+	Enable     bool   `yaml:"enable,omitempty"`
+	WebhookURL string `yaml:"webhook_url,omitempty"`
+}
+
+// NotifTeams holds Teams notification configuration details
+type NotifTeams struct {
 	Enable     bool   `yaml:"enable,omitempty"`
 	WebhookURL string `yaml:"webhook_url,omitempty"`
 }
