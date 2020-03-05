@@ -3,6 +3,7 @@ package teams
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -34,20 +35,42 @@ func (c *Client) Name() string {
 	return "teams"
 }
 
+type Sections struct {
+	ActivityTitle    string `json:"activityTitle"`
+	ActivitySubtitle string `json:"activitySubtitle"`
+	Facts            []Fact `json:"facts"`
+}
+
+type Fact struct {
+	Name  string `json:"Name"`
+	Value string `json:"Value"`
+}
+
 // Send creates and sends a webhook notification with an entry
 func (c *Client) Send(entry model.NotifEntry) error {
 	hc := http.Client{
 		Timeout: time.Duration(10) * time.Second,
 	}
 
-	body, err := json.Marshal(struct {
-		Type       string `json:"@type"`
-		Text       string `json:"text"`
-		ThemeColor string `json:"themeColor"`
+	var body, err = json.Marshal(struct {
+		Type       string     `json:"@type"`
+		Context    string     `json:"@context"`
+		ThemeColor string     `json:"themeColor"`
+		Summary    string     `json:"summary"`
+		Sections   []Sections `json:"sections"`
 	}{
 		Type:       "MessageCard",
-		Text:       "Update tagged " + entry.Image.String() + " is available. Please consider to update!",
+		Context:    "http://schema.org/extensions",
 		ThemeColor: "0076D7",
+		Summary:    "Docker tag " + entry.Image.String() + " newly added",
+		Sections: []Sections{{
+			ActivityTitle:    "Docker tag " + entry.Image.String() + " newly added",
+			ActivitySubtitle: "Provider: " + entry.Provider,
+			Facts: []Fact{
+				{"Created", entry.Manifest.Created.Format("Jan 02, 2006 15:04:05 UTC")},
+				{"Digest", entry.Manifest.Digest.String()},
+				{"Plattform", fmt.Sprintf("%s/%s", entry.Manifest.Os, entry.Manifest.Architecture)},
+			},}},
 	})
 	if err != nil {
 		return err

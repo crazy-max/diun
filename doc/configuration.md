@@ -54,6 +54,9 @@ notif:
   slack:
     enable: false
     webhook_url: https://hooks.slack.com/services/ABCD12EFG/HIJK34LMN/01234567890abcdefghij
+  teams:
+    enable: false
+    webhook_url: https://outlook.office.com/webhook/ABCD12EFG/HIJK34LMN/01234567890abcdefghij
   telegram:
     enable: false
     token: aabbccdd:11223344
@@ -107,6 +110,7 @@ providers:
 * [mail](notifications.md#mail)
 * [rocketchat](notifications.md#rocketchat)
 * [slack](notifications.md#slack)
+* [teams](notifications.md#teams)
 * [telegram](notifications.md#telegram)
 * [webhook](notifications.md#webhook)
 
