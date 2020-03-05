@@ -44,12 +44,10 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		Type       string `json:"@type"`
 		Text       string `json:"text"`
 		ThemeColor string `json:"themeColor"`
-		Summary    string `json:"summary"`
 	}{
 		Type:       "MessageCard",
-		Text:       entry.Image.String(),
+		Text:       "Update tagged " + entry.Image.String() + " is available. Please consider to update!",
 		ThemeColor: "0076D7",
-		Summary:    string(entry.Status),
 	})
 	if err != nil {
 		return err
