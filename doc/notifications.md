@@ -31,6 +31,12 @@ You can send notifications to your Slack channel using an [incoming webhook URL]
 
 ![](../.res/notif-slack.png)
 
+## Teams
+
+You can send notifications to your Teams team-channel using an [incoming webhook URL](https://docs.microsoft.com/en-us/microsoftteams/platform/webhooks-and-connectors/what-are-webhooks-and-connectors):
+
+![](../.res/notif-slack.png)
+
 ## Telegram
 
 Notifications can be sent via Telegram using a [Telegram Bot](https://core.telegram.org/bots).

@@ -48,6 +48,9 @@ notif:
   slack:
     enable: false
     webhook_url: https://hooks.slack.com/services/ABCD12EFG/HIJK34LMN/01234567890abcdefghij
+  teams:
+    enable: false
+    webhook_url: https://outlook.office.com/webhook/ABCD12EFG/HIJK34LMN/01234567890abcdefghij
   telegram:
     enable: false
     token: aabbccdd:11223344
@@ -161,6 +164,10 @@ providers:
 * `slack`
   * `enable`: Enable slack notification (default: `false`).
   * `webhook_url`: Slack [incoming webhook URL](https://api.slack.com/messaging/webhooks). **required**
+
+* `teams`
+  * `enable`: Enable teams notification (default: `false`).
+  * `webhook_url`: Teams [incoming webhook URL](https://docs.microsoft.com/en-us/microsoftteams/platform/webhooks-and-connectors/what-are-webhooks-and-connectors). **required**
 
 * `telegram`
   * `enable`: Enable Telegram notification (default: `false`).
