@@ -5,7 +5,7 @@ go 1.13
 require (
 	github.com/Azure/go-ansiterm v0.0.0-20170929234023-d6e3b3328b78 // indirect
 	github.com/alecthomas/kingpin v0.0.0-20190816080609-dce89ec0b9f1
-	github.com/containers/image/v5 v5.2.1
+	github.com/containers/image/v5 v5.3.0
 	github.com/docker/docker v1.13.1
 	github.com/docker/go-connections v0.4.0
 	github.com/go-gomail/gomail v0.0.0-20160411212932-81ebce5c23df
