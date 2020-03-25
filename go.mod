@@ -11,7 +11,7 @@ require (
 	github.com/go-gomail/gomail v0.0.0-20160411212932-81ebce5c23df
 	github.com/go-telegram-bot-api/telegram-bot-api v4.6.4+incompatible
 	github.com/hako/durafmt v0.0.0-20190612201238-650ed9f29a84
-	github.com/imdario/mergo v0.3.8
+	github.com/imdario/mergo v0.3.9
 	github.com/matcornic/hermes/v2 v2.1.0
 	github.com/morikuni/aec v1.0.0 // indirect
 	github.com/nlopes/slack v0.6.0
