@@ -30,4 +30,4 @@ require (
 	gopkg.in/yaml.v2 v2.2.8
 )
 
-replace github.com/docker/docker => github.com/docker/engine v1.4.2-0.20191113042239-ea84732a7725
+replace github.com/docker/docker => github.com/docker/engine v1.4.2-0.20200309214505-aa6a9891b09c
