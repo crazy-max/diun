@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.5.1 (2020/03/26)
+
+* Fix service image inspection (#52)
+* Docker client v19.03.8
+* Update deps
+
 ## 2.5.0 (2020/03/01)
 
 * Add Rocket.Chat notifier (#44)
