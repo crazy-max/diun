@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.6.1 (2020/03/26)
+
+* Downgrade containers/image to 5.2.1 (#54)
+
 ## 2.6.0 (2020/03/26)
 
 * Fix service image inspection (#52)
