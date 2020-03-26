@@ -7,7 +7,7 @@ Diun binaries are available in [releases](https://github.com/crazy-max/diun/rele
 Choose the archive matching the destination platform and extract diun:
 
 ```
-wget -qO- https://github.com/crazy-max/diun/releases/download/v2.6.0/diun_2.6.0_linux_x86_64.tar.gz | tar -zxvf - diun
+wget -qO- https://github.com/crazy-max/diun/releases/download/v2.6.1/diun_2.6.1_linux_x86_64.tar.gz | tar -zxvf - diun
 ```
 
 ## Test
