@@ -35,20 +35,17 @@ func (c *Client) listServiceImage(id string, elt model.PrdSwarm) []model.Image {
 
 	var list []model.Image
 	for _, svc := range svcs {
-		local, err := cli.IsLocalImage(svc.Spec.TaskTemplate.ContainerSpec.Image)
-		if err != nil {
-			sublog.Error().Err(err).Msgf("Cannot inspect image from service %s", svc.ID)
-			continue
-		} else if local {
-			sublog.Debug().Msgf("Skip locally built image for service %s", svc.ID)
+		local, _ := cli.IsLocalImage(svc.Spec.TaskTemplate.ContainerSpec.Image)
+		if local {
+			sublog.Debug().Msgf("Skip locally built image for service %s", svc.Spec.Name)
 			continue
 		}
 		image, err := provider.ValidateContainerImage(svc.Spec.TaskTemplate.ContainerSpec.Image, svc.Spec.Labels, elt.WatchByDefault)
 		if err != nil {
-			sublog.Error().Err(err).Msgf("Cannot get image from service %s", svc.ID)
+			sublog.Error().Err(err).Msgf("Cannot get image from service %s", svc.Spec.Name)
 			continue
 		} else if reflect.DeepEqual(image, model.Image{}) {
-			sublog.Debug().Msgf("Watch disabled for service %s", svc.ID)
+			sublog.Debug().Msgf("Watch disabled for service %s", svc.Spec.Name)
 			continue
 		}
 		list = append(list, image)
