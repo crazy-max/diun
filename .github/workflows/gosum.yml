@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - 'master'
+      - 'v*'
     paths:
       - '.github/workflows/gosum.yml'
       - 'go.mod'
