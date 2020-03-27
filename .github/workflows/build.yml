@@ -2,7 +2,9 @@ name: build
 
 on:
   pull_request:
-    branches: master
+    branches:
+      - 'master'
+      - 'v*'
     paths:
       - '.github/workflows/build.yml'
       - 'cmd/**'
@@ -13,8 +15,11 @@ on:
       - 'go.mod'
       - 'go.sum'
   push:
-    branches: master
-    tags: v*
+    branches:
+      - 'master'
+      - 'v*'
+    tags:
+      - 'v*'
     paths:
       - '.github/workflows/build.yml'
       - 'cmd/**'
