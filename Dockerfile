@@ -46,15 +46,15 @@ ARG VCS_REF
 ARG VERSION
 
 LABEL maintainer="CrazyMax" \
-  org.label-schema.build-date=$BUILD_DATE \
-  org.label-schema.name="Diun" \
-  org.label-schema.description="Docker image update notifier" \
-  org.label-schema.version=$VERSION \
-  org.label-schema.url="https://github.com/crazy-max/diun" \
-  org.label-schema.vcs-ref=$VCS_REF \
-  org.label-schema.vcs-url="https://github.com/crazy-max/diun" \
-  org.label-schema.vendor="CrazyMax" \
-  org.label-schema.schema-version="1.0"
+  org.opencontainers.image.created=$BUILD_DATE \
+  org.opencontainers.image.url="https://github.com/crazy-max/diun" \
+  org.opencontainers.image.source="https://github.com/crazy-max/diun" \
+  org.opencontainers.image.version=$VERSION \
+  org.opencontainers.image.revision=$VCS_REF \
+  org.opencontainers.image.vendor="CrazyMax" \
+  org.opencontainers.image.title="Diun" \
+  org.opencontainers.image.description="Docker image update notifier" \
+  org.opencontainers.image.licenses="MIT"
 
 RUN apk --update --no-cache add \
     ca-certificates \
