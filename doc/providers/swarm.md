@@ -105,4 +105,11 @@ diun_diun.1.i1l4yuiafq6y@docker-desktop    | Sat, 14 Dec 2019 16:20:02 CET INF N
 
 ## Configuration
 
-You can configure more finely the way to analyze the image of your service as for the [Docker provider](docker.md) with [Docker labels](docker.md#configuration).
+In the same spirit as the [static provider](static.md), you can configure more finely the way to analyze the image of your service. But unlike the static provider, this is done via Docker labels:
+
+* `diun.enable`: Set to true to enable image analysis of this container. Required if `watch_by_default` is disabled for this provider.
+* `diun.regopts_id`: Registry options ID from [`regopts`](../configuration.md#regopts) to use.
+* `diun.watch_repo`: Watch all tags of this container image (default: `false`).
+* `diun.max_tags`: Maximum number of tags to watch if `diun.watch_repo` enabled. 0 means all of them (default: `0`).
+* `diun.include_tags`: Semi-colon separated list of regular expressions to include tags. Can be useful if you enable `diun.watch_repo`.
+* `diun.exclude_tags`: Semi-colon separated list of regular expressions to exclude tags. Can be useful if you enable `diun.watch_repo`.

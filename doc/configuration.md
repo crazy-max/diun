@@ -109,11 +109,13 @@ providers:
       include_tags:
         - ^(0|[1-9]\d*)\..*
     # Watch alpine image (library) and assume docker.io registry and latest tag.
-    # Only check linux/arm64v8 image
+    # Force linux/arm64/v8 platform for this image
     - name: alpine
       watch_repo: true
-      os: linux
-      arch: arm64v8
+      platform:
+        os: linux
+        arch: arm64
+        variant: v8
 ```
 
 ## Reference
@@ -124,9 +126,9 @@ providers:
 
 ### watch
 
-* `workers`: Maximum number of workers that will execute tasks concurrently. _Optional_. (default: `10`).
-* `schedule`: [CRON expression](https://godoc.org/github.com/robfig/cron#hdr-CRON_Expression_Format) to schedule Diun watcher. _Optional_. (default: `0 * * * *`).
-* `first_check_notif`: Send notification at the very first analysis of an image. _Optional_. (default: `false`).
+* `workers`: Maximum number of workers that will execute tasks concurrently (default: `10`).
+* `schedule`: [CRON expression](https://godoc.org/github.com/robfig/cron#hdr-CRON_Expression_Format) to schedule Diun watcher (default: `0 * * * *`).
+* `first_check_notif`: Send notification at the very first analysis of an image. (default: `false`).
 
 ### notif
 
@@ -187,27 +189,29 @@ providers:
 
 * `docker`: Map of Docker standalone engines to watch
   * `<key>`: An unique identifier for this provider.
-    * `endpoint`: Server address to connect to. Local if empty. _Optional_
-    * `api_version`: Overrides the client version with the specified one. _Optional_
-    * `tls_certs_path`: Path to load the TLS certificates from. _Optional_
+    * `endpoint`: Server address to connect to. Local if empty.
+    * `api_version`: Overrides the client version with the specified one.
+    * `tls_certs_path`: Path to load the TLS certificates from.
     * `tls_verify`: Controls whether client verifies the server's certificate chain and hostname (default: `true`).
     * `watch_by_default`: Enable watch by default. If false, containers that don't have `diun.enable=true` label will be ignored (default: `false`).
     * `watch_stopped`: Include created and exited containers too (default: `false`).
 
 * `swarm`: Map of Docker Swarm to watch
   * `<key>`: An unique identifier for this provider.
-    * `endpoint`: Server address to connect to. Local if empty. _Optional_
-    * `api_version`: Overrides the client version with the specified one. _Optional_
-    * `tls_certs_path`: Path to load the TLS certificates from. _Optional_
+    * `endpoint`: Server address to connect to. Local if empty.
+    * `api_version`: Overrides the client version with the specified one.
+    * `tls_certs_path`: Path to load the TLS certificates from.
     * `tls_verify`: Controls whether client verifies the server's certificate chain and hostname (default: `true`).
     * `watch_by_default`: Enable watch by default. If false, services that don't have `diun.enable=true` label will be ignored (default: `false`).
 
 * `static`: Slice of static image to watch
   * `name`: Docker image name to watch using `registry/path:tag` format. If registry is omitted, `docker.io` will be used and if tag is omitted, `latest` will be used. **required**
-  * `os`: OS to use. _Optional_. (default: `linux`).
-  * `arch`: Architecture to use. _Optional_. (default: `amd64`).
   * `regopts_id`: Registry options ID from `regopts` to use.
   * `watch_repo`: Watch all tags of this `image` repository (default: `false`).
   * `max_tags`: Maximum number of tags to watch if `watch_repo` enabled. 0 means all of them (default: `0`).
   * `include_tags`: List of regular expressions to include tags. Can be useful if you enable `watch_repo`.
   * `exclude_tags`: List of regular expressions to exclude tags. Can be useful if you enable `watch_repo`.
+  * `platform`: Check a custom platform. (default is retrieved dynamically based on your operating system).
+    * `os`: Operating system to use.
+    * `arch`: CPU architecture to use.
+    * `variant`: Variant of the CPU to use.

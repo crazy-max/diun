@@ -66,6 +66,12 @@ func New(cfg *config.Config, location *time.Location) (*Diun, error) {
 func (di *Diun) Start() error {
 	var err error
 
+	// Migrate db
+	err = di.db.Migrate()
+	if err != nil {
+		return err
+	}
+
 	// Run on startup
 	di.Run()
 

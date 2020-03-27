@@ -44,6 +44,7 @@
   * [Swarm](doc/providers/swarm.md)
   * [Static](doc/providers/static.md)
 * [Notifications](doc/notifications.md)
+* [FAQ](doc/faq.md)
 
 ## How can I help ?
 

@@ -93,8 +93,6 @@ diun_1         | Sat, 14 Dec 2019 15:30:13 CET INF Next run in 29 minutes (2019-
 In the same spirit as the [static provider](static.md), you can configure more finely the way to analyze the image of your container. But unlike the static provider, this is done via Docker labels:
 
 * `diun.enable`: Set to true to enable image analysis of this container. Required if `watch_by_default` is disabled for this provider.
-* `diun.os`: OS to use. _Optional_. (default: `linux`).
-* `diun.arch`: Architecture to use. _Optional_. (default: `amd64`).
 * `diun.regopts_id`: Registry options ID from [`regopts`](../configuration.md#regopts) to use.
 * `diun.watch_repo`: Watch all tags of this container image (default: `false`).
 * `diun.max_tags`: Maximum number of tags to watch if `diun.watch_repo` enabled. 0 means all of them (default: `0`).

@@ -18,13 +18,14 @@ type Client struct {
 
 // Options holds docker registry object options
 type Options struct {
-	Os          string
-	Arch        string
-	Username    string
-	Password    string
-	InsecureTLS bool
-	Timeout     time.Duration
-	UserAgent   string
+	Username     string
+	Password     string
+	InsecureTLS  bool
+	Timeout      time.Duration
+	UserAgent    string
+	ImageOs      string
+	ImageArch    string
+	ImageVariant string
 }
 
 // New creates new docker registry client instance
@@ -40,12 +41,13 @@ func New(opts Options) (*Client, error) {
 
 	// Sys context
 	sysCtx := &types.SystemContext{
-		OSChoice:                          opts.Os,
-		ArchitectureChoice:                opts.Arch,
 		DockerAuthConfig:                  auth,
 		DockerDaemonInsecureSkipTLSVerify: opts.InsecureTLS,
 		DockerInsecureSkipTLSVerify:       types.NewOptionalBool(opts.InsecureTLS),
 		DockerRegistryUserAgent:           opts.UserAgent,
+		OSChoice:                          opts.ImageOs,
+		ArchitectureChoice:                opts.ImageArch,
+		VariantChoice:                     opts.ImageVariant,
 	}
 
 	return &Client{

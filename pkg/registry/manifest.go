@@ -1,9 +1,11 @@
 package registry
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/containers/image/v5/manifest"
+	"github.com/crazy-max/diun/pkg/registry/platform"
 	"github.com/opencontainers/go-digest"
 )
 
@@ -16,9 +18,8 @@ type Manifest struct {
 	Created       *time.Time
 	DockerVersion string
 	Labels        map[string]string
-	Architecture  string
-	Os            string
 	Layers        []string
+	Platform      string `json:"-"`
 }
 
 // Manifest returns the manifest for a specific image
@@ -26,18 +27,18 @@ func (c *Client) Manifest(image Image) (Manifest, error) {
 	ctx, cancel := c.timeoutContext()
 	defer cancel()
 
-	imgCls, err := c.newImage(ctx, image.String())
+	imgCloser, err := c.newImage(ctx, image.String())
 	if err != nil {
 		return Manifest{}, err
 	}
-	defer imgCls.Close()
+	defer imgCloser.Close()
 
-	rawManifest, _, err := imgCls.Manifest(ctx)
+	rawManifest, _, err := imgCloser.Manifest(ctx)
 	if err != nil {
 		return Manifest{}, err
 	}
 
-	imgInspect, err := imgCls.Inspect(ctx)
+	imgInspect, err := imgCloser.Inspect(ctx)
 	if err != nil {
 		return Manifest{}, err
 	}
@@ -47,21 +48,30 @@ func (c *Client) Manifest(image Image) (Manifest, error) {
 		return Manifest{}, err
 	}
 
+	platforms, err := platform.WantedPlatforms(c.sysCtx)
+	if err != nil {
+		return Manifest{}, err
+	}
+
 	imgTag := imgInspect.Tag
 	if imgTag == "" {
 		imgTag = image.Tag
 	}
 
+	imgPlatform := fmt.Sprintf("%s/%s", platforms[0].OS, platforms[0].Architecture)
+	if platforms[0].Variant != "" {
+		imgPlatform = fmt.Sprintf("%s/%s", imgPlatform, platforms[0].Variant)
+	}
+
 	return Manifest{
-		Name:          imgCls.Reference().DockerReference().Name(),
+		Name:          imgCloser.Reference().DockerReference().Name(),
 		Tag:           imgTag,
 		MIMEType:      manifest.GuessMIMEType(rawManifest),
 		Digest:        imgDigest,
 		Created:       imgInspect.Created,
 		DockerVersion: imgInspect.DockerVersion,
 		Labels:        imgInspect.Labels,
-		Architecture:  imgInspect.Architecture,
-		Os:            imgInspect.Os,
 		Layers:        imgInspect.Layers,
+		Platform:      imgPlatform,
 	}, nil
 }

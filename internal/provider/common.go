@@ -31,10 +31,6 @@ func ValidateContainerImage(image string, labels map[string]string, watchByDef b
 
 	for key, value := range labels {
 		switch key {
-		case "diun.os":
-			img.Os = value
-		case "diun.arch":
-			img.Arch = value
 		case "diun.regopts_id":
 			img.RegOptsID = value
 		case "diun.watch_repo":
