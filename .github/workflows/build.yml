@@ -65,6 +65,18 @@ jobs:
           version: latest
           args: release --skip-publish --rm-dist
       -
+        name: Test
+        run: |
+          go test -coverprofile=coverage.txt -covermode=atomic ./...
+      -
+        # https://github.com/codecov/codecov-action
+        name: Upload coverage
+        uses: codecov/codecov-action@v1
+        if: success()
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          file: ./coverage.txt
+      -
         # https://github.com/softprops/action-gh-release
         name: GitHub Release
         uses: softprops/action-gh-release@v1

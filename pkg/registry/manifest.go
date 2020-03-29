@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/containers/image/v5/manifest"
-	"github.com/crazy-max/diun/pkg/registry/platform"
 	"github.com/opencontainers/go-digest"
 )
 
@@ -48,19 +47,14 @@ func (c *Client) Manifest(image Image) (Manifest, error) {
 		return Manifest{}, err
 	}
 
-	platforms, err := platform.WantedPlatforms(c.sysCtx)
-	if err != nil {
-		return Manifest{}, err
-	}
-
 	imgTag := imgInspect.Tag
 	if imgTag == "" {
 		imgTag = image.Tag
 	}
 
-	imgPlatform := fmt.Sprintf("%s/%s", platforms[0].OS, platforms[0].Architecture)
-	if platforms[0].Variant != "" {
-		imgPlatform = fmt.Sprintf("%s/%s", imgPlatform, platforms[0].Variant)
+	imgPlatform := fmt.Sprintf("%s/%s", imgInspect.Os, imgInspect.Architecture)
+	if imgInspect.Variant != "" {
+		imgPlatform = fmt.Sprintf("%s/%s", imgPlatform, imgInspect.Variant)
 	}
 
 	return Manifest{

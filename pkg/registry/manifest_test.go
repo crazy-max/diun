@@ -32,5 +32,6 @@ func TestManifestVariant(t *testing.T) {
 	assert.Equal(t, "docker.io/crazymax/diun", manifest.Name)
 	assert.Equal(t, "2.5.0", manifest.Tag)
 	assert.Equal(t, "application/vnd.docker.distribution.manifest.list.v2+json", manifest.MIMEType)
+	assert.Equal(t, "linux/arm/v7", manifest.Platform)
 	assert.Empty(t, manifest.DockerVersion)
 }

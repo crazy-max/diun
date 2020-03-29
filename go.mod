@@ -16,7 +16,6 @@ require (
 	github.com/morikuni/aec v1.0.0 // indirect
 	github.com/nlopes/slack v0.6.0
 	github.com/opencontainers/go-digest v1.0.0-rc1
-	github.com/opencontainers/image-spec v1.0.2-0.20190823105129-775207bd45b6
 	github.com/panjf2000/ants/v2 v2.3.1
 	github.com/pkg/errors v0.9.1
 	github.com/robfig/cron/v3 v3.0.1
@@ -31,4 +30,7 @@ require (
 	gopkg.in/yaml.v2 v2.2.8
 )
 
-replace github.com/docker/docker => github.com/docker/engine v1.4.2-0.20200309214505-aa6a9891b09c
+replace (
+	github.com/containers/image/v5 => github.com/crazy-max/containers-image/v5 v5.3.1-0.20200328223453-372660f9f40d
+	github.com/docker/docker => github.com/docker/engine v1.4.2-0.20200309214505-aa6a9891b09c
+)
