@@ -35,12 +35,14 @@ func (c *Client) Name() string {
 	return "teams"
 }
 
+// Sections is grouping data together containing title, subtitle and facts and creating a nested json element
 type Sections struct {
 	ActivityTitle    string `json:"activityTitle"`
 	ActivitySubtitle string `json:"activitySubtitle"`
 	Facts            []Fact `json:"facts"`
 }
 
+// Fact is grouping data togheter to create a nested json element containg a name and an associated value
 type Fact struct {
 	Name  string `json:"Name"`
 	Value string `json:"Value"`
