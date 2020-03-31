@@ -51,8 +51,7 @@ func (di *Diun) createJob(job model.Job) {
 
 	// Set defaults
 	if err := mergo.Merge(&job.Image, model.Image{
-		Os:        "linux",
-		Arch:      "amd64",
+		Platform:  model.ImagePlatform{},
 		WatchRepo: false,
 		MaxTags:   0,
 	}); err != nil {
@@ -75,13 +74,14 @@ func (di *Diun) createJob(job model.Job) {
 	}
 
 	job.Registry, err = registry.New(registry.Options{
-		Os:          job.Image.Os,
-		Arch:        job.Image.Arch,
-		Username:    regUser,
-		Password:    regPassword,
-		Timeout:     time.Duration(regOpts.Timeout) * time.Second,
-		InsecureTLS: regOpts.InsecureTLS,
-		UserAgent:   di.userAgent,
+		Username:     regUser,
+		Password:     regPassword,
+		Timeout:      time.Duration(regOpts.Timeout) * time.Second,
+		InsecureTLS:  regOpts.InsecureTLS,
+		UserAgent:    di.userAgent,
+		ImageOs:      job.Image.Platform.Os,
+		ImageArch:    job.Image.Platform.Arch,
+		ImageVariant: job.Image.Platform.Variant,
 	})
 	if err != nil {
 		sublog.Error().Err(err).Msg("Cannot create registry client")

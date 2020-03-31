@@ -159,8 +159,11 @@ func TestLoad(t *testing.T) {
 						},
 						{
 							Name: "alpine",
-							Os:   "linux",
-							Arch: "arm64v8",
+							Platform: model.ImagePlatform{
+								Os:      "linux",
+								Arch:    "arm64",
+								Variant: "v8",
+							},
 						},
 						{
 							Name: "docker.io/graylog/graylog:3.2.0",

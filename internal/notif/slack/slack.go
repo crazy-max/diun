@@ -76,7 +76,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 					},
 					{
 						Title: "Platform",
-						Value: fmt.Sprintf("%s/%s", entry.Manifest.Os, entry.Manifest.Architecture),
+						Value: entry.Manifest.Platform,
 						Short: false,
 					},
 				},
