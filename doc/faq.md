@@ -10,7 +10,7 @@ In the example below, Diun is running (`diun_x.x.x_windows_i386.zip`) on Windows
 
 ```yml
 db:
-  path: rocketchat.db
+  path: diun.db
 
 watch:
   workers: 20
@@ -34,7 +34,7 @@ You have to force the platform for this image if you are not on a supported plat
 
 ```yml
 db:
-  path: rocketchat.db
+  path: diun.db
 
 watch:
   workers: 20
