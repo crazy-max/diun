@@ -3,9 +3,8 @@ module github.com/crazy-max/diun
 go 1.13
 
 require (
-	github.com/Azure/go-ansiterm v0.0.0-20170929234023-d6e3b3328b78 // indirect
 	github.com/alecthomas/kingpin v0.0.0-20190816080609-dce89ec0b9f1
-	github.com/containers/image/v5 v5.3.2-0.20200330195913-06b89332d28f
+	github.com/containers/image/v5 v5.4.0
 	github.com/docker/docker v1.13.1
 	github.com/docker/go-connections v0.4.0
 	github.com/go-gomail/gomail v0.0.0-20160411212932-81ebce5c23df
@@ -13,7 +12,6 @@ require (
 	github.com/hako/durafmt v0.0.0-20190612201238-650ed9f29a84
 	github.com/imdario/mergo v0.3.9
 	github.com/matcornic/hermes/v2 v2.1.0
-	github.com/morikuni/aec v1.0.0 // indirect
 	github.com/nlopes/slack v0.6.0
 	github.com/opencontainers/go-digest v1.0.0-rc1
 	github.com/panjf2000/ants/v2 v2.3.1
@@ -24,7 +22,6 @@ require (
 	github.com/stretchr/testify v1.5.1
 	github.com/technoweenie/multipartstreamer v1.0.1 // indirect
 	go.etcd.io/bbolt v1.3.4
-	golang.org/x/time v0.0.0-20191024005414-555d28b269f0 // indirect
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df // indirect
 	gopkg.in/yaml.v2 v2.2.8
