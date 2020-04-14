@@ -82,7 +82,7 @@ func Load(cli model.Cli, version string) (*Config, error) {
 				Password: "guest",
 				Exchange: "",
 				Queue:    "queue",
-			}
+			},
 		},
 	}
 
