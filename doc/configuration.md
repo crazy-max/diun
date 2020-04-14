@@ -159,6 +159,15 @@ providers:
   * `headers`: Map of additional headers to be sent.
   * `timeout`: Timeout specifies a time limit for the request to be made. (default: `10`).
 
+* `amqp`
+  * `enable`: Enable AMQP notifications (default: `false`).
+  * `host`: AMQP server host (default: `localhost`). **required**
+  * `port`: AMQP server port (default: `5672`). **required**
+  * `username`: AMQP username. **required**  
+  * `password`: AMQP password. **required**
+  * `exchange`: Name of the exchange the message will be sent to.
+  * `queue`: Name of the queue the message will be sent to. **required**
+  
 ### regopts
 
 * `username`: Registry username.
