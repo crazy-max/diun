@@ -20,6 +20,7 @@ type Notif struct {
 	Slack      NotifSlack      `yaml:"slack,omitempty"`
 	Telegram   NotifTelegram   `yaml:"telegram,omitempty"`
 	Webhook    NotifWebhook    `yaml:"webhook,omitempty"`
+	Amqp       NotifAmqp       `yaml:"amqp,omitempty"`
 }
 
 // NotifGotify holds gotify notification configuration details
@@ -76,4 +77,15 @@ type NotifWebhook struct {
 	Method   string            `yaml:"method,omitempty"`
 	Headers  map[string]string `yaml:"headers,omitempty"`
 	Timeout  int               `yaml:"timeout,omitempty"`
+}
+
+// NotifAmqp holds amqp notification configuration details
+type NotifAmqp struct {
+	Enable   bool   `yaml:"enable,omitempty"`
+	Username string `yaml:"username,omitempty"`
+	Password string `yaml:"password,omitempty"`
+	Host     string `yaml:"host,omitempty"`
+	Port     int    `yaml:"port,omitempty"`
+	Queue    string `yaml:"queue,omitempty"`
+	Exchange string `yaml:"exchange,omitempty"`
 }

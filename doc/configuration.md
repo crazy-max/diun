@@ -62,6 +62,14 @@ notif:
       Content-Type: application/json
       Authorization: Token123456
     timeout: 10
+  amqp:
+    enable: false
+    host: localhost
+    port: 25
+    username:
+    password:
+    exchange:
+    queue:
 
 regopts:
   someregistryoptions:
