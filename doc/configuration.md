@@ -163,8 +163,10 @@ providers:
   * `enable`: Enable AMQP notifications (default: `false`).
   * `host`: AMQP server host (default: `localhost`). **required**
   * `port`: AMQP server port (default: `5672`). **required**
-  * `username`: AMQP username. **required**  
+  * `username`: AMQP username. **required**
+  * `username_file`: Use content of secret file as AMQP username if `username` not defined.
   * `password`: AMQP password. **required**
+  * `password_file`: Use content of secret file as AMQP password if `password` not defined.
   * `exchange`: Name of the exchange the message will be sent to.
   * `queue`: Name of the queue the message will be sent to. **required**
   

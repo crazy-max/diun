@@ -7,6 +7,7 @@ import (
 
 	"github.com/crazy-max/diun/internal/model"
 	"github.com/crazy-max/diun/internal/notif/notifier"
+	"github.com/crazy-max/diun/pkg/utl"
 	"github.com/opencontainers/go-digest"
 	"github.com/rs/zerolog/log"
 	"github.com/streadway/amqp"
@@ -36,7 +37,18 @@ func (c *Client) Name() string {
 
 // Send creates and sends a slack notification with an entry
 func (c *Client) Send(entry model.NotifEntry) error {
-	connString := fmt.Sprintf("amqp://%s:%s@%s:%d/", c.cfg.Username, c.cfg.Password, c.cfg.Host, c.cfg.Port)
+
+	username, err := utl.GetSecret(c.cfg.Username, c.cfg.UsernameFile)
+	if err != nil {
+		log.Warn().Err(err).Msg("Cannot retrieve username secret for amqp notifier")
+	}
+
+	password, err := utl.GetSecret(c.cfg.Password, c.cfg.PasswordFile)
+	if err != nil {
+		log.Warn().Err(err).Msg("Cannot retrieve password secret for amqp notifier")
+	}
+
+	connString := fmt.Sprintf("amqp://%s:%s@%s:%d/", username, password, c.cfg.Host, c.cfg.Port)
 
 	conn, err := amqp.Dial(connString)
 	failOnError(err, "Failed to connect to mq")

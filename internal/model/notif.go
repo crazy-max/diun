@@ -81,11 +81,13 @@ type NotifWebhook struct {
 
 // NotifAmqp holds amqp notification configuration details
 type NotifAmqp struct {
-	Enable   bool   `yaml:"enable,omitempty"`
-	Username string `yaml:"username,omitempty"`
-	Password string `yaml:"password,omitempty"`
-	Host     string `yaml:"host,omitempty"`
-	Port     int    `yaml:"port,omitempty"`
-	Queue    string `yaml:"queue,omitempty"`
-	Exchange string `yaml:"exchange,omitempty"`
+	Enable       bool   `yaml:"enable,omitempty"`
+	Username     string `yaml:"username,omitempty"`
+	UsernameFile string `yaml:"username_file,omitempty"`
+	Password     string `yaml:"password,omitempty"`
+	PasswordFile string `yaml:"password_file,omitempty"`
+	Host         string `yaml:"host,omitempty"`
+	Port         int    `yaml:"port,omitempty"`
+	Queue        string `yaml:"queue,omitempty"`
+	Exchange     string `yaml:"exchange,omitempty"`
 }
