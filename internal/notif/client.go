@@ -29,6 +29,9 @@ func New(config model.Notif, app model.App, userAgent string) (*Client, error) {
 	}
 
 	// Add notifiers
+	if config.Amqp.Enable {
+		c.notifiers = append(c.notifiers, amqp.New(config.Amqp, app))
+	}
 	if config.Gotify.Enable {
 		c.notifiers = append(c.notifiers, gotify.New(config.Gotify, app, userAgent))
 	}
@@ -46,9 +49,6 @@ func New(config model.Notif, app model.App, userAgent string) (*Client, error) {
 	}
 	if config.Webhook.Enable {
 		c.notifiers = append(c.notifiers, webhook.New(config.Webhook, app, userAgent))
-	}
-	if config.Amqp.Enable {
-		c.notifiers = append(c.notifiers, amqp.New(config.Amqp, app))
 	}
 
 	log.Debug().Msgf("%d notifier(s) created", len(c.notifiers))
