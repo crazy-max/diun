@@ -65,11 +65,11 @@ notif:
   amqp:
     enable: false
     host: localhost
-    port: 25
-    username:
-    password:
-    exchange:
-    queue:
+    port: 5672
+    username: guest
+    password: guest
+    exchange: 
+    queue: queue
 
 regopts:
   someregistryoptions:
