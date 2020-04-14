@@ -22,6 +22,14 @@ watch:
   first_check_notif: false
 
 notif:
+  amqp:
+    enable: false
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+    exchange: 
+    queue: queue
   gotify:
     enable: false
     endpoint: http://gotify.foo.com
@@ -62,14 +70,6 @@ notif:
       Content-Type: application/json
       Authorization: Token123456
     timeout: 10
-  amqp:
-    enable: false
-    host: localhost
-    port: 5672
-    username: guest
-    password: guest
-    exchange: 
-    queue: queue
 
 regopts:
   someregistryoptions:
@@ -114,6 +114,16 @@ providers:
 * `first_check_notif`: Send notification at the very first analysis of an image. (default: `false`).
 
 ### notif
+* `amqp`
+  * `enable`: Enable AMQP notifications (default: `false`).
+  * `host`: AMQP server host (default: `localhost`). **required**
+  * `port`: AMQP server port (default: `5672`). **required**
+  * `username`: AMQP username. **required**
+  * `username_file`: Use content of secret file as AMQP username if `username` not defined.
+  * `password`: AMQP password. **required**
+  * `password_file`: Use content of secret file as AMQP password if `password` not defined.
+  * `exchange`: Name of the exchange the message will be sent to. (default: `empty`)
+  * `queue`: Name of the queue the message will be sent to. **required**
 
 * `gotify`
   * `enable`: Enable gotify notification (default: `false`).
@@ -158,17 +168,6 @@ providers:
   * `method`: HTTP method (default: `GET`). **required**
   * `headers`: Map of additional headers to be sent.
   * `timeout`: Timeout specifies a time limit for the request to be made. (default: `10`).
-
-* `amqp`
-  * `enable`: Enable AMQP notifications (default: `false`).
-  * `host`: AMQP server host (default: `localhost`). **required**
-  * `port`: AMQP server port (default: `5672`). **required**
-  * `username`: AMQP username. **required**
-  * `username_file`: Use content of secret file as AMQP username if `username` not defined.
-  * `password`: AMQP password. **required**
-  * `password_file`: Use content of secret file as AMQP password if `password` not defined.
-  * `exchange`: Name of the exchange the message will be sent to.
-  * `queue`: Name of the queue the message will be sent to. **required**
   
 ### regopts
 

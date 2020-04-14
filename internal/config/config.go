@@ -48,6 +48,12 @@ func Load(cli model.Cli, version string) (*Config, error) {
 			FirstCheckNotif: false,
 		},
 		Notif: model.Notif{
+			Amqp: model.NotifAmqp{
+				Enable:   false,
+				Host:     "localhost",
+				Port:     5672,
+				Exchange: "",
+			},
 			Gotify: model.NotifGotify{
 				Enable:  false,
 				Timeout: 10,
@@ -73,15 +79,6 @@ func Load(cli model.Cli, version string) (*Config, error) {
 				Enable:  false,
 				Method:  "GET",
 				Timeout: 10,
-			},
-			Amqp: model.NotifAmqp{
-				Enable:   false,
-				Host:     "localhost",
-				Port:     5672,
-				Username: "guest",
-				Password: "guest",
-				Exchange: "",
-				Queue:    "queue",
 			},
 		},
 	}

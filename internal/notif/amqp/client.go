@@ -40,12 +40,14 @@ func (c *Client) Send(entry model.NotifEntry) error {
 
 	username, err := utl.GetSecret(c.cfg.Username, c.cfg.UsernameFile)
 	if err != nil {
-		log.Warn().Err(err).Msg("Cannot retrieve username secret for amqp notifier")
+		log.Err(err).Msg("Cannot retrieve username secret for amqp notifier")
+		return err
 	}
 
 	password, err := utl.GetSecret(c.cfg.Password, c.cfg.PasswordFile)
 	if err != nil {
-		log.Warn().Err(err).Msg("Cannot retrieve password secret for amqp notifier")
+		log.Err(err).Msg("Cannot retrieve password secret for amqp notifier")
+		return err
 	}
 
 	connString := fmt.Sprintf("amqp://%s:%s@%s:%d/", username, password, c.cfg.Host, c.cfg.Port)
