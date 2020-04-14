@@ -3,12 +3,12 @@ package amqp
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/crazy-max/diun/internal/model"
 	"github.com/crazy-max/diun/internal/notif/notifier"
 	"github.com/opencontainers/go-digest"
+	"github.com/rs/zerolog/log"
 	"github.com/streadway/amqp"
 )
 
@@ -123,6 +123,6 @@ func buildBody(entry model.NotifEntry, app model.App) ([]byte, error) {
 
 func failOnError(err error, msg string) {
 	if err != nil {
-		log.Fatalf("%s: %s", msg, err)
+		log.Err(err).Msg(msg)
 	}
 }
