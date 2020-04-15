@@ -114,6 +114,7 @@ providers:
 * `first_check_notif`: Send notification at the very first analysis of an image. (default: `false`).
 
 ### notif
+
 * `amqp`
   * `enable`: Enable AMQP notifications (default: `false`).
   * `host`: AMQP server host (default: `localhost`). **required**
@@ -168,7 +169,7 @@ providers:
   * `method`: HTTP method (default: `GET`). **required**
   * `headers`: Map of additional headers to be sent.
   * `timeout`: Timeout specifies a time limit for the request to be made. (default: `10`).
-  
+
 ### regopts
 
 * `username`: Registry username.

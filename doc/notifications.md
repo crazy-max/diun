@@ -10,6 +10,7 @@
 ## Amqp
 
 You can send notifications any amqp compatible server, the body will be a JSON format that looks like:
+
 ```json
 {
   "diun_version": "0.3.0",

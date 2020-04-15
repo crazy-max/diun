@@ -9,7 +9,6 @@ import (
 	"github.com/crazy-max/diun/internal/notif/notifier"
 	"github.com/crazy-max/diun/pkg/utl"
 	"github.com/opencontainers/go-digest"
-	"github.com/rs/zerolog/log"
 	"github.com/streadway/amqp"
 )
 
@@ -35,26 +34,23 @@ func (c *Client) Name() string {
 	return "amqp"
 }
 
-// Send creates and sends a slack notification with an entry
+// Send creates and sends a amqp notification with an entry
 func (c *Client) Send(entry model.NotifEntry) error {
 
 	username, err := utl.GetSecret(c.cfg.Username, c.cfg.UsernameFile)
+
 	if err != nil {
-		log.Err(err).Msg("Cannot retrieve username secret for amqp notifier")
 		return err
 	}
 
 	password, err := utl.GetSecret(c.cfg.Password, c.cfg.PasswordFile)
 	if err != nil {
-		log.Err(err).Msg("Cannot retrieve password secret for amqp notifier")
 		return err
 	}
 
 	connString := fmt.Sprintf("amqp://%s:%s@%s:%d/", username, password, c.cfg.Host, c.cfg.Port)
 
 	conn, err := amqp.Dial(connString)
-	failOnError(err, "Failed to connect to mq")
-
 	if err != nil {
 		return err
 	}
@@ -62,8 +58,6 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	defer conn.Close()
 
 	ch, err := conn.Channel()
-	failOnError(err, "Failed to open a channel")
-
 	if err != nil {
 		return err
 	}
@@ -78,20 +72,16 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		false,       // no-wait
 		nil,         // arguments
 	)
-	failOnError(err, "Failed to declare a queue")
-
 	if err != nil {
 		return err
 	}
 
 	body, err := buildBody(entry, c.app)
-	failOnError(err, "Failed build body")
-
 	if err != nil {
 		return err
 	}
 
-	err = ch.Publish(
+	return ch.Publish(
 		c.cfg.Exchange, // exchange
 		q.Name,         // routing key
 		false,          // mandatory
@@ -100,13 +90,10 @@ func (c *Client) Send(entry model.NotifEntry) error {
 			ContentType: "application/json",
 			Body:        body,
 		})
-	failOnError(err, "Failed to publish a message")
-
-	return err
 }
 
 func buildBody(entry model.NotifEntry, app model.App) ([]byte, error) {
-	body, err := json.Marshal(struct {
+	return json.Marshal(struct {
 		Version      string        `json:"diun_version"`
 		Status       string        `json:"status"`
 		Provider     string        `json:"provider"`
@@ -127,16 +114,4 @@ func buildBody(entry model.NotifEntry, app model.App) ([]byte, error) {
 		Architecture: entry.Manifest.Architecture,
 		Os:           entry.Manifest.Os,
 	})
-
-	if err != nil {
-		return nil, err
-	}
-
-	return body, nil
-}
-
-func failOnError(err error, msg string) {
-	if err != nil {
-		log.Err(err).Msg(msg)
-	}
 }
