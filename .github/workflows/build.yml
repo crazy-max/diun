@@ -44,19 +44,13 @@ jobs:
       -
         # https://github.com/actions/setup-go
         name: Set up Go
-        uses: actions/setup-go@master
+        uses: actions/setup-go@v2
         with:
           go-version: 1.13
       -
-        name: Set GOPATH
-        # temporary fix (see https://github.com/actions/setup-go/issues/14)
-        run: |
-          echo "##[set-env name=GOPATH;]$(dirname $GITHUB_WORKSPACE)"
-          echo "##[add-path]$(dirname $GITHUB_WORKSPACE)/bin"
-      -
         # https://github.com/actions/checkout
         name: Checkout
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
       -
         # https://github.com/goreleaser/goreleaser-action
         name: GoReleaser
@@ -122,12 +116,10 @@ jobs:
         # https://github.com/crazy-max/ghaction-docker-buildx
         name: Set up Docker Buildx
         uses: crazy-max/ghaction-docker-buildx@v1
-        with:
-          version: latest
       -
         # https://github.com/actions/checkout
         name: Checkout
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
       -
         name: Docker Buildx (build)
         run: |
