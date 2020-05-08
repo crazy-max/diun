@@ -49,7 +49,7 @@
 * Add Docker provider (#3)
 * Docker client v19.03.5
 * Move `image` field to providers layer and rename it `static`
-* Update libs
+* Update deps
 * Go 1.13.5
 * Seconds field optional for schedule
 
@@ -59,7 +59,7 @@
 
 ## 1.4.1 (2019/10/20)
 
-* Update libs
+* Update deps
 * Fix Docker labels
 
 ## 1.4.0 (2019/10/01)
@@ -90,13 +90,13 @@
 
 ## 1.2.0 (2019/08/18)
 
-* Update libs
+* Update deps
 * Display containers/image logs
 * Fix registry options not setted (Issue #5)
 
 ## 1.1.0 (2019/07/24)
 
-* Update libs
+* Update deps
 
 ## 1.0.2 (2019/07/01)
 

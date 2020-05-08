@@ -13,7 +13,7 @@ import (
 )
 
 // Configure configures logger
-func Configure(fl *model.Flags, location *time.Location) {
+func Configure(cli *model.Cli, location *time.Location) {
 	var err error
 	var w io.Writer
 
@@ -21,7 +21,7 @@ func Configure(fl *model.Flags, location *time.Location) {
 		return time.Now().In(location)
 	}
 
-	if !fl.LogJSON {
+	if !cli.LogJSON {
 		w = zerolog.ConsoleWriter{
 			Out:        os.Stdout,
 			TimeFormat: time.RFC1123,
@@ -31,20 +31,20 @@ func Configure(fl *model.Flags, location *time.Location) {
 	}
 
 	ctx := zerolog.New(w).With().Timestamp()
-	if fl.LogCaller {
+	if cli.LogCaller {
 		ctx = ctx.Caller()
 	}
 
 	log.Logger = ctx.Logger()
 
-	logLevel, err := zerolog.ParseLevel(fl.LogLevel)
+	logLevel, err := zerolog.ParseLevel(cli.LogLevel)
 	if err != nil {
 		log.Fatal().Err(err).Msgf("Unknown log level")
 	} else {
 		zerolog.SetGlobalLevel(logLevel)
 	}
 
-	logrusLevel, err := logrus.ParseLevel(fl.LogLevel)
+	logrusLevel, err := logrus.ParseLevel(cli.LogLevel)
 	if err != nil {
 		log.Fatal().Err(err).Msgf("Unknown log level")
 	} else {

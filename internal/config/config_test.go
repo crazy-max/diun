@@ -11,29 +11,29 @@ import (
 func TestLoad(t *testing.T) {
 	cases := []struct {
 		name     string
-		flags    model.Flags
+		cli      model.Cli
 		wantData *config.Config
 		wantErr  bool
 	}{
 		{
 			name:    "Fail on non-existing file",
-			flags:   model.Flags{},
+			cli:     model.Cli{},
 			wantErr: true,
 		},
 		{
 			name: "Fail on wrong file format",
-			flags: model.Flags{
+			cli: model.Cli{
 				Cfgfile: "config.invalid.yml",
 			},
 			wantErr: true,
 		},
 		{
 			name: "Success",
-			flags: model.Flags{
+			cli: model.Cli{
 				Cfgfile: "config.test.yml",
 			},
 			wantData: &config.Config{
-				Flags: model.Flags{
+				Cli: model.Cli{
 					Cfgfile: "config.test.yml",
 				},
 				App: model.App{
@@ -188,7 +188,7 @@ func TestLoad(t *testing.T) {
 	}
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
-			cfg, err := config.Load(tt.flags, "test")
+			cfg, err := config.Load(tt.cli, "test")
 			assert.Equal(t, tt.wantData, cfg)
 			assert.Equal(t, tt.wantErr, err != nil)
 		})
