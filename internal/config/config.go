@@ -18,7 +18,7 @@ import (
 
 // Config holds configuration details
 type Config struct {
-	Flags     model.Flags
+	Cli       model.Cli
 	App       model.App
 	Db        model.Db                 `yaml:"db,omitempty"`
 	Watch     model.Watch              `yaml:"watch,omitempty"`
@@ -28,10 +28,10 @@ type Config struct {
 }
 
 // Load returns Configuration struct
-func Load(flags model.Flags, version string) (*Config, error) {
+func Load(cli model.Cli, version string) (*Config, error) {
 	var err error
 	var cfg = Config{
-		Flags: flags,
+		Cli: cli,
 		App: model.App{
 			ID:      "diun",
 			Name:    "Diun",
@@ -78,11 +78,11 @@ func Load(flags model.Flags, version string) (*Config, error) {
 		},
 	}
 
-	if _, err = os.Lstat(flags.Cfgfile); err != nil {
+	if _, err = os.Lstat(cli.Cfgfile); err != nil {
 		return nil, fmt.Errorf("unable to open config file, %s", err)
 	}
 
-	bytes, err := ioutil.ReadFile(flags.Cfgfile)
+	bytes, err := ioutil.ReadFile(cli.Cfgfile)
 	if err != nil {
 		return nil, fmt.Errorf("unable to read config file, %s", err)
 	}

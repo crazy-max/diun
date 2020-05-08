@@ -1,13 +1,14 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"os/signal"
 	"runtime"
 	"syscall"
 	"time"
 
-	"github.com/alecthomas/kingpin"
+	"github.com/alecthomas/kong"
 	"github.com/crazy-max/diun/internal/app"
 	"github.com/crazy-max/diun/internal/config"
 	"github.com/crazy-max/diun/internal/logging"
@@ -17,7 +18,7 @@ import (
 
 var (
 	diun    *app.Diun
-	flags   model.Flags
+	cli     model.Cli
 	version = "dev"
 )
 
@@ -25,24 +26,26 @@ func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
 	// Parse command line
-	kingpin.Flag("config", "Diun configuration file.").Envar("CONFIG").Required().StringVar(&flags.Cfgfile)
-	kingpin.Flag("timezone", "Timezone assigned to Diun.").Envar("TZ").Default("UTC").StringVar(&flags.Timezone)
-	kingpin.Flag("log-level", "Set log level.").Envar("LOG_LEVEL").Default("info").StringVar(&flags.LogLevel)
-	kingpin.Flag("log-json", "Enable JSON logging output.").Envar("LOG_JSON").Default("false").BoolVar(&flags.LogJSON)
-	kingpin.Flag("log-caller", "Enable to add file:line of the caller.").Envar("LOG_CALLER").Default("false").BoolVar(&flags.LogCaller)
-	kingpin.UsageTemplate(kingpin.CompactUsageTemplate).Version(version).Author("CrazyMax")
-	kingpin.CommandLine.Name = "diun"
-	kingpin.CommandLine.Help = `Docker image update notifier.\nMore info: https://github.com/crazy-max/diun`
-	kingpin.Parse()
+	_ = kong.Parse(&cli,
+		kong.Name("diun"),
+		kong.Description(`Docker image update notifier. More info: https://github.com/crazy-max/diun`),
+		kong.UsageOnError(),
+		kong.Vars{
+			"version": fmt.Sprintf("%s", version),
+		},
+		kong.ConfigureHelp(kong.HelpOptions{
+			Compact: true,
+			Summary: true,
+		}))
 
 	// Load timezone location
-	location, err := time.LoadLocation(flags.Timezone)
+	location, err := time.LoadLocation(cli.Timezone)
 	if err != nil {
-		log.Panic().Err(err).Msgf("Cannot load timezone %s", flags.Timezone)
+		log.Panic().Err(err).Msgf("Cannot load timezone %s", cli.Timezone)
 	}
 
 	// Init
-	logging.Configure(&flags, location)
+	logging.Configure(&cli, location)
 	log.Info().Msgf("Starting Diun %s", version)
 
 	// Handle os signals
@@ -56,7 +59,7 @@ func main() {
 	}()
 
 	// Load and check configuration
-	cfg, err := config.Load(flags, version)
+	cfg, err := config.Load(cli, version)
 	if err != nil {
 		log.Fatal().Err(err).Msg("Cannot load configuration")
 	}

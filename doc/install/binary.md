@@ -16,20 +16,19 @@ After getting the binary, it can be tested with `./diun --help` or moved to a pe
 
 ```
 $ ./diun --help
-usage: diun --config=CONFIG [<flags>]
+Usage: diun --config=STRING
 
-Docker image update notifier. More info on https://github.com/crazy-max/diun
+Docker image update notifier. More info: https://github.com/crazy-max/diun
 
 Flags:
-  --help              Show context-sensitive help (also try --help-long and
-                      --help-man).
-  --config=CONFIG     Diun configuration file.
-  --timezone="UTC"    Timezone assigned to Diun.
-  --log-level="info"  Set log level.
-  --log-json          Enable JSON logging output.
-  --log-caller        Enable to add file:line of the caller.
-  --docker            Enable Docker mode.
-  --version           Show application version.
+  --help                 Show context-sensitive help.
+  --version
+  --config=STRING        Diun configuration file ($CONFIG).
+  --timezone="UTC"       Timezone assigned to Diun ($TZ).
+  --log-level="debug"    Set log level ($LOG_LEVEL).
+  --log-json             Enable JSON logging output ($LOG_JSON).
+  --log-caller           Add file:line of the caller to log output
+                         ($LOG_CALLER).
 ```
 
 ## Server configuration
