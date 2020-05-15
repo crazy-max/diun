@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"text/template"
 	"time"
 
 	"github.com/crazy-max/diun/internal/model"
@@ -54,6 +55,17 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		Timeout: time.Duration(10) * time.Second,
 	}
 
+	var textBuf bytes.Buffer
+	textTpl := template.Must(template.New("text").Parse("<!channel> Docker tag `{{ .Image.Domain }}/{{ .Image.Path }}:{{ .Image.Tag }}` {{ if (eq .Status \"new\") }}newly added{{ else }}updated{{ end }}."))
+	if err := textTpl.Execute(&textBuf, entry); err != nil {
+		return err
+	}
+
+	themeColor := "68CA00"
+	if entry.Status == model.ImageStatusUpdate {
+		themeColor = "0076D7"
+	}
+
 	var body, err = json.Marshal(struct {
 		Type       string     `json:"@type"`
 		Context    string     `json:"@context"`
@@ -63,7 +75,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	}{
 		Type:       "MessageCard",
 		Context:    "http://schema.org/extensions",
-		ThemeColor: "0076D7",
+		ThemeColor: themeColor,
 		Summary:    "Docker tag " + entry.Image.String() + " newly added",
 		Sections: []Sections{{
 			ActivityTitle:    "Docker tag " + entry.Image.String() + " newly added",
@@ -72,7 +84,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 				{"Created", entry.Manifest.Created.Format("Jan 02, 2006 15:04:05 UTC")},
 				{"Digest", entry.Manifest.Digest.String()},
 				{"Plattform", fmt.Sprintf("%s/%s", entry.Manifest.Os, entry.Manifest.Architecture)},
-			},}},
+			}}},
 	})
 	if err != nil {
 		return err

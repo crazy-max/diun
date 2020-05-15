@@ -98,7 +98,7 @@ You can send notifications to your Teams team-channel using an [incoming webhook
 * `teams`  
   * `webhook_url`: Teams [incoming webhook URL](https://docs.microsoft.com/en-us/microsoftteams/platform/webhooks-and-connectors/what-are-webhooks-and-connectors). **required**
 
-![](../.res/notif-slack.png)
+![](../.res/notif-teams.png)
 
 ## Telegram
 

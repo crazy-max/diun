@@ -85,6 +85,9 @@ func TestLoad(t *testing.T) {
 					Slack: &model.NotifSlack{
 						WebhookURL: "https://hooks.slack.com/services/ABCD12EFG/HIJK34LMN/01234567890abcdefghij",
 					},
+					Teams: &model.NotifTeams{
+						WebhookURL: "https://outlook.office.com/webhook/ABCD12EFG/HIJK34LMN/01234567890abcdefghij",
+					},
 					Telegram: &model.NotifTelegram{
 						BotToken: "abcdef123456",
 						ChatIDs:  []int64{8547439, 1234567},
