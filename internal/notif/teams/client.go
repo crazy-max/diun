@@ -3,7 +3,6 @@ package teams
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"text/template"
 	"time"
@@ -83,7 +82,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 			Facts: []Fact{
 				{"Created", entry.Manifest.Created.Format("Jan 02, 2006 15:04:05 UTC")},
 				{"Digest", entry.Manifest.Digest.String()},
-				{"Plattform", fmt.Sprintf("%s/%s", entry.Manifest.Os, entry.Manifest.Architecture)},
+				{"Plattform", entry.Manifest.Platform},
 			}}},
 	})
 	if err != nil {
