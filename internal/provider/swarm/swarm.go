@@ -32,6 +32,7 @@ func (c *Client) ListJob() []model.Job {
 
 	images := c.listServiceImage()
 	if len(images) == 0 {
+		log.Warn().Msg("No image found")
 		return []model.Job{}
 	}
 
