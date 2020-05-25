@@ -7,7 +7,7 @@
 
 ## About
 
-The Docker provider allows you to analyze the containers of your standalone Docker instance to extract the images found and check for updates on the registry.
+The Docker provider allows you to analyze the containers of your Docker instance to extract images found and check for updates on the registry.
 
 ## Quick start
 
@@ -22,8 +22,7 @@ watch:
 
 providers:
   docker:
-    mydocker:
-      watch_stopped: true
+    watch_stopped: true
 ```
 
 Here we use a single Docker provider with a minimum configuration to analyze labeled containers (watch by default disabled), even stopped ones, of your local Docker instance.
@@ -64,7 +63,7 @@ services:
     restart: always
 ```
 
-As an example we use [crazymax/cloudflared:latest](https://github.com/crazy-max/docker-cloudflared) Docker image. A few [labels](#configuration) are added to configure the image analysis of this container for Diun. Now start this composition with `docker-composes up -d` and take a look at the logs:
+As an example we use [crazymax/cloudflared:latest](https://github.com/crazy-max/docker-cloudflared) Docker image. A few [labels](#docker-labels) are added to configure the image analysis of this container for Diun. Now start this composition with `docker-composes up -d` and take a look at the logs:
 
 ```
 $ docker-compose logs -f
@@ -74,7 +73,7 @@ cloudflared    | time="2019-12-14T15:30:07+01:00" level=info msg="Adding DNS ups
 cloudflared    | time="2019-12-14T15:30:07+01:00" level=info msg="Starting metrics server" addr="[::]:49312"
 cloudflared    | time="2019-12-14T15:30:07+01:00" level=info msg="Starting DNS over HTTPS proxy server" addr="dns://0.0.0.0:5053"
 diun_1         | Sat, 14 Dec 2019 15:30:07 CET INF Starting Diun v2.0.0
-diun_1         | Sat, 14 Dec 2019 15:30:07 CET INF Found 1 docker provider(s) to analyze...
+diun_1         | Sat, 14 Dec 2019 15:30:07 CET INF Found 1 image(s) to analyze provider=docker
 diun_1         | Sat, 14 Dec 2019 15:30:10 CET INF New image found id=mydocker image=docker.io/crazymax/cloudflared:latest provider=docker
 diun_1         | Sat, 14 Dec 2019 15:30:12 CET INF New image found id=mydocker image=docker.io/crazymax/cloudflared:2019.9.0 provider=docker
 diun_1         | Sat, 14 Dec 2019 15:30:12 CET INF New image found id=mydocker image=docker.io/crazymax/cloudflared:2019.9.1 provider=docker
@@ -90,8 +89,6 @@ diun_1         | Sat, 14 Dec 2019 15:30:13 CET INF Next run in 29 minutes (2019-
 ```
 
 ## Provider configuration
-
-The Docker provider configuration is map of Docker standalone engines to watch with the following options available: 
 
 * `endpoint`: Server address to connect to. Local if empty.
 * `api_version`: Overrides the client version with the specified one.

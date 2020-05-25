@@ -5,6 +5,7 @@ import (
 
 	"github.com/crazy-max/diun/internal/config"
 	"github.com/crazy-max/diun/internal/model"
+	"github.com/crazy-max/diun/pkg/utl"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -115,21 +116,17 @@ func TestLoad(t *testing.T) {
 						PasswordFile: "/run/secrets/password",
 					},
 				},
-				Providers: model.Providers{
-					Docker: map[string]model.PrdDocker{
-						"standalone": {
-							TLSVerify:      true,
-							WatchByDefault: true,
-							WatchStopped:   true,
-						},
+				Providers: &model.Providers{
+					Docker: &model.PrdDocker{
+						TLSVerify:      utl.NewTrue(),
+						WatchByDefault: utl.NewTrue(),
+						WatchStopped:   utl.NewTrue(),
 					},
-					Swarm: map[string]model.PrdSwarm{
-						"local_swarm": {
-							TLSVerify:      true,
-							WatchByDefault: true,
-						},
+					Swarm: &model.PrdSwarm{
+						TLSVerify:      utl.NewTrue(),
+						WatchByDefault: utl.NewTrue(),
 					},
-					File: model.PrdFile{
+					File: &model.PrdFile{
 						Filename: "./dummy.yml",
 					},
 				},

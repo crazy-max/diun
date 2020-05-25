@@ -10,8 +10,6 @@
 
 ## Overview
 
-Here is a YAML structure example:
-
 ```yml
 db:
   path: diun.db
@@ -83,21 +81,10 @@ regopts:
 
 providers:
   docker:
-    # Watch only labeled containers on local Docker engine
-    local:
-      watch_stopped: true
-    # Watch all containers on 10.0.0.1:2375
-    remote:
-      endpoint: tcp://10.0.0.1:2375
-      watch_by_default: true
+    watch_stopped: true
   swarm:
-    # Watch all services on local Swarm cluster
-    myswarm:
-      watch_by_default: true
+    watch_by_default: true
   file:
-    # Watch images from filename ./myimages.yml
-    filename: ./myimages.yml
-    # Watch images from directory ./imagesdir
     directory: ./imagesdir
 ```
 

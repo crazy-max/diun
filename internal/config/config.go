@@ -23,7 +23,7 @@ type Config struct {
 	Watch     model.Watch              `yaml:"watch,omitempty"`
 	Notif     model.Notif              `yaml:"notif,omitempty"`
 	RegOpts   map[string]model.RegOpts `yaml:"regopts,omitempty"`
-	Providers model.Providers          `yaml:"providers,omitempty"`
+	Providers *model.Providers         `yaml:"providers,omitempty"`
 }
 
 // Load returns Configuration struct
@@ -116,16 +116,12 @@ func (cfg *Config) validate() error {
 		}
 	}
 
-	for id, prdDocker := range cfg.Providers.Docker {
-		if err := cfg.validateDockerProvider(id, prdDocker); err != nil {
-			return err
-		}
+	if err := cfg.validateDockerProvider(); err != nil {
+		return err
 	}
 
-	for id, prdSwarm := range cfg.Providers.Swarm {
-		if err := cfg.validateSwarmProvider(id, prdSwarm); err != nil {
-			return err
-		}
+	if err := cfg.validateSwarmProvider(); err != nil {
+		return err
 	}
 
 	if err := cfg.validateFileProvider(); err != nil {
@@ -161,32 +157,42 @@ func (cfg *Config) validateRegOpts(id string, regopts model.RegOpts) error {
 	return nil
 }
 
-func (cfg *Config) validateDockerProvider(id string, prdDocker model.PrdDocker) error {
-	if err := mergo.Merge(&prdDocker, model.PrdDocker{
-		TLSVerify:      true,
-		WatchByDefault: false,
-		WatchStopped:   false,
-	}); err != nil {
-		return fmt.Errorf("cannot set default values for docker %s provider: %v", id, err)
+func (cfg *Config) validateDockerProvider() error {
+	if cfg.Providers.Docker == nil {
+		return nil
 	}
 
-	cfg.Providers.Docker[id] = prdDocker
+	if err := mergo.Merge(cfg.Providers.Docker, model.PrdDocker{
+		TLSVerify:      utl.NewTrue(),
+		WatchByDefault: utl.NewFalse(),
+		WatchStopped:   utl.NewFalse(),
+	}); err != nil {
+		return errors.Wrap(err, "cannot set default values for docker provider")
+	}
+
 	return nil
 }
 
-func (cfg *Config) validateSwarmProvider(id string, prdSwarm model.PrdSwarm) error {
-	if err := mergo.Merge(&prdSwarm, model.PrdSwarm{
-		TLSVerify:      true,
-		WatchByDefault: false,
-	}); err != nil {
-		return fmt.Errorf("cannot set default values for swarm %s provider: %v", id, err)
+func (cfg *Config) validateSwarmProvider() error {
+	if cfg.Providers.Swarm == nil {
+		return nil
 	}
 
-	cfg.Providers.Swarm[id] = prdSwarm
+	if err := mergo.Merge(cfg.Providers.Swarm, model.PrdSwarm{
+		TLSVerify:      utl.NewTrue(),
+		WatchByDefault: utl.NewFalse(),
+	}); err != nil {
+		return errors.Wrap(err, "cannot set default values for docker provider")
+	}
+
 	return nil
 }
 
 func (cfg *Config) validateFileProvider() error {
+	if cfg.Providers.File == nil {
+		return nil
+	}
+
 	switch {
 	case len(cfg.Providers.File.Directory) > 0:
 		if _, err := os.Stat(cfg.Providers.File.Directory); os.IsNotExist(err) {
@@ -196,7 +202,10 @@ func (cfg *Config) validateFileProvider() error {
 		if _, err := os.Stat(cfg.Providers.File.Filename); os.IsNotExist(err) {
 			return errors.Wrap(err, "filename not found for file provider")
 		}
+	default:
+		return errors.New("error using file provider, neither filename or directory defined")
 	}
+
 	return nil
 }
 

@@ -1,8 +1,6 @@
 package swarm
 
 import (
-	"fmt"
-
 	"github.com/crazy-max/diun/internal/model"
 	"github.com/crazy-max/diun/internal/provider"
 	"github.com/rs/zerolog"
@@ -12,15 +10,15 @@ import (
 // Client represents an active swarm provider object
 type Client struct {
 	*provider.Client
-	elts   map[string]model.PrdSwarm
+	config *model.PrdSwarm
 	logger zerolog.Logger
 }
 
 // New creates new swarm provider instance
-func New(elts map[string]model.PrdSwarm) *provider.Client {
+func New(config *model.PrdSwarm) *provider.Client {
 	return &provider.Client{
 		Handler: &Client{
-			elts:   elts,
+			config: config,
 			logger: log.With().Str("provider", "swarm").Logger(),
 		},
 	}
@@ -28,19 +26,22 @@ func New(elts map[string]model.PrdSwarm) *provider.Client {
 
 // ListJob returns job list to process
 func (c *Client) ListJob() []model.Job {
-	if len(c.elts) == 0 {
+	if c.config == nil {
 		return []model.Job{}
 	}
 
-	c.logger.Info().Msgf("Found %d image(s) to analyze", len(c.elts))
+	images := c.listServiceImage()
+	if len(images) == 0 {
+		return []model.Job{}
+	}
+
+	c.logger.Info().Msgf("Found %d image(s) to analyze", len(images))
 	var list []model.Job
-	for id, elt := range c.elts {
-		for _, img := range c.listServiceImage(id, elt) {
-			list = append(list, model.Job{
-				Provider: fmt.Sprintf("swarm-%s", id),
-				Image:    img,
-			})
-		}
+	for _, image := range images {
+		list = append(list, model.Job{
+			Provider: "swarm",
+			Image:    image,
+		})
 	}
 
 	return list

@@ -69,11 +69,9 @@ regopts:
 
 providers:
   docker:
-    standalone:
-      watch_by_default: true
-      watch_stopped: true
+    watch_by_default: true
+    watch_stopped: true
   swarm:
-    local_swarm:
-      watch_by_default: true
+    watch_by_default: true
   file:
     filename: ./dummy.yml

@@ -7,7 +7,7 @@
 
 ## About
 
-The Swarm provider is closely linked to the [Docker provider](docker.md) except that it allows you to analyze the services of your Swarm cluster to extract the images found and check for updates on the registry.
+The Swarm provider allows you to analyze the services of your Swarm cluster to extract images found and check for updates on the registry.
 
 ## Quick start
 
@@ -22,10 +22,9 @@ watch:
 
 providers:
   swarm:
-    myswarm:
 ```
 
-Here we use a single Swarm provider with a minimum configuration to analyze labeled containers (watch by default disabled), of your local Swarm cluster.
+Here we use our local Swarm provider with a minimum configuration to analyze labeled containers (watch by default disabled).
 
 Now let's create a simple stack for Diun:
 
@@ -69,7 +68,7 @@ services:
         - "diun.watch_repo=true"
 ```
 
-As an example we use [nginx](https://hub.docker.com/_/nginx/) Docker image. A few [labels](#configuration) are added to configure the image analysis of this service for Diun. We can now start these 2 stacks:
+As an example we use [nginx](https://hub.docker.com/_/nginx/) Docker image. A few [labels](#docker-labels) are added to configure the image analysis of this service for Diun. We can now start these 2 stacks:
 
 ```
 docker stack deploy -c diun.yml diun
@@ -82,7 +81,7 @@ And watch logs of Diun service:
 $ docker service logs -f diun_diun
 diun_diun.1.i1l4yuiafq6y@docker-desktop    | Sat, 14 Dec 2019 16:19:57 CET INF Starting Diun dev
 diun_diun.1.i1l4yuiafq6y@docker-desktop    | Sat, 14 Dec 2019 16:19:57 CET INF Starting Diun...
-diun_diun.1.i1l4yuiafq6y@docker-desktop    | Sat, 14 Dec 2019 16:19:57 CET INF Found 1 swarm provider(s) to analyze...
+diun_diun.1.i1l4yuiafq6y@docker-desktop    | Sat, 14 Dec 2019 16:19:57 CET INF Found 1 image(s) to analyze provider=swarm
 diun_diun.1.i1l4yuiafq6y@docker-desktop    | Sat, 14 Dec 2019 16:19:59 CET INF New image found id=myswarm image=docker.io/library/nginx:latest provider=swarm
 diun_diun.1.i1l4yuiafq6y@docker-desktop    | Sat, 14 Dec 2019 16:20:01 CET INF New image found id=myswarm image=docker.io/library/nginx:1.9 provider=swarm
 diun_diun.1.i1l4yuiafq6y@docker-desktop    | Sat, 14 Dec 2019 16:20:01 CET INF New image found id=myswarm image=docker.io/library/nginx:1.9.4 provider=swarm
@@ -105,8 +104,6 @@ diun_diun.1.i1l4yuiafq6y@docker-desktop    | Sat, 14 Dec 2019 16:20:02 CET INF N
 ```
 
 ## Provider configuration
-
-The Swarm provider configuration is a map of Docker Swarm clusters to watch with the following options available: 
 
 * `endpoint`: Server address to connect to. Local if empty.
 * `api_version`: Overrides the client version with the specified one.
