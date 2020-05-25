@@ -19,7 +19,7 @@ require (
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/rs/zerolog v1.18.0
 	github.com/sirupsen/logrus v1.6.0
-  github.com/streadway/amqp v0.0.0-20200108173154-1c71cc93ed71
+	github.com/streadway/amqp v0.0.0-20200108173154-1c71cc93ed71
 	github.com/stretchr/testify v1.5.1
 	github.com/technoweenie/multipartstreamer v1.0.1 // indirect
 	go.etcd.io/bbolt v1.3.4
