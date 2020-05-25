@@ -16,12 +16,12 @@ import (
 // Client represents an active slack notification object
 type Client struct {
 	*notifier.Notifier
-	cfg model.NotifSlack
+	cfg *model.NotifSlack
 	app model.App
 }
 
 // New creates a new slack notification instance
-func New(config model.NotifSlack, app model.App) notifier.Notifier {
+func New(config *model.NotifSlack, app model.App) notifier.Notifier {
 	return notifier.Notifier{
 		Handler: &Client{
 			cfg: config,

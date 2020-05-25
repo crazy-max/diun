@@ -7,20 +7,20 @@ import (
 
 	"github.com/crazy-max/diun/internal/model"
 	"github.com/crazy-max/diun/internal/notif/notifier"
-	"github.com/go-telegram-bot-api/telegram-bot-api"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/rs/zerolog/log"
 )
 
 // Client represents an active Telegram notification object
 type Client struct {
 	*notifier.Notifier
-	cfg model.NotifTelegram
+	cfg *model.NotifTelegram
 	app model.App
 	bot *tgbotapi.BotAPI
 }
 
 // New creates a new Telegram notification instance
-func New(config model.NotifTelegram, app model.App) notifier.Notifier {
+func New(config *model.NotifTelegram, app model.App) notifier.Notifier {
 	bot, err := tgbotapi.NewBotAPI(config.BotToken)
 	if err != nil {
 		log.Err(err).Msgf("Failed to initialize Telegram notifications")
@@ -42,7 +42,7 @@ func (c *Client) Name() string {
 // Send creates and sends a Telegram notification with an entry
 func (c *Client) Send(entry model.NotifEntry) error {
 	if c.bot == nil {
-		return errors.New("Telegram not initialized")
+		return errors.New("telegram not initialized")
 	}
 
 	var msgBuf bytes.Buffer

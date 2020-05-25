@@ -102,60 +102,13 @@ providers:
 
 ### notif
 
-* `amqp`
-  * `enable`: Enable AMQP notifications (default: `false`).
-  * `host`: AMQP server host (default: `localhost`). **required**
-  * `port`: AMQP server port (default: `5672`). **required**
-  * `username`: AMQP username. **required**
-  * `username_file`: Use content of secret file as AMQP username if `username` not defined.
-  * `password`: AMQP password. **required**
-  * `password_file`: Use content of secret file as AMQP password if `password` not defined.
-  * `exchange`: Name of the exchange the message will be sent to. (default: `empty`)
-  * `queue`: Name of the queue the message will be sent to. **required**
-
-* `gotify`
-  * `enable`: Enable gotify notification (default: `false`).
-  * `endpoint`: Gotify base URL (e.g. `http://gotify.foo.com`). **required**
-  * `token`: Application token. **required**
-  * `priority`: The priority of the message.
-  * `timeout`: Timeout specifies a time limit for the request to be made. (default: `10`).
-
-* `mail`
-  * `enable`: Enable email reports (default: `false`).
-  * `host`: SMTP server host (default: `localhost`). **required**
-  * `port`: SMTP server port (default: `25`). **required**
-  * `ssl`: SSL defines whether an SSL connection is used. Should be false in most cases since the auth mechanism should use STARTTLS (default: `false`).
-  * `insecure_skip_verify`: Controls whether a client verifies the server's certificate chain and hostname (default: `false`).
-  * `username`: SMTP username.
-  * `username_file`: Use content of secret file as SMTP username if `username` not defined.
-  * `password`: SMTP password.
-  * `password_file`: Use content of secret file as SMTP password if `password` not defined.
-  * `from`: Sender email address. **required**
-  * `to`: Recipient email address. **required**
-
-* `rocketchat`
-  * `enable`: Enable Rocket.Chat notification (default: `false`).
-  * `endpoint`: Rocket.Chat base URL (e.g. `http://rocket.foo.com:3000`). **required**
-  * `channel`: Channel name with the prefix in front of it. **required**
-  * `user_id`: User ID. **required**
-  * `token`: Authentication token. **required**
-  * `timeout`: Timeout specifies a time limit for the request to be made. (default: `10`).
-
-* `slack`
-  * `enable`: Enable slack notification (default: `false`).
-  * `webhook_url`: Slack [incoming webhook URL](https://api.slack.com/messaging/webhooks). **required**
-
-* `telegram`
-  * `enable`: Enable Telegram notification (default: `false`).
-  * `token`: Telegram bot token. **required**
-  * `chat_ids`: List of chat IDs to send notifications to. **required**
-
-* `webhook`
-  * `enable`: Enable webhook notification (default: `false`).
-  * `endpoint`: URL of the HTTP request. **required**
-  * `method`: HTTP method (default: `GET`). **required**
-  * `headers`: Map of additional headers to be sent.
-  * `timeout`: Timeout specifies a time limit for the request to be made. (default: `10`).
+* [amqp](notifications.md#amqp)
+* [gotify](notifications.md#gotify)
+* [mail](notifications.md#mail)
+* [rocketchat](notifications.md#rocketchat)
+* [slack](notifications.md#slack)
+* [telegram](notifications.md#telegram)
+* [webhook](notifications.md#webhook)
 
 ### regopts
 

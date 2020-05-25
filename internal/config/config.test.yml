@@ -8,20 +8,17 @@ watch:
 
 notif:
   amqp:
-    enable: false
     host: localhost
     port: 5672
     username: guest
     password: guest
     queue: queue
   gotify:
-    enable: false
     endpoint: http://gotify.foo.com
     token: Token123456
     priority: 1
     timeout: 10
   mail:
-    enable: false
     host: localhost
     port: 25
     ssl: false
@@ -30,26 +27,22 @@ notif:
     username_file:
     password:
     password_file:
-    from:
-    to:
+    from: diun@example.com
+    to: webmaster@example.com
   rocketchat:
-    enable: false
     endpoint: http://rocket.foo.com:3000
     channel: "#general"
     user_id: abcdEFGH012345678
     token: Token123456
     timeout: 10
   slack:
-    enable: false
     webhook_url: https://hooks.slack.com/services/ABCD12EFG/HIJK34LMN/01234567890abcdefghij
   telegram:
-    enable: false
     token: abcdef123456
     chat_ids:
       - 8547439
       - 1234567
   webhook:
-    enable: false
     endpoint: http://webhook.foo.com/sd54qad89azd5a
     method: GET
     headers:

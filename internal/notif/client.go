@@ -15,39 +15,44 @@ import (
 
 // Client represents an active webhook notification object
 type Client struct {
-	cfg       model.Notif
+	cfg       *model.Notif
 	app       model.App
 	notifiers []notifier.Notifier
 }
 
 // New creates a new notification instance
-func New(config model.Notif, app model.App, userAgent string) (*Client, error) {
+func New(config *model.Notif, app model.App, userAgent string) (*Client, error) {
 	var c = &Client{
 		cfg:       config,
 		app:       app,
 		notifiers: []notifier.Notifier{},
 	}
 
+	if config == nil {
+		log.Warn().Msg("No notifier available")
+		return c, nil
+	}
+
 	// Add notifiers
-	if config.Amqp.Enable {
+	if config.Amqp != nil {
 		c.notifiers = append(c.notifiers, amqp.New(config.Amqp, app))
 	}
-	if config.Gotify.Enable {
+	if config.Gotify != nil {
 		c.notifiers = append(c.notifiers, gotify.New(config.Gotify, app, userAgent))
 	}
-	if config.Mail.Enable {
+	if config.Mail != nil {
 		c.notifiers = append(c.notifiers, mail.New(config.Mail, app))
 	}
-	if config.RocketChat.Enable {
+	if config.RocketChat != nil {
 		c.notifiers = append(c.notifiers, rocketchat.New(config.RocketChat, app, userAgent))
 	}
-	if config.Slack.Enable {
+	if config.Slack != nil {
 		c.notifiers = append(c.notifiers, slack.New(config.Slack, app))
 	}
-	if config.Telegram.Enable {
+	if config.Telegram != nil {
 		c.notifiers = append(c.notifiers, telegram.New(config.Telegram, app))
 	}
-	if config.Webhook.Enable {
+	if config.Webhook != nil {
 		c.notifiers = append(c.notifiers, webhook.New(config.Webhook, app, userAgent))
 	}
 

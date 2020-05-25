@@ -14,18 +14,17 @@ type NotifEntry struct {
 
 // Notif holds data necessary for notification configuration
 type Notif struct {
-	Amqp       NotifAmqp       `yaml:"amqp,omitempty"`
-	Gotify     NotifGotify     `yaml:"gotify,omitempty"`
-	Mail       NotifMail       `yaml:"mail,omitempty"`
-	RocketChat NotifRocketChat `yaml:"rocketchat,omitempty"`
-	Slack      NotifSlack      `yaml:"slack,omitempty"`
-	Telegram   NotifTelegram   `yaml:"telegram,omitempty"`
-	Webhook    NotifWebhook    `yaml:"webhook,omitempty"`
+	Amqp       *NotifAmqp       `yaml:"amqp,omitempty"`
+	Gotify     *NotifGotify     `yaml:"gotify,omitempty"`
+	Mail       *NotifMail       `yaml:"mail,omitempty"`
+	RocketChat *NotifRocketChat `yaml:"rocketchat,omitempty"`
+	Slack      *NotifSlack      `yaml:"slack,omitempty"`
+	Telegram   *NotifTelegram   `yaml:"telegram,omitempty"`
+	Webhook    *NotifWebhook    `yaml:"webhook,omitempty"`
 }
 
 // NotifAmqp holds amqp notification configuration details
 type NotifAmqp struct {
-	Enable       bool   `yaml:"enable,omitempty"`
 	Username     string `yaml:"username,omitempty"`
 	UsernameFile string `yaml:"username_file,omitempty"`
 	Password     string `yaml:"password,omitempty"`
@@ -38,7 +37,6 @@ type NotifAmqp struct {
 
 // NotifGotify holds gotify notification configuration details
 type NotifGotify struct {
-	Enable   bool   `yaml:"enable,omitempty"`
 	Endpoint string `yaml:"endpoint,omitempty"`
 	Token    string `yaml:"token,omitempty"`
 	Priority int    `yaml:"priority,omitempty"`
@@ -47,11 +45,10 @@ type NotifGotify struct {
 
 // NotifMail holds mail notification configuration details
 type NotifMail struct {
-	Enable             bool   `yaml:"enable,omitempty"`
 	Host               string `yaml:"host,omitempty"`
 	Port               int    `yaml:"port,omitempty"`
-	SSL                bool   `yaml:"ssl,omitempty"`
-	InsecureSkipVerify bool   `yaml:"insecure_skip_verify,omitempty"`
+	SSL                *bool  `yaml:"ssl,omitempty"`
+	InsecureSkipVerify *bool  `yaml:"insecure_skip_verify,omitempty"`
 	Username           string `yaml:"username,omitempty"`
 	UsernameFile       string `yaml:"username_file,omitempty"`
 	Password           string `yaml:"password,omitempty"`
@@ -62,7 +59,6 @@ type NotifMail struct {
 
 // NotifRocketChat holds Rocket.Chat notification configuration details
 type NotifRocketChat struct {
-	Enable   bool   `yaml:"enable,omitempty"`
 	Endpoint string `yaml:"endpoint,omitempty"`
 	Channel  string `yaml:"channel,omitempty"`
 	UserID   string `yaml:"user_id,omitempty"`
@@ -72,20 +68,17 @@ type NotifRocketChat struct {
 
 // NotifSlack holds slack notification configuration details
 type NotifSlack struct {
-	Enable     bool   `yaml:"enable,omitempty"`
 	WebhookURL string `yaml:"webhook_url,omitempty"`
 }
 
 // NotifTelegram holds Telegram notification configuration details
 type NotifTelegram struct {
-	Enable   bool    `yaml:"enable,omitempty"`
 	BotToken string  `yaml:"token,omitempty"`
 	ChatIDs  []int64 `yaml:"chat_ids,omitempty"`
 }
 
 // NotifWebhook holds webhook notification configuration details
 type NotifWebhook struct {
-	Enable   bool              `yaml:"enable,omitempty"`
 	Endpoint string            `yaml:"endpoint,omitempty"`
 	Method   string            `yaml:"method,omitempty"`
 	Headers  map[string]string `yaml:"headers,omitempty"`

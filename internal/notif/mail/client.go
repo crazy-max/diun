@@ -18,12 +18,12 @@ import (
 // Client represents an active mail notification object
 type Client struct {
 	*notifier.Notifier
-	cfg model.NotifMail
+	cfg *model.NotifMail
 	app model.App
 }
 
 // New creates a new mail notification instance
-func New(config model.NotifMail, app model.App) notifier.Notifier {
+func New(config *model.NotifMail, app model.App) notifier.Notifier {
 	return notifier.Notifier{
 		Handler: &Client{
 			cfg: config,
@@ -101,9 +101,9 @@ Need help, or have questions? Go to https://github.com/crazy-max/diun and leave 
 	msg.AddAlternative("text/html", htmlpart)
 
 	var tlsConfig *tls.Config
-	if c.cfg.InsecureSkipVerify {
+	if *c.cfg.InsecureSkipVerify {
 		tlsConfig = &tls.Config{
-			InsecureSkipVerify: c.cfg.InsecureSkipVerify,
+			InsecureSkipVerify: *c.cfg.InsecureSkipVerify,
 		}
 	}
 
@@ -121,7 +121,7 @@ Need help, or have questions? Go to https://github.com/crazy-max/diun and leave 
 		Port:      c.cfg.Port,
 		Username:  username,
 		Password:  password,
-		SSL:       c.cfg.SSL,
+		SSL:       *c.cfg.SSL,
 		TLSConfig: tlsConfig,
 	}
 

@@ -15,12 +15,12 @@ import (
 // Client represents an active amqp notification object
 type Client struct {
 	*notifier.Notifier
-	cfg model.NotifAmqp
+	cfg *model.NotifAmqp
 	app model.App
 }
 
 // New creates a new amqp notification instance
-func New(config model.NotifAmqp, app model.App) notifier.Notifier {
+func New(config *model.NotifAmqp, app model.App) notifier.Notifier {
 	return notifier.Notifier{
 		Handler: &Client{
 			cfg: config,

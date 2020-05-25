@@ -173,7 +173,7 @@ func (di *Diun) runJob(job model.Job) error {
 	}
 	sublog.Debug().Msg("Manifest saved to database")
 
-	if job.FirstCheck && !di.cfg.Watch.FirstCheckNotif {
+	if job.FirstCheck && !*di.cfg.Watch.FirstCheckNotif {
 		sublog.Debug().Msg("Skipping notification (first check)")
 		return nil
 	}

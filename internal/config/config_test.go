@@ -49,51 +49,47 @@ func TestLoad(t *testing.T) {
 					Path: "diun.db",
 				},
 				Watch: model.Watch{
-					Workers:  100,
-					Schedule: "*/30 * * * *",
+					Workers:         100,
+					Schedule:        "*/30 * * * *",
+					FirstCheckNotif: utl.NewFalse(),
 				},
-				Notif: model.Notif{
-					Amqp: model.NotifAmqp{
-						Enable:   false,
+				Notif: &model.Notif{
+					Amqp: &model.NotifAmqp{
 						Host:     "localhost",
 						Port:     5672,
 						Username: "guest",
 						Password: "guest",
 						Queue:    "queue",
 					},
-					Gotify: model.NotifGotify{
-						Enable:   false,
+					Gotify: &model.NotifGotify{
 						Endpoint: "http://gotify.foo.com",
 						Token:    "Token123456",
 						Priority: 1,
 						Timeout:  10,
 					},
-					Mail: model.NotifMail{
-						Enable:             false,
+					Mail: &model.NotifMail{
 						Host:               "localhost",
 						Port:               25,
-						SSL:                false,
-						InsecureSkipVerify: false,
+						SSL:                utl.NewFalse(),
+						InsecureSkipVerify: utl.NewFalse(),
+						From:               "diun@example.com",
+						To:                 "webmaster@example.com",
 					},
-					RocketChat: model.NotifRocketChat{
-						Enable:   false,
+					RocketChat: &model.NotifRocketChat{
 						Endpoint: "http://rocket.foo.com:3000",
 						Channel:  "#general",
 						UserID:   "abcdEFGH012345678",
 						Token:    "Token123456",
 						Timeout:  10,
 					},
-					Slack: model.NotifSlack{
-						Enable:     false,
+					Slack: &model.NotifSlack{
 						WebhookURL: "https://hooks.slack.com/services/ABCD12EFG/HIJK34LMN/01234567890abcdefghij",
 					},
-					Telegram: model.NotifTelegram{
-						Enable:   false,
+					Telegram: &model.NotifTelegram{
 						BotToken: "abcdef123456",
 						ChatIDs:  []int64{8547439, 1234567},
 					},
-					Webhook: model.NotifWebhook{
-						Enable:   false,
+					Webhook: &model.NotifWebhook{
 						Endpoint: "http://webhook.foo.com/sd54qad89azd5a",
 						Method:   "GET",
 						Headers: map[string]string{

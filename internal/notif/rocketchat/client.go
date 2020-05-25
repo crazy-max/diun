@@ -18,13 +18,13 @@ import (
 // Client represents an active rocketchat notification object
 type Client struct {
 	*notifier.Notifier
-	cfg       model.NotifRocketChat
+	cfg       *model.NotifRocketChat
 	app       model.App
 	userAgent string
 }
 
 // New creates a new rocketchat notification instance
-func New(config model.NotifRocketChat, app model.App, userAgent string) notifier.Notifier {
+func New(config *model.NotifRocketChat, app model.App, userAgent string) notifier.Notifier {
 	return notifier.Notifier{
 		Handler: &Client{
 			cfg:       config,
