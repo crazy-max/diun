@@ -56,7 +56,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	}
 
 	var textBuf bytes.Buffer
-	textTpl := template.Must(template.New("text").Parse("<!channel> Docker tag `{{ .Image.Domain }}/{{ .Image.Path }}:{{ .Image.Tag }}` {{ if (eq .Status \"new\") }}newly added{{ else }}updated{{ end }}."))
+	textTpl := template.Must(template.New("text").Parse("Docker tag `{{ .Image.Domain }}/{{ .Image.Path }}:{{ .Image.Tag }}` {{ if (eq .Status \"new\") }}newly added{{ else }}updated{{ end }}."))
 	if err := textTpl.Execute(&textBuf, entry); err != nil {
 		return err
 	}
@@ -76,9 +76,9 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		Type:       "MessageCard",
 		Context:    "http://schema.org/extensions",
 		ThemeColor: themeColor,
-		Summary:    "Docker tag " + entry.Image.String() + " newly added",
+		Summary:    textBuf.String(),
 		Sections: []Sections{{
-			ActivityTitle:    "Docker tag " + entry.Image.String() + " newly added",
+			ActivityTitle:    textBuf.String(),
 			ActivitySubtitle: "Provider: " + entry.Provider,
 			Facts: []Fact{
 				{"Created", entry.Manifest.Created.Format("Jan 02, 2006 15:04:05 UTC")},
