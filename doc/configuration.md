@@ -86,36 +86,11 @@ providers:
     # Watch all services on local Swarm cluster
     myswarm:
       watch_by_default: true
-  static:
-    # Watch latest tag of crazymax/nextcloud image on docker.io (DockerHub) with registry ID 'someregistryoptions'.
-    - name: docker.io/crazymax/nextcloud:latest
-      regopts_id: someregistryoptions
-    # Watch 4.0.0 tag of jfrog/artifactory-oss image on frog-docker-reg2.bintray.io (Bintray) with registry ID 'onemore'.
-    - name: jfrog-docker-reg2.bintray.io/jfrog/artifactory-oss:4.0.0
-      regopts_id: onemore
-    # Watch coreos/hyperkube image on quay.io (Quay) and assume latest tag.
-    - name: quay.io/coreos/hyperkube
-    # Watch crazymax/swarm-cronjob image and assume docker.io registry and latest tag.
-    # Only include tags matching regexp ^1\.2\..*
-    - name: crazymax/swarm-cronjob
-      watch_repo: true
-      include_tags:
-        - ^1\.2\..*
-    # Watch portainer/portainer image on docker.io (DockerHub) and assume latest tag
-    # Only watch latest 10 tags and include tags matching regexp ^(0|[1-9]\d*)\..*
-    - name: docker.io/portainer/portainer
-      watch_repo: true
-      max_tags: 10
-      include_tags:
-        - ^(0|[1-9]\d*)\..*
-    # Watch alpine image (library) and assume docker.io registry and latest tag.
-    # Force linux/arm64/v8 platform for this image
-    - name: alpine
-      watch_repo: true
-      platform:
-        os: linux
-        arch: arm64
-        variant: v8
+  file:
+    # Watch images from filename ./myimages.yml
+    filename: ./myimages.yml
+    # Watch images from directory ./imagesdir
+    directory: ./imagesdir
 ```
 
 ## Reference
@@ -187,31 +162,6 @@ providers:
 
 ### providers
 
-* `docker`: Map of Docker standalone engines to watch
-  * `<key>`: An unique identifier for this provider.
-    * `endpoint`: Server address to connect to. Local if empty.
-    * `api_version`: Overrides the client version with the specified one.
-    * `tls_certs_path`: Path to load the TLS certificates from.
-    * `tls_verify`: Controls whether client verifies the server's certificate chain and hostname (default: `true`).
-    * `watch_by_default`: Enable watch by default. If false, containers that don't have `diun.enable=true` label will be ignored (default: `false`).
-    * `watch_stopped`: Include created and exited containers too (default: `false`).
-
-* `swarm`: Map of Docker Swarm to watch
-  * `<key>`: An unique identifier for this provider.
-    * `endpoint`: Server address to connect to. Local if empty.
-    * `api_version`: Overrides the client version with the specified one.
-    * `tls_certs_path`: Path to load the TLS certificates from.
-    * `tls_verify`: Controls whether client verifies the server's certificate chain and hostname (default: `true`).
-    * `watch_by_default`: Enable watch by default. If false, services that don't have `diun.enable=true` label will be ignored (default: `false`).
-
-* `static`: Slice of static image to watch
-  * `name`: Docker image name to watch using `registry/path:tag` format. If registry is omitted, `docker.io` will be used and if tag is omitted, `latest` will be used. **required**
-  * `regopts_id`: Registry options ID from `regopts` to use.
-  * `watch_repo`: Watch all tags of this `image` repository (default: `false`).
-  * `max_tags`: Maximum number of tags to watch if `watch_repo` enabled. 0 means all of them (default: `0`).
-  * `include_tags`: List of regular expressions to include tags. Can be useful if you enable `watch_repo`.
-  * `exclude_tags`: List of regular expressions to exclude tags. Can be useful if you enable `watch_repo`.
-  * `platform`: Check a custom platform. (default is retrieved dynamically based on your operating system).
-    * `os`: Operating system to use.
-    * `arch`: CPU architecture to use.
-    * `variant`: Variant of the CPU to use.
+* [docker](providers/docker.md)
+* [swarm](providers/swarm.md)
+* [file](providers/file.md)

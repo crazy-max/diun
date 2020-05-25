@@ -121,66 +121,8 @@ func TestLoad(t *testing.T) {
 							WatchByDefault: true,
 						},
 					},
-					Static: []model.PrdStatic{
-						{
-							Name:      "docker.io/crazymax/nextcloud:latest",
-							RegOptsID: "someregopts",
-						},
-						{
-							Name:      "crazymax/swarm-cronjob",
-							WatchRepo: true,
-							IncludeTags: []string{
-								`^1\.2\..*`,
-							},
-						},
-						{
-							Name:      "jfrog-docker-reg2.bintray.io/jfrog/artifactory-oss:4.0.0",
-							RegOptsID: "bintrayoptions",
-						},
-						{
-							Name:      "docker.bintray.io/jfrog/xray-server:2.8.6",
-							WatchRepo: true,
-							MaxTags:   50,
-						},
-						{
-							Name: "quay.io/coreos/hyperkube",
-						},
-						{
-							Name:      "docker.io/portainer/portainer",
-							WatchRepo: true,
-							MaxTags:   10,
-							IncludeTags: []string{
-								`^(0|[1-9]\d*)\..*`,
-							},
-						},
-						{
-							Name:      "traefik",
-							WatchRepo: true,
-						},
-						{
-							Name: "alpine",
-							Platform: model.ImagePlatform{
-								Os:      "linux",
-								Arch:    "arm64",
-								Variant: "v8",
-							},
-						},
-						{
-							Name: "docker.io/graylog/graylog:3.2.0",
-						},
-						{
-							Name: "jacobalberty/unifi:5.9",
-						},
-						{
-							Name: "quay.io/coreos/hyperkube:v1.1.7-coreos.1",
-						},
-						{
-							Name:      "crazymax/ddns-route53",
-							WatchRepo: true,
-							IncludeTags: []string{
-								`^1\..*`,
-							},
-						},
+					File: model.PrdFile{
+						Filename: "./dummy.yml",
 					},
 				},
 			},
@@ -189,8 +131,13 @@ func TestLoad(t *testing.T) {
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
 			cfg, err := config.Load(tt.cli, "test")
+			if !tt.wantErr && err != nil {
+				t.Error(err)
+			}
 			assert.Equal(t, tt.wantData, cfg)
-			assert.Equal(t, tt.wantErr, err != nil)
+			if !tt.wantErr && cfg != nil {
+				assert.NotEmpty(t, cfg.Display())
+			}
 		})
 	}
 }

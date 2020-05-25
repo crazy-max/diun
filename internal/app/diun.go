@@ -13,7 +13,7 @@ import (
 	"github.com/crazy-max/diun/internal/model"
 	"github.com/crazy-max/diun/internal/notif"
 	dockerPrd "github.com/crazy-max/diun/internal/provider/docker"
-	staticPrd "github.com/crazy-max/diun/internal/provider/static"
+	filePrd "github.com/crazy-max/diun/internal/provider/file"
 	swarmPrd "github.com/crazy-max/diun/internal/provider/swarm"
 	"github.com/hako/durafmt"
 	"github.com/panjf2000/ants/v2"
@@ -127,8 +127,8 @@ func (di *Diun) Run() {
 		di.createJob(job)
 	}
 
-	// Static provider
-	for _, job := range staticPrd.New(di.cfg.Providers.Static).ListJob() {
+	// File provider
+	for _, job := range filePrd.New(di.cfg.Providers.File).ListJob() {
 		di.createJob(job)
 	}
 

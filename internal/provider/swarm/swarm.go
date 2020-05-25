@@ -5,20 +5,25 @@ import (
 
 	"github.com/crazy-max/diun/internal/model"
 	"github.com/crazy-max/diun/internal/provider"
+	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
 
 // Client represents an active swarm provider object
 type Client struct {
 	*provider.Client
-	elts map[string]model.PrdSwarm
+	elts   map[string]model.PrdSwarm
+	logger zerolog.Logger
 }
 
 // New creates new swarm provider instance
 func New(elts map[string]model.PrdSwarm) *provider.Client {
-	return &provider.Client{Handler: &Client{
-		elts: elts,
-	}}
+	return &provider.Client{
+		Handler: &Client{
+			elts:   elts,
+			logger: log.With().Str("provider", "swarm").Logger(),
+		},
+	}
 }
 
 // ListJob returns job list to process
@@ -27,7 +32,7 @@ func (c *Client) ListJob() []model.Job {
 		return []model.Job{}
 	}
 
-	log.Info().Msgf("Found %d swarm provider(s) to analyze...", len(c.elts))
+	c.logger.Info().Msgf("Found %d image(s) to analyze", len(c.elts))
 	var list []model.Job
 	for id, elt := range c.elts {
 		for _, img := range c.listServiceImage(id, elt) {

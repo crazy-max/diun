@@ -2,11 +2,12 @@
 
 * [About](#about)
 * [Quick start](#quick-start)
-* [Configuration](#configuration)
+* [Provider configuration](#provider-configuration)
+* [Docker labels](#docker-labels)
 
 ## About
 
-The Docker provider allows you to analyze the containers of your standalone Docker instance defined in the [Diun configuration](../configuration.md#providers) to extract the images found and check for updates on the registry.
+The Docker provider allows you to analyze the containers of your standalone Docker instance to extract the images found and check for updates on the registry.
 
 ## Quick start
 
@@ -88,9 +89,20 @@ diun_1         | Sat, 14 Dec 2019 15:30:13 CET INF Cron initialized with schedul
 diun_1         | Sat, 14 Dec 2019 15:30:13 CET INF Next run in 29 minutes (2019-12-14 16:00:00 +0100 CET)
 ```
 
-## Configuration
+## Provider configuration
 
-In the same spirit as the [static provider](static.md), you can configure more finely the way to analyze the image of your container. But unlike the static provider, this is done via Docker labels:
+The Docker provider configuration is map of Docker standalone engines to watch with the following options available: 
+
+* `endpoint`: Server address to connect to. Local if empty.
+* `api_version`: Overrides the client version with the specified one.
+* `tls_certs_path`: Path to load the TLS certificates from.
+* `tls_verify`: Controls whether client verifies the server's certificate chain and hostname (default: `true`).
+* `watch_by_default`: Enable watch by default. If false, containers that don't have `diun.enable=true` label will be ignored (default: `false`).
+* `watch_stopped`: Include created and exited containers too (default: `false`).
+
+## Docker labels
+
+You can configure more finely the way to analyze the image of your container through Docker labels:
 
 * `diun.enable`: Set to true to enable image analysis of this container. Required if `watch_by_default` is disabled for this provider.
 * `diun.regopts_id`: Registry options ID from [`regopts`](../configuration.md#regopts) to use.
