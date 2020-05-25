@@ -52,6 +52,14 @@ func TestLoad(t *testing.T) {
 					Schedule: "*/30 * * * *",
 				},
 				Notif: model.Notif{
+					Amqp: model.NotifAmqp{
+						Enable:   false,
+						Host:     "localhost",
+						Port:     5672,
+						Username: "guest",
+						Password: "guest",
+						Queue:    "queue",
+					},
 					Gotify: model.NotifGotify{
 						Enable:   false,
 						Endpoint: "http://gotify.foo.com",

@@ -2,6 +2,7 @@ package notif
 
 import (
 	"github.com/crazy-max/diun/internal/model"
+	"github.com/crazy-max/diun/internal/notif/amqp"
 	"github.com/crazy-max/diun/internal/notif/gotify"
 	"github.com/crazy-max/diun/internal/notif/mail"
 	"github.com/crazy-max/diun/internal/notif/notifier"
@@ -28,6 +29,9 @@ func New(config model.Notif, app model.App, userAgent string) (*Client, error) {
 	}
 
 	// Add notifiers
+	if config.Amqp.Enable {
+		c.notifiers = append(c.notifiers, amqp.New(config.Amqp, app))
+	}
 	if config.Gotify.Enable {
 		c.notifiers = append(c.notifiers, gotify.New(config.Gotify, app, userAgent))
 	}

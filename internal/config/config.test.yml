@@ -7,6 +7,13 @@ watch:
   first_check_notif: false
 
 notif:
+  amqp:
+    enable: false
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+    queue: queue
   gotify:
     enable: false
     endpoint: http://gotify.foo.com
