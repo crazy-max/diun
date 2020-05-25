@@ -82,7 +82,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 			Facts: []Fact{
 				{"Created", entry.Manifest.Created.Format("Jan 02, 2006 15:04:05 UTC")},
 				{"Digest", entry.Manifest.Digest.String()},
-				{"Plattform", entry.Manifest.Platform},
+				{"Platform", entry.Manifest.Platform},
 			}}},
 	})
 	if err != nil {
