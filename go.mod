@@ -4,7 +4,7 @@ go 1.13
 
 require (
 	github.com/alecthomas/kong v0.2.9
-	github.com/containers/image/v5 v5.4.0
+	github.com/containers/image/v5 v5.4.4
 	github.com/docker/docker v1.13.1
 	github.com/docker/go-connections v0.4.0
 	github.com/go-gomail/gomail v0.0.0-20160411212932-81ebce5c23df
@@ -18,7 +18,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/rs/zerolog v1.18.0
-	github.com/sirupsen/logrus v1.5.0
+	github.com/sirupsen/logrus v1.6.0
 	github.com/stretchr/testify v1.5.1
 	github.com/technoweenie/multipartstreamer v1.0.1 // indirect
 	go.etcd.io/bbolt v1.3.4
