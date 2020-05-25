@@ -94,24 +94,22 @@ func (c *Client) Send(entry model.NotifEntry) error {
 
 func buildBody(entry model.NotifEntry, app model.App) ([]byte, error) {
 	return json.Marshal(struct {
-		Version      string        `json:"diun_version"`
-		Status       string        `json:"status"`
-		Provider     string        `json:"provider"`
-		Image        string        `json:"image"`
-		MIMEType     string        `json:"mime_type"`
-		Digest       digest.Digest `json:"digest"`
-		Created      *time.Time    `json:"created"`
-		Architecture string        `json:"architecture"`
-		Os           string        `json:"os"`
+		Version  string        `json:"diun_version"`
+		Status   string        `json:"status"`
+		Provider string        `json:"provider"`
+		Image    string        `json:"image"`
+		MIMEType string        `json:"mime_type"`
+		Digest   digest.Digest `json:"digest"`
+		Created  *time.Time    `json:"created"`
+		Platform string        `json:"platform"`
 	}{
-		Version:      app.Version,
-		Status:       string(entry.Status),
-		Provider:     entry.Provider,
-		Image:        entry.Image.String(),
-		MIMEType:     entry.Manifest.MIMEType,
-		Digest:       entry.Manifest.Digest,
-		Created:      entry.Manifest.Created,
-		Architecture: entry.Manifest.Architecture,
-		Os:           entry.Manifest.Os,
+		Version:  app.Version,
+		Status:   string(entry.Status),
+		Provider: entry.Provider,
+		Image:    entry.Image.String(),
+		MIMEType: entry.Manifest.MIMEType,
+		Digest:   entry.Manifest.Digest,
+		Created:  entry.Manifest.Created,
+		Platform: entry.Manifest.Platform,
 	})
 }
