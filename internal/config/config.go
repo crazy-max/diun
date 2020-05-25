@@ -12,7 +12,6 @@ import (
 	"github.com/crazy-max/diun/pkg/utl"
 	"github.com/imdario/mergo"
 	"github.com/pkg/errors"
-	"github.com/rs/zerolog/log"
 	"gopkg.in/yaml.v2"
 )
 
@@ -196,7 +195,7 @@ func (cfg *Config) validateFileProvider() error {
 }
 
 // Display configuration in a pretty JSON format
-func (cfg *Config) Display() {
+func (cfg *Config) Display() string {
 	b, _ := json.MarshalIndent(cfg, "", "  ")
-	log.Debug().Msg(string(b))
+	return string(b)
 }

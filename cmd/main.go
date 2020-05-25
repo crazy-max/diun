@@ -63,7 +63,7 @@ func main() {
 	if err != nil {
 		log.Fatal().Err(err).Msg("Cannot load configuration")
 	}
-	cfg.Display()
+	log.Debug().Msg(cfg.Display())
 
 	// Init
 	if diun, err = app.New(cfg, location); err != nil {

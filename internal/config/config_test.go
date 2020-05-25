@@ -135,6 +135,9 @@ func TestLoad(t *testing.T) {
 				t.Error(err)
 			}
 			assert.Equal(t, tt.wantData, cfg)
+			if !tt.wantErr && cfg != nil {
+				assert.NotEmpty(t, cfg.Display())
+			}
 		})
 	}
 }
