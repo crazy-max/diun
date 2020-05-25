@@ -9,7 +9,7 @@
 
 ## Amqp
 
-You can send notifications any amqp compatible server, the body will be a JSON format that looks like:
+You can send notifications to any amqp compatible server, the body will be a JSON format that looks like:
 
 ```json
 {
