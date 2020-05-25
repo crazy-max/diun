@@ -2,7 +2,6 @@ package config
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/mail"
@@ -12,6 +11,7 @@ import (
 	"github.com/crazy-max/diun/internal/model"
 	"github.com/crazy-max/diun/pkg/utl"
 	"github.com/imdario/mergo"
+	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 	"gopkg.in/yaml.v2"
 )
@@ -123,10 +123,8 @@ func (cfg *Config) validate() error {
 		}
 	}
 
-	for key, prdStatic := range cfg.Providers.Static {
-		if err := cfg.validateStaticProvider(key, prdStatic); err != nil {
-			return err
-		}
+	if err := cfg.validateFileProvider(); err != nil {
+		return err
 	}
 
 	if cfg.Notif.Mail.Enable {
@@ -183,16 +181,21 @@ func (cfg *Config) validateSwarmProvider(id string, prdSwarm model.PrdSwarm) err
 	return nil
 }
 
-func (cfg *Config) validateStaticProvider(key int, prdStatic model.PrdStatic) error {
-	if prdStatic.Name == "" {
-		return fmt.Errorf("name is required for static provider %d", key)
+func (cfg *Config) validateFileProvider() error {
+	switch {
+	case len(cfg.Providers.File.Directory) > 0:
+		if _, err := os.Stat(cfg.Providers.File.Directory); os.IsNotExist(err) {
+			return errors.Wrap(err, "directory not found for file provider")
+		}
+	case len(cfg.Providers.File.Filename) > 0:
+		if _, err := os.Stat(cfg.Providers.File.Filename); os.IsNotExist(err) {
+			return errors.Wrap(err, "filename not found for file provider")
+		}
 	}
-
-	cfg.Providers.Static[key] = prdStatic
 	return nil
 }
 
-// Display logs configuration in a pretty JSON format
+// Display configuration in a pretty JSON format
 func (cfg *Config) Display() {
 	b, _ := json.MarshalIndent(cfg, "", "  ")
 	log.Debug().Msg(string(b))

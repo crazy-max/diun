@@ -25,7 +25,7 @@
 * Internal cron implementation through go routines
 * Worker pool to parallelize analyses
 * Allow overriding image os and architecture
-* Multi providers available like [Docker](doc/providers/docker.md), [Swarm](doc/providers/swarm.md), [Static](doc/providers/static.md)...
+* Multi providers available like [Docker](doc/providers/docker.md), [Swarm](doc/providers/swarm.md), [File](doc/providers/file.md)...
 * Get notified through Slack, Mail, Telegram and [more](doc/notifications.md)
 * Enhanced logging
 * Timezone can be changed
@@ -42,7 +42,7 @@
 * Providers
   * [Docker](doc/providers/docker.md)
   * [Swarm](doc/providers/swarm.md)
-  * [Static](doc/providers/static.md)
+  * [File](doc/providers/file.md)
 * [Notifications](doc/notifications.md)
 * [FAQ](doc/faq.md)
 

@@ -4,7 +4,7 @@ package model
 type Providers struct {
 	Docker map[string]PrdDocker `yaml:"docker,omitempty" json:",omitempty"`
 	Swarm  map[string]PrdSwarm  `yaml:"swarm,omitempty" json:",omitempty"`
-	Static []PrdStatic          `yaml:"static,omitempty" json:",omitempty"`
+	File   PrdFile              `yaml:"file,omitempty" json:",omitempty"`
 }
 
 // PrdDocker holds docker provider configuration
@@ -26,5 +26,8 @@ type PrdSwarm struct {
 	WatchByDefault bool   `yaml:"watch_by_default,omitempty" json:",omitempty"`
 }
 
-// PrdStatic holds static provider configuration
-type PrdStatic Image
+// PrdFile holds file provider configuration
+type PrdFile struct {
+	Filename  string `yaml:"filename,omitempty" json:",omitempty"`
+	Directory string `yaml:"directory,omitempty" json:",omitempty"`
+}

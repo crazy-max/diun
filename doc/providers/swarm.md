@@ -2,11 +2,12 @@
 
 * [About](#about)
 * [Quick start](#quick-start)
-* [Configuration](#configuration)
+* [Provider configuration](#provider-configuration)
+* [Docker labels](#docker-labels)
 
 ## About
 
-The Swarm provider is closely linked to the [Docker provider](docker.md) except that it allows you to analyze the services of your Swarm cluster defined in the [Diun configuration](../configuration.md#providers) to extract the images found and check for updates on the registry.
+The Swarm provider is closely linked to the [Docker provider](docker.md) except that it allows you to analyze the services of your Swarm cluster to extract the images found and check for updates on the registry.
 
 ## Quick start
 
@@ -103,9 +104,19 @@ diun_diun.1.i1l4yuiafq6y@docker-desktop    | Sat, 14 Dec 2019 16:20:02 CET INF N
 ...
 ```
 
-## Configuration
+## Provider configuration
 
-In the same spirit as the [static provider](static.md), you can configure more finely the way to analyze the image of your service. But unlike the static provider, this is done via Docker labels:
+The Swarm provider configuration is a map of Docker Swarm clusters to watch with the following options available: 
+
+* `endpoint`: Server address to connect to. Local if empty.
+* `api_version`: Overrides the client version with the specified one.
+* `tls_certs_path`: Path to load the TLS certificates from.
+* `tls_verify`: Controls whether client verifies the server's certificate chain and hostname (default: `true`).
+* `watch_by_default`: Enable watch by default. If false, services that don't have `diun.enable=true` label will be ignored (default: `false`).
+
+## Docker labels
+
+You can configure more finely the way to analyze the image of your service through Docker labels:
 
 * `diun.enable`: Set to true to enable image analysis of this container. Required if `watch_by_default` is disabled for this provider.
 * `diun.regopts_id`: Registry options ID from [`regopts`](../configuration.md#regopts) to use.

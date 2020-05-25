@@ -1,0 +1,5 @@
+- name: jfrog-docker-reg2.bintray.io/jfrog/artifactory-oss:4.0.0
+  regopts_id: bintrayoptions
+- name: docker.bintray.io/jfrog/xray-server:2.8.6
+  watch_repo: true
+  max_tags: 50
