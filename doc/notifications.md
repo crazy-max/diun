@@ -4,6 +4,7 @@
 * [Gotify](#gotify)
 * [Mail](#mail)
 * [Rocket.Chat](#rocketchat)
+* [Script](#script)
 * [Slack](#slack)
 * [Teams](#teams)
 * [Telegram](#telegram)
@@ -82,6 +83,28 @@ To be able to send notifications to your Rocket.Chat channel:
   * `timeout`: Timeout specifies a time limit for the request to be made. (default: `10`).
 
 ![](../.res/notif-rocketchat.png)
+
+## Script
+
+You can send script notifications with the following settings:
+
+* `script`
+  * `cmd`: Command or script to execute. **required**
+  * `args`: List of args to pass to `cmd`.
+  * `dir`: Specifies the working directory of the command.
+
+Following environment variables are passed to the process and will look like this:
+
+```
+DIUN_VERSION=3.0.0
+DIUN_ENTRY_STATUS=new
+DIUN_ENTRY_PROVIDER=file
+DIUN_ENTRY_IMAGE=docker.io/crazymax/diun:latest
+DIUN_ENTRY_MIMETYPE=application/vnd.docker.distribution.manifest.list.v2+json
+DIUN_ENTRY_DIGEST=sha256:216e3ae7de4ca8b553eb11ef7abda00651e79e537e85c46108284e5e91673e01
+DIUN_ENTRY_CREATED=2020-03-26 12:23:56 +0000 UTC
+DIUN_ENTRY_PLATFORM=linux/adm64
+```
 
 ## Slack
 

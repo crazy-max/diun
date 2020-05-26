@@ -18,6 +18,7 @@ type Notif struct {
 	Gotify     *NotifGotify     `yaml:"gotify,omitempty"`
 	Mail       *NotifMail       `yaml:"mail,omitempty"`
 	RocketChat *NotifRocketChat `yaml:"rocketchat,omitempty"`
+	Script     *NotifScript     `yaml:"script,omitempty"`
 	Slack      *NotifSlack      `yaml:"slack,omitempty"`
 	Teams      *NotifTeams      `yaml:"teams,omitempty"`
 	Telegram   *NotifTelegram   `yaml:"telegram,omitempty"`
@@ -65,6 +66,13 @@ type NotifRocketChat struct {
 	UserID   string `yaml:"user_id,omitempty"`
 	Token    string `yaml:"token,omitempty"`
 	Timeout  int    `yaml:"timeout,omitempty"`
+}
+
+// NotifScript holds script notification configuration details
+type NotifScript struct {
+	Cmd  string   `yaml:"cmd,omitempty"`
+	Args []string `yaml:"args,omitempty"`
+	Dir  string   `yaml:"dir,omitempty"`
 }
 
 // NotifSlack holds slack notification configuration details

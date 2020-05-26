@@ -15,7 +15,7 @@ In this section we quickly go over a basic stack using your local swarm cluster.
 
 First of all, let's create a Diun configuration we named `diun.yml`:
 
-```yml
+```yaml
 watch:
   workers: 20
   schedule: "*/30 * * * *"
@@ -28,7 +28,7 @@ Here we use our local Swarm provider with a minimum configuration to analyze lab
 
 Now let's create a simple stack for Diun:
 
-```yml
+```yaml
 version: "3.5"
 
 services:
@@ -50,7 +50,7 @@ services:
 
 And another one with a simple service:
 
-```yml
+```yaml
 version: "3.5"
 
 services:

@@ -24,18 +24,18 @@ func TestLoad(t *testing.T) {
 		{
 			name: "Fail on wrong file format",
 			cli: model.Cli{
-				Cfgfile: "config.invalid.yml",
+				Cfgfile: "./test/config.invalid.yml",
 			},
 			wantErr: true,
 		},
 		{
 			name: "Success",
 			cli: model.Cli{
-				Cfgfile: "config.test.yml",
+				Cfgfile: "./test/config.test.yml",
 			},
 			wantData: &config.Config{
 				Cli: model.Cli{
-					Cfgfile: "config.test.yml",
+					Cfgfile: "./test/config.test.yml",
 				},
 				App: model.App{
 					ID:      "diun",
@@ -82,6 +82,12 @@ func TestLoad(t *testing.T) {
 						Token:    "Token123456",
 						Timeout:  10,
 					},
+					Script: &model.NotifScript{
+						Cmd: "go",
+						Args: []string{
+							"version",
+						},
+					},
 					Slack: &model.NotifSlack{
 						WebhookURL: "https://hooks.slack.com/services/ABCD12EFG/HIJK34LMN/01234567890abcdefghij",
 					},
@@ -126,7 +132,7 @@ func TestLoad(t *testing.T) {
 						WatchByDefault: utl.NewTrue(),
 					},
 					File: &model.PrdFile{
-						Filename: "./dummy.yml",
+						Filename: "./test/dummy.yml",
 					},
 				},
 			},

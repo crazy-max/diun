@@ -25,7 +25,7 @@ about: Create a report to help us improve
 * Platform (windows/linux) :
 * System info (type `uname -a`) : 
 
-```yml
+```yaml
 # paste your YAML configuration file here and remove sensitive data
 ```
 

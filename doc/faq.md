@@ -8,7 +8,7 @@ If you encounter this kind of error, you are probably using the [file provider](
 
 In the example below, Diun is running (`diun_x.x.x_windows_i386.zip`) on Windows 10 and tries to analyze the `crazymax/cloudflared` image with the detected platform (`windows/386)`:
 
-```yml
+```yaml
 - name: crazymax/cloudflared:2020.2.1
   watch_repo: true
 ```
@@ -22,7 +22,7 @@ Fri, 27 Mar 2020 01:20:03 UTC ERR Cannot list tags from registry error="Error ch
 
 You have to force the platform for this image if you are not on a supported platform. For example:
 
-```yml
+```yaml
 - name: crazymax/cloudflared:2020.2.1
   watch_repo: true
   platform:
