@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"runtime"
 	"strings"
 	"syscall"
 
@@ -40,7 +41,9 @@ func (c *Client) Name() string {
 // Send creates and sends a script notification with an entry
 func (c *Client) Send(entry model.NotifEntry) error {
 	cmd := exec.Command(c.cfg.Cmd, c.cfg.Args...)
-	cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
+	if runtime.GOOS == "windows" {
+		cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
+	}
 
 	// Capture output
 	var stdout, stderr bytes.Buffer
