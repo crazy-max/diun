@@ -21,14 +21,14 @@ Usage: diun --config=STRING
 Docker image update notifier. More info: https://github.com/crazy-max/diun
 
 Flags:
-  --help                 Show context-sensitive help.
+  --help                Show context-sensitive help.
   --version
-  --config=STRING        Diun configuration file ($CONFIG).
-  --timezone="UTC"       Timezone assigned to Diun ($TZ).
-  --log-level="debug"    Set log level ($LOG_LEVEL).
-  --log-json             Enable JSON logging output ($LOG_JSON).
-  --log-caller           Add file:line of the caller to log output
-                         ($LOG_CALLER).
+  --config=STRING       Diun configuration file ($CONFIG).
+  --timezone="UTC"      Timezone assigned to Diun ($TZ).
+  --log-level="info"    Set log level ($LOG_LEVEL).
+  --log-json            Enable JSON logging output ($LOG_JSON).
+  --log-caller          Add file:line of the caller to log output ($LOG_CALLER).
+  --test-notif          Test notification settings.
 ```
 
 ## Server configuration
