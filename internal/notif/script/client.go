@@ -5,9 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"runtime"
 	"strings"
-	"syscall"
 
 	"github.com/crazy-max/diun/internal/model"
 	"github.com/crazy-max/diun/internal/notif/notifier"
@@ -41,9 +39,7 @@ func (c *Client) Name() string {
 // Send creates and sends a script notification with an entry
 func (c *Client) Send(entry model.NotifEntry) error {
 	cmd := exec.Command(c.cfg.Cmd, c.cfg.Args...)
-	if runtime.GOOS == "windows" {
-		cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
-	}
+	setSysProcAttr(cmd)
 
 	// Capture output
 	var stdout, stderr bytes.Buffer
