@@ -11,3 +11,4 @@
 * `--log-level <level>`: Log level output. (default `info`).
 * `--log-json`: Enable JSON logging output. (default `false`).
 * `--log-caller`: Add file:line of the caller to log output. (default `false`).
+* `--test-notif`: Enable to test notification settings.

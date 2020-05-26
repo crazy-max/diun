@@ -70,6 +70,12 @@ func main() {
 		log.Fatal().Err(err).Msg("Cannot initialize Diun")
 	}
 
+	// Test notif
+	if cli.TestNotif {
+		diun.TestNotif()
+		return
+	}
+
 	// Start
 	if err = diun.Start(); err != nil {
 		log.Fatal().Err(err).Msg("Cannot start Diun")
