@@ -37,8 +37,7 @@ notif:
     timeout: 10
   slack:
     webhook_url: https://hooks.slack.com/services/ABCD12EFG/HIJK34LMN/01234567890abcdefghij
-  teams:
-    enable: false
+  teams:    
     webhook_url: https://outlook.office.com/webhook/ABCD12EFG/HIJK34LMN/01234567890abcdefghij
   telegram:
     token: abcdef123456
