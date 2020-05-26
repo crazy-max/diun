@@ -2,6 +2,7 @@ package config
 
 import (
 	"net/mail"
+	"os/exec"
 
 	"github.com/crazy-max/diun/internal/model"
 	"github.com/crazy-max/diun/pkg/utl"
@@ -24,6 +25,9 @@ func (cfg *Config) validateNotif() error {
 		return err
 	}
 	if err := cfg.validateNotifRocketChat(); err != nil {
+		return err
+	}
+	if err := cfg.validateNotifScript(); err != nil {
 		return err
 	}
 	if err := cfg.validateNotifSlack(); err != nil {
@@ -101,6 +105,22 @@ func (cfg *Config) validateNotifRocketChat() error {
 		Timeout: 10,
 	}); err != nil {
 		return errors.Wrap(err, "cannot set default values for rocketchat notif")
+	}
+
+	return nil
+}
+
+func (cfg *Config) validateNotifScript() error {
+	if cfg.Notif.Script == nil {
+		return nil
+	}
+
+	if cfg.Notif.Script.Cmd == "" {
+		return errors.New("command required for script provider")
+	}
+
+	if _, err := exec.LookPath(cfg.Notif.Script.Cmd); err != nil {
+		return errors.Wrap(err, "command not found for script provider")
 	}
 
 	return nil

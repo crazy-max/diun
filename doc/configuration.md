@@ -10,7 +10,7 @@
 
 ## Overview
 
-```yml
+```yaml
 db:
   path: diun.db
 
@@ -20,19 +20,19 @@ watch:
   first_check_notif: false
 
 notif:
-  amqp:    
+  amqp:
     host: localhost
     port: 5672
     username: guest
     password: guest
     exchange: 
     queue: queue
-  gotify:    
+  gotify:
     endpoint: http://gotify.foo.com
     token: Token123456
     priority: 1
     timeout: 10
-  mail:  
+  mail:
     host: localhost
     port: 25
     ssl: false
@@ -41,15 +41,20 @@ notif:
     password:
     from:
     to:
-  rocketchat:    
+  rocketchat:
     endpoint: http://rocket.foo.com:3000
     channel: "#general"
     user_id: abcdEFGH012345678
     token: Token123456
     timeout: 10
-  slack:    
+  script:
+      cmd: "myprogram"
+      args:
+        - "--anarg"
+        - "another"
+  slack:
     webhook_url: https://hooks.slack.com/services/ABCD12EFG/HIJK34LMN/01234567890abcdefghij
-  teams:    
+  teams:
     webhook_url: https://outlook.office.com/webhook/ABCD12EFG/HIJK34LMN/01234567890abcdefghij
   telegram:
     token: aabbccdd:11223344
@@ -101,6 +106,7 @@ providers:
 * [gotify](notifications.md#gotify)
 * [mail](notifications.md#mail)
 * [rocketchat](notifications.md#rocketchat)
+* [script](notifications.md#script)
 * [slack](notifications.md#slack)
 * [teams](notifications.md#teams)
 * [telegram](notifications.md#telegram)

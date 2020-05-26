@@ -35,9 +35,13 @@ notif:
     user_id: abcdEFGH012345678
     token: Token123456
     timeout: 10
+  script:
+    cmd: "go"
+    args:
+      - "version"
   slack:
     webhook_url: https://hooks.slack.com/services/ABCD12EFG/HIJK34LMN/01234567890abcdefghij
-  teams:    
+  teams:
     webhook_url: https://outlook.office.com/webhook/ABCD12EFG/HIJK34LMN/01234567890abcdefghij
   telegram:
     token: abcdef123456
@@ -69,4 +73,4 @@ providers:
   swarm:
     watch_by_default: true
   file:
-    filename: ./dummy.yml
+    filename: ./test/dummy.yml

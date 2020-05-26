@@ -7,6 +7,7 @@ import (
 	"github.com/crazy-max/diun/internal/notif/mail"
 	"github.com/crazy-max/diun/internal/notif/notifier"
 	"github.com/crazy-max/diun/internal/notif/rocketchat"
+	"github.com/crazy-max/diun/internal/notif/script"
 	"github.com/crazy-max/diun/internal/notif/slack"
 	"github.com/crazy-max/diun/internal/notif/teams"
 	"github.com/crazy-max/diun/internal/notif/telegram"
@@ -46,6 +47,9 @@ func New(config *model.Notif, app model.App, userAgent string) (*Client, error) 
 	}
 	if config.RocketChat != nil {
 		c.notifiers = append(c.notifiers, rocketchat.New(config.RocketChat, app, userAgent))
+	}
+	if config.Script != nil {
+		c.notifiers = append(c.notifiers, script.New(config.Script, app))
 	}
 	if config.Slack != nil {
 		c.notifiers = append(c.notifiers, slack.New(config.Slack, app))

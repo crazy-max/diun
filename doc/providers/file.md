@@ -16,7 +16,7 @@ The file provider lets you define Docker images to analyze through a YAML file o
 
 Register the file provider:
 
-```yml
+```yaml
 db:
   path: diun.db
 
@@ -39,7 +39,7 @@ providers:
     filename: /path/to/config.yml
 ```
 
-```yml
+```yaml
 ### /path/to/config.yml
 
 # Watch latest tag of crazymax/nextcloud image on docker.io (DockerHub) with registry ID 'someregistryoptions'.
@@ -82,7 +82,7 @@ providers:
 
 Let's take a look with a simple example:
 
-```yml
+```yaml
 db:
   path: diun.db
 
@@ -100,7 +100,7 @@ providers:
     filename: /path/to/config.yml
 ```
 
-```yml
+```yaml
 # /path/to/config.yml
 - name: crazymax/cloudflared
   watch_repo: true
@@ -137,7 +137,7 @@ Defines the path to the [configuration file](#yaml-configuration-file).
 
 > :warning: `filename` and `directory` are mutually exclusive.
 
-```yml
+```yaml
 providers:
   file:
     filename: /path/to/config/conf.yml
@@ -149,7 +149,7 @@ Defines the path to the directory that contains the [configuration files](#yaml-
 
 > :warning: `filename` and `directory` are mutually exclusive.
 
-```yml
+```yaml
 providers:
   file:
     directory: /path/to/config

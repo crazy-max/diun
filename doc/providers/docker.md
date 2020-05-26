@@ -15,7 +15,7 @@ In this section we quickly go over a basic docker-compose file using your local 
 
 First of all, let's create a Diun configuration we named `diun.yml`:
 
-```yml
+```yaml
 watch:
   workers: 20
   schedule: "*/30 * * * *"
@@ -29,7 +29,7 @@ Here we use a single Docker provider with a minimum configuration to analyze lab
 
 Now let's create a simple docker-compose file with Diun and some simple services:
 
-```yml
+```yaml
 version: "3.5"
 
 services:
