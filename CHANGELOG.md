@@ -53,9 +53,7 @@
 * Go 1.13.5
 * Seconds field optional for schedule
 
-> :warning: **BREAKING CHANGES**<br />
-> `image` field has been moved to `providers.static` in configuration file.<br />
-> See [providers configuration](doc/configuration.md#providers) for more info.
+> :warning: See [**UPGRADE NOTES**](UPGRADE.md#1x--2x) for breaking changes.
 
 ## 1.4.1 (2019/10/20)
 
@@ -66,19 +64,9 @@
 
 * Multi-platform Docker image
 * Switch to GitHub Actions
-* :warning: Run Docker container as non-root user
-* :warning: Stop publishing Docker image on Quay
+* Stop publishing Docker image on Quay
 * Go 1.12.10
 * Use GOPROXY
-
-> :warning: **UPGRADE NOTES**
-> As the Docker container now runs as a non-root user, you have to first stop the container and change permissions to `data` volume:
-> ```
-> docker-compose stop
-> chown -R 1000:1000 data/
-> docker-compose pull
-> docker-compose up -d
-> ```
 
 ## 1.3.0 (2019/08/22)
 
@@ -116,14 +104,7 @@
 * Review config file structure
 * Improve worker pool
 
-> :warning: **BREAKING CHANGES**
-> Some fields in configuration file has been changed:
-> * `registries` renamed `regopts`
-> * `items` renamed `image`
-> * `items[].image` renamed `image[].name`
-> * `items[].registry_id` renamed `image[].regopts_id`
-> * `watch.os` and `watch.arch` moved to `image[].os` and `image[].arch`
-> See README for more info.
+> :warning: See [**UPGRADE NOTES**](UPGRADE.md#0x--1x) for breaking changes.
 
 ## 0.5.0 (2019/06/09)
 
