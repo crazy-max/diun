@@ -20,22 +20,19 @@ watch:
   first_check_notif: false
 
 notif:
-  amqp:
-    enable: false
+  amqp:    
     host: localhost
     port: 5672
     username: guest
     password: guest
     exchange: 
     queue: queue
-  gotify:
-    enable: false
+  gotify:    
     endpoint: http://gotify.foo.com
     token: Token123456
     priority: 1
     timeout: 10
-  mail:
-    enable: false
+  mail:  
     host: localhost
     port: 25
     ssl: false
@@ -44,27 +41,22 @@ notif:
     password:
     from:
     to:
-  rocketchat:
-    enable: false
+  rocketchat:    
     endpoint: http://rocket.foo.com:3000
     channel: "#general"
     user_id: abcdEFGH012345678
     token: Token123456
     timeout: 10
-  slack:
-    enable: false
+  slack:    
     webhook_url: https://hooks.slack.com/services/ABCD12EFG/HIJK34LMN/01234567890abcdefghij
-  teams:
-    enable: false
+  teams:    
     webhook_url: https://outlook.office.com/webhook/ABCD12EFG/HIJK34LMN/01234567890abcdefghij
   telegram:
-    enable: false
     token: aabbccdd:11223344
     chat_ids:
       - 123456789
       - 987654321
   webhook:
-    enable: false
     endpoint: http://webhook.foo.com/sd54qad89azd5a
     method: GET
     headers:
