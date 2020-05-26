@@ -74,7 +74,6 @@ type NotifSlack struct {
 
 // NotifTeams holds Teams notification configuration details
 type NotifTeams struct {
-	Enable     bool   `yaml:"enable,omitempty"`
 	WebhookURL string `yaml:"webhook_url,omitempty"`
 }
 
