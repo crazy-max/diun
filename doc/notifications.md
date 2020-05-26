@@ -120,7 +120,6 @@ Multiple chat IDs can be provided in order to deliver notifications to multiple 
 You can send webhook notifications with the following settings:
 
 * `webhook`
-  * `enable`: Enable webhook notification (default: `false`).
   * `endpoint`: URL of the HTTP request. **required**
   * `method`: HTTP method (default: `GET`). **required**
   * `headers`: Map of additional headers to be sent.
