@@ -1,34 +1,20 @@
 name: build
 
 on:
-  pull_request:
-    branches:
-      - 'master'
-      - 'v*'
-    paths:
-      - '.github/workflows/build.yml'
-      - 'cmd/**'
-      - 'internal/**'
-      - 'pkg/**'
-      - '.goreleaser.yml'
-      - 'Dockerfile'
-      - 'go.mod'
-      - 'go.sum'
   push:
     branches:
       - 'master'
       - 'v*'
     tags:
       - 'v*'
-    paths:
-      - '.github/workflows/build.yml'
-      - 'cmd/**'
-      - 'internal/**'
-      - 'pkg/**'
-      - '.goreleaser.yml'
-      - 'Dockerfile'
-      - 'go.mod'
-      - 'go.sum'
+    paths-ignore:
+      - '**.md'
+  pull_request:
+    branches:
+      - 'master'
+      - 'v*'
+    paths-ignore:
+      - '**.md'
 
 jobs:
   go:
