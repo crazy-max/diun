@@ -7,8 +7,8 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/crazy-max/diun/internal/model"
-	"github.com/crazy-max/diun/internal/notif/notifier"
+	"github.com/crazy-max/diun/v3/internal/model"
+	"github.com/crazy-max/diun/v3/internal/notif/notifier"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 )

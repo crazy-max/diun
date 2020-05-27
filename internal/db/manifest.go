@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 
-	"github.com/crazy-max/diun/pkg/registry"
+	"github.com/crazy-max/diun/v3/pkg/registry"
 	bolt "go.etcd.io/bbolt"
 )
 

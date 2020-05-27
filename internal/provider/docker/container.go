@@ -3,9 +3,9 @@ package docker
 import (
 	"reflect"
 
-	"github.com/crazy-max/diun/internal/model"
-	"github.com/crazy-max/diun/internal/provider"
-	"github.com/crazy-max/diun/pkg/docker"
+	"github.com/crazy-max/diun/v3/internal/model"
+	"github.com/crazy-max/diun/v3/internal/provider"
+	"github.com/crazy-max/diun/v3/pkg/docker"
 	"github.com/docker/docker/api/types/filters"
 )
 

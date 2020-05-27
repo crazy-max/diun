@@ -9,10 +9,10 @@ import (
 	"time"
 
 	"github.com/alecthomas/kong"
-	"github.com/crazy-max/diun/internal/app"
-	"github.com/crazy-max/diun/internal/config"
-	"github.com/crazy-max/diun/internal/logging"
-	"github.com/crazy-max/diun/internal/model"
+	"github.com/crazy-max/diun/v3/internal/app"
+	"github.com/crazy-max/diun/v3/internal/config"
+	"github.com/crazy-max/diun/v3/internal/logging"
+	"github.com/crazy-max/diun/v3/internal/model"
 	"github.com/rs/zerolog/log"
 )
 

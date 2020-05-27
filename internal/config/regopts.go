@@ -3,7 +3,7 @@ package config
 import (
 	"fmt"
 
-	"github.com/crazy-max/diun/internal/model"
+	"github.com/crazy-max/diun/v3/internal/model"
 	"github.com/imdario/mergo"
 )
 

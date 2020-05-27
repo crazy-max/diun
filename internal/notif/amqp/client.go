@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/crazy-max/diun/internal/model"
-	"github.com/crazy-max/diun/internal/notif/notifier"
-	"github.com/crazy-max/diun/pkg/utl"
+	"github.com/crazy-max/diun/v3/internal/model"
+	"github.com/crazy-max/diun/v3/internal/notif/notifier"
+	"github.com/crazy-max/diun/v3/pkg/utl"
 	"github.com/opencontainers/go-digest"
 	"github.com/streadway/amqp"
 )

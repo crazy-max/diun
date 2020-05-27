@@ -1,7 +1,7 @@
 package provider
 
 import (
-	"github.com/crazy-max/diun/internal/model"
+	"github.com/crazy-max/diun/v3/internal/model"
 )
 
 // Handler is a provider interface

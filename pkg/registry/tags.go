@@ -2,7 +2,7 @@ package registry
 
 import (
 	"github.com/containers/image/v5/docker"
-	"github.com/crazy-max/diun/pkg/utl"
+	"github.com/crazy-max/diun/v3/pkg/utl"
 )
 
 // Tags holds information about image tags.

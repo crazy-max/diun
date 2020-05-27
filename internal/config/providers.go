@@ -3,8 +3,8 @@ package config
 import (
 	"os"
 
-	"github.com/crazy-max/diun/internal/model"
-	"github.com/crazy-max/diun/pkg/utl"
+	"github.com/crazy-max/diun/v3/internal/model"
+	"github.com/crazy-max/diun/v3/pkg/utl"
 	"github.com/imdario/mergo"
 	"github.com/pkg/errors"
 )

@@ -11,8 +11,8 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/crazy-max/diun/internal/model"
-	"github.com/crazy-max/diun/internal/notif/notifier"
+	"github.com/crazy-max/diun/v3/internal/model"
+	"github.com/crazy-max/diun/v3/internal/notif/notifier"
 )
 
 // Client represents an active rocketchat notification object

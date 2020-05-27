@@ -7,8 +7,8 @@ import (
 	"os"
 	"path"
 
-	"github.com/crazy-max/diun/internal/model"
-	"github.com/crazy-max/diun/pkg/utl"
+	"github.com/crazy-max/diun/v3/internal/model"
+	"github.com/crazy-max/diun/v3/pkg/utl"
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
 )

@@ -3,9 +3,9 @@ package config_test
 import (
 	"testing"
 
-	"github.com/crazy-max/diun/internal/config"
-	"github.com/crazy-max/diun/internal/model"
-	"github.com/crazy-max/diun/pkg/utl"
+	"github.com/crazy-max/diun/v3/internal/config"
+	"github.com/crazy-max/diun/v3/internal/model"
+	"github.com/crazy-max/diun/v3/pkg/utl"
 	"github.com/stretchr/testify/assert"
 )
 
