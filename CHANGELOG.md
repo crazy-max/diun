@@ -15,7 +15,7 @@
 * Switch to kong command-line parser (#66)
 * Enhanced Dockerfile
 * Review of platform detection (#57)
-* Leave default image platform empty for static provider (see FAQ doc)
+* Leave default image platform empty for file provider (see FAQ doc)
 * Handle platform variant
 * Add database migration process
 * Switch to Open Container Specification labels as label-schema.org ones are deprecated
