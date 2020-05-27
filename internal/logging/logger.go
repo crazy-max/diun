@@ -71,3 +71,11 @@ func (f *LogrusFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 	}
 	return nil, nil
 }
+
+// AntsLogger is a logger for ants module
+type AntsLogger struct{}
+
+// Printf must have the same semantics as log.Printf
+func (w *AntsLogger) Printf(format string, args ...interface{}) {
+	log.Debug().Msgf(format, args...)
+}

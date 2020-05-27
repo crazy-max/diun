@@ -10,6 +10,7 @@ import (
 
 	"github.com/crazy-max/diun/v3/internal/config"
 	"github.com/crazy-max/diun/v3/internal/db"
+	"github.com/crazy-max/diun/v3/internal/logging"
 	"github.com/crazy-max/diun/v3/internal/model"
 	"github.com/crazy-max/diun/v3/internal/notif"
 	dockerPrd "github.com/crazy-max/diun/v3/internal/provider/docker"
@@ -115,7 +116,7 @@ func (di *Diun) Run() {
 				Msg("Cannot run job")
 		}
 		di.wg.Done()
-	})
+	}, ants.WithLogger(new(logging.AntsLogger)))
 	defer di.pool.Release()
 
 	// Docker provider
