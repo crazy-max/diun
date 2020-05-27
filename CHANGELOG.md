@@ -1,5 +1,30 @@
 # Changelog
 
+## 3.0.0 (2020/05/27)
+
+* Add script notification (#53)
+* Add Teams notification (#72)
+* Add `--test-notification` flag (#23)
+* Allow only one Docker and Swarm provider
+* Remove "enable" setting for notifiers
+* Logging when no image is found
+* Add Amqp notification client (#63)
+* Fix default log level
+* Move static to file provider (#71)
+* Reload config on change for file provider (#16)
+* Switch to kong command-line parser (#66)
+* Enhanced Dockerfile
+* Review of platform detection (#57)
+* Leave default image platform empty for static provider (see FAQ doc)
+* Handle platform variant
+* Add database migration process
+* Switch to Open Container Specification labels as label-schema.org ones are deprecated
+* Remove unneeded `diun.os` and `diun.arch` docker labels
+* Add upgrade notes
+* Update deps
+
+> :warning: See [**UPGRADE NOTES**](UPGRADE.md#2x--3x) for breaking changes.
+
 ## 2.6.1 (2020/03/26)
 
 * Downgrade containers/image to 5.2.1 (#54)
