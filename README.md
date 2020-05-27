@@ -45,6 +45,7 @@
   * [File](doc/providers/file.md)
 * [Notifications](doc/notifications.md)
 * [FAQ](doc/faq.md)
+* [Upgrade notes](UPGRADE.md)
 
 ## How can I help?
 
