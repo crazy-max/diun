@@ -1,0 +1,10 @@
+version: 2
+updates:
+  - package-ecosystem: "gomod"
+    directory: "/"
+    schedule:
+      interval: "daily"
+      timezone: "Europe/Paris"
+    labels:
+      - ":game_die: dependencies"
+      - ":robot: bot"
