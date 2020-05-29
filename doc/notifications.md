@@ -5,7 +5,7 @@
 * [Mail](#mail)
 * [Rocket.Chat](#rocketchat)
 * [Script](#script)
-* [Slack / Mattermost](#slack)
+* [Slack / Mattermost](#slack--mattermost)
 * [Teams](#teams)
 * [Telegram](#telegram)
 * [Webhook](#webhook)
