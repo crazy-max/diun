@@ -28,7 +28,7 @@ Flags:
   --log-level="info"    Set log level ($LOG_LEVEL).
   --log-json            Enable JSON logging output ($LOG_JSON).
   --log-caller          Add file:line of the caller to log output ($LOG_CALLER).
-  --test-notif          Test notification settings ($TEST_NOTIF).
+  --test-notif          Test notification settings.
 ```
 
 ## Server configuration
