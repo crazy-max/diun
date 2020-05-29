@@ -5,7 +5,7 @@
 * [Mail](#mail)
 * [Rocket.Chat](#rocketchat)
 * [Script](#script)
-* [Slack](#slack)
+* [Slack / Mattermost](#slack)
 * [Teams](#teams)
 * [Telegram](#telegram)
 * [Webhook](#webhook)
@@ -106,7 +106,7 @@ DIUN_ENTRY_CREATED=2020-03-26 12:23:56 +0000 UTC
 DIUN_ENTRY_PLATFORM=linux/adm64
 ```
 
-## Slack
+## Slack / Mattermost
 
 You can send notifications to your Slack channel using an [incoming webhook URL](https://api.slack.com/messaging/webhooks):
 
@@ -114,6 +114,8 @@ You can send notifications to your Slack channel using an [incoming webhook URL]
   * `webhook_url`: Slack [incoming webhook URL](https://api.slack.com/messaging/webhooks). **required**
 
 ![](../.res/notif-slack.png)
+
+Mattermost webhooks are compatible with Slack notification without any special configuration (if Webhooks are enabled).
 
 ## Teams
 
