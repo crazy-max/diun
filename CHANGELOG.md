@@ -4,7 +4,7 @@
 
 * Add script notification (#53)
 * Add Teams notification (#72)
-* Add `--test-notification` flag (#23)
+* Add `--test-notif` flag (#23)
 * Allow only one Docker and Swarm provider
 * Remove "enable" setting for notifiers
 * Logging when no image is found
