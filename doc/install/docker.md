@@ -24,6 +24,7 @@ Image: crazymax/diun:latest
 * `LOG_LEVEL` : Log level output (default `info`)
 * `LOG_JSON`: Enable JSON logging output (default `false`)
 * `LOG_CALLER`: Enable to add file:line of the caller (default `false`)
+* `TEST_NOTIF`: Enable to test notification settings on startup (default `false`)
 
 ## Volumes
 
