@@ -40,7 +40,7 @@ jobs:
         uses: actions/checkout@v2
       -
         name: GoReleaser
-        uses: goreleaser/goreleaser-action@v1
+        uses: goreleaser/goreleaser-action@v2
         with:
           version: latest
           args: release --skip-publish --rm-dist
@@ -74,11 +74,14 @@ jobs:
     needs: go
     steps:
       -
+        name: Checkout
+        uses: actions/checkout@v2
+      -
         name: Prepare
         id: prepare
         run: |
           DOCKER_USERNAME=crazymax
-          DOCKER_IMAGE=crazymax/${{ github.event.repository.name }}
+          DOCKER_IMAGE=crazymax/diun
           DOCKER_PLATFORMS=linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64,linux/386,linux/ppc64le,linux/s390x
           VERSION=edge
 
@@ -104,10 +107,7 @@ jobs:
             ${TAGS} --file Dockerfile .
       -
         name: Set up Docker Buildx
-        uses: crazy-max/ghaction-docker-buildx@v1
-      -
-        name: Checkout
-        uses: actions/checkout@v2
+        uses: crazy-max/ghaction-docker-buildx@v2
       -
         name: Docker Buildx (build)
         run: |
