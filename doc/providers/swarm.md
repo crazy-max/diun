@@ -3,6 +3,8 @@
 * [About](#about)
 * [Quick start](#quick-start)
 * [Provider configuration](#provider-configuration)
+  * [Configuration file](#configuration-file)
+  * [Environment variables](#environment-variables)
 * [Docker labels](#docker-labels)
 
 ## About
@@ -12,17 +14,6 @@ The Swarm provider allows you to analyze the services of your Swarm cluster to e
 ## Quick start
 
 In this section we quickly go over a basic stack using your local swarm cluster.
-
-First of all, let's create a Diun configuration we named `diun.yml`:
-
-```yaml
-watch:
-  workers: 20
-  schedule: "*/30 * * * *"
-
-providers:
-  swarm:
-```
 
 Here we use our local Swarm provider with a minimum configuration to analyze labeled containers (watch by default disabled).
 
@@ -36,7 +27,6 @@ services:
     image: crazymax/diun:latest
     volumes:
       - "./data:/data"
-      - "./diun.yml:/diun.yml:ro"
       - "/var/run/docker.sock:/var/run/docker.sock"
     environment:
       - "TZ=Europe/Paris"
@@ -105,11 +95,22 @@ diun_diun.1.i1l4yuiafq6y@docker-desktop    | Sat, 14 Dec 2019 16:20:02 CET INF N
 
 ## Provider configuration
 
+### Configuration file
+
 * `endpoint`: Server address to connect to. Local if empty.
 * `api_version`: Overrides the client version with the specified one.
 * `tls_certs_path`: Path to load the TLS certificates from.
 * `tls_verify`: Controls whether client verifies the server's certificate chain and hostname (default: `true`).
 * `watch_by_default`: Enable watch by default. If false, services that don't have `diun.enable=true` label will be ignored (default: `false`).
+
+### Environment variables
+
+* `DIUN_PROVIDERS_SWARM`
+* `DIUN_PROVIDERS_SWARM_ENDPOINT`
+* `DIUN_PROVIDERS_SWARM_APIVERSION`
+* `DIUN_PROVIDERS_SWARM_TLSCERTSPATH`
+* `DIUN_PROVIDERS_SWARM_TLSVERIFY`
+* `DIUN_PROVIDERS_SWARM_WATCHBYDEFAULT`
 
 ## Docker labels
 

@@ -10,7 +10,6 @@ import (
 	"strconv"
 	"strings"
 	"text/template"
-	"time"
 
 	"github.com/crazy-max/diun/v3/internal/model"
 	"github.com/crazy-max/diun/v3/internal/notif/notifier"
@@ -43,7 +42,7 @@ func (c *Client) Name() string {
 // Send creates and sends a gotify notification with an entry
 func (c *Client) Send(entry model.NotifEntry) error {
 	hc := http.Client{
-		Timeout: time.Duration(c.cfg.Timeout) * time.Second,
+		Timeout: *c.cfg.Timeout,
 	}
 
 	title := fmt.Sprintf("Image update for %s", entry.Image.String())

@@ -55,9 +55,8 @@ COPY --from=builder /app/diun /usr/local/bin/diun
 COPY --from=builder /usr/local/go/lib/time/zoneinfo.zip /usr/local/go/lib/time/zoneinfo.zip
 RUN diun --version
 
-ENV DIUN_DB="/data/diun.db"
+ENV CONFIG="/diun.yml" \
+  DIUN_DB_PATH="/data/diun.db"
 
 VOLUME [ "/data" ]
-
 ENTRYPOINT [ "diun" ]
-CMD [ "--config", "/diun.yml" ]

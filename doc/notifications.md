@@ -12,7 +12,9 @@
 
 ## Amqp
 
-You can send notifications to any amqp compatible server with the following settings:
+You can send notifications to any amqp compatible server with the following settings.
+
+### Configuration file
 
 * `amqp`
   * `host`: AMQP server host (default: `localhost`). **required**
@@ -21,8 +23,21 @@ You can send notifications to any amqp compatible server with the following sett
   * `username_file`: Use content of secret file as AMQP username if `username` not defined.
   * `password`: AMQP password. **required**
   * `password_file`: Use content of secret file as AMQP password if `password` not defined.
-  * `exchange`: Name of the exchange the message will be sent to. (default: `empty`)
+  * `exchange`: Name of the exchange the message will be sent to.
   * `queue`: Name of the queue the message will be sent to. **required**
+
+### Environment variables
+
+* `DIUN_NOTIF_AMQP_HOST`
+* `DIUN_NOTIF_AMQP_EXCHANGE`
+* `DIUN_NOTIF_AMQP_PORT`
+* `DIUN_NOTIF_AMQP_USERNAME`
+* `DIUN_NOTIF_AMQP_USERNAMEFILE`
+* `DIUN_NOTIF_AMQP_PASSWORD`
+* `DIUN_NOTIF_AMQP_PASSWORDFILE`
+* `DIUN_NOTIF_AMQP_QUEUE`
+
+### Sample
 
 The JSON response will look like this:
 
@@ -41,19 +56,32 @@ The JSON response will look like this:
 
 ## Gotify
 
-Notifications can be sent using a [Gotify](https://gotify.net/) instance:
+Notifications can be sent using a [Gotify](https://gotify.net/) instance.
+
+### Configuration file
 
 * `gotify`
   * `endpoint`: Gotify base URL (e.g. `http://gotify.foo.com`). **required**
   * `token`: Application token. **required**
   * `priority`: The priority of the message.
-  * `timeout`: Timeout specifies a time limit for the request to be made. (default: `10`).
+  * `timeout`: Timeout specifies a time limit for the request to be made. (default: `10s`).
+
+### Environment variables
+
+* `DIUN_NOTIF_GOTIFY_ENDPOINT`
+* `DIUN_NOTIF_GOTIFY_TOKEN`
+* `DIUN_NOTIF_GOTIFY_PRIORITY`
+* `DIUN_NOTIF_GOTIFY_TIMEOUT`
+
+### Sample
 
 ![](../.res/notif-gotify.png)
 
 ## Mail
 
-Notifications can be sent through SMTP:
+Notifications can be sent through SMTP.
+
+### Configuration file
 
 * `mail`
   * `host`: SMTP server host (default: `localhost`). **required**
@@ -67,33 +95,53 @@ Notifications can be sent through SMTP:
   * `from`: Sender email address. **required**
   * `to`: Recipient email address. **required**
 
+### Environment variables
+
+* `DIUN_NOTIF_MAIL_HOST`
+* `DIUN_NOTIF_MAIL_PORT`
+* `DIUN_NOTIF_MAIL_SSL`
+* `DIUN_NOTIF_MAIL_INSECURESKIPVERIFY`
+* `DIUN_NOTIF_MAIL_USERNAME`
+* `DIUN_NOTIF_MAIL_USERNAMEFILE`
+* `DIUN_NOTIF_MAIL_PASSWORD`
+* `DIUN_NOTIF_MAIL_PASSWORDFILE`
+* `DIUN_NOTIF_MAIL_FROM`
+* `DIUN_NOTIF_MAIL_TO`
+
+### Sample
+
 ![](../.res/notif-mail.png)
 
 ## Rocket.Chat
 
-To be able to send notifications to your Rocket.Chat channel:
+Allow to send notifications to your Rocket.Chat channel.
 
 > You must first create a _Personal Access Token_ through your account settings on your RocketChat instance.
+
+### Configuration file
 
 * `rocketchat`
   * `endpoint`: Rocket.Chat base URL (e.g. `http://rocket.foo.com:3000`). **required**
   * `channel`: Channel name with the prefix in front of it. **required**
   * `user_id`: User ID. **required**
   * `token`: Authentication token. **required**
-  * `timeout`: Timeout specifies a time limit for the request to be made. (default: `10`).
+  * `timeout`: Timeout specifies a time limit for the request to be made. (default: `10s`).
+
+### Environment variables
+
+* `DIUN_NOTIF_ROCKETCHAT_ENDPOINT`
+* `DIUN_NOTIF_ROCKETCHAT_CHANNEL`
+* `DIUN_NOTIF_ROCKETCHAT_USERID`
+* `DIUN_NOTIF_ROCKETCHAT_TOKEN`
+* `DIUN_NOTIF_ROCKETCHAT_TIMEOUT`
+
+### Sample
 
 ![](../.res/notif-rocketchat.png)
 
 ## Script
 
-You can send script notifications with the following settings:
-
-* `script`
-  * `cmd`: Command or script to execute. **required**
-  * `args`: List of args to pass to `cmd`.
-  * `dir`: Specifies the working directory of the command.
-
-Following environment variables are passed to the process and will look like this:
+You can call a script when a notification occured. Following environment variables will be passed:
 
 ```
 DIUN_VERSION=3.0.0
@@ -106,12 +154,33 @@ DIUN_ENTRY_CREATED=2020-03-26 12:23:56 +0000 UTC
 DIUN_ENTRY_PLATFORM=linux/adm64
 ```
 
+### Configuration file
+
+* `script`
+  * `cmd`: Command or script to execute. **required**
+  * `args`: List of args to pass to `cmd`.
+  * `dir`: Specifies the working directory of the command.
+
+### Environment variables
+
+* `DIUN_NOTIF_SCRIPT_CMD`
+* `DIUN_NOTIF_SCRIPT_ARGS`
+* `DIUN_NOTIF_SCRIPT_DIR`
+
 ## Slack / Mattermost
 
-You can send notifications to your Slack channel using an [incoming webhook URL](https://api.slack.com/messaging/webhooks):
+You can send notifications to your Slack channel using an [incoming webhook URL](https://api.slack.com/messaging/webhooks).
+
+### Configuration file
 
 * `slack`
   * `webhook_url`: Slack [incoming webhook URL](https://api.slack.com/messaging/webhooks). **required**
+
+### Environment variables
+
+* `DIUN_NOTIF_SLACK_WEBHOOKURL`
+
+### Sample
 
 ![](../.res/notif-slack.png)
 
@@ -119,10 +188,18 @@ Mattermost webhooks are compatible with Slack notification without any special c
 
 ## Teams
 
-You can send notifications to your Teams team-channel using an [incoming webhook URL](https://docs.microsoft.com/en-us/microsoftteams/platform/webhooks-and-connectors/what-are-webhooks-and-connectors):
+You can send notifications to your Teams team-channel using an [incoming webhook URL](https://docs.microsoft.com/en-us/microsoftteams/platform/webhooks-and-connectors/what-are-webhooks-and-connectors).
 
-* `teams`  
+### Configuration file
+
+* `teams`
   * `webhook_url`: Teams [incoming webhook URL](https://docs.microsoft.com/en-us/microsoftteams/platform/webhooks-and-connectors/what-are-webhooks-and-connectors). **required**
+
+### Environment variables
+
+* `DIUN_NOTIF_TEAMS_WEBHOOKURL`
+
+### Sample
 
 ![](../.res/notif-teams.png)
 
@@ -135,21 +212,41 @@ Follow the [instructions](https://core.telegram.org/bots#6-botfather) to set up 
 Message the [GetID bot](https://t.me/getidsbot) to find your chat ID.
 Multiple chat IDs can be provided in order to deliver notifications to multiple recipients.
 
+### Configuration file
+
 * `telegram`
   * `token`: Telegram bot token. **required**
   * `chat_ids`: List of chat IDs to send notifications to. **required**
+
+### Environment variables
+
+* `DIUN_NOTIF_TELEGRAM_TOKEN`
+* `DIUN_NOTIF_TELEGRAM_CHATIDS`
+
+### Sample
 
 ![](../.res/notif-telegram.png)
 
 ## Webhook
 
-You can send webhook notifications with the following settings:
+You can send webhook notifications with the following settings.
+
+### Configuration file
 
 * `webhook`
   * `endpoint`: URL of the HTTP request. **required**
   * `method`: HTTP method (default: `GET`). **required**
-  * `headers`: Map of additional headers to be sent.
-  * `timeout`: Timeout specifies a time limit for the request to be made. (default: `10`).
+  * `headers`: Map of additional headers to be sent (key is case-insensitive).
+  * `timeout`: Timeout specifies a time limit for the request to be made. (default: `10s`).
+
+### Environment variables
+
+* `DIUN_NOTIF_WEBHOOK_ENDPOINT`
+* `DIUN_NOTIF_WEBHOOK_METHOD`
+* `DIUN_NOTIF_WEBHOOK_HEADERS_<KEY>`
+* `DIUN_NOTIF_WEBHOOK_TIMEOUT`
+
+### Sample
 
 The JSON response will look like this:
 

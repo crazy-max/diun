@@ -1,6 +1,7 @@
 # Configuration
 
 * [Overview](#overview)
+* [Configuration file](#configuration-file)
 * [Reference](#reference)
   * [db](#db)
   * [watch](#watch)
@@ -9,6 +10,21 @@
   * [providers](#providers)
 
 ## Overview
+
+There are two different ways to define static configuration options in Diun:
+
+* In a [configuration file](#configuration-file)
+* As environment variables
+
+These ways are evaluated in the order listed above.
+
+If no value was provided for a given option, a default value applies. Moreover, if an option has sub-options, and any of these sub-options is not specified, a default value will apply as well.
+
+For example, the `DIUN_PROVIDERS_DOCKER` environment variable is enough by itself to enable the docker provider, even though sub-options like `DIUN_PROVIDERS_DOCKER_ENDPOINT` exist. Once positioned, this option sets (and resets) all the default values of the sub-options of `DIUN_PROVIDERS_DOCKER`.
+
+## Configuration file
+
+You can define a configuration file through the option `--config` with the following content:
 
 ```yaml
 db:
@@ -25,13 +41,12 @@ notif:
     port: 5672
     username: guest
     password: guest
-    exchange: 
     queue: queue
   gotify:
     endpoint: http://gotify.foo.com
     token: Token123456
     priority: 1
-    timeout: 10
+    timeout: 10s
   mail:
     host: localhost
     port: 25
@@ -46,7 +61,7 @@ notif:
     channel: "#general"
     user_id: abcdEFGH012345678
     token: Token123456
-    timeout: 10
+    timeout: 10s
   script:
       cmd: "myprogram"
       args:
@@ -67,13 +82,13 @@ notif:
     headers:
       Content-Type: application/json
       Authorization: Token123456
-    timeout: 10
+    timeout: 10s
 
 regopts:
   someregistryoptions:
     username: foo
     password: bar
-    timeout: 20
+    timeout: 20s
   onemore:
     username: foo2
     password: bar2
@@ -92,13 +107,23 @@ providers:
 
 ### db
 
-* `path`: Path to Bolt database file where images manifests are stored (default: `diun.db`). Environment var `DIUN_DB` override this value.
+* `path`: Path to Bolt database file where images manifests are stored. (default `diun.db`)
+
+You can also use the following environment variables:
+
+* `DIUN_DB_PATH`
 
 ### watch
 
-* `workers`: Maximum number of workers that will execute tasks concurrently (default: `10`).
-* `schedule`: [CRON expression](https://godoc.org/github.com/robfig/cron#hdr-CRON_Expression_Format) to schedule Diun watcher (default: `0 * * * *`).
-* `first_check_notif`: Send notification at the very first analysis of an image. (default: `false`).
+* `workers`: Maximum number of workers that will execute tasks concurrently. (default `10`)
+* `schedule`: [CRON expression](https://godoc.org/github.com/robfig/cron#hdr-CRON_Expression_Format) to schedule Diun watcher. (default `0 * * * *`)
+* `first_check_notif`: Send notification at the very first analysis of an image. (default `false`)
+
+You can also use the following environment variables:
+
+* `DIUN_WATCH_WORKERS`
+* `DIUN_WATCH_SCHEDULE`
+* `DIUN_WATCH_FIRSTCHECKNOTIF`
 
 ### notif
 
@@ -107,7 +132,7 @@ providers:
 * [mail](notifications.md#mail)
 * [rocketchat](notifications.md#rocketchat)
 * [script](notifications.md#script)
-* [slack](notifications.md#slack)
+* [slack](notifications.md#slack--mattermost)
 * [teams](notifications.md#teams)
 * [telegram](notifications.md#telegram)
 * [webhook](notifications.md#webhook)
@@ -118,8 +143,17 @@ providers:
 * `username_file`: Use content of secret file as registry username if `username` not defined.
 * `password`: Registry password.
 * `password_file`: Use content of secret file as registry password if `password` not defined.
-* `timeout`: Timeout is the maximum amount of time for the TCP connection to establish. 0 means no timeout (default: `10`).
-* `insecure_tls`: Allow contacting docker registry over HTTP, or HTTPS with failed TLS verification (default: `false`).
+* `timeout`: Timeout is the maximum amount of time for the TCP connection to establish. (default `10s`)
+* `insecure_tls`: Allow contacting docker registry over HTTP, or HTTPS with failed TLS verification. (default `false`)
+
+You can also use the following environment variables:
+
+* `DIUN_REGOPTS_<KEY>_USERNAME`
+* `DIUN_REGOPTS_<KEY>_USERNAMEFILE`
+* `DIUN_REGOPTS_<KEY>_PASSWORD`
+* `DIUN_REGOPTS_<KEY>_PASSWORDFILE`
+* `DIUN_REGOPTS_<KEY>_TIMEOUT`
+* `DIUN_REGOPTS_<KEY>_INSECURETLS`
 
 ### providers
 

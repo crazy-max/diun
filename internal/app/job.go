@@ -3,7 +3,6 @@ package app
 import (
 	"fmt"
 	"regexp"
-	"time"
 
 	"github.com/crazy-max/diun/v3/internal/model"
 	"github.com/crazy-max/diun/v3/pkg/registry"
@@ -76,8 +75,8 @@ func (di *Diun) createJob(job model.Job) {
 	job.Registry, err = registry.New(registry.Options{
 		Username:     regUser,
 		Password:     regPassword,
-		Timeout:      time.Duration(regOpts.Timeout) * time.Second,
-		InsecureTLS:  regOpts.InsecureTLS,
+		Timeout:      *regOpts.Timeout,
+		InsecureTLS:  *regOpts.InsecureTLS,
 		UserAgent:    di.userAgent,
 		ImageOs:      job.Image.Platform.Os,
 		ImageArch:    job.Image.Platform.Arch,

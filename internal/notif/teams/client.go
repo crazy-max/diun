@@ -95,7 +95,6 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	}
 
 	req.Header.Add("Content-Type", "application/json")
-
 	req.Header.Set("User-Agent", c.userAgent)
 
 	_, err = hc.Do(req)

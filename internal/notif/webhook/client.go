@@ -38,7 +38,7 @@ func (c *Client) Name() string {
 // Send creates and sends a webhook notification with an entry
 func (c *Client) Send(entry model.NotifEntry) error {
 	hc := http.Client{
-		Timeout: time.Duration(c.cfg.Timeout) * time.Second,
+		Timeout: *c.cfg.Timeout,
 	}
 
 	body, err := json.Marshal(struct {

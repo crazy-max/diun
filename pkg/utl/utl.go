@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"os"
 	"regexp"
+	"time"
 )
 
 // MatchString reports whether a string s
@@ -77,4 +78,9 @@ func NewFalse() *bool {
 func NewTrue() *bool {
 	b := true
 	return &b
+}
+
+// NewDuration returns a duration pointer
+func NewDuration(duration time.Duration) *time.Duration {
+	return &duration
 }

@@ -36,9 +36,7 @@ func (c *Client) Name() string {
 
 // Send creates and sends a amqp notification with an entry
 func (c *Client) Send(entry model.NotifEntry) error {
-
 	username, err := utl.GetSecret(c.cfg.Username, c.cfg.UsernameFile)
-
 	if err != nil {
 		return err
 	}
@@ -48,29 +46,25 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		return err
 	}
 
-	connString := fmt.Sprintf("amqp://%s:%s@%s:%d/", username, password, c.cfg.Host, c.cfg.Port)
-
-	conn, err := amqp.Dial(connString)
+	conn, err := amqp.Dial(fmt.Sprintf("amqp://%s:%s@%s:%d/", username, password, c.cfg.Host, c.cfg.Port))
 	if err != nil {
 		return err
 	}
-
 	defer conn.Close()
 
 	ch, err := conn.Channel()
 	if err != nil {
 		return err
 	}
-
 	defer ch.Close()
 
 	q, err := ch.QueueDeclare(
-		c.cfg.Queue, // name
-		false,       // durable
-		false,       // delete when unused
-		false,       // exclusive
-		false,       // no-wait
-		nil,         // arguments
+		c.cfg.Queue,
+		false,
+		false,
+		false,
+		false,
+		nil,
 	)
 	if err != nil {
 		return err
@@ -82,10 +76,10 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	}
 
 	return ch.Publish(
-		c.cfg.Exchange, // exchange
-		q.Name,         // routing key
-		false,          // mandatory
-		false,          // immediate
+		c.cfg.Exchange,
+		q.Name,
+		false,
+		false,
 		amqp.Publishing{
 			ContentType: "application/json",
 			Body:        body,

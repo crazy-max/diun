@@ -38,7 +38,7 @@
   * [With Docker](doc/install/docker.md)
   * [From binary](doc/install/binary.md)
   * [Linux service](doc/install/linux-service.md)
-* [Usage](doc/usage.md)
+* [Getting started](doc/getting-started.md)
 * [Configuration](doc/configuration.md)
 * Providers
   * [Docker](doc/providers/docker.md)

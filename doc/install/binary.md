@@ -7,12 +7,12 @@ Diun binaries are available in [releases](https://github.com/crazy-max/diun/rele
 Choose the archive matching the destination platform and extract diun:
 
 ```
-wget -qO- https://github.com/crazy-max/diun/releases/download/v2.6.1/diun_2.6.1_linux_x86_64.tar.gz | tar -zxvf - diun
+wget -qO- https://github.com/crazy-max/diun/releases/download/v3.0.0/diun_3.0.0_linux_x86_64.tar.gz | tar -zxvf - diun
 ```
 
 ## Test
 
-After getting the binary, it can be tested with `./diun --help` or moved to a permanent location.
+After getting the binary, it can be tested with `./diun --help` and moved to a permanent location.
 
 ```
 $ ./diun --help
@@ -81,7 +81,7 @@ See how to create [Linux service](linux-service.md) to start Diun automatically.
 ### 2. Running from command-line/terminal
 
 ```
-DIUN_DB=/var/lib/diun/diun.db /usr/local/bin/diun --config /etc/diun/diun.yml
+DIUN_DB_PATH=/var/lib/diun/diun.db /usr/local/bin/diun --config /etc/diun/diun.yml
 ```
 
 ## Updating to a new version

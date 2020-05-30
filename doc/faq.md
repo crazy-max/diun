@@ -1,6 +1,21 @@
 # FAQ
 
+* [Test notifications](#test-notifications)
 * [No image found in manifest list for architecture [], variant [], OS []](#no-image-found-in-manifest-list-for-architecture--variant--os-)
+
+## Test notifications
+
+Through the command line with:
+
+```
+diun --config ./diun.yml --test-notif
+```
+
+Or within a container:
+
+```
+docker-compose exec diun --test-notif
+```
 
 ## No image found in manifest list for architecture [], variant [], OS []
 

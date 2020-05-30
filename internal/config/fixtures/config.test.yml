@@ -17,7 +17,7 @@ notif:
     endpoint: http://gotify.foo.com
     token: Token123456
     priority: 1
-    timeout: 10
+    timeout: 10s
   mail:
     host: localhost
     port: 25
@@ -34,7 +34,7 @@ notif:
     channel: "#general"
     user_id: abcdEFGH012345678
     token: Token123456
-    timeout: 10
+    timeout: 10s
   script:
     cmd: "go"
     args:
@@ -54,11 +54,11 @@ notif:
     headers:
       Content-Type: application/json
       Authorization: Token123456
-    timeout: 10
+    timeout: 10s
 
 regopts:
   someregopts:
-    timeout: 5
+    timeout: 5s
   bintrayoptions:
     username: foo
     password: bar
@@ -73,4 +73,4 @@ providers:
   swarm:
     watch_by_default: true
   file:
-    filename: ./test/dummy.yml
+    filename: ./fixtures/dummy.yml

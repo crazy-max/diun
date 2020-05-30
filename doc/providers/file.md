@@ -4,8 +4,8 @@
 * [Example](#example)
 * [Quick start](#quick-start)
 * [Provider configuration](#provider-configuration)
-  * [filename](#filename)
-  * [directory](#directory)
+  * [Configuration file](#configuration-file)
+  * [Environment variables](#environment-variables)
 * [YAML configuration file](#yaml-configuration-file)
 
 ## About
@@ -131,7 +131,9 @@ Sat, 14 Dec 2019 15:32:28 UTC INF Next run in 31 seconds (2019-12-14 15:33:00 +0
 
 ## Provider configuration
 
-### filename
+### Configuration file
+
+#### filename
 
 Defines the path to the [configuration file](#yaml-configuration-file).
 
@@ -143,7 +145,7 @@ providers:
     filename: /path/to/config/conf.yml
 ```
 
-### directory
+#### directory
 
 Defines the path to the directory that contains the [configuration files](#yaml-configuration-file) (`*.yml` or `*.yaml`).
 
@@ -154,6 +156,11 @@ providers:
   file:
     directory: /path/to/config
 ```
+
+### Environment variables
+
+* `DIUN_PROVIDERS_FILE_DIRECTORY`
+* `DIUN_PROVIDERS_FILE_FILENAME`
 
 ## YAML configuration file
 

@@ -43,7 +43,7 @@ func (c *Client) Name() string {
 // https://rocket.chat/docs/developer-guides/rest-api/chat/postmessage/
 func (c *Client) Send(entry model.NotifEntry) error {
 	hc := http.Client{
-		Timeout: time.Duration(c.cfg.Timeout) * time.Second,
+		Timeout: *c.cfg.Timeout,
 	}
 
 	title := fmt.Sprintf("Image update for %s", entry.Image.String())
