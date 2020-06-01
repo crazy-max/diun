@@ -5,7 +5,7 @@
 
 ## Test notifications
 
-Through the command line with:
+Through the [command line](getting-started.md#diun-cli) with:
 
 ```
 diun --config ./diun.yml --test-notif

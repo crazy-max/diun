@@ -10,26 +10,7 @@ Choose the archive matching the destination platform and extract diun:
 wget -qO- https://github.com/crazy-max/diun/releases/download/v3.0.0/diun_3.0.0_linux_x86_64.tar.gz | tar -zxvf - diun
 ```
 
-## Test
-
-After getting the binary, it can be tested with `./diun --help` and moved to a permanent location.
-
-```
-$ ./diun --help
-Usage: diun
-
-Docker image update notifier. More info: https://github.com/crazy-max/diun
-
-Flags:
-  --help                Show context-sensitive help.
-  --version
-  --config=STRING       Diun configuration file ($CONFIG).
-  --timezone="UTC"      Timezone assigned to Diun ($TZ).
-  --log-level="info"    Set log level ($LOG_LEVEL).
-  --log-json            Enable JSON logging output ($LOG_JSON).
-  --log-caller          Add file:line of the caller to log output ($LOG_CALLER).
-  --test-notif          Test notification settings.
-```
+After getting the binary, it can be tested with [`./diun --help`](../getting-started.md#diun-cli) command and moved to a permanent location.
 
 ## Server configuration
 

@@ -18,14 +18,6 @@ Image: crazymax/diun:latest
    - linux/s390x
 ```
 
-## Environment variables
-
-* `CONFIG`: Diun configuration file
-* `TZ`: Timezone assigned (default `UTC`)
-* `LOG_LEVEL`: Log level output (default `info`)
-* `LOG_JSON`: Enable JSON logging output (default `false`)
-* `LOG_CALLER`: Enable to add `file:line` of the caller (default `false`)
-
 ## Volumes
 
 * `/data`: Contains bbolt database which retains Docker images manifests
