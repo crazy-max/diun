@@ -1,8 +1,6 @@
 name: build
 
 on:
-  schedule:
-    - cron: '0 10 * * *' # everyday at 10am
   push:
     branches:
       - 'master'
@@ -87,9 +85,6 @@ jobs:
 
           if [[ $GITHUB_REF == refs/tags/* ]]; then
             VERSION=${GITHUB_REF#refs/tags/v}
-          fi
-          if [ "${{ github.event_name }}" = "schedule" ]; then
-            VERSION=nightly
           fi
 
           TAGS="--tag ${DOCKER_IMAGE}:${VERSION}"
