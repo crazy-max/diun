@@ -12,16 +12,16 @@ import (
 // Client represents an active Telegram notification object
 type Client struct {
 	*notifier.Notifier
-	cfg *model.NotifTelegram
-	app model.App
+	cfg  *model.NotifTelegram
+	meta model.Meta
 }
 
 // New creates a new Telegram notification instance
-func New(config *model.NotifTelegram, app model.App) notifier.Notifier {
+func New(config *model.NotifTelegram, meta model.Meta) notifier.Notifier {
 	return notifier.Notifier{
 		Handler: &Client{
-			cfg: config,
-			app: app,
+			cfg:  config,
+			meta: meta,
 		},
 	}
 }

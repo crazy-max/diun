@@ -33,7 +33,7 @@ db:
 watch:
   workers: 10
   schedule: "0 * * * *"
-  first_check_notif: false
+  firstCheckNotif: false
 
 notif:
   amqp:
@@ -51,15 +51,13 @@ notif:
     host: localhost
     port: 25
     ssl: false
-    insecure_skip_verify: false
-    username:
-    password:
-    from:
-    to:
+    insecureSkipVerify: false
+    from: diun@example.com
+    to: webmaster@example.com
   rocketchat:
     endpoint: http://rocket.foo.com:3000
     channel: "#general"
-    user_id: abcdEFGH012345678
+    userID: abcdEFGH012345678
     token: Token123456
     timeout: 10s
   script:
@@ -68,20 +66,20 @@ notif:
         - "--anarg"
         - "another"
   slack:
-    webhook_url: https://hooks.slack.com/services/ABCD12EFG/HIJK34LMN/01234567890abcdefghij
+    webhookURL: https://hooks.slack.com/services/ABCD12EFG/HIJK34LMN/01234567890abcdefghij
   teams:
-    webhook_url: https://outlook.office.com/webhook/ABCD12EFG/HIJK34LMN/01234567890abcdefghij
+    webhookURL: https://outlook.office.com/webhook/ABCD12EFG/HIJK34LMN/01234567890abcdefghij
   telegram:
     token: aabbccdd:11223344
-    chat_ids:
+    chatIDs:
       - 123456789
       - 987654321
   webhook:
     endpoint: http://webhook.foo.com/sd54qad89azd5a
     method: GET
     headers:
-      Content-Type: application/json
-      Authorization: Token123456
+      content-type: application/json
+      authorization: Token123456
     timeout: 10s
 
 regopts:
@@ -92,13 +90,13 @@ regopts:
   onemore:
     username: foo2
     password: bar2
-    insecure_tls: true
+    insecureTls: true
 
 providers:
   docker:
-    watch_stopped: true
+    watchStopped: true
   swarm:
-    watch_by_default: true
+    watchByDefault: true
   file:
     directory: ./imagesdir
 ```
@@ -117,7 +115,7 @@ You can also use the following environment variables:
 
 * `workers`: Maximum number of workers that will execute tasks concurrently. (default `10`)
 * `schedule`: [CRON expression](https://godoc.org/github.com/robfig/cron#hdr-CRON_Expression_Format) to schedule Diun watcher. (default `0 * * * *`)
-* `first_check_notif`: Send notification at the very first analysis of an image. (default `false`)
+* `firstCheckNotif`: Send notification at the very first analysis of an image. (default `false`)
 
 You can also use the following environment variables:
 
@@ -140,20 +138,20 @@ You can also use the following environment variables:
 ### regopts
 
 * `username`: Registry username.
-* `username_file`: Use content of secret file as registry username if `username` not defined.
+* `usernameFile`: Use content of secret file as registry username if `username` not defined.
 * `password`: Registry password.
-* `password_file`: Use content of secret file as registry password if `password` not defined.
+* `passwordFile`: Use content of secret file as registry password if `password` not defined.
 * `timeout`: Timeout is the maximum amount of time for the TCP connection to establish. (default `10s`)
-* `insecure_tls`: Allow contacting docker registry over HTTP, or HTTPS with failed TLS verification. (default `false`)
+* `insecureTls`: Allow contacting docker registry over HTTP, or HTTPS with failed TLS verification. (default `false`)
 
 You can also use the following environment variables:
 
-* `DIUN_REGOPTS_<KEY>_USERNAME`
-* `DIUN_REGOPTS_<KEY>_USERNAMEFILE`
-* `DIUN_REGOPTS_<KEY>_PASSWORD`
-* `DIUN_REGOPTS_<KEY>_PASSWORDFILE`
-* `DIUN_REGOPTS_<KEY>_TIMEOUT`
-* `DIUN_REGOPTS_<KEY>_INSECURETLS`
+* `DIUN_REGOPTS_<NAME>_USERNAME`
+* `DIUN_REGOPTS_<NAME>_USERNAMEFILE`
+* `DIUN_REGOPTS_<NAME>_PASSWORD`
+* `DIUN_REGOPTS_<NAME>_PASSWORDFILE`
+* `DIUN_REGOPTS_<NAME>_TIMEOUT`
+* `DIUN_REGOPTS_<NAME>_INSECURETLS`
 
 ### providers
 

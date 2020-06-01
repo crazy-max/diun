@@ -19,11 +19,11 @@ import (
 type Client struct {
 	*notifier.Notifier
 	cfg *model.NotifMail
-	app model.App
+	app model.Meta
 }
 
 // New creates a new mail notification instance
-func New(config *model.NotifMail, app model.App) notifier.Notifier {
+func New(config *model.NotifMail, app model.Meta) notifier.Notifier {
 	return notifier.Notifier{
 		Handler: &Client{
 			cfg: config,

@@ -15,16 +15,16 @@ import (
 type Client struct {
 	*notifier.Notifier
 	cfg       *model.NotifWebhook
-	app       model.App
+	meta      model.Meta
 	userAgent string
 }
 
 // New creates a new webhook notification instance
-func New(config *model.NotifWebhook, app model.App, userAgent string) notifier.Notifier {
+func New(config *model.NotifWebhook, meta model.Meta, userAgent string) notifier.Notifier {
 	return notifier.Notifier{
 		Handler: &Client{
 			cfg:       config,
-			app:       app,
+			meta:      meta,
 			userAgent: userAgent,
 		},
 	}
@@ -51,7 +51,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		Created  *time.Time    `json:"created"`
 		Platform string        `json:"platform"`
 	}{
-		Version:  c.app.Version,
+		Version:  c.meta.Version,
 		Status:   string(entry.Status),
 		Provider: entry.Provider,
 		Image:    entry.Image.String(),

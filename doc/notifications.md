@@ -17,12 +17,12 @@ You can send notifications to any amqp compatible server with the following sett
 ### Configuration file
 
 * `amqp`
-  * `host`: AMQP server host (default: `localhost`). **required**
-  * `port`: AMQP server port (default: `5672`). **required**
-  * `username`: AMQP username. **required**
-  * `username_file`: Use content of secret file as AMQP username if `username` not defined.
-  * `password`: AMQP password. **required**
-  * `password_file`: Use content of secret file as AMQP password if `password` not defined.
+  * `host`: AMQP server host (default `localhost`). **required**
+  * `port`: AMQP server port (default `5672`). **required**
+  * `username`: AMQP username.
+  * `usernameFile`: Use content of secret file as AMQP username if `username` not defined.
+  * `password`: AMQP password.
+  * `passwordFile`: Use content of secret file as AMQP password if `password` not defined.
   * `exchange`: Name of the exchange the message will be sent to.
   * `queue`: Name of the queue the message will be sent to. **required**
 
@@ -63,8 +63,8 @@ Notifications can be sent using a [Gotify](https://gotify.net/) instance.
 * `gotify`
   * `endpoint`: Gotify base URL (e.g. `http://gotify.foo.com`). **required**
   * `token`: Application token. **required**
-  * `priority`: The priority of the message.
-  * `timeout`: Timeout specifies a time limit for the request to be made. (default: `10s`).
+  * `priority`: The priority of the message (default `1`).
+  * `timeout`: Timeout specifies a time limit for the request to be made. (default `10s`).
 
 ### Environment variables
 
@@ -84,14 +84,14 @@ Notifications can be sent through SMTP.
 ### Configuration file
 
 * `mail`
-  * `host`: SMTP server host (default: `localhost`). **required**
-  * `port`: SMTP server port (default: `25`). **required**
-  * `ssl`: SSL defines whether an SSL connection is used. Should be false in most cases since the auth mechanism should use STARTTLS (default: `false`).
-  * `insecure_skip_verify`: Controls whether a client verifies the server's certificate chain and hostname (default: `false`).
+  * `host`: SMTP server host. (default `localhost`) **required**
+  * `port`: SMTP server port. (default `25`) **required**
+  * `ssl`: SSL defines whether an SSL connection is used. Should be false in most cases since the auth mechanism should use STARTTLS. (default `false`)
+  * `insecureSkipVerify`: Controls whether a client verifies the server's certificate chain and hostname. (default `false`)
   * `username`: SMTP username.
-  * `username_file`: Use content of secret file as SMTP username if `username` not defined.
+  * `usernameFile`: Use content of secret file as SMTP username if `username` not defined.
   * `password`: SMTP password.
-  * `password_file`: Use content of secret file as SMTP password if `password` not defined.
+  * `passwordFile`: Use content of secret file as SMTP password if `password` not defined.
   * `from`: Sender email address. **required**
   * `to`: Recipient email address. **required**
 
@@ -123,9 +123,9 @@ Allow to send notifications to your Rocket.Chat channel.
 * `rocketchat`
   * `endpoint`: Rocket.Chat base URL (e.g. `http://rocket.foo.com:3000`). **required**
   * `channel`: Channel name with the prefix in front of it. **required**
-  * `user_id`: User ID. **required**
+  * `userID`: User ID. **required**
   * `token`: Authentication token. **required**
-  * `timeout`: Timeout specifies a time limit for the request to be made. (default: `10s`).
+  * `timeout`: Timeout specifies a time limit for the request to be made. (default `10s`).
 
 ### Environment variables
 
@@ -174,7 +174,7 @@ You can send notifications to your Slack channel using an [incoming webhook URL]
 ### Configuration file
 
 * `slack`
-  * `webhook_url`: Slack [incoming webhook URL](https://api.slack.com/messaging/webhooks). **required**
+  * `webhookURL`: Slack [incoming webhook URL](https://api.slack.com/messaging/webhooks). **required**
 
 ### Environment variables
 
@@ -193,7 +193,7 @@ You can send notifications to your Teams team-channel using an [incoming webhook
 ### Configuration file
 
 * `teams`
-  * `webhook_url`: Teams [incoming webhook URL](https://docs.microsoft.com/en-us/microsoftteams/platform/webhooks-and-connectors/what-are-webhooks-and-connectors). **required**
+  * `webhookURL`: Teams [incoming webhook URL](https://docs.microsoft.com/en-us/microsoftteams/platform/webhooks-and-connectors/what-are-webhooks-and-connectors). **required**
 
 ### Environment variables
 
@@ -216,12 +216,12 @@ Multiple chat IDs can be provided in order to deliver notifications to multiple 
 
 * `telegram`
   * `token`: Telegram bot token. **required**
-  * `chat_ids`: List of chat IDs to send notifications to. **required**
+  * `chatIDs`: List of chat IDs to send notifications to. **required**
 
 ### Environment variables
 
 * `DIUN_NOTIF_TELEGRAM_TOKEN`
-* `DIUN_NOTIF_TELEGRAM_CHATIDS`
+* `DIUN_NOTIF_TELEGRAM_CHATIDS` (comma separated)
 
 ### Sample
 
@@ -235,9 +235,9 @@ You can send webhook notifications with the following settings.
 
 * `webhook`
   * `endpoint`: URL of the HTTP request. **required**
-  * `method`: HTTP method (default: `GET`). **required**
-  * `headers`: Map of additional headers to be sent (key is case-insensitive).
-  * `timeout`: Timeout specifies a time limit for the request to be made. (default: `10s`).
+  * `method`: HTTP method (default `GET`). **required**
+  * `headers`: Map of additional headers to be sent (key is case insensitive).
+  * `timeout`: Timeout specifies a time limit for the request to be made. (default `10s`)
 
 ### Environment variables
 

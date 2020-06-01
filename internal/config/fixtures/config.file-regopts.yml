@@ -1,0 +1,11 @@
+notif:
+  webhook:
+    endpoint: http://webhook.foo.com/sd54qad89azd5a
+    headers:
+      content-type: application/json
+      authorization: Token123456
+    timeout: 20s
+
+providers:
+  file:
+    filename: "./fixtures/dummy.yml"

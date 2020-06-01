@@ -1,25 +1,18 @@
 package model
 
-import (
-	"github.com/imdario/mergo"
-	"github.com/pkg/errors"
-)
-
 // Db holds data necessary for database configuration
 type Db struct {
-	Path string `yaml:"path,omitempty"`
+	Path string `yaml:"path,omitempty" json:"path,omitempty" validate:"required"`
 }
 
-// UnmarshalYAML implements the yaml.Unmarshaler interface
-func (s *Db) UnmarshalYAML(unmarshal func(interface{}) error) error {
-	type plain Db
-	if err := unmarshal((*plain)(s)); err != nil {
-		return err
-	}
+// GetDefaults gets the default values
+func (s *Db) GetDefaults() *Db {
+	n := &Db{}
+	n.SetDefaults()
+	return n
+}
 
-	if err := mergo.Merge(s, DefaultConfig.Db); err != nil {
-		return errors.Wrap(err, "cannot set default values for db")
-	}
-
-	return nil
+// SetDefaults sets the default values
+func (s *Db) SetDefaults() {
+	s.Path = "diun.db"
 }

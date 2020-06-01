@@ -16,11 +16,11 @@ import (
 type Client struct {
 	*notifier.Notifier
 	cfg *model.NotifAmqp
-	app model.App
+	app model.Meta
 }
 
 // New creates a new amqp notification instance
-func New(config *model.NotifAmqp, app model.App) notifier.Notifier {
+func New(config *model.NotifAmqp, app model.Meta) notifier.Notifier {
 	return notifier.Notifier{
 		Handler: &Client{
 			cfg: config,
@@ -70,7 +70,25 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		return err
 	}
 
-	body, err := buildBody(entry, c.app)
+	body, err := json.Marshal(struct {
+		Version  string        `json:"diun_version"`
+		Status   string        `json:"status"`
+		Provider string        `json:"provider"`
+		Image    string        `json:"image"`
+		MIMEType string        `json:"mime_type"`
+		Digest   digest.Digest `json:"digest"`
+		Created  *time.Time    `json:"created"`
+		Platform string        `json:"platform"`
+	}{
+		Version:  c.app.Version,
+		Status:   string(entry.Status),
+		Provider: entry.Provider,
+		Image:    entry.Image.String(),
+		MIMEType: entry.Manifest.MIMEType,
+		Digest:   entry.Manifest.Digest,
+		Created:  entry.Manifest.Created,
+		Platform: entry.Manifest.Platform,
+	})
 	if err != nil {
 		return err
 	}
@@ -84,26 +102,4 @@ func (c *Client) Send(entry model.NotifEntry) error {
 			ContentType: "application/json",
 			Body:        body,
 		})
-}
-
-func buildBody(entry model.NotifEntry, app model.App) ([]byte, error) {
-	return json.Marshal(struct {
-		Version  string        `json:"diun_version"`
-		Status   string        `json:"status"`
-		Provider string        `json:"provider"`
-		Image    string        `json:"image"`
-		MIMEType string        `json:"mime_type"`
-		Digest   digest.Digest `json:"digest"`
-		Created  *time.Time    `json:"created"`
-		Platform string        `json:"platform"`
-	}{
-		Version:  app.Version,
-		Status:   string(entry.Status),
-		Provider: entry.Provider,
-		Image:    entry.Image.String(),
-		MIMEType: entry.Manifest.MIMEType,
-		Digest:   entry.Manifest.Digest,
-		Created:  entry.Manifest.Created,
-		Platform: entry.Manifest.Platform,
-	})
 }

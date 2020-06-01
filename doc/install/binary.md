@@ -16,7 +16,7 @@ After getting the binary, it can be tested with `./diun --help` and moved to a p
 
 ```
 $ ./diun --help
-Usage: diun --config=STRING
+Usage: diun
 
 Docker image update notifier. More info: https://github.com/crazy-max/diun
 
@@ -57,12 +57,14 @@ chmod 770 /etc/diun
 
 ### Configuration
 
-You must create your first [configuration](../configuration.md) file in `/etc/diun/diun.yml` and type:
+Create your first [configuration](../configuration.md) file in `/etc/diun/diun.yml` and type:
 
 ```
 chown diun:diun /etc/diun/diun.yml
 chmod 644 /etc/diun/diun.yml
 ```
+
+> 💡 Not required if you want to only rely on environment variables
 
 ### Copy binary to global location
 

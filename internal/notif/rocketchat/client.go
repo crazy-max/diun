@@ -19,16 +19,16 @@ import (
 type Client struct {
 	*notifier.Notifier
 	cfg       *model.NotifRocketChat
-	app       model.App
+	meta      model.Meta
 	userAgent string
 }
 
 // New creates a new rocketchat notification instance
-func New(config *model.NotifRocketChat, app model.App, userAgent string) notifier.Notifier {
+func New(config *model.NotifRocketChat, meta model.Meta, userAgent string) notifier.Notifier {
 	return notifier.Notifier{
 		Handler: &Client{
 			cfg:       config,
-			app:       app,
+			meta:      meta,
 			userAgent: userAgent,
 		},
 	}
@@ -58,7 +58,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	}
 
 	data := Message{
-		Alias:   c.app.Name,
+		Alias:   c.meta.Name,
 		Avatar:  "https://raw.githubusercontent.com/crazy-max/diun/master/.res/diun.png",
 		Channel: c.cfg.Channel,
 		Text:    title,

@@ -1,6 +1,6 @@
 # Getting started
 
-## Launch Diun with the Docker provider
+## Docker provider
 
 Create a `docker-compose.yml` file that uses the official Diun image:
 
@@ -24,6 +24,42 @@ services:
     restart: always
 ```
 
-Here we use a minimal configuration to analyze **all running containers** (watch by default enable) of your **local Docker** instance **every 30 minutes**.
+Here we use a minimal configuration to analyze **all running containers** (watch by default enabled) of your **local Docker** instance **every 30 minutes**.
 
-That's it. Now you can launch Diun!
+That's it. Now you can launch Diun with the following command:
+
+```shell
+$ docker-compose up -d
+```
+
+If you prefer to rely on the configuration file instead of envrionment variables:
+
+```yaml
+version: "3.5"
+
+services:
+  diun:
+    image: crazymax/diun:latest
+    volumes:
+      - "./data:/data"
+      - "./diun.yml:/diun.yml:ro"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    environment:
+      - "CONFIG=/diun.yml"
+      - "TZ=Europe/Paris"
+      - "LOG_LEVEL=info"
+      - "LOG_JSON=false"
+    restart: always
+```
+
+```yaml
+# ./diun.yml
+
+watch:
+  workers: 20
+  schedule: "*/30 * * * *"
+  firstCheckNotif: false
+
+providers:
+  docker: {}
+```

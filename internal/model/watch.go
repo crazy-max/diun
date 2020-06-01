@@ -1,27 +1,26 @@
 package model
 
 import (
-	"github.com/imdario/mergo"
-	"github.com/pkg/errors"
+	"github.com/crazy-max/diun/v3/pkg/utl"
 )
 
 // Watch holds data necessary for watch configuration
 type Watch struct {
-	Workers         int    `yaml:"workers,omitempty"`
-	Schedule        string `yaml:"schedule,omitempty"`
-	FirstCheckNotif *bool  `yaml:"first_check_notif,omitempty"`
+	Workers         int    `yaml:"workers,omitempty" json:"workers,omitempty" validate:"required,min=1"`
+	Schedule        string `yaml:"schedule,omitempty" json:"schedule,omitempty" validate:"required"`
+	FirstCheckNotif *bool  `yaml:"firstCheckNotif,omitempty" json:"firstCheckNotif,omitempty" validate:"required"`
 }
 
-// UnmarshalYAML implements the yaml.Unmarshaler interface
-func (s *Watch) UnmarshalYAML(unmarshal func(interface{}) error) error {
-	type plain Watch
-	if err := unmarshal((*plain)(s)); err != nil {
-		return err
-	}
+// GetDefaults gets the default values
+func (s *Watch) GetDefaults() *Watch {
+	n := &Watch{}
+	n.SetDefaults()
+	return n
+}
 
-	if err := mergo.Merge(s, DefaultConfig.Watch); err != nil {
-		return errors.Wrap(err, "cannot set default values for watch")
-	}
-
-	return nil
+// SetDefaults sets the default values
+func (s *Watch) SetDefaults() {
+	s.Workers = 10
+	s.Schedule = "0 * * * *"
+	s.FirstCheckNotif = utl.NewFalse()
 }

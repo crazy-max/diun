@@ -2,35 +2,33 @@ package config
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"fmt"
 	"os"
-	"strings"
 
 	"github.com/crazy-max/diun/v3/internal/model"
 	"github.com/crazy-max/diun/v3/pkg/traefik/config/env"
-	"github.com/imdario/mergo"
+	"github.com/crazy-max/diun/v3/pkg/traefik/config/file"
+	"github.com/go-playground/validator/v10"
 	"github.com/pkg/errors"
-	"github.com/rs/zerolog/log"
-	"gopkg.in/yaml.v2"
 )
 
 // Config holds configuration details
-type Config model.Config
+type Config struct {
+	Db        *model.Db                 `yaml:"db,omitempty"`
+	Watch     *model.Watch              `yaml:"watch,omitempty"`
+	Notif     *model.Notif              `yaml:"notif,omitempty"`
+	RegOpts   map[string]*model.RegOpts `yaml:"regopts,omitempty" validate:"unique"`
+	Providers *model.Providers          `yaml:"providers,omitempty" validate:"required"`
+}
 
 // Load returns Configuration struct
-func Load(cli model.Cli, version string) (*Config, error) {
-	var cfg = Config{
-		Cli: cli,
-		App: model.App{
-			Version: version,
-		},
+func Load(cfgfile string) (*Config, error) {
+	cfg := Config{
+		Db:    (&model.Db{}).GetDefaults(),
+		Watch: (&model.Watch{}).GetDefaults(),
 	}
 
-	if err := mergo.Merge(&cfg, Config(model.DefaultConfig)); err != nil {
-		return nil, errors.Wrap(err, "cannot set default values for config")
-	}
-
-	if err := cfg.loadFile(&cfg); err != nil {
+	if err := cfg.loadFile(cfgfile, &cfg); err != nil {
 		return nil, err
 	}
 
@@ -38,22 +36,25 @@ func Load(cli model.Cli, version string) (*Config, error) {
 		return nil, err
 	}
 
+	validate := validator.New()
+	if err := validate.Struct(&cfg); err != nil {
+		return nil, err
+	}
+
 	return &cfg, nil
 }
 
-func (cfg *Config) loadFile(out interface{}) error {
-	if _, err := os.Lstat(cfg.Cli.Cfgfile); os.IsNotExist(err) {
-		log.Debug().Msg("No config file provided")
+func (cfg *Config) loadFile(cfgfile string, out interface{}) error {
+	if len(cfgfile) == 0 {
 		return nil
 	}
 
-	b, err := ioutil.ReadFile(cfg.Cli.Cfgfile)
-	if err != nil {
-		return errors.Wrap(err, "unable to read config file")
+	if _, err := os.Lstat(cfgfile); os.IsNotExist(err) {
+		return fmt.Errorf("config file %s not found", cfgfile)
 	}
 
-	if err := yaml.UnmarshalStrict(b, out); err != nil {
-		return errors.Wrap(err, "unable to decode into struct")
+	if err := file.Decode(cfgfile, out); err != nil {
+		return errors.Wrap(err, "failed to decode configuration from file")
 	}
 
 	return nil
@@ -62,9 +63,6 @@ func (cfg *Config) loadFile(out interface{}) error {
 func (cfg *Config) loadEnv(out interface{}) error {
 	var envvars []string
 	for _, envvar := range env.FindPrefixedEnvVars(os.Environ(), "DIUN_", out) {
-		if strings.HasPrefix(envvar, "DIUN_APP") || strings.HasPrefix(envvar, "DIUN_CLI") {
-			continue
-		}
 		envvars = append(envvars, envvar)
 	}
 	if len(envvars) == 0 {
@@ -72,15 +70,24 @@ func (cfg *Config) loadEnv(out interface{}) error {
 	}
 
 	if err := env.Decode(envvars, "DIUN_", out); err != nil {
-		log.Debug().Strs("envvars", envvars).Msg("Environment variables")
 		return errors.Wrap(err, "failed to decode configuration from environment variables")
 	}
 
 	return nil
 }
 
-// Display configuration in a pretty JSON format
-func (cfg *Config) Display() string {
+func (cfg *Config) GetRegOpts(id string) (*model.RegOpts, error) {
+	if len(id) == 0 {
+		return (&model.RegOpts{}).GetDefaults(), nil
+	}
+	if regopts, ok := cfg.RegOpts[id]; ok {
+		return regopts, nil
+	}
+	return (&model.RegOpts{}).GetDefaults(), fmt.Errorf("%s not found", id)
+}
+
+// String returns the string representation of configuration
+func (cfg *Config) String() string {
 	b, _ := json.MarshalIndent(cfg, "", "  ")
 	return string(b)
 }

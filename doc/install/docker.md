@@ -30,8 +30,6 @@ Image: crazymax/diun:latest
 
 * `/data`: Contains bbolt database which retains Docker images manifests
 
-> :warning: Note that the volume should be owned by uid `1000` and gid `1000`. If you don't give the volume correct permissions, the container may not start.
-
 ## Usage
 
 Docker compose is the recommended way to run this image. Copy the content of folder [.res/compose](../../.res/compose) in `/opt/diun/` on your host for example. Edit the compose file with your preferences and run the following commands:

@@ -34,7 +34,7 @@ func (di *Diun) createJob(job model.Job) {
 	}
 
 	// Registry options
-	regOpts, err := di.getRegOpts(job.Image.RegOptsID)
+	regOpts, err := di.cfg.GetRegOpts(job.Image.RegOptsID)
 	if err != nil {
 		sublog.Warn().Err(err).Msg("Registry options")
 	}
@@ -93,7 +93,7 @@ func (di *Diun) createJob(job model.Job) {
 		sublog.Error().Err(err).Msgf("Invoking job")
 	}
 
-	if !job.Image.WatchRepo || job.RegImage.Domain == "" {
+	if !job.Image.WatchRepo || len(job.RegImage.Domain) == 0 {
 		return
 	}
 
@@ -156,7 +156,7 @@ func (di *Diun) runJob(job model.Job) error {
 	}
 
 	status := model.ImageStatusUnchange
-	if dbManifest.Name == "" {
+	if len(dbManifest.Name) == 0 {
 		status = model.ImageStatusNew
 		sublog.Info().Msg("New image found")
 	} else if !liveManifest.Created.Equal(*dbManifest.Created) {
@@ -185,14 +185,4 @@ func (di *Diun) runJob(job model.Job) error {
 	})
 
 	return nil
-}
-
-func (di *Diun) getRegOpts(id string) (model.RegOpts, error) {
-	if id == "" {
-		return model.RegOpts{}, nil
-	}
-	if regopts, ok := di.cfg.RegOpts[id]; ok {
-		return regopts, nil
-	}
-	return model.RegOpts{}, fmt.Errorf("%s not found", id)
 }

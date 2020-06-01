@@ -32,6 +32,9 @@ services:
       - "TZ=Europe/Paris"
       - "LOG_LEVEL=info"
       - "LOG_JSON=false"
+      - "DIUN_WATCH_WORKERS=20"
+      - "DIUN_WATCH_SCHEDULE=*/30 * * * *"
+      - "DIUN_PROVIDERS_SWARM=true"
     deploy:
       placement:
         constraints:
@@ -65,7 +68,7 @@ docker stack deploy -c diun.yml diun
 docker stack deploy -c nginx.yml nginx
 ```
 
-And watch logs of Diun service:
+Now take a look at the logs:
 
 ```
 $ docker service logs -f diun_diun
@@ -98,10 +101,10 @@ diun_diun.1.i1l4yuiafq6y@docker-desktop    | Sat, 14 Dec 2019 16:20:02 CET INF N
 ### Configuration file
 
 * `endpoint`: Server address to connect to. Local if empty.
-* `api_version`: Overrides the client version with the specified one.
-* `tls_certs_path`: Path to load the TLS certificates from.
-* `tls_verify`: Controls whether client verifies the server's certificate chain and hostname (default: `true`).
-* `watch_by_default`: Enable watch by default. If false, services that don't have `diun.enable=true` label will be ignored (default: `false`).
+* `apiVersion`: Overrides the client version with the specified one.
+* `TLSCertsPath`: Path to load the TLS certificates from.
+* `TLSVerify`: Controls whether client verifies the server's certificate chain and hostname (default `true`).
+* `watchByDefault`: Enable watch by default. If false, services that don't have `diun.enable=true` label will be ignored (default `false`).
 
 ### Environment variables
 
@@ -116,9 +119,9 @@ diun_diun.1.i1l4yuiafq6y@docker-desktop    | Sat, 14 Dec 2019 16:20:02 CET INF N
 
 You can configure more finely the way to analyze the image of your service through Docker labels:
 
-* `diun.enable`: Set to true to enable image analysis of this container. Required if `watch_by_default` is disabled for this provider.
+* `diun.enable`: Set to true to enable image analysis of this container.
 * `diun.regopts_id`: Registry options ID from [`regopts`](../configuration.md#regopts) to use.
-* `diun.watch_repo`: Watch all tags of this container image (default: `false`).
-* `diun.max_tags`: Maximum number of tags to watch if `diun.watch_repo` enabled. 0 means all of them (default: `0`).
+* `diun.watch_repo`: Watch all tags of this container image (default `false`).
+* `diun.max_tags`: Maximum number of tags to watch if `diun.watch_repo` enabled. 0 means all of them (default `0`).
 * `diun.include_tags`: Semi-colon separated list of regular expressions to include tags. Can be useful if you enable `diun.watch_repo`.
 * `diun.exclude_tags`: Semi-colon separated list of regular expressions to exclude tags. Can be useful if you enable `diun.watch_repo`.

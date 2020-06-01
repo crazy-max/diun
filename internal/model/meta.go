@@ -1,7 +1,7 @@
 package model
 
-// App holds application details
-type App struct {
+// Meta holds application details
+type Meta struct {
 	ID      string
 	Name    string
 	Desc    string

@@ -35,6 +35,7 @@ notif:
     cmd: "go"
     args:
       - "version"
+      - "-v"
   slack:
     webhookURL: https://hooks.slack.com/services/ABCD12EFG/HIJK34LMN/01234567890abcdefghij
   teams:

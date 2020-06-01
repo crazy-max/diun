@@ -19,12 +19,12 @@ import (
 type Client struct {
 	*notifier.Notifier
 	cfg       *model.NotifGotify
-	app       model.App
+	app       model.Meta
 	userAgent string
 }
 
 // New creates a new gotify notification instance
-func New(config *model.NotifGotify, app model.App, userAgent string) notifier.Notifier {
+func New(config *model.NotifGotify, app model.Meta, userAgent string) notifier.Notifier {
 	return notifier.Notifier{
 		Handler: &Client{
 			cfg:       config,

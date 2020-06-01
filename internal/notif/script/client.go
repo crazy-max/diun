@@ -17,16 +17,16 @@ import (
 type Client struct {
 	*notifier.Notifier
 	cfg       *model.NotifScript
-	app       model.App
+	meta      model.Meta
 	userAgent string
 }
 
 // New creates a new script notification instance
-func New(config *model.NotifScript, app model.App) notifier.Notifier {
+func New(config *model.NotifScript, meta model.Meta) notifier.Notifier {
 	return notifier.Notifier{
 		Handler: &Client{
-			cfg: config,
-			app: app,
+			cfg:  config,
+			meta: meta,
 		},
 	}
 }
@@ -53,7 +53,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 
 	// Set env vars
 	cmd.Env = append(os.Environ(), []string{
-		fmt.Sprintf("DIUN_VERSION=%s", c.app.Version),
+		fmt.Sprintf("DIUN_VERSION=%s", c.meta.Version),
 		fmt.Sprintf("DIUN_ENTRY_STATUS=%s", string(entry.Status)),
 		fmt.Sprintf("DIUN_ENTRY_PROVIDER=%s", entry.Provider),
 		fmt.Sprintf("DIUN_ENTRY_IMAGE=%s", entry.Image.String()),

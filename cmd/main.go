@@ -20,15 +20,23 @@ var (
 	diun    *app.Diun
 	cli     model.Cli
 	version = "dev"
+	meta    = model.Meta{
+		ID:     "diun",
+		Name:   "Diun",
+		Desc:   "Docker image update notifier",
+		URL:    "https://github.com/crazy-max/diun",
+		Author: "CrazyMax",
+	}
 )
 
 func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
+	meta.Version = version
 
 	// Parse command line
 	_ = kong.Parse(&cli,
-		kong.Name("diun"),
-		kong.Description(`Docker image update notifier. More info: https://github.com/crazy-max/diun`),
+		kong.Name(meta.ID),
+		kong.Description(fmt.Sprintf("%s. More info: %s", meta.Desc, meta.URL)),
 		kong.UsageOnError(),
 		kong.Vars{
 			"version": fmt.Sprintf("%s", version),
@@ -46,7 +54,7 @@ func main() {
 
 	// Init
 	logging.Configure(&cli, location)
-	log.Info().Msgf("Starting Diun %s", version)
+	log.Info().Str("version", version).Msgf("Starting %s", meta.Name)
 
 	// Handle os signals
 	channel := make(chan os.Signal)
@@ -59,14 +67,14 @@ func main() {
 	}()
 
 	// Load configuration
-	cfg, err := config.Load(cli, version)
+	cfg, err := config.Load(cli.Cfgfile)
 	if err != nil {
 		log.Fatal().Err(err).Msg("Cannot load configuration")
 	}
-	log.Debug().Msg(cfg.Display())
+	log.Debug().Msg(cfg.String())
 
 	// Init
-	if diun, err = app.New(cfg, location); err != nil {
+	if diun, err = app.New(meta, cfg, location); err != nil {
 		log.Fatal().Err(err).Msg("Cannot initialize Diun")
 	}
 

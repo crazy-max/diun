@@ -8,43 +8,36 @@ import (
 
 	"github.com/crazy-max/diun/v3/internal/config"
 	"github.com/crazy-max/diun/v3/internal/model"
-	"github.com/crazy-max/diun/v3/pkg/traefik/config/env"
 	"github.com/crazy-max/diun/v3/pkg/utl"
 	"github.com/stretchr/testify/assert"
-	"gopkg.in/yaml.v2"
+	"github.com/stretchr/testify/require"
 )
 
-func TestLoad(t *testing.T) {
-	defaultCfg := config.Config(model.DefaultConfig)
+func TestLoadFile(t *testing.T) {
 	cases := []struct {
 		name     string
-		cli      model.Cli
+		cfgfile  string
 		wantData *config.Config
 		wantErr  bool
 	}{
 		{
-			name:     "Default on non-existing file",
-			cli:      model.Cli{},
-			wantData: &defaultCfg,
-			wantErr:  false,
-		},
-		{
-			name: "Fail on wrong file format",
-			cli: model.Cli{
-				Cfgfile: "./fixtures/config.invalid.yml",
-			},
+			name:    "Failed on non-existing file",
+			cfgfile: "",
 			wantErr: true,
 		},
 		{
-			name: "Success",
-			cli: model.Cli{
-				Cfgfile: "./fixtures/config.test.yml",
-			},
+			name:    "Fail on wrong file format",
+			cfgfile: "./fixtures/config.invalid.yml",
+			wantErr: true,
+		},
+		{
+			name:    "Success",
+			cfgfile: "./fixtures/config.test.yml",
 			wantData: &config.Config{
-				Db: model.Db{
+				Db: &model.Db{
 					Path: "diun.db",
 				},
-				Watch: model.Watch{
+				Watch: &model.Watch{
 					Workers:         100,
 					Schedule:        "*/30 * * * *",
 					FirstCheckNotif: utl.NewFalse(),
@@ -104,7 +97,7 @@ func TestLoad(t *testing.T) {
 						Timeout: utl.NewDuration(10 * time.Second),
 					},
 				},
-				RegOpts: map[string]model.RegOpts{
+				RegOpts: map[string]*model.RegOpts{
 					"someregopts": {
 						InsecureTLS: utl.NewFalse(),
 						Timeout:     utl.NewDuration(5 * time.Second),
@@ -130,7 +123,7 @@ func TestLoad(t *testing.T) {
 					},
 					Swarm: &model.PrdSwarm{
 						TLSVerify:      utl.NewTrue(),
-						WatchByDefault: utl.NewTrue(),
+						WatchByDefault: utl.NewFalse(),
 					},
 					File: &model.PrdFile{
 						Filename: "./fixtures/dummy.yml",
@@ -141,132 +134,295 @@ func TestLoad(t *testing.T) {
 	}
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
-			cfg, err := config.Load(tt.cli, "test")
-			if !tt.wantErr && err != nil {
-				t.Error(err)
+			cfg, err := config.Load(tt.cfgfile)
+			if tt.wantErr {
+				require.Error(t, err)
+				return
 			}
-			ex, _ := yaml.Marshal(tt.wantData)
-			ac, _ := yaml.Marshal(cfg)
-			assert.Equal(t, string(ex), string(ac))
-			if !tt.wantErr && cfg != nil {
-				assert.NotEmpty(t, cfg.Display())
+			require.NoError(t, err)
+			assert.Equal(t, tt.wantData, cfg)
+			if cfg != nil {
+				assert.NotEmpty(t, cfg.String())
 			}
 		})
 	}
 }
 
-func TestLoadFromEnv(t *testing.T) {
-	defer UnsetEnv("DIUN_")()
+func TestLoadEnv(t *testing.T) {
+	defer UnsetEnv("DIUN_")
 
-	testConfig := config.Config{
-		Db: model.Db{
-			Path: "diunenv.db",
+	testCases := []struct {
+		desc     string
+		cfgfile  string
+		environ  []string
+		expected interface{}
+		wantErr  bool
+	}{
+		{
+			desc:     "no env vars",
+			environ:  nil,
+			expected: nil,
+			wantErr:  true,
 		},
-		Watch: model.Watch{
-			Workers:         32,
-			Schedule:        "* * * * *",
-			FirstCheckNotif: utl.NewTrue(),
-		},
-		Notif: &model.Notif{
-			Amqp: &model.NotifAmqp{
-				Host:     "127.0.0.1",
-				Port:     56720,
-				Username: "guestwhat",
-				Password: "guestwhat",
-				Queue:    "queue2",
+		{
+			desc: "docker provider",
+			environ: []string{
+				"DIUN_PROVIDERS_DOCKER=true",
 			},
-			Gotify: &model.NotifGotify{
-				Endpoint: "http://gotify.example.com",
-				Token:    "Token123456789",
-				Priority: 2,
-				Timeout:  utl.NewDuration(20 * time.Second),
-			},
-			Mail: &model.NotifMail{
-				Host:               "127.0.0.1",
-				Port:               25,
-				SSL:                utl.NewTrue(),
-				InsecureSkipVerify: utl.NewTrue(),
-				From:               "diun@foo.com",
-				To:                 "webmaster@foo.com",
-			},
-			RocketChat: &model.NotifRocketChat{
-				Endpoint: "http://rocket.example.com",
-				Channel:  "#diun",
-				UserID:   "abcd1234",
-				Token:    "Token123456789",
-				Timeout:  utl.NewDuration(10 * time.Second),
-			},
-			Script: &model.NotifScript{
-				Cmd: "go",
-				Args: []string{
-					"version",
+			expected: &config.Config{
+				Db:      (&model.Db{}).GetDefaults(),
+				Watch:   (&model.Watch{}).GetDefaults(),
+				Notif:   nil,
+				RegOpts: nil,
+				Providers: &model.Providers{
+					Docker: &model.PrdDocker{
+						TLSVerify:      utl.NewTrue(),
+						WatchByDefault: utl.NewFalse(),
+						WatchStopped:   utl.NewFalse(),
+					},
 				},
 			},
-			Slack: &model.NotifSlack{
-				WebhookURL: "https://hooks.slack.com/services/AB1234/HIJK34LMN/01234567890abcdefghij",
+			wantErr: false,
+		},
+		{
+			desc: "docker provider and regopts",
+			environ: []string{
+				"DIUN_REGOPTS_SENSITIVE_USERNAMEFILE=/run/secrets/username",
+				"DIUN_REGOPTS_SENSITIVE_PASSWORDFILE=/run/secrets/password",
+				"DIUN_REGOPTS_SENSITIVE_TIMEOUT=30s",
+				"DIUN_PROVIDERS_DOCKER=true",
 			},
-			Teams: &model.NotifTeams{
-				WebhookURL: "https://outlook.office.com/webhook/ABCD12EFG/HIJK34LMN/01234567890abcdefghij",
-			},
-			Telegram: &model.NotifTelegram{
-				Token:   "abcdef123456",
-				ChatIDs: []int64{1234567, 891012},
-			},
-			Webhook: &model.NotifWebhook{
-				Endpoint: "http://webhook.foo.com/sd54qad89azd5a",
-				Method:   "GET",
-				Headers: map[string]string{
-					"content-type":  "text/plain",
-					"authorization": "Token78910",
+			expected: &config.Config{
+				Db:    (&model.Db{}).GetDefaults(),
+				Watch: (&model.Watch{}).GetDefaults(),
+				RegOpts: map[string]*model.RegOpts{
+					"sensitive": {
+						UsernameFile: "/run/secrets/username",
+						PasswordFile: "/run/secrets/password",
+						InsecureTLS:  utl.NewFalse(),
+						Timeout:      utl.NewDuration(30 * time.Second),
+					},
 				},
-				Timeout: utl.NewDuration(20 * time.Second),
+				Providers: &model.Providers{
+					Docker: &model.PrdDocker{
+						TLSVerify:      utl.NewTrue(),
+						WatchByDefault: utl.NewFalse(),
+						WatchStopped:   utl.NewFalse(),
+					},
+				},
 			},
+			wantErr: false,
 		},
-		RegOpts: map[string]model.RegOpts{
-			"someregopts": {
-				Timeout: utl.NewDuration(20 * time.Second),
+		{
+			desc: "swarm provider and notif telegram",
+			environ: []string{
+				"DIUN_NOTIF_TELEGRAM_TOKEN=abcdef123456",
+				"DIUN_NOTIF_TELEGRAM_CHATIDS=8547439,1234567",
+				"DIUN_PROVIDERS_SWARM=true",
 			},
-			"bintrayoptions": {
-				Username: "foo",
-				Password: "bar5",
+			expected: &config.Config{
+				Db:    (&model.Db{}).GetDefaults(),
+				Watch: (&model.Watch{}).GetDefaults(),
+				Notif: &model.Notif{
+					Telegram: &model.NotifTelegram{
+						Token:   "abcdef123456",
+						ChatIDs: []int64{8547439, 1234567},
+					},
+				},
+				Providers: &model.Providers{
+					Swarm: &model.PrdSwarm{
+						TLSVerify:      utl.NewTrue(),
+						WatchByDefault: utl.NewFalse(),
+					},
+				},
 			},
-			"sensitive": {
-				UsernameFile: "/run/secrets/username2",
-				PasswordFile: "/run/secrets/password3",
-			},
+			wantErr: false,
 		},
-		Providers: &model.Providers{
-			Docker: &model.PrdDocker{
-				TLSVerify:      utl.NewFalse(),
-				WatchByDefault: utl.NewFalse(),
-				WatchStopped:   utl.NewFalse(),
+		{
+			desc: "file provider and notif script",
+			environ: []string{
+				"DIUN_NOTIF_SCRIPT_CMD=go",
+				"DIUN_NOTIF_SCRIPT_ARGS=-v,version",
+				"DIUN_PROVIDERS_FILE_DIRECTORY=./fixtures",
 			},
-			Swarm: &model.PrdSwarm{
-				TLSVerify:      utl.NewFalse(),
-				WatchByDefault: utl.NewFalse(),
+			expected: &config.Config{
+				Db:    (&model.Db{}).GetDefaults(),
+				Watch: (&model.Watch{}).GetDefaults(),
+				Notif: &model.Notif{
+					Script: &model.NotifScript{
+						Cmd: "go",
+						Args: []string{
+							"-v",
+							"version",
+						},
+					},
+				},
+				Providers: &model.Providers{
+					File: &model.PrdFile{
+						Directory: "./fixtures",
+					},
+				},
 			},
-			File: &model.PrdFile{
-				Filename: "./fixtures/dummy.yml",
-			},
+			wantErr: false,
 		},
 	}
 
-	dec, err := env.Encode(&testConfig)
-	for _, value := range dec {
-		os.Setenv(strings.Replace(value.Name, "TRAEFIK_", "DIUN_", 1), value.Default)
-		//fmt.Println(fmt.Sprintf(`%s=%s`, strings.Replace(value.Name, "TRAEFIK_", "DIUN_", 1), value.Default))
+	for _, tt := range testCases {
+		t.Run(tt.desc, func(t *testing.T) {
+			UnsetEnv("DIUN_")
+
+			if tt.environ != nil {
+				for _, environ := range tt.environ {
+					n := strings.SplitN(environ, "=", 2)
+					os.Setenv(n[0], n[1])
+				}
+			}
+
+			cfg, err := config.Load(tt.cfgfile)
+			if tt.wantErr {
+				require.Error(t, err)
+				return
+			}
+
+			require.NoError(t, err)
+			assert.Equal(t, tt.expected, cfg)
+		})
+	}
+}
+
+func TestLoadMixed(t *testing.T) {
+	defer UnsetEnv("DIUN_")
+
+	testCases := []struct {
+		desc     string
+		cfgfile  string
+		environ  []string
+		expected interface{}
+		wantErr  bool
+	}{
+		{
+			desc:    "env vars and invalid file",
+			cfgfile: "./fixtures/config.invalid.yml",
+			environ: []string{
+				"DIUN_PROVIDERS_DOCKER=true",
+			},
+			expected: nil,
+			wantErr:  true,
+		},
+		{
+			desc:    "docker provider (file) and notif mails (envs)",
+			cfgfile: "./fixtures/config.docker.yml",
+			environ: []string{
+				"DIUN_NOTIF_MAIL_HOST=127.0.0.1",
+				"DIUN_NOTIF_MAIL_PORT=25",
+				"DIUN_NOTIF_MAIL_SSL=false",
+				"DIUN_NOTIF_MAIL_INSECURESKIPVERIFY=true",
+				"DIUN_NOTIF_MAIL_FROM=diun@foo.com",
+				"DIUN_NOTIF_MAIL_TO=webmaster@foo.com",
+			},
+			expected: &config.Config{
+				Db:    (&model.Db{}).GetDefaults(),
+				Watch: (&model.Watch{}).GetDefaults(),
+				Notif: &model.Notif{
+					Mail: &model.NotifMail{
+						Host:               "127.0.0.1",
+						Port:               25,
+						SSL:                utl.NewFalse(),
+						InsecureSkipVerify: utl.NewTrue(),
+						From:               "diun@foo.com",
+						To:                 "webmaster@foo.com",
+					},
+				},
+				RegOpts: nil,
+				Providers: &model.Providers{
+					Docker: &model.PrdDocker{
+						TLSVerify:      utl.NewTrue(),
+						WatchByDefault: utl.NewFalse(),
+						WatchStopped:   utl.NewFalse(),
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			desc:    "file provider, regopts (file) and notif webhook env override",
+			cfgfile: "./fixtures/config.file-regopts.yml",
+			environ: []string{
+				"DIUN_NOTIF_WEBHOOK_ENDPOINT=http://webhook.foo.com/sd54qad89azd5a",
+				"DIUN_NOTIF_WEBHOOK_HEADERS_AUTHORIZATION=Token78910",
+				"DIUN_NOTIF_WEBHOOK_HEADERS_CONTENT-TYPE=text/plain",
+				"DIUN_NOTIF_WEBHOOK_METHOD=GET",
+				"DIUN_NOTIF_WEBHOOK_TIMEOUT=1m",
+			},
+			expected: &config.Config{
+				Db:    (&model.Db{}).GetDefaults(),
+				Watch: (&model.Watch{}).GetDefaults(),
+				Notif: &model.Notif{
+					Webhook: &model.NotifWebhook{
+						Endpoint: "http://webhook.foo.com/sd54qad89azd5a",
+						Method:   "GET",
+						Headers: map[string]string{
+							"content-type":  "text/plain",
+							"authorization": "Token78910",
+						},
+						Timeout: utl.NewDuration(1 * time.Minute),
+					},
+				},
+				RegOpts: nil,
+				Providers: &model.Providers{
+					File: &model.PrdFile{
+						Filename: "./fixtures/dummy.yml",
+					},
+				},
+			},
+			wantErr: false,
+		},
 	}
 
-	cfg, err := config.Load(model.Cli{
-		Cfgfile: "./fixtures/config.test.yml",
-	}, "test")
-	if err != nil {
-		t.Fatal(err)
-	}
+	for _, tt := range testCases {
+		t.Run(tt.desc, func(t *testing.T) {
+			UnsetEnv("DIUN_")
 
-	ex, _ := yaml.Marshal(testConfig)
-	ac, _ := yaml.Marshal(cfg)
-	assert.Equal(t, string(ex), string(ac))
+			if tt.environ != nil {
+				for _, environ := range tt.environ {
+					n := strings.SplitN(environ, "=", 2)
+					os.Setenv(n[0], n[1])
+				}
+			}
+
+			cfg, err := config.Load(tt.cfgfile)
+			if tt.wantErr {
+				require.Error(t, err)
+				return
+			}
+
+			require.NoError(t, err)
+			assert.Equal(t, tt.expected, cfg)
+		})
+	}
+}
+
+func TestValidation(t *testing.T) {
+	cases := []struct {
+		name    string
+		cfgfile string
+	}{
+		{
+			name:    "Success",
+			cfgfile: "./fixtures/config.validate.yml",
+		},
+	}
+	for _, tt := range cases {
+		t.Run(tt.name, func(t *testing.T) {
+			_, err := config.Load(tt.cfgfile)
+			require.NoError(t, err)
+
+			//dec, err := env.Encode(cfg)
+			//for _, value := range dec {
+			//	fmt.Println(fmt.Sprintf(`%s=%s`, strings.Replace(value.Name, "TRAEFIK_", "DIUN_", 1), value.Default))
+			//}
+		})
+	}
 }
 
 func UnsetEnv(prefix string) (restore func()) {

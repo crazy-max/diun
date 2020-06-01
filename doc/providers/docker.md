@@ -86,11 +86,11 @@ diun_1         | Sat, 14 Dec 2019 15:30:13 CET INF Next run in 29 minutes (2019-
 ### Configuration file
 
 * `endpoint`: Server address to connect to. Local if empty.
-* `api_version`: Overrides the client version with the specified one.
-* `tls_certs_path`: Path to load the TLS certificates from.
-* `tls_verify`: Controls whether client verifies the server's certificate chain and hostname (default: `true`).
-* `watch_by_default`: Enable watch by default. If false, containers that don't have `diun.enable=true` label will be ignored (default: `false`).
-* `watch_stopped`: Include created and exited containers too (default: `false`).
+* `apiVersion`: Overrides the client version with the specified one.
+* `tlsCertsPath`: Path to load the TLS certificates from.
+* `tlsVerify`: Controls whether client verifies the server's certificate chain and hostname (default `true`).
+* `watchByDefault`: Enable watch by default. If false, containers that don't have `diun.enable=true` label will be ignored (default `false`).
+* `watchStopped`: Include created and exited containers too (default `false`).
 
 ### Environment variables
 
@@ -106,9 +106,9 @@ diun_1         | Sat, 14 Dec 2019 15:30:13 CET INF Next run in 29 minutes (2019-
 
 You can configure more finely the way to analyze the image of your container through Docker labels:
 
-* `diun.enable`: Set to true to enable image analysis of this container. Required if `watch_by_default` is disabled for this provider.
+* `diun.enable`: Set to true to enable image analysis of this container.
 * `diun.regopts_id`: Registry options ID from [`regopts`](../configuration.md#regopts) to use.
-* `diun.watch_repo`: Watch all tags of this container image (default: `false`).
-* `diun.max_tags`: Maximum number of tags to watch if `diun.watch_repo` enabled. 0 means all of them (default: `0`).
+* `diun.watch_repo`: Watch all tags of this container image (default `false`).
+* `diun.max_tags`: Maximum number of tags to watch if `diun.watch_repo` enabled. 0 means all of them (default `0`).
 * `diun.include_tags`: Semi-colon separated list of regular expressions to include tags. Can be useful if you enable `diun.watch_repo`.
 * `diun.exclude_tags`: Semi-colon separated list of regular expressions to exclude tags. Can be useful if you enable `diun.watch_repo`.

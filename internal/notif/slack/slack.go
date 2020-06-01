@@ -16,16 +16,16 @@ import (
 // Client represents an active slack notification object
 type Client struct {
 	*notifier.Notifier
-	cfg *model.NotifSlack
-	app model.App
+	cfg  *model.NotifSlack
+	meta model.Meta
 }
 
 // New creates a new slack notification instance
-func New(config *model.NotifSlack, app model.App) notifier.Notifier {
+func New(config *model.NotifSlack, meta model.Meta) notifier.Notifier {
 	return notifier.Notifier{
 		Handler: &Client{
-			cfg: config,
-			app: app,
+			cfg:  config,
+			meta: meta,
 		},
 	}
 }
@@ -57,7 +57,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 				AuthorLink:    "https://github.com/crazy-max/diun",
 				AuthorIcon:    "https://raw.githubusercontent.com/crazy-max/diun/master/.res/diun.png",
 				Text:          textBuf.String(),
-				Footer:        fmt.Sprintf("%s © %d %s %s", c.app.Author, time.Now().Year(), c.app.Name, c.app.Version),
+				Footer:        fmt.Sprintf("%s © %d %s %s", c.meta.Author, time.Now().Year(), c.meta.Name, c.meta.Version),
 				Fields: []slack.AttachmentField{
 					{
 						Title: "Provider",
