@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/signal"
 	"runtime"
+	"strings"
 	"syscall"
 	"time"
 
@@ -25,6 +26,7 @@ var (
 		Name:   "Diun",
 		Desc:   "Docker image update notifier",
 		URL:    "https://github.com/crazy-max/diun",
+		Logo:   "https://raw.githubusercontent.com/crazy-max/diun/master/.res/diun.png",
 		Author: "CrazyMax",
 	}
 )
@@ -32,6 +34,7 @@ var (
 func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 	meta.Version = version
+	meta.UserAgent = fmt.Sprintf("%s/%s go/%s %s", meta.ID, meta.Version, runtime.Version()[2:], strings.Title(runtime.GOOS))
 
 	// Parse command line
 	_ = kong.Parse(&cli,
@@ -75,7 +78,7 @@ func main() {
 
 	// Init
 	if diun, err = app.New(meta, cfg, location); err != nil {
-		log.Fatal().Err(err).Msg("Cannot initialize Diun")
+		log.Fatal().Err(err).Msgf("Cannot initialize %s", meta.Name)
 	}
 
 	// Test notif
@@ -86,6 +89,6 @@ func main() {
 
 	// Start
 	if err = diun.Start(); err != nil {
-		log.Fatal().Err(err).Msg("Cannot start Diun")
+		log.Fatal().Err(err).Msgf("Cannot start %s", meta.Name)
 	}
 }

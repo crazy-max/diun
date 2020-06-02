@@ -18,18 +18,16 @@ import (
 // Client represents an active rocketchat notification object
 type Client struct {
 	*notifier.Notifier
-	cfg       *model.NotifRocketChat
-	meta      model.Meta
-	userAgent string
+	cfg  *model.NotifRocketChat
+	meta model.Meta
 }
 
 // New creates a new rocketchat notification instance
-func New(config *model.NotifRocketChat, meta model.Meta, userAgent string) notifier.Notifier {
+func New(config *model.NotifRocketChat, meta model.Meta) notifier.Notifier {
 	return notifier.Notifier{
 		Handler: &Client{
-			cfg:       config,
-			meta:      meta,
-			userAgent: userAgent,
+			cfg:  config,
+			meta: meta,
 		},
 	}
 }
@@ -59,7 +57,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 
 	data := Message{
 		Alias:   c.meta.Name,
-		Avatar:  "https://raw.githubusercontent.com/crazy-max/diun/master/.res/diun.png",
+		Avatar:  c.meta.Logo,
 		Channel: c.cfg.Channel,
 		Text:    title,
 		Attachments: []Attachment{
@@ -109,7 +107,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("User-Agent", c.userAgent)
+	req.Header.Set("User-Agent", c.meta.UserAgent)
 	req.Header.Add("X-User-Id", c.cfg.UserID)
 	req.Header.Add("X-Auth-Token", c.cfg.Token)
 

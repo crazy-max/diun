@@ -16,9 +16,8 @@ import (
 // Client represents an active script notification object
 type Client struct {
 	*notifier.Notifier
-	cfg       *model.NotifScript
-	meta      model.Meta
-	userAgent string
+	cfg  *model.NotifScript
+	meta model.Meta
 }
 
 // New creates a new script notification instance

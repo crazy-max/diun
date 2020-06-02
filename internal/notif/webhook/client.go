@@ -14,18 +14,16 @@ import (
 // Client represents an active webhook notification object
 type Client struct {
 	*notifier.Notifier
-	cfg       *model.NotifWebhook
-	meta      model.Meta
-	userAgent string
+	cfg  *model.NotifWebhook
+	meta model.Meta
 }
 
 // New creates a new webhook notification instance
-func New(config *model.NotifWebhook, meta model.Meta, userAgent string) notifier.Notifier {
+func New(config *model.NotifWebhook, meta model.Meta) notifier.Notifier {
 	return notifier.Notifier{
 		Handler: &Client{
-			cfg:       config,
-			meta:      meta,
-			userAgent: userAgent,
+			cfg:  config,
+			meta: meta,
 		},
 	}
 }
@@ -75,7 +73,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		}
 	}
 
-	req.Header.Set("User-Agent", c.userAgent)
+	req.Header.Set("User-Agent", c.meta.UserAgent)
 
 	_, err = hc.Do(req)
 	return err

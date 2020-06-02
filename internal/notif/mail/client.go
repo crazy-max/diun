@@ -18,16 +18,16 @@ import (
 // Client represents an active mail notification object
 type Client struct {
 	*notifier.Notifier
-	cfg *model.NotifMail
-	app model.Meta
+	cfg  *model.NotifMail
+	meta model.Meta
 }
 
 // New creates a new mail notification instance
-func New(config *model.NotifMail, app model.Meta) notifier.Notifier {
+func New(config *model.NotifMail, meta model.Meta) notifier.Notifier {
 	return notifier.Notifier{
 		Handler: &Client{
-			cfg: config,
-			app: app,
+			cfg:  config,
+			meta: meta,
 		},
 	}
 }
@@ -42,14 +42,14 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	h := hermes.Hermes{
 		Theme: new(Theme),
 		Product: hermes.Product{
-			Name: c.app.Name,
-			Link: "https://github.com/crazy-max/diun",
-			Logo: "https://raw.githubusercontent.com/crazy-max/diun/master/.res/diun.png",
+			Name: c.meta.Name,
+			Link: c.meta.URL,
+			Logo: c.meta.Logo,
 			Copyright: fmt.Sprintf("%s © %d %s %s",
-				c.app.Author,
+				c.meta.Author,
 				time.Now().Year(),
-				c.app.Name,
-				c.app.Version),
+				c.meta.Name,
+				c.meta.Version),
 		},
 	}
 
@@ -75,7 +75,7 @@ Need help, or have questions? Go to https://github.com/crazy-max/diun and leave 
 	}
 	email := hermes.Email{
 		Body: hermes.Body{
-			Title:        fmt.Sprintf("%s 🔔 notification", c.app.Name),
+			Title:        fmt.Sprintf("%s 🔔 notification", c.meta.Name),
 			FreeMarkdown: hermes.Markdown(emailBuf.String()),
 			Signature:    "Thanks for your support",
 		},
@@ -94,7 +94,7 @@ Need help, or have questions? Go to https://github.com/crazy-max/diun and leave 
 	}
 
 	msg := gomail.NewMessage()
-	msg.SetHeader("From", fmt.Sprintf("%s <%s>", c.app.Name, c.cfg.From))
+	msg.SetHeader("From", fmt.Sprintf("%s <%s>", c.meta.Name, c.cfg.From))
 	msg.SetHeader("To", c.cfg.To)
 	msg.SetHeader("Subject", subject)
 	msg.SetBody("text/plain", textpart)

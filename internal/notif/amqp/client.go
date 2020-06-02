@@ -15,16 +15,16 @@ import (
 // Client represents an active amqp notification object
 type Client struct {
 	*notifier.Notifier
-	cfg *model.NotifAmqp
-	app model.Meta
+	cfg  *model.NotifAmqp
+	meta model.Meta
 }
 
 // New creates a new amqp notification instance
-func New(config *model.NotifAmqp, app model.Meta) notifier.Notifier {
+func New(config *model.NotifAmqp, meta model.Meta) notifier.Notifier {
 	return notifier.Notifier{
 		Handler: &Client{
-			cfg: config,
-			app: app,
+			cfg:  config,
+			meta: meta,
 		},
 	}
 }
@@ -80,7 +80,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		Created  *time.Time    `json:"created"`
 		Platform string        `json:"platform"`
 	}{
-		Version:  c.app.Version,
+		Version:  c.meta.Version,
 		Status:   string(entry.Status),
 		Provider: entry.Provider,
 		Image:    entry.Image.String(),

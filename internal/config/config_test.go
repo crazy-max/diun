@@ -40,7 +40,7 @@ func TestLoadFile(t *testing.T) {
 				Watch: &model.Watch{
 					Workers:         100,
 					Schedule:        "*/30 * * * *",
-					FirstCheckNotif: utl.NewFalse(),
+					FirstCheckNotif: utl.NewTrue(),
 				},
 				Notif: &model.Notif{
 					Amqp: &model.NotifAmqp{
@@ -72,9 +72,9 @@ func TestLoadFile(t *testing.T) {
 						Timeout:  utl.NewDuration(10 * time.Second),
 					},
 					Script: &model.NotifScript{
-						Cmd: "go",
+						Cmd: "uname",
 						Args: []string{
-							"version",
+							"-a",
 						},
 					},
 					Slack: &model.NotifSlack{
@@ -241,8 +241,8 @@ func TestLoadEnv(t *testing.T) {
 		{
 			desc: "file provider and notif script",
 			environ: []string{
-				"DIUN_NOTIF_SCRIPT_CMD=go",
-				"DIUN_NOTIF_SCRIPT_ARGS=-v,version",
+				"DIUN_NOTIF_SCRIPT_CMD=uname",
+				"DIUN_NOTIF_SCRIPT_ARGS=-a",
 				"DIUN_PROVIDERS_FILE_DIRECTORY=./fixtures",
 			},
 			expected: &config.Config{
@@ -250,10 +250,9 @@ func TestLoadEnv(t *testing.T) {
 				Watch: (&model.Watch{}).GetDefaults(),
 				Notif: &model.Notif{
 					Script: &model.NotifScript{
-						Cmd: "go",
+						Cmd: "uname",
 						Args: []string{
-							"-v",
-							"version",
+							"-a",
 						},
 					},
 				},

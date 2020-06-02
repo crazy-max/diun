@@ -4,7 +4,7 @@ db:
 watch:
   workers: 100
   schedule: "*/30 * * * *"
-  firstCheckNotif: false
+  firstCheckNotif: true
 
 notif:
   amqp:
@@ -32,9 +32,9 @@ notif:
     token: Token123456
     timeout: 10s
   script:
-    cmd: "go"
+    cmd: "uname"
     args:
-      - "version"
+      - "-a"
   slack:
     webhookURL: https://hooks.slack.com/services/ABCD12EFG/HIJK34LMN/01234567890abcdefghij
   teams:

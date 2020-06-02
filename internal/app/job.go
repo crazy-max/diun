@@ -77,7 +77,7 @@ func (di *Diun) createJob(job model.Job) {
 		Password:     regPassword,
 		Timeout:      *regOpts.Timeout,
 		InsecureTLS:  *regOpts.InsecureTLS,
-		UserAgent:    di.userAgent,
+		UserAgent:    di.meta.UserAgent,
 		ImageOs:      job.Image.Platform.Os,
 		ImageArch:    job.Image.Platform.Arch,
 		ImageVariant: job.Image.Platform.Variant,

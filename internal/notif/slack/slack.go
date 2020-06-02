@@ -52,10 +52,10 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		Attachments: []slack.Attachment{
 			{
 				Color:         color,
-				AuthorName:    "Diun",
+				AuthorName:    c.meta.Name,
 				AuthorSubname: "github.com/crazy-max/diun",
-				AuthorLink:    "https://github.com/crazy-max/diun",
-				AuthorIcon:    "https://raw.githubusercontent.com/crazy-max/diun/master/.res/diun.png",
+				AuthorLink:    c.meta.URL,
+				AuthorIcon:    c.meta.Logo,
 				Text:          textBuf.String(),
 				Footer:        fmt.Sprintf("%s © %d %s %s", c.meta.Author, time.Now().Year(), c.meta.Name, c.meta.Version),
 				Fields: []slack.AttachmentField{

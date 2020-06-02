@@ -1,9 +1,6 @@
 package app
 
 import (
-	"fmt"
-	"runtime"
-	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -25,16 +22,15 @@ import (
 
 // Diun represents an active diun object
 type Diun struct {
-	meta      model.Meta
-	cfg       *config.Config
-	cron      *cron.Cron
-	db        *db.Client
-	notif     *notif.Client
-	userAgent string
-	jobID     cron.EntryID
-	locker    uint32
-	pool      *ants.PoolWithFunc
-	wg        *sync.WaitGroup
+	meta   model.Meta
+	cfg    *config.Config
+	cron   *cron.Cron
+	db     *db.Client
+	notif  *notif.Client
+	jobID  cron.EntryID
+	locker uint32
+	pool   *ants.PoolWithFunc
+	wg     *sync.WaitGroup
 }
 
 // New creates new diun instance
@@ -45,11 +41,8 @@ func New(meta model.Meta, cfg *config.Config, location *time.Location) (*Diun, e
 		return nil, err
 	}
 
-	// User-Agent
-	userAgent := fmt.Sprintf("diun/%s go/%s %s", meta.Version, runtime.Version()[2:], strings.Title(runtime.GOOS))
-
 	// Notification client
-	notifcli, err := notif.New(cfg.Notif, meta, userAgent)
+	notifcli, err := notif.New(cfg.Notif, meta)
 	if err != nil {
 		return nil, err
 	}
@@ -60,9 +53,8 @@ func New(meta model.Meta, cfg *config.Config, location *time.Location) (*Diun, e
 		cron: cron.New(cron.WithLocation(location), cron.WithParser(cron.NewParser(
 			cron.SecondOptional|cron.Minute|cron.Hour|cron.Dom|cron.Month|cron.Dow|cron.Descriptor),
 		)),
-		db:        dbcli,
-		notif:     notifcli,
-		userAgent: userAgent,
+		db:    dbcli,
+		notif: notifcli,
 	}, nil
 }
 
