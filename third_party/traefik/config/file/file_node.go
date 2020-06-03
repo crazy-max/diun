@@ -7,7 +7,7 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/crazy-max/diun/v3/pkg/traefik/config/parser"
+	"github.com/crazy-max/diun/v3/third_party/traefik/config/parser"
 	"gopkg.in/yaml.v2"
 )
 

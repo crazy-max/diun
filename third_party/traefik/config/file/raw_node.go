@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/crazy-max/diun/v3/pkg/traefik/config/parser"
+	"github.com/crazy-max/diun/v3/third_party/traefik/config/parser"
 )
 
 func decodeRawToNode(data map[string]interface{}, rootName string, filters ...string) (*parser.Node, error) {

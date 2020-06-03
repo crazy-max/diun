@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/crazy-max/diun/v3/pkg/traefik/types"
+	"github.com/crazy-max/diun/v3/third_party/traefik/types"
 )
 
 const defaultPtrValue = "false"
