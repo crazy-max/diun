@@ -1,6 +1,7 @@
 # FAQ
 
 * [Test notifications](#test-notifications)
+* [field docker|swarm uses unsupported type: invalid]()
 * [No image found in manifest list for architecture [], variant [], OS []](#no-image-found-in-manifest-list-for-architecture--variant--os-)
 
 ## Test notifications
@@ -15,6 +16,22 @@ Or within a container:
 
 ```
 docker-compose exec diun --test-notif
+```
+
+## field docker|swarm uses unsupported type: invalid
+
+If you get the error `failed to decode configuration from file: field docker uses unsupported type: invalid` that's because your `docker` or `swarm` provider is not initialized in your configuration:
+
+```
+providers:
+  docker:
+```
+
+should be:
+
+```
+providers:
+  docker: {}
 ```
 
 ## No image found in manifest list for architecture [], variant [], OS []
