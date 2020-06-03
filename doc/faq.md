@@ -1,7 +1,8 @@
 # FAQ
 
 * [Test notifications](#test-notifications)
-* [field docker|swarm uses unsupported type: invalid]()
+* [Maximum supported API version is 1.39 error](#maximum-supported-api-version-is-139-error)
+* [field docker|swarm uses unsupported type: invalid](#field-dockerswarm-uses-unsupported-type-invalid)
 * [No image found in manifest list for architecture [], variant [], OS []](#no-image-found-in-manifest-list-for-architecture--variant--os-)
 
 ## Test notifications
@@ -18,18 +19,52 @@ Or within a container:
 docker-compose exec diun --test-notif
 ```
 
+## Maximum supported API version is 1.39 error
+
+The error `Error response from daemon: client version 1.40 is too new. Maximum supported API version is 1.39` indicates that you are using a fairly old version of Docker like:
+
+```shell
+$ docker version
+Client:
+ Version:           18.09.8
+ API version:       1.39
+ Go version:        go1.11
+ Git commit:        bfed4f5
+ Built:             Fri Mar 13 06:46:11 2020
+ OS/Arch:           linux/amd64
+ Experimental:      false
+
+Server:
+ Engine:
+  Version:          18.09.8
+  API version:      1.39 (minimum version 1.12)
+  Go version:       go1.11
+  Git commit:       3a371f3
+  Built:            Fri Mar 13 06:44:35 2020
+  OS/Arch:          linux/amd64
+  Experimental:     false
+```
+
+To solve this, you need to specify the API version in your docker or swarm provider (`apiVersion`) displayed in the error message. In this case:
+
+```yaml
+providers:
+  docker:
+    apiVersion: 1.39
+```
+
 ## field docker|swarm uses unsupported type: invalid
 
-If you get the error `failed to decode configuration from file: field docker uses unsupported type: invalid` that's because your `docker` or `swarm` provider is not initialized in your configuration:
+If you have the error `failed to decode configuration from file: field docker uses unsupported type: invalid` that's because your `docker` or `swarm` provider is not initialized in your configuration:
 
-```
+```yaml
 providers:
   docker:
 ```
 
 should be:
 
-```
+```yaml
 providers:
   docker: {}
 ```
