@@ -3,7 +3,6 @@ package app
 import (
 	"fmt"
 	"regexp"
-	"time"
 
 	"github.com/crazy-max/diun/v3/internal/model"
 	"github.com/crazy-max/diun/v3/pkg/registry"
@@ -35,7 +34,7 @@ func (di *Diun) createJob(job model.Job) {
 	}
 
 	// Registry options
-	regOpts, err := di.getRegOpts(job.Image.RegOptsID)
+	regOpts, err := di.cfg.GetRegOpts(job.Image.RegOptsID)
 	if err != nil {
 		sublog.Warn().Err(err).Msg("Registry options")
 	}
@@ -76,9 +75,9 @@ func (di *Diun) createJob(job model.Job) {
 	job.Registry, err = registry.New(registry.Options{
 		Username:     regUser,
 		Password:     regPassword,
-		Timeout:      time.Duration(regOpts.Timeout) * time.Second,
-		InsecureTLS:  regOpts.InsecureTLS,
-		UserAgent:    di.userAgent,
+		Timeout:      *regOpts.Timeout,
+		InsecureTLS:  *regOpts.InsecureTLS,
+		UserAgent:    di.meta.UserAgent,
 		ImageOs:      job.Image.Platform.Os,
 		ImageArch:    job.Image.Platform.Arch,
 		ImageVariant: job.Image.Platform.Variant,
@@ -94,7 +93,7 @@ func (di *Diun) createJob(job model.Job) {
 		sublog.Error().Err(err).Msgf("Invoking job")
 	}
 
-	if !job.Image.WatchRepo || job.RegImage.Domain == "" {
+	if !job.Image.WatchRepo || len(job.RegImage.Domain) == 0 {
 		return
 	}
 
@@ -157,7 +156,7 @@ func (di *Diun) runJob(job model.Job) error {
 	}
 
 	status := model.ImageStatusUnchange
-	if dbManifest.Name == "" {
+	if len(dbManifest.Name) == 0 {
 		status = model.ImageStatusNew
 		sublog.Info().Msg("New image found")
 	} else if !liveManifest.Created.Equal(*dbManifest.Created) {
@@ -186,14 +185,4 @@ func (di *Diun) runJob(job model.Job) error {
 	})
 
 	return nil
-}
-
-func (di *Diun) getRegOpts(id string) (model.RegOpts, error) {
-	if id == "" {
-		return model.RegOpts{}, nil
-	}
-	if regopts, ok := di.cfg.RegOpts[id]; ok {
-		return regopts, nil
-	}
-	return model.RegOpts{}, fmt.Errorf("%s not found", id)
 }

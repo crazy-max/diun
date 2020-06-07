@@ -7,29 +7,10 @@ Diun binaries are available in [releases](https://github.com/crazy-max/diun/rele
 Choose the archive matching the destination platform and extract diun:
 
 ```
-wget -qO- https://github.com/crazy-max/diun/releases/download/v2.6.1/diun_2.6.1_linux_x86_64.tar.gz | tar -zxvf - diun
+wget -qO- https://github.com/crazy-max/diun/releases/download/v3.0.0/diun_3.0.0_linux_x86_64.tar.gz | tar -zxvf - diun
 ```
 
-## Test
-
-After getting the binary, it can be tested with `./diun --help` or moved to a permanent location.
-
-```
-$ ./diun --help
-Usage: diun --config=STRING
-
-Docker image update notifier. More info: https://github.com/crazy-max/diun
-
-Flags:
-  --help                Show context-sensitive help.
-  --version
-  --config=STRING       Diun configuration file ($CONFIG).
-  --timezone="UTC"      Timezone assigned to Diun ($TZ).
-  --log-level="info"    Set log level ($LOG_LEVEL).
-  --log-json            Enable JSON logging output ($LOG_JSON).
-  --log-caller          Add file:line of the caller to log output ($LOG_CALLER).
-  --test-notif          Test notification settings.
-```
+After getting the binary, it can be tested with [`./diun --help`](../getting-started.md#diun-cli) command and moved to a permanent location.
 
 ## Server configuration
 
@@ -57,12 +38,14 @@ chmod 770 /etc/diun
 
 ### Configuration
 
-You must create your first [configuration](../configuration.md) file in `/etc/diun/diun.yml` and type:
+Create your first [configuration](../configuration.md) file in `/etc/diun/diun.yml` and type:
 
 ```
 chown diun:diun /etc/diun/diun.yml
 chmod 644 /etc/diun/diun.yml
 ```
+
+> 💡 Not required if you want to only rely on environment variables
 
 ### Copy binary to global location
 
@@ -81,7 +64,7 @@ See how to create [Linux service](linux-service.md) to start Diun automatically.
 ### 2. Running from command-line/terminal
 
 ```
-DIUN_DB=/var/lib/diun/diun.db /usr/local/bin/diun --config /etc/diun/diun.yml
+DIUN_DB_PATH=/var/lib/diun/diun.db /usr/local/bin/diun --config /etc/diun/diun.yml
 ```
 
 ## Updating to a new version

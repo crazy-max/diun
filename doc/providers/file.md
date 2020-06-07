@@ -4,8 +4,8 @@
 * [Example](#example)
 * [Quick start](#quick-start)
 * [Provider configuration](#provider-configuration)
-  * [filename](#filename)
-  * [directory](#directory)
+  * [Configuration file](#configuration-file)
+  * [Environment variables](#environment-variables)
 * [YAML configuration file](#yaml-configuration-file)
 
 ## About
@@ -32,7 +32,7 @@ regopts:
   onemore:
     username: foo2
     password: bar2
-    insecure_tls: true
+    insecureTls: true
 
 providers:
   file:
@@ -131,7 +131,9 @@ Sat, 14 Dec 2019 15:32:28 UTC INF Next run in 31 seconds (2019-12-14 15:33:00 +0
 
 ## Provider configuration
 
-### filename
+### Configuration file
+
+#### filename
 
 Defines the path to the [configuration file](#yaml-configuration-file).
 
@@ -143,7 +145,7 @@ providers:
     filename: /path/to/config/conf.yml
 ```
 
-### directory
+#### directory
 
 Defines the path to the directory that contains the [configuration files](#yaml-configuration-file) (`*.yml` or `*.yaml`).
 
@@ -155,14 +157,19 @@ providers:
     directory: /path/to/config
 ```
 
+### Environment variables
+
+* `DIUN_PROVIDERS_FILE_DIRECTORY`
+* `DIUN_PROVIDERS_FILE_FILENAME`
+
 ## YAML configuration file
 
 The configuration file(s) defines a slice of images to analyze with the following fields:
 
 * `name`: Docker image name to watch using `registry/path:tag` format. If registry omitted, `docker.io` will be used and if tag omitted, `latest` will be used. **required**
 * `regopts_id`: Registry options ID from [`regopts`](../configuration.md#regopts) to use.
-* `watch_repo`: Watch all tags of this `image` repository (default: `false`).
-* `max_tags`: Maximum number of tags to watch if `watch_repo` enabled. 0 means all of them (default: `0`).
+* `watch_repo`: Watch all tags of this `image` repository (default `false`).
+* `max_tags`: Maximum number of tags to watch if `watch_repo` enabled. 0 means all of them (default `0`).
 * `include_tags`: List of regular expressions to include tags. Can be useful if you enable `watch_repo`.
 * `exclude_tags`: List of regular expressions to exclude tags. Can be useful if you enable `watch_repo`.
 * `platform`: Check a custom platform. (default will retrieve platform dynamically based on your operating system).

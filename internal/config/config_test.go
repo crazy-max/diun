@@ -1,57 +1,46 @@
 package config_test
 
 import (
+	"os"
+	"strings"
 	"testing"
+	"time"
 
 	"github.com/crazy-max/diun/v3/internal/config"
 	"github.com/crazy-max/diun/v3/internal/model"
 	"github.com/crazy-max/diun/v3/pkg/utl"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
-func TestLoad(t *testing.T) {
+func TestLoadFile(t *testing.T) {
 	cases := []struct {
 		name     string
-		cli      model.Cli
+		cfgfile  string
 		wantData *config.Config
 		wantErr  bool
 	}{
 		{
-			name:    "Fail on non-existing file",
-			cli:     model.Cli{},
+			name:    "Failed on non-existing file",
+			cfgfile: "",
 			wantErr: true,
 		},
 		{
-			name: "Fail on wrong file format",
-			cli: model.Cli{
-				Cfgfile: "./test/config.invalid.yml",
-			},
+			name:    "Fail on wrong file format",
+			cfgfile: "./fixtures/config.invalid.yml",
 			wantErr: true,
 		},
 		{
-			name: "Success",
-			cli: model.Cli{
-				Cfgfile: "./test/config.test.yml",
-			},
+			name:    "Success",
+			cfgfile: "./fixtures/config.test.yml",
 			wantData: &config.Config{
-				Cli: model.Cli{
-					Cfgfile: "./test/config.test.yml",
-				},
-				App: model.App{
-					ID:      "diun",
-					Name:    "Diun",
-					Desc:    "Docker image update notifier",
-					URL:     "https://github.com/crazy-max/diun",
-					Author:  "CrazyMax",
-					Version: "test",
-				},
-				Db: model.Db{
+				Db: &model.Db{
 					Path: "diun.db",
 				},
-				Watch: model.Watch{
+				Watch: &model.Watch{
 					Workers:         100,
 					Schedule:        "*/30 * * * *",
-					FirstCheckNotif: utl.NewFalse(),
+					FirstCheckNotif: utl.NewTrue(),
 				},
 				Notif: &model.Notif{
 					Amqp: &model.NotifAmqp{
@@ -65,7 +54,7 @@ func TestLoad(t *testing.T) {
 						Endpoint: "http://gotify.foo.com",
 						Token:    "Token123456",
 						Priority: 1,
-						Timeout:  10,
+						Timeout:  utl.NewDuration(10 * time.Second),
 					},
 					Mail: &model.NotifMail{
 						Host:               "localhost",
@@ -80,12 +69,12 @@ func TestLoad(t *testing.T) {
 						Channel:  "#general",
 						UserID:   "abcdEFGH012345678",
 						Token:    "Token123456",
-						Timeout:  10,
+						Timeout:  utl.NewDuration(10 * time.Second),
 					},
 					Script: &model.NotifScript{
-						Cmd: "go",
+						Cmd: "uname",
 						Args: []string{
-							"version",
+							"-a",
 						},
 					},
 					Slack: &model.NotifSlack{
@@ -95,30 +84,35 @@ func TestLoad(t *testing.T) {
 						WebhookURL: "https://outlook.office.com/webhook/ABCD12EFG/HIJK34LMN/01234567890abcdefghij",
 					},
 					Telegram: &model.NotifTelegram{
-						BotToken: "abcdef123456",
-						ChatIDs:  []int64{8547439, 1234567},
+						Token:   "abcdef123456",
+						ChatIDs: []int64{8547439, 1234567},
 					},
 					Webhook: &model.NotifWebhook{
 						Endpoint: "http://webhook.foo.com/sd54qad89azd5a",
 						Method:   "GET",
 						Headers: map[string]string{
-							"Content-Type":  "application/json",
-							"Authorization": "Token123456",
+							"content-type":  "application/json",
+							"authorization": "Token123456",
 						},
-						Timeout: 10,
+						Timeout: utl.NewDuration(10 * time.Second),
 					},
 				},
-				RegOpts: map[string]model.RegOpts{
+				RegOpts: map[string]*model.RegOpts{
 					"someregopts": {
-						Timeout: 5,
+						InsecureTLS: utl.NewFalse(),
+						Timeout:     utl.NewDuration(5 * time.Second),
 					},
 					"bintrayoptions": {
-						Username: "foo",
-						Password: "bar",
+						Username:    "foo",
+						Password:    "bar",
+						InsecureTLS: utl.NewFalse(),
+						Timeout:     utl.NewDuration(10 * time.Second),
 					},
 					"sensitive": {
 						UsernameFile: "/run/secrets/username",
 						PasswordFile: "/run/secrets/password",
+						InsecureTLS:  utl.NewFalse(),
+						Timeout:      utl.NewDuration(10 * time.Second),
 					},
 				},
 				Providers: &model.Providers{
@@ -129,10 +123,10 @@ func TestLoad(t *testing.T) {
 					},
 					Swarm: &model.PrdSwarm{
 						TLSVerify:      utl.NewTrue(),
-						WatchByDefault: utl.NewTrue(),
+						WatchByDefault: utl.NewFalse(),
 					},
 					File: &model.PrdFile{
-						Filename: "./test/dummy.yml",
+						Filename: "./fixtures/dummy.yml",
 					},
 				},
 			},
@@ -140,14 +134,341 @@ func TestLoad(t *testing.T) {
 	}
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
-			cfg, err := config.Load(tt.cli, "test")
-			if !tt.wantErr && err != nil {
-				t.Error(err)
+			cfg, err := config.Load(tt.cfgfile)
+			if tt.wantErr {
+				require.Error(t, err)
+				return
 			}
+			require.NoError(t, err)
 			assert.Equal(t, tt.wantData, cfg)
-			if !tt.wantErr && cfg != nil {
-				assert.NotEmpty(t, cfg.Display())
+			if cfg != nil {
+				assert.NotEmpty(t, cfg.String())
 			}
 		})
+	}
+}
+
+func TestLoadEnv(t *testing.T) {
+	defer UnsetEnv("DIUN_")
+
+	testCases := []struct {
+		desc     string
+		cfgfile  string
+		environ  []string
+		expected interface{}
+		wantErr  bool
+	}{
+		{
+			desc:     "no env vars",
+			environ:  nil,
+			expected: nil,
+			wantErr:  true,
+		},
+		{
+			desc: "docker provider",
+			environ: []string{
+				"DIUN_PROVIDERS_DOCKER=true",
+			},
+			expected: &config.Config{
+				Db:      (&model.Db{}).GetDefaults(),
+				Watch:   (&model.Watch{}).GetDefaults(),
+				Notif:   nil,
+				RegOpts: nil,
+				Providers: &model.Providers{
+					Docker: &model.PrdDocker{
+						TLSVerify:      utl.NewTrue(),
+						WatchByDefault: utl.NewFalse(),
+						WatchStopped:   utl.NewFalse(),
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			desc: "docker provider and regopts",
+			environ: []string{
+				"DIUN_REGOPTS_SENSITIVE_USERNAMEFILE=/run/secrets/username",
+				"DIUN_REGOPTS_SENSITIVE_PASSWORDFILE=/run/secrets/password",
+				"DIUN_REGOPTS_SENSITIVE_TIMEOUT=30s",
+				"DIUN_PROVIDERS_DOCKER=true",
+			},
+			expected: &config.Config{
+				Db:    (&model.Db{}).GetDefaults(),
+				Watch: (&model.Watch{}).GetDefaults(),
+				RegOpts: map[string]*model.RegOpts{
+					"sensitive": {
+						UsernameFile: "/run/secrets/username",
+						PasswordFile: "/run/secrets/password",
+						InsecureTLS:  utl.NewFalse(),
+						Timeout:      utl.NewDuration(30 * time.Second),
+					},
+				},
+				Providers: &model.Providers{
+					Docker: &model.PrdDocker{
+						TLSVerify:      utl.NewTrue(),
+						WatchByDefault: utl.NewFalse(),
+						WatchStopped:   utl.NewFalse(),
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			desc: "swarm provider and notif telegram",
+			environ: []string{
+				"DIUN_NOTIF_TELEGRAM_TOKEN=abcdef123456",
+				"DIUN_NOTIF_TELEGRAM_CHATIDS=8547439,1234567",
+				"DIUN_PROVIDERS_SWARM=true",
+			},
+			expected: &config.Config{
+				Db:    (&model.Db{}).GetDefaults(),
+				Watch: (&model.Watch{}).GetDefaults(),
+				Notif: &model.Notif{
+					Telegram: &model.NotifTelegram{
+						Token:   "abcdef123456",
+						ChatIDs: []int64{8547439, 1234567},
+					},
+				},
+				Providers: &model.Providers{
+					Swarm: &model.PrdSwarm{
+						TLSVerify:      utl.NewTrue(),
+						WatchByDefault: utl.NewFalse(),
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			desc: "file provider and notif script",
+			environ: []string{
+				"DIUN_NOTIF_SCRIPT_CMD=uname",
+				"DIUN_NOTIF_SCRIPT_ARGS=-a",
+				"DIUN_PROVIDERS_FILE_DIRECTORY=./fixtures",
+			},
+			expected: &config.Config{
+				Db:    (&model.Db{}).GetDefaults(),
+				Watch: (&model.Watch{}).GetDefaults(),
+				Notif: &model.Notif{
+					Script: &model.NotifScript{
+						Cmd: "uname",
+						Args: []string{
+							"-a",
+						},
+					},
+				},
+				Providers: &model.Providers{
+					File: &model.PrdFile{
+						Directory: "./fixtures",
+					},
+				},
+			},
+			wantErr: false,
+		},
+	}
+
+	for _, tt := range testCases {
+		t.Run(tt.desc, func(t *testing.T) {
+			UnsetEnv("DIUN_")
+
+			if tt.environ != nil {
+				for _, environ := range tt.environ {
+					n := strings.SplitN(environ, "=", 2)
+					os.Setenv(n[0], n[1])
+				}
+			}
+
+			cfg, err := config.Load(tt.cfgfile)
+			if tt.wantErr {
+				require.Error(t, err)
+				return
+			}
+
+			require.NoError(t, err)
+			assert.Equal(t, tt.expected, cfg)
+		})
+	}
+}
+
+func TestLoadMixed(t *testing.T) {
+	defer UnsetEnv("DIUN_")
+
+	testCases := []struct {
+		desc     string
+		cfgfile  string
+		environ  []string
+		expected interface{}
+		wantErr  bool
+	}{
+		{
+			desc:    "env vars and invalid file",
+			cfgfile: "./fixtures/config.invalid.yml",
+			environ: []string{
+				"DIUN_PROVIDERS_DOCKER=true",
+			},
+			expected: nil,
+			wantErr:  true,
+		},
+		{
+			desc:    "docker provider (file) and notif mails (envs)",
+			cfgfile: "./fixtures/config.docker.yml",
+			environ: []string{
+				"DIUN_NOTIF_MAIL_HOST=127.0.0.1",
+				"DIUN_NOTIF_MAIL_PORT=25",
+				"DIUN_NOTIF_MAIL_SSL=false",
+				"DIUN_NOTIF_MAIL_INSECURESKIPVERIFY=true",
+				"DIUN_NOTIF_MAIL_FROM=diun@foo.com",
+				"DIUN_NOTIF_MAIL_TO=webmaster@foo.com",
+			},
+			expected: &config.Config{
+				Db:    (&model.Db{}).GetDefaults(),
+				Watch: (&model.Watch{}).GetDefaults(),
+				Notif: &model.Notif{
+					Mail: &model.NotifMail{
+						Host:               "127.0.0.1",
+						Port:               25,
+						SSL:                utl.NewFalse(),
+						InsecureSkipVerify: utl.NewTrue(),
+						From:               "diun@foo.com",
+						To:                 "webmaster@foo.com",
+					},
+				},
+				RegOpts: nil,
+				Providers: &model.Providers{
+					Docker: &model.PrdDocker{
+						TLSVerify:      utl.NewTrue(),
+						WatchByDefault: utl.NewFalse(),
+						WatchStopped:   utl.NewFalse(),
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			desc:    "file provider, regopts (file) and notif webhook env override",
+			cfgfile: "./fixtures/config.file-regopts.yml",
+			environ: []string{
+				"DIUN_NOTIF_WEBHOOK_ENDPOINT=http://webhook.foo.com/sd54qad89azd5a",
+				"DIUN_NOTIF_WEBHOOK_HEADERS_AUTHORIZATION=Token78910",
+				"DIUN_NOTIF_WEBHOOK_HEADERS_CONTENT-TYPE=text/plain",
+				"DIUN_NOTIF_WEBHOOK_METHOD=GET",
+				"DIUN_NOTIF_WEBHOOK_TIMEOUT=1m",
+			},
+			expected: &config.Config{
+				Db:    (&model.Db{}).GetDefaults(),
+				Watch: (&model.Watch{}).GetDefaults(),
+				Notif: &model.Notif{
+					Webhook: &model.NotifWebhook{
+						Endpoint: "http://webhook.foo.com/sd54qad89azd5a",
+						Method:   "GET",
+						Headers: map[string]string{
+							"content-type":  "text/plain",
+							"authorization": "Token78910",
+						},
+						Timeout: utl.NewDuration(1 * time.Minute),
+					},
+				},
+				RegOpts: nil,
+				Providers: &model.Providers{
+					File: &model.PrdFile{
+						Filename: "./fixtures/dummy.yml",
+					},
+				},
+			},
+			wantErr: false,
+		},
+	}
+
+	for _, tt := range testCases {
+		t.Run(tt.desc, func(t *testing.T) {
+			UnsetEnv("DIUN_")
+
+			if tt.environ != nil {
+				for _, environ := range tt.environ {
+					n := strings.SplitN(environ, "=", 2)
+					os.Setenv(n[0], n[1])
+				}
+			}
+
+			cfg, err := config.Load(tt.cfgfile)
+			if tt.wantErr {
+				require.Error(t, err)
+				return
+			}
+
+			require.NoError(t, err)
+			assert.Equal(t, tt.expected, cfg)
+		})
+	}
+}
+
+func TestValidation(t *testing.T) {
+	cases := []struct {
+		name    string
+		cfgfile string
+	}{
+		{
+			name:    "Success",
+			cfgfile: "./fixtures/config.validate.yml",
+		},
+	}
+	for _, tt := range cases {
+		t.Run(tt.name, func(t *testing.T) {
+			_, err := config.Load(tt.cfgfile)
+			require.NoError(t, err)
+
+			//dec, err := env.Encode(cfg)
+			//for _, value := range dec {
+			//	fmt.Println(fmt.Sprintf(`%s=%s`, strings.Replace(value.Name, "TRAEFIK_", "DIUN_", 1), value.Default))
+			//}
+		})
+	}
+}
+
+func UnsetEnv(prefix string) (restore func()) {
+	before := map[string]string{}
+
+	for _, e := range os.Environ() {
+		if !strings.HasPrefix(e, prefix) {
+			continue
+		}
+
+		parts := strings.SplitN(e, "=", 2)
+		before[parts[0]] = parts[1]
+
+		os.Unsetenv(parts[0])
+	}
+
+	return func() {
+		after := map[string]string{}
+
+		for _, e := range os.Environ() {
+			if !strings.HasPrefix(e, prefix) {
+				continue
+			}
+
+			parts := strings.SplitN(e, "=", 2)
+			after[parts[0]] = parts[1]
+
+			// Check if the envar previously existed
+			v, ok := before[parts[0]]
+			if !ok {
+				// This is a newly added envar with prefix, zap it
+				os.Unsetenv(parts[0])
+				continue
+			}
+
+			if parts[1] != v {
+				// If the envar value has changed, set it back
+				os.Setenv(parts[0], v)
+			}
+		}
+
+		// Still need to check if there have been any deleted envars
+		for k, v := range before {
+			if _, ok := after[k]; !ok {
+				// k is not present in after, so we set it.
+				os.Setenv(k, v)
+			}
+		}
 	}
 }

@@ -15,16 +15,16 @@ import (
 // Client represents an active amqp notification object
 type Client struct {
 	*notifier.Notifier
-	cfg *model.NotifAmqp
-	app model.App
+	cfg  *model.NotifAmqp
+	meta model.Meta
 }
 
 // New creates a new amqp notification instance
-func New(config *model.NotifAmqp, app model.App) notifier.Notifier {
+func New(config *model.NotifAmqp, meta model.Meta) notifier.Notifier {
 	return notifier.Notifier{
 		Handler: &Client{
-			cfg: config,
-			app: app,
+			cfg:  config,
+			meta: meta,
 		},
 	}
 }
@@ -36,9 +36,7 @@ func (c *Client) Name() string {
 
 // Send creates and sends a amqp notification with an entry
 func (c *Client) Send(entry model.NotifEntry) error {
-
 	username, err := utl.GetSecret(c.cfg.Username, c.cfg.UsernameFile)
-
 	if err != nil {
 		return err
 	}
@@ -48,52 +46,31 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		return err
 	}
 
-	connString := fmt.Sprintf("amqp://%s:%s@%s:%d/", username, password, c.cfg.Host, c.cfg.Port)
-
-	conn, err := amqp.Dial(connString)
+	conn, err := amqp.Dial(fmt.Sprintf("amqp://%s:%s@%s:%d/", username, password, c.cfg.Host, c.cfg.Port))
 	if err != nil {
 		return err
 	}
-
 	defer conn.Close()
 
 	ch, err := conn.Channel()
 	if err != nil {
 		return err
 	}
-
 	defer ch.Close()
 
 	q, err := ch.QueueDeclare(
-		c.cfg.Queue, // name
-		false,       // durable
-		false,       // delete when unused
-		false,       // exclusive
-		false,       // no-wait
-		nil,         // arguments
+		c.cfg.Queue,
+		false,
+		false,
+		false,
+		false,
+		nil,
 	)
 	if err != nil {
 		return err
 	}
 
-	body, err := buildBody(entry, c.app)
-	if err != nil {
-		return err
-	}
-
-	return ch.Publish(
-		c.cfg.Exchange, // exchange
-		q.Name,         // routing key
-		false,          // mandatory
-		false,          // immediate
-		amqp.Publishing{
-			ContentType: "application/json",
-			Body:        body,
-		})
-}
-
-func buildBody(entry model.NotifEntry, app model.App) ([]byte, error) {
-	return json.Marshal(struct {
+	body, err := json.Marshal(struct {
 		Version  string        `json:"diun_version"`
 		Status   string        `json:"status"`
 		Provider string        `json:"provider"`
@@ -103,7 +80,7 @@ func buildBody(entry model.NotifEntry, app model.App) ([]byte, error) {
 		Created  *time.Time    `json:"created"`
 		Platform string        `json:"platform"`
 	}{
-		Version:  app.Version,
+		Version:  c.meta.Version,
 		Status:   string(entry.Status),
 		Provider: entry.Provider,
 		Image:    entry.Image.String(),
@@ -112,4 +89,17 @@ func buildBody(entry model.NotifEntry, app model.App) ([]byte, error) {
 		Created:  entry.Manifest.Created,
 		Platform: entry.Manifest.Platform,
 	})
+	if err != nil {
+		return err
+	}
+
+	return ch.Publish(
+		c.cfg.Exchange,
+		q.Name,
+		false,
+		false,
+		amqp.Publishing{
+			ContentType: "application/json",
+			Body:        body,
+		})
 }

@@ -1,0 +1,71 @@
+db:
+  path: diun.db
+
+watch:
+  workers: 100
+  schedule: "*/30 * * * *"
+  firstCheckNotif: false
+
+notif:
+  amqp:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+    queue: queue
+  gotify:
+    endpoint: http://gotify.foo.com
+    token: Token123456
+    priority: 1
+    timeout: 10s
+  mail:
+    host: localhost
+    port: 25
+    ssl: false
+    insecureSkipVerify: false
+    from: diun@example.com
+    to: webmaster@example.com
+  rocketchat:
+    endpoint: http://rocket.foo.com:3000
+    channel: "#general"
+    userID: abcdEFGH012345678
+    token: Token123456
+    timeout: 10s
+  script:
+    cmd: "uname"
+    args:
+      - "-a"
+  slack:
+    webhookURL: https://hooks.slack.com/services/ABCD12EFG/HIJK34LMN/01234567890abcdefghij
+  teams:
+    webhookURL: https://outlook.office.com/webhook/ABCD12EFG/HIJK34LMN/01234567890abcdefghij
+  telegram:
+    token: abcdef123456
+    chatIDs:
+      - 8547439
+      - 1234567
+  webhook:
+    endpoint: http://webhook.foo.com/sd54qad89azd5a
+    method: GET
+    headers:
+      content-type: application/json
+      authorization: Token123456
+    timeout: 10s
+
+regopts:
+  someregopts:
+    timeout: 5s
+  bintrayoptions:
+    username: foo
+    password: bar
+  sensitive:
+    usernameFile: /run/secrets/username
+    passwordFile: /run/secrets/password
+
+providers:
+  docker:
+    watchByDefault: true
+    watchStopped: true
+  swarm: {}
+  file:
+    filename: ./fixtures/dummy.yml

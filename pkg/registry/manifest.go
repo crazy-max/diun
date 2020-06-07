@@ -48,7 +48,7 @@ func (c *Client) Manifest(image Image) (Manifest, error) {
 	}
 
 	imgTag := imgInspect.Tag
-	if imgTag == "" {
+	if len(imgTag) == 0 {
 		imgTag = image.Tag
 	}
 

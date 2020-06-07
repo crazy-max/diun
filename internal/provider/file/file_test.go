@@ -114,14 +114,14 @@ var (
 
 func TestListJobFilename(t *testing.T) {
 	fc := file.New(&model.PrdFile{
-		Filename: "./test/dockerhub.yml",
+		Filename: "./fixtures/dockerhub.yml",
 	})
 	assert.Equal(t, dockerhubFile, fc.ListJob())
 }
 
 func TestListJobDirectory(t *testing.T) {
 	fc := file.New(&model.PrdFile{
-		Directory: "./test",
+		Directory: "./fixtures",
 	})
 	assert.Equal(t, append(append(bintrayFile, dockerhubFile...), quayFile...), fc.ListJob())
 }

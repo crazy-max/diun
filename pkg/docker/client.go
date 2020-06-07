@@ -44,7 +44,7 @@ func New(opts Options) (*Client, error) {
 		}
 		tlsc, err := tlsconfig.Client(options)
 		if err != nil {
-			return nil, errors.Wrap(err, "failed to create tls config")
+			return nil, errors.Wrap(err, "failed to create TLS config")
 		}
 		httpCli := &http.Client{
 			Transport:     &http.Transport{TLSClientConfig: tlsc},

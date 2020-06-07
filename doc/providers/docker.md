@@ -3,6 +3,8 @@
 * [About](#about)
 * [Quick start](#quick-start)
 * [Provider configuration](#provider-configuration)
+  * [Configuration file](#configuration-file)
+  * [Environment variables](#environment-variables)
 * [Docker labels](#docker-labels)
 
 ## About
@@ -12,18 +14,6 @@ The Docker provider allows you to analyze the containers of your Docker instance
 ## Quick start
 
 In this section we quickly go over a basic docker-compose file using your local docker provider.
-
-First of all, let's create a Diun configuration we named `diun.yml`:
-
-```yaml
-watch:
-  workers: 20
-  schedule: "*/30 * * * *"
-
-providers:
-  docker:
-    watch_stopped: true
-```
 
 Here we use a single Docker provider with a minimum configuration to analyze labeled containers (watch by default disabled), even stopped ones, of your local Docker instance.
 
@@ -37,12 +27,15 @@ services:
     image: crazymax/diun:latest
     volumes:
       - "./data:/data"
-      - "./diun.yml:/diun.yml:ro"
       - "/var/run/docker.sock:/var/run/docker.sock"
     environment:
       - "TZ=Europe/Paris"
       - "LOG_LEVEL=info"
       - "LOG_JSON=false"
+      - "DIUN_WATCH_WORKERS=20"
+      - "DIUN_WATCH_SCHEDULE=*/30 * * * *"
+      - "DIUN_PROVIDERS_DOCKER=true"
+      - "DIUN_PROVIDERS_DOCKER_WATCHSTOPPED=true"
     restart: always
 
   cloudflared:
@@ -90,20 +83,32 @@ diun_1         | Sat, 14 Dec 2019 15:30:13 CET INF Next run in 29 minutes (2019-
 
 ## Provider configuration
 
+### Configuration file
+
 * `endpoint`: Server address to connect to. Local if empty.
-* `api_version`: Overrides the client version with the specified one.
-* `tls_certs_path`: Path to load the TLS certificates from.
-* `tls_verify`: Controls whether client verifies the server's certificate chain and hostname (default: `true`).
-* `watch_by_default`: Enable watch by default. If false, containers that don't have `diun.enable=true` label will be ignored (default: `false`).
-* `watch_stopped`: Include created and exited containers too (default: `false`).
+* `apiVersion`: Overrides the client version with the specified one.
+* `tlsCertsPath`: Path to load the TLS certificates from.
+* `tlsVerify`: Controls whether client verifies the server's certificate chain and hostname (default `true`).
+* `watchByDefault`: Enable watch by default. If false, containers that don't have `diun.enable=true` label will be ignored (default `false`).
+* `watchStopped`: Include created and exited containers too (default `false`).
+
+### Environment variables
+
+* `DIUN_PROVIDERS_DOCKER`
+* `DIUN_PROVIDERS_DOCKER_ENDPOINT`
+* `DIUN_PROVIDERS_DOCKER_APIVERSION`
+* `DIUN_PROVIDERS_DOCKER_TLSCERTSPATH`
+* `DIUN_PROVIDERS_DOCKER_TLSVERIFY`
+* `DIUN_PROVIDERS_DOCKER_WATCHBYDEFAULT`
+* `DIUN_PROVIDERS_DOCKER_WATCHSTOPPED`
 
 ## Docker labels
 
 You can configure more finely the way to analyze the image of your container through Docker labels:
 
-* `diun.enable`: Set to true to enable image analysis of this container. Required if `watch_by_default` is disabled for this provider.
+* `diun.enable`: Set to true to enable image analysis of this container.
 * `diun.regopts_id`: Registry options ID from [`regopts`](../configuration.md#regopts) to use.
-* `diun.watch_repo`: Watch all tags of this container image (default: `false`).
-* `diun.max_tags`: Maximum number of tags to watch if `diun.watch_repo` enabled. 0 means all of them (default: `0`).
+* `diun.watch_repo`: Watch all tags of this container image (default `false`).
+* `diun.max_tags`: Maximum number of tags to watch if `diun.watch_repo` enabled. 0 means all of them (default `0`).
 * `diun.include_tags`: Semi-colon separated list of regular expressions to include tags. Can be useful if you enable `diun.watch_repo`.
 * `diun.exclude_tags`: Semi-colon separated list of regular expressions to exclude tags. Can be useful if you enable `diun.watch_repo`.

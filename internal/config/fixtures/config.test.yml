@@ -4,7 +4,7 @@ db:
 watch:
   workers: 100
   schedule: "*/30 * * * *"
-  first_check_notif: false
+  firstCheckNotif: true
 
 notif:
   amqp:
@@ -17,60 +17,55 @@ notif:
     endpoint: http://gotify.foo.com
     token: Token123456
     priority: 1
-    timeout: 10
+    timeout: 10s
   mail:
     host: localhost
     port: 25
     ssl: false
-    insecure_skip_verify: false
-    username:
-    username_file:
-    password:
-    password_file:
+    insecureSkipVerify: false
     from: diun@example.com
     to: webmaster@example.com
   rocketchat:
     endpoint: http://rocket.foo.com:3000
     channel: "#general"
-    user_id: abcdEFGH012345678
+    userID: abcdEFGH012345678
     token: Token123456
-    timeout: 10
+    timeout: 10s
   script:
-    cmd: "go"
+    cmd: "uname"
     args:
-      - "version"
+      - "-a"
   slack:
-    webhook_url: https://hooks.slack.com/services/ABCD12EFG/HIJK34LMN/01234567890abcdefghij
+    webhookURL: https://hooks.slack.com/services/ABCD12EFG/HIJK34LMN/01234567890abcdefghij
   teams:
-    webhook_url: https://outlook.office.com/webhook/ABCD12EFG/HIJK34LMN/01234567890abcdefghij
+    webhookURL: https://outlook.office.com/webhook/ABCD12EFG/HIJK34LMN/01234567890abcdefghij
   telegram:
     token: abcdef123456
-    chat_ids:
+    chatIDs:
       - 8547439
       - 1234567
   webhook:
     endpoint: http://webhook.foo.com/sd54qad89azd5a
     method: GET
     headers:
-      Content-Type: application/json
-      Authorization: Token123456
-    timeout: 10
+      content-type: application/json
+      authorization: Token123456
+    timeout: 10s
 
 regopts:
   someregopts:
-    timeout: 5
+    timeout: 5s
   bintrayoptions:
     username: foo
     password: bar
   sensitive:
-    username_file: /run/secrets/username
-    password_file: /run/secrets/password
+    usernameFile: /run/secrets/username
+    passwordFile: /run/secrets/password
 
 providers:
   docker:
-    watch_by_default: true
-    watch_stopped: true
-  swarm:
-    watch_by_default: true
+    watchByDefault: true
+    watchStopped: true
+  swarm: {}
   file:
-    filename: ./test/dummy.yml
+    filename: ./fixtures/dummy.yml

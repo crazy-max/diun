@@ -18,37 +18,32 @@ Image: crazymax/diun:latest
    - linux/s390x
 ```
 
-## Environment variables
-
-* `TZ` : Timezone assigned
-* `LOG_LEVEL` : Log level output (default `info`)
-* `LOG_JSON`: Enable JSON logging output (default `false`)
-* `LOG_CALLER`: Enable to add file:line of the caller (default `false`)
-
 ## Volumes
 
-* `/data` : Contains bbolt database which retains Docker images manifests
-
-> :warning: Note that the volume should be owned by uid `1000` and gid `1000`. If you don't give the volume correct permissions, the container may not start.
+* `/data`: Contains bbolt database which retains Docker images manifests
 
 ## Usage
 
-Docker compose is the recommended way to run this image. Copy the content of folder [.res/compose](../../.res/compose) in `/opt/diun/` on your host for example. Edit the compose and config file with your preferences and run the following commands:
+Docker compose is the recommended way to run this image. Copy the content of folder [.res/compose](../../.res/compose) in `/opt/diun/` on your host for example. Edit the compose file with your preferences and run the following commands:
 
 ```
 docker-compose up -d
 docker-compose logs -f
 ```
 
-Or use the following command :
+Or use the following command:
 
 ```
 $ docker run -d --name diun \
   -e "TZ=Europe/Paris" \
   -e "LOG_LEVEL=info" \
   -e "LOG_JSON=false" \
+  -e "DIUN_WATCH_WORKERS=20" \
+  -e "DIUN_WATCH_SCHEDULE=*/30 * * * *" \
+  -e "DIUN_PROVIDERS_DOCKER=true" \
+  -e "DIUN_PROVIDERS_DOCKER_WATCHSTOPPED=true" \
   -v "$(pwd)/data:/data" \
-  -v "$(pwd)/diun.yml:/diun.yml:ro" \
+  -v "/var/run/docker.sock:/var/run/docker.sock" \
   crazymax/diun:latest
 ```
 

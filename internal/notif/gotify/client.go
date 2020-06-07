@@ -10,7 +10,6 @@ import (
 	"strconv"
 	"strings"
 	"text/template"
-	"time"
 
 	"github.com/crazy-max/diun/v3/internal/model"
 	"github.com/crazy-max/diun/v3/internal/notif/notifier"
@@ -19,18 +18,16 @@ import (
 // Client represents an active gotify notification object
 type Client struct {
 	*notifier.Notifier
-	cfg       *model.NotifGotify
-	app       model.App
-	userAgent string
+	cfg  *model.NotifGotify
+	meta model.Meta
 }
 
 // New creates a new gotify notification instance
-func New(config *model.NotifGotify, app model.App, userAgent string) notifier.Notifier {
+func New(config *model.NotifGotify, meta model.Meta) notifier.Notifier {
 	return notifier.Notifier{
 		Handler: &Client{
-			cfg:       config,
-			app:       app,
-			userAgent: userAgent,
+			cfg:  config,
+			meta: meta,
 		},
 	}
 }
@@ -43,7 +40,7 @@ func (c *Client) Name() string {
 // Send creates and sends a gotify notification with an entry
 func (c *Client) Send(entry model.NotifEntry) error {
 	hc := http.Client{
-		Timeout: time.Duration(c.cfg.Timeout) * time.Second,
+		Timeout: *c.cfg.Timeout,
 	}
 
 	title := fmt.Sprintf("Image update for %s", entry.Image.String())
@@ -79,7 +76,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Add("Content-Length", strconv.Itoa(len(data.Encode())))
-	req.Header.Set("User-Agent", c.userAgent)
+	req.Header.Set("User-Agent", c.meta.UserAgent)
 
 	resp, err := hc.Do(req)
 	if err != nil {

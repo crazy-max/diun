@@ -11,7 +11,7 @@ User=diun
 Group=diun
 ExecStart=/usr/local/bin/diun --config /etc/diun/diun.yml --log-level info
 Restart=always
-Environment=DIUN_DB=/var/lib/diun/diun.db
+Environment=DIUN_DB_PATH=/var/lib/diun/diun.db
 
 [Install]
 WantedBy=multi-user.target

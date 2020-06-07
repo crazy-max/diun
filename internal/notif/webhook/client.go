@@ -14,18 +14,16 @@ import (
 // Client represents an active webhook notification object
 type Client struct {
 	*notifier.Notifier
-	cfg       *model.NotifWebhook
-	app       model.App
-	userAgent string
+	cfg  *model.NotifWebhook
+	meta model.Meta
 }
 
 // New creates a new webhook notification instance
-func New(config *model.NotifWebhook, app model.App, userAgent string) notifier.Notifier {
+func New(config *model.NotifWebhook, meta model.Meta) notifier.Notifier {
 	return notifier.Notifier{
 		Handler: &Client{
-			cfg:       config,
-			app:       app,
-			userAgent: userAgent,
+			cfg:  config,
+			meta: meta,
 		},
 	}
 }
@@ -38,7 +36,7 @@ func (c *Client) Name() string {
 // Send creates and sends a webhook notification with an entry
 func (c *Client) Send(entry model.NotifEntry) error {
 	hc := http.Client{
-		Timeout: time.Duration(c.cfg.Timeout) * time.Second,
+		Timeout: *c.cfg.Timeout,
 	}
 
 	body, err := json.Marshal(struct {
@@ -51,7 +49,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		Created  *time.Time    `json:"created"`
 		Platform string        `json:"platform"`
 	}{
-		Version:  c.app.Version,
+		Version:  c.meta.Version,
 		Status:   string(entry.Status),
 		Provider: entry.Provider,
 		Image:    entry.Image.String(),
@@ -75,7 +73,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		}
 	}
 
-	req.Header.Set("User-Agent", c.userAgent)
+	req.Header.Set("User-Agent", c.meta.UserAgent)
 
 	_, err = hc.Do(req)
 	return err

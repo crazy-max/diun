@@ -6,9 +6,15 @@ services:
     container_name: diun
     volumes:
       - "./data:/data"
-      - "./diun.yml:/diun.yml:ro"
+      - "/var/run/docker.sock:/var/run/docker.sock"
     environment:
       - "TZ=Europe/Paris"
       - "LOG_LEVEL=info"
       - "LOG_JSON=false"
+      - "DIUN_PROVIDERS_DOCKER=true"
+      - "DIUN_PROVIDERS_DOCKER_WATCHBYDEFAULT=false"
+      - "DIUN_PROVIDERS_DOCKER_WATCHSTOPPED=false"
+    labels:
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
     restart: always
