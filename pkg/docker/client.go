@@ -32,6 +32,8 @@ func New(opts Options) (*Client, error) {
 	}
 	if opts.APIVersion != "" {
 		dockerOpts = append(dockerOpts, client.WithVersion(opts.APIVersion))
+	} else {
+		dockerOpts = append(dockerOpts, client.WithAPIVersionNegotiation())
 	}
 	if opts.TLSCertPath != "" {
 		options := tlsconfig.Options{
