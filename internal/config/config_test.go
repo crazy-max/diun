@@ -6,9 +6,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/crazy-max/diun/v3/internal/config"
-	"github.com/crazy-max/diun/v3/internal/model"
-	"github.com/crazy-max/diun/v3/pkg/utl"
+	"github.com/crazy-max/diun/v4/internal/config"
+	"github.com/crazy-max/diun/v4/internal/model"
+	"github.com/crazy-max/diun/v4/pkg/utl"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

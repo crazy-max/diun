@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/crazy-max/diun/v3/third_party/traefik/config/parser"
+	"github.com/crazy-max/diun/v4/third_party/traefik/config/parser"
 )
 
 // FindPrefixedEnvVars finds prefixed environment variables.

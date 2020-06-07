@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/crazy-max/diun/v3/internal/model"
-	"github.com/crazy-max/diun/v3/third_party/traefik/config/env"
-	"github.com/crazy-max/diun/v3/third_party/traefik/config/file"
+	"github.com/crazy-max/diun/v4/internal/model"
+	"github.com/crazy-max/diun/v4/third_party/traefik/config/env"
+	"github.com/crazy-max/diun/v4/third_party/traefik/config/file"
 	"github.com/go-playground/validator/v10"
 	"github.com/pkg/errors"
 )

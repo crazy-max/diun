@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/crazy-max/diun/v3/third_party/traefik/types"
+	"github.com/crazy-max/diun/v4/third_party/traefik/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

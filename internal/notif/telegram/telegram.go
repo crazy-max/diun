@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"text/template"
 
-	"github.com/crazy-max/diun/v3/internal/model"
-	"github.com/crazy-max/diun/v3/internal/notif/notifier"
+	"github.com/crazy-max/diun/v4/internal/model"
+	"github.com/crazy-max/diun/v4/internal/notif/notifier"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 

@@ -7,9 +7,9 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/crazy-max/diun/v3/internal/model"
-	"github.com/crazy-max/diun/v3/internal/notif/notifier"
-	"github.com/crazy-max/diun/v3/pkg/utl"
+	"github.com/crazy-max/diun/v4/internal/model"
+	"github.com/crazy-max/diun/v4/internal/notif/notifier"
+	"github.com/crazy-max/diun/v4/pkg/utl"
 	"github.com/go-gomail/gomail"
 	"github.com/matcornic/hermes/v2"
 	"github.com/rs/zerolog/log"

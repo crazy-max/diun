@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/crazy-max/diun/v3/internal/model"
+	"github.com/crazy-max/diun/v4/internal/model"
 	"gopkg.in/yaml.v2"
 )
 

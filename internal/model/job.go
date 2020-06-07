@@ -1,7 +1,7 @@
 package model
 
 import (
-	"github.com/crazy-max/diun/v3/pkg/registry"
+	"github.com/crazy-max/diun/v4/pkg/registry"
 )
 
 // Job holds job configuration

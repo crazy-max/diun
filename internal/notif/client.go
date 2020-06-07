@@ -3,17 +3,17 @@ package notif
 import (
 	"strings"
 
-	"github.com/crazy-max/diun/v3/internal/model"
-	"github.com/crazy-max/diun/v3/internal/notif/amqp"
-	"github.com/crazy-max/diun/v3/internal/notif/gotify"
-	"github.com/crazy-max/diun/v3/internal/notif/mail"
-	"github.com/crazy-max/diun/v3/internal/notif/notifier"
-	"github.com/crazy-max/diun/v3/internal/notif/rocketchat"
-	"github.com/crazy-max/diun/v3/internal/notif/script"
-	"github.com/crazy-max/diun/v3/internal/notif/slack"
-	"github.com/crazy-max/diun/v3/internal/notif/teams"
-	"github.com/crazy-max/diun/v3/internal/notif/telegram"
-	"github.com/crazy-max/diun/v3/internal/notif/webhook"
+	"github.com/crazy-max/diun/v4/internal/model"
+	"github.com/crazy-max/diun/v4/internal/notif/amqp"
+	"github.com/crazy-max/diun/v4/internal/notif/gotify"
+	"github.com/crazy-max/diun/v4/internal/notif/mail"
+	"github.com/crazy-max/diun/v4/internal/notif/notifier"
+	"github.com/crazy-max/diun/v4/internal/notif/rocketchat"
+	"github.com/crazy-max/diun/v4/internal/notif/script"
+	"github.com/crazy-max/diun/v4/internal/notif/slack"
+	"github.com/crazy-max/diun/v4/internal/notif/teams"
+	"github.com/crazy-max/diun/v4/internal/notif/telegram"
+	"github.com/crazy-max/diun/v4/internal/notif/webhook"
 	"github.com/rs/zerolog/log"
 )
 

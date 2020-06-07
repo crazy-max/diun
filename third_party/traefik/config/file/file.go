@@ -2,7 +2,7 @@
 package file
 
 import (
-	"github.com/crazy-max/diun/v3/third_party/traefik/config/parser"
+	"github.com/crazy-max/diun/v4/third_party/traefik/config/parser"
 )
 
 // Decode decodes the given configuration file into the given element.

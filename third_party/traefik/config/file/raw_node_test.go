@@ -3,7 +3,7 @@ package file
 import (
 	"testing"
 
-	"github.com/crazy-max/diun/v3/third_party/traefik/config/parser"
+	"github.com/crazy-max/diun/v4/third_party/traefik/config/parser"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

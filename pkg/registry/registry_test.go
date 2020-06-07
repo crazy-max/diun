@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/crazy-max/diun/v3/pkg/registry"
+	"github.com/crazy-max/diun/v4/pkg/registry"
 	"github.com/stretchr/testify/assert"
 )
 

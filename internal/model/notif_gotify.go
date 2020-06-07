@@ -3,7 +3,7 @@ package model
 import (
 	"time"
 
-	"github.com/crazy-max/diun/v3/pkg/utl"
+	"github.com/crazy-max/diun/v4/pkg/utl"
 )
 
 // NotifGotify holds gotify notification configuration details

@@ -3,9 +3,9 @@ package swarm
 import (
 	"reflect"
 
-	"github.com/crazy-max/diun/v3/internal/model"
-	"github.com/crazy-max/diun/v3/internal/provider"
-	"github.com/crazy-max/diun/v3/pkg/docker"
+	"github.com/crazy-max/diun/v4/internal/model"
+	"github.com/crazy-max/diun/v4/internal/provider"
+	"github.com/crazy-max/diun/v4/pkg/docker"
 	"github.com/docker/docker/api/types/filters"
 )
 

@@ -3,8 +3,8 @@ package file_test
 import (
 	"testing"
 
-	"github.com/crazy-max/diun/v3/internal/model"
-	"github.com/crazy-max/diun/v3/internal/provider/file"
+	"github.com/crazy-max/diun/v4/internal/model"
+	"github.com/crazy-max/diun/v4/internal/provider/file"
 	"github.com/stretchr/testify/assert"
 )
 

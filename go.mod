@@ -1,4 +1,4 @@
-module github.com/crazy-max/diun/v3
+module github.com/crazy-max/diun/v4
 
 go 1.13
 

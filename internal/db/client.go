@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/crazy-max/diun/v3/internal/model"
+	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/rs/zerolog/log"
 	bolt "go.etcd.io/bbolt"
 )

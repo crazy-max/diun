@@ -3,7 +3,7 @@ package model
 import (
 	"net/mail"
 
-	"github.com/crazy-max/diun/v3/pkg/utl"
+	"github.com/crazy-max/diun/v4/pkg/utl"
 	"github.com/imdario/mergo"
 	"github.com/pkg/errors"
 )

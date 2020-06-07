@@ -1,7 +1,7 @@
 package model
 
 import (
-	"github.com/crazy-max/diun/v3/pkg/utl"
+	"github.com/crazy-max/diun/v4/pkg/utl"
 )
 
 // PrdDocker holds docker provider configuration
