@@ -5,7 +5,7 @@ go 1.13
 require (
 	github.com/alecthomas/kong v0.2.9
 	github.com/containers/image/v5 v5.4.4
-	github.com/docker/docker v1.13.1
+	github.com/docker/docker v1.4.2-0.20191219165747-a9416c67da9f
 	github.com/docker/go-connections v0.4.0
 	github.com/go-gomail/gomail v0.0.0-20160411212932-81ebce5c23df
 	github.com/go-telegram-bot-api/telegram-bot-api v4.6.4+incompatible
@@ -27,5 +27,3 @@ require (
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df // indirect
 	gopkg.in/yaml.v2 v2.3.0
 )
-
-replace github.com/docker/docker => github.com/docker/engine v1.4.2-0.20200309214505-aa6a9891b09c
