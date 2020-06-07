@@ -91,5 +91,6 @@ watch:
   firstCheckNotif: false
 
 providers:
-  docker: {}
+  docker:
+    watchByDefault: true
 ```
