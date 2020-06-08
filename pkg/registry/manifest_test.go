@@ -14,7 +14,7 @@ func TestManifestVariant(t *testing.T) {
 		ImageVariant: "v7",
 	})
 	if err != nil {
-		panic(err.Error())
+		t.Error(err)
 	}
 
 	img, err := registry.ParseImage(registry.ParseImageOptions{

@@ -47,6 +47,7 @@ The JSON response will look like this:
   "status": "new",
   "provider": "file",
   "image": "docker.io/crazymax/swarm-cronjob:0.2.1",
+  "hub_link": "https://hub.docker.com/r/crazymax/swarm-cronjob",
   "mime_type": "application/vnd.docker.distribution.manifest.v2+json",
   "digest": "sha256:5913d4b5e8dc15430c2f47f40e43ab2ca7f2b8df5eee5db4d5c42311e08dfb79",
   "created": "2019-01-24T10:26:49.152006005Z",
@@ -148,10 +149,11 @@ DIUN_VERSION=3.0.0
 DIUN_ENTRY_STATUS=new
 DIUN_ENTRY_PROVIDER=file
 DIUN_ENTRY_IMAGE=docker.io/crazymax/diun:latest
+DIUN_ENTRY_HUBLINK=https://hub.docker.com/r/crazymax/diun
 DIUN_ENTRY_MIMETYPE=application/vnd.docker.distribution.manifest.list.v2+json
 DIUN_ENTRY_DIGEST=sha256:216e3ae7de4ca8b553eb11ef7abda00651e79e537e85c46108284e5e91673e01
 DIUN_ENTRY_CREATED=2020-03-26 12:23:56 +0000 UTC
-DIUN_ENTRY_PLATFORM=linux/adm64
+DIUN_ENTRY_PLATFORM=linux/amd64
 ```
 
 ### Configuration file
@@ -252,13 +254,14 @@ The JSON response will look like this:
 
 ```json
 {
-  "diun_version": "0.3.0",
+  "diun_version": "4.0.0",
   "status": "new",
   "provider": "file",
-  "image": "docker.io/crazymax/swarm-cronjob:0.2.1",
-  "mime_type": "application/vnd.docker.distribution.manifest.v2+json",
-  "digest": "sha256:5913d4b5e8dc15430c2f47f40e43ab2ca7f2b8df5eee5db4d5c42311e08dfb79",
-  "created": "2019-01-24T10:26:49.152006005Z",
+  "image": "docker.io/crazymax/diun:latest",
+  "hub_link": "https://hub.docker.com/r/crazymax/diun",
+  "mime_type": "application/vnd.docker.distribution.manifest.list.v2+json",
+  "digest": "sha256:216e3ae7de4ca8b553eb11ef7abda00651e79e537e85c46108284e5e91673e01",
+  "created": "2020-03-26T12:23:56Z",
   "platform": "linux/amd64"
 }
 ```

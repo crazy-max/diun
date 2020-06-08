@@ -56,6 +56,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		fmt.Sprintf("DIUN_ENTRY_STATUS=%s", string(entry.Status)),
 		fmt.Sprintf("DIUN_ENTRY_PROVIDER=%s", entry.Provider),
 		fmt.Sprintf("DIUN_ENTRY_IMAGE=%s", entry.Image.String()),
+		fmt.Sprintf("DIUN_ENTRY_HUBLINK=%s", entry.Image.HubLink),
 		fmt.Sprintf("DIUN_ENTRY_MIMETYPE=%s", entry.Manifest.MIMEType),
 		fmt.Sprintf("DIUN_ENTRY_DIGEST=%s", entry.Manifest.Digest),
 		fmt.Sprintf("DIUN_ENTRY_CREATED=%s", entry.Manifest.Created),
