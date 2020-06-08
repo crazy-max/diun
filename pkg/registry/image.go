@@ -1,21 +1,32 @@
 package registry
 
 import (
+	"bytes"
 	"fmt"
+	"path/filepath"
+	"strings"
+	"text/template"
 
 	"github.com/containers/image/v5/docker/reference"
 	digest "github.com/opencontainers/go-digest"
+	"github.com/pkg/errors"
 )
-
-// Source: https://github.com/genuinetools/reg/blob/f3a9b00ec86f334702381edf842f03b3a9243a0a/registry/image.go
 
 // Image holds information about an image.
 type Image struct {
-	Domain string
-	Path   string
-	Tag    string
-	Digest digest.Digest
-	named  reference.Named
+	Domain  string
+	Path    string
+	Tag     string
+	Digest  digest.Digest
+	HubLink string
+	named   reference.Named
+	opts    ParseImageOptions
+}
+
+// ParseImageOptions holds image options for parsing.
+type ParseImageOptions struct {
+	Name   string
+	HubTpl string
 }
 
 // Name returns the full name representation of an image.
@@ -45,19 +56,26 @@ func (i *Image) WithDigest(digest digest.Digest) (err error) {
 }
 
 // ParseImage returns an Image struct with all the values filled in for a given image.
-func ParseImage(image string) (Image, error) {
+func ParseImage(parseOpts ParseImageOptions) (Image, error) {
 	// Parse the image name and tag.
-	named, err := reference.ParseNormalizedNamed(image)
+	named, err := reference.ParseNormalizedNamed(parseOpts.Name)
 	if err != nil {
-		return Image{}, fmt.Errorf("parsing image %q failed: %v", image, err)
+		return Image{}, errors.Wrap(err, fmt.Sprintf("parsing image %s failed", parseOpts.Name))
 	}
 	// Add the latest lag if they did not provide one.
 	named = reference.TagNameOnly(named)
 
 	i := Image{
+		opts:   parseOpts,
 		named:  named,
 		Domain: reference.Domain(named),
 		Path:   reference.Path(named),
+	}
+
+	// Hub link
+	i.HubLink, err = i.hubLink()
+	if err != nil {
+		return Image{}, errors.Wrap(err, fmt.Sprintf("resolving hub link for image %s failed", parseOpts.Name))
 	}
 
 	// Add the tag if there was one.
@@ -71,4 +89,43 @@ func ParseImage(image string) (Image, error) {
 	}
 
 	return i, nil
+}
+
+func (i Image) hubLink() (string, error) {
+	if i.opts.HubTpl != "" {
+		var out bytes.Buffer
+		tmpl, err := template.New("tmpl").
+			Option("missingkey=error").
+			Parse(i.opts.HubTpl)
+		if err != nil {
+			return "", err
+		}
+		err = tmpl.Execute(&out, i)
+		return out.String(), err
+	}
+
+	switch i.Domain {
+	case "docker.io":
+		prefix := "r"
+		path := i.Path
+		if strings.HasPrefix(i.Path, "library/") {
+			prefix = "_"
+			path = strings.Replace(i.Path, "library/", "", 1)
+		}
+		return fmt.Sprintf("https://hub.docker.com/%s/%s", prefix, path), nil
+	case "docker.bintray.io", "jfrog-docker-reg2.bintray.io":
+		return fmt.Sprintf("https://bintray.com/jfrog/reg2/%s", strings.ReplaceAll(i.Path, "/", "%3A")), nil
+	case "docker.pkg.github.com":
+		return fmt.Sprintf("https://github.com/%s/packages", filepath.ToSlash(filepath.Dir(i.Path))), nil
+	case "gcr.io":
+		return fmt.Sprintf("https://%s/%s", i.Domain, i.Path), nil
+	case "quay.io":
+		return fmt.Sprintf("https://quay.io/repository/%s", i.Path), nil
+	case "registry.access.redhat.com":
+		return fmt.Sprintf("https://access.redhat.com/containers/#/registry.access.redhat.com/%s", i.Path), nil
+	case "registry.gitlab.com":
+		return fmt.Sprintf("https://gitlab.com/%s/container_registry", i.Path), nil
+	default:
+		return "", nil
+	}
 }
