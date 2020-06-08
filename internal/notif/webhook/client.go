@@ -44,6 +44,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		Status   string        `json:"status"`
 		Provider string        `json:"provider"`
 		Image    string        `json:"image"`
+		HubLink  string        `json:"hub_link"`
 		MIMEType string        `json:"mime_type"`
 		Digest   digest.Digest `json:"digest"`
 		Created  *time.Time    `json:"created"`
@@ -53,6 +54,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		Status:   string(entry.Status),
 		Provider: entry.Provider,
 		Image:    entry.Image.String(),
+		HubLink:  entry.Image.HubLink,
 		MIMEType: entry.Manifest.MIMEType,
 		Digest:   entry.Manifest.Digest,
 		Created:  entry.Manifest.Created,

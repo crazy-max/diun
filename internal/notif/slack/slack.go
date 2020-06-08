@@ -48,6 +48,36 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		color = "#0054ca"
 	}
 
+	fields := []slack.AttachmentField{
+		{
+			Title: "Provider",
+			Value: entry.Provider,
+			Short: false,
+		},
+		{
+			Title: "Created",
+			Value: entry.Manifest.Created.Format("Jan 02, 2006 15:04:05 UTC"),
+			Short: false,
+		},
+		{
+			Title: "Digest",
+			Value: entry.Manifest.Digest.String(),
+			Short: false,
+		},
+		{
+			Title: "Platform",
+			Value: entry.Manifest.Platform,
+			Short: false,
+		},
+	}
+	if len(entry.Image.HubLink) > 0 {
+		fields = append(fields, slack.AttachmentField{
+			Title: "HubLink",
+			Value: entry.Image.HubLink,
+			Short: false,
+		})
+	}
+
 	return slack.PostWebhook(c.cfg.WebhookURL, &slack.WebhookMessage{
 		Attachments: []slack.Attachment{
 			{
@@ -58,29 +88,8 @@ func (c *Client) Send(entry model.NotifEntry) error {
 				AuthorIcon:    c.meta.Logo,
 				Text:          textBuf.String(),
 				Footer:        fmt.Sprintf("%s © %d %s %s", c.meta.Author, time.Now().Year(), c.meta.Name, c.meta.Version),
-				Fields: []slack.AttachmentField{
-					{
-						Title: "Provider",
-						Value: entry.Provider,
-						Short: false,
-					},
-					{
-						Title: "Created",
-						Value: entry.Manifest.Created.Format("Jan 02, 2006 15:04:05 UTC"),
-						Short: false,
-					},
-					{
-						Title: "Digest",
-						Value: entry.Manifest.Digest.String(),
-						Short: false,
-					},
-					{
-						Title: "Platform",
-						Value: entry.Manifest.Platform,
-						Short: false,
-					},
-				},
-				Ts: json.Number(strconv.FormatInt(time.Now().Unix(), 10)),
+				Fields:        fields,
+				Ts:            json.Number(strconv.FormatInt(time.Now().Unix(), 10)),
 			},
 		},
 	})

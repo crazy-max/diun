@@ -2,6 +2,7 @@ package telegram
 
 import (
 	"bytes"
+	"fmt"
 	"text/template"
 
 	"github.com/crazy-max/diun/v4/internal/model"
@@ -38,16 +39,27 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		return err
 	}
 
+	tagTpl := "{{ .Image.Domain }}/{{ .Image.Path }}:{{ .Image.Tag }}"
+	if len(entry.Image.HubLink) > 0 {
+		tagTpl = "[{{ .Image.Domain }}/{{ .Image.Path }}:{{ .Image.Tag }}]({{ .Image.HubLink }})"
+	}
+
 	var msgBuf bytes.Buffer
-	msgTpl := template.Must(template.New("email").Parse(`Docker 🐳 tag {{ .Image.Domain }}/{{ .Image.Path }}:{{ .Image.Tag }} which you subscribed to through {{ .Provider }} provider has been {{ if (eq .Status "new") }}newly added{{ else }}updated{{ end }}.`))
+	msgTpl := template.Must(template.New("email").Parse(fmt.Sprintf("Docker tag %s which you subscribed to through {{ .Provider }} provider has been {{ if (eq .Status \"new\") }}newly added{{ else }}updated{{ end }}.", tagTpl)))
 	if err := msgTpl.Execute(&msgBuf, entry); err != nil {
 		return err
 	}
 
 	for _, chatID := range c.cfg.ChatIDs {
-		msg := tgbotapi.NewMessage(chatID, bot.Self.UserName)
-		msg.Text = msgBuf.String()
-		if _, err := bot.Send(msg); err != nil {
+		_, err := bot.Send(tgbotapi.MessageConfig{
+			BaseChat: tgbotapi.BaseChat{
+				ChatID: chatID,
+			},
+			Text:                  msgBuf.String(),
+			ParseMode:             "markdown",
+			DisableWebPagePreview: true,
+		})
+		if err != nil {
 			return err
 		}
 	}

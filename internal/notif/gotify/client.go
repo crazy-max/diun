@@ -8,7 +8,6 @@ import (
 	"net/url"
 	"path"
 	"strconv"
-	"strings"
 	"text/template"
 
 	"github.com/crazy-max/diun/v4/internal/model"
@@ -48,16 +47,35 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		title = fmt.Sprintf("New image %s has been added", entry.Image.String())
 	}
 
+	tagTpl := "`{{ .Image.Domain }}/{{ .Image.Path }}:{{ .Image.Tag }}`"
+	if len(entry.Image.HubLink) > 0 {
+		tagTpl = "[`{{ .Image.Domain }}/{{ .Image.Path }}:{{ .Image.Tag }}`]({{ .Image.HubLink }})"
+	}
+
 	var msgBuf bytes.Buffer
-	msgTpl := template.Must(template.New("gotify").Parse(`Docker 🐳 tag {{ .Image.Domain }}/{{ .Image.Path }}:{{ .Image.Tag }} which you subscribed to through {{ .Provider }} provider has been {{ if (eq .Status "new") }}newly added{{ else }}updated{{ end }}.`))
+	msgTpl := template.Must(template.New("gotify").Parse(fmt.Sprintf("Docker tag %s which you subscribed to through {{ .Provider }} provider has been {{ if (eq .Status \"new\") }}newly added{{ else }}updated{{ end }}.", tagTpl)))
 	if err := msgTpl.Execute(&msgBuf, entry); err != nil {
 		return err
 	}
 
-	data := url.Values{}
-	data.Set("message", msgBuf.String())
-	data.Set("title", title)
-	data.Set("priority", strconv.Itoa(c.cfg.Priority))
+	var body, err = json.Marshal(struct {
+		Message  string                 `json:"message"`
+		Title    string                 `json:"title"`
+		Priority int                    `json:"priority"`
+		Extras   map[string]interface{} `json:"extras"`
+	}{
+		Message:  msgBuf.String(),
+		Title:    title,
+		Priority: c.cfg.Priority,
+		Extras: map[string]interface{}{
+			"client::display": map[string]string{
+				"contentType": "text/markdown",
+			},
+		},
+	})
+	if err != nil {
+		return err
+	}
 
 	u, err := url.Parse(c.cfg.Endpoint)
 	if err != nil {
@@ -69,13 +87,13 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	q.Set("token", c.cfg.Token)
 	u.RawQuery = q.Encode()
 
-	req, err := http.NewRequest("POST", u.String(), strings.NewReader(data.Encode()))
+	req, err := http.NewRequest("POST", u.String(), bytes.NewBuffer(body))
 	if err != nil {
 		return err
 	}
 
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	req.Header.Add("Content-Length", strconv.Itoa(len(data.Encode())))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Add("Content-Length", strconv.Itoa(len(string(body))))
 	req.Header.Set("User-Agent", c.meta.UserAgent)
 
 	resp, err := hc.Do(req)

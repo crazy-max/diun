@@ -59,17 +59,23 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		subject = fmt.Sprintf("New image %s has been added", entry.Image.String())
 	}
 
+	tagTpl := "**{{ .Image.Domain }}/{{ .Image.Path }}:{{ .Image.Tag }}**"
+	if len(entry.Image.HubLink) > 0 {
+		tagTpl = "[**{{ .Image.Domain }}/{{ .Image.Path }}:{{ .Image.Tag }}**]({{ .Image.HubLink }})"
+	}
+
 	// Body
 	var emailBuf bytes.Buffer
-	emailTpl := template.Must(template.New("email").Parse(`
+	emailTpl := template.Must(template.New("email").Parse(fmt.Sprintf(`
 
-Docker 🐳 tag **{{ .Image.Domain }}/{{ .Image.Path }}:{{ .Image.Tag }}** which you subscribed to through **{{ .Provider }}** provider has been {{ if (eq .Status "new") }}newly added{{ else }}updated{{ end }}.
+Docker tag %s which you subscribed to through **{{ .Provider }}** provider has been {{ if (eq .Status "new") }}newly added{{ else }}updated{{ end }}.
 
-This image has been {{ if (eq .Status "new") }}created{{ else }}updated{{ end }} at <code>{{ .Manifest.Created.Format "Jan 02, 2006 15:04:05 UTC" }}</code> with digest <code>{{ .Manifest.Digest }}</code> for <code>{{ .Manifest.Platform }}</code> platform.
+This image has been {{ if (eq .Status "new") }}created{{ else }}updated{{ end }} at <code>{{ .Manifest.Created.Format "Jan 02, 2006 15:04:05 UTC" }}</code>
+with digest <code>{{ .Manifest.Digest }}</code> for <code>{{ .Manifest.Platform }}</code> platform.
 
 Need help, or have questions? Go to https://github.com/crazy-max/diun and leave an issue.
 
-`))
+`, tagTpl)))
 	if err := emailTpl.Execute(&emailBuf, entry); err != nil {
 		return err
 	}

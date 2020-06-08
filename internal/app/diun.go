@@ -179,7 +179,7 @@ func (di *Diun) TestNotif() {
 				"sha256:c6a5bfed445b3ed7e85523cd73c6532ac9f9b72bb588ca728fd5b33987ca6538",
 				"sha256:df2140efb8abeb727ef0b27ff158b7010a7941eb1cfdade505f510a6e1eaf016",
 			},
-			Platform: "linux/adm64",
+			Platform: "linux/amd64",
 		},
 	})
 }

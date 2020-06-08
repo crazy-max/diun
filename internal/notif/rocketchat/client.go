@@ -50,48 +50,55 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	}
 
 	var textBuf bytes.Buffer
-	textTpl := template.Must(template.New("rocketchat").Parse(`Docker 🐳 tag {{ .Image.Domain }}/{{ .Image.Path }}:{{ .Image.Tag }} which you subscribed to through {{ .Provider }} provider has been {{ if (eq .Status "new") }}newly added{{ else }}updated{{ end }}.`))
+	textTpl := template.Must(template.New("rocketchat").Parse(`Docker tag {{ .Image.Domain }}/{{ .Image.Path }}:{{ .Image.Tag }} which you subscribed to through {{ .Provider }} provider has been {{ if (eq .Status "new") }}newly added{{ else }}updated{{ end }}.`))
 	if err := textTpl.Execute(&textBuf, entry); err != nil {
 		return err
 	}
 
-	data := Message{
+	fields := []AttachmentField{
+		{
+			Title: "Provider",
+			Value: entry.Provider,
+			Short: false,
+		},
+		{
+			Title: "Created",
+			Value: entry.Manifest.Created.Format("Jan 02, 2006 15:04:05 UTC"),
+			Short: false,
+		},
+		{
+			Title: "Digest",
+			Value: entry.Manifest.Digest.String(),
+			Short: false,
+		},
+		{
+			Title: "Platform",
+			Value: entry.Manifest.Platform,
+			Short: false,
+		},
+	}
+	if len(entry.Image.HubLink) > 0 {
+		fields = append(fields, AttachmentField{
+			Title: "HubLink",
+			Value: entry.Image.HubLink,
+			Short: false,
+		})
+	}
+
+	dataBuf := new(bytes.Buffer)
+	if err := json.NewEncoder(dataBuf).Encode(Message{
 		Alias:   c.meta.Name,
 		Avatar:  c.meta.Logo,
 		Channel: c.cfg.Channel,
 		Text:    title,
 		Attachments: []Attachment{
 			{
-				Text: textBuf.String(),
-				Ts:   json.Number(strconv.FormatInt(time.Now().Unix(), 10)),
-				Fields: []AttachmentField{
-					{
-						Title: "Provider",
-						Value: entry.Provider,
-						Short: false,
-					},
-					{
-						Title: "Created",
-						Value: entry.Manifest.Created.Format("Jan 02, 2006 15:04:05 UTC"),
-						Short: false,
-					},
-					{
-						Title: "Digest",
-						Value: entry.Manifest.Digest.String(),
-						Short: false,
-					},
-					{
-						Title: "Platform",
-						Value: entry.Manifest.Platform,
-						Short: false,
-					},
-				},
+				Text:   textBuf.String(),
+				Ts:     json.Number(strconv.FormatInt(time.Now().Unix(), 10)),
+				Fields: fields,
 			},
 		},
-	}
-
-	dataBuf := new(bytes.Buffer)
-	if err := json.NewEncoder(dataBuf).Encode(data); err != nil {
+	}); err != nil {
 		return err
 	}
 

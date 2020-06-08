@@ -3,6 +3,7 @@ package teams
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"text/template"
 	"time"
@@ -52,8 +53,13 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		Timeout: time.Duration(10) * time.Second,
 	}
 
+	tagTpl := "`{{ .Image.Domain }}/{{ .Image.Path }}:{{ .Image.Tag }}`"
+	if len(entry.Image.HubLink) > 0 {
+		tagTpl = "[`{{ .Image.Domain }}/{{ .Image.Path }}:{{ .Image.Tag }}`]({{ .Image.HubLink }})"
+	}
+
 	var textBuf bytes.Buffer
-	textTpl := template.Must(template.New("text").Parse("Docker tag `{{ .Image.Domain }}/{{ .Image.Path }}:{{ .Image.Tag }}` {{ if (eq .Status \"new\") }}newly added{{ else }}updated{{ end }}."))
+	textTpl := template.Must(template.New("text").Parse(fmt.Sprintf("Docker tag %s {{ if (eq .Status \"new\") }}newly added{{ else }}updated{{ end }}.", tagTpl)))
 	if err := textTpl.Execute(&textBuf, entry); err != nil {
 		return err
 	}
