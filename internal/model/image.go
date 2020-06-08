@@ -9,6 +9,7 @@ type Image struct {
 	MaxTags     int           `yaml:"max_tags,omitempty" json:",omitempty"`
 	IncludeTags []string      `yaml:"include_tags,omitempty" json:",omitempty"`
 	ExcludeTags []string      `yaml:"exclude_tags,omitempty" json:",omitempty"`
+	HubTpl      string        `yaml:"hub_tpl,omitempty" json:",omitempty"`
 }
 
 // ImagePlatform holds image platform configuration

@@ -144,7 +144,9 @@ func (di *Diun) Close() {
 // TestNotif test the notification settings
 func (di *Diun) TestNotif() {
 	createdAt, _ := time.Parse("2006-01-02T15:04:05Z", "2020-03-26T12:23:56Z")
-	image, _ := registry.ParseImage("crazymax/diun:latest")
+	image, _ := registry.ParseImage(registry.ParseImageOptions{
+		Name: "crazymax/diun:latest",
+	})
 
 	log.Info().Msg("Testing notification settings...")
 	di.notif.Send(model.NotifEntry{

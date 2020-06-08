@@ -45,6 +45,8 @@ func ValidateContainerImage(image string, labels map[string]string, watchByDef b
 			img.IncludeTags = strings.Split(value, ";")
 		case "diun.exclude_tags":
 			img.ExcludeTags = strings.Split(value, ";")
+		case "diun.hub_tpl":
+			img.HubTpl = value
 		}
 	}
 

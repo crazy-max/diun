@@ -20,7 +20,10 @@ func (di *Diun) createJob(job model.Job) {
 		Logger()
 
 	// Validate image
-	job.RegImage, err = registry.ParseImage(job.Image.Name)
+	job.RegImage, err = registry.ParseImage(registry.ParseImageOptions{
+		Name:   job.Image.Name,
+		HubTpl: job.Image.HubTpl,
+	})
 	if err != nil {
 		sublog.Error().Err(err).Msg("Cannot parse image")
 		return
@@ -118,7 +121,10 @@ func (di *Diun) createJob(job model.Job) {
 
 	for _, tag := range tags.List {
 		job.Image.Name = fmt.Sprintf("%s/%s:%s", job.RegImage.Domain, job.RegImage.Path, tag)
-		job.RegImage, err = registry.ParseImage(job.Image.Name)
+		job.RegImage, err = registry.ParseImage(registry.ParseImageOptions{
+			Name:   job.Image.Name,
+			HubTpl: job.Image.HubTpl,
+		})
 		if err != nil {
 			sublog.Error().Err(err).Msg("Cannot parse image (tag)")
 			continue
