@@ -67,5 +67,7 @@ providers:
     watchByDefault: true
     watchStopped: true
   swarm: {}
+  kubernetes:
+    watchByDefault: true
   file:
     filename: ./fixtures/dummy.yml
