@@ -14,5 +14,8 @@ trim_trailing_whitespace = true
 [*.go]
 indent_style = tab
 
+[{**/fixtures/**,**/.dev/**}]
+insert_final_newline = false
+
 [*.md]
 trim_trailing_whitespace = false

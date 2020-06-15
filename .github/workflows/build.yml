@@ -22,6 +22,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       -
+        name: Checkout
+        uses: actions/checkout@v2
+      -
         name: Prepare
         id: prepare
         run: |
@@ -34,8 +37,13 @@ jobs:
         with:
           go-version: 1.13
       -
-        name: Checkout
-        uses: actions/checkout@v2
+        name: Cache Go modules
+        uses: actions/cache@v2
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
       -
         name: GoReleaser
         uses: goreleaser/goreleaser-action@v2
@@ -102,30 +110,30 @@ jobs:
             ${TAGS} --file Dockerfile .
       -
         name: Set up Docker Buildx
-        uses: crazy-max/ghaction-docker-buildx@v2
+        uses: crazy-max/ghaction-docker-buildx@v3.1.0
       -
         name: Docker Buildx (build)
         run: |
           docker buildx build --output "type=image,push=false" ${{ steps.prepare.outputs.buildx_args }}
       -
         name: Docker Login
-        if: success() && github.event_name != 'pull_request'
+        if: success() && github.event_name != 'pull_request' && endsWith(github.ref, github.repository.default_branch)
         env:
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         run: |
           echo "${DOCKER_PASSWORD}" | docker login --username "${{ steps.prepare.outputs.docker_username }}" --password-stdin
       -
         name: Docker Buildx (push)
-        if: success() && github.event_name != 'pull_request'
+        if: success() && github.event_name != 'pull_request' && endsWith(github.ref, github.repository.default_branch)
         run: |
           docker buildx build --output "type=image,push=true" ${{ steps.prepare.outputs.buildx_args }}
       -
         name: Docker Check Manifest
-        if: always() && github.event_name != 'pull_request'
+        if: success() && github.event_name != 'pull_request' && endsWith(github.ref, github.repository.default_branch)
         run: |
           docker run --rm mplatform/mquery ${{ steps.prepare.outputs.docker_image }}:${{ steps.prepare.outputs.version }}
       -
         name: Clear
-        if: always() && github.event_name != 'pull_request'
+        if: always() && github.event_name != 'pull_request' && endsWith(github.ref, github.repository.default_branch)
         run: |
           rm -f ${HOME}/.docker/config.json
