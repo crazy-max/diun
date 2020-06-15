@@ -15,7 +15,10 @@
 
 ## About
 
-**Diun** is a CLI application written in [Go](https://golang.org/) to receive notifications when a Docker image is updated on a Docker registry. With Go, this app can be used across many platforms and architectures. This support includes Linux, FreeBSD, macOS and Windows on architectures like amd64, i386, ARM and others.
+**Diun** is a CLI application written in [Go](https://golang.org/)  and delivered as a
+[single executable](https://github.com/crazy-max/diun/releases/latest) (and a
+[Docker image](https://hub.docker.com/r/crazymax/diun/)) to receive notifications when a Docker image is updated on
+a Docker registry.
 
 ![](.res/notif-slack.png)
 
@@ -26,7 +29,7 @@
 * Internal cron implementation through go routines
 * Worker pool to parallelize analyses
 * Allow overriding image os and architecture
-* Multi providers available like [Docker](doc/providers/docker.md), [Swarm](doc/providers/swarm.md), [File](doc/providers/file.md)...
+* Multi providers available: [Docker](doc/providers/docker.md), [Swarm](doc/providers/swarm.md) and [File](doc/providers/file.md)
 * Get notified through Gotify, Mail, Slack, Telegram and [more](doc/notifications.md)
 * Enhanced logging
 * Timezone can be changed
@@ -50,7 +53,10 @@
 
 ## How can I help?
 
-All kinds of contributions are welcome :raised_hands:! The most basic way to show your support is to star :star2: the project, or to raise issues :speech_balloon: You can also support this project by [**becoming a sponsor on GitHub**](https://github.com/sponsors/crazy-max) :clap: or by making a [Paypal donation](https://www.paypal.me/crazyws) to ensure this journey continues indefinitely! :rocket:
+All kinds of contributions are welcome :raised_hands:! The most basic way to show your support is to star :star2: the
+project, or to raise issues :speech_balloon: You can also support this project by
+[**becoming a sponsor on GitHub**](https://github.com/sponsors/crazy-max) :clap: or by making a
+[Paypal donation](https://www.paypal.me/crazyws) to ensure this journey continues indefinitely! :rocket:
 
 Thanks again for your support, it is much appreciated! :pray:
 
