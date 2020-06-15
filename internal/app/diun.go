@@ -12,6 +12,7 @@ import (
 	"github.com/crazy-max/diun/v4/internal/notif"
 	dockerPrd "github.com/crazy-max/diun/v4/internal/provider/docker"
 	filePrd "github.com/crazy-max/diun/v4/internal/provider/file"
+	kubernetesPrd "github.com/crazy-max/diun/v4/internal/provider/kubernetes"
 	swarmPrd "github.com/crazy-max/diun/v4/internal/provider/swarm"
 	"github.com/crazy-max/diun/v4/pkg/registry"
 	"github.com/hako/durafmt"
@@ -120,6 +121,11 @@ func (di *Diun) Run() {
 
 	// Swarm provider
 	for _, job := range swarmPrd.New(di.cfg.Providers.Swarm).ListJob() {
+		di.createJob(job)
+	}
+
+	// Kubernetes provider
+	for _, job := range kubernetesPrd.New(di.cfg.Providers.Kubernetes).ListJob() {
 		di.createJob(job)
 	}
 

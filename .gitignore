@@ -1,6 +1,6 @@
 /.idea
 /*.iml
 
-/.dev
+.dev
 /bin
 /dist

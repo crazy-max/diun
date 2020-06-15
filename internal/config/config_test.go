@@ -125,6 +125,10 @@ func TestLoadFile(t *testing.T) {
 						TLSVerify:      utl.NewTrue(),
 						WatchByDefault: utl.NewFalse(),
 					},
+					Kubernetes: &model.PrdKubernetes{
+						TLSInsecure:    utl.NewFalse(),
+						WatchByDefault: utl.NewTrue(),
+					},
 					File: &model.PrdFile{
 						Filename: "./fixtures/dummy.yml",
 					},
