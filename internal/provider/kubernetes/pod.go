@@ -14,7 +14,6 @@ func (c *Client) listPodImage() []model.Image {
 		Endpoint:    c.config.Endpoint,
 		Token:       c.config.Token,
 		TokenFile:   c.config.TokenFile,
-		Namespaces:  c.config.Namespaces,
 		TLSCAFile:   c.config.TLSCAFile,
 		TLSInsecure: c.config.TLSInsecure,
 	})
