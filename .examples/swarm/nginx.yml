@@ -1,0 +1,15 @@
+version: "3.5"
+
+services:
+  nginx:
+    image: nginx
+    ports:
+      - target: 80
+        published: 80
+        protocol: udp
+    deploy:
+      mode: replicated
+      replicas: 2
+      labels:
+        - "diun.enable=true"
+        - "diun.watch_repo=true"

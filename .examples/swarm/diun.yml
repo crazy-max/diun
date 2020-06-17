@@ -1,0 +1,24 @@
+version: "3.5"
+
+services:
+  diun:
+    image: crazymax/diun:latest
+    volumes:
+      - "./data:/data"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    environment:
+      - "TZ=Europe/Paris"
+      - "LOG_LEVEL=info"
+      - "LOG_JSON=false"
+      - "DIUN_WATCH_WORKERS=20"
+      - "DIUN_WATCH_SCHEDULE=*/30 * * * *"
+      - "DIUN_PROVIDERS_SWARM=true"
+    deploy:
+      mode: replicated
+      replicas: 1
+      labels:
+        - "diun.enable=true"
+        - "diun.watch_repo=true"
+      placement:
+        constraints:
+          - node.role == manager
