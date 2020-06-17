@@ -72,7 +72,7 @@ spec:
               name: "data"
       restartPolicy: Always
       volumes:
-        # Set up a data directory for gitea
+        # Set up a data directory for diun
         # For production usage, you should consider using PV/PVC instead(or simply using storage like NAS)
         # For more details, please see https://kubernetes.io/docs/concepts/storage/volumes/
         - name: "data"
