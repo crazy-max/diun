@@ -83,6 +83,14 @@ jobs:
         name: Checkout
         uses: actions/checkout@v2
       -
+        name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
+      -
+        name: Env vars
+        run: env|sort
+      -
         name: Prepare
         id: prepare
         run: |
