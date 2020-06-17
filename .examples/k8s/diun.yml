@@ -1,8 +1,41 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  namespace: default
+  name: diun
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: diun
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+    verbs:
+      - get
+      - watch
+      - list
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: diun
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: diun
+subjects:
+  - kind: ServiceAccount
+    name: diun
+    namespace: default
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  labels:
-    app: diun
+  namespace: default
+  name: diun
 spec:
   replicas: 1
   selector:
@@ -12,10 +45,11 @@ spec:
     metadata:
       labels:
         app: diun
-#      annotations:
-#        diun.enable: "true"
-#        diun.watch_repo: "true"
+      annotations:
+        diun.enable: "true"
+        diun.watch_repo: "true"
     spec:
+      serviceAccountName: diun
       containers:
         - name: diun
           image: crazymax/diun:latest

@@ -20,11 +20,44 @@ Here we use our local Kubernetes provider with a minimum configuration to analyz
 Now let's create a simple pod for Diun:
 
 ```yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  namespace: default
+  name: diun
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: diun
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+    verbs:
+      - get
+      - watch
+      - list
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: diun
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: diun
+subjects:
+  - kind: ServiceAccount
+    name: diun
+    namespace: default
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  labels:
-    app: diun
+  namespace: default
+  name: diun
 spec:
   replicas: 1
   selector:
@@ -34,36 +67,40 @@ spec:
     metadata:
       labels:
         app: diun
+      annotations:
+        diun.enable: "true"
+        diun.watch_repo: "true"
     spec:
+      serviceAccountName: diun
       containers:
-      - name: diun
-        image: crazymax/diun:latest
-        imagePullPolicy: Always
-        env:
-          - name: TZ
-            value: "Europe/Paris"
-          - name: LOG_LEVEL
-            value: "info"
-          - name: LOG_JSON
-            value: "false"
-          - name: DIUN_WATCH_WORKERS
-            value: "20"
-          - name: DIUN_WATCH_SCHEDULE
-            value: "*/30 * * * *"
-          - name: DIUN_PROVIDERS_KUBERNETES
-            value: "true"
-        volumeMounts:
-          - mountPath: "/data"
-            name: "data"
+        - name: diun
+          image: crazymax/diun:latest
+          imagePullPolicy: Always
+          env:
+            - name: TZ
+              value: "Europe/Paris"
+            - name: LOG_LEVEL
+              value: "info"
+            - name: LOG_JSON
+              value: "false"
+            - name: DIUN_WATCH_WORKERS
+              value: "20"
+            - name: DIUN_WATCH_SCHEDULE
+              value: "*/30 * * * *"
+            - name: DIUN_PROVIDERS_KUBERNETES
+              value: "true"
+          volumeMounts:
+            - mountPath: "/data"
+              name: "data"
       restartPolicy: Always
       volumes:
         # Set up a data directory for gitea
         # For production usage, you should consider using PV/PVC instead(or simply using storage like NAS)
         # For more details, please see https://kubernetes.io/docs/concepts/storage/volumes/
-      - name: "data"
-        hostPath:
-          path: "/data"
-          type: Directory
+        - name: "data"
+          hostPath:
+            path: "/data"
+            type: Directory
 ```
 
 And another one with a simple Nginx pod:
@@ -72,6 +109,7 @@ And another one with a simple Nginx pod:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  namespace: default
   name: nginx
 spec:
   selector:
@@ -87,10 +125,10 @@ spec:
         diun.watch_repo: "true"
     spec:
       containers:
-      - name: nginx
-        image: nginx
-        ports:
-        - containerPort: 80
+        - name: nginx
+          image: nginx
+          ports:
+            - containerPort: 80
 ```
 
 As an example we use [nginx](https://hub.docker.com/_/nginx/) Docker image. A few [annotations](#kubernetes-annotations) are added to configure the image analysis of this pod for Diun. We can now start these 2 pods:
@@ -104,7 +142,22 @@ Now take a look at the logs:
 
 ```
 $ kubectl logs -f -l app=diun --all-containers
-# TODO: add logs example
+Wed, 17 Jun 2020 10:49:58 CEST INF Starting Diun version=4.0.0-beta.3
+Wed, 17 Jun 2020 10:49:58 CEST WRN No notifier available
+Wed, 17 Jun 2020 10:49:58 CEST INF Cron triggered
+Wed, 17 Jun 2020 10:49:59 CEST INF Found 1 image(s) to analyze provider=kubernetes
+Wed, 17 Jun 2020 10:50:00 CEST INF New image found image=docker.io/library/nginx:latest provider=kubernetes
+Wed, 17 Jun 2020 10:50:02 CEST INF New image found image=docker.io/library/nginx:1.9 provider=kubernetes
+Wed, 17 Jun 2020 10:50:02 CEST INF New image found image=docker.io/library/nginx:1.9.5 provider=kubernetes
+Wed, 17 Jun 2020 10:50:02 CEST INF New image found image=docker.io/library/nginx:1.9.7 provider=kubernetes
+Wed, 17 Jun 2020 10:50:02 CEST INF New image found image=docker.io/library/nginx:1.9.9 provider=kubernetes
+Wed, 17 Jun 2020 10:50:02 CEST INF New image found image=docker.io/library/nginx:1.9.4 provider=kubernetes
+Wed, 17 Jun 2020 10:50:02 CEST INF New image found image=docker.io/library/nginx:1.9.6 provider=kubernetes
+Wed, 17 Jun 2020 10:50:02 CEST INF New image found image=docker.io/library/nginx:1.9.8 provider=kubernetes
+Wed, 17 Jun 2020 10:50:03 CEST INF New image found image=docker.io/library/nginx:stable provider=kubernetes
+Wed, 17 Jun 2020 10:50:03 CEST INF New image found image=docker.io/library/nginx:stable-alpine provider=kubernetes
+Wed, 17 Jun 2020 10:50:03 CEST INF New image found image=docker.io/library/nginx:perl provider=kubernetes
+...
 ```
 
 ## Provider configuration
