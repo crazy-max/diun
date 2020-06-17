@@ -85,12 +85,65 @@ diun_1         | Sat, 14 Dec 2019 15:30:13 CET INF Next run in 29 minutes (2019-
 
 ### Configuration file
 
-* `endpoint`: Server address to connect to. Local if empty.
-* `apiVersion`: Overrides the client version with the specified one.
-* `tlsCertsPath`: Path to load the TLS certificates from.
-* `tlsVerify`: Controls whether client verifies the server's certificate chain and hostname (default `true`).
-* `watchByDefault`: Enable watch by default. If false, containers that don't have `diun.enable=true` label will be ignored (default `false`).
-* `watchStopped`: Include created and exited containers too (default `false`).
+#### `endpoint`
+
+Server address to connect to. Local if empty.
+
+```yaml
+providers:
+  docker:
+    endpoint: "unix:///var/run/docker.sock"
+```
+
+#### `apiVersion`
+
+Overrides the client version with the specified one.
+
+```yaml
+providers:
+  docker:
+    apiVersion: "1.39"
+```
+
+#### `tlsCertsPath`
+
+Path to load the TLS certificates from.
+
+```yaml
+providers:
+  docker:
+    tlsCertsPath: "/certs/"
+```
+
+#### `tlsVerify`
+
+Controls whether client verifies the server's certificate chain and hostname (default `true`).
+
+```yaml
+providers:
+  docker:
+    tlsVerify: true
+```
+
+#### `watchByDefault`
+
+Enable watch by default. If false, containers that don't have `diun.enable=true` label will be ignored (default `false`).
+
+```yaml
+providers:
+  docker:
+    watchByDefault: false
+```
+
+#### `watchStopped`
+
+Include created and exited containers too (default `false`).
+
+```yaml
+providers:
+  docker:
+    watchStopped: false
+```
 
 ### Environment variables
 

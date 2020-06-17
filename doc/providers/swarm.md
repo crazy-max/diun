@@ -102,11 +102,55 @@ diun_diun.1.i1l4yuiafq6y@docker-desktop    | Sat, 14 Dec 2019 16:20:02 CET INF N
 
 ### Configuration file
 
-* `endpoint`: Server address to connect to. Local if empty.
-* `apiVersion`: Overrides the client version with the specified one.
-* `tlsCertsPath`: Path to load the TLS certificates from.
-* `tlsVerify`: Controls whether client verifies the server's certificate chain and hostname (default `true`).
-* `watchByDefault`: Enable watch by default. If false, services that don't have `diun.enable=true` label will be ignored (default `false`).
+#### `endpoint`
+
+Server address to connect to. Local if empty.
+
+```yaml
+providers:
+  swarm:
+    endpoint: "unix:///var/run/docker.sock"
+```
+
+#### `apiVersion`
+
+Overrides the client version with the specified one.
+
+```yaml
+providers:
+  swarm:
+    apiVersion: "1.39"
+```
+
+#### `tlsCertsPath`
+
+Path to load the TLS certificates from.
+
+```yaml
+providers:
+  swarm:
+    tlsCertsPath: "/certs/"
+```
+
+#### `tlsVerify`
+
+Controls whether client verifies the server's certificate chain and hostname (default `true`).
+
+```yaml
+providers:
+  swarm:
+    tlsVerify: true
+```
+
+#### `watchByDefault`
+
+Enable watch by default. If false, services that don't have `diun.enable=true` label will be ignored (default `false`).
+
+```yaml
+providers:
+  swarm:
+    watchByDefault: false
+```
 
 ### Environment variables
 
