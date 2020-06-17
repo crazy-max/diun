@@ -36,6 +36,8 @@ services:
       - "DIUN_WATCH_SCHEDULE=*/30 * * * *"
       - "DIUN_PROVIDERS_SWARM=true"
     deploy:
+      mode: replicated
+      replicas: 1
       placement:
         constraints:
           - node.role == manager
@@ -102,8 +104,8 @@ diun_diun.1.i1l4yuiafq6y@docker-desktop    | Sat, 14 Dec 2019 16:20:02 CET INF N
 
 * `endpoint`: Server address to connect to. Local if empty.
 * `apiVersion`: Overrides the client version with the specified one.
-* `TLSCertsPath`: Path to load the TLS certificates from.
-* `TLSVerify`: Controls whether client verifies the server's certificate chain and hostname (default `true`).
+* `tlsCertsPath`: Path to load the TLS certificates from.
+* `tlsVerify`: Controls whether client verifies the server's certificate chain and hostname (default `true`).
 * `watchByDefault`: Enable watch by default. If false, services that don't have `diun.enable=true` label will be ignored (default `false`).
 
 ### Environment variables
