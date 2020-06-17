@@ -19,7 +19,7 @@ func New(config *model.PrdKubernetes) *provider.Client {
 	return &provider.Client{
 		Handler: &Client{
 			config: config,
-			logger: log.With().Str("provider", "k8s").Logger(),
+			logger: log.With().Str("provider", "kubernetes").Logger(),
 		},
 	}
 }
@@ -40,7 +40,7 @@ func (c *Client) ListJob() []model.Job {
 	var list []model.Job
 	for _, image := range images {
 		list = append(list, model.Job{
-			Provider: "k8s",
+			Provider: "kubernetes",
 			Image:    image,
 		})
 	}

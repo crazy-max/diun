@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: diun
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: diun
+  template:
+    metadata:
+      labels:
+        app: diun
+#      annotations:
+#        diun.enable: "true"
+#        diun.watch_repo: "true"
+    spec:
+      containers:
+        - name: diun
+          image: crazymax/diun:latest
+          imagePullPolicy: Always
+          env:
+            - name: TZ
+              value: "Europe/Paris"
+            - name: LOG_LEVEL
+              value: "info"
+            - name: LOG_JSON
+              value: "false"
+            - name: DIUN_WATCH_WORKERS
+              value: "20"
+            - name: DIUN_WATCH_SCHEDULE
+              value: "*/30 * * * *"
+            - name: DIUN_PROVIDERS_KUBERNETES
+              value: "true"
+          volumeMounts:
+            - mountPath: "/data"
+              name: "data"
+      restartPolicy: Always
+      volumes:
+        # Set up a data directory for gitea
+        # For production usage, you should consider using PV/PVC instead(or simply using storage like NAS)
+        # For more details, please see https://kubernetes.io/docs/concepts/storage/volumes/
+        - name: "data"
+          hostPath:
+            path: "/data"
+            type: Directory

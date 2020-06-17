@@ -20,7 +20,7 @@ docker-compose exec diun --test-notif
 
 ## field docker|swarm uses unsupported type: invalid
 
-If you have the error `failed to decode configuration from file: field docker uses unsupported type: invalid` that's because your `docker` or `swarm` provider is not initialized in your configuration:
+If you have the error `failed to decode configuration from file: field docker uses unsupported type: invalid` that's because your `docker`, `swarm` or `kubernetes` provider is not initialized in your configuration:
 
 ```yaml
 providers:

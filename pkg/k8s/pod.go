@@ -9,14 +9,19 @@ import (
 
 // PodList returns Kubernetes pods
 func (c *Client) PodList(opts metav1.ListOptions) ([]v1.Pod, error) {
-	pods, err := c.API.CoreV1().Pods("").List(c.ctx, opts)
-	if err != nil {
-		return nil, err
+	var podList []v1.Pod
+
+	for _, ns := range c.namespaces {
+		pods, err := c.API.CoreV1().Pods(ns).List(c.ctx, opts)
+		if err != nil {
+			return nil, err
+		}
+		podList = append(podList, pods.Items...)
 	}
 
-	sort.Slice(pods.Items, func(i, j int) bool {
-		return pods.Items[i].Name < pods.Items[j].Name
+	sort.Slice(podList, func(i, j int) bool {
+		return podList[i].Name < podList[j].Name
 	})
 
-	return pods.Items, nil
+	return podList, nil
 }

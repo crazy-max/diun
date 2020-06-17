@@ -8,6 +8,7 @@ import (
 	"github.com/crazy-max/diun/v4/pkg/utl"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
@@ -15,39 +16,46 @@ import (
 
 // Client represents an active kubernetes object
 type Client struct {
-	ctx context.Context
-	API *kubernetes.Clientset
+	ctx        context.Context
+	namespaces []string
+	API        *kubernetes.Clientset
 }
 
 // Options holds kubernetes client object options
 type Options struct {
-	Endpoint    string
-	Token       string
-	TokenFile   string
-	TLSCAFile   string
-	TLSInsecure *bool
+	Endpoint         string
+	Token            string
+	TokenFile        string
+	CertAuthFilePath string
+	TLSInsecure      *bool
+	Namespaces       []string
 }
 
 // New initializes a new Kubernetes client
 func New(opts Options) (*Client, error) {
 	var err error
-	var cl *kubernetes.Clientset
+	var api *kubernetes.Clientset
 
 	switch {
 	case os.Getenv("KUBERNETES_SERVICE_HOST") != "" && os.Getenv("KUBERNETES_SERVICE_PORT") != "":
 		log.Debug().Msgf("Creating in-cluster Kubernetes provider client %s", opts.Endpoint)
-		cl, err = newInClusterClient(opts)
+		api, err = newInClusterClient(opts)
 	case os.Getenv("KUBECONFIG") != "":
 		log.Debug().Msgf("Creating cluster-external Kubernetes provider client from KUBECONFIG %s", os.Getenv("KUBECONFIG"))
-		cl, err = newExternalClusterClientFromFile(opts, os.Getenv("KUBECONFIG"))
+		api, err = newExternalClusterClientFromFile(opts, os.Getenv("KUBECONFIG"))
 	default:
 		log.Debug().Msgf("Creating cluster-external Kubernetes provider client %s", opts.Endpoint)
-		cl, err = newExternalClusterClient(opts)
+		api, err = newExternalClusterClient(opts)
+	}
+
+	if len(opts.Namespaces) == 0 {
+		opts.Namespaces = []string{metav1.NamespaceAll}
 	}
 
 	return &Client{
-		ctx: context.Background(),
-		API: cl,
+		ctx:        context.Background(),
+		namespaces: opts.Namespaces,
+		API:        api,
 	}, err
 }
 
@@ -76,7 +84,6 @@ func newExternalClusterClientFromFile(opts Options, file string) (*kubernetes.Cl
 		configFromFlags.TLSClientConfig.Insecure = *opts.TLSInsecure
 	}
 
-	configFromFlags.TLSClientConfig.Insecure = true
 	return kubernetes.NewForConfig(configFromFlags)
 }
 
@@ -97,8 +104,8 @@ func newExternalClusterClient(opts Options) (*kubernetes.Clientset, error) {
 		BearerToken: opts.Token,
 	}
 
-	if opts.TLSCAFile != "" {
-		caData, err := ioutil.ReadFile(opts.TLSCAFile)
+	if opts.CertAuthFilePath != "" {
+		caData, err := ioutil.ReadFile(opts.CertAuthFilePath)
 		if err != nil {
 			return nil, errors.Wrap(err, "Failed to read CA file")
 		}

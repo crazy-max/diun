@@ -97,6 +97,10 @@ providers:
     watchStopped: true
   swarm:
     watchByDefault: true
+  kubernetes:
+    namespaces:
+      - default
+      - production
   file:
     directory: ./imagesdir
 ```
@@ -157,4 +161,5 @@ You can also use the following environment variables:
 
 * [docker](providers/docker.md)
 * [swarm](providers/swarm.md)
+* [kubernetes](providers/kubernetes.md)
 * [file](providers/file.md)
