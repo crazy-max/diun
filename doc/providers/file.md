@@ -133,7 +133,7 @@ Sat, 14 Dec 2019 15:32:28 UTC INF Next run in 31 seconds (2019-12-14 15:33:00 +0
 
 ### Configuration file
 
-#### filename
+#### `filename`
 
 Defines the path to the [configuration file](#yaml-configuration-file).
 
@@ -145,7 +145,7 @@ providers:
     filename: /path/to/config/conf.yml
 ```
 
-#### directory
+#### `directory`
 
 Defines the path to the directory that contains the [configuration files](#yaml-configuration-file) (`*.yml` or `*.yaml`).
 
