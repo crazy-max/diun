@@ -29,7 +29,8 @@ a Docker registry.
 * Internal cron implementation through go routines
 * Worker pool to parallelize analyses
 * Allow overriding image os and architecture
-* Multi providers available: [Docker](doc/providers/docker.md), [Swarm](doc/providers/swarm.md) and [File](doc/providers/file.md)
+* [Docker](doc/providers/docker.md), [Swarm](doc/providers/swarm.md),
+[Kubernetes](doc/providers/kubernetes.md) and [File](doc/providers/file.md) providers available
 * Get notified through Gotify, Mail, Slack, Telegram and [more](doc/notifications.md)
 * Enhanced logging
 * Timezone can be changed
@@ -46,6 +47,7 @@ a Docker registry.
 * Providers
   * [Docker](doc/providers/docker.md)
   * [Swarm](doc/providers/swarm.md)
+  * [Kubernetes](doc/providers/kubernetes.md)
   * [File](doc/providers/file.md)
 * [Notifications](doc/notifications.md)
 * [FAQ](doc/faq.md)
