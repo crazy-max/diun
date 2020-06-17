@@ -11,11 +11,12 @@ import (
 
 func (c *Client) listPodImage() []model.Image {
 	cli, err := k8s.New(k8s.Options{
-		Endpoint:    c.config.Endpoint,
-		Token:       c.config.Token,
-		TokenFile:   c.config.TokenFile,
-		TLSCAFile:   c.config.TLSCAFile,
-		TLSInsecure: c.config.TLSInsecure,
+		Endpoint:         c.config.Endpoint,
+		Token:            c.config.Token,
+		TokenFile:        c.config.TokenFile,
+		CertAuthFilePath: c.config.CertAuthFilePath,
+		TLSInsecure:      c.config.TLSInsecure,
+		Namespaces:       c.config.Namespaces,
 	})
 	if err != nil {
 		c.logger.Error().Err(err).Msg("Cannot create Kubernetes client")
@@ -31,7 +32,7 @@ func (c *Client) listPodImage() []model.Image {
 	var list []model.Image
 	for _, pod := range pods {
 		for _, ctn := range pod.Spec.Containers {
-			image, err := provider.ValidateContainerImage(ctn.Image, pod.Labels, *c.config.WatchByDefault)
+			image, err := provider.ValidateContainerImage(ctn.Image, pod.Annotations, *c.config.WatchByDefault)
 			if err != nil {
 				c.logger.Error().Err(err).Msgf("Cannot get image from container %s (pod %s)", ctn.Name, pod.Name)
 				continue
