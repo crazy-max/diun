@@ -83,14 +83,6 @@ jobs:
         name: Checkout
         uses: actions/checkout@v2
       -
-        name: Dump GitHub context
-        env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-        run: echo "$GITHUB_CONTEXT"
-      -
-        name: Env vars
-        run: env|sort
-      -
         name: Prepare
         id: prepare
         run: |
@@ -125,23 +117,23 @@ jobs:
           docker buildx build --output "type=image,push=false" ${{ steps.prepare.outputs.buildx_args }}
       -
         name: Docker Login
-        if: success() && github.event_name != 'pull_request' && endsWith(github.ref, github.repository.default_branch)
+        if: success() && github.event_name != 'pull_request' && endsWith(github.ref, github.event.repository.default_branch)
         env:
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         run: |
           echo "${DOCKER_PASSWORD}" | docker login --username "${{ steps.prepare.outputs.docker_username }}" --password-stdin
       -
         name: Docker Buildx (push)
-        if: success() && github.event_name != 'pull_request' && endsWith(github.ref, github.repository.default_branch)
+        if: success() && github.event_name != 'pull_request' && endsWith(github.ref, github.event.repository.default_branch)
         run: |
           docker buildx build --output "type=image,push=true" ${{ steps.prepare.outputs.buildx_args }}
       -
         name: Docker Check Manifest
-        if: success() && github.event_name != 'pull_request' && endsWith(github.ref, github.repository.default_branch)
+        if: success() && github.event_name != 'pull_request' && endsWith(github.ref, github.event.repository.default_branch)
         run: |
           docker run --rm mplatform/mquery ${{ steps.prepare.outputs.docker_image }}:${{ steps.prepare.outputs.version }}
       -
         name: Clear
-        if: always() && github.event_name != 'pull_request' && endsWith(github.ref, github.repository.default_branch)
+        if: always() && github.event_name != 'pull_request' && endsWith(github.ref, github.event.repository.default_branch)
         run: |
           rm -f ${HOME}/.docker/config.json
