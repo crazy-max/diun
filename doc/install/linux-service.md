@@ -10,7 +10,7 @@ Run the below command in a terminal:
 sudo vim /etc/systemd/system/diun.service
 ```
 
-Copy the sample [diun.service](../../.examples/systemd/diun.service).
+Copy the sample [diun.service](../../.res/examples/systemd/diun.service).
 
 Change the user, group, and other required startup values following your needs.
 
