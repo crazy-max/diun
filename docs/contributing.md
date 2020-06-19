@@ -1,18 +1,18 @@
-## Contributing
+# Contributing
 
 Hi there! I'm thrilled that you'd like to contribute to this project. Your help is essential for keeping it great.
 
-Contributions to this project are [released](https://help.github.com/articles/github-terms-of-service/#6-contributions-under-repository-license) to the public under the [project's open source license](../LICENSE).
+Contributions to this project are [released](https://help.github.com/articles/github-terms-of-service/#6-contributions-under-repository-license) to the public under the [project's open source license]({{ config.repo_url }}/blob/master/LICENSE).
 
 ## Submitting a pull request
 
-1. [Fork](https://github.com/crazy-max/diun/fork) and clone the repository
+1. [Fork]({{ config.repo_url }}fork) and clone the repository
 2. Configure and install the dependencies: `go mod download`
 3. Create a new branch: `git checkout -b my-branch-name`
-4. Make your change
+4. Make your changes
 5. Test your code: `go test -covermode=atomic ./...`
-6. Build with [GoReleaser](https://goreleaser.com/): `goreleaser release --skip-publish --skip-validate --rm-dist`
-7. Push to your fork and [submit a pull request](https://github.com/crazy-max/diun/compare)
+6. Build with [GoReleaser](https://goreleaser.com/): `goreleaser release --skip-publish --skip-validate`
+7. Push to your fork and [submit a pull request]({{ config.repo_url }}compare)
 8. Pat your self on the back and wait for your pull request to be reviewed and merged.
 
 Here are a few things you can do that will increase the likelihood of your pull request being accepted:

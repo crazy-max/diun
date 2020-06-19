@@ -1,0 +1,108 @@
+site_name: Diun
+site_description: Receive notifications when a Docker image is updated on a Docker registry
+site_author: CrazyMax
+site_url: https://diun.crazymax.dev
+edit_uri: edit/master/www/docs/
+docs_dir: docs
+
+repo_name: crazy-max/diun
+repo_url: https://github.com/crazy-max/diun
+copyright: |
+  Made with <img alt="❤" class="twemoji md-footer-custom-text" src="https://twemoji.maxcdn.com/v/latest/svg/2764.svg" title="love">
+  by <a target="_blank" href="https://crazymax.dev/">CrazyMax</a> and <a target="_blank" href="https://github.com/crazy-max/diun/graphs/contributors">contributors</a>.
+
+extra:
+  app:
+    version: 4.0.0
+  social:
+    - icon: fontawesome/brands/github-alt
+      link: https://github.com/crazy-max/diun
+
+theme:
+  name: material
+  custom_dir: docs/overrides
+  language: en
+  palette:
+    scheme: default
+    primary: light blue
+    accent: light blue
+  font:
+    text: Roboto
+    code: Roboto Mono
+  i18n:
+    prev: Previous
+    next: Next
+  logo: assets/logo.png
+  favicon: assets/favicon.ico
+  include_search_page: false
+  search_index_only: true
+
+plugins:
+  - macros
+  - search:
+      prebuild_index: python
+      lang:
+        - en
+  - git-revision-date-localized:
+      type: iso_datetime
+  - minify:
+      minify_html: true
+
+google_analytics:
+  - !!python/object/apply:os.getenv ["GOOGLE_ANALYTICS_KEY"]
+  - auto
+
+nav:
+  - Home: index.md
+  - Get started: get-started.md
+  - Installation:
+    - With Docker: install/docker.md
+    - From binary: install/binary.md
+    - Linux service: install/linux-service.md
+  - Configuration:
+    - Overview: config/index.md
+    - .db: config/db.md
+    - .watch: config/watch.md
+    - .notif: config/notif.md
+    - .regopts: config/regopts.md
+    - .providers: config/providers.md
+  - Notifications:
+    - Amqp: notif/amqp.md
+    - Gotify: notif/gotify.md
+    - Mail: notif/mail.md
+    - Rocket.Chat: notif/rocketchat.md
+    - Script: notif/script.md
+    - Slack: notif/slack.md
+    - Teams: notif/teams.md
+    - Telegram: notif/telegram.md
+    - Webhook: notif/webhook.md
+  - Providers:
+    - Docker: providers/docker.md
+    - File: providers/file.md
+    - Kubernetes: providers/kubernetes.md
+    - Swarm: providers/swarm.md
+  - FAQ: faq.md
+  - Migration:
+    - Diun v2 to v3: migration/v2-to-v3.md
+    - Diun v1 to v2: migration/v1-to-v2.md
+    - Diun v0 to v1: migration/v0-to-v1.md
+  - Reporting an issue: reporting-issue.md
+  - Contributing: contributing.md
+  - Donate: donate.md
+
+markdown_extensions:
+  - admonition
+  - codehilite
+  - footnotes
+  - meta
+  - pymdownx.details
+  - pymdownx.tabbed
+  - pymdownx.superfences
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+  - toc:
+      permalink: true
+
+extra_css:
+  - css/extra.css

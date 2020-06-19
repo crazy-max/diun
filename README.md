@@ -1,6 +1,7 @@
 <p align="center"><a href="https://github.com/crazy-max/diun" target="_blank"><img height="128" src="https://raw.githubusercontent.com/crazy-max/diun/master/.res/diun.png"></a></p>
 
 <p align="center">
+  <a href="https://crazy-max.github.io/diun/"><img src="https://img.shields.io/badge/doc-mkdocs-02a6f2?style=flat-square&logo=read-the-docs" alt="Documentation"></a>
   <a href="https://github.com/crazy-max/diun/releases/latest"><img src="https://img.shields.io/github/release/crazy-max/diun.svg?style=flat-square" alt="GitHub release"></a>
   <a href="https://github.com/crazy-max/diun/releases/latest"><img src="https://img.shields.io/github/downloads/crazy-max/diun/total.svg?style=flat-square" alt="Total downloads"></a>
   <a href="https://github.com/crazy-max/diun/actions?workflow=build"><img src="https://img.shields.io/github/workflow/status/crazy-max/diun/build?label=build&logo=github&style=flat-square" alt="Build Status"></a>
@@ -20,38 +21,11 @@
 [Docker image](https://hub.docker.com/r/crazymax/diun/)) to receive notifications when a Docker image is updated on
 a Docker registry.
 
-![](.res/notif-slack.png)
-
-## Features
-
-* Allow to watch a Docker repository and report new tags
-* Include and exclude filters with regular expression for tags
-* Internal cron implementation through go routines
-* Worker pool to parallelize analyses
-* Allow overriding image os and architecture
-* [Docker](doc/providers/docker.md), [Swarm](doc/providers/swarm.md),
-[Kubernetes](doc/providers/kubernetes.md) and [File](doc/providers/file.md) providers available
-* Get notified through Gotify, Mail, Slack, Telegram and [more](doc/notifications.md)
-* Enhanced logging
-* Timezone can be changed
-* Official [Docker image available](doc/install/docker.md)
+![](.res/screenshot.png)
 
 ## Documentation
 
-* Install
-  * [With Docker](doc/install/docker.md)
-  * [From binary](doc/install/binary.md)
-  * [Linux service](doc/install/linux-service.md)
-* [Getting started](doc/getting-started.md)
-* [Configuration](doc/configuration.md)
-* Providers
-  * [Docker](doc/providers/docker.md)
-  * [Swarm](doc/providers/swarm.md)
-  * [Kubernetes](doc/providers/kubernetes.md)
-  * [File](doc/providers/file.md)
-* [Notifications](doc/notifications.md)
-* [FAQ](doc/faq.md)
-* [Upgrade notes](UPGRADE.md)
+Documentation can be found on https://crazy-max.github.io/diun/
 
 ## How can I help?
 

@@ -9,12 +9,20 @@ on:
       - 'v*'
     paths-ignore:
       - '**.md'
+      - '.github/workflows/docs.yml'
+      - 'docs/**'
+      - 'Dockerfile.mkdocs'
+      - 'mkdocs.yml'
   pull_request:
     branches:
       - 'master'
       - 'v*'
     paths-ignore:
       - '**.md'
+      - '.github/workflows/docs.yml'
+      - 'docs/**'
+      - 'Dockerfile.mkdocs'
+      - 'mkdocs.yml'
 
 jobs:
 
