@@ -1,7 +1,28 @@
-# Getting started
+## What is Diun?
 
-* [Diun CLI](#diun-cli)
-* [Run with the Docker provider](#run-with-the-docker-provider)
+**D**ocker **I**mage **U**pdate **N**otifier is a CLI application written in [Go](https://golang.org/) and delivered as a
+[single executable](https://github.com/crazy-max/diun/releases/latest) (and a [Docker image](install/docker.md))
+to receive notifications when a Docker image is updated on a Docker registry.
+
+## Purpose
+
+The goal of this project is to provide the easiest, fastest, and most painless way of setting up a self-hosted service to handle this.
+With Go, this can be done with an independent binary distribution across all platforms and architectures that Go supports.
+This support includes Linux, macOS, and Windows, on architectures like amd64, i386, ARM, PowerPC, and others.
+
+## Features
+
+* Allow to watch a Docker repository and report new tags
+* Include and exclude filters with regular expression for tags
+* Internal cron implementation through go routines
+* Worker pool to parallelize analyses
+* Allow overriding image os and architecture
+* [Docker](providers/docker.md), [Swarm](providers/swarm.md), [Kubernetes](providers/kubernetes.md)
+and [File](providers/file.md) providers available
+* Get notified through Gotify, Mail, Slack, Telegram and [more](config/index.md#reference)
+* Enhanced logging
+* Timezone can be changed
+* Official [Docker image available](install/docker.md)
 
 ## Diun CLI
 
@@ -24,11 +45,13 @@ Flags:
 
 Following environment variables can be used in place of flags:
 
-* `CONFIG`: Diun configuration file
-* `TZ`: Timezone assigned (default `UTC`)
-* `LOG_LEVEL`: Log level output (default `info`)
-* `LOG_JSON`: Enable JSON logging output (default `false`)
-* `LOG_CALLER`: Enable to add `file:line` of the caller (default `false`)
+| Name               | Default       | Description   |
+|--------------------|---------------|---------------|
+| `CONFIG`           |               | Diun configuration file |
+| `TZ`               | `UTC`         | Timezone assigned |
+| `LOG_LEVEL`        | `info`        | Log level output |
+| `LOG_JSON`         | `false`       | Enable JSON logging output |
+| `LOG_CALLER`       | `false`       | Enable to add `file:line` of the caller |
 
 ## Run with the Docker provider
 

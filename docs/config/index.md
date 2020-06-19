@@ -1,17 +1,8 @@
 # Configuration
 
-* [Overview](#overview)
-* [Configuration file](#configuration-file)
-* [Reference](#reference)
-  * [db](#db)
-  * [watch](#watch)
-  * [notif](#notif)
-  * [regopts](#regopts)
-  * [providers](#providers)
-
 ## Overview
 
-There are two different ways to define static configuration options in Diun:
+There are two different ways to define configuration in Diun:
 
 * In a [configuration file](#configuration-file)
 * As environment variables
@@ -90,7 +81,7 @@ regopts:
   onemore:
     username: foo2
     password: bar2
-    insecureTls: true
+    insecureTLS: true
 
 providers:
   docker:
@@ -107,59 +98,21 @@ providers:
 
 ## Reference
 
-### db
-
-* `path`: Path to Bolt database file where images manifests are stored. (default `diun.db`)
-
-You can also use the following environment variables:
-
-* `DIUN_DB_PATH`
-
-### watch
-
-* `workers`: Maximum number of workers that will execute tasks concurrently. (default `10`)
-* `schedule`: [CRON expression](https://godoc.org/github.com/robfig/cron#hdr-CRON_Expression_Format) to schedule Diun watcher. (default `0 * * * *`)
-* `firstCheckNotif`: Send notification at the very first analysis of an image. (default `false`)
-
-You can also use the following environment variables:
-
-* `DIUN_WATCH_WORKERS`
-* `DIUN_WATCH_SCHEDULE`
-* `DIUN_WATCH_FIRSTCHECKNOTIF`
-
-### notif
-
-* [amqp](notifications.md#amqp)
-* [gotify](notifications.md#gotify)
-* [mail](notifications.md#mail)
-* [rocketchat](notifications.md#rocketchat)
-* [script](notifications.md#script)
-* [slack](notifications.md#slack--mattermost)
-* [teams](notifications.md#teams)
-* [telegram](notifications.md#telegram)
-* [webhook](notifications.md#webhook)
-
-### regopts
-
-* `username`: Registry username.
-* `usernameFile`: Use content of secret file as registry username if `username` not defined.
-* `password`: Registry password.
-* `passwordFile`: Use content of secret file as registry password if `password` not defined.
-* `timeout`: Timeout is the maximum amount of time for the TCP connection to establish. (default `10s`)
-* `insecureTls`: Allow contacting docker registry over HTTP, or HTTPS with failed TLS verification. (default `false`)
-
-You can also use the following environment variables:
-
-* `DIUN_REGOPTS_<NAME>_USERNAME`
-* `DIUN_REGOPTS_<NAME>_USERNAMEFILE`
-* `DIUN_REGOPTS_<NAME>_PASSWORD`
-* `DIUN_REGOPTS_<NAME>_PASSWORDFILE`
-* `DIUN_REGOPTS_<NAME>_TIMEOUT`
-* `DIUN_REGOPTS_<NAME>_INSECURETLS`
-
-### providers
-
-* [docker](providers/docker.md)
-* [swarm](providers/swarm.md)
-* [kubernetes](providers/kubernetes.md)
-* [file](providers/file.md)
+* [db](db.md)
+* [watch](watch.md)
+* notif
+    * [amqp](../notif/amqp.md)
+    * [gotify](../notif/amqp.md)
+    * [mail](../notif/amqp.md)
+    * [rocketchat](../notif/amqp.md)
+    * [script](../notif/amqp.md)
+    * [slack](../notif/amqp.md)
+    * [teams](../notif/amqp.md)
+    * [telegram](../notif/amqp.md)
+    * [webhook](../notif/amqp.md)
+* [regopts](regopts.md)
+* providers
+    * [docker](../providers/docker.md)
+    * [file](../providers/file.md)
+    * [kubernetes](../providers/kubernetes.md)
+    * [swarm](../providers/swarm.md)

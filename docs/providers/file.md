@@ -1,13 +1,5 @@
 # File provider
 
-* [About](#about)
-* [Example](#example)
-* [Quick start](#quick-start)
-* [Provider configuration](#provider-configuration)
-  * [Configuration file](#configuration-file)
-  * [Environment variables](#environment-variables)
-* [YAML configuration file](#yaml-configuration-file)
-
 ## About
 
 The file provider lets you define Docker images to analyze through a YAML file or a directory.
@@ -32,7 +24,7 @@ regopts:
   onemore:
     username: foo2
     password: bar2
-    insecureTls: true
+    insecureTLS: true
 
 providers:
   file:
@@ -129,50 +121,54 @@ Sat, 14 Dec 2019 15:32:28 UTC INF Cron initialized with schedule * * * * *
 Sat, 14 Dec 2019 15:32:28 UTC INF Next run in 31 seconds (2019-12-14 15:33:00 +0000 UTC)
 ```
 
-## Provider configuration
+## Configuration
 
-### Configuration file
-
-#### `filename`
+### `filename`
 
 Defines the path to the [configuration file](#yaml-configuration-file).
 
-> :warning: `filename` and `directory` are mutually exclusive.
+!!! warning
+    `filename` and `directory` are mutually exclusive
 
-```yaml
-providers:
-  file:
-    filename: /path/to/config/conf.yml
-```
+!!! example "File"
+    ```yaml
+    providers:
+      file:
+        filename: /path/to/config/conf.yml
+    ```
 
-#### `directory`
+!!! abstract "Environment variables"
+    * `DIUN_PROVIDERS_FILE_FILENAME`
+
+### `directory`
 
 Defines the path to the directory that contains the [configuration files](#yaml-configuration-file) (`*.yml` or `*.yaml`).
 
-> :warning: `filename` and `directory` are mutually exclusive.
+!!! warning
+    `filename` and `directory` are mutually exclusive
 
-```yaml
-providers:
-  file:
-    directory: /path/to/config
-```
+!!! example "File"
+    ```yaml
+    providers:
+      file:
+        directory: /path/to/config
+    ```
 
-### Environment variables
-
-* `DIUN_PROVIDERS_FILE_DIRECTORY`
-* `DIUN_PROVIDERS_FILE_FILENAME`
+!!! abstract "Environment variables"
+    * `DIUN_PROVIDERS_FILE_DIRECTORY`
 
 ## YAML configuration file
 
 The configuration file(s) defines a slice of images to analyze with the following fields:
 
-* `name`: Docker image name to watch using `registry/path:tag` format. If registry omitted, `docker.io` will be used and if tag omitted, `latest` will be used. **required**
-* `regopts_id`: Registry options ID from [`regopts`](../configuration.md#regopts) to use.
-* `watch_repo`: Watch all tags of this `image` repository (default `false`).
-* `max_tags`: Maximum number of tags to watch if `watch_repo` enabled. 0 means all of them (default `0`).
-* `include_tags`: List of regular expressions to include tags. Can be useful if you enable `watch_repo`.
-* `exclude_tags`: List of regular expressions to exclude tags. Can be useful if you enable `watch_repo`.
-* `platform`: Check a custom platform. (default will retrieve platform dynamically based on your operating system).
-  * `os`: Operating system to use.
-  * `arch`: CPU architecture to use.
-  * `variant`: Variant of the CPU to use.
+| Name                          | Default                          | Description   |
+|-------------------------------|----------------------------------|---------------|
+| `name`                        | `latest`                         | Docker image name to watch using `registry/path:tag` format. If registry omitted, `docker.io` will be used and if tag omitted, `latest` will be used |
+| `regopts_id`                  |                                  | Registry options ID from [`regopts`](../config/regopts.md) to use |
+| `watch_repo`                  | `false`                          | Watch all tags of this image |
+| `max_tags`                    | `0`                              | Maximum number of tags to watch if `watch_repo` enabled. `0` means all of them |
+| `include_tags`                |                                  | List of regular expressions to include tags. Can be useful if you enable `watch_repo` |
+| `exclude_tags`                |                                  | List of regular expressions to exclude tags. Can be useful if you enable `watch_repo` |
+| `platform.os`                 | dynamic based on your OS specs   | Operating system to use as custom platform |
+| `platform.arch`               | dynamic based on your OS specs   | CPU architecture to use as custom platform |
+| `platform.variant`            | dynamic based on your OS specs   | Variant of the CPU to use as custom platform |

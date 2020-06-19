@@ -1,12 +1,5 @@
 # Docker provider
 
-* [About](#about)
-* [Quick start](#quick-start)
-* [Provider configuration](#provider-configuration)
-  * [Configuration file](#configuration-file)
-  * [Environment variables](#environment-variables)
-* [Docker labels](#docker-labels)
-
 ## About
 
 The Docker provider allows you to analyze the containers of your Docker instance to extract images found and check for updates on the registry.
@@ -81,87 +74,104 @@ diun_1         | Sat, 14 Dec 2019 15:30:13 CET INF Cron initialized with schedul
 diun_1         | Sat, 14 Dec 2019 15:30:13 CET INF Next run in 29 minutes (2019-12-14 16:00:00 +0100 CET)
 ```
 
-## Provider configuration
+## Configuration
 
-### Configuration file
+!!! hint
+    Environment variable `DIUN_PROVIDERS_DOCKER=true` can be used to enable this provider with default values.
 
-#### `endpoint`
+### `endpoint`
 
 Server address to connect to. Local if empty.
 
-```yaml
-providers:
-  docker:
-    endpoint: "unix:///var/run/docker.sock"
-```
+!!! example "File"
+    ```yaml
+    providers:
+      docker:
+        endpoint: "unix:///var/run/docker.sock"
+    ```
 
-#### `apiVersion`
+!!! abstract "Environment variables"
+    * `DIUN_PROVIDERS_DOCKER_ENDPOINT`
+
+### `apiVersion`
 
 Overrides the client version with the specified one.
 
-```yaml
-providers:
-  docker:
-    apiVersion: "1.39"
-```
+!!! example "File"
+    ```yaml
+    providers:
+      docker:
+        apiVersion: "1.39"
+    ```
 
-#### `tlsCertsPath`
+!!! abstract "Environment variables"
+    * `DIUN_PROVIDERS_DOCKER_APIVERSION`
+
+### `tlsCertsPath`
 
 Path to load the TLS certificates from.
 
-```yaml
-providers:
-  docker:
-    tlsCertsPath: "/certs/"
-```
+!!! example "File"
+    ```yaml
+    providers:
+      docker:
+        tlsCertsPath: "/certs/"
+    ```
 
-#### `tlsVerify`
+!!! abstract "Environment variables"
+    * `DIUN_PROVIDERS_DOCKER_TLSCERTSPATH`
+
+### `tlsVerify`
 
 Controls whether client verifies the server's certificate chain and hostname (default `true`).
 
-```yaml
-providers:
-  docker:
-    tlsVerify: true
-```
+!!! example "File"
+    ```yaml
+    providers:
+      docker:
+        tlsVerify: true
+    ```
 
-#### `watchByDefault`
+!!! abstract "Environment variables"
+    * `DIUN_PROVIDERS_DOCKER_TLSVERIFY`
+
+### `watchByDefault`
 
 Enable watch by default. If false, containers that don't have `diun.enable=true` label will be ignored (default `false`).
 
-```yaml
-providers:
-  docker:
-    watchByDefault: false
-```
+!!! example "File"
+    ```yaml
+    providers:
+      docker:
+        watchByDefault: false
+    ```
 
-#### `watchStopped`
+!!! abstract "Environment variables"
+    * `DIUN_PROVIDERS_DOCKER_WATCHBYDEFAULT`
+
+### `watchStopped`
 
 Include created and exited containers too (default `false`).
 
-```yaml
-providers:
-  docker:
-    watchStopped: false
-```
+!!! example "File"
+    ```yaml
+    providers:
+      docker:
+        watchStopped: false
+    ```
 
-### Environment variables
-
-* `DIUN_PROVIDERS_DOCKER`
-* `DIUN_PROVIDERS_DOCKER_ENDPOINT`
-* `DIUN_PROVIDERS_DOCKER_APIVERSION`
-* `DIUN_PROVIDERS_DOCKER_TLSCERTSPATH`
-* `DIUN_PROVIDERS_DOCKER_TLSVERIFY`
-* `DIUN_PROVIDERS_DOCKER_WATCHBYDEFAULT`
-* `DIUN_PROVIDERS_DOCKER_WATCHSTOPPED`
+!!! abstract "Environment variables"
+    * `DIUN_PROVIDERS_DOCKER_WATCHSTOPPED`
 
 ## Docker labels
 
 You can configure more finely the way to analyze the image of your container through Docker labels:
 
-* `diun.enable`: Set to true to enable image analysis of this container.
-* `diun.regopts_id`: Registry options ID from [`regopts`](../configuration.md#regopts) to use.
-* `diun.watch_repo`: Watch all tags of this container image (default `false`).
-* `diun.max_tags`: Maximum number of tags to watch if `diun.watch_repo` enabled. 0 means all of them (default `0`).
-* `diun.include_tags`: Semi-colon separated list of regular expressions to include tags. Can be useful if you enable `diun.watch_repo`.
-* `diun.exclude_tags`: Semi-colon separated list of regular expressions to exclude tags. Can be useful if you enable `diun.watch_repo`.
+| Name                          | Default       | Description   |
+|-------------------------------|---------------|---------------|
+| `diun.enable`                 |               | Set to true to enable image analysis of this container |
+| `diun.regopts_id`             |               | Registry options ID from [`regopts`](../config/regopts.md) to use |
+| `diun.watch_repo`             | `false`       | Watch all tags of this container image |
+| `diun.max_tags`               | `0`           | Maximum number of tags to watch if `diun.watch_repo` enabled. `0` means all of them |
+| `diun.include_tags`           |               | Semi-colon separated list of regular expressions to include tags. Can be useful if you enable `diun.watch_repo` |
+| `diun.exclude_tags`           |               | Semi-colon separated list of regular expressions to exclude tags. Can be useful if you enable `diun.watch_repo` |

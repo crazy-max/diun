@@ -12,7 +12,7 @@ type RegOpts struct {
 	UsernameFile string         `yaml:"usernameFile,omitempty" json:"usernameFile,omitempty" validate:"omitempty,file"`
 	Password     string         `yaml:"password,omitempty" json:"password,omitempty" validate:"omitempty"`
 	PasswordFile string         `yaml:"passwordFile,omitempty" json:"passwordFile,omitempty" validate:"omitempty,file"`
-	InsecureTLS  *bool          `yaml:"insecureTls,omitempty" json:"insecureTls,omitempty" validate:"required"`
+	InsecureTLS  *bool          `yaml:"insecureTLS,omitempty" json:"insecureTLS,omitempty" validate:"required"`
 	Timeout      *time.Duration `yaml:"timeout,omitempty" json:"timeout,omitempty" validate:"required"`
 }
 

@@ -1,12 +1,5 @@
 # Kubernetes provider
 
-* [About](#about)
-* [Quick start](#quick-start)
-* [Provider configuration](#provider-configuration)
-  * [Configuration file](#configuration-file)
-  * [Environment variables](#environment-variables)
-* [Kubernetes annotations](#kubernetes-annotations)
-
 ## About
 
 The Kubernetes provider allows you to analyze the pods of your Kubernetes cluster to extract images found and check for updates on the registry.
@@ -160,19 +153,24 @@ Wed, 17 Jun 2020 10:50:03 CEST INF New image found image=docker.io/library/nginx
 ...
 ```
 
-## Provider configuration
+## Configuration
 
-### Configuration file
+!!! hint
+    Environment variable `DIUN_PROVIDERS_KUBERNETES=true` can be used to enable this provider with default values.
 
-#### `endpoint`
+### `endpoint`
 
 The Kubernetes server endpoint as URL.
 
-```yaml
-providers:
-  kubernetes:
-    endpoint: "http://localhost:8080"
-```
+!!! example "File"
+    ```yaml
+    providers:
+      kubernetes:
+        endpoint: "http://localhost:8080"
+    ```
+
+!!! abstract "Environment variables"
+    * `DIUN_PROVIDERS_KUBERNETES_ENDPOINT`
 
 Kubernetes server endpoint as URL, which is only used when the behavior based on environment variables described below does not apply.
 
@@ -182,86 +180,101 @@ The access token is looked up in `/var/run/secrets/kubernetes.io/serviceaccount/
 
 When the environment variables are not found, Diun tries to connect to the Kubernetes API server with an external-cluster client. In which case, the endpoint is required. Specifically, it may be set to the URL used by `kubectl proxy` to connect to a Kubernetes cluster using the granted authentication and authorization of the associated kubeconfig.
 
-#### `token`
-
-```yaml
-providers:
-  kubernetes:
-    token: "atoken"
-```
+### `token`
 
 Bearer token used for the Kubernetes client configuration.
 
-#### `tokenFile`
+!!! example "File"
+    ```yaml
+    providers:
+      kubernetes:
+        token: "atoken"
+    ```
+
+!!! abstract "Environment variables"
+    * `DIUN_PROVIDERS_KUBERNETES_TOKEN`
+
+### `tokenFile`
 
 Use content of secret file as bearer token if `token` not defined.
 
-```yaml
-providers:
-  kubernetes:
-    tokenFile: "/run/secrets/token"
-```
+!!! example "File"
+    ```yaml
+    providers:
+      kubernetes:
+        tokenFile: "/run/secrets/token"
+    ```
 
-#### `certAuthFilePath`
+!!! abstract "Environment variables"
+    * `DIUN_PROVIDERS_KUBERNETES_TOKEN`
+
+### `certAuthFilePath`
 
 Path to the certificate authority file. Used for the Kubernetes client configuration.
 
-```yaml
-providers:
-  kubernetes:
-    certAuthFilePath: "/a/ca.crt"
-```
+!!! example "File"
+    ```yaml
+    providers:
+      kubernetes:
+        certAuthFilePath: "/a/ca.crt"
+    ```
 
-#### `tlsInsecure`
+!!! abstract "Environment variables"
+    * `DIUN_PROVIDERS_KUBERNETES_CERTAUTHFILEPATH`
+
+### `tlsInsecure`
 
 Controls whether client does not verify the server's certificate chain and hostname (default `false`).
 
-```yaml
-providers:
-  kubernetes:
-    tlsInsecure: false
-```
+!!! example "File"
+    ```yaml
+    providers:
+      kubernetes:
+        tlsInsecure: false
+    ```
 
-#### `namespaces`
+!!! abstract "Environment variables"
+    * `DIUN_PROVIDERS_KUBERNETES_TLSINSECURE`
+
+### `namespaces`
 
 Array of namespaces to watch (default all namespaces).
 
-```yaml
-providers:
-  kubernetes:
-    namespaces:
-      - default
-      - production
-```
+!!! example "File"
+    ```yaml
+    providers:
+      kubernetes:
+        namespaces:
+          - default
+          - production
+    ```
 
-#### `watchByDefault`
+!!! abstract "Environment variables"
+    * `DIUN_PROVIDERS_KUBERNETES_NAMESPACES` (comma separated)
+
+### `watchByDefault`
 
 Enable watch by default. If false, pods that don't have `diun.enable: "true"` annotation will be ignored (default `false`).
 
-```yaml
-providers:
-  kubernetes:
-    watchByDefault: false
-```
+!!! example "File"
+    ```yaml
+    providers:
+      kubernetes:
+        watchByDefault: false
+    ```
 
-### Environment variables
-
-* `DIUN_PROVIDERS_KUBERNETES`
-* `DIUN_PROVIDERS_KUBERNETES_ENDPOINT`
-* `DIUN_PROVIDERS_KUBERNETES_TOKEN`
-* `DIUN_PROVIDERS_KUBERNETES_TOKENFILE`
-* `DIUN_PROVIDERS_KUBERNETES_CERTAUTHFILEPATH`
-* `DIUN_PROVIDERS_KUBERNETES_TLSINSECURE`
-* `DIUN_PROVIDERS_KUBERNETES_NAMESPACES` (comma separated)
-* `DIUN_PROVIDERS_KUBERNETES_WATCHBYDEFAULT`
+!!! abstract "Environment variables"
+    * `DIUN_PROVIDERS_KUBERNETES_WATCHBYDEFAULT`
 
 ## Kubernetes annotations
 
 You can configure more finely the way to analyze the image of your pods through Kubernetes annotations:
 
-* `diun.enable`: Set to true to enable image analysis of this pod.
-* `diun.regopts_id`: Registry options ID from [`regopts`](../configuration.md#regopts) to use.
-* `diun.watch_repo`: Watch all tags of this pod image (default `false`).
-* `diun.max_tags`: Maximum number of tags to watch if `diun.watch_repo` enabled. 0 means all of them (default `0`).
-* `diun.include_tags`: Semi-colon separated list of regular expressions to include tags. Can be useful if you enable `diun.watch_repo`.
-* `diun.exclude_tags`: Semi-colon separated list of regular expressions to exclude tags. Can be useful if you enable `diun.watch_repo`.
+| Name                          | Default       | Description   |
+|-------------------------------|---------------|---------------|
+| `diun.enable`                 |               | Set to true to enable image analysis of this pod |
+| `diun.regopts_id`             |               | Registry options ID from [`regopts`](../config/regopts.md) to use |
+| `diun.watch_repo`             | `false`       | Watch all tags of this pod image |
+| `diun.max_tags`               | `0`           | Maximum number of tags to watch if `diun.watch_repo` enabled. `0` means all of them |
+| `diun.include_tags`           |               | Semi-colon separated list of regular expressions to include tags. Can be useful if you enable `diun.watch_repo` |
+| `diun.exclude_tags`           |               | Semi-colon separated list of regular expressions to exclude tags. Can be useful if you enable `diun.watch_repo` |

@@ -20,7 +20,7 @@
 [Docker image](https://hub.docker.com/r/crazymax/diun/)) to receive notifications when a Docker image is updated on
 a Docker registry.
 
-![](.res/notif-slack.png)
+![](.res/screenshot.png)
 
 ## Features
 

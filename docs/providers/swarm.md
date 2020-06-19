@@ -1,12 +1,5 @@
 # Swarm provider
 
-* [About](#about)
-* [Quick start](#quick-start)
-* [Provider configuration](#provider-configuration)
-  * [Configuration file](#configuration-file)
-  * [Environment variables](#environment-variables)
-* [Docker labels](#docker-labels)
-
 ## About
 
 The Swarm provider allows you to analyze the services of your Swarm cluster to extract images found and check for updates on the registry.
@@ -98,76 +91,91 @@ diun_diun.1.i1l4yuiafq6y@docker-desktop    | Sat, 14 Dec 2019 16:20:02 CET INF N
 ...
 ```
 
-## Provider configuration
+## Configuration
 
-### Configuration file
+!!! hint
+    Environment variable `DIUN_PROVIDERS_SWARM=true` can be used to enable this provider with default values.
 
-#### `endpoint`
+### `endpoint`
 
 Server address to connect to. Local if empty.
 
-```yaml
-providers:
-  swarm:
-    endpoint: "unix:///var/run/docker.sock"
-```
+!!! example "File"
+    ```yaml
+    providers:
+      swarm:
+        endpoint: "unix:///var/run/docker.sock"
+    ```
+
+!!! abstract "Environment variables"
+    * `DIUN_PROVIDERS_SWARM_ENDPOINT`
 
 #### `apiVersion`
 
 Overrides the client version with the specified one.
 
-```yaml
-providers:
-  swarm:
-    apiVersion: "1.39"
-```
+!!! example "File"
+    ```yaml
+    providers:
+      swarm:
+        apiVersion: "1.39"
+    ```
+
+!!! abstract "Environment variables"
+    * `DIUN_PROVIDERS_SWARM_APIVERSION`
 
 #### `tlsCertsPath`
 
 Path to load the TLS certificates from.
 
-```yaml
-providers:
-  swarm:
-    tlsCertsPath: "/certs/"
-```
+!!! example "File"
+    ```yaml
+    providers:
+      swarm:
+        tlsCertsPath: "/certs/"
+    ```
+
+!!! abstract "Environment variables"
+    * `DIUN_PROVIDERS_SWARM_TLSCERTSPATH`
 
 #### `tlsVerify`
 
 Controls whether client verifies the server's certificate chain and hostname (default `true`).
 
-```yaml
-providers:
-  swarm:
-    tlsVerify: true
-```
+!!! example "File"
+    ```yaml
+    providers:
+      swarm:
+        tlsVerify: true
+    ```
+
+!!! abstract "Environment variables"
+    * `DIUN_PROVIDERS_SWARM_TLSVERIFY`
 
 #### `watchByDefault`
 
 Enable watch by default. If false, services that don't have `diun.enable=true` label will be ignored (default `false`).
 
-```yaml
-providers:
-  swarm:
-    watchByDefault: false
-```
+!!! example "File"
+    ```yaml
+    providers:
+      swarm:
+        watchByDefault: false
+    ```
 
-### Environment variables
+!!! abstract "Environment variables"
+    * `DIUN_PROVIDERS_SWARM_WATCHBYDEFAULT`
 
-* `DIUN_PROVIDERS_SWARM`
-* `DIUN_PROVIDERS_SWARM_ENDPOINT`
-* `DIUN_PROVIDERS_SWARM_APIVERSION`
-* `DIUN_PROVIDERS_SWARM_TLSCERTSPATH`
-* `DIUN_PROVIDERS_SWARM_TLSVERIFY`
-* `DIUN_PROVIDERS_SWARM_WATCHBYDEFAULT`
 
 ## Docker labels
 
 You can configure more finely the way to analyze the image of your service through Docker labels:
 
-* `diun.enable`: Set to true to enable image analysis of this container.
-* `diun.regopts_id`: Registry options ID from [`regopts`](../configuration.md#regopts) to use.
-* `diun.watch_repo`: Watch all tags of this container image (default `false`).
-* `diun.max_tags`: Maximum number of tags to watch if `diun.watch_repo` enabled. 0 means all of them (default `0`).
-* `diun.include_tags`: Semi-colon separated list of regular expressions to include tags. Can be useful if you enable `diun.watch_repo`.
-* `diun.exclude_tags`: Semi-colon separated list of regular expressions to exclude tags. Can be useful if you enable `diun.watch_repo`.
+| Name                          | Default       | Description   |
+|-------------------------------|---------------|---------------|
+| `diun.enable`                 |               | Set to true to enable image analysis of this service |
+| `diun.regopts_id`             |               | Registry options ID from [`regopts`](../config/regopts.md) to use |
+| `diun.watch_repo`             | `false`       | Watch all tags of this service image |
+| `diun.max_tags`               | `0`           | Maximum number of tags to watch if `diun.watch_repo` enabled. `0` means all of them |
+| `diun.include_tags`           |               | Semi-colon separated list of regular expressions to include tags. Can be useful if you enable `diun.watch_repo` |
+| `diun.exclude_tags`           |               | Semi-colon separated list of regular expressions to exclude tags. Can be useful if you enable `diun.watch_repo` |

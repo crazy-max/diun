@@ -1,21 +1,17 @@
 # FAQ
 
-* [Test notifications](#test-notifications)
-* [field docker|swarm uses unsupported type: invalid](#field-dockerswarm-uses-unsupported-type-invalid)
-* [No image found in manifest list for architecture [], variant [], OS []](#no-image-found-in-manifest-list-for-architecture--variant--os-)
-
 ## Test notifications
 
 Through the [command line](getting-started.md#diun-cli) with:
 
-```
-diun --config ./diun.yml --test-notif
+```shell
+$ diun --config ./diun.yml --test-notif
 ```
 
 Or within a container:
 
-```
-docker-compose exec diun --test-notif
+```shell
+$ docker-compose exec diun --test-notif
 ```
 
 ## field docker|swarm uses unsupported type: invalid
@@ -34,7 +30,7 @@ providers:
   docker: {}
 ```
 
-## No image found in manifest list for architecture [], variant [], OS []
+## No image found in manifest list for architecture, variant, OS
 
 If you encounter this kind of error, you are probably using the [file provider](providers/file.md) containing an image with an erroneous or empty platform. If the platform is not filled in, it will be deduced automatically from the information of your operating system on which Diun is running.
 

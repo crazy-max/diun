@@ -1,10 +1,10 @@
-# Support [![](https://isitmaintained.com/badge/resolution/crazy-max/diun.svg)](https://isitmaintained.com/project/crazy-max/diun)
+# Reporting an issue
+
+## Before submitting an issue
 
 First, [be a good guy](https://github.com/kossnocorp/etiquette/blob/master/README.md).
 
-## Reporting an issue
-
-Please do a search in [open issues](https://github.com/crazy-max/diun/issues?utf8=%E2%9C%93&q=) to see if the issue or feature request has already been filed.
+Please do a search in [open issues]({{ config.repo_url }}issues?utf8=%E2%9C%93&q=) to see if the issue or feature request has already been filed and read the [FAQ](faq.md) page first.
 
 If you find your issue already exists, make relevant comments and add your [reaction](https://github.com/blog/2119-add-reactions-to-pull-requests-issues-and-comments). Use a reaction in place of a "+1" comment.
 
@@ -23,9 +23,9 @@ File a single issue per problem and feature request.
 
 The more information you can provide, the more likely someone will be successful reproducing the issue and finding a fix.
 
-You are now ready to [create a new issue](https://github.com/crazy-max/diun/issues/new/choose)!
+You are now ready to [create a new issue]({{ config.repo_url }}issues/new/choose)!
 
 ## Closure policy
 
 * Issues that don't have the information requested above (when applicable) will be closed immediately and the poster directed to the support guidelines.
-* Issues that go a week without a response from original poster are subject to closure at my discretion.
+* Issues that go a week without a response from original poster are subject to closure at our discretion.
