@@ -2,6 +2,8 @@
 
 ## 3.0.0 (2020/05/27)
 
+> :warning: See **Migration notes** in the documentation for breaking changes.
+
 * Add script notification (#53)
 * Add Teams notification (#72)
 * Add `--test-notif` flag (#23)
@@ -22,8 +24,6 @@
 * Remove unneeded `diun.os` and `diun.arch` docker labels
 * Add upgrade notes
 * Update deps
-
-> :warning: See [**UPGRADE NOTES**](UPGRADE.md#2x--3x) for breaking changes.
 
 ## 2.6.1 (2020/03/26)
 
@@ -66,6 +66,8 @@
 
 ## 2.0.0 (2019/12/14)
 
+> :warning: See **Migration notes** in the documentation for breaking changes.
+
 * Include provider in notifications
 * Add providers documentation
 * Move image validation and improve job execution
@@ -77,8 +79,6 @@
 * Update deps
 * Go 1.13.5
 * Seconds field optional for schedule
-
-> :warning: See [**UPGRADE NOTES**](UPGRADE.md#1x--2x) for breaking changes.
 
 ## 1.4.1 (2019/10/20)
 
@@ -121,6 +121,8 @@
 
 ## 1.0.0 (2019/07/01)
 
+> :warning: See **Migration notes** in the documentation for breaking changes.
+
 * Always run on startup. Flag `--run-startup` removed.
 * Display next execution time
 * Use v3 robfig/cron
@@ -128,8 +130,6 @@
 * Retrieve all tags by default
 * Review config file structure
 * Improve worker pool
-
-> :warning: See [**UPGRADE NOTES**](UPGRADE.md#0x--1x) for breaking changes.
 
 ## 0.5.0 (2019/06/09)
 
