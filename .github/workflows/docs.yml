@@ -2,7 +2,23 @@ name: docs
 
 on:
   push:
+    branches:
+      - 'master'
+      - 'v*'
+    tags:
+      - 'v*'
+    paths:
+      - '.github/workflows/docs.yml'
+      - 'docs/**'
+      - 'mkdocs.yml'
   pull_request:
+    branches:
+      - 'master'
+      - 'v*'
+    paths:
+      - '.github/workflows/docs.yml'
+      - 'docs/**'
+      - 'mkdocs.yml'
 
 jobs:
   publish:
@@ -18,8 +34,8 @@ jobs:
       -
         name: Build docs
         run: |
-          docker run --rm --entrypoint "sh" -v "$(pwd)/docs:/mkdocs" mkdocs \
-            sh -c "mkdocs build --strict && chown -R $(id -u):$(id -g) ./site"
+          docker run --rm -v "$(pwd):/docs" mkdocs build --strict
+          sudo chown -R $(id -u):$(id -g) ./site
       -
         name: Deploy
         if: success() && github.event_name != 'pull_request' && endsWith(github.ref, github.event.repository.default_branch)
