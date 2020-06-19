@@ -2,7 +2,7 @@
 
 ## Test notifications
 
-Through the [command line](getting-started.md#diun-cli) with:
+Through the [command line](get-started.md#diun-cli) with:
 
 ```shell
 $ diun --config ./diun.yml --test-notif

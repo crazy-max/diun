@@ -24,7 +24,7 @@ And extract diun:
 $ wget -qO- {{ config.repo_url }}releases/download/v{{ app.version }}/diun_{{ app.version }}_linux_x86_64.tar.gz | tar -zxvf - diun
 ```
 
-After getting the binary, it can be tested with [`./diun --help`](../getting-started.md#diun-cli) command and moved to a permanent location.
+After getting the binary, it can be tested with [`./diun --help`](../get-started.md#diun-cli) command and moved to a permanent location.
 
 ## Server configuration
 

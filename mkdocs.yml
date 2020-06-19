@@ -54,7 +54,7 @@ google_analytics:
 
 nav:
   - Home: index.md
-  - Getting started: getting-started.md
+  - Get started: get-started.md
   - Installation:
     - With Docker: install/docker.md
     - From binary: install/binary.md
