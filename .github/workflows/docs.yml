@@ -10,6 +10,7 @@ on:
     paths:
       - '.github/workflows/docs.yml'
       - 'docs/**'
+      - 'Dockerfile.mkdocs'
       - 'mkdocs.yml'
   pull_request:
     branches:
@@ -18,6 +19,7 @@ on:
     paths:
       - '.github/workflows/docs.yml'
       - 'docs/**'
+      - 'Dockerfile.mkdocs'
       - 'mkdocs.yml'
 
 jobs:

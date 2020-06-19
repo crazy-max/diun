@@ -11,6 +11,7 @@ on:
       - '**.md'
       - '.github/workflows/docs.yml'
       - 'docs/**'
+      - 'Dockerfile.mkdocs'
       - 'mkdocs.yml'
   pull_request:
     branches:
@@ -20,6 +21,7 @@ on:
       - '**.md'
       - '.github/workflows/docs.yml'
       - 'docs/**'
+      - 'Dockerfile.mkdocs'
       - 'mkdocs.yml'
 
 jobs:
