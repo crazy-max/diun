@@ -22,10 +22,6 @@
 * Improve configuration validation
 * Fix telegram init
 * All fields in configuration are now _camelCased_
-  * `notif.mail.insecure_skip_verify` > `notif.mail.insecureSkipVerify`
-  * `notif.rocketchat.user_id` > `notif.rocketchat.userID`
-  * `watch.first_check_notif` > `watch.firstCheckNotif`
-  * ...
 * Docker API version negotiation (#29)
 * Add Mattermost compatibility via Slack webhooks (#80)
 
