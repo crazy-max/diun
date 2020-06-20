@@ -82,6 +82,7 @@ nav:
     - Kubernetes: providers/kubernetes.md
     - Swarm: providers/swarm.md
   - FAQ: faq.md
+  - Changelog: changelog.md
   - Migration:
     - Diun v2 to v3: migration/v2-to-v3.md
     - Diun v1 to v2: migration/v1-to-v2.md
@@ -94,6 +95,8 @@ markdown_extensions:
   - admonition
   - codehilite
   - footnotes
+  - markdown_include.include:
+      base_path: docs
   - meta
   - pymdownx.details
   - pymdownx.tabbed

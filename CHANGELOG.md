@@ -2,7 +2,7 @@
 
 ## 3.0.0 (2020/05/27)
 
-> :warning: See **Migration notes** in the documentation for breaking changes.
+:warning: See **Migration notes** in the documentation for breaking changes.
 
 * Add script notification (#53)
 * Add Teams notification (#72)
@@ -66,7 +66,7 @@
 
 ## 2.0.0 (2019/12/14)
 
-> :warning: See **Migration notes** in the documentation for breaking changes.
+:warning: See **Migration notes** in the documentation for breaking changes.
 
 * Include provider in notifications
 * Add providers documentation
@@ -121,7 +121,7 @@
 
 ## 1.0.0 (2019/07/01)
 
-> :warning: See **Migration notes** in the documentation for breaking changes.
+:warning: See **Migration notes** in the documentation for breaking changes.
 
 * Always run on startup. Flag `--run-startup` removed.
 * Display next execution time

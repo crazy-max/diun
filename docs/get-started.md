@@ -4,9 +4,6 @@
 [single executable](https://github.com/crazy-max/diun/releases/latest) (and a [Docker image](install/docker.md))
 to receive notifications when a Docker image is updated on a Docker registry.
 
-## Purpose
-
-The goal of this project is to provide the easiest, fastest, and most painless way of setting up a self-hosted service to handle this.
 With Go, this can be done with an independent binary distribution across all platforms and architectures that Go supports.
 This support includes Linux, macOS, and Windows, on architectures like amd64, i386, ARM, PowerPC, and others.
 
