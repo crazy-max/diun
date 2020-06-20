@@ -105,11 +105,7 @@ func (di *Diun) Run() {
 	di.wg = new(sync.WaitGroup)
 	di.pool, _ = ants.NewPoolWithFunc(di.cfg.Watch.Workers, func(i interface{}) {
 		job := i.(model.Job)
-		if err := di.runJob(job); err != nil {
-			log.Error().Err(err).
-				Str("provider", job.Provider).
-				Msg("Cannot run job")
-		}
+		di.runJob(job)
 		di.wg.Done()
 	}, ants.WithLogger(new(logging.AntsLogger)))
 	defer di.pool.Release()

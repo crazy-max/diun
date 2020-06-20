@@ -8,6 +8,7 @@ import (
 
 	"github.com/containers/image/v5/docker"
 	"github.com/containers/image/v5/types"
+	"github.com/pkg/errors"
 )
 
 // Client represents an active docker registry object
@@ -71,7 +72,7 @@ func (c *Client) newImage(ctx context.Context, imageStr string) (types.ImageClos
 
 	ref, err := docker.ParseReference(imageStr)
 	if err != nil {
-		return nil, fmt.Errorf("invalid image name %s: %v", imageStr, err)
+		return nil, errors.Wrap(err, "Invalid image name")
 	}
 
 	img, err := ref.NewImage(ctx, c.sysCtx)

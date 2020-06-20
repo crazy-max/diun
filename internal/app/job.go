@@ -137,7 +137,7 @@ func (di *Diun) createJob(job model.Job) {
 	}
 }
 
-func (di *Diun) runJob(job model.Job) error {
+func (di *Diun) runJob(job model.Job) {
 	sublog := log.With().
 		Str("provider", job.Provider).
 		Str("image", job.RegImage.String()).
@@ -145,20 +145,22 @@ func (di *Diun) runJob(job model.Job) error {
 
 	if !utl.IsIncluded(job.RegImage.Tag, job.Image.IncludeTags) {
 		sublog.Warn().Msg("Tag not included")
-		return nil
+		return
 	} else if utl.IsExcluded(job.RegImage.Tag, job.Image.ExcludeTags) {
 		sublog.Warn().Msg("Tag excluded")
-		return nil
+		return
 	}
 
 	liveManifest, err := job.Registry.Manifest(job.RegImage)
 	if err != nil {
-		return err
+		sublog.Warn().Err(err).Msg("Cannot get remote manifest")
+		return
 	}
 
 	dbManifest, err := di.db.GetManifest(job.RegImage)
 	if err != nil {
-		return err
+		sublog.Error().Err(err).Msg("Cannot get manifest from db")
+		return
 	}
 
 	status := model.ImageStatusUnchange
@@ -170,17 +172,18 @@ func (di *Diun) runJob(job model.Job) error {
 		sublog.Info().Msg("Image update found")
 	} else {
 		sublog.Debug().Msg("No changes")
-		return nil
+		return
 	}
 
 	if err := di.db.PutManifest(job.RegImage, liveManifest); err != nil {
-		return err
+		sublog.Error().Err(err).Msg("Cannot write manifest to db")
+		return
 	}
 	sublog.Debug().Msg("Manifest saved to database")
 
 	if job.FirstCheck && !*di.cfg.Watch.FirstCheckNotif {
 		sublog.Debug().Msg("Skipping notification (first check)")
-		return nil
+		return
 	}
 
 	di.notif.Send(model.NotifEntry{
@@ -189,6 +192,4 @@ func (di *Diun) runJob(job model.Job) error {
 		Image:    job.RegImage,
 		Manifest: liveManifest,
 	})
-
-	return nil
 }

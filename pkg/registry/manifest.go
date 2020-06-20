@@ -6,6 +6,7 @@ import (
 
 	"github.com/containers/image/v5/manifest"
 	"github.com/opencontainers/go-digest"
+	"github.com/pkg/errors"
 )
 
 // Manifest is the Docker image manifest information
@@ -28,23 +29,23 @@ func (c *Client) Manifest(image Image) (Manifest, error) {
 
 	imgCloser, err := c.newImage(ctx, image.String())
 	if err != nil {
-		return Manifest{}, err
+		return Manifest{}, errors.Wrap(err, "Cannot create image closer")
 	}
 	defer imgCloser.Close()
 
 	rawManifest, _, err := imgCloser.Manifest(ctx)
 	if err != nil {
-		return Manifest{}, err
+		return Manifest{}, errors.Wrap(err, "Cannot get raw manifest")
 	}
 
 	imgInspect, err := imgCloser.Inspect(ctx)
 	if err != nil {
-		return Manifest{}, err
+		return Manifest{}, errors.Wrap(err, "Cannot inspect")
 	}
 
 	imgDigest, err := manifest.Digest(rawManifest)
 	if err != nil {
-		return Manifest{}, err
+		return Manifest{}, errors.Wrap(err, "Cannot get digest")
 	}
 
 	imgTag := imgInspect.Tag
