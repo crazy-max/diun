@@ -12,8 +12,6 @@ copyright: |
   by <a target="_blank" href="https://crazymax.dev/">CrazyMax</a> and <a target="_blank" href="https://github.com/crazy-max/diun/graphs/contributors">contributors</a>.
 
 extra:
-  app:
-    version: 4.0.0
   social:
     - icon: fontawesome/brands/github-alt
       link: https://github.com/crazy-max/diun

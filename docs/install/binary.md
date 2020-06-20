@@ -6,22 +6,22 @@ Diun binaries are available on [releases]({{ config.repo_url }}releases) page.
 
 Choose the archive matching the destination platform:
 
-* [diun_{{ app.version }}_darwin_i386.tar.gz]({{ config.repo_url }}releases/download/v{{ app.version }}/diun_{{ app.version }}_darwin_i386.tar.gz)
-* [diun_{{ app.version }}_darwin_x86_64.tar.gz]({{ config.repo_url }}/releases/download/v{{ app.version }}/diun_{{ app.version }}_darwin_x86_64.tar.gz)
-* [diun_{{ app.version }}_freebsd_i386.tar.gz]({{ config.repo_url }}/releases/download/v{{ app.version }}/diun_{{ app.version }}_freebsd_i386.tar.gz)
-* [diun_{{ app.version }}_freebsd_x86_64.tar.gz]({{ config.repo_url }}/releases/download/v{{ app.version }}/diun_{{ app.version }}_freebsd_x86_64.tar.gz)
-* [diun_{{ app.version }}_linux_arm64.tar.gz]({{ config.repo_url }}/releases/download/v{{ app.version }}/diun_{{ app.version }}_linux_arm64.tar.gz)
-* [diun_{{ app.version }}_linux_armv6.tar.gz]({{ config.repo_url }}/releases/download/v{{ app.version }}/diun_{{ app.version }}_linux_armv6.tar.gz)
-* [diun_{{ app.version }}_linux_armv7.tar.gz]({{ config.repo_url }}/releases/download/v{{ app.version }}/diun_{{ app.version }}_linux_armv7.tar.gz)
-* [diun_{{ app.version }}_linux_i386.tar.gz]({{ config.repo_url }}/releases/download/v{{ app.version }}/diun_{{ app.version }}_linux_i386.tar.gz)
-* [diun_{{ app.version }}_linux_x86_64.tar.gz]({{ config.repo_url }}/releases/download/v{{ app.version }}/diun_{{ app.version }}_linux_x86_64.tar.gz)
-* [diun_{{ app.version }}_windows_i386.zip]({{ config.repo_url }}/releases/download/v{{ app.version }}/diun_{{ app.version }}_windows_i386.zip)
-* [diun_{{ app.version }}_windows_x86_64.zip]({{ config.repo_url }}/releases/download/v{{ app.version }}/diun_{{ app.version }}_windows_x86_64.zip)
+* [diun_{{ git.tag | trim('v') }}_darwin_i386.tar.gz]({{ config.repo_url }}releases/download/v{{ git.tag | trim('v') }}/diun_{{ git.tag | trim('v') }}_darwin_i386.tar.gz)
+* [diun_{{ git.tag | trim('v') }}_darwin_x86_64.tar.gz]({{ config.repo_url }}/releases/download/v{{ git.tag | trim('v') }}/diun_{{ git.tag | trim('v') }}_darwin_x86_64.tar.gz)
+* [diun_{{ git.tag | trim('v') }}_freebsd_i386.tar.gz]({{ config.repo_url }}/releases/download/v{{ git.tag | trim('v') }}/diun_{{ git.tag | trim('v') }}_freebsd_i386.tar.gz)
+* [diun_{{ git.tag | trim('v') }}_freebsd_x86_64.tar.gz]({{ config.repo_url }}/releases/download/v{{ git.tag | trim('v') }}/diun_{{ git.tag | trim('v') }}_freebsd_x86_64.tar.gz)
+* [diun_{{ git.tag | trim('v') }}_linux_arm64.tar.gz]({{ config.repo_url }}/releases/download/v{{ git.tag | trim('v') }}/diun_{{ git.tag | trim('v') }}_linux_arm64.tar.gz)
+* [diun_{{ git.tag | trim('v') }}_linux_armv6.tar.gz]({{ config.repo_url }}/releases/download/v{{ git.tag | trim('v') }}/diun_{{ git.tag | trim('v') }}_linux_armv6.tar.gz)
+* [diun_{{ git.tag | trim('v') }}_linux_armv7.tar.gz]({{ config.repo_url }}/releases/download/v{{ git.tag | trim('v') }}/diun_{{ git.tag | trim('v') }}_linux_armv7.tar.gz)
+* [diun_{{ git.tag | trim('v') }}_linux_i386.tar.gz]({{ config.repo_url }}/releases/download/v{{ git.tag | trim('v') }}/diun_{{ git.tag | trim('v') }}_linux_i386.tar.gz)
+* [diun_{{ git.tag | trim('v') }}_linux_x86_64.tar.gz]({{ config.repo_url }}/releases/download/v{{ git.tag | trim('v') }}/diun_{{ git.tag | trim('v') }}_linux_x86_64.tar.gz)
+* [diun_{{ git.tag | trim('v') }}_windows_i386.zip]({{ config.repo_url }}/releases/download/v{{ git.tag | trim('v') }}/diun_{{ git.tag | trim('v') }}_windows_i386.zip)
+* [diun_{{ git.tag | trim('v') }}_windows_x86_64.zip]({{ config.repo_url }}/releases/download/v{{ git.tag | trim('v') }}/diun_{{ git.tag | trim('v') }}_windows_x86_64.zip)
 
 And extract diun:
 
 ```shell
-$ wget -qO- {{ config.repo_url }}releases/download/v{{ app.version }}/diun_{{ app.version }}_linux_x86_64.tar.gz | tar -zxvf - diun
+$ wget -qO- {{ config.repo_url }}releases/download/v{{ git.tag | trim('v') }}/diun_{{ git.tag | trim('v') }}_linux_x86_64.tar.gz | tar -zxvf - diun
 ```
 
 After getting the binary, it can be tested with [`./diun --help`](../get-started.md#diun-cli) command and moved to a permanent location.
