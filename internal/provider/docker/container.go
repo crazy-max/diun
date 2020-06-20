@@ -36,14 +36,20 @@ func (c *Client) listContainerImage() []model.Image {
 
 	var list []model.Image
 	for _, ctn := range ctns {
-		local, err := cli.IsLocalImage(ctn.Image)
+		imageRaw, err := cli.RawImage(ctn.Image)
 		if err != nil {
 			c.logger.Error().Err(err).Msgf("Cannot inspect image from container %s", ctn.ID)
 			continue
-		} else if local {
-			c.logger.Debug().Msgf("Skip locally built image for container %s", ctn.ID)
+		}
+		if local := cli.IsLocalImage(imageRaw); local {
+			c.logger.Debug().Msgf("Skip locally built image from container %s", ctn.ID)
 			continue
 		}
+		if dangling := cli.IsDanglingImage(imageRaw); dangling {
+			c.logger.Debug().Msgf("Skip dangling image from container %s", ctn.ID)
+			continue
+		}
+
 		image, err := provider.ValidateContainerImage(ctn.Image, ctn.Labels, *c.config.WatchByDefault)
 		if err != nil {
 			c.logger.Error().Err(err).Msgf("Cannot get image from container %s", ctn.ID)

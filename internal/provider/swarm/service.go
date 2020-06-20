@@ -29,11 +29,17 @@ func (c *Client) listServiceImage() []model.Image {
 
 	var list []model.Image
 	for _, svc := range svcs {
-		local, _ := cli.IsLocalImage(svc.Spec.TaskTemplate.ContainerSpec.Image)
-		if local {
-			c.logger.Debug().Msgf("Skip locally built image for service %s", svc.Spec.Name)
-			continue
+		if imageRaw, err := cli.RawImage(svc.Spec.TaskTemplate.ContainerSpec.Image); err == nil {
+			if local := cli.IsLocalImage(imageRaw); local {
+				c.logger.Debug().Msgf("Skip locally built image for service %s", svc.Spec.Name)
+				continue
+			}
+			if dangling := cli.IsDanglingImage(imageRaw); dangling {
+				c.logger.Debug().Msgf("Skip dangling image for service %s", svc.Spec.Name)
+				continue
+			}
 		}
+
 		image, err := provider.ValidateContainerImage(svc.Spec.TaskTemplate.ContainerSpec.Image, svc.Spec.Labels, *c.config.WatchByDefault)
 		if err != nil {
 			c.logger.Error().Err(err).Msgf("Cannot get image from service %s", svc.Spec.Name)
