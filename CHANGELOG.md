@@ -1,5 +1,34 @@
 # Changelog
 
+## 4.0.0 (2020/06/??)
+
+:warning: See **Migration notes** in the documentation for breaking changes.
+
+* Docs website with mkdocs (#99)
+* Skip dangling images (#98)
+* More explicit massage if manifest not found (#94)
+* Add swarm example
+* Update doc for file and Swarm providers
+* Add Kubernetes provider (#25)
+* Update Teams notification screenshot (#93)
+* Send message as markdown for Gotify and Telegram notifiers
+* Add link to respective hub (#40)
+* Configuration transposed into environment variables (#82)
+* Configuration file not required anymore
+* `DIUN_DB` env var renamed `DIUN_DB_PATH`
+* Only accept duration as timeout value (`10` becomes `10s`)
+* Enhanced documentation (#83)
+* Add note about test notifications (#79)
+* Improve configuration validation
+* Fix telegram init
+* All fields in configuration are now _camelCased_
+  * `notif.mail.insecure_skip_verify` > `notif.mail.insecureSkipVerify`
+  * `notif.rocketchat.user_id` > `notif.rocketchat.userID`
+  * `watch.first_check_notif` > `watch.firstCheckNotif`
+  * ...
+* Docker API version negotiation (#29)
+* Add Mattermost compatibility via Slack webhooks (#80)
+
 ## 3.0.0 (2020/05/27)
 
 :warning: See **Migration notes** in the documentation for breaking changes.
