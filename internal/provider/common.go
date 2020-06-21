@@ -31,8 +31,8 @@ func ValidateContainerImage(image string, labels map[string]string, watchByDef b
 
 	for key, value := range labels {
 		switch key {
-		case "diun.regopts_id":
-			img.RegOptsID = value
+		case "diun.regopt":
+			img.RegOpt = value
 		case "diun.watch_repo":
 			if img.WatchRepo, err = strconv.ParseBool(value); err != nil {
 				return img, fmt.Errorf("cannot parse %s value of label %s", value, key)

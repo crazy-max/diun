@@ -60,7 +60,7 @@ func ParseImage(parseOpts ParseImageOptions) (Image, error) {
 	// Parse the image name and tag.
 	named, err := reference.ParseNormalizedNamed(parseOpts.Name)
 	if err != nil {
-		return Image{}, errors.Wrap(err, fmt.Sprintf("parsing image %s failed", parseOpts.Name))
+		return Image{}, errors.Wrapf(err, "parsing image %s failed", parseOpts.Name)
 	}
 	// Add the latest lag if they did not provide one.
 	named = reference.TagNameOnly(named)

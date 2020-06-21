@@ -36,19 +36,23 @@ func (di *Diun) createJob(job model.Job) {
 		return
 	}
 
-	// Registry options
-	regOpts, err := di.cfg.GetRegOpts(job.Image.RegOptsID)
+	// Get registry options
+	reg, err := di.cfg.RegOpts.Select(job.Image.RegOpt, job.RegImage)
 	if err != nil {
 		sublog.Warn().Err(err).Msg("Registry options")
+	} else if reg != nil {
+		sublog.Debug().Str("regopt", reg.Name).Msg("Registry options will be used")
+	} else {
+		reg = (&model.RegOpt{}).GetDefaults()
 	}
 
-	regUser, err := utl.GetSecret(regOpts.Username, regOpts.UsernameFile)
+	regUser, err := utl.GetSecret(reg.Username, reg.UsernameFile)
 	if err != nil {
-		log.Warn().Err(err).Msgf("Cannot retrieve username secret for regopts %s", job.Image.RegOptsID)
+		log.Warn().Err(err).Msgf("Cannot retrieve username secret for regopts %s", reg.Name)
 	}
-	regPassword, err := utl.GetSecret(regOpts.Password, regOpts.PasswordFile)
+	regPassword, err := utl.GetSecret(reg.Password, reg.PasswordFile)
 	if err != nil {
-		log.Warn().Err(err).Msgf("Cannot retrieve password secret for regopts %s", job.Image.RegOptsID)
+		log.Warn().Err(err).Msgf("Cannot retrieve password secret for regopts %s", reg.Name)
 	}
 
 	// Set defaults
@@ -78,8 +82,8 @@ func (di *Diun) createJob(job model.Job) {
 	job.Registry, err = registry.New(registry.Options{
 		Username:     regUser,
 		Password:     regPassword,
-		Timeout:      *regOpts.Timeout,
-		InsecureTLS:  *regOpts.InsecureTLS,
+		Timeout:      *reg.Timeout,
+		InsecureTLS:  *reg.InsecureTLS,
 		UserAgent:    di.meta.UserAgent,
 		ImageOs:      job.Image.Platform.Os,
 		ImageArch:    job.Image.Platform.Arch,

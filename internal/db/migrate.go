@@ -28,7 +28,7 @@ func (c *Client) Migrate() error {
 
 		log.Info().Msgf("Database migration v%d...", version)
 		if err := migration(c); err != nil {
-			return errors.Wrap(err, fmt.Sprintf("Database migration v%d failed", version))
+			return errors.Wrapf(err, "Database migration v%d failed", version)
 		}
 	}
 

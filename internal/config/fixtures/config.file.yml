@@ -8,4 +8,4 @@ notif:
 
 providers:
   file:
-    filename: "./fixtures/dummy.yml"
+    filename: "./fixtures/file.yml"

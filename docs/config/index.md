@@ -75,14 +75,15 @@ You can define a configuration file through the option `--config` with the follo
         timeout: 10s
     
     regopts:
-      someregistryoptions:
+      - name: "myregistry"
         username: foo
         password: bar
         timeout: 20s
-      onemore:
+        insecureTLS: true
+      - name: "docker.io"
+        selector: image
         username: foo2
         password: bar2
-        insecureTLS: true
     
     providers:
       docker:
@@ -131,11 +132,16 @@ All configuration from file can be transposed into environment variables. As an 
         timeout: 10s
     
     regopts:
-      someregistryoptions:
+      - name: "docker.io"
+        selector: image
         username: foo
         password: bar
+      - name: "registry.gitlab.com"
+        selector: image
+        username: fii
+        password: bor
         timeout: 20s
-    
+
     providers:
       kubernetes:
         tlsInsecure: false
@@ -168,9 +174,15 @@ Can be transposed to:
     DIUN_NOTIF_WEBHOOK_HEADERS_AUTHORIZATION=Token123456
     DIUN_NOTIF_WEBHOOK_TIMEOUT=10s
     
-    DIUN_REGOPTS_SOMEREGISTRYOPTIONS_USERNAME=foo
-    DIUN_REGOPTS_SOMEREGISTRYOPTIONS_PASSWORD=bar
-    DIUN_REGOPTS_SOMEREGISTRYOPTIONS_TIMEOUT=20s
+    DIUN_REGOPTS_0_NAME=docker.io
+    DIUN_REGOPTS_0_SELECTOR=image
+    DIUN_REGOPTS_0_USERNAME=foo
+    DIUN_REGOPTS_0_PASSWORD=bar
+    DIUN_REGOPTS_1_NAME=registry.gitlab.com
+    DIUN_REGOPTS_1_SELECTOR=image
+    DIUN_REGOPTS_1_USERNAME=fii
+    DIUN_REGOPTS_1_PASSWORD=bor
+    DIUN_REGOPTS_1_TIMEOUT=20s
     
     PROVIDERS_KUBERNETES_TLSINSECURE=false
     PROVIDERS_KUBERNETES_NAMESPACES=default,production
