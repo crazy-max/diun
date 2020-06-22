@@ -17,14 +17,18 @@ watch:
   schedule: "* * * * *"
 
 regopts:
-  someregistryoptions:
+  - name: "myregistry"
+    username: fii
+    password: bor
+    timeout: 5s
+  - name: "docker.io/crazymax"
+    selector: image
+    username: fii
+    password: bor
+  - name: "docker.io"
+    selector: image
     username: foo
     password: bar
-    timeout: 20
-  onemore:
-    username: foo2
-    password: bar2
-    insecureTLS: true
 
 providers:
   file:
@@ -34,18 +38,20 @@ providers:
 ```yaml
 ### /path/to/config.yml
 
-# Watch latest tag of crazymax/nextcloud image on docker.io (DockerHub) with registry ID 'someregistryoptions'.
+# Watch latest tag of crazymax/nextcloud image on docker.io (DockerHub)
+# with registry options named 'docker.io/crazymax' (image selector).
 - name: docker.io/crazymax/nextcloud:latest
-  regopts_id: someregistryoptions
 
-# Watch 4.0.0 tag of jfrog/artifactory-oss image on frog-docker-reg2.bintray.io (Bintray) with registry ID 'onemore'.
+# Watch 4.0.0 tag of jfrog/artifactory-oss image on frog-docker-reg2.bintray.io (Bintray)
+# with registry options named 'myregistry' (name selector).
 - name: jfrog-docker-reg2.bintray.io/jfrog/artifactory-oss:4.0.0
-  regopts_id: onemore
+  regopt: myregistry
 
 # Watch coreos/hyperkube image on quay.io (Quay) and assume latest tag.
 - name: quay.io/coreos/hyperkube
 
-# Watch crazymax/swarm-cronjob image and assume docker.io registry and latest tag.
+# Watch crazymax/swarm-cronjob image and assume docker.io registry and latest tag
+# with registry options named 'docker.io/crazymax' (image selector).
 # Only include tags matching regexp ^1\.2\..*
 - name: crazymax/swarm-cronjob
   watch_repo: true
@@ -53,6 +59,7 @@ providers:
     - ^1\.2\..*
 
 # Watch portainer/portainer image on docker.io (DockerHub) and assume latest tag
+# with registry options named 'docker.io' (image selector).
 # Only watch latest 10 tags and include tags matching regexp ^(0|[1-9]\d*)\..*
 - name: docker.io/portainer/portainer
   watch_repo: true
@@ -60,7 +67,8 @@ providers:
   include_tags:
     - ^(0|[1-9]\d*)\..*
 
-# Watch alpine image (library) and assume docker.io registry and latest tag.
+# Watch alpine image (library) and assume docker.io registry and latest tag
+# with registry options named 'docker.io' (image selector).
 # Force linux/arm64/v8 platform for this image
 - name: alpine
   watch_repo: true
@@ -83,7 +91,8 @@ watch:
   schedule: "* * * * *"
 
 regopts:
-  jfrog:
+  - name: "docker.bintray.io"
+    selector: image
     username: foo
     password: bar
 
@@ -97,7 +106,6 @@ providers:
 - name: crazymax/cloudflared
   watch_repo: true
 - name: docker.bintray.io/jfrog/xray-mongo:3.2.6
-  regopts_id: jfrog
 ```
 
 Here we want to analyze all tags of `crazymax/cloudflared` and `docker.bintray.io/jfrog/xray-mongo:3.2.6` tag. Now let's start Diun:
@@ -164,7 +172,7 @@ The configuration file(s) defines a slice of images to analyze with the followin
 | Name                          | Default                          | Description   |
 |-------------------------------|----------------------------------|---------------|
 | `name`                        | `latest`                         | Docker image name to watch using `registry/path:tag` format. If registry omitted, `docker.io` will be used and if tag omitted, `latest` will be used |
-| `regopts_id`                  |                                  | Registry options ID from [`regopts`](../config/regopts.md) to use |
+| `regopt`                      |                                  | Registry options name from [`regopts`](../config/regopts.md) to use |
 | `watch_repo`                  | `false`                          | Watch all tags of this image |
 | `max_tags`                    | `0`                              | Maximum number of tags to watch if `watch_repo` enabled. `0` means all of them |
 | `include_tags`                |                                  | List of regular expressions to include tags. Can be useful if you enable `watch_repo` |

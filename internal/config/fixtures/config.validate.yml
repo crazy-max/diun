@@ -53,14 +53,16 @@ notif:
     timeout: 10s
 
 regopts:
-  someregopts:
+  - name: "myregistry"
     timeout: 5s
-  bintrayoptions:
+  - name: "docker.io"
+    selector: image
     username: foo
     password: bar
-  sensitive:
-    usernameFile: /run/secrets/username
-    passwordFile: /run/secrets/password
+  - name: "docker.io/crazymax"
+    selector: image
+    usernameFile: ./fixtures/run_secrets_username
+    passwordFile: ./fixtures/run_secrets_username
 
 providers:
   docker:
@@ -68,4 +70,4 @@ providers:
     watchStopped: true
   swarm: {}
   file:
-    filename: ./fixtures/dummy.yml
+    filename: ./fixtures/file.yml

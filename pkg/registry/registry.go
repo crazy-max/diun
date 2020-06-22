@@ -32,7 +32,7 @@ type Options struct {
 // New creates new docker registry client instance
 func New(opts Options) (*Client, error) {
 	// Auth
-	auth := &types.DockerAuthConfig{}
+	var auth *types.DockerAuthConfig
 	if opts.Username != "" {
 		auth = &types.DockerAuthConfig{
 			Username: opts.Username,
@@ -73,6 +73,16 @@ func (c *Client) newImage(ctx context.Context, imageStr string) (types.ImageClos
 	ref, err := docker.ParseReference(imageStr)
 	if err != nil {
 		return nil, errors.Wrap(err, "Invalid image name")
+	}
+
+	if c.sysCtx.DockerAuthConfig == nil {
+		c.sysCtx.DockerAuthConfig = &types.DockerAuthConfig{}
+		// TODO: Seek credentials
+		//auth, err := config.GetCredentials(c.sysCtx, reference.Domain(ref.DockerReference()))
+		//if err != nil {
+		//	return nil, errors.Wrap(err, "Cannot get registry credentials")
+		//}
+		//*c.sysCtx.DockerAuthConfig = auth
 	}
 
 	img, err := ref.NewImage(ctx, c.sysCtx)

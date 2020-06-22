@@ -14,11 +14,11 @@ import (
 
 // Config holds configuration details
 type Config struct {
-	Db        *model.Db                 `yaml:"db,omitempty" json:"db,omitempty"`
-	Watch     *model.Watch              `yaml:"watch,omitempty" json:"watch,omitempty"`
-	Notif     *model.Notif              `yaml:"notif,omitempty" json:"notif,omitempty"`
-	RegOpts   map[string]*model.RegOpts `yaml:"regopts,omitempty" json:"regopts,omitempty" validate:"unique"`
-	Providers *model.Providers          `yaml:"providers,omitempty" json:"providers,omitempty" validate:"required"`
+	Db        *model.Db        `yaml:"db,omitempty" json:"db,omitempty"`
+	Watch     *model.Watch     `yaml:"watch,omitempty" json:"watch,omitempty"`
+	Notif     *model.Notif     `yaml:"notif,omitempty" json:"notif,omitempty"`
+	RegOpts   model.RegOpts    `yaml:"regopts,omitempty" json:"regopts,omitempty" validate:"unique=Name,dive"`
+	Providers *model.Providers `yaml:"providers,omitempty" json:"providers,omitempty" validate:"required"`
 }
 
 // Load returns Configuration struct
@@ -74,16 +74,6 @@ func (cfg *Config) loadEnv(out interface{}) error {
 	}
 
 	return nil
-}
-
-func (cfg *Config) GetRegOpts(id string) (*model.RegOpts, error) {
-	if len(id) == 0 {
-		return (&model.RegOpts{}).GetDefaults(), nil
-	}
-	if regopts, ok := cfg.RegOpts[id]; ok {
-		return regopts, nil
-	}
-	return (&model.RegOpts{}).GetDefaults(), fmt.Errorf("%s not found", id)
 }
 
 // String returns the string representation of configuration

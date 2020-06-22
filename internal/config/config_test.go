@@ -97,20 +97,28 @@ func TestLoadFile(t *testing.T) {
 						Timeout: utl.NewDuration(10 * time.Second),
 					},
 				},
-				RegOpts: map[string]*model.RegOpts{
-					"someregopts": {
+				RegOpts: model.RegOpts{
+					{
+						Name:        "myregistry",
+						Selector:    model.RegOptSelectorName,
+						Username:    "fii",
+						Password:    "bor",
 						InsecureTLS: utl.NewFalse(),
 						Timeout:     utl.NewDuration(5 * time.Second),
 					},
-					"bintrayoptions": {
+					{
+						Name:        "docker.io",
+						Selector:    model.RegOptSelectorImage,
 						Username:    "foo",
 						Password:    "bar",
 						InsecureTLS: utl.NewFalse(),
 						Timeout:     utl.NewDuration(10 * time.Second),
 					},
-					"sensitive": {
-						UsernameFile: "/run/secrets/username",
-						PasswordFile: "/run/secrets/password",
+					{
+						Name:         "docker.io/crazymax",
+						Selector:     model.RegOptSelectorImage,
+						UsernameFile: "./fixtures/run_secrets_username",
+						PasswordFile: "./fixtures/run_secrets_password",
 						InsecureTLS:  utl.NewFalse(),
 						Timeout:      utl.NewDuration(10 * time.Second),
 					},
@@ -130,7 +138,7 @@ func TestLoadFile(t *testing.T) {
 						WatchByDefault: utl.NewTrue(),
 					},
 					File: &model.PrdFile{
-						Filename: "./fixtures/dummy.yml",
+						Filename: "./fixtures/file.yml",
 					},
 				},
 			},
@@ -191,18 +199,22 @@ func TestLoadEnv(t *testing.T) {
 		{
 			desc: "docker provider and regopts",
 			environ: []string{
-				"DIUN_REGOPTS_SENSITIVE_USERNAMEFILE=/run/secrets/username",
-				"DIUN_REGOPTS_SENSITIVE_PASSWORDFILE=/run/secrets/password",
-				"DIUN_REGOPTS_SENSITIVE_TIMEOUT=30s",
+				"DIUN_REGOPTS_0_NAME=docker.io",
+				"DIUN_REGOPTS_0_SELECTOR=image",
+				"DIUN_REGOPTS_0_USERNAMEFILE=./fixtures/run_secrets_username",
+				"DIUN_REGOPTS_0_PASSWORDFILE=./fixtures/run_secrets_password",
+				"DIUN_REGOPTS_0_TIMEOUT=30s",
 				"DIUN_PROVIDERS_DOCKER=true",
 			},
 			expected: &config.Config{
 				Db:    (&model.Db{}).GetDefaults(),
 				Watch: (&model.Watch{}).GetDefaults(),
-				RegOpts: map[string]*model.RegOpts{
-					"sensitive": {
-						UsernameFile: "/run/secrets/username",
-						PasswordFile: "/run/secrets/password",
+				RegOpts: model.RegOpts{
+					{
+						Name:         "docker.io",
+						Selector:     model.RegOptSelectorImage,
+						UsernameFile: "./fixtures/run_secrets_username",
+						PasswordFile: "./fixtures/run_secrets_password",
 						InsecureTLS:  utl.NewFalse(),
 						Timeout:      utl.NewDuration(30 * time.Second),
 					},
@@ -348,8 +360,8 @@ func TestLoadMixed(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			desc:    "file provider, regopts (file) and notif webhook env override",
-			cfgfile: "./fixtures/config.file-regopts.yml",
+			desc:    "file provider and notif webhook env override",
+			cfgfile: "./fixtures/config.file.yml",
 			environ: []string{
 				"DIUN_NOTIF_WEBHOOK_ENDPOINT=http://webhook.foo.com/sd54qad89azd5a",
 				"DIUN_NOTIF_WEBHOOK_HEADERS_AUTHORIZATION=Token78910",
@@ -374,7 +386,7 @@ func TestLoadMixed(t *testing.T) {
 				RegOpts: nil,
 				Providers: &model.Providers{
 					File: &model.PrdFile{
-						Filename: "./fixtures/dummy.yml",
+						Filename: "./fixtures/file.yml",
 					},
 				},
 			},

@@ -13,8 +13,8 @@ var (
 		{
 			Provider: "file",
 			Image: model.Image{
-				Name:      "jfrog-docker-reg2.bintray.io/jfrog/artifactory-oss:4.0.0",
-				RegOptsID: "bintrayoptions",
+				Name:   "jfrog-docker-reg2.bintray.io/jfrog/artifactory-oss:4.0.0",
+				RegOpt: "bintrayoptions",
 			},
 		},
 		{
@@ -30,8 +30,8 @@ var (
 		{
 			Provider: "file",
 			Image: model.Image{
-				Name:      "docker.io/crazymax/nextcloud:latest",
-				RegOptsID: "someregopts",
+				Name:   "docker.io/crazymax/nextcloud:latest",
+				RegOpt: "myregistry",
 			},
 		},
 		{
