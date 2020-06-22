@@ -50,7 +50,7 @@ Following environment variables can be used in place of flags:
 | `LOG_JSON`         | `false`       | Enable JSON logging output |
 | `LOG_CALLER`       | `false`       | Enable to add `file:line` of the caller |
 
-## Run with the Docker provider
+## Quick start with the Docker provider
 
 Create a `docker-compose.yml` file that uses the official Diun image:
 
