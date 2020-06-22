@@ -26,6 +26,7 @@
 * All fields in configuration are now _camelCased_
 * Docker API version negotiation (#29)
 * Add Mattermost compatibility via Slack webhooks (#80)
+* Update deps
 
 ## 3.0.0 (2020/05/27)
 
