@@ -10,7 +10,7 @@
 {% endif %}
 
 <!-- assets absolute URL -->
-{% set assets = config.site_url ~ '/assets' %}
+{% set assets = config.site_url ~ 'assets' %}
 
 <!-- Some meta tags -->
 <link rel="apple-touch-icon-precomposed" sizes="57x57" href="{{ assets }}/meta/apple-touch-icon-57x57.png">
@@ -21,6 +21,11 @@
 <link rel="apple-touch-icon-precomposed" sizes="120x120" href="{{ assets }}/meta/apple-touch-icon-120x120.png">
 <link rel="apple-touch-icon-precomposed" sizes="76x76" href="{{ assets }}/meta/apple-touch-icon-76x76.png">
 <link rel="apple-touch-icon-precomposed" sizes="152x152" href="{{ assets }}/meta/apple-touch-icon-152x152.png">
+<link rel="icon" type="image/png" href="{{ assets }}/meta/favicon-196x196.png" sizes="196x196">
+<link rel="icon" type="image/png" href="{{ assets }}/meta/favicon-96x96.png" sizes="96x96">
+<link rel="icon" type="image/png" href="{{ assets }}/meta/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="{{ assets }}/meta/favicon-16x16.png" sizes="16x16">
+<link rel="icon" type="image/png" href="{{ assets }}/meta/favicon-128.png" sizes="128x128">
 <meta name="application-name" content="{{ config.site_name }}">
 <meta name="msapplication-TileColor" content="#FFFFFF">
 <meta name="msapplication-TileImage" content="{{ assets }}/meta/mstile-144x144.png">
@@ -34,14 +39,14 @@
 <meta property="og:url" content="{{ page.canonical_url }}">
 <meta property="og:image" content="{{ assets }}/meta/card.png">
 <meta property="og:image:type" content="image/png">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="@crazyws">
 <meta name="twitter:creator" content="@crazyws">
 <meta name="twitter:title" content="{{ title }}">
 <meta name="twitter:description" content="{{ config.site_description }}">
-<meta name="twitter:image" content="{{ assets }}/card.png">
+<meta name="twitter:image" content="{{ assets }}/meta/card.png">
 {% endblock %}
 
 <!-- Announcement bar -->
