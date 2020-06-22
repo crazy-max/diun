@@ -64,7 +64,7 @@ jobs:
           go test -coverprofile=coverage.txt -covermode=atomic ./...
       -
         name: Upload coverage
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v1.0.7
         if: success()
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
