@@ -53,6 +53,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	// Set env vars
 	cmd.Env = append(os.Environ(), []string{
 		fmt.Sprintf("DIUN_VERSION=%s", c.meta.Version),
+		fmt.Sprintf("DIUN_HOSTNAME=%s", c.meta.Hostname),
 		fmt.Sprintf("DIUN_ENTRY_STATUS=%s", string(entry.Status)),
 		fmt.Sprintf("DIUN_ENTRY_PROVIDER=%s", entry.Provider),
 		fmt.Sprintf("DIUN_ENTRY_IMAGE=%s", entry.Image.String()),

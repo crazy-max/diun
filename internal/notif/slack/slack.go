@@ -38,8 +38,14 @@ func (c *Client) Name() string {
 // Send creates and sends a slack notification with an entry
 func (c *Client) Send(entry model.NotifEntry) error {
 	var textBuf bytes.Buffer
-	textTpl := template.Must(template.New("text").Parse("<!channel> Docker tag `{{ .Image.Domain }}/{{ .Image.Path }}:{{ .Image.Tag }}` {{ if (eq .Status \"new\") }}newly added{{ else }}updated{{ end }}."))
-	if err := textTpl.Execute(&textBuf, entry); err != nil {
+	textTpl := template.Must(template.New("text").Parse("<!channel> Docker tag `{{ .Entry.Image.Domain }}/{{ .Entry.Image.Path }}:{{ .Entry.Image.Tag }}` {{ if (eq .Entry.Status \"new\") }}newly added{{ else }}updated{{ end }}."))
+	if err := textTpl.Execute(&textBuf, struct {
+		Meta  model.Meta
+		Entry model.NotifEntry
+	}{
+		Meta:  c.meta,
+		Entry: entry,
+	}); err != nil {
 		return err
 	}
 
@@ -49,6 +55,11 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	}
 
 	fields := []slack.AttachmentField{
+		{
+			Title: "Hostname",
+			Value: c.meta.Hostname,
+			Short: false,
+		},
 		{
 			Title: "Provider",
 			Value: entry.Provider,

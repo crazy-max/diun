@@ -72,6 +72,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 
 	body, err := json.Marshal(struct {
 		Version  string        `json:"diun_version"`
+		Hostname string        `json:"hostname"`
 		Status   string        `json:"status"`
 		Provider string        `json:"provider"`
 		Image    string        `json:"image"`
@@ -82,6 +83,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		Platform string        `json:"platform"`
 	}{
 		Version:  c.meta.Version,
+		Hostname: c.meta.Hostname,
 		Status:   string(entry.Status),
 		Provider: entry.Provider,
 		Image:    entry.Image.String(),

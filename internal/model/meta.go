@@ -10,4 +10,5 @@ type Meta struct {
 	Author    string
 	Version   string
 	UserAgent string
+	Hostname  string
 }

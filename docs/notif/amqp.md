@@ -43,6 +43,7 @@ The JSON response will look like this:
 ```json
 {
   "diun_version": "0.3.0",
+  "hostname": "myserver",
   "status": "new",
   "provider": "file",
   "image": "docker.io/crazymax/swarm-cronjob:0.2.1",

@@ -50,12 +50,23 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	}
 
 	var textBuf bytes.Buffer
-	textTpl := template.Must(template.New("rocketchat").Parse(`Docker tag {{ .Image.Domain }}/{{ .Image.Path }}:{{ .Image.Tag }} which you subscribed to through {{ .Provider }} provider has been {{ if (eq .Status "new") }}newly added{{ else }}updated{{ end }}.`))
-	if err := textTpl.Execute(&textBuf, entry); err != nil {
+	textTpl := template.Must(template.New("rocketchat").Parse(`Docker tag {{ .Entry.Image.Domain }}/{{ .Entry.Image.Path }}:{{ .Entry.Image.Tag }} which you subscribed to through {{ .Entry.Provider }} provider has been {{ if (eq .Entry.Status "new") }}newly added{{ else }}updated{{ end }}.`))
+	if err := textTpl.Execute(&textBuf, struct {
+		Meta  model.Meta
+		Entry model.NotifEntry
+	}{
+		Meta:  c.meta,
+		Entry: entry,
+	}); err != nil {
 		return err
 	}
 
 	fields := []AttachmentField{
+		{
+			Title: "Hostname",
+			Value: c.meta.Hostname,
+			Short: false,
+		},
 		{
 			Title: "Provider",
 			Value: entry.Provider,

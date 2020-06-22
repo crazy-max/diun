@@ -47,14 +47,20 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		title = fmt.Sprintf("New image %s has been added", entry.Image.String())
 	}
 
-	tagTpl := "`{{ .Image.Domain }}/{{ .Image.Path }}:{{ .Image.Tag }}`"
+	tagTpl := "`{{ .Entry.Image.Domain }}/{{ .Entry.Image.Path }}:{{ .Entry.Image.Tag }}`"
 	if len(entry.Image.HubLink) > 0 {
-		tagTpl = "[`{{ .Image.Domain }}/{{ .Image.Path }}:{{ .Image.Tag }}`]({{ .Image.HubLink }})"
+		tagTpl = "[`{{ .Entry.Image.Domain }}/{{ .Entry.Image.Path }}:{{ .Entry.Image.Tag }}`]({{ .Entry.Image.HubLink }})"
 	}
 
 	var msgBuf bytes.Buffer
-	msgTpl := template.Must(template.New("gotify").Parse(fmt.Sprintf("Docker tag %s which you subscribed to through {{ .Provider }} provider has been {{ if (eq .Status \"new\") }}newly added{{ else }}updated{{ end }}.", tagTpl)))
-	if err := msgTpl.Execute(&msgBuf, entry); err != nil {
+	msgTpl := template.Must(template.New("gotify").Parse(fmt.Sprintf("Docker tag %s which you subscribed to through {{ .Entry.Provider }} provider has been {{ if (eq .Entry.Status \"new\") }}newly added{{ else }}updated{{ end }} on {{ .Meta.Hostname }}.", tagTpl)))
+	if err := msgTpl.Execute(&msgBuf, struct {
+		Meta  model.Meta
+		Entry model.NotifEntry
+	}{
+		Meta:  c.meta,
+		Entry: entry,
+	}); err != nil {
 		return err
 	}
 

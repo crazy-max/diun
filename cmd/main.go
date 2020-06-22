@@ -32,9 +32,14 @@ var (
 )
 
 func main() {
+	var err error
 	runtime.GOMAXPROCS(runtime.NumCPU())
+
 	meta.Version = version
 	meta.UserAgent = fmt.Sprintf("%s/%s go/%s %s", meta.ID, meta.Version, runtime.Version()[2:], strings.Title(runtime.GOOS))
+	if meta.Hostname, err = os.Hostname(); err != nil {
+		log.Fatal().Err(err).Msg("Cannot resolve hostname")
+	}
 
 	// Parse command line
 	_ = kong.Parse(&cli,
@@ -52,7 +57,7 @@ func main() {
 	// Load timezone location
 	location, err := time.LoadLocation(cli.Timezone)
 	if err != nil {
-		log.Panic().Err(err).Msgf("Cannot load timezone %s", cli.Timezone)
+		log.Fatal().Err(err).Msgf("Cannot load timezone %s", cli.Timezone)
 	}
 
 	// Init

@@ -53,14 +53,20 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		Timeout: time.Duration(10) * time.Second,
 	}
 
-	tagTpl := "`{{ .Image.Domain }}/{{ .Image.Path }}:{{ .Image.Tag }}`"
+	tagTpl := "`{{ .Entry.Image.Domain }}/{{ .Entry.Image.Path }}:{{ .Entry.Image.Tag }}`"
 	if len(entry.Image.HubLink) > 0 {
-		tagTpl = "[`{{ .Image.Domain }}/{{ .Image.Path }}:{{ .Image.Tag }}`]({{ .Image.HubLink }})"
+		tagTpl = "[`{{ .Entry.Image.Domain }}/{{ .Entry.Image.Path }}:{{ .Entry.Image.Tag }}`]({{ .Entry.Image.HubLink }})"
 	}
 
 	var textBuf bytes.Buffer
-	textTpl := template.Must(template.New("text").Parse(fmt.Sprintf("Docker tag %s {{ if (eq .Status \"new\") }}newly added{{ else }}updated{{ end }}.", tagTpl)))
-	if err := textTpl.Execute(&textBuf, entry); err != nil {
+	textTpl := template.Must(template.New("text").Parse(fmt.Sprintf("Docker tag %s {{ if (eq .Entry.Status \"new\") }}newly added{{ else }}updated{{ end }}.", tagTpl)))
+	if err := textTpl.Execute(&textBuf, struct {
+		Meta  model.Meta
+		Entry model.NotifEntry
+	}{
+		Meta:  c.meta,
+		Entry: entry,
+	}); err != nil {
 		return err
 	}
 
@@ -84,6 +90,8 @@ func (c *Client) Send(entry model.NotifEntry) error {
 			ActivityTitle:    textBuf.String(),
 			ActivitySubtitle: "Provider: " + entry.Provider,
 			Facts: []Fact{
+				{"Hostname", c.meta.Hostname},
+				{"Provider", entry.Provider},
 				{"Created", entry.Manifest.Created.Format("Jan 02, 2006 15:04:05 UTC")},
 				{"Digest", entry.Manifest.Digest.String()},
 				{"Platform", entry.Manifest.Platform},

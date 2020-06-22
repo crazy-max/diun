@@ -34,6 +34,7 @@ The JSON response will look like this:
 ```json
 {
   "diun_version": "4.0.0",
+  "hostname": "myserver",
   "status": "new",
   "provider": "file",
   "image": "docker.io/crazymax/diun:latest",
