@@ -4,6 +4,47 @@
 
 Only accept duration as timeout value (`10` becomes `10s`)
 
+## Registry options enhancements
+
+Configuration of registry options has changed:
+
+??? example "v3"
+    ```yaml
+    regopts:
+      myregistry:
+        username: fii
+        password: bor
+        insecure_tls: true
+        timeout: 5s
+      docker.io:
+        username: foo
+        password: bar
+      docker.io/crazymax:
+        username_file: /run/secrets/username
+        password_file: /run/secrets/password
+    ```
+
+??? example "v4"
+    ```yaml
+    regopts:
+      - name: "myregistry"
+        username: fii
+        password: bor
+        insecureTLS: true
+        timeout: 5s
+      - name: "docker.io"
+        selector: image
+        username: foo
+        password: bar
+      - name: "docker.io/crazymax"
+        selector: image
+        usernameFile: /run/secrets/username
+        passwordFile: /run/secrets/password
+    ```
+
+Also, registry options can now be resolved automatically based on image name.
+Take a look at the [Registry options configuration](../config/regopts.md) for more details.
+
 ## Configuration transposed into environment variables
 
 All configuration is now transposed into environment variables. Take a look at the [documentation](../config/index.md#environment-variables) for more details.
@@ -80,14 +121,17 @@ In order to enable transposition into environmental variables, all fields in con
         timeout: 10
     
     regopts:
-      someregistryoptions:
+      myregistry:
+        username: fii
+        password: bor
+        insecure_tls: true
+        timeout: 5s
+      docker.io:
         username: foo
         password: bar
-        timeout: 20
-      onemore:
-        username: foo2
-        password: bar2
-        insecure_tls: true
+      docker.io/crazymax:
+        username_file: /run/secrets/username
+        password_file: /run/secrets/password
     
     providers:
       docker:
@@ -156,14 +200,19 @@ In order to enable transposition into environmental variables, all fields in con
         timeout: 10s
     
     regopts:
-      someregistryoptions:
+      - name: "myregistry"
+        username: fii
+        password: bor
+        insecureTLS: true
+        timeout: 5s
+      - name: "docker.io"
+        selector: image
         username: foo
         password: bar
-        timeout: 20s
-      onemore:
-        username: foo2
-        password: bar2
-        insecureTLS: true
+      - name: "docker.io/crazymax"
+        selector: image
+        usernameFile: /run/secrets/username
+        passwordFile: /run/secrets/password
     
     providers:
       docker:
