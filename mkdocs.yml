@@ -7,9 +7,6 @@ docs_dir: docs
 
 repo_name: crazy-max/diun
 repo_url: https://github.com/crazy-max/diun
-copyright: |
-  Made with <img alt="❤" class="twemoji md-footer-custom-text" src="https://twemoji.maxcdn.com/v/latest/svg/2764.svg" title="love">
-  by <a target="_blank" href="https://crazymax.dev/">CrazyMax</a> and <a target="_blank" href="https://github.com/crazy-max/diun/graphs/contributors">contributors</a>.
 
 extra:
   social:
@@ -34,6 +31,9 @@ theme:
   favicon: assets/favicon.ico
   include_search_page: false
   search_index_only: true
+
+extra_css:
+  - css/extra.css
 
 plugins:
   - macros
@@ -105,6 +105,3 @@ markdown_extensions:
       emoji_generator: !!python/name:materialx.emoji.to_svg
   - toc:
       permalink: true
-
-extra_css:
-  - css/extra.css

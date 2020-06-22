@@ -1,6 +1,6 @@
 # Changelog
 
-## 4.0.0 (2020/06/??)
+## 4.0.0 (2020/06/22)
 
 :warning: See **Migration notes** in the documentation for breaking changes.
 
