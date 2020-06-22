@@ -10,6 +10,7 @@ import (
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/go-playground/validator/v10"
 	"github.com/pkg/errors"
+	"github.com/rs/zerolog/log"
 )
 
 // Config holds configuration details
@@ -46,6 +47,7 @@ func Load(cfgfile string) (*Config, error) {
 
 func (cfg *Config) loadFile(cfgfile string, out interface{}) error {
 	if len(cfgfile) == 0 {
+		log.Debug().Msg("No configuration file defined")
 		return nil
 	}
 
@@ -66,6 +68,7 @@ func (cfg *Config) loadEnv(out interface{}) error {
 		envvars = append(envvars, envvar)
 	}
 	if len(envvars) == 0 {
+		log.Debug().Msg("No DIUN_* environment variables defined")
 		return nil
 	}
 
