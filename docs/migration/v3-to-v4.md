@@ -226,3 +226,29 @@ In order to enable transposition into environmental variables, all fields in con
       file:
         directory: ./imagesdir
     ```
+
+## `/diun.yml` not loaded by default in Docker image
+
+Following the transposition of the configuration into environment variables, the configuration file `/diun.yml`
+is no longer loaded by default in the official Docker image.
+
+If you want to load a configuration file through the Docker image you will have to declare the
+[`CONFIG` environment variable](../get-started.md#diun-cli) pointing to the assigned configuration file:
+
+```yaml
+version: "3.5"
+
+services:
+  diun:
+    image: crazymax/diun:latest
+    volumes:
+      - "./data:/data"
+      - "./diun.yml:/diun.yml:ro"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    environment:
+      - "CONFIG=/diun.yml"
+      - "TZ=Europe/Paris"
+      - "LOG_LEVEL=info"
+      - "LOG_JSON=false"
+    restart: always
+```
