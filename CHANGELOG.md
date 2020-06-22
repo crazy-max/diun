@@ -4,6 +4,8 @@
 
 :warning: See **Migration notes** in the documentation for breaking changes.
 
+* Display hostname in notifications (#102)
+* Automatically determine registry options based on image name (#103)
 * Docs website with mkdocs (#99)
 * Skip dangling images (#98)
 * More explicit massage if manifest not found (#94)
