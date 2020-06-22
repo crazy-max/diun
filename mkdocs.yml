@@ -47,7 +47,7 @@ plugins:
       minify_html: true
 
 google_analytics:
-  - !!python/object/apply:os.getenv ["GOOGLE_ANALYTICS_KEY"]
+  - UA-12516800-10
   - auto
 
 nav:

@@ -53,8 +53,6 @@ jobs:
         run: |
           docker run --rm -v "$(pwd):/docs" mkdocs build --strict
           sudo chown -R $(id -u):$(id -g) ./site
-        env:
-          GOOGLE_ANALYTICS_KEY: ${{ secrets.GOOGLE_ANALYTICS_KEY }}
       -
         name: Deploy
         if: success() && github.event_name != 'pull_request' && (endsWith(github.ref, github.event.repository.default_branch) || steps.prepare.outputs.release == 'true')
