@@ -1,7 +1,7 @@
 site_name: Diun
 site_description: Receive notifications when a Docker image is updated on a Docker registry
 site_author: CrazyMax
-site_url: https://diun.crazymax.dev
+site_url: https://crazy-max.github.io/diun
 edit_uri: edit/master/docs/
 docs_dir: docs
 
