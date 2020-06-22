@@ -172,7 +172,7 @@ The configuration file(s) defines a slice of images to analyze with the followin
 | Name                          | Default                          | Description   |
 |-------------------------------|----------------------------------|---------------|
 | `name`                        | `latest`                         | Docker image name to watch using `registry/path:tag` format. If registry omitted, `docker.io` will be used and if tag omitted, `latest` will be used |
-| `regopt`                      |                                  | Registry options name from [`regopts`](../config/regopts.md) to use |
+| `regopt`                      |                                  | [Registry options](../config/regopts.md) name to use |
 | `watch_repo`                  | `false`                          | Watch all tags of this image |
 | `max_tags`                    | `0`                              | Maximum number of tags to watch if `watch_repo` enabled. `0` means all of them |
 | `include_tags`                |                                  | List of regular expressions to include tags. Can be useful if you enable `watch_repo` |

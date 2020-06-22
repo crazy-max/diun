@@ -273,7 +273,7 @@ You can configure more finely the way to analyze the image of your pods through 
 | Name                          | Default       | Description   |
 |-------------------------------|---------------|---------------|
 | `diun.enable`                 |               | Set to true to enable image analysis of this pod |
-| `diun.regopt`                 |               | Registry options name from [`regopts`](../config/regopts.md) to use |
+| `diun.regopt`                 |               | [Registry options](../config/regopts.md) name to use |
 | `diun.watch_repo`             | `false`       | Watch all tags of this pod image |
 | `diun.max_tags`               | `0`           | Maximum number of tags to watch if `diun.watch_repo` enabled. `0` means all of them |
 | `diun.include_tags`           |               | Semi-colon separated list of regular expressions to include tags. Can be useful if you enable `diun.watch_repo` |
