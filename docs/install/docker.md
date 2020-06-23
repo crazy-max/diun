@@ -46,6 +46,7 @@ services:
       - "DIUN_WATCH_WORKERS=20"
       - "DIUN_WATCH_SCHEDULE=*/30 * * * *"
       - "DIUN_PROVIDERS_DOCKER=true"
+      - "DIUN_PROVIDERS_DOCKER_WATCHSTOPPED=true"
     labels:
       - "diun.enable=true"
       - "diun.watch_repo=true"
@@ -82,4 +83,36 @@ To upgrade your installation to the latest release:
 ```shell
 $ docker-compose pull
 $ docker-compose up -d
+```
+
+If you prefer to rely on the configuration file instead of environment variables:
+
+```yaml
+version: "3.5"
+
+services:
+  diun:
+    image: crazymax/diun:latest
+    volumes:
+      - "./data:/data"
+      - "./diun.yml:/diun.yml:ro"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    environment:
+      - "CONFIG=/diun.yml"
+      - "TZ=Europe/Paris"
+      - "LOG_LEVEL=info"
+      - "LOG_JSON=false"
+    restart: always
+```
+
+```yaml
+# ./diun.yml
+
+watch:
+  workers: 20
+  schedule: "*/30 * * * *"
+
+providers:
+  docker:
+    watchStopped: true
 ```
