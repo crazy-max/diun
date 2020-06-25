@@ -8,7 +8,7 @@
 * Automatically determine registry options based on image name (#103)
 * Docs website with mkdocs (#99)
 * Skip dangling images (#98)
-* More explicit massage if manifest not found (#94)
+* More explicit message if manifest not found (#94)
 * Add swarm example
 * Update doc for file and Swarm providers
 * Add Kubernetes provider (#25)
