@@ -50,6 +50,10 @@ func TestLoadFile(t *testing.T) {
 						Password: "guest",
 						Queue:    "queue",
 					},
+					Discord: &model.NotifDiscord{
+						WebhookURL: "https://discordapp.com/api/webhooks/1234567890/Abcd-eFgh-iJklmNo_pqr",
+						Timeout:    utl.NewDuration(10 * time.Second),
+					},
 					Gotify: &model.NotifGotify{
 						Endpoint: "http://gotify.foo.com",
 						Token:    "Token123456",
