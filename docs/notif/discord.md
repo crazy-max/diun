@@ -18,7 +18,7 @@ Allow to send notifications to your Discord channel.
 
 | Name               | Default       | Description   |
 |--------------------|---------------|---------------|
-| `webhookURL`[^1]   |               | Discord [incoming webhook URL](https://api.slack.com/messaging/webhooks) |
+| `webhookURL`[^1]   |               | Discord [incoming webhook URL](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks) |
 | `timeout`          | `10s`         | Timeout specifies a time limit for the request to be made |
 
 ## Sample
