@@ -27,17 +27,15 @@ Some fields in configuration file has been changed:
 
 !!! example "v1"
     ```yaml
-    watch:
-      os: linux
-      arch: amd64
-    
-    registries:
+    regopts:
       someregistryoptions:
         username: foo
         password: bar
         timeout: 20
     
-    items:
-      - image: docker.io/crazymax/nextcloud:latest
-        registry_id: someregistryoptions
+    image:
+      - name: docker.io/crazymax/nextcloud:latest
+        regopts_id: someregistryoptions
+        os: linux
+        arch: amd64
     ```
