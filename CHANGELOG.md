@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.1.1 (2020/06/26)
+
+* Small typo
+
 ## 4.1.0 (2020/06/26)
 
 * Discord notifications (#110 #111)

@@ -53,7 +53,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	}
 
 	var textBuf bytes.Buffer
-	textTpl := template.Must(template.New("discord").Parse(fmt.Sprintf(`Docker tag %s which you subscribed to through **{{ .Entry.Provider }}** provider has been {{ if (eq .Entry.Status "new") }}newly added{{ else }}updated{{ end }} on **myserver**.`, tagTpl)))
+	textTpl := template.Must(template.New("discord").Parse(fmt.Sprintf(`Docker tag %s which you subscribed to through **{{ .Entry.Provider }}** provider has been {{ if (eq .Entry.Status "new") }}newly added{{ else }}updated{{ end }} on **{{ .Meta.Hostname }}**.`, tagTpl)))
 	if err := textTpl.Execute(&textBuf, struct {
 		Meta  model.Meta
 		Entry model.NotifEntry
