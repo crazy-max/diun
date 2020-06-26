@@ -26,13 +26,13 @@
   .tx-container {
     padding-top: 1rem;
     background:
-            url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1123 258'><path d='M1124,2c0,0 0,256 0,256l-1125,0l0,-48c0,0 16,5 55,5c116,0 197,-92 325,-92c121,0 114,46 254,46c140,0 214,-167 572,-166Z' style='fill: white' /></svg>") no-repeat bottom,
-            linear-gradient(
-                    to bottom,
-                    var(--md-primary-fg-color),
-                    hsla(280deg, 67%, 55%, 1) 99%,
-                    white 99%
-            );
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1123 258'><path d='M1124,2c0,0 0,256 0,256l-1125,0l0,-48c0,0 16,5 55,5c116,0 197,-92 325,-92c121,0 114,46 254,46c140,0 214,-167 572,-166Z' style='fill: white' /></svg>") no-repeat bottom,
+      linear-gradient(
+        to bottom,
+        var(--md-primary-fg-color),
+        hsla(280deg, 67%, 55%, 1) 99%,
+        white 99%
+      );
   }
 
   /* Set inverted text color on hero */
@@ -75,55 +75,58 @@
     border-color: var(--md-accent-fg-color);
   }
 
-  /* [mobile portrait -]: Adjust headline */
-  @media screen and (max-width: 30em) {
-
-    /* Make main headline smaller */
+  @media screen and (max-width:70em) {
     .tx-hero h1 {
-      font-size: 1.4rem;
+      font-size: 1.4rem
+    }
+
+    .tx-hero__image {
+      text-align: center;
+    }
+
+    .tx-hero__image img {
+      max-width: 10rem;
     }
   }
 
-  /* [tablet landscape +]: Display content and image next to each other */
-  @media screen and (min-width: 60em) {
-
-    /* Hide table of contents */
+  @media screen and (min-width:70em) {
     .md-sidebar--secondary {
-      display: none;
+      display: none
     }
 
-    /* Use flex layout to align items */
     .tx-hero {
       display: flex;
-      align-items: stretch;
+      align-items: stretch
     }
 
-    /* Increase bottom spacing and set dimensions */
     .tx-hero__content {
-      max-width: 19rem;
+      max-width: 30rem;
       margin-top: 3.5rem;
-      padding-bottom: 14vw;
+      padding-bottom: 14vw
     }
 
-    /* Swap with teaser and set dimensions */
     .tx-hero__image {
-      width: 38rem;
       order: 1;
-      transform: translateX(4rem);
+      margin-left: auto;
+      margin-top: 3.5rem;
+    }
+
+    .tx-hero__image img {
+      max-width: 15rem;
     }
   }
 
-  /* [screen +]: Adjust spacing */
-  @media screen and (min-width: 76.25em) {
-
-    /* Hide navigation */
+  @media screen and (min-width:76.25em) {
     .md-sidebar--primary {
-      display: none;
+      display: none
     }
 
-    /* Ensure the image aligns with the repository information */
     .tx-hero__image {
-      transform: translateX(8rem);
+      margin-left: auto;
+    }
+
+    .tx-hero__image img {
+      max-width: 20rem;
     }
   }
 
