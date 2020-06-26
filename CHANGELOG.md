@@ -1,5 +1,12 @@
 # Changelog
 
+## 4.1.0 (2020/06/26)
+
+* Discord notifications (#110 #111)
+* Update migration notes (#107)
+* Logging when configuration file or `DIUN_` env vars not found (#107)
+* Bump github.com/containers/image/v5 from 5.4.4 to 5.5.1 (#96)
+
 ## 4.0.0 (2020/06/22)
 
 :warning: See **Migration notes** in the documentation for breaking changes.
