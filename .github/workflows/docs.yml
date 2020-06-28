@@ -56,6 +56,11 @@ jobs:
           docker run --rm -v "$(pwd):/docs" mkdocs build --strict
           sudo chown -R $(id -u):$(id -g) ./site
       -
+        name: Check GitHub Pages status
+        uses: crazy-max/ghaction-github-status@v1
+        with:
+          pages_threshold: major_outage
+      -
         name: Deploy
         if: success() && github.event_name != 'pull_request' && (endsWith(github.ref, github.event.repository.default_branch) || steps.prepare.outputs.release == 'true')
         uses: crazy-max/ghaction-github-pages@v2.1.0
