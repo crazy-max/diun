@@ -35,16 +35,35 @@ theme:
 extra_css:
   - css/extra.css
 
+markdown_extensions:
+  - admonition
+  - codehilite
+  - footnotes
+  - markdown_include.include:
+      base_path: docs
+  - meta
+  - pymdownx.details
+  - pymdownx.tabbed
+  - pymdownx.superfences
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+  - toc:
+      permalink: true
+
 plugins:
+  - exclude:
+      glob:
+        - "Dockerfile"
+  - git-revision-date-localized:
+      type: iso_datetime
   - macros
+  - minify:
+      minify_html: true
   - search:
       prebuild_index: python
       lang:
         - en
-  - git-revision-date-localized:
-      type: iso_datetime
-  - minify:
-      minify_html: true
 
 google_analytics:
   - UA-12516800-10
@@ -93,19 +112,3 @@ nav:
   - Reporting an issue: reporting-issue.md
   - Contributing: contributing.md
   - Donate: donate.md
-
-markdown_extensions:
-  - admonition
-  - codehilite
-  - footnotes
-  - markdown_include.include:
-      base_path: docs
-  - meta
-  - pymdownx.details
-  - pymdownx.tabbed
-  - pymdownx.superfences
-  - pymdownx.emoji:
-      emoji_index: !!python/name:materialx.emoji.twemoji
-      emoji_generator: !!python/name:materialx.emoji.to_svg
-  - toc:
-      permalink: true
