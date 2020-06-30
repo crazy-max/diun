@@ -59,6 +59,7 @@ nav:
     - Linux service: install/linux-service.md
   - Usage:
     - Command line: usage/cli.md
+    - Basic example: usage/basic-example.md
   - Configuration:
     - Overview: config/index.md
     - .db: config/db.md

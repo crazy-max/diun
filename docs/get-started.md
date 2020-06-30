@@ -21,7 +21,7 @@ and [File](providers/file.md) providers available
 * Timezone can be changed
 * Official [Docker image available](install/docker.md)
 
-## Usage
+## Next steps
 
 * [Command line](usage/cli.md)
 * [Basic example](usage/basic-example.md)
