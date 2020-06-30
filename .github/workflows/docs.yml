@@ -21,7 +21,6 @@ on:
       - '.github/workflows/docs.yml'
       - 'docs/**'
       - 'CHANGELOG.md'
-      - 'Dockerfile.mkdocs'
       - 'mkdocs.yml'
 
 jobs:
