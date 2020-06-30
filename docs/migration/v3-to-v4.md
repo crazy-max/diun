@@ -233,7 +233,7 @@ Following the transposition of the configuration into environment variables, the
 is no longer loaded by default in the official Docker image.
 
 If you want to load a configuration file through the Docker image you will have to declare the
-[`CONFIG` environment variable](../get-started.md#diun-cli) pointing to the assigned configuration file:
+[`CONFIG` environment variable](../usage/cli.md#environment-variables) pointing to the assigned configuration file:
 
 ```yaml
 version: "3.5"

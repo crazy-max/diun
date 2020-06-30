@@ -2,7 +2,7 @@
 
 ## Test notifications
 
-Through the [command line](get-started.md#diun-cli) with:
+Through the [command line](usage/cli.md) with:
 
 ```shell
 $ diun --config ./diun.yml --test-notif
@@ -11,7 +11,7 @@ $ diun --config ./diun.yml --test-notif
 Or within a container:
 
 ```shell
-$ docker-compose exec diun --test-notif
+$ docker run --rm -it -v "$(pwd)/diun.yml:/diun.yml" crazymax/diun:latest --config /diun.yml --test-notif
 ```
 
 ## field docker|swarm uses unsupported type: invalid

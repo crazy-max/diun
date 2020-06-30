@@ -19,6 +19,10 @@ Image: crazymax/diun:latest
    - linux/s390x
 ```
 
+This reference setup guides users through the setup based on `docker-compose`, but the installation of `docker-compose`
+is out of scope of this documentation. To install `docker-compose` itself, follow the official
+[install instructions](https://docs.docker.com/compose/install/).
+
 ## Volumes
 
 | Path               | Description   |
@@ -26,8 +30,6 @@ Image: crazymax/diun:latest
 | `/data`            | Contains bbolt database which retains Docker images manifests |
 
 ## Usage
-
-Docker compose is the recommended way to run this image. Copy the following `docker-compose.yml` in `/opt/diun/` on your host for example:
 
 ```yaml
 version: "3.5"

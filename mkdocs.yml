@@ -57,6 +57,8 @@ nav:
     - With Docker: install/docker.md
     - From binary: install/binary.md
     - Linux service: install/linux-service.md
+  - Usage:
+    - Command line: usage/cli.md
   - Configuration:
     - Overview: config/index.md
     - .db: config/db.md

@@ -1,0 +1,38 @@
+# Command Line
+
+## Usage
+
+```shell
+$ diun [options]
+```
+
+## Options
+
+```
+$ diun --help
+Usage: diun
+
+Docker image update notifier. More info: https://github.com/crazy-max/diun
+
+Flags:
+  --help                Show context-sensitive help.
+  --version
+  --config=STRING       Diun configuration file ($CONFIG).
+  --timezone="UTC"      Timezone assigned to Diun ($TZ).
+  --log-level="info"    Set log level ($LOG_LEVEL).
+  --log-json            Enable JSON logging output ($LOG_JSON).
+  --log-caller          Add file:line of the caller to log output ($LOG_CALLER).
+  --test-notif          Test notification settings.
+```
+
+## Environment variables
+
+Following environment variables can be used in place:
+
+| Name               | Default       | Description   |
+|--------------------|---------------|---------------|
+| `CONFIG`           |               | Diun configuration file |
+| `TZ`               | `UTC`         | Timezone assigned |
+| `LOG_LEVEL`        | `info`        | Log level output |
+| `LOG_JSON`         | `false`       | Enable JSON logging output |
+| `LOG_CALLER`       | `false`       | Enable to add `file:line` of the caller |
