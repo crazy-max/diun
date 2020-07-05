@@ -7,8 +7,7 @@ Path to Bolt database file where images manifests are stored. (default `diun.db`
 !!! example "Config file"
     ```yaml
     db:
-      path:
-        token: diun.db
+      path: diun.db
     ```
 
 !!! abstract "Environment variables"

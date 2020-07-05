@@ -66,18 +66,18 @@ Or use the following command:
 
 ```shell
 $ docker run -d --name diun \
-  -e "TZ=Europe/Paris" \
-  -e "LOG_LEVEL=info" \
-  -e "LOG_JSON=false" \
-  -e "DIUN_WATCH_WORKERS=20" \
-  -e "DIUN_WATCH_SCHEDULE=*/30 * * * *" \
-  -e "DIUN_PROVIDERS_DOCKER=true" \
-  -e "DIUN_PROVIDERS_DOCKER_WATCHSTOPPED=true" \
-  -v "$(pwd)/data:/data" \
-  -v "/var/run/docker.sock:/var/run/docker.sock" \
-  -l "diun.enable=true" \
-  -l "diun.watch_repo=true" \
-  crazymax/diun:latest
+    -e "TZ=Europe/Paris" \
+    -e "LOG_LEVEL=info" \
+    -e "LOG_JSON=false" \
+    -e "DIUN_WATCH_WORKERS=20" \
+    -e "DIUN_WATCH_SCHEDULE=*/30 * * * *" \
+    -e "DIUN_PROVIDERS_DOCKER=true" \
+    -e "DIUN_PROVIDERS_DOCKER_WATCHSTOPPED=true" \
+    -v "$(pwd)/data:/data" \
+    -v "/var/run/docker.sock:/var/run/docker.sock" \
+    -l "diun.enable=true" \
+    -l "diun.watch_repo=true" \
+    crazymax/diun:latest
 ```
 
 To upgrade your installation to the latest release:
