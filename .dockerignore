@@ -7,7 +7,7 @@
 /.res
 /bin
 /dist
-/doc
+/docs
 /.editorconfig
 /.gitignore
 /.goreleaser.yml
