@@ -9,6 +9,11 @@ repo_name: crazy-max/diun
 repo_url: https://github.com/crazy-max/diun
 
 extra:
+  seo:
+    google: zczpYiFTLpd1jgOb3K5zGqERX2gZrkm7aRjtDqxP0a4
+    bing: D188E0BEC1AB6E7C1E0194BFC35D0033
+    #alexa:
+    #yandex:
   social:
     - icon: fontawesome/brands/github-alt
       link: https://github.com/crazy-max/diun
