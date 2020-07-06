@@ -7,10 +7,12 @@ You can send webhook notifications with the following settings.
 !!! example "File"
     ```yaml
     notif:
-      gotify:
-        endpoint: http://gotify.foo.com
-        token: Token123456
-        priority: 1
+      webhook:
+        endpoint: http://webhook.foo.com/sd54qad89azd5a
+        method: GET
+        headers:
+          content-type: application/json
+          authorization: Token123456
         timeout: 10s
     ```
 
