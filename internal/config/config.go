@@ -22,7 +22,7 @@ type Config struct {
 	Providers *model.Providers `yaml:"providers,omitempty" json:"providers,omitempty" validate:"required"`
 }
 
-// Load returns Configuration struct
+// Load returns Config struct
 func Load(cfgfile string) (*Config, error) {
 	cfg := Config{
 		Db:    (&model.Db{}).GetDefaults(),

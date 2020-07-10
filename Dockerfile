@@ -10,9 +10,6 @@ ENV GO111MODULE on
 ENV GOPROXY https://goproxy.io
 COPY --from=xgo / /
 
-ARG TARGETPLATFORM
-RUN go env
-
 RUN apk --update --no-cache add \
     build-base \
     gcc \
@@ -21,11 +18,13 @@ RUN apk --update --no-cache add \
 
 WORKDIR /app
 
-COPY go.mod .
-COPY go.sum .
+COPY . ./
 RUN go mod download
 
-COPY . ./
+ARG TARGETPLATFORM
+ARG TARGETOS
+ARG TARGETARCH
+RUN go env
 RUN go build -ldflags "-w -s -X 'main.version=${VERSION}'" -v -o diun cmd/main.go
 
 FROM --platform=${TARGETPLATFORM:-linux/amd64} alpine:latest
