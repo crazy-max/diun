@@ -80,6 +80,8 @@ github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d/go.mod h1:asat6
 github.com/akamai/AkamaiOPEN-edgegrid-golang v0.9.8/go.mod h1:aVvklgKsPENRkl29bNwrHISa1F+YLGTHArMxZMBqWM8=
 github.com/alecthomas/kong v0.2.9 h1:WGuTS/N2/NQ/9LymVqpr1ifZ4EEkQPvwFHqZs6ak5IU=
 github.com/alecthomas/kong v0.2.9/go.mod h1:kQOmtJgV+Lb4aj+I2LEn40cbtawdWJ9Y8QLq+lElKxE=
+github.com/alecthomas/kong v0.2.10 h1:OFaPFcEGRWgFjQyeYh8xGTLsroYHPUSlo9mBBh/gIeI=
+github.com/alecthomas/kong v0.2.10/go.mod h1:kQOmtJgV+Lb4aj+I2LEn40cbtawdWJ9Y8QLq+lElKxE=
 github.com/alecthomas/template v0.0.0-20160405071501-a0175ee3bccc/go.mod h1:LOuyumcjzFXgccqObfd/Ljyb9UuFJ6TxHnclSeseNhc=
 github.com/alecthomas/units v0.0.0-20151022065526-2efee857e7cf/go.mod h1:ybxpYRFXyAe+OPACYpWeL0wqObRcbAqCMya13uyzqw0=
 github.com/aliyun/alibaba-cloud-sdk-go v1.61.112/go.mod h1:pUKYbK5JQ+1Dfxk80P0qxGqe5dkxDoabbZS7zOcouyA=

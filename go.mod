@@ -3,7 +3,7 @@ module github.com/crazy-max/diun/v4
 go 1.13
 
 require (
-	github.com/alecthomas/kong v0.2.9
+	github.com/alecthomas/kong v0.2.10
 	github.com/containers/image/v5 v5.5.1
 	github.com/containous/traefik/v2 v2.2.2
 	github.com/docker/docker v1.4.2-0.20200204220554-5f6d6f3f2203
