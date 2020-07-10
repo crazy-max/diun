@@ -5,7 +5,7 @@ go 1.13
 require (
 	github.com/alecthomas/kong v0.2.9
 	github.com/containers/image/v5 v5.5.1
-	github.com/containous/traefik/v2 v2.2.2
+	github.com/containous/traefik/v2 v2.2.3
 	github.com/docker/docker v1.4.2-0.20200204220554-5f6d6f3f2203
 	github.com/docker/go-connections v0.4.0
 	github.com/go-gomail/gomail v0.0.0-20160411212932-81ebce5c23df
