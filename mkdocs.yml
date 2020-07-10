@@ -20,7 +20,7 @@ extra:
 
 theme:
   name: material
-  custom_dir: docs/overrides
+  custom_dir: docs/_overrides
   language: en
   palette:
     scheme: default
@@ -29,16 +29,13 @@ theme:
   font:
     text: Roboto
     code: Roboto Mono
-  i18n:
-    prev: Previous
-    next: Next
   logo: assets/logo.png
   favicon: assets/favicon.ico
   include_search_page: false
   search_index_only: true
 
 extra_css:
-  - css/extra.css
+  - assets/stylesheets/extra.css
 
 markdown_extensions:
   - admonition
@@ -59,6 +56,7 @@ markdown_extensions:
 plugins:
   - exclude:
       glob:
+        - "_overrides/*"
         - "Dockerfile"
   - git-revision-date-localized:
       type: iso_datetime

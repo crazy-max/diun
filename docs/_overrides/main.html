@@ -9,7 +9,7 @@
 <!-- assets absolute URL -->
 {% set assets = config.site_url ~ 'assets' %}
 
-{% block site_meta %}
+{% block extrahead %}
 <meta name="application-name" content="{{ config.site_name }}">
 <meta name="msapplication-TileColor" content="#FFFFFF">
 <meta name="msapplication-TileImage" content="{{ assets }}/meta/mstile-144x144.png">
@@ -22,6 +22,7 @@
 <meta property="og:description" content="{{ config.site_description }}">
 <meta property="og:url" content="{{ page.canonical_url }}">
 <meta property="og:image" content="{{ assets }}/meta/card.png">
+<meta property="og:image:alt" content="{{ config.site_name }}">
 <meta property="og:image:type" content="image/png">
 <meta property="og:image:width" content="1280">
 <meta property="og:image:height" content="640">
@@ -33,9 +34,7 @@
 <meta name="twitter:image" content="{{ assets }}/meta/card.png">
 <meta name="google-site-verification" content="{{ config.extra.seo.google }}">
 <meta name="msvalidate.01" content="{{ config.extra.seo.bing }}">
-{% endblock %}
 
-{% block extrahead %}
 <link rel="apple-touch-icon-precomposed" sizes="57x57" href="{{ assets }}/meta/apple-touch-icon-57x57.png">
 <link rel="apple-touch-icon-precomposed" sizes="114x114" href="{{ assets }}/meta/apple-touch-icon-114x114.png">
 <link rel="apple-touch-icon-precomposed" sizes="72x72" href="{{ assets }}/meta/apple-touch-icon-72x72.png">

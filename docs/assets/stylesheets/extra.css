@@ -1,0 +1,19 @@
+.md-logo {
+  width: 40px;
+  height: 40px;
+  padding-bottom: 2px;
+  padding-top: 2px;
+}
+
+.md-logo img {
+  width: 40px;
+  height: 40px;
+}
+
+.md-header-nav__title {
+  font-size: .85rem;
+}
+
+.md-typeset__table code {
+  word-break: normal;
+}
