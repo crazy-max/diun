@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.2.0 (2020/07/16)
+
+* Seek configuration file from default places (#107)
+* Switch to [gonfig](https://github.com/crazy-max/gonfig)
+* Update deps
+
 ## 4.1.1 (2020/06/26)
 
 * Small typo
@@ -144,7 +150,7 @@
 
 * Update deps
 * Display containers/image logs
-* Fix registry options not setted (Issue #5)
+* Fix registry options not setted (#5)
 
 ## 1.1.0 (2019/07/24)
 
