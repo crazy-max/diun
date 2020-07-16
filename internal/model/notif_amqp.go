@@ -7,7 +7,7 @@ type NotifAmqp struct {
 	Password     string `yaml:"password,omitempty" json:"password,omitempty" validate:"omitempty"`
 	PasswordFile string `yaml:"passwordFile,omitempty" json:"passwordFile,omitempty" validate:"omitempty,file"`
 	Host         string `yaml:"host,omitempty" json:"host,omitempty" validate:"required"`
-	Port         int    `yaml:"port,omitempty" json:"port,omitempty" validate:"required"`
+	Port         int    `yaml:"port,omitempty" json:"port,omitempty" validate:"required,min=1"`
 	Queue        string `yaml:"queue,omitempty" json:"queue,omitempty" validate:"required"`
 	Exchange     string `yaml:"exchange,omitempty" json:"exchange,omitempty" validate:"omitempty"`
 }

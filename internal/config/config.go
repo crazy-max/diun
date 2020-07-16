@@ -2,6 +2,8 @@ package config
 
 import (
 	"encoding/json"
+	"os"
+	"path"
 
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/gonfig"
@@ -52,12 +54,21 @@ func Load(cfgfile string) (*Config, error) {
 		log.Info().Msgf("Configuration loaded from %d environment variable(s)", len(envLoader.GetVars()))
 	}
 
-	validate := validator.New()
-	if err := validate.Struct(&cfg); err != nil {
+	if err := cfg.validate(); err != nil {
 		return nil, err
 	}
 
 	return &cfg, nil
+}
+
+func (cfg *Config) validate() error {
+	if len(cfg.Db.Path) > 0 {
+		if err := os.MkdirAll(path.Dir(cfg.Db.Path), os.ModePerm); err != nil {
+			return errors.Wrap(err, "Cannot create database destination folder")
+		}
+	}
+
+	return validator.New().Struct(cfg)
 }
 
 // String returns the string representation of configuration

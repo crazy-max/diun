@@ -1,11 +1,7 @@
 package model
 
 import (
-	"net/mail"
-
 	"github.com/crazy-max/diun/v4/pkg/utl"
-	"github.com/imdario/mergo"
-	"github.com/pkg/errors"
 )
 
 // NotifMail holds mail notification configuration details
@@ -35,30 +31,4 @@ func (s *NotifMail) SetDefaults() {
 	s.Port = 25
 	s.SSL = utl.NewFalse()
 	s.InsecureSkipVerify = utl.NewFalse()
-}
-
-// UnmarshalYAML implements the yaml.Unmarshaler interface
-func (s *NotifMail) UnmarshalYAML(unmarshal func(interface{}) error) error {
-	type plain NotifMail
-	if err := unmarshal((*plain)(s)); err != nil {
-		return err
-	}
-
-	if _, err := mail.ParseAddress(s.From); err != nil {
-		return errors.Wrap(err, "cannot parse sender mail address")
-	}
-	if _, err := mail.ParseAddress(s.To); err != nil {
-		return errors.Wrap(err, "cannot parse recipient mail address")
-	}
-
-	if err := mergo.Merge(s, NotifMail{
-		Host:               "localhost",
-		Port:               25,
-		SSL:                utl.NewFalse(),
-		InsecureSkipVerify: utl.NewFalse(),
-	}); err != nil {
-		return errors.Wrap(err, "cannot set default values for mail notif")
-	}
-
-	return nil
 }
