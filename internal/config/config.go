@@ -2,12 +2,9 @@ package config
 
 import (
 	"encoding/json"
-	"fmt"
-	"os"
 
-	"github.com/containous/traefik/v2/pkg/config/env"
-	"github.com/containous/traefik/v2/pkg/config/file"
 	"github.com/crazy-max/diun/v4/internal/model"
+	"github.com/crazy-max/gonfig"
 	"github.com/go-playground/validator/v10"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
@@ -29,12 +26,26 @@ func Load(cfgfile string) (*Config, error) {
 		Watch: (&model.Watch{}).GetDefaults(),
 	}
 
-	if err := cfg.loadFile(cfgfile, &cfg); err != nil {
-		return nil, err
+	fileLoader := gonfig.NewFileLoader(gonfig.FileLoaderConfig{
+		Filename: cfgfile,
+	})
+	if found, err := fileLoader.Load(&cfg); err != nil {
+		return nil, errors.Wrap(err, "Failed to decode configuration from file")
+	} else if !found {
+		log.Debug().Msg("No configuration file found")
+	} else {
+		log.Info().Msgf("Configuration loaded from file: %s", fileLoader.GetFilename())
 	}
 
-	if err := cfg.loadEnv(&cfg); err != nil {
-		return nil, err
+	envLoader := gonfig.NewEnvLoader(gonfig.EnvLoaderConfig{
+		Prefix: "DIUN_",
+	})
+	if found, err := envLoader.Load(&cfg); err != nil {
+		return nil, errors.Wrap(err, "Failed to decode configuration from environment variables")
+	} else if !found {
+		log.Debug().Msg("No DIUN_* environment variables defined")
+	} else {
+		log.Info().Msgf("Configuration loaded from %d environment variables", len(envLoader.GetVars()))
 	}
 
 	validate := validator.New()
@@ -43,40 +54,6 @@ func Load(cfgfile string) (*Config, error) {
 	}
 
 	return &cfg, nil
-}
-
-func (cfg *Config) loadFile(cfgfile string, out interface{}) error {
-	if len(cfgfile) == 0 {
-		log.Debug().Msg("No configuration file defined")
-		return nil
-	}
-
-	if _, err := os.Lstat(cfgfile); os.IsNotExist(err) {
-		return fmt.Errorf("config file %s not found", cfgfile)
-	}
-
-	if err := file.Decode(cfgfile, out); err != nil {
-		return errors.Wrap(err, "failed to decode configuration from file")
-	}
-
-	return nil
-}
-
-func (cfg *Config) loadEnv(out interface{}) error {
-	var envvars []string
-	for _, envvar := range env.FindPrefixedEnvVars(os.Environ(), "DIUN_", out) {
-		envvars = append(envvars, envvar)
-	}
-	if len(envvars) == 0 {
-		log.Debug().Msg("No DIUN_* environment variables defined")
-		return nil
-	}
-
-	if err := env.Decode(envvars, "DIUN_", out); err != nil {
-		return errors.Wrap(err, "failed to decode configuration from environment variables")
-	}
-
-	return nil
 }
 
 // String returns the string representation of configuration

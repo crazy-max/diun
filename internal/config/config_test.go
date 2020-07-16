@@ -1,6 +1,7 @@
 package config_test
 
 import (
+	"fmt"
 	"os"
 	"strings"
 	"testing"
@@ -9,6 +10,7 @@ import (
 	"github.com/crazy-max/diun/v4/internal/config"
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/pkg/utl"
+	"github.com/crazy-max/gonfig/env"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -433,13 +435,14 @@ func TestValidation(t *testing.T) {
 	}
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := config.Load(tt.cfgfile)
+			cfg, err := config.Load(tt.cfgfile)
 			require.NoError(t, err)
 
-			//dec, err := env.Encode(cfg)
-			//for _, value := range dec {
-			//	fmt.Println(fmt.Sprintf(`%s=%s`, strings.Replace(value.Name, "TRAEFIK_", "DIUN_", 1), value.Default))
-			//}
+			dec, err := env.Encode(cfg)
+			require.NoError(t, err)
+			for _, value := range dec {
+				fmt.Println(fmt.Sprintf(`%s=%s`, strings.Replace(value.Name, "GONFIG_", "DIUN_", 1), value.Default))
+			}
 		})
 	}
 }

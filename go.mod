@@ -5,7 +5,7 @@ go 1.13
 require (
 	github.com/alecthomas/kong v0.2.9
 	github.com/containers/image/v5 v5.5.1
-	github.com/containous/traefik/v2 v2.2.2
+	github.com/crazy-max/gonfig v0.2.0
 	github.com/docker/docker v1.4.2-0.20200204220554-5f6d6f3f2203
 	github.com/docker/go-connections v0.4.0
 	github.com/go-gomail/gomail v0.0.0-20160411212932-81ebce5c23df
@@ -35,9 +35,3 @@ require (
 
 // Docker v19.03.6
 replace github.com/docker/docker => github.com/docker/engine v1.4.2-0.20200204220554-5f6d6f3f2203
-
-// Containous forks
-replace (
-	github.com/abbot/go-http-auth => github.com/containous/go-http-auth v0.4.1-0.20200324110947-a37a7636d23e
-	github.com/go-check/check => github.com/containous/check v0.0.0-20170915194414-ca0bf163426a
-)
