@@ -28,6 +28,10 @@ func Load(cfgfile string) (*Config, error) {
 
 	fileLoader := gonfig.NewFileLoader(gonfig.FileLoaderConfig{
 		Filename: cfgfile,
+		Finder: gonfig.Finder{
+			BasePaths:  []string{"/etc/diun/diun", "$XDG_CONFIG_HOME/diun", "$HOME/.config/diun", "./diun"},
+			Extensions: []string{"yaml", "yml"},
+		},
 	})
 	if found, err := fileLoader.Load(&cfg); err != nil {
 		return nil, errors.Wrap(err, "Failed to decode configuration from file")
@@ -45,7 +49,7 @@ func Load(cfgfile string) (*Config, error) {
 	} else if !found {
 		log.Debug().Msg("No DIUN_* environment variables defined")
 	} else {
-		log.Info().Msgf("Configuration loaded from %d environment variables", len(envLoader.GetVars()))
+		log.Info().Msgf("Configuration loaded from %d environment variable(s)", len(envLoader.GetVars()))
 	}
 
 	validate := validator.New()

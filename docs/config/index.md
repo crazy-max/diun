@@ -15,7 +15,14 @@ For example, the `DIUN_PROVIDERS_DOCKER` environment variable is enough by itsel
 
 ## Configuration file
 
-You can define a configuration file through the option `--config` with the following content:
+At startup, Diun searches for a file named `diun.yml` (or `diun.yaml`) in:
+
+* `/etc/diun/`
+* `$XDG_CONFIG_HOME/`
+* `$HOME/.config/`
+* `.` _(the working directory)_
+
+You can override this using the [`--config` flag or `CONFIG` env var](../usage/cli.md).
 
 ??? example "diun.yml"
     ```yaml

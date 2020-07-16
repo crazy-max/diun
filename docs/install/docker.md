@@ -100,7 +100,6 @@ services:
       - "./diun.yml:/diun.yml:ro"
       - "/var/run/docker.sock:/var/run/docker.sock"
     environment:
-      - "CONFIG=/diun.yml"
       - "TZ=Europe/Paris"
       - "LOG_LEVEL=info"
       - "LOG_JSON=false"
