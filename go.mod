@@ -12,7 +12,7 @@ require (
 	github.com/go-playground/validator/v10 v10.3.0
 	github.com/go-telegram-bot-api/telegram-bot-api v4.6.4+incompatible
 	github.com/hako/durafmt v0.0.0-20190612201238-650ed9f29a84
-	github.com/imdario/mergo v0.3.9
+	github.com/imdario/mergo v0.3.10
 	github.com/matcornic/hermes/v2 v2.1.0
 	github.com/nlopes/slack v0.6.0
 	github.com/opencontainers/go-digest v1.0.0
