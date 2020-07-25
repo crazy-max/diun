@@ -17,6 +17,8 @@ extra:
   social:
     - icon: fontawesome/brands/github-alt
       link: https://github.com/crazy-max/diun
+    - icon: fontawesome/brands/twitter
+      link: https://twitter.com/crazyws
 
 theme:
   name: material
