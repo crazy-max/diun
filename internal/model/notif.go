@@ -18,6 +18,7 @@ type Notif struct {
 	Discord    *NotifDiscord    `yaml:"discord,omitempty" json:"discord,omitempty"`
 	Gotify     *NotifGotify     `yaml:"gotify,omitempty" json:"gotify,omitempty"`
 	Mail       *NotifMail       `yaml:"mail,omitempty" json:"mail,omitempty"`
+	Matrix     *NotifMatrix     `yaml:"matrix,omitempty" json:"matrix,omitempty"`
 	RocketChat *NotifRocketChat `yaml:"rocketchat,omitempty" json:"rocketchat,omitempty"`
 	Script     *NotifScript     `yaml:"script,omitempty" json:"script,omitempty"`
 	Slack      *NotifSlack      `yaml:"slack,omitempty" json:"slack,omitempty"`

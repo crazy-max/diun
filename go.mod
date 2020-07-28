@@ -14,12 +14,15 @@ require (
 	github.com/hako/durafmt v0.0.0-20190612201238-650ed9f29a84
 	github.com/imdario/mergo v0.3.10
 	github.com/matcornic/hermes/v2 v2.1.0
+	github.com/matrix-org/gomatrix v0.0.0-20200501121722-e5578b12c752
+	github.com/microcosm-cc/bluemonday v1.0.3
 	github.com/nlopes/slack v0.6.0
 	github.com/opencontainers/go-digest v1.0.0
 	github.com/panjf2000/ants/v2 v2.4.1
 	github.com/pkg/errors v0.9.1
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/rs/zerolog v1.19.0
+	github.com/russross/blackfriday/v2 v2.0.1
 	github.com/sirupsen/logrus v1.6.0
 	github.com/streadway/amqp v0.0.0-20200108173154-1c71cc93ed71
 	github.com/stretchr/testify v1.6.1

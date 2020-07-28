@@ -28,6 +28,11 @@ notif:
     insecureSkipVerify: false
     from: diun@example.com
     to: webmaster@example.com
+  matrix:
+    homeserverURL: https://matrix.org
+    user: "@foo:matrix.org"
+    password: bar
+    roomID: "!abcdefGHIjklmno:matrix.org"
   rocketchat:
     endpoint: http://rocket.foo.com:3000
     channel: "#general"
