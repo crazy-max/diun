@@ -93,6 +93,7 @@ nav:
     - Discord: notif/discord.md
     - Gotify: notif/gotify.md
     - Mail: notif/mail.md
+    - Matrix: notif/matrix.md
     - Rocket.Chat: notif/rocketchat.md
     - Script: notif/script.md
     - Slack: notif/slack.md
