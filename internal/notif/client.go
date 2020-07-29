@@ -8,6 +8,7 @@ import (
 	"github.com/crazy-max/diun/v4/internal/notif/discord"
 	"github.com/crazy-max/diun/v4/internal/notif/gotify"
 	"github.com/crazy-max/diun/v4/internal/notif/mail"
+	"github.com/crazy-max/diun/v4/internal/notif/matrix"
 	"github.com/crazy-max/diun/v4/internal/notif/notifier"
 	"github.com/crazy-max/diun/v4/internal/notif/rocketchat"
 	"github.com/crazy-max/diun/v4/internal/notif/script"
@@ -50,6 +51,9 @@ func New(config *model.Notif, meta model.Meta) (*Client, error) {
 	}
 	if config.Mail != nil {
 		c.notifiers = append(c.notifiers, mail.New(config.Mail, meta))
+	}
+	if config.Matrix != nil {
+		c.notifiers = append(c.notifiers, matrix.New(config.Matrix, meta))
 	}
 	if config.RocketChat != nil {
 		c.notifiers = append(c.notifiers, rocketchat.New(config.RocketChat, meta))

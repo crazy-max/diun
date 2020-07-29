@@ -70,6 +70,12 @@ func TestLoadFile(t *testing.T) {
 						From:               "diun@example.com",
 						To:                 "webmaster@example.com",
 					},
+					Matrix: &model.NotifMatrix{
+						HomeserverURL: "https://matrix.org",
+						User:          "@foo:matrix.org",
+						Password:      "bar",
+						RoomID:        "!abcdefGHIjklmno:matrix.org",
+					},
 					RocketChat: &model.NotifRocketChat{
 						Endpoint: "http://rocket.foo.com:3000",
 						Channel:  "#general",
