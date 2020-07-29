@@ -201,8 +201,10 @@ Can be transposed to:
 * [watch](watch.md)
 * notif
     * [amqp](../notif/amqp.md)
+    * [discord](../notif/discord.md)
     * [gotify](../notif/amqp.md)
     * [mail](../notif/amqp.md)
+    * [matrix](../notif/matrix.md)
     * [rocketchat](../notif/amqp.md)
     * [script](../notif/amqp.md)
     * [slack](../notif/amqp.md)
