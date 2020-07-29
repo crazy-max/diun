@@ -3,31 +3,34 @@ name: Bug report
 about: Create a report to help us improve
 ---
 
-### Behaviour
+## Behaviour
 
-#### Steps to reproduce this issue
+### Steps to reproduce this issue
 
 1.
 2.
 3.
 
-#### Expected behaviour
+### Expected behaviour
 
 > Tell me what should happen
 
-#### Actual behaviour
+### Actual behaviour
 
 > Tell me what happens instead
 
-### Configuration
+## Configuration
 
 * Diun version : 
 * Platform (windows/linux) :
 * System info (type `uname -a`) : 
 
-```yaml
-# paste your YAML configuration file here and remove sensitive data
-```
+> Paste your configuration files here
+> * docker-compose.yml
+> * k8s deployment configuration
+> * environment variables
+> * diun config file
+> * ...
 
 ### Logs
 
