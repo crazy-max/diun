@@ -16,12 +16,12 @@ Allow to send notifications to your Matrix server.
 
 | Name                  | Default                | Description       |
 |-----------------------|------------------------|-------------------|
-| `homeserverURL`[^1]   | `https://matrix.org`   | Matrix server URL |
+| `homeserverURL`       | `https://matrix.org`   | Matrix server URL |
 | `user`                |                        | Username for authentication |
 | `userFile`            |                        | Use content of secret file as username authentication if `username` not defined |
 | `password`            |                        | Password for authentication |
 | `passwordFile`        |                        | Use content of secret file as password authentication if `password` not defined |
-| `roomID`[^1]          |                        | Room ID to send messages |
+| `roomID`              |                        | Room ID to send messages |
 
 !!! abstract "Environment variables"
     * `DIUN_NOTIF_MATRIX_HOMESERVERURL`
@@ -34,5 +34,3 @@ Allow to send notifications to your Matrix server.
 ## Sample
 
 ![](../assets/notif/matrix.png)
-
-[^1]: Value required
