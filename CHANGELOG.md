@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.3.0 (2020/07/29)
+
+* Add Matrix notification (#124)
+
 ## 4.2.0 (2020/07/16)
 
 * Seek configuration file from default places (#107)
