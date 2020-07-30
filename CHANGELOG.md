@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.3.1 (2020/07/30)
+
+* Hostname not taken into account for Matrix notifications
+
 ## 4.3.0 (2020/07/29)
 
 * Add Matrix notification (#124)
