@@ -69,8 +69,6 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		return errors.Wrap(err, "failed to join room")
 	}
 
-	c.meta.Hostname = "myserver"
-
 	tagTpl := "**{{ .Entry.Image.Domain }}/{{ .Entry.Image.Path }}:{{ .Entry.Image.Tag }}**"
 	if len(entry.Image.HubLink) > 0 {
 		tagTpl = "[**{{ .Entry.Image.Domain }}/{{ .Entry.Image.Path }}:{{ .Entry.Image.Tag }}**]({{ .Entry.Image.HubLink }})"
