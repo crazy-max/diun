@@ -75,6 +75,7 @@ func TestLoadFile(t *testing.T) {
 						User:          "@foo:matrix.org",
 						Password:      "bar",
 						RoomID:        "!abcdefGHIjklmno:matrix.org",
+						MsgType:       model.NotifMatrixMsgTypeNotice,
 					},
 					RocketChat: &model.NotifRocketChat{
 						Endpoint: "http://rocket.foo.com:3000",
