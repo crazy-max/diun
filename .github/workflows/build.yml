@@ -51,15 +51,15 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-go-
       -
+        name: Test
+        run: |
+          go test -coverprofile=coverage.txt -covermode=atomic -race ./...
+      -
         name: GoReleaser
         uses: goreleaser/goreleaser-action@v2
         with:
           version: latest
           args: release --skip-publish --rm-dist
-      -
-        name: Test
-        run: |
-          go test -coverprofile=coverage.txt -covermode=atomic -race ./...
       -
         name: Upload coverage
         uses: codecov/codecov-action@v1.0.12
