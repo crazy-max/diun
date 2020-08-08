@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.4.0 (2020/08/08)
+
+* Allow to customize message type for Matrix notifications (#143)
+
 ## 4.3.1 (2020/07/30)
 
 * Hostname not taken into account for Matrix notifications

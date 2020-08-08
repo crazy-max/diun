@@ -92,7 +92,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 
 	if _, err := m.SendMessageEvent(joined.RoomID, "m.room.message", gomatrix.HTMLMessage{
 		Body:          msgBuf.String(),
-		MsgType:       "m.notice",
+		MsgType:       fmt.Sprintf("m.%s", c.cfg.MsgType),
 		Format:        "org.matrix.custom.html",
 		FormattedBody: string(msgHTML),
 	}); err != nil {

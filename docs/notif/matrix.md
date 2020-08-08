@@ -12,6 +12,7 @@ Allow to send notifications to your Matrix server.
         user: "@foo:matrix.org"
         password: bar
         roomID: "!abcdefGHIjklmno:matrix.org"
+        msgType: notice
     ```
 
 | Name                  | Default                | Description       |
@@ -22,6 +23,7 @@ Allow to send notifications to your Matrix server.
 | `password`            |                        | Password for authentication |
 | `passwordFile`        |                        | Use content of secret file as password authentication if `password` not defined |
 | `roomID`              |                        | Room ID to send messages |
+| `msgType`             | `notice`               | Type of message being sent. Can be `notice` or `text` |
 
 !!! abstract "Environment variables"
     * `DIUN_NOTIF_MATRIX_HOMESERVERURL`
@@ -30,6 +32,7 @@ Allow to send notifications to your Matrix server.
     * `DIUN_NOTIF_MATRIX_PASSWORD`
     * `DIUN_NOTIF_MATRIX_PASSWORDFILE`
     * `DIUN_NOTIF_MATRIX_ROOMID`
+    * `DIUN_NOTIF_MATRIX_MSGTYPE`
 
 ## Sample
 
