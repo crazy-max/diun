@@ -8,6 +8,7 @@ require (
 	github.com/crazy-max/gonfig v0.2.0
 	github.com/docker/docker v1.4.2-0.20200204220554-5f6d6f3f2203
 	github.com/docker/go-connections v0.4.0
+	github.com/evanphx/json-patch v4.2.0+incompatible // indirect
 	github.com/go-gomail/gomail v0.0.0-20160411212932-81ebce5c23df
 	github.com/go-playground/validator/v10 v10.3.0
 	github.com/go-telegram-bot-api/telegram-bot-api v4.6.4+incompatible
@@ -31,9 +32,9 @@ require (
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df // indirect
 	gopkg.in/yaml.v2 v2.3.0
-	k8s.io/api v0.18.6
-	k8s.io/apimachinery v0.18.6
-	k8s.io/client-go v0.18.6
+	k8s.io/api v0.18.8
+	k8s.io/apimachinery v0.18.8
+	k8s.io/client-go v0.18.8
 )
 
 // Docker v19.03.6
