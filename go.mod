@@ -16,7 +16,7 @@ require (
 	github.com/imdario/mergo v0.3.11
 	github.com/matcornic/hermes/v2 v2.1.0
 	github.com/matrix-org/gomatrix v0.0.0-20200501121722-e5578b12c752
-	github.com/microcosm-cc/bluemonday v1.0.3
+	github.com/microcosm-cc/bluemonday v1.0.4
 	github.com/nlopes/slack v0.6.0
 	github.com/opencontainers/go-digest v1.0.0
 	github.com/panjf2000/ants/v2 v2.4.1
