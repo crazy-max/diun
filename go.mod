@@ -8,7 +8,6 @@ require (
 	github.com/crazy-max/gonfig v0.2.0
 	github.com/docker/docker v1.4.2-0.20200204220554-5f6d6f3f2203
 	github.com/docker/go-connections v0.4.0
-	github.com/evanphx/json-patch v4.2.0+incompatible // indirect
 	github.com/go-gomail/gomail v0.0.0-20160411212932-81ebce5c23df
 	github.com/go-playground/validator/v10 v10.3.0
 	github.com/go-telegram-bot-api/telegram-bot-api v4.6.4+incompatible
