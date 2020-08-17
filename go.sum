@@ -67,6 +67,8 @@ github.com/containers/storage v1.20.2/go.mod h1:oOB9Ie8OVPojvoaKWEGSEtHbXUAs+tSy
 github.com/coreos/go-systemd v0.0.0-20190321100706-95778dfbb74e/go.mod h1:F5haX7vjVVG0kc13fIWeqUViNPyEJxv/OmvnBo0Yme4=
 github.com/crazy-max/gonfig v0.2.0 h1:xmhIS7rgd/JGAxGsVCp1dLVSEr15DOBQXvN5AvCkyhA=
 github.com/crazy-max/gonfig v0.2.0/go.mod h1:UNwOsugQKi1lY7sXRAYJNP5rftyUC5LeKyaly9Efh+c=
+github.com/crazy-max/gonfig v0.3.0 h1:/HFdLQjXSNhImgeQgD2eXhc5svX4PhUkGSbl4fJRp4s=
+github.com/crazy-max/gonfig v0.3.0/go.mod h1:7vmzltkoa1RHpGB5fTom0ebnqelHdd7fzhtXTi8sVoQ=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
