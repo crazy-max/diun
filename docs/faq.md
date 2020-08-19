@@ -11,7 +11,7 @@ $ diun --config ./diun.yml --test-notif
 Or within a container:
 
 ```shell
-$ docker-compose exec diun --test-notif
+$ docker-compose exec diun diun --test-notif
 ```
 
 ## field docker|swarm uses unsupported type: invalid

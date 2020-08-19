@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.4.1 (2020/08/20)
+
+* Allow to use `--test-notif` without providers and DB connection (#157 #150)
+* Update deps
+
 ## 4.4.0 (2020/08/08)
 
 * Allow to customize message type for Matrix notifications (#143)
