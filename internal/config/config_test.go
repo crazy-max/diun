@@ -18,23 +18,31 @@ import (
 func TestLoadFile(t *testing.T) {
 	cases := []struct {
 		name     string
-		cfgfile  string
+		cli      model.Cli
 		wantData *config.Config
 		wantErr  bool
 	}{
 		{
-			name:    "Failed on non-existing file",
-			cfgfile: "",
+			name: "Failed on non-existing file",
+			cli: model.Cli{
+				TestNotif: false,
+			},
 			wantErr: true,
 		},
 		{
-			name:    "Fail on wrong file format",
-			cfgfile: "./fixtures/config.invalid.yml",
+			name: "Fail on wrong file format",
+			cli: model.Cli{
+				Cfgfile:   "./fixtures/config.invalid.yml",
+				TestNotif: false,
+			},
 			wantErr: true,
 		},
 		{
-			name:    "Success",
-			cfgfile: "./fixtures/config.test.yml",
+			name: "Success",
+			cli: model.Cli{
+				Cfgfile:   "./fixtures/config.test.yml",
+				TestNotif: false,
+			},
 			wantData: &config.Config{
 				Db: &model.Db{
 					Path: "diun.db",
@@ -159,7 +167,7 @@ func TestLoadFile(t *testing.T) {
 	}
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
-			cfg, err := config.Load(tt.cfgfile)
+			cfg, err := config.Load(tt.cli)
 			if tt.wantErr {
 				require.Error(t, err)
 				return
@@ -178,7 +186,7 @@ func TestLoadEnv(t *testing.T) {
 
 	testCases := []struct {
 		desc     string
-		cfgfile  string
+		cli      model.Cli
 		environ  []string
 		expected interface{}
 		wantErr  bool
@@ -306,7 +314,7 @@ func TestLoadEnv(t *testing.T) {
 				}
 			}
 
-			cfg, err := config.Load(tt.cfgfile)
+			cfg, err := config.Load(tt.cli)
 			if tt.wantErr {
 				require.Error(t, err)
 				return
@@ -323,14 +331,17 @@ func TestLoadMixed(t *testing.T) {
 
 	testCases := []struct {
 		desc     string
-		cfgfile  string
+		cli      model.Cli
 		environ  []string
 		expected interface{}
 		wantErr  bool
 	}{
 		{
-			desc:    "env vars and invalid file",
-			cfgfile: "./fixtures/config.invalid.yml",
+			desc: "env vars and invalid file",
+			cli: model.Cli{
+				Cfgfile:   "./fixtures/config.invalid.yml",
+				TestNotif: false,
+			},
 			environ: []string{
 				"DIUN_PROVIDERS_DOCKER=true",
 			},
@@ -338,8 +349,11 @@ func TestLoadMixed(t *testing.T) {
 			wantErr:  true,
 		},
 		{
-			desc:    "docker provider (file) and notif mails (envs)",
-			cfgfile: "./fixtures/config.docker.yml",
+			desc: "docker provider (file) and notif mails (envs)",
+			cli: model.Cli{
+				Cfgfile:   "./fixtures/config.docker.yml",
+				TestNotif: false,
+			},
 			environ: []string{
 				"DIUN_NOTIF_MAIL_HOST=127.0.0.1",
 				"DIUN_NOTIF_MAIL_PORT=25",
@@ -373,8 +387,11 @@ func TestLoadMixed(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			desc:    "file provider and notif webhook env override",
-			cfgfile: "./fixtures/config.file.yml",
+			desc: "file provider and notif webhook env override",
+			cli: model.Cli{
+				Cfgfile:   "./fixtures/config.file.yml",
+				TestNotif: false,
+			},
 			environ: []string{
 				"DIUN_NOTIF_WEBHOOK_ENDPOINT=http://webhook.foo.com/sd54qad89azd5a",
 				"DIUN_NOTIF_WEBHOOK_HEADERS_AUTHORIZATION=Token78910",
@@ -418,7 +435,7 @@ func TestLoadMixed(t *testing.T) {
 				}
 			}
 
-			cfg, err := config.Load(tt.cfgfile)
+			cfg, err := config.Load(tt.cli)
 			if tt.wantErr {
 				require.Error(t, err)
 				return
@@ -432,17 +449,20 @@ func TestLoadMixed(t *testing.T) {
 
 func TestValidation(t *testing.T) {
 	cases := []struct {
-		name    string
-		cfgfile string
+		name string
+		cli  model.Cli
 	}{
 		{
-			name:    "Success",
-			cfgfile: "./fixtures/config.validate.yml",
+			name: "Success",
+			cli: model.Cli{
+				Cfgfile:   "./fixtures/config.validate.yml",
+				TestNotif: false,
+			},
 		},
 	}
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
-			cfg, err := config.Load(tt.cfgfile)
+			cfg, err := config.Load(tt.cli)
 			require.NoError(t, err)
 
 			dec, err := env.Encode(cfg)
