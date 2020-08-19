@@ -35,28 +35,30 @@ type Diun struct {
 }
 
 // New creates new diun instance
-func New(meta model.Meta, cfg *config.Config, location *time.Location) (*Diun, error) {
-	// DB client
-	dbcli, err := db.New(*cfg.Db)
-	if err != nil {
-		return nil, err
-	}
+func New(meta model.Meta, cli model.Cli, cfg *config.Config, location *time.Location) (*Diun, error) {
+	var err error
 
-	// Notification client
-	notifcli, err := notif.New(cfg.Notif, meta)
-	if err != nil {
-		return nil, err
-	}
-
-	return &Diun{
+	diun := &Diun{
 		meta: meta,
 		cfg:  cfg,
 		cron: cron.New(cron.WithLocation(location), cron.WithParser(cron.NewParser(
 			cron.SecondOptional|cron.Minute|cron.Hour|cron.Dom|cron.Month|cron.Dow|cron.Descriptor),
 		)),
-		db:    dbcli,
-		notif: notifcli,
-	}, nil
+	}
+
+	diun.notif, err = notif.New(cfg.Notif, meta)
+	if err != nil {
+		return nil, err
+	}
+
+	if !cli.TestNotif {
+		diun.db, err = db.New(*cfg.Db)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return diun, nil
 }
 
 // Start starts diun
@@ -147,8 +149,9 @@ func (di *Diun) Close() {
 func (di *Diun) TestNotif() {
 	createdAt, _ := time.Parse("2006-01-02T15:04:05Z", "2020-03-26T12:23:56Z")
 	image, _ := registry.ParseImage(registry.ParseImageOptions{
-		Name: "crazymax/diun:latest",
+		Name: "diun/testnotif:latest",
 	})
+	image.HubLink = ""
 
 	log.Info().Msg("Testing notification settings...")
 	di.notif.Send(model.NotifEntry{
@@ -156,7 +159,7 @@ func (di *Diun) TestNotif() {
 		Provider: "file",
 		Image:    image,
 		Manifest: registry.Manifest{
-			Name:          "docker.io/crazymax/diun",
+			Name:          "diun/testnotif",
 			Tag:           "latest",
 			MIMEType:      "application/vnd.docker.distribution.manifest.list.v2+json",
 			Digest:        "sha256:216e3ae7de4ca8b553eb11ef7abda00651e79e537e85c46108284e5e91673e01",
@@ -172,7 +175,7 @@ func (di *Diun) TestNotif() {
 				"org.label-schema.vcs-ref":        "e13f097c",
 				"org.label-schema.vcs-url":        "https://github.com/crazy-max/diun",
 				"org.label-schema.vendor":         "CrazyMax",
-				"org.label-schema.version":        "2.6.1",
+				"org.label-schema.version":        "x.x.x",
 			},
 			Layers: []string{
 				"sha256:aad63a9339440e7c3e1fff2b988991b9bfb81280042fa7f39a5e327023056819",

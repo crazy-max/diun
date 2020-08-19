@@ -75,14 +75,14 @@ func main() {
 	}()
 
 	// Load configuration
-	cfg, err := config.Load(cli.Cfgfile)
+	cfg, err := config.Load(cli)
 	if err != nil {
 		log.Fatal().Err(err).Msg("Cannot load configuration")
 	}
 	log.Debug().Msg(cfg.String())
 
 	// Init
-	if diun, err = app.New(meta, cfg, location); err != nil {
+	if diun, err = app.New(meta, cli, cfg, location); err != nil {
 		log.Fatal().Err(err).Msgf("Cannot initialize %s", meta.Name)
 	}
 

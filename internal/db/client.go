@@ -1,11 +1,11 @@
 package db
 
 import (
-	"fmt"
 	"reflect"
 	"time"
 
 	"github.com/crazy-max/diun/v4/internal/model"
+	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 	bolt "go.etcd.io/bbolt"
 )
@@ -52,7 +52,7 @@ func New(cfg model.Db) (*Client, error) {
 		log.Debug().Msgf("%d entries found in manifest bucket", stats.KeyN)
 		return nil
 	}); err != nil {
-		return nil, fmt.Errorf("cannot count entries in manifest bucket, %v", err)
+		return nil, errors.Wrap(err, "Cannot count entries in manifest bucket")
 	}
 
 	c := &Client{

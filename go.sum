@@ -65,8 +65,6 @@ github.com/containers/ocicrypt v1.0.2/go.mod h1:nsOhbP19flrX6rE7ieGFvBlr7modwmNj
 github.com/containers/storage v1.20.2 h1:tw/uKRPDnmVrluIzer3dawTFG/bTJLP8IEUyHFhltYk=
 github.com/containers/storage v1.20.2/go.mod h1:oOB9Ie8OVPojvoaKWEGSEtHbXUAs+tSyr7RO7ZGteMc=
 github.com/coreos/go-systemd v0.0.0-20190321100706-95778dfbb74e/go.mod h1:F5haX7vjVVG0kc13fIWeqUViNPyEJxv/OmvnBo0Yme4=
-github.com/crazy-max/gonfig v0.2.0 h1:xmhIS7rgd/JGAxGsVCp1dLVSEr15DOBQXvN5AvCkyhA=
-github.com/crazy-max/gonfig v0.2.0/go.mod h1:UNwOsugQKi1lY7sXRAYJNP5rftyUC5LeKyaly9Efh+c=
 github.com/crazy-max/gonfig v0.3.0 h1:/HFdLQjXSNhImgeQgD2eXhc5svX4PhUkGSbl4fJRp4s=
 github.com/crazy-max/gonfig v0.3.0/go.mod h1:7vmzltkoa1RHpGB5fTom0ebnqelHdd7fzhtXTi8sVoQ=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=

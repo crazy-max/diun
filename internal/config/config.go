@@ -18,18 +18,18 @@ type Config struct {
 	Watch     *model.Watch     `yaml:"watch,omitempty" json:"watch,omitempty"`
 	Notif     *model.Notif     `yaml:"notif,omitempty" json:"notif,omitempty"`
 	RegOpts   model.RegOpts    `yaml:"regopts,omitempty" json:"regopts,omitempty" validate:"unique=Name,dive"`
-	Providers *model.Providers `yaml:"providers,omitempty" json:"providers,omitempty" validate:"required"`
+	Providers *model.Providers `yaml:"providers,omitempty" json:"providers,omitempty"`
 }
 
 // Load returns Config struct
-func Load(cfgfile string) (*Config, error) {
+func Load(cli model.Cli) (*Config, error) {
 	cfg := Config{
 		Db:    (&model.Db{}).GetDefaults(),
 		Watch: (&model.Watch{}).GetDefaults(),
 	}
 
 	fileLoader := gonfig.NewFileLoader(gonfig.FileLoaderConfig{
-		Filename: cfgfile,
+		Filename: cli.Cfgfile,
 		Finder: gonfig.Finder{
 			BasePaths:  []string{"/etc/diun/diun", "$XDG_CONFIG_HOME/diun", "$HOME/.config/diun", "./diun"},
 			Extensions: []string{"yaml", "yml"},
@@ -54,18 +54,26 @@ func Load(cfgfile string) (*Config, error) {
 		log.Info().Msgf("Configuration loaded from %d environment variable(s)", len(envLoader.GetVars()))
 	}
 
-	if err := cfg.validate(); err != nil {
+	if err := cfg.validate(cli); err != nil {
 		return nil, err
 	}
 
 	return &cfg, nil
 }
 
-func (cfg *Config) validate() error {
+func (cfg *Config) validate(cli model.Cli) error {
 	if len(cfg.Db.Path) > 0 {
 		if err := os.MkdirAll(path.Dir(cfg.Db.Path), os.ModePerm); err != nil {
 			return errors.Wrap(err, "Cannot create database destination folder")
 		}
+	}
+
+	if cfg.Notif == nil && cli.TestNotif {
+		return errors.New("At least one notifier is required")
+	}
+
+	if cfg.Providers == nil && !cli.TestNotif {
+		return errors.New("At least one provider is required")
 	}
 
 	return validator.New().Struct(cfg)
