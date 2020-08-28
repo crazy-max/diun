@@ -22,6 +22,7 @@ Notifications can be sent through SMTP.
 | `port`[^1]            | `25`          | SMTP server port |
 | `ssl`                 | `false`       | SSL defines whether an SSL connection is used. Should be false in most cases since the auth mechanism should use STARTTLS |
 | `insecureSkipVerify`  | `false`       | Controls whether a client verifies the server's certificate chain and hostname |
+| `localName`           | `localhost`   | Hostname sent to the SMTP server with the HELO command |
 | `username`            |               | SMTP username |
 | `usernameFile`        |               | Use content of secret file as SMTP username if `username` not defined |
 | `password`            |               | SMTP password |
@@ -34,6 +35,7 @@ Notifications can be sent through SMTP.
     * `DIUN_NOTIF_MAIL_PORT`
     * `DIUN_NOTIF_MAIL_SSL`
     * `DIUN_NOTIF_MAIL_INSECURESKIPVERIFY`
+    * `DIUN_NOTIF_MAIL_LOCALNAME`
     * `DIUN_NOTIF_MAIL_USERNAME`
     * `DIUN_NOTIF_MAIL_USERNAMEFILE`
     * `DIUN_NOTIF_MAIL_PASSWORD`
