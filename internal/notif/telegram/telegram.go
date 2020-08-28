@@ -3,6 +3,7 @@ package telegram
 import (
 	"bytes"
 	"fmt"
+	"strings"
 	"text/template"
 
 	"github.com/crazy-max/diun/v4/internal/model"
@@ -45,13 +46,13 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	}
 
 	var msgBuf bytes.Buffer
-	msgTpl := template.Must(template.New("email").Parse(fmt.Sprintf("Docker tag %s which you subscribed to through {{ .Entry.Provider }} provider has been {{ if (eq .Entry.Status \"new\") }}newly added{{ else }}updated{{ end }} on {{ .Meta.Hostname }}.", tagTpl)))
+	msgTpl := template.Must(template.New("email").Parse(fmt.Sprintf("Docker tag %s which you subscribed to through {{ .Entry.Provider }} provider has been {{ if (eq .Entry.Status \"new\") }}newly added{{ else }}updated{{ end }} on {{ .Hostname }}.", tagTpl)))
 	if err := msgTpl.Execute(&msgBuf, struct {
-		Meta  model.Meta
-		Entry model.NotifEntry
+		Hostname string
+		Entry    model.NotifEntry
 	}{
-		Meta:  c.meta,
-		Entry: entry,
+		Hostname: escapeMarkdown(c.meta.Hostname),
+		Entry:    entry,
 	}); err != nil {
 		return err
 	}
@@ -71,4 +72,12 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	}
 
 	return nil
+}
+
+func escapeMarkdown(txt string) string {
+	txt = strings.ReplaceAll(txt, "_", "\\_")
+	txt = strings.ReplaceAll(txt, "*", "\\*")
+	txt = strings.ReplaceAll(txt, "[", "\\[")
+	txt = strings.ReplaceAll(txt, "`", "\\`")
+	return txt
 }
