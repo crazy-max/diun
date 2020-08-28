@@ -362,6 +362,7 @@ func TestLoadMixed(t *testing.T) {
 				"DIUN_NOTIF_MAIL_INSECURESKIPVERIFY=true",
 				"DIUN_NOTIF_MAIL_FROM=diun@foo.com",
 				"DIUN_NOTIF_MAIL_TO=webmaster@foo.com",
+				"DIUN_NOTIF_MAIL_LOCALNAME=foo.com",
 			},
 			expected: &config.Config{
 				Db:    (&model.Db{}).GetDefaults(),
@@ -372,7 +373,7 @@ func TestLoadMixed(t *testing.T) {
 						Port:               25,
 						SSL:                utl.NewFalse(),
 						InsecureSkipVerify: utl.NewTrue(),
-						LocalName:          "localhost",
+						LocalName:          "foo.com",
 						From:               "diun@foo.com",
 						To:                 "webmaster@foo.com",
 					},

@@ -135,6 +135,7 @@ Need help, or have questions? Go to https://github.com/crazy-max/diun and leave 
 		Password:  password,
 		SSL:       *c.cfg.SSL,
 		TLSConfig: tlsConfig,
+		LocalName: c.cfg.LocalName,
 	}
 
 	return dialer.DialAndSend(msg)
