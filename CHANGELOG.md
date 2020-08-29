@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.5.0 (2020/08/29)
+
+* Allow to set the hostname sent to the SMTP server with the HELO command for mail notification (#165)
+* Fix Telegram notification error (#162)
+
 ## 4.4.1 (2020/08/20)
 
 * Allow to use `--test-notif` without providers and DB connection (#157 #150)
