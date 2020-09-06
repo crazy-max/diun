@@ -26,7 +26,7 @@ services:
       - "LOG_LEVEL=info"
       - "LOG_JSON=false"
       - "DIUN_WATCH_WORKERS=20"
-      - "DIUN_WATCH_SCHEDULE=*/30 * * * *"
+      - "DIUN_WATCH_SCHEDULE=0 */6 * * *"
       - "DIUN_PROVIDERS_SWARM=true"
     deploy:
       mode: replicated

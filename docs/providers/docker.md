@@ -26,7 +26,7 @@ services:
       - "LOG_LEVEL=info"
       - "LOG_JSON=false"
       - "DIUN_WATCH_WORKERS=20"
-      - "DIUN_WATCH_SCHEDULE=*/30 * * * *"
+      - "DIUN_WATCH_SCHEDULE=0 */6 * * *"
       - "DIUN_PROVIDERS_DOCKER=true"
       - "DIUN_PROVIDERS_DOCKER_WATCHSTOPPED=true"
     restart: always
@@ -70,8 +70,8 @@ diun_1         | Sat, 14 Dec 2019 15:30:12 CET INF New image found id=mydocker i
 diun_1         | Sat, 14 Dec 2019 15:30:12 CET INF New image found id=mydocker image=docker.io/crazymax/cloudflared:2019.11.0 provider=docker
 diun_1         | Sat, 14 Dec 2019 15:30:12 CET INF New image found id=mydocker image=docker.io/crazymax/cloudflared:2019.11.3 provider=docker
 diun_1         | Sat, 14 Dec 2019 15:30:13 CET INF New image found id=mydocker image=docker.io/crazymax/cloudflared:2019.11.2 provider=docker
-diun_1         | Sat, 14 Dec 2019 15:30:13 CET INF Cron initialized with schedule */30 * * * *
-diun_1         | Sat, 14 Dec 2019 15:30:13 CET INF Next run in 29 minutes (2019-12-14 16:00:00 +0100 CET)
+diun_1         | Sat, 14 Dec 2019 15:30:13 CET INF Cron initialized with schedule 0 */6 * * *
+diun_1         | Sat, 14 Dec 2019 15:30:13 CET INF Next run in 2 hours 29 minutes (2019-12-14 16:00:00 +0100 CET)
 ```
 
 ## Configuration

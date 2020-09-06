@@ -16,7 +16,8 @@ $ docker-compose exec diun diun --test-notif
 
 ## field docker|swarm uses unsupported type: invalid
 
-If you have the error `failed to decode configuration from file: field docker uses unsupported type: invalid` that's because your `docker`, `swarm` or `kubernetes` provider is not initialized in your configuration:
+If you have the error `failed to decode configuration from file: field docker uses unsupported type: invalid` that's
+because your `docker`, `swarm` or `kubernetes` provider is not initialized in your configuration:
 
 !!! failure
     ```yaml
@@ -34,9 +35,12 @@ should be:
 
 ## No image found in manifest list for architecture, variant, OS
 
-If you encounter this kind of warning, you are probably using the [file provider](providers/file.md) containing an image with an erroneous or empty platform. If the platform is not filled in, it will be deduced automatically from the information of your operating system on which Diun is running.
+If you encounter this kind of warning, you are probably using the [file provider](providers/file.md) containing an
+image with an erroneous or empty platform. If the platform is not filled in, it will be deduced automatically from the
+information of your operating system on which Diun is running.
 
-In the example below, Diun is running (`diun_x.x.x_windows_i386.zip`) on Windows 10 and tries to analyze the `crazymax/cloudflared` image with the detected platform (`windows/386)`:
+In the example below, Diun is running (`diun_x.x.x_windows_i386.zip`) on Windows 10 and tries to analyze the
+`crazymax/cloudflared` image with the detected platform (`windows/386)`:
 
 ```yaml
 - name: crazymax/cloudflared:2020.2.1
@@ -60,3 +64,23 @@ You have to force the platform for this image if you are not on a supported plat
 
 !!! success
     `Fri, 27 Mar 2020 01:24:33 UTC INF New image found image=docker.io/crazymax/cloudflared:2020.2.1 provider=file`
+
+## Too many requests to registry
+
+The error `Cannot create image closer: too many requests to registry` is returned when the HTTP status code returned
+by the registry is 429.
+
+This can happen on the DockerHub registry because of the [rate-limited anonymous pulls](https://docs.docker.com/docker-hub/download-rate-limit/).
+
+To solve this you must first be authenticated against the registry through the [`regopts` settings](config/regopts.md): 
+
+```yaml
+regopts:
+  - name: "docker.io"
+    selector: image
+    username: foo
+    password: bar
+```
+
+If this is not enough, tweak the [`schedule` setting](config/watch.md#schedule) with something
+like `0 */6 * * *` (every 6 hours).

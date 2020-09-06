@@ -46,7 +46,7 @@ services:
       - "LOG_LEVEL=info"
       - "LOG_JSON=false"
       - "DIUN_WATCH_WORKERS=20"
-      - "DIUN_WATCH_SCHEDULE=*/30 * * * *"
+      - "DIUN_WATCH_SCHEDULE=0 */6 * * *"
       - "DIUN_PROVIDERS_DOCKER=true"
       - "DIUN_PROVIDERS_DOCKER_WATCHSTOPPED=true"
     labels:
@@ -70,7 +70,7 @@ $ docker run -d --name diun \
     -e "LOG_LEVEL=info" \
     -e "LOG_JSON=false" \
     -e "DIUN_WATCH_WORKERS=20" \
-    -e "DIUN_WATCH_SCHEDULE=*/30 * * * *" \
+    -e "DIUN_WATCH_SCHEDULE=0 */6 * * *" \
     -e "DIUN_PROVIDERS_DOCKER=true" \
     -e "DIUN_PROVIDERS_DOCKER_WATCHSTOPPED=true" \
     -v "$(pwd)/data:/data" \
@@ -111,7 +111,7 @@ services:
 
 watch:
   workers: 20
-  schedule: "*/30 * * * *"
+  schedule: "0 */6 * * *"
 
 providers:
   docker:

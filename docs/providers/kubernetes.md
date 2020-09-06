@@ -79,7 +79,7 @@ spec:
             - name: DIUN_WATCH_WORKERS
               value: "20"
             - name: DIUN_WATCH_SCHEDULE
-              value: "*/30 * * * *"
+              value: "0 */6 * * *"
             - name: DIUN_PROVIDERS_KUBERNETES
               value: "true"
           volumeMounts:
