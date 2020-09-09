@@ -28,12 +28,12 @@ jobs:
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v2.3.2
         with:
           fetch-depth: 0
       -
         name: Prepare
-        id: prepare
+        id: prep
         run: |
           VERSION=edge
           RELEASE=false
@@ -60,7 +60,7 @@ jobs:
           pages_threshold: major_outage
       -
         name: Deploy
-        if: success() && github.event_name != 'pull_request' && (endsWith(github.ref, github.event.repository.default_branch) || steps.prepare.outputs.release == 'true')
+        if: success() && github.event_name != 'pull_request' && (endsWith(github.ref, github.event.repository.default_branch) || steps.prep.outputs.release == 'true')
         uses: crazy-max/ghaction-github-pages@v2.1.2
         with:
           target_branch: gh-pages
