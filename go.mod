@@ -13,7 +13,6 @@ require (
 	github.com/go-telegram-bot-api/telegram-bot-api v4.6.4+incompatible
 	github.com/hako/durafmt v0.0.0-20190612201238-650ed9f29a84
 	github.com/imdario/mergo v0.3.11
-	github.com/jessevdk/go-flags v1.4.0 // indirect
 	github.com/matcornic/hermes/v2 v2.1.0
 	github.com/matrix-org/gomatrix v0.0.0-20200501121722-e5578b12c752
 	github.com/microcosm-cc/bluemonday v1.0.4
@@ -35,8 +34,6 @@ require (
 	k8s.io/api v0.19.2
 	k8s.io/apimachinery v0.19.2
 	k8s.io/client-go v0.19.2
-	k8s.io/klog v1.0.0 // indirect
-	sigs.k8s.io/structured-merge-diff/v3 v3.0.0 // indirect
 )
 
 // Docker v19.03.6
