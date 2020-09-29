@@ -4,6 +4,7 @@ updates:
     open-pull-requests-limit: 10
     directory: "/"
     ignore:
+      - dependency-name: "github.com/sirupsen/logrus"
       - dependency-name: "k8s.io/api"
       - dependency-name: "k8s.io/apimachinery"
     schedule:
