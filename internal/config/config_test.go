@@ -62,6 +62,7 @@ func TestLoadFile(t *testing.T) {
 					},
 					Discord: &model.NotifDiscord{
 						WebhookURL: "https://discordapp.com/api/webhooks/1234567890/Abcd-eFgh-iJklmNo_pqr",
+						Mention:    "here",
 						Timeout:    utl.NewDuration(10 * time.Second),
 					},
 					Gotify: &model.NotifGotify{

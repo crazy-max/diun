@@ -9,16 +9,19 @@ Allow to send notifications to your Discord channel.
     notif:
       discord:
         webhookURL: https://discordapp.com/api/webhooks/1234567890/Abcd-eFgh-iJklmNo_pqr
+        mention: here
         timeout: 10s
     ```
 
 !!! abstract "Environment variables"
     * `DIUN_NOTIF_DISCORD_WEBHOOK`
+    * `DIUN_NOTIF_DISCORD_MENTION`
     * `DIUN_NOTIF_DISCORD_TIMEOUT`
 
 | Name               | Default       | Description   |
 |--------------------|---------------|---------------|
 | `webhookURL`[^1]   |               | Discord [incoming webhook URL](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks) |
+| `mention`          |               | Mention to directly notify a user, multiple users or roles in messages (eg. `here`) |
 | `timeout`          | `10s`         | Timeout specifies a time limit for the request to be made |
 
 ## Sample

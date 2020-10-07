@@ -38,13 +38,19 @@ func (c *Client) Name() string {
 // Send creates and sends a discord notification with an entry
 // https://discord.com/developers/docs/resources/webhook#execute-webhook
 func (c *Client) Send(entry model.NotifEntry) error {
+	var content bytes.Buffer
+
 	hc := http.Client{
 		Timeout: *c.cfg.Timeout,
 	}
 
-	content := fmt.Sprintf("@here Image update for %s", entry.Image.String())
+	if len(c.cfg.Mention) > 0 {
+		content.WriteString(fmt.Sprintf("@%s ", c.cfg.Mention))
+	}
 	if entry.Status == model.ImageStatusNew {
-		content = fmt.Sprintf("@here New image %s has been added", entry.Image.String())
+		content.WriteString(fmt.Sprintf("@here New image %s has been added", entry.Image.String()))
+	} else {
+		content.WriteString(fmt.Sprintf("@here Image update for %s", entry.Image.String()))
 	}
 
 	tagTpl := "**{{ .Entry.Image.Domain }}/{{ .Entry.Image.Path }}:{{ .Entry.Image.Tag }}**"
@@ -95,7 +101,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 
 	dataBuf := new(bytes.Buffer)
 	if err := json.NewEncoder(dataBuf).Encode(Message{
-		Content:   content,
+		Content:   content.String(),
 		Username:  c.meta.Name,
 		AvatarURL: c.meta.Logo,
 		Embeds: []Embed{
