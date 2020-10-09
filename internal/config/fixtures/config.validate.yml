@@ -15,7 +15,12 @@ notif:
     queue: queue
   discord:
     webhookURL: https://discordapp.com/api/webhooks/1234567890/Abcd-eFgh-iJklmNo_pqr
-    mention: here
+    mentions:
+      - "@here"
+      - "@everyone"
+      - "<@124>"
+      - "<@125>"
+      - "<@&200>"
     timeout: 10s
   gotify:
     endpoint: http://gotify.foo.com

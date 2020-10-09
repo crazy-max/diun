@@ -9,7 +9,7 @@ import (
 // NotifDiscord holds Discord notification configuration details
 type NotifDiscord struct {
 	WebhookURL string         `yaml:"webhookURL,omitempty" json:"webhookURL,omitempty" validate:"required"`
-	Mention    string         `yaml:"mention,omitempty" json:"mention,omitempty"`
+	Mentions   []string       `yaml:"mentions,omitempty" json:"mentions,omitempty"`
 	Timeout    *time.Duration `yaml:"timeout,omitempty" json:"timeout,omitempty" validate:"required"`
 }
 

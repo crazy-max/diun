@@ -44,8 +44,10 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		Timeout: *c.cfg.Timeout,
 	}
 
-	if len(c.cfg.Mention) > 0 {
-		content.WriteString(fmt.Sprintf("@%s ", c.cfg.Mention))
+	if len(c.cfg.Mentions) > 0 {
+		for _, mention := range c.cfg.Mentions {
+			content.WriteString(fmt.Sprintf("%s ", mention))
+		}
 	}
 	if entry.Status == model.ImageStatusNew {
 		content.WriteString(fmt.Sprintf("New image %s has been added", entry.Image.String()))
