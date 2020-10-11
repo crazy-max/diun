@@ -1,4 +1,6 @@
-# Installation with Docker
+# Installation from Docker image
+
+## About
 
 Diun provides automatically updated Docker :whale: images within [Docker Hub](https://hub.docker.com/r/crazymax/diun).
 It is possible to always use the latest stable tag or to use another service that handles updating Docker images.
@@ -19,10 +21,6 @@ Image: crazymax/diun:latest
    - linux/s390x
 ```
 
-This reference setup guides users through the setup based on `docker-compose`, but the installation of `docker-compose`
-is out of scope of this documentation. To install `docker-compose` itself, follow the official
-[install instructions](https://docs.docker.com/compose/install/).
-
 ## Volumes
 
 | Path               | Description   |
@@ -30,6 +28,15 @@ is out of scope of this documentation. To install `docker-compose` itself, follo
 | `/data`            | Contains bbolt database which retains Docker images manifests |
 
 ## Usage
+
+!!! note
+    This reference setup guides users through the setup based on `docker-compose` and the
+    [Docker provider](../providers/docker.md), but the installation of `docker-compose` is out of scope of this
+    documentation. To install `docker-compose` itself, follow the official
+    [install instructions](https://docs.docker.com/compose/install/).
+    
+    You can also use the [Swarm](../providers/swarm.md) or [Kubernetes](../providers/kubernetes.md) providers
+    if you don't want to use `docker-compose`.
 
 ```yaml
 version: "3.5"
