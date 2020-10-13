@@ -5,6 +5,9 @@ watch:
   workers: 100
   schedule: "*/30 * * * *"
   firstCheckNotif: false
+  healthchecks:
+    baseURL: https://hc-ping.com/
+    uuid: 5bf66975-d4c7-4bf5-bcc8-b8d8a82ea278
 
 notif:
   amqp:
