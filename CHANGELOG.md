@@ -1,5 +1,14 @@
 # Changelog
 
+## 4.6.0 (2020/10/13)
+
+* Add support for [Healthchecks](https://healthchecks.io/) to monitor Diun watcher (#78)
+* Add option to mention specific users or roles for Discord notifier (#188)
+* Update docker install documentation
+* Add "Too many requests to registry" section in FAQ (#168)
+* Update deps
+* Switch [Docker actions](https://github.com/docker/build-push-action)
+
 ## 4.5.0 (2020/08/29)
 
 * Allow to set the hostname sent to the SMTP server with the HELO command for mail notification (#165)
