@@ -1,0 +1,15 @@
+watch:
+  healthchecks:
+    baseURL: https://hc-ping.com/
+
+notif:
+  mail:
+    host: localhost
+    port: 25
+    ssl: false
+    insecureSkipVerify: false
+    from: diun@example.com
+    to: webmaster@example.com
+
+providers:
+  docker: {}

@@ -38,6 +38,30 @@ func TestLoadFile(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "Fail on no UUID for Healthchecks",
+			cli: model.Cli{
+				Cfgfile:   "./fixtures/config.err.hc.yml",
+				TestNotif: false,
+			},
+			wantErr: true,
+		},
+		{
+			name: "Fail on no notifier if test notif",
+			cli: model.Cli{
+				Cfgfile:   "./fixtures/config.err.notif.yml",
+				TestNotif: true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "Fail on no provider",
+			cli: model.Cli{
+				Cfgfile:   "./fixtures/config.err.provider.yml",
+				TestNotif: false,
+			},
+			wantErr: true,
+		},
+		{
 			name: "Success",
 			cli: model.Cli{
 				Cfgfile:   "./fixtures/config.test.yml",
