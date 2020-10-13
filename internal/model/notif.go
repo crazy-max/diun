@@ -4,6 +4,16 @@ import (
 	"github.com/crazy-max/diun/v4/pkg/registry"
 )
 
+// NotifEntries represents a list of notification entries
+type NotifEntries struct {
+	Entries       []NotifEntry
+	CountNew      int
+	CountUpdate   int
+	CountUnchange int
+	CountError    int
+	CountTotal    int
+}
+
 // NotifEntry represents a notification entry
 type NotifEntry struct {
 	Status   ImageStatus       `json:"status,omitempty"`
@@ -35,4 +45,23 @@ func (s *Notif) GetDefaults() *Notif {
 // SetDefaults sets the default values
 func (s *Notif) SetDefaults() {
 	// noop
+}
+
+// Add adds a new notif entry
+func (s *NotifEntries) Add(entry NotifEntry) {
+	s.Entries = append(s.Entries, entry)
+	switch entry.Status {
+	case ImageStatusNew:
+		s.CountNew++
+		s.CountTotal++
+	case ImageStatusUpdate:
+		s.CountUpdate++
+		s.CountTotal++
+	case ImageStatusUnchange:
+		s.CountUnchange++
+		s.CountTotal++
+	case ImageStatusError:
+		s.CountError++
+		s.CountTotal++
+	}
 }
