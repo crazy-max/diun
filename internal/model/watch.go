@@ -6,9 +6,10 @@ import (
 
 // Watch holds data necessary for watch configuration
 type Watch struct {
-	Workers         int    `yaml:"workers,omitempty" json:"workers,omitempty" validate:"required,min=1"`
-	Schedule        string `yaml:"schedule,omitempty" json:"schedule,omitempty" validate:"required"`
-	FirstCheckNotif *bool  `yaml:"firstCheckNotif,omitempty" json:"firstCheckNotif,omitempty" validate:"required"`
+	Workers         int           `yaml:"workers,omitempty" json:"workers,omitempty" validate:"required,min=1"`
+	Schedule        string        `yaml:"schedule,omitempty" json:"schedule,omitempty" validate:"required"`
+	FirstCheckNotif *bool         `yaml:"firstCheckNotif,omitempty" json:"firstCheckNotif,omitempty" validate:"required"`
+	Healthchecks    *Healthchecks `yaml:"healthchecks,omitempty" json:"healthchecks,omitempty"`
 }
 
 // GetDefaults gets the default values

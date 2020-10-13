@@ -141,7 +141,14 @@ func (di *Diun) createJob(job model.Job) {
 	}
 }
 
-func (di *Diun) runJob(job model.Job) {
+func (di *Diun) runJob(job model.Job) (entry model.NotifEntry) {
+	var err error
+	entry = model.NotifEntry{
+		Status:   model.ImageStatusError,
+		Provider: job.Provider,
+		Image:    job.RegImage,
+	}
+
 	sublog := log.With().
 		Str("provider", job.Provider).
 		Str("image", job.RegImage.String()).
@@ -155,7 +162,7 @@ func (di *Diun) runJob(job model.Job) {
 		return
 	}
 
-	liveManifest, err := job.Registry.Manifest(job.RegImage)
+	entry.Manifest, err = job.Registry.Manifest(job.RegImage)
 	if err != nil {
 		sublog.Warn().Err(err).Msg("Cannot get remote manifest")
 		return
@@ -167,19 +174,19 @@ func (di *Diun) runJob(job model.Job) {
 		return
 	}
 
-	status := model.ImageStatusUnchange
 	if len(dbManifest.Name) == 0 {
-		status = model.ImageStatusNew
+		entry.Status = model.ImageStatusNew
 		sublog.Info().Msg("New image found")
-	} else if !liveManifest.Created.Equal(*dbManifest.Created) {
-		status = model.ImageStatusUpdate
+	} else if !entry.Manifest.Created.Equal(*dbManifest.Created) {
+		entry.Status = model.ImageStatusUpdate
 		sublog.Info().Msg("Image update found")
 	} else {
+		entry.Status = model.ImageStatusUnchange
 		sublog.Debug().Msg("No changes")
 		return
 	}
 
-	if err := di.db.PutManifest(job.RegImage, liveManifest); err != nil {
+	if err := di.db.PutManifest(job.RegImage, entry.Manifest); err != nil {
 		sublog.Error().Err(err).Msg("Cannot write manifest to db")
 		return
 	}
@@ -190,10 +197,6 @@ func (di *Diun) runJob(job model.Job) {
 		return
 	}
 
-	di.notif.Send(model.NotifEntry{
-		Status:   status,
-		Provider: job.Provider,
-		Image:    job.RegImage,
-		Manifest: liveManifest,
-	})
+	di.notif.Send(entry)
+	return
 }

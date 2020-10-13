@@ -1,6 +1,20 @@
 # Watch configuration
 
-## `workers`
+## Overview
+
+```yaml
+watch:
+  workers: 10
+  schedule: "0 * * * *"
+  firstCheckNotif: false
+  healthchecks:
+    baseURL: https://hc-ping.com/
+    uuid: 5bf66975-d4c7-4bf5-bcc8-b8d8a82ea278
+```
+
+## Configuration
+
+### `workers`
 
 Maximum number of workers that will execute tasks concurrently. (default `10`)
 
@@ -13,7 +27,7 @@ Maximum number of workers that will execute tasks concurrently. (default `10`)
 !!! abstract "Environment variables"
     * `DIUN_WATCH_WORKERS`
 
-## `schedule`
+### `schedule`
 
 [CRON expression](https://godoc.org/github.com/robfig/cron#hdr-CRON_Expression_Format) to schedule Diun watcher. (default `0 * * * *`)
 
@@ -26,7 +40,7 @@ Maximum number of workers that will execute tasks concurrently. (default `10`)
 !!! abstract "Environment variables"
     * `DIUN_WATCH_SCHEDULE`
 
-## `firstCheckNotif`
+### `firstCheckNotif`
 
 Send notification at the very first analysis of an image. (default `false`)
 
@@ -38,3 +52,29 @@ Send notification at the very first analysis of an image. (default `false`)
 
 !!! abstract "Environment variables"
     * `DIUN_WATCH_FIRSTCHECKNOTIF`
+
+### `healthchecks`
+
+Healthchecks allows to monitor Diun watcher by sending start and success notification
+events to [healthchecks.io](https://healthchecks.io/).
+
+!!! tip
+    A [Docker image for Healthchecks](https://github.com/crazy-max/docker-healthchecks) is available if you want
+    to self-host your instance.
+
+![](../assets/watch/healthchecks.png)
+
+!!! example "Config file"
+    ```yaml
+    watch:
+      healthchecks:
+        baseURL: https://hc-ping.com/
+        uuid: 5bf66975-d4c7-4bf5-bcc8-b8d8a82ea278
+    ```
+
+!!! abstract "Environment variables"
+    * `DIUN_WATCH_HEALTHCHECKS_BASEURL`
+    * `DIUN_WATCH_HEALTHCHECKS_UUID`
+
+* `baseURL`: Base URL for the Healthchecks Ping API (default `https://hc-ping.com/`).
+* `uuid`: UUID of an existing healthcheck (required).

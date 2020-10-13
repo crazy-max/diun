@@ -68,6 +68,10 @@ func (cfg *Config) validate(cli model.Cli) error {
 		}
 	}
 
+	if cfg.Watch.Healthchecks != nil && len(cfg.Watch.Healthchecks.UUID) == 0 {
+		return errors.New("Healthchecks UUID is required")
+	}
+
 	if cfg.Notif == nil && cli.TestNotif {
 		return errors.New("At least one notifier is required")
 	}

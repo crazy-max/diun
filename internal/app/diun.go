@@ -1,6 +1,7 @@
 package app
 
 import (
+	"net/url"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -15,8 +16,10 @@ import (
 	kubernetesPrd "github.com/crazy-max/diun/v4/internal/provider/kubernetes"
 	swarmPrd "github.com/crazy-max/diun/v4/internal/provider/swarm"
 	"github.com/crazy-max/diun/v4/pkg/registry"
+	"github.com/crazy-max/gohealthchecks"
 	"github.com/hako/durafmt"
 	"github.com/panjf2000/ants/v2"
+	"github.com/pkg/errors"
 	"github.com/robfig/cron/v3"
 	"github.com/rs/zerolog/log"
 )
@@ -27,6 +30,7 @@ type Diun struct {
 	cfg    *config.Config
 	cron   *cron.Cron
 	db     *db.Client
+	hc     *gohealthchecks.Client
 	notif  *notif.Client
 	jobID  cron.EntryID
 	locker uint32
@@ -56,6 +60,19 @@ func New(meta model.Meta, cli model.Cli, cfg *config.Config, location *time.Loca
 		if err != nil {
 			return nil, err
 		}
+	}
+
+	if cfg.Watch.Healthchecks != nil {
+		var hcBaseURL *url.URL
+		if len(cfg.Watch.Healthchecks.BaseURL) > 0 {
+			hcBaseURL, err = url.Parse(cfg.Watch.Healthchecks.BaseURL)
+			if err != nil {
+				return nil, errors.Wrap(err, "Cannot parse Healthchecks base URL")
+			}
+		}
+		diun.hc = gohealthchecks.NewClient(&gohealthchecks.ClientOptions{
+			BaseURL: hcBaseURL,
+		})
 	}
 
 	return diun, nil
@@ -104,10 +121,14 @@ func (di *Diun) Run() {
 	}
 
 	log.Info().Msg("Cron triggered")
+	entries := new(model.NotifEntries)
+	di.HealthchecksStart()
+	defer di.HealthchecksSuccess(entries)
+
 	di.wg = new(sync.WaitGroup)
 	di.pool, _ = ants.NewPoolWithFunc(di.cfg.Watch.Workers, func(i interface{}) {
 		job := i.(model.Job)
-		di.runJob(job)
+		entries.Add(di.runJob(job))
 		di.wg.Done()
 	}, ants.WithLogger(new(logging.AntsLogger)))
 	defer di.pool.Release()
@@ -133,10 +154,17 @@ func (di *Diun) Run() {
 	}
 
 	di.wg.Wait()
+	log.Info().
+		Int("added", entries.CountNew).
+		Int("updated", entries.CountUpdate).
+		Int("unchanged", entries.CountUnchange).
+		Int("failed", entries.CountError).
+		Msg("Jobs completed")
 }
 
 // Close closes diun
 func (di *Diun) Close() {
+	di.HealthchecksFail("Application closed")
 	if di.cron != nil {
 		di.cron.Stop()
 	}

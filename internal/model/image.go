@@ -24,6 +24,7 @@ const (
 	ImageStatusNew      = ImageStatus("new")
 	ImageStatusUpdate   = ImageStatus("update")
 	ImageStatusUnchange = ImageStatus("unchange")
+	ImageStatusError    = ImageStatus("error")
 )
 
 // ImageStatus holds Docker image status analysis
