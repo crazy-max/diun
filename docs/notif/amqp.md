@@ -17,12 +17,12 @@ You can send notifications to any amqp compatible server with the following sett
 
 !!! abstract "Environment variables"
     * `DIUN_NOTIF_AMQP_HOST`
-    * `DIUN_NOTIF_AMQP_EXCHANGE`
     * `DIUN_NOTIF_AMQP_PORT`
     * `DIUN_NOTIF_AMQP_USERNAME`
     * `DIUN_NOTIF_AMQP_USERNAMEFILE`
     * `DIUN_NOTIF_AMQP_PASSWORD`
     * `DIUN_NOTIF_AMQP_PASSWORDFILE`
+    * `DIUN_NOTIF_AMQP_EXCHANGE`
     * `DIUN_NOTIF_AMQP_QUEUE`
 
 | Name               | Default       | Description   |

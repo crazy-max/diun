@@ -19,7 +19,7 @@ Allow to send notifications to your Discord channel.
     ```
 
 !!! abstract "Environment variables"
-    * `DIUN_NOTIF_DISCORD_WEBHOOK`
+    * `DIUN_NOTIF_DISCORD_WEBHOOKURL`
     * `DIUN_NOTIF_DISCORD_MENTIONS`
     * `DIUN_NOTIF_DISCORD_TIMEOUT`
 
