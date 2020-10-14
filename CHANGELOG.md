@@ -7,7 +7,7 @@
 * Update docker install documentation
 * Add "Too many requests to registry" section in FAQ (#168)
 * Update deps
-* Switch [Docker actions](https://github.com/docker/build-push-action)
+* Switch to [Docker actions](https://github.com/docker/build-push-action)
 
 ## 4.5.0 (2020/08/29)
 
