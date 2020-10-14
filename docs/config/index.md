@@ -31,7 +31,7 @@ You can override this using the [`--config` flag or `CONFIG` env var](../usage/c
     
     watch:
       workers: 10
-      schedule: "0 * * * *"
+      schedule: "0 */6 * * *"
       firstCheckNotif: false
     
     notif:
@@ -116,7 +116,7 @@ All configuration from file can be transposed into environment variables. As an 
     
     watch:
       workers: 10
-      schedule: "0 * * * *"
+      schedule: "0 */6 * * *"
       firstCheckNotif: false
     
     notif:
@@ -164,7 +164,7 @@ Can be transposed to:
     DIUN_DB_PATH=diun.db
     
     DIUN_WATCH_WORKERS=10
-    DIUN_WATCH_SCHEDULE=0 * * * *
+    DIUN_WATCH_SCHEDULE=0 */6 * * *
     DIUN_WATCH_FIRSTCHECKNOTIF=false
     
     DIUN_NOTIF_GOTIFY_ENDPOINT=http://gotify.foo.com

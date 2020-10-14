@@ -14,7 +14,7 @@ db:
 
 watch:
   workers: 20
-  schedule: "* * * * *"
+  schedule: "0 */6 * * *"
 
 regopts:
   - name: "myregistry"
@@ -88,7 +88,7 @@ db:
 
 watch:
   workers: 20
-  schedule: "* * * * *"
+  schedule: "0 */6 * * *"
 
 regopts:
   - name: "docker.bintray.io"
@@ -125,7 +125,7 @@ Sat, 14 Dec 2019 15:32:28 UTC INF New image found id=crazymax/cloudflared image=
 Sat, 14 Dec 2019 15:32:28 UTC INF New image found id=crazymax/cloudflared image=docker.io/crazymax/cloudflared:2019.9.1 provider=file
 Sat, 14 Dec 2019 15:32:28 UTC INF New image found id=crazymax/cloudflared image=docker.io/crazymax/cloudflared:2019.10.4 provider=file
 Sat, 14 Dec 2019 15:32:28 UTC INF New image found id=docker.bintray.io/jfrog/xray-mongo:3.2.6 image=docker.bintray.io/jfrog/xray-mongo:3.2.6 provider=file
-Sat, 14 Dec 2019 15:32:28 UTC INF Cron initialized with schedule * * * * *
+Sat, 14 Dec 2019 15:32:28 UTC INF Cron initialized with schedule 0 */6 * * *
 Sat, 14 Dec 2019 15:32:28 UTC INF Next run in 31 seconds (2019-12-14 15:33:00 +0000 UTC)
 ```
 

@@ -5,7 +5,7 @@
 ```yaml
 watch:
   workers: 10
-  schedule: "0 * * * *"
+  schedule: "0 */6 * * *"
   firstCheckNotif: false
   healthchecks:
     baseURL: https://hc-ping.com/
@@ -34,7 +34,7 @@ Maximum number of workers that will execute tasks concurrently. (default `10`)
 !!! example "Config file"
     ```yaml
     watch:
-      schedule: "0 * * * *"
+      schedule: "0 */6 * * *"
     ```
 
 !!! abstract "Environment variables"

@@ -67,7 +67,7 @@ In order to enable transposition into environmental variables, all fields in con
     
     watch:
       workers: 10
-      schedule: "0 * * * *"
+      schedule: "0 */6 * * *"
       first_check_notif: false
     
     notif:
@@ -149,7 +149,7 @@ In order to enable transposition into environmental variables, all fields in con
     
     watch:
       workers: 10
-      schedule: "0 * * * *"
+      schedule: "0 */6 * * *"
       firstCheckNotif: false
     
     notif:
