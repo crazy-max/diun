@@ -35,6 +35,7 @@ type Notif struct {
 	Teams      *NotifTeams      `yaml:"teams,omitempty" json:"teams,omitempty"`
 	Telegram   *NotifTelegram   `yaml:"telegram,omitempty" json:"telegram,omitempty"`
 	Webhook    *NotifWebhook    `yaml:"webhook,omitempty" json:"webhook,omitempty"`
+	Mqtt       *NotifMqtt       `yaml:"mqtt,omitempty" json:"mqtt,omitempty"`
 }
 
 // GetDefaults gets the default values
