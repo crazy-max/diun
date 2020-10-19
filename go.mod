@@ -19,7 +19,7 @@ require (
 	github.com/microcosm-cc/bluemonday v1.0.4
 	github.com/nlopes/slack v0.6.0
 	github.com/opencontainers/go-digest v1.0.0
-	github.com/panjf2000/ants/v2 v2.4.2
+	github.com/panjf2000/ants/v2 v2.4.3
 	github.com/pkg/errors v0.9.1
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/rs/zerolog v1.20.0
