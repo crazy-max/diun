@@ -1,4 +1,4 @@
-# Rocket.Chat notifications
+# Matrix notifications
 
 Allow to send notifications to your Matrix server.
 

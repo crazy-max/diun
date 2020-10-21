@@ -1,4 +1,4 @@
-# Amqp notifications
+# Gotify notifications
 
 Notifications can be sent using a [Gotify](https://gotify.net/) instance.
 
