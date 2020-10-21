@@ -26,7 +26,8 @@ services:
     restart: always
 ```
 
-Here we use a minimal configuration to analyze **all running containers** (watch by default enabled) of your **local Docker** instance **every 30 minutes**.
+Here we use a minimal configuration to analyze **all running containers** (watch by default enabled) of
+your **local Docker** instance **every 6 hours**.
 
 That's it. Now you can launch Diun with the following command:
 
