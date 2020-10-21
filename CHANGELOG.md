@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.6.1 (2020/10/22)
+
+* Typos in documentation
+* Update deps
+
 ## 4.6.0 (2020/10/13)
 
 * Add support for [Healthchecks](https://healthchecks.io/) to monitor Diun watcher (#78)
