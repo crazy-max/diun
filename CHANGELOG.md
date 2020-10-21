@@ -3,7 +3,11 @@
 ## 4.6.1 (2020/10/22)
 
 * Typos in documentation
-* Update deps
+* Bump docker/login-action from v1.4.1 to v1.6.0 (#198)
+* Bump k8s.io/client-go from 0.19.2 to 0.19.3 (#199)
+* Bump codecov/codecov-action from v1.0.13 to v1.0.14 (#195)
+* Bump github.com/go-playground/validator/v10 from 10.4.0 to 10.4.1 (#197)
+* Bump github.com/panjf2000/ants/v2 from 2.4.2 to 2.4.3 (#196)
 
 ## 4.6.0 (2020/10/13)
 
