@@ -59,7 +59,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		return token.Error()
 	}
 
-	log.Debug().Msg(fmt.Sprintf("Connected to broker: %s", broker))
+	log.Debug().Msgf("Connected to broker: %s", broker)
 
 	message, err := json.Marshal(struct {
 		Version  string     `json:"diun_version"`
@@ -86,16 +86,9 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		return err
 	}
 
-	log.Debug().Msg(fmt.Sprintf("Publishing to topic: %s", c.cfg.Topic))
+	log.Debug().Msgf("Publishing to topic: %s", c.cfg.Topic)
 	token := client.Publish(c.cfg.Topic, byte(c.cfg.QoS), false, message)
 	token.Wait()
 
-	if token.Error() != nil {
-		return token.Error()
-	}
-
-	log.Debug().Msg("Publish successful")
-	return nil
+	return token.Error()
 }
-
-

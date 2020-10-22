@@ -29,13 +29,13 @@ type Notif struct {
 	Gotify     *NotifGotify     `yaml:"gotify,omitempty" json:"gotify,omitempty"`
 	Mail       *NotifMail       `yaml:"mail,omitempty" json:"mail,omitempty"`
 	Matrix     *NotifMatrix     `yaml:"matrix,omitempty" json:"matrix,omitempty"`
+	Mqtt       *NotifMqtt       `yaml:"mqtt,omitempty" json:"mqtt,omitempty"`	
 	RocketChat *NotifRocketChat `yaml:"rocketchat,omitempty" json:"rocketchat,omitempty"`
 	Script     *NotifScript     `yaml:"script,omitempty" json:"script,omitempty"`
 	Slack      *NotifSlack      `yaml:"slack,omitempty" json:"slack,omitempty"`
 	Teams      *NotifTeams      `yaml:"teams,omitempty" json:"teams,omitempty"`
 	Telegram   *NotifTelegram   `yaml:"telegram,omitempty" json:"telegram,omitempty"`
 	Webhook    *NotifWebhook    `yaml:"webhook,omitempty" json:"webhook,omitempty"`
-	Mqtt       *NotifMqtt       `yaml:"mqtt,omitempty" json:"mqtt,omitempty"`
 }
 
 // GetDefaults gets the default values
