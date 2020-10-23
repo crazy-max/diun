@@ -13,8 +13,8 @@ You can send notifications to any mqtt compatible server with the following sett
         username: guest
         password: guest
         topic: docker/diun
-    client: diun
-    qos: 0
+        client: diun
+        qos: 0
     ```
 
 | Name               | Default       | Description   |
