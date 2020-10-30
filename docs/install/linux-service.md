@@ -21,6 +21,7 @@ User=diun
 Group=diun
 ExecStart=/usr/local/bin/diun --config /etc/diun/diun.yml --log-level info
 Restart=always
+#Environment=TZ=Europe/Paris
 Environment=DIUN_DB_PATH=/var/lib/diun/diun.db
 
 [Install]

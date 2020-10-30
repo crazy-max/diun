@@ -13,13 +13,9 @@ import (
 )
 
 // Configure configures logger
-func Configure(cli *model.Cli, location *time.Location) {
+func Configure(cli *model.Cli) {
 	var err error
 	var w io.Writer
-
-	zerolog.TimestampFunc = func() time.Time {
-		return time.Now().In(location)
-	}
 
 	if !cli.LogJSON {
 		w = zerolog.ConsoleWriter{
