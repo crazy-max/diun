@@ -2,7 +2,13 @@
 
 ## About
 
-Diun provides automatically updated Docker :whale: images within [Docker Hub](https://hub.docker.com/r/crazymax/diun).
+Diun provides automatically updated Docker :whale: images within several registries:
+
+| Registry                                                                                         | Image                           |
+|--------------------------------------------------------------------------------------------------|---------------------------------|
+| [Docker Hub](https://hub.docker.com/r/crazymax/diun/)                             | `crazymax/diun`                 |
+| [GitHub Container Registry](https://github.com/users/crazy-max/packages/container/package/diun)  | `ghcr.io/crazy-max/diun`        |
+
 It is possible to always use the latest stable tag or to use another service that handles updating Docker images.
 
 Following platforms for this image are available:
