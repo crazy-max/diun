@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - '**'
-      - 'v*'
     tags:
       - 'v*'
     paths-ignore:
@@ -23,7 +22,6 @@ on:
       - 'mkdocs.yml'
 
 jobs:
-
   go:
     runs-on: ubuntu-latest
     steps:

@@ -36,7 +36,6 @@ and [File](providers/file.md) providers available
 * Get notified through Gotify, Mail, Slack, Telegram and [more](config/index.md#reference)
 * [Healthchecks support](config/watch.md#healthchecks) to monitor Diun watcher
 * Enhanced logging
-* Timezone can be changed
 * Official [Docker image available](install/docker.md)
 
 ## License

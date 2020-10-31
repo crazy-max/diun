@@ -39,14 +39,14 @@ type Diun struct {
 }
 
 // New creates new diun instance
-func New(meta model.Meta, cli model.Cli, cfg *config.Config, location *time.Location) (*Diun, error) {
+func New(meta model.Meta, cli model.Cli, cfg *config.Config) (*Diun, error) {
 	var err error
 
 	diun := &Diun{
 		meta: meta,
 		cfg:  cfg,
-		cron: cron.New(cron.WithLocation(location), cron.WithParser(cron.NewParser(
-			cron.SecondOptional|cron.Minute|cron.Hour|cron.Dom|cron.Month|cron.Dow|cron.Descriptor),
+		cron: cron.New(cron.WithParser(cron.NewParser(
+			cron.SecondOptional | cron.Minute | cron.Hour | cron.Dom | cron.Month | cron.Dow | cron.Descriptor),
 		)),
 	}
 

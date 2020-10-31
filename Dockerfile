@@ -31,7 +31,6 @@ LABEL maintainer="CrazyMax"
 RUN apk --update --no-cache add \
     ca-certificates \
     libressl \
-    tzdata \
   && rm -rf /tmp/* /var/cache/apk/*
 
 COPY --from=builder /app/diun /usr/local/bin/diun

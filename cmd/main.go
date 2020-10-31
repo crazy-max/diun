@@ -7,7 +7,6 @@ import (
 	"runtime"
 	"strings"
 	"syscall"
-	"time"
 
 	"github.com/alecthomas/kong"
 	"github.com/crazy-max/diun/v4/internal/app"
@@ -54,14 +53,8 @@ func main() {
 			Summary: true,
 		}))
 
-	// Load timezone location
-	location, err := time.LoadLocation(cli.Timezone)
-	if err != nil {
-		log.Fatal().Err(err).Msgf("Cannot load timezone %s", cli.Timezone)
-	}
-
 	// Init
-	logging.Configure(&cli, location)
+	logging.Configure(&cli)
 	log.Info().Str("version", version).Msgf("Starting %s", meta.Name)
 
 	// Handle os signals
@@ -82,7 +75,7 @@ func main() {
 	log.Debug().Msg(cfg.String())
 
 	// Init
-	if diun, err = app.New(meta, cli, cfg, location); err != nil {
+	if diun, err = app.New(meta, cli, cfg); err != nil {
 		log.Fatal().Err(err).Msgf("Cannot initialize %s", meta.Name)
 	}
 
