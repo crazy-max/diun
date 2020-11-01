@@ -1,6 +1,6 @@
-# Mqtt notifications
+# MQTT notifications
 
-You can send notifications to any mqtt compatible server with the following settings.
+You can send notifications to any MQTT compatible server with the following settings.
 
 ## Configuration
 
@@ -12,8 +12,8 @@ You can send notifications to any mqtt compatible server with the following sett
         port: 1883
         username: guest
         password: guest
-        topic: docker/diun
         client: diun
+        topic: docker/diun
         qos: 0
     ```
 
@@ -21,13 +21,13 @@ You can send notifications to any mqtt compatible server with the following sett
 |--------------------|---------------|---------------|
 | `host`[^1]         | `localhost`   | MQTT server host |
 | `port`[^1]         | `1883`        | MQTT server port |
-| `client`[^1]       | `diun-client` | Name of the client which connects to the server |
-| `topic`[^1]        | `docker/diun` | Topic the message will be sent to |
 | `username`         |               | MQTT username |
 | `usernameFile`     |               | Use content of secret file as MQTT username if `username` not defined |
 | `password`         |               | MQTT password |
 | `passwordFile`     |               | Use content of secret file as MQTT password if `password` not defined |
-| `qos`              | `0`           | Topic the message will be sent to |
+| `client`[^1]       |               | Client id to be used by this client when connecting to the MQTT broker |
+| `topic`[^1]        |               | Topic the message will be sent to |
+| `qos`              | `0`           | Ensured message delivery at specified Quality of Service (QoS) |
 
 ## Sample
 

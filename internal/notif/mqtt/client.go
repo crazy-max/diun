@@ -3,11 +3,11 @@ package mqtt
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/crazy-max/diun/v4/pkg/utl"
 	"time"
 
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/internal/notif/notifier"
+	"github.com/crazy-max/diun/v4/pkg/utl"
 	MQTT "github.com/eclipse/paho.mqtt.golang"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -16,8 +16,8 @@ import (
 // Client represents an active mqtt notification object
 type Client struct {
 	*notifier.Notifier
-	cfg  *model.NotifMqtt
-	meta model.Meta
+	cfg    *model.NotifMqtt
+	meta   model.Meta
 	logger zerolog.Logger
 }
 
@@ -25,8 +25,8 @@ type Client struct {
 func New(config *model.NotifMqtt, meta model.Meta) notifier.Notifier {
 	return notifier.Notifier{
 		Handler: &Client{
-			cfg:  config,
-			meta: meta,
+			cfg:    config,
+			meta:   meta,
 			logger: log.With().Str("notif", "mqtt").Logger(),
 		},
 	}
@@ -59,8 +59,6 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		return token.Error()
 	}
 
-	log.Debug().Msgf("Connected to broker: %s", broker)
-
 	message, err := json.Marshal(struct {
 		Version  string     `json:"diun_version"`
 		Hostname string     `json:"hostname"`
@@ -86,9 +84,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		return err
 	}
 
-	log.Debug().Msgf("Publishing to topic: %s", c.cfg.Topic)
 	token := client.Publish(c.cfg.Topic, byte(c.cfg.QoS), false, message)
 	token.Wait()
-
 	return token.Error()
 }

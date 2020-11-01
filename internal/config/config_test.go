@@ -121,6 +121,15 @@ func TestLoadFile(t *testing.T) {
 						RoomID:        "!abcdefGHIjklmno:matrix.org",
 						MsgType:       model.NotifMatrixMsgTypeNotice,
 					},
+					Mqtt: &model.NotifMqtt{
+						Host:     "localhost",
+						Port:     1883,
+						Username: "guest",
+						Password: "guest",
+						Client:   "diun",
+						Topic:    "docker/diun",
+						QoS:      0,
+					},
 					RocketChat: &model.NotifRocketChat{
 						Endpoint: "http://rocket.foo.com:3000",
 						Channel:  "#general",

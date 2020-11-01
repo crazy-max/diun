@@ -42,6 +42,14 @@ notif:
     user: "@foo:matrix.org"
     password: bar
     roomID: "!abcdefGHIjklmno:matrix.org"
+  mqtt:
+    host: "localhost"
+    port: 1883
+    username: "guest"
+    password: "guest"
+    client: "diun"
+    topic: "docker/diun"
+    qos: 0
   rocketchat:
     endpoint: http://rocket.foo.com:3000
     channel: "#general"

@@ -1,7 +1,6 @@
 package notif
 
 import (
-	"github.com/crazy-max/diun/v4/internal/notif/mqtt"
 	"strings"
 
 	"github.com/crazy-max/diun/v4/internal/model"
@@ -10,6 +9,7 @@ import (
 	"github.com/crazy-max/diun/v4/internal/notif/gotify"
 	"github.com/crazy-max/diun/v4/internal/notif/mail"
 	"github.com/crazy-max/diun/v4/internal/notif/matrix"
+	"github.com/crazy-max/diun/v4/internal/notif/mqtt"
 	"github.com/crazy-max/diun/v4/internal/notif/notifier"
 	"github.com/crazy-max/diun/v4/internal/notif/rocketchat"
 	"github.com/crazy-max/diun/v4/internal/notif/script"
