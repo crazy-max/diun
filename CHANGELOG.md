@@ -1,5 +1,14 @@
 # Changelog
 
+## 4.7.0 (2020/11/02)
+
+* Add MQTT notification (#192)
+* Docker image also available on [GitHub Container Registry](https://github.com/users/crazy-max/packages/container/package/diun)
+* Use zoneinfo from Go (#202)
+* Remove `--timezone` flag
+* Use Docker meta action to handle tags and labels
+* Update deps
+
 ## 4.6.1 (2020/10/22)
 
 * Typos in documentation
