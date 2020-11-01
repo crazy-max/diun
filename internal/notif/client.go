@@ -1,6 +1,7 @@
 package notif
 
 import (
+	"github.com/crazy-max/diun/v4/internal/notif/mqtt"
 	"strings"
 
 	"github.com/crazy-max/diun/v4/internal/model"
@@ -54,6 +55,9 @@ func New(config *model.Notif, meta model.Meta) (*Client, error) {
 	}
 	if config.Matrix != nil {
 		c.notifiers = append(c.notifiers, matrix.New(config.Matrix, meta))
+	}
+	if config.Mqtt != nil {
+		c.notifiers = append(c.notifiers, mqtt.New(config.Mqtt, meta))
 	}
 	if config.RocketChat != nil {
 		c.notifiers = append(c.notifiers, rocketchat.New(config.RocketChat, meta))
