@@ -3,7 +3,8 @@ name: build
 on:
   push:
     branches:
-      - '**'
+      - 'master'
+      - 'v*'
     tags:
       - 'v*'
     paths-ignore:
