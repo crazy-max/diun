@@ -101,6 +101,28 @@ func TestParseImage(t *testing.T) {
 				Tag:    "latest",
 			},
 		},
+		{
+			desc: "ghcr ddns-route53",
+			parseOpts: registry.ParseImageOptions{
+				Name: "ghcr.io/crazy-max/ddns-route53",
+			},
+			expected: registry.Image{
+				Domain: "ghcr.io",
+				Path:   "crazy-max/ddns-route53",
+				Tag:    "latest",
+			},
+		},
+		{
+			desc: "ghcr radarr",
+			parseOpts: registry.ParseImageOptions{
+				Name: "ghcr.io/linuxserver/radarr",
+			},
+			expected: registry.Image{
+				Domain: "ghcr.io",
+				Path:   "linuxserver/radarr",
+				Tag:    "latest",
+			},
+		},
 	}
 
 	for _, tt := range testCases {
@@ -184,6 +206,20 @@ func TestHubLink(t *testing.T) {
 				Name: "quay.io/coreos/hyperkube",
 			},
 			expected: "https://quay.io/repository/coreos/hyperkube",
+		},
+		{
+			desc: "ghcr ddns-route53",
+			parseOpts: registry.ParseImageOptions{
+				Name: "ghcr.io/crazy-max/ddns-route53",
+			},
+			expected: "https://github.com/users/crazy-max/packages/container/package/ddns-route53",
+		},
+		{
+			desc: "ghcr radarr",
+			parseOpts: registry.ParseImageOptions{
+				Name: "ghcr.io/linuxserver/radarr",
+			},
+			expected: "https://github.com/users/linuxserver/packages/container/package/radarr",
 		},
 		{
 			desc: "redhat etcd",
