@@ -119,6 +119,10 @@ func (i Image) hubLink() (string, error) {
 		return fmt.Sprintf("https://github.com/%s/packages", filepath.ToSlash(filepath.Dir(i.Path))), nil
 	case "gcr.io":
 		return fmt.Sprintf("https://%s/%s", i.Domain, i.Path), nil
+	case "ghcr.io":
+		ref := strings.Split(i.Path, "/")
+		ghUser, ghPackage := ref[0], ref[1]
+		return fmt.Sprintf("https://github.com/users/%s/packages/container/package/%s", ghUser, ghPackage), nil
 	case "quay.io":
 		return fmt.Sprintf("https://quay.io/repository/%s", i.Path), nil
 	case "registry.access.redhat.com":
