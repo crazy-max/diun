@@ -1,7 +1,7 @@
 /.idea
 /*.iml
 
-/.dev
+.dev
 /.git
 /.github
 /.res
