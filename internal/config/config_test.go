@@ -512,10 +512,10 @@ func TestValidation(t *testing.T) {
 			cfg, err := config.Load(tt.cli)
 			require.NoError(t, err)
 
-			dec, err := env.Encode(cfg)
+			dec, err := env.Encode("DIUN_", cfg)
 			require.NoError(t, err)
 			for _, value := range dec {
-				fmt.Println(fmt.Sprintf(`%s=%s`, strings.Replace(value.Name, "GONFIG_", "DIUN_", 1), value.Default))
+				fmt.Println(fmt.Sprintf(`%s=%s`, value.Name, value.Default))
 			}
 		})
 	}
