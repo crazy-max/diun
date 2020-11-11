@@ -7,6 +7,7 @@ import (
 	"runtime"
 	"strings"
 	"syscall"
+	_ "time/tzdata"
 
 	"github.com/alecthomas/kong"
 	"github.com/crazy-max/diun/v4/internal/app"

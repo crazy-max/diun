@@ -1,6 +1,6 @@
 module github.com/crazy-max/diun/v4
 
-go 1.13
+go 1.15
 
 require (
 	github.com/alecthomas/kong v0.2.11
