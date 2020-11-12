@@ -105,9 +105,19 @@ for free Docker accounts. But this rate limit is not necessarily an indicator on
 actually been downloaded. In fact, their _pulls_ counter/metric is actually a representation of the number of times a
 manifest for a particular image has been retrieved.
 
-As you probably know, Diun download the manifest of an image from its registry through a `GET` request to be able to
-retrive its inside metadata. Fortunately Diun doesn't perform a `GET` request at each scan but only when an image
-has been updated and/or added on the registry. This allows us not to exceed this rate limit in our situation, but
-it also strongly depends on the number of images you scan. To increase your pull rate limits you can upgrade
-your account to a [Docker Pro or Team subscription](https://www.docker.com/pricing) or you can tweak the
-[`schedule` setting](config/watch.md#schedule) with something like `0 */6 * * *` (every 6 hours).
+As you probably know, Diun downloads the manifest of an image from its registry through a `GET` request to be able to
+retrieve its inside metadata. Fortunately Diun doesn't perform a `GET` request at each scan but only when an image
+has been updated or added on the registry. This allows us not to exceed this rate limit in our situation, but
+it also **strongly depends on the number of images you scan**. To increase your pull rate limits you can upgrade
+your account to a [Docker Pro or Team subscription](https://www.docker.com/pricing) and authenticate against the
+registry through the [`regopts` settings](config/regopts.md): 
+
+```yaml
+regopts:
+  - name: "docker.io"
+    selector: image
+    username: foo
+    password: bar
+```
+
+Or you can tweak the [`schedule` setting](config/watch.md#schedule) with something like `0 */6 * * *` (every 6 hours).
