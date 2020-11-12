@@ -75,6 +75,7 @@ func TestLoadFile(t *testing.T) {
 					Workers:         100,
 					Schedule:        "*/30 * * * *",
 					FirstCheckNotif: utl.NewTrue(),
+					CompareDigest:   utl.NewTrue(),
 					Healthchecks: &model.Healthchecks{
 						BaseURL: "https://hc-ping.com/",
 						UUID:    "5bf66975-d4c7-4bf5-bcc8-b8d8a82ea278",

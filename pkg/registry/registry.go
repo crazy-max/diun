@@ -15,14 +15,15 @@ type Client struct {
 
 // Options holds docker registry object options
 type Options struct {
-	Username     string
-	Password     string
-	InsecureTLS  bool
-	Timeout      time.Duration
-	UserAgent    string
-	ImageOs      string
-	ImageArch    string
-	ImageVariant string
+	Username      string
+	Password      string
+	InsecureTLS   bool
+	Timeout       time.Duration
+	UserAgent     string
+	CompareDigest bool
+	ImageOs       string
+	ImageArch     string
+	ImageVariant  string
 }
 
 // New creates new docker registry client instance
@@ -48,6 +49,7 @@ func New(opts Options) (*Client, error) {
 	}
 
 	return &Client{
+		opts:   opts,
 		sysCtx: sysCtx,
 	}, nil
 }

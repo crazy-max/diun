@@ -44,13 +44,16 @@ func (c *Client) Manifest(image Image, dbManifest Manifest) (Manifest, error) {
 		return Manifest{}, errors.Wrap(err, "Cannot parse reference")
 	}
 
-	imgDigest, err := docker.GetDigest(ctx, c.sysCtx, imgRef)
-	if err != nil {
-		return Manifest{}, errors.Wrap(err, "Cannot get image digest")
-	}
+	var imgDigest digest.Digest
+	if c.opts.CompareDigest {
+		imgDigest, err = docker.GetDigest(ctx, c.sysCtx, imgRef)
+		if err != nil {
+			return Manifest{}, errors.Wrap(err, "Cannot get image digest from HEAD request")
+		}
 
-	if dbManifest.Digest != "" && dbManifest.Digest == imgDigest {
-		return dbManifest, nil
+		if dbManifest.Digest != "" && dbManifest.Digest == imgDigest {
+			return dbManifest, nil
+		}
 	}
 
 	imgCloser, err := imgRef.NewImage(ctx, c.sysCtx)
@@ -62,6 +65,13 @@ func (c *Client) Manifest(image Image, dbManifest Manifest) (Manifest, error) {
 	rawManifest, _, err := imgCloser.Manifest(ctx)
 	if err != nil {
 		return Manifest{}, errors.Wrap(err, "Cannot get raw manifest")
+	}
+
+	if !c.opts.CompareDigest {
+		imgDigest, err = manifest.Digest(rawManifest)
+		if err != nil {
+			return Manifest{}, errors.Wrap(err, "Cannot get digest")
+		}
 	}
 
 	imgInspect, err := imgCloser.Inspect(ctx)

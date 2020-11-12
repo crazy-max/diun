@@ -7,6 +7,7 @@ watch:
   workers: 10
   schedule: "0 */6 * * *"
   firstCheckNotif: false
+  compareDigest: true
   healthchecks:
     baseURL: https://hc-ping.com/
     uuid: 5bf66975-d4c7-4bf5-bcc8-b8d8a82ea278
@@ -52,6 +53,21 @@ Send notification at the very first analysis of an image. (default `false`)
 
 !!! abstract "Environment variables"
     * `DIUN_WATCH_FIRSTCHECKNOTIF`
+
+### `compareDigest`
+
+Compare the digest of an image with the registry before downloading the image manifest. It is strongly
+recommended to leave this value at `true`, especially with [Docker Hub which imposes a rate-limit](../faq.md#docker-hub-rate-limits)
+on image pull. (default `true`)
+
+!!! example "Config file"
+    ```yaml
+    watch:
+      compareDigest: false
+    ```
+
+!!! abstract "Environment variables"
+    * `DIUN_WATCH_COMPAREDIGEST`
 
 ### `healthchecks`
 

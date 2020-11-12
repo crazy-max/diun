@@ -80,14 +80,15 @@ func (di *Diun) createJob(job model.Job) {
 	}
 
 	job.Registry, err = registry.New(registry.Options{
-		Username:     regUser,
-		Password:     regPassword,
-		Timeout:      *reg.Timeout,
-		InsecureTLS:  *reg.InsecureTLS,
-		UserAgent:    di.meta.UserAgent,
-		ImageOs:      job.Image.Platform.Os,
-		ImageArch:    job.Image.Platform.Arch,
-		ImageVariant: job.Image.Platform.Variant,
+		Username:      regUser,
+		Password:      regPassword,
+		Timeout:       *reg.Timeout,
+		InsecureTLS:   *reg.InsecureTLS,
+		UserAgent:     di.meta.UserAgent,
+		CompareDigest: *di.cfg.Watch.CompareDigest,
+		ImageOs:       job.Image.Platform.Os,
+		ImageArch:     job.Image.Platform.Arch,
+		ImageVariant:  job.Image.Platform.Variant,
 	})
 	if err != nil {
 		sublog.Error().Err(err).Msg("Cannot create registry client")
