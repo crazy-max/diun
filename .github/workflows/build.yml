@@ -38,7 +38,7 @@ jobs:
         name: Set up Go
         uses: actions/setup-go@v2
         with:
-          go-version: 1.13
+          go-version: 1.15
       -
         name: Cache Go modules
         uses: actions/cache@v2
@@ -124,7 +124,7 @@ jobs:
         with:
           context: .
           file: ./Dockerfile
-          platforms: linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64,linux/386,linux/ppc64le,linux/s390x
+          platforms: linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64,linux/386,linux/ppc64le
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.docker_meta.outputs.tags }}
           build-args: |

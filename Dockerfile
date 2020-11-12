@@ -1,4 +1,4 @@
-ARG GO_VERSION=1.13
+ARG GO_VERSION=1.15
 ARG VERSION=dev
 
 FROM --platform=${BUILDPLATFORM:-linux/amd64} tonistiigi/xx:golang AS xgo
@@ -30,7 +30,6 @@ RUN apk --update --no-cache add \
   && rm -rf /tmp/* /var/cache/apk/*
 
 COPY --from=build /opt/diun /usr/local/bin/diun
-COPY --from=build /usr/local/go/lib/time/zoneinfo.zip /usr/local/go/lib/time/zoneinfo.zip
 RUN diun --version
 
 ENV DIUN_DB_PATH="/data/diun.db"
