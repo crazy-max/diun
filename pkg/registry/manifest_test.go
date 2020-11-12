@@ -24,7 +24,7 @@ func TestManifestVariant(t *testing.T) {
 		t.Error(err)
 	}
 
-	manifest, err := rc.Manifest(img)
+	manifest, err := rc.Manifest(img, registry.Manifest{})
 	assert.NoError(t, err)
 	assert.Equal(t, "docker.io/crazymax/diun", manifest.Name)
 	assert.Equal(t, "2.5.0", manifest.Tag)

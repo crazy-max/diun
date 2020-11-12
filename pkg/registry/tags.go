@@ -3,6 +3,7 @@ package registry
 import (
 	"github.com/containers/image/v5/docker"
 	"github.com/crazy-max/diun/v4/pkg/utl"
+	"github.com/pkg/errors"
 )
 
 // Tags holds information about image tags.
@@ -26,13 +27,18 @@ func (c *Client) Tags(opts TagsOptions) (*Tags, error) {
 	ctx, cancel := c.timeoutContext()
 	defer cancel()
 
-	imgCls, err := c.newImage(ctx, opts.Image.String())
+	imgRef, err := ParseReference(opts.Image.String())
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "Cannot parse reference")
 	}
-	defer imgCls.Close()
 
-	tags, err := docker.GetRepositoryTags(ctx, c.sysCtx, imgCls.Reference())
+	imgCloser, err := imgRef.NewImage(ctx, c.sysCtx)
+	if err != nil {
+		return nil, errors.Wrap(err, "Cannot create image closer")
+	}
+	defer imgCloser.Close()
+
+	tags, err := docker.GetRepositoryTags(ctx, c.sysCtx, imgCloser.Reference())
 	if err != nil {
 		return nil, err
 	}

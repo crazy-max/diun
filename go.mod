@@ -4,7 +4,7 @@ go 1.13
 
 require (
 	github.com/alecthomas/kong v0.2.11
-	github.com/containers/image/v5 v5.7.0
+	github.com/containers/image/v5 v5.7.1-0.20201112143342-1aef8ae0fec6
 	github.com/crazy-max/gohealthchecks v0.2.0
 	github.com/crazy-max/gonfig v0.4.0
 	github.com/docker/docker v1.4.2-0.20200204220554-5f6d6f3f2203
