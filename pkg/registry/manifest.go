@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/containers/image/v5/docker"
 	"github.com/containers/image/v5/manifest"
+	"github.com/containers/image/v5/types"
 	"github.com/opencontainers/go-digest"
 	"github.com/pkg/errors"
 )
@@ -23,11 +25,38 @@ type Manifest struct {
 }
 
 // Manifest returns the manifest for a specific image
-func (c *Client) Manifest(image Image) (Manifest, error) {
+func (c *Client) Manifest(image Image, dbManifest Manifest) (Manifest, error) {
 	ctx, cancel := c.timeoutContext()
 	defer cancel()
 
-	imgCloser, err := c.newImage(ctx, image.String())
+	if c.sysCtx.DockerAuthConfig == nil {
+		c.sysCtx.DockerAuthConfig = &types.DockerAuthConfig{}
+		// TODO: Seek credentials
+		//auth, err := config.GetCredentials(c.sysCtx, reference.Domain(ref.DockerReference()))
+		//if err != nil {
+		//	return nil, errors.Wrap(err, "Cannot get registry credentials")
+		//}
+		//*c.sysCtx.DockerAuthConfig = auth
+	}
+
+	imgRef, err := ParseReference(image.String())
+	if err != nil {
+		return Manifest{}, errors.Wrap(err, "Cannot parse reference")
+	}
+
+	var imgDigest digest.Digest
+	if c.opts.CompareDigest {
+		imgDigest, err = docker.GetDigest(ctx, c.sysCtx, imgRef)
+		if err != nil {
+			return Manifest{}, errors.Wrap(err, "Cannot get image digest from HEAD request")
+		}
+
+		if dbManifest.Digest != "" && dbManifest.Digest == imgDigest {
+			return dbManifest, nil
+		}
+	}
+
+	imgCloser, err := imgRef.NewImage(ctx, c.sysCtx)
 	if err != nil {
 		return Manifest{}, errors.Wrap(err, "Cannot create image closer")
 	}
@@ -38,14 +67,16 @@ func (c *Client) Manifest(image Image) (Manifest, error) {
 		return Manifest{}, errors.Wrap(err, "Cannot get raw manifest")
 	}
 
+	if !c.opts.CompareDigest {
+		imgDigest, err = manifest.Digest(rawManifest)
+		if err != nil {
+			return Manifest{}, errors.Wrap(err, "Cannot get digest")
+		}
+	}
+
 	imgInspect, err := imgCloser.Inspect(ctx)
 	if err != nil {
 		return Manifest{}, errors.Wrap(err, "Cannot inspect")
-	}
-
-	imgDigest, err := manifest.Digest(rawManifest)
-	if err != nil {
-		return Manifest{}, errors.Wrap(err, "Cannot get digest")
 	}
 
 	imgTag := imgInspect.Tag

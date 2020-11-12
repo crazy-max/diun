@@ -9,6 +9,7 @@ type Watch struct {
 	Workers         int           `yaml:"workers,omitempty" json:"workers,omitempty" validate:"required,min=1"`
 	Schedule        string        `yaml:"schedule,omitempty" json:"schedule,omitempty" validate:"required"`
 	FirstCheckNotif *bool         `yaml:"firstCheckNotif,omitempty" json:"firstCheckNotif,omitempty" validate:"required"`
+	CompareDigest   *bool         `yaml:"compareDigest,omitempty" json:"compareDigest,omitempty" validate:"required"`
 	Healthchecks    *Healthchecks `yaml:"healthchecks,omitempty" json:"healthchecks,omitempty"`
 }
 
@@ -24,4 +25,5 @@ func (s *Watch) SetDefaults() {
 	s.Workers = 10
 	s.Schedule = "0 * * * *"
 	s.FirstCheckNotif = utl.NewFalse()
+	s.CompareDigest = utl.NewTrue()
 }
