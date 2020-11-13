@@ -1,5 +1,16 @@
 # Changelog
 
+## 4.8.0 (2020/11/13)
+
+* Go 1.15 (#218)
+* Remove `linux/s390x` platform support (for now)
+* Check digest from HEAD request (#217)
+* Add FAQ note about Docker Hub rate limits
+* Compare digest as watch setting
+* Optimize build time
+* Add hub link for GitHub Container Registry (#211)
+* Update deps
+
 ## 4.7.0 (2020/11/02)
 
 * Add MQTT notification (#192)
