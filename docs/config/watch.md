@@ -63,7 +63,7 @@ on image pull. (default `true`)
 !!! example "Config file"
     ```yaml
     watch:
-      compareDigest: false
+      compareDigest: true
     ```
 
 !!! abstract "Environment variables"
