@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.8.1 (2020/11/14)
+
+* Fix registry timeout context (#221)
+* Image closer not required while fetching tags
+
 ## 4.8.0 (2020/11/13)
 
 * Go 1.15 (#218)
