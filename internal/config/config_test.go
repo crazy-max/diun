@@ -179,7 +179,7 @@ func TestLoadFile(t *testing.T) {
 						Username:    "foo",
 						Password:    "bar",
 						InsecureTLS: utl.NewFalse(),
-						Timeout:     utl.NewDuration(10 * time.Second),
+						Timeout:     utl.NewDuration(0),
 					},
 					{
 						Name:         "docker.io/crazymax",
@@ -187,7 +187,7 @@ func TestLoadFile(t *testing.T) {
 						UsernameFile: "./fixtures/run_secrets_username",
 						PasswordFile: "./fixtures/run_secrets_password",
 						InsecureTLS:  utl.NewFalse(),
-						Timeout:      utl.NewDuration(10 * time.Second),
+						Timeout:      utl.NewDuration(0),
 					},
 				},
 				Providers: &model.Providers{

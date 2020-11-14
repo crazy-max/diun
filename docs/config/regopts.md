@@ -9,7 +9,7 @@ regopts:
   - name: "myregistry"
     username: fii
     password: bor
-    timeout: 5s
+    timeout: 30s
   - name: "docker.io"
     selector: image
     username: foo
@@ -128,13 +128,13 @@ Use content of secret file as registry password if `password` not defined.
 
 ### `timeout`
 
-Timeout is the maximum amount of time for the TCP connection to establish. (default `10s`)
+Timeout is the maximum amount of time for the TCP connection to establish. (default `0` ; no timeout)
 
 !!! example "Config file"
     ```yaml
     regopts:
       - name: "myregistry"
-        timeout: 10s
+        timeout: 30s
     ```
 
 !!! abstract "Environment variables"

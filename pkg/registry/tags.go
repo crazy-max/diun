@@ -32,13 +32,7 @@ func (c *Client) Tags(opts TagsOptions) (*Tags, error) {
 		return nil, errors.Wrap(err, "Cannot parse reference")
 	}
 
-	imgCloser, err := imgRef.NewImage(ctx, c.sysCtx)
-	if err != nil {
-		return nil, errors.Wrap(err, "Cannot create image closer")
-	}
-	defer imgCloser.Close()
-
-	tags, err := docker.GetRepositoryTags(ctx, c.sysCtx, imgCloser.Reference())
+	tags, err := docker.GetRepositoryTags(ctx, c.sysCtx, imgRef)
 	if err != nil {
 		return nil, err
 	}

@@ -21,7 +21,7 @@ type RegOpt struct {
 	Password     string         `yaml:"password,omitempty" json:"password,omitempty" validate:"omitempty"`
 	PasswordFile string         `yaml:"passwordFile,omitempty" json:"passwordFile,omitempty" validate:"omitempty,file"`
 	InsecureTLS  *bool          `yaml:"insecureTLS,omitempty" json:"insecureTLS,omitempty" validate:"required"`
-	Timeout      *time.Duration `yaml:"timeout,omitempty" json:"timeout,omitempty" validate:"required"`
+	Timeout      *time.Duration `yaml:"timeout,omitempty" json:"timeout,omitempty"`
 }
 
 // RegOpt selector constants
@@ -44,7 +44,7 @@ func (s *RegOpt) GetDefaults() *RegOpt {
 func (s *RegOpt) SetDefaults() {
 	s.Selector = RegOptSelectorName
 	s.InsecureTLS = utl.NewFalse()
-	s.Timeout = utl.NewDuration(10 * time.Second)
+	s.Timeout = utl.NewDuration(0)
 }
 
 // Select returns a registry based on its selector
