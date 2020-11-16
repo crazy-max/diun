@@ -1,5 +1,13 @@
 # Changelog
 
+## 4.9.0 (2020/11/16)
+
+* Fix duplicated notifications
+* Remove support for `freebsd/*` (moby/moby#38818)
+* Add support for `linux/ppc64le` and `linux/s390x` (binary)
+* Bump k8s.io/client-go from 0.19.3 to 0.19.4 (#224)
+* Bump github.com/containers/image/v5 to 5.8.0
+
 ## 4.8.1 (2020/11/14)
 
 * Fix registry timeout context (#221)
