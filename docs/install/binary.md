@@ -6,14 +6,13 @@ Diun binaries are available on [releases]({{ config.repo_url }}releases) page.
 
 Choose the archive matching the destination platform:
 
-* [diun_{{ git.tag | trim('v') }}_darwin_i386.tar.gz]({{ config.repo_url }}releases/download/v{{ git.tag | trim('v') }}/diun_{{ git.tag | trim('v') }}_darwin_i386.tar.gz)
 * [diun_{{ git.tag | trim('v') }}_darwin_x86_64.tar.gz]({{ config.repo_url }}/releases/download/v{{ git.tag | trim('v') }}/diun_{{ git.tag | trim('v') }}_darwin_x86_64.tar.gz)
-* [diun_{{ git.tag | trim('v') }}_freebsd_i386.tar.gz]({{ config.repo_url }}/releases/download/v{{ git.tag | trim('v') }}/diun_{{ git.tag | trim('v') }}_freebsd_i386.tar.gz)
-* [diun_{{ git.tag | trim('v') }}_freebsd_x86_64.tar.gz]({{ config.repo_url }}/releases/download/v{{ git.tag | trim('v') }}/diun_{{ git.tag | trim('v') }}_freebsd_x86_64.tar.gz)
 * [diun_{{ git.tag | trim('v') }}_linux_arm64.tar.gz]({{ config.repo_url }}/releases/download/v{{ git.tag | trim('v') }}/diun_{{ git.tag | trim('v') }}_linux_arm64.tar.gz)
 * [diun_{{ git.tag | trim('v') }}_linux_armv6.tar.gz]({{ config.repo_url }}/releases/download/v{{ git.tag | trim('v') }}/diun_{{ git.tag | trim('v') }}_linux_armv6.tar.gz)
 * [diun_{{ git.tag | trim('v') }}_linux_armv7.tar.gz]({{ config.repo_url }}/releases/download/v{{ git.tag | trim('v') }}/diun_{{ git.tag | trim('v') }}_linux_armv7.tar.gz)
 * [diun_{{ git.tag | trim('v') }}_linux_i386.tar.gz]({{ config.repo_url }}/releases/download/v{{ git.tag | trim('v') }}/diun_{{ git.tag | trim('v') }}_linux_i386.tar.gz)
+* [diun_{{ git.tag | trim('v') }}_linux_ppc64le.tar.gz]({{ config.repo_url }}/releases/download/v{{ git.tag | trim('v') }}/diun_{{ git.tag | trim('v') }}_linux_ppc64le.tar.gz)
+* [diun_{{ git.tag | trim('v') }}_linux_s390x.tar.gz]({{ config.repo_url }}/releases/download/v{{ git.tag | trim('v') }}/diun_{{ git.tag | trim('v') }}_linux_s390x.tar.gz)
 * [diun_{{ git.tag | trim('v') }}_linux_x86_64.tar.gz]({{ config.repo_url }}/releases/download/v{{ git.tag | trim('v') }}/diun_{{ git.tag | trim('v') }}_linux_x86_64.tar.gz)
 * [diun_{{ git.tag | trim('v') }}_windows_i386.zip]({{ config.repo_url }}/releases/download/v{{ git.tag | trim('v') }}/diun_{{ git.tag | trim('v') }}_windows_i386.zip)
 * [diun_{{ git.tag | trim('v') }}_windows_x86_64.zip]({{ config.repo_url }}/releases/download/v{{ git.tag | trim('v') }}/diun_{{ git.tag | trim('v') }}_windows_x86_64.zip)
