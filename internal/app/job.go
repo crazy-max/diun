@@ -13,6 +13,7 @@ import (
 
 func (di *Diun) createJob(job model.Job) {
 	var err error
+	var prvImage registry.Image
 
 	sublog := log.With().
 		Str("provider", job.Provider).
@@ -20,7 +21,7 @@ func (di *Diun) createJob(job model.Job) {
 		Logger()
 
 	// Validate image
-	job.RegImage, err = registry.ParseImage(registry.ParseImageOptions{
+	prvImage, err = registry.ParseImage(registry.ParseImageOptions{
 		Name:   job.Image.Name,
 		HubTpl: job.Image.HubTpl,
 	})
@@ -28,6 +29,7 @@ func (di *Diun) createJob(job model.Job) {
 		sublog.Error().Err(err).Msg("Cannot parse image")
 		return
 	}
+	job.RegImage = prvImage
 
 	// First check?
 	job.FirstCheck, err = di.db.First(job.RegImage)
@@ -125,6 +127,9 @@ func (di *Diun) createJob(job model.Job) {
 	)
 
 	for _, tag := range tags.List {
+		if prvImage.Tag == tag {
+			continue
+		}
 		job.Image.Name = fmt.Sprintf("%s/%s:%s", job.RegImage.Domain, job.RegImage.Path, tag)
 		job.RegImage, err = registry.ParseImage(registry.ParseImageOptions{
 			Name:   job.Image.Name,
