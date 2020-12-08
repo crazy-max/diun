@@ -3,7 +3,7 @@ module github.com/crazy-max/diun/v4
 go 1.15
 
 require (
-	github.com/alecthomas/kong v0.2.11
+	github.com/alecthomas/kong v0.2.12
 	github.com/containers/image/v5 v5.9.0
 	github.com/crazy-max/gohealthchecks v0.2.0
 	github.com/crazy-max/gonfig v0.4.0
