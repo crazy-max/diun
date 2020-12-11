@@ -106,6 +106,8 @@ nav:
     - File: providers/file.md
     - Kubernetes: providers/kubernetes.md
     - Swarm: providers/swarm.md
+  - User guides:
+    - Docker + File providers: user-guides/docker-file-providers.md
   - FAQ: faq.md
   - Changelog: changelog.md
   - Migration:
