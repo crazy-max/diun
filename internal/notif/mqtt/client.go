@@ -16,9 +16,10 @@ import (
 // Client represents an active mqtt notification object
 type Client struct {
 	*notifier.Notifier
-	cfg    *model.NotifMqtt
-	meta   model.Meta
-	logger zerolog.Logger
+	cfg        *model.NotifMqtt
+	meta       model.Meta
+	logger     zerolog.Logger
+	mqttClient MQTT.Client
 }
 
 // New creates a new mqtt notification instance
@@ -54,9 +55,13 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	opts.Username = username
 	opts.Password = password
 
-	var client = MQTT.NewClient(opts)
-	if token := client.Connect(); token.Wait() && token.Error() != nil {
-		return token.Error()
+	if c.mqttClient == nil {
+		c.mqttClient = MQTT.NewClient(opts)
+	}
+	if !c.mqttClient.IsConnected() {
+		if token := c.mqttClient.Connect(); token.Wait() && token.Error() != nil {
+			return token.Error()
+		}
 	}
 
 	message, err := json.Marshal(struct {
@@ -84,7 +89,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		return err
 	}
 
-	token := client.Publish(c.cfg.Topic, byte(c.cfg.QoS), false, message)
+	token := c.mqttClient.Publish(c.cfg.Topic, byte(c.cfg.QoS), false, message)
 	token.Wait()
 	return token.Error()
 }
