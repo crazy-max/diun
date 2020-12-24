@@ -50,53 +50,7 @@ jobs:
         with:
           file: ./coverage.txt
 
-  artifacts:
-    runs-on: ubuntu-latest
-    needs: [ test ]
-    steps:
-      -
-        name: Checkout
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-      -
-        name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
-      -
-        name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-        with:
-          version: latest
-          buildkitd-flags: --debug
-      -
-        name: Build artifacts
-        uses: crazy-max/ghaction-docker-buildx-bake@v1
-        with:
-          targets: artifact-all
-      -
-        name: Move artifacts
-        run: |
-          mv ./dist/**/* ./dist/
-      -
-        name: Upload artifacts
-        uses: actions/upload-artifact@v2
-        with:
-          name: diun
-          path: ./dist/*
-          if-no-files-found: error
-      -
-        name: GitHub Release
-        uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
-        with:
-          draft: true
-          files: |
-            dist/*.tar.gz
-            dist/*.zip
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  docker:
+  build:
     runs-on: ubuntu-latest
     needs: [ test ]
     steps:
@@ -145,6 +99,22 @@ jobs:
           username: ${{ secrets.GHCR_USERNAME }}
           password: ${{ secrets.GHCR_TOKEN }}
       -
+        name: Build artifacts
+        uses: crazy-max/ghaction-docker-buildx-bake@v1
+        with:
+          targets: artifact-all
+      -
+        name: Move artifacts
+        run: |
+          mv ./dist/**/* ./dist/
+      -
+        name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: diun
+          path: ./dist/*
+          if-no-files-found: error
+      -
         name: Build image
         uses: crazy-max/ghaction-docker-buildx-bake@v1
         with:
@@ -153,6 +123,17 @@ jobs:
             ${{ steps.docker_meta.outputs.bake-file }}
           targets: image-all
           push: ${{ github.event_name != 'pull_request' }}
+      -
+        name: GitHub Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          draft: true
+          files: |
+            dist/*.tar.gz
+            dist/*.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       -
         name: Check manifest
         if: github.event_name != 'pull_request'
