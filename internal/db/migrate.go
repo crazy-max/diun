@@ -55,7 +55,11 @@ func (c *Client) migration2() error {
 	if err != nil {
 		return err
 	}
-	defer tx.Rollback()
+	defer func() {
+		if err := tx.Rollback(); err != nil {
+			log.Error().Err(err).Msg("Cannot rollback")
+		}
+	}()
 
 	bucket := tx.Bucket([]byte(bucketManifest))
 	curs := bucket.Cursor()

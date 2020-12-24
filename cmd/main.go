@@ -49,7 +49,7 @@ func main() {
 		kong.Description(fmt.Sprintf("%s. More info: %s", meta.Desc, meta.URL)),
 		kong.UsageOnError(),
 		kong.Vars{
-			"version": fmt.Sprintf("%s", version),
+			"version": version,
 		},
 		kong.ConfigureHelp(kong.HelpOptions{
 			Compact: true,
