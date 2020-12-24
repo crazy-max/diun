@@ -82,7 +82,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: diun
-          path: ./release-out/*
+          path: ./dist/*
           if-no-files-found: error
       -
         name: GitHub Release
