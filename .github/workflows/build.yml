@@ -153,9 +153,6 @@ jobs:
             ${{ steps.docker_meta.outputs.bake-file }}
           targets: image-all
           push: ${{ github.event_name != 'pull_request' }}
-        env:
-          TAGS: ${{ steps.docker_meta.outputs.tags }}
-          LABELS: ${{ steps.docker_meta.outputs.labels }}
       -
         name: Check manifest
         if: github.event_name != 'pull_request'

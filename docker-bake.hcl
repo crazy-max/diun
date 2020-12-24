@@ -14,6 +14,7 @@ target "go-version" {
   }
 }
 
+// Special target: https://github.com/crazy-max/ghaction-docker-meta#bake-definition
 target "ghaction-docker-meta" {
   tags = ["crazymax/diun:local"]
 }
@@ -74,7 +75,6 @@ target "artifact-all" {
 
 target "image" {
   inherits = ["go-version", "ghaction-docker-meta"]
-  cache-from = ["crazymax/diun:edge"]
 }
 
 target "image-all" {
