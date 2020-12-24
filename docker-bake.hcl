@@ -20,7 +20,7 @@ target "ghaction-docker-meta" {
 }
 
 group "default" {
-  targets = ["image"]
+  targets = ["image-local"]
 }
 
 group "validate" {
@@ -75,6 +75,11 @@ target "artifact-all" {
 
 target "image" {
   inherits = ["go-version", "ghaction-docker-meta"]
+}
+
+target "image-local" {
+  inherits = ["image"]
+  output = ["type=docker"]
 }
 
 target "image-all" {
