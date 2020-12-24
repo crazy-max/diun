@@ -103,7 +103,7 @@ builds:
   -
     main: ./cmd/main.go
     ldflags:
-      - -s -w -X "main.version={{ .Version }}" -X "main.commit={{ .ShortCommit }}"
+      - -s -w -X "main.version={{ .Version }}"
     env:
       - CGO_ENABLED=0
     goos:

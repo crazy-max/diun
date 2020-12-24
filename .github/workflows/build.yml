@@ -74,6 +74,17 @@ jobs:
         with:
           targets: artifact-all
       -
+        name: Move artifacts
+        run: |
+          mv ./dist/**/* ./dist/
+      -
+        name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: diun
+          path: ./release-out/*
+          if-no-files-found: error
+      -
         name: GitHub Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
