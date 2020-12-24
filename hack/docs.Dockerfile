@@ -1,7 +1,7 @@
-FROM squidfunk/mkdocs-material:6.1.7
+# syntax=docker/dockerfile:1.2
 
-RUN \
-  apk add --no-cache \
+FROM squidfunk/mkdocs-material:6.1.7 AS base
+RUN apk add --no-cache \
     git \
     git-fast-import \
     openssh \
@@ -14,3 +14,10 @@ RUN \
     'mkdocs-macros-plugin' \
   && apk del .build gcc musl-dev \
   && rm -rf /tmp/*
+
+FROM base AS generate
+RUN --mount=type=bind,target=. \
+  mkdocs build --strict --site-dir /tmp/site
+
+FROM scratch AS release
+COPY --from=generate /tmp/site/ /

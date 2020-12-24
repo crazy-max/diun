@@ -20,39 +20,55 @@ on:
       - 'docs/**'
       - 'mkdocs.yml'
 
+env:
+  DOCKERHUB_SLUG: crazymax/diun
+  GHCR_SLUG: ghcr.io/crazy-max/diun
+
 jobs:
-  go:
+  test:
     runs-on: ubuntu-latest
     steps:
       -
         name: Checkout
         uses: actions/checkout@v2
       -
-        name: Prepare
-        id: prep
-        run: |
-          if [[ $GITHUB_REF == refs/tags/* ]]; then
-            echo ::set-output name=tag_name::${GITHUB_REF#refs/tags/}
-          fi
-      -
-        name: Set up Go
-        uses: actions/setup-go@v2
-        with:
-          go-version: 1.15
-      -
-        name: Cache Go modules
-        uses: actions/cache@v2
-        with:
-          path: ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
-      -
-        name: GoReleaser
-        uses: goreleaser/goreleaser-action@v2
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
         with:
           version: latest
-          args: release --skip-publish --rm-dist
+          buildkitd-flags: --debug
+      -
+        name: Test
+        uses: crazy-max/ghaction-docker-buildx-bake@v1
+        with:
+          targets: test
+      -
+        name: Upload coverage
+        uses: codecov/codecov-action@v1
+        with:
+          file: ./coverage.txt
+
+  artifacts:
+    runs-on: ubuntu-latest
+    needs: [ test ]
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v2
+      -
+        name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+        with:
+          version: latest
+          buildkitd-flags: --debug
+      -
+        name: Build artifacts
+        uses: crazy-max/ghaction-docker-buildx-bake@v1
+        with:
+          targets: artifact-all
       -
         name: GitHub Release
         uses: softprops/action-gh-release@v1
@@ -60,18 +76,14 @@ jobs:
         with:
           draft: true
           files: |
-            dist/checksums.txt
             dist/*.tar.gz
             dist/*.zip
-          name: ${{ steps.prep.outputs.tag_name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   docker:
     runs-on: ubuntu-latest
-    env:
-      DOCKERHUB_SLUG: crazymax/diun
-      GHCR_SLUG: ghcr.io/crazy-max/diun
+    needs: [ test ]
     steps:
       -
         name: Checkout
@@ -84,9 +96,13 @@ jobs:
           images: |
             ${{ env.DOCKERHUB_SLUG }}
             ${{ env.GHCR_SLUG }}
+          tag-semver: |
+            {{version}}
           tag-edge: true
-          tag-match: ^v(\d{1,3}.\d{1,3}.\d{1,3})$
-          tag-match-group: 1
+          label-custom: |
+            org.opencontainers.image.title=Diun
+            org.opencontainers.image.description=Docker image update notifier
+            org.opencontainers.image.vendor=CrazyMax
       -
         name: Set up QEMU
         uses: docker/setup-qemu-action@v1
@@ -94,7 +110,8 @@ jobs:
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
         with:
-          buildkitd-flags: "--debug"
+          version: latest
+          buildkitd-flags: --debug
       -
         name: Login to DockerHub
         if: github.event_name != 'pull_request'
@@ -111,21 +128,17 @@ jobs:
           username: ${{ secrets.GHCR_USERNAME }}
           password: ${{ secrets.GHCR_TOKEN }}
       -
-        name: Build
-        uses: docker/build-push-action@v2
+        name: Build image
+        uses: crazy-max/ghaction-docker-buildx-bake@v1
         with:
-          context: .
-          file: ./Dockerfile
-          platforms: linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64,linux/386,linux/ppc64le
+          files: |
+            ./docker-bake.hcl
+            ${{ steps.docker_meta.outputs.bake-file }}
+          targets: image-all
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.docker_meta.outputs.tags }}
-          build-args: |
-            VERSION=${{ steps.docker_meta.outputs.version }}
-          labels: |
-            ${{ steps.docker_meta.outputs.labels }}
-            org.opencontainers.image.title=Diun
-            org.opencontainers.image.description=Docker image update notifier
-            org.opencontainers.image.vendor=CrazyMax
+        env:
+          TAGS: ${{ steps.docker_meta.outputs.tags }}
+          LABELS: ${{ steps.docker_meta.outputs.labels }}
       -
         name: Check manifest
         if: github.event_name != 'pull_request'

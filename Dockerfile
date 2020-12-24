@@ -1,27 +1,35 @@
+# syntax=docker/dockerfile:1.2
 ARG GO_VERSION=1.15
-ARG VERSION=dev
+ARG GORELEASER_VERSION=0.149.0
 
-FROM --platform=${BUILDPLATFORM:-linux/amd64} tonistiigi/xx:golang AS xgo
-
-FROM --platform=${BUILDPLATFORM:-linux/amd64} golang:${GO_VERSION}-alpine AS base
-RUN apk add --no-cache curl gcc git musl-dev
-COPY --from=xgo / /
+FROM --platform=$BUILDPLATFORM golang:${GO_VERSION}-alpine AS base
+ARG GORELEASER_VERSION
+RUN apk add --no-cache ca-certificates curl gcc file git musl-dev tar
+RUN wget -qO- https://github.com/goreleaser/goreleaser/releases/download/v${GORELEASER_VERSION}/goreleaser_Linux_x86_64.tar.gz | tar -zxvf - goreleaser \
+  && mv goreleaser /usr/local/bin/goreleaser
 WORKDIR /src
 
 FROM base AS gomod
-COPY . .
-RUN go mod download
+RUN --mount=type=bind,target=.,rw \
+  --mount=type=cache,target=/go/pkg/mod \
+  go mod tidy && go mod download
 
 FROM gomod AS build
 ARG TARGETPLATFORM
 ARG TARGETOS
 ARG TARGETARCH
-ARG VERSION
-ENV CGO_ENABLED 0
-ENV GOPROXY https://goproxy.io,direct
-RUN go build -ldflags "-w -s -X 'main.version=${VERSION}'" -v -o /opt/diun cmd/main.go
+ARG TARGETVARIANT
+ARG GIT_REF
+RUN --mount=type=bind,target=/src,rw \
+  --mount=type=cache,target=/root/.cache/go-build \
+  --mount=target=/go/pkg/mod,type=cache \
+  ./hack/goreleaser.sh
 
-FROM --platform=${TARGETPLATFORM:-linux/amd64} alpine:latest
+FROM scratch AS artifacts
+COPY --from=build /out/*.tar.gz /
+COPY --from=build /out/*.zip /
+
+FROM --platform=$TARGETPLATFORM alpine
 LABEL maintainer="CrazyMax"
 
 RUN apk --update --no-cache add \
@@ -29,7 +37,7 @@ RUN apk --update --no-cache add \
     libressl \
   && rm -rf /tmp/* /var/cache/apk/*
 
-COPY --from=build /opt/diun /usr/local/bin/diun
+COPY --from=build /usr/local/bin/diun /usr/local/bin/diun
 RUN diun --version
 
 ENV DIUN_DB_PATH="/data/diun.db"

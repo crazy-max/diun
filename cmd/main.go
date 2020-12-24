@@ -21,6 +21,7 @@ var (
 	diun    *app.Diun
 	cli     model.Cli
 	version = "dev"
+	commit  = ""
 	meta    = model.Meta{
 		ID:     "diun",
 		Name:   "Diun",
@@ -36,7 +37,8 @@ func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
 	meta.Version = version
-	meta.UserAgent = fmt.Sprintf("%s/%s go/%s %s", meta.ID, meta.Version, runtime.Version()[2:], strings.Title(runtime.GOOS))
+	meta.Commit = commit
+	meta.UserAgent = fmt.Sprintf("%s/%s go/%s %s-%s", meta.ID, meta.Version, meta.Commit, runtime.Version()[2:], strings.Title(runtime.GOOS))
 	if meta.Hostname, err = os.Hostname(); err != nil {
 		log.Fatal().Err(err).Msg("Cannot resolve hostname")
 	}

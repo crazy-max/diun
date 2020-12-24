@@ -9,6 +9,7 @@ type Meta struct {
 	Logo      string
 	Author    string
 	Version   string
+	Commit    string
 	UserAgent string
 	Hostname  string
 }
