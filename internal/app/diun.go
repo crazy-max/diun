@@ -101,7 +101,7 @@ func (di *Diun) Start() error {
 	// Start scheduler
 	di.cron.Start()
 	log.Info().Msgf("Next run in %s (%s)",
-		durafmt.ParseShort(di.cron.Entry(di.jobID).Next.Sub(time.Now())).String(),
+		durafmt.ParseShort(time.Until(di.cron.Entry(di.jobID).Next)).String(),
 		di.cron.Entry(di.jobID).Next)
 
 	select {}
@@ -116,7 +116,7 @@ func (di *Diun) Run() {
 	defer atomic.StoreUint32(&di.locker, 0)
 	if di.jobID > 0 {
 		defer log.Info().Msgf("Next run in %s (%s)",
-			durafmt.ParseShort(di.cron.Entry(di.jobID).Next.Sub(time.Now())).String(),
+			durafmt.ParseShort(time.Until(di.cron.Entry(di.jobID).Next)).String(),
 			di.cron.Entry(di.jobID).Next)
 	}
 

@@ -11,6 +11,7 @@ import (
 	"github.com/matrix-org/gomatrix"
 	"github.com/microcosm-cc/bluemonday"
 	"github.com/pkg/errors"
+	"github.com/rs/zerolog/log"
 	"github.com/russross/blackfriday/v2"
 )
 
@@ -42,7 +43,11 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	if err != nil {
 		return errors.Wrap(err, "failed to initialize Matrix client")
 	}
-	defer m.Logout()
+	defer func() {
+		if _, err := m.Logout(); err != nil {
+			log.Error().Err(err).Msg("Cannot logout")
+		}
+	}()
 
 	user, err := utl.GetSecret(c.cfg.User, c.cfg.UserFile)
 	if err != nil {

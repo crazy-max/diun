@@ -8,6 +8,7 @@ Choose the archive matching the destination platform:
 
 * [diun_{{ git.tag | trim('v') }}_darwin_x86_64.tar.gz]({{ config.repo_url }}/releases/download/v{{ git.tag | trim('v') }}/diun_{{ git.tag | trim('v') }}_darwin_x86_64.tar.gz)
 * [diun_{{ git.tag | trim('v') }}_linux_arm64.tar.gz]({{ config.repo_url }}/releases/download/v{{ git.tag | trim('v') }}/diun_{{ git.tag | trim('v') }}_linux_arm64.tar.gz)
+* [diun_{{ git.tag | trim('v') }}_linux_armv5.tar.gz]({{ config.repo_url }}/releases/download/v{{ git.tag | trim('v') }}/diun_{{ git.tag | trim('v') }}_linux_armv5.tar.gz)
 * [diun_{{ git.tag | trim('v') }}_linux_armv6.tar.gz]({{ config.repo_url }}/releases/download/v{{ git.tag | trim('v') }}/diun_{{ git.tag | trim('v') }}_linux_armv6.tar.gz)
 * [diun_{{ git.tag | trim('v') }}_linux_armv7.tar.gz]({{ config.repo_url }}/releases/download/v{{ git.tag | trim('v') }}/diun_{{ git.tag | trim('v') }}_linux_armv7.tar.gz)
 * [diun_{{ git.tag | trim('v') }}_linux_i386.tar.gz]({{ config.repo_url }}/releases/download/v{{ git.tag | trim('v') }}/diun_{{ git.tag | trim('v') }}_linux_i386.tar.gz)

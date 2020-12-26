@@ -59,7 +59,6 @@ plugins:
   - exclude:
       glob:
         - "_overrides/*"
-        - "Dockerfile"
   - git-revision-date-localized:
       type: iso_datetime
   - macros
