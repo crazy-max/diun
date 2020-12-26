@@ -5,4 +5,5 @@
 /bin
 /dist
 /site
+/.goreleaser.yml
 /coverage.txt
