@@ -136,7 +136,7 @@ EOL
 gitTag=""
 case "$GIT_REF" in
   refs/tags/v*)
-    gitTag="${GIT_REF#refs/tags/v}"
+    gitTag="${GIT_REF#refs/tags/}"
     export GORELEASER_CURRENT_TAG=$gitTag
     ;;
   *)
@@ -151,9 +151,6 @@ echo "git tag found: ${gitTag}"
 
 gitDirty="true"
 if git describe --exact-match --tags --match "$gitTag" >/dev/null 2>&1; then
-  gitDirty="false"
-fi
-if [ -n "$GORELEASER_CURRENT_TAG" ]; then
   gitDirty="false"
 fi
 echo "git dirty: ${gitDirty}"
