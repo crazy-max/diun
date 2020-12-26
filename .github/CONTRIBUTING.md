@@ -27,5 +27,5 @@ Here are a few things you can do that will increase the likelihood of your pull 
 ## Resources
 
 * [How to Contribute to Open Source](https://opensource.guide/how-to-contribute/)
-* [Using Pull Requests](https://help.github.com/articles/about-pull-requests/)
-* [GitHub Help](https://help.github.com)
+* [Using Pull Requests](https://docs.github.com/free-pro-team@latest/github/collaborating-with-issues-and-pull-requests/about-pull-requests)
+* [GitHub Help](https://docs.github.com)
