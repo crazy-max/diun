@@ -1,5 +1,20 @@
 # Changelog
 
+## 4.10.0 (2020/12/26)
+
+* Refactor CI and dev workflow with buildx bake (#247)
+  * Upload artifacts
+  * Add `image-local` target
+  * Single job for artifacts and image
+  * Add `armv5` artifact
+* MQTT Reconnection Log Spam (#241)
+* Add Docker + File providers user guide (#239)
+* Bump github.com/alecthomas/kong from 0.2.11 to 0.2.12 (#231)
+* Bump github.com/eclipse/paho.mqtt.golang from 1.2.0 to 1.3.0 (#235)
+* Bump github.com/containers/image/v5 from 5.8.1 to 5.9.0 (#236)
+* Bump gopkg.in/yaml.v2 from 2.3.0 to 2.4.0 (#228)
+* Bump github.com/containers/image/v5 from 5.8.0 to 5.8.1 (#226)
+
 ## 4.9.0 (2020/11/16)
 
 * Fix duplicated notifications
