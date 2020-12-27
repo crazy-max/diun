@@ -161,10 +161,12 @@ func (di *Diun) runJob(job model.Job) (entry model.NotifEntry) {
 		Logger()
 
 	if !utl.IsIncluded(job.RegImage.Tag, job.Image.IncludeTags) {
-		sublog.Warn().Msg("Tag not included")
+		entry.Status = model.ImageStatusSkip
+		sublog.Debug().Msg("Tag not included")
 		return
 	} else if utl.IsExcluded(job.RegImage.Tag, job.Image.ExcludeTags) {
-		sublog.Warn().Msg("Tag excluded")
+		entry.Status = model.ImageStatusSkip
+		sublog.Debug().Msg("Tag excluded")
 		return
 	}
 

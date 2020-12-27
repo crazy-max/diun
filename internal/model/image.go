@@ -24,6 +24,7 @@ const (
 	ImageStatusNew      = ImageStatus("new")
 	ImageStatusUpdate   = ImageStatus("update")
 	ImageStatusUnchange = ImageStatus("unchange")
+	ImageStatusSkip     = ImageStatus("skip")
 	ImageStatusError    = ImageStatus("error")
 )
 

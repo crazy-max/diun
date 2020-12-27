@@ -158,6 +158,7 @@ func (di *Diun) Run() {
 		Int("added", entries.CountNew).
 		Int("updated", entries.CountUpdate).
 		Int("unchanged", entries.CountUnchange).
+		Int("skipped", entries.CountSkip).
 		Int("failed", entries.CountError).
 		Msg("Jobs completed")
 }

@@ -32,6 +32,7 @@ func (di *Diun) HealthchecksSuccess(entries *model.NotifEntries) {
 * {{ .CountNew }} new tag(s) found
 * {{ .CountUpdate }} tag(s) updated
 * {{ .CountUnchange }} tag(s) unchanged
+* {{ .CountSkip }} tag(s) skipped
 * {{ .CountError }} tag(s) with error`))
 	if err := logsTpl.Execute(&logsBuf, entries); err != nil {
 		log.Error().Err(err).Msgf("Cannot create logs for Healthchecks success event")
