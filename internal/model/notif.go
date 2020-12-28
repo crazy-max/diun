@@ -10,6 +10,7 @@ type NotifEntries struct {
 	CountNew      int
 	CountUpdate   int
 	CountUnchange int
+	CountSkip     int
 	CountError    int
 	CountTotal    int
 }
@@ -60,6 +61,9 @@ func (s *NotifEntries) Add(entry NotifEntry) {
 		s.CountTotal++
 	case ImageStatusUnchange:
 		s.CountUnchange++
+		s.CountTotal++
+	case ImageStatusSkip:
+		s.CountSkip++
 		s.CountTotal++
 	case ImageStatusError:
 		s.CountError++
