@@ -91,7 +91,10 @@ func (di *Diun) Start() error {
 	// Run on startup
 	di.Run()
 
-	// Init scheduler
+	// Init scheduler if defined
+	if len(di.cfg.Watch.Schedule) == 0 {
+		return nil
+	}
 	di.jobID, err = di.cron.AddJob(di.cfg.Watch.Schedule, di)
 	if err != nil {
 		return err
