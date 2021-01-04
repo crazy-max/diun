@@ -2,12 +2,14 @@ package pushover
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"text/template"
 	"time"
 
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/internal/notif/notifier"
+	"github.com/crazy-max/diun/v4/pkg/utl"
 	"github.com/gregdel/pushover"
 )
 
@@ -35,8 +37,18 @@ func (c *Client) Name() string {
 
 // Send creates and sends a Pushover notification with an entry
 func (c *Client) Send(entry model.NotifEntry) error {
-	app := pushover.New(c.cfg.Token)
-	recipient := pushover.NewRecipient(c.cfg.Recipient)
+	token, err := utl.GetSecret(c.cfg.Token, c.cfg.TokenFile)
+	if err != nil {
+		return errors.New("Cannot retrieve token secret for Pushover notifier")
+	}
+
+	recipient, err := utl.GetSecret(c.cfg.Recipient, c.cfg.RecipientFile)
+	if err != nil {
+		return errors.New("Cannot retrieve recipient secret for Pushover notifier")
+	}
+
+	app := pushover.New(token)
+	user := pushover.NewRecipient(recipient)
 
 	title := fmt.Sprintf("Image update for %s", entry.Image.String())
 	if entry.Status == model.ImageStatusNew {
@@ -60,7 +72,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		return err
 	}
 
-	_, err := app.GetRecipientDetails(recipient)
+	_, err = app.GetRecipientDetails(user)
 	if err != nil {
 		return err
 	}
@@ -73,7 +85,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		URLTitle:  c.meta.Name,
 		Timestamp: time.Now().Unix(),
 		HTML:      true,
-	}, recipient)
+	}, user)
 
 	return err
 }
