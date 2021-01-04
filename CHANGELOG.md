@@ -1,5 +1,14 @@
 # Changelog
 
+## 4.11.0 (2021/01/04)
+
+* Fix DB migration (#255)
+* Add Pushover notification (#254)
+* Avoid duplicated notifications with Kubernetes DaemonSet (#252)
+* Make scheduler optional (#251)
+* Bump github.com/eclipse/paho.mqtt.golang from 1.3.0 to 1.3.1 (#249)
+* Handle exclusions as a distinct status (#248)
+
 ## 4.10.0 (2020/12/26)
 
 * Refactor CI and dev workflow with buildx bake (#247)
