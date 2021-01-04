@@ -16,7 +16,9 @@ func (c *Client) PodList(opts metav1.ListOptions) ([]v1.Pod, error) {
 		if err != nil {
 			return nil, err
 		}
-		podList = append(podList, pods.Items...)
+		for _, pod := range pods.Items {
+			podList = appendPod(podList, pod)
+		}
 	}
 
 	sort.Slice(podList, func(i, j int) bool {
@@ -24,4 +26,13 @@ func (c *Client) PodList(opts metav1.ListOptions) ([]v1.Pod, error) {
 	})
 
 	return podList, nil
+}
+
+func appendPod(pods []v1.Pod, i v1.Pod) []v1.Pod {
+	for _, pod := range pods {
+		if len(pod.OwnerReferences) > 0 && len(i.OwnerReferences) > 0 && pod.OwnerReferences[0].UID == i.OwnerReferences[0].UID {
+			return pods
+		}
+	}
+	return append(pods, i)
 }
