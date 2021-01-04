@@ -18,16 +18,16 @@ Allow to send notifications to your Discord channel.
         timeout: 10s
     ```
 
-!!! abstract "Environment variables"
-    * `DIUN_NOTIF_DISCORD_WEBHOOKURL`
-    * `DIUN_NOTIF_DISCORD_MENTIONS`
-    * `DIUN_NOTIF_DISCORD_TIMEOUT`
-
 | Name               | Default       | Description   |
 |--------------------|---------------|---------------|
 | `webhookURL`[^1]   |               | Discord [incoming webhook URL](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks) |
 | `mentions`          |              | List of users or roles to notify |
 | `timeout`          | `10s`         | Timeout specifies a time limit for the request to be made |
+
+!!! abstract "Environment variables"
+    * `DIUN_NOTIF_DISCORD_WEBHOOKURL`
+    * `DIUN_NOTIF_DISCORD_MENTIONS`
+    * `DIUN_NOTIF_DISCORD_TIMEOUT`
 
 ## Sample
 

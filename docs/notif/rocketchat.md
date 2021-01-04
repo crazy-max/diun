@@ -15,13 +15,6 @@ Allow to send notifications to your Rocket.Chat channel.
         timeout: 10s
     ```
 
-!!! abstract "Environment variables"
-    * `DIUN_NOTIF_ROCKETCHAT_ENDPOINT`
-    * `DIUN_NOTIF_ROCKETCHAT_CHANNEL`
-    * `DIUN_NOTIF_ROCKETCHAT_USERID`
-    * `DIUN_NOTIF_ROCKETCHAT_TOKEN`
-    * `DIUN_NOTIF_ROCKETCHAT_TIMEOUT`
-
 | Name               | Default       | Description   |
 |--------------------|---------------|---------------|
 | `endpoint`[^1]     |               | Rocket.Chat base URL |
@@ -32,6 +25,13 @@ Allow to send notifications to your Rocket.Chat channel.
 
 !!! warning
     You must first create a _Personal Access Token_ through your account settings on your Rocket.Chat instance.
+
+!!! abstract "Environment variables"
+    * `DIUN_NOTIF_ROCKETCHAT_ENDPOINT`
+    * `DIUN_NOTIF_ROCKETCHAT_CHANNEL`
+    * `DIUN_NOTIF_ROCKETCHAT_USERID`
+    * `DIUN_NOTIF_ROCKETCHAT_TOKEN`
+    * `DIUN_NOTIF_ROCKETCHAT_TIMEOUT`
 
 ## Sample
 

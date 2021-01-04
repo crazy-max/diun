@@ -14,12 +14,12 @@ You can send notifications to your Slack channel using an [incoming webhook URL]
         webhookURL: https://hooks.slack.com/services/ABCD12EFG/HIJK34LMN/01234567890abcdefghij
     ```
 
-!!! abstract "Environment variables"
-    * `DIUN_NOTIF_SLACK_WEBHOOKURL`
-
 | Name               | Default       | Description   |
 |--------------------|---------------|---------------|
 | `webhookURL`[^1]   |               | Slack [incoming webhook URL](https://api.slack.com/messaging/webhooks) |
+
+!!! abstract "Environment variables"
+    * `DIUN_NOTIF_SLACK_WEBHOOKURL`
 
 ## Sample
 
