@@ -8,6 +8,7 @@ import (
 	"github.com/opencontainers/go-digest"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
+	"go.etcd.io/bbolt"
 )
 
 // Migrate runs database migration
@@ -56,7 +57,7 @@ func (c *Client) migration2() error {
 		return err
 	}
 	defer func() {
-		if err := tx.Rollback(); err != nil {
+		if err := tx.Rollback(); err != nil && err != bbolt.ErrTxClosed {
 			log.Error().Err(err).Msg("Cannot rollback")
 		}
 	}()
