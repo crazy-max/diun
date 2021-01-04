@@ -16,18 +16,18 @@ You can send webhook notifications with the following settings.
         timeout: 10s
     ```
 
-!!! abstract "Environment variables"
-    * `DIUN_NOTIF_WEBHOOK_ENDPOINT`
-    * `DIUN_NOTIF_WEBHOOK_METHOD`
-    * `DIUN_NOTIF_WEBHOOK_HEADERS_<KEY>`
-    * `DIUN_NOTIF_WEBHOOK_TIMEOUT`
-
 | Name               | Default       | Description   |
 |--------------------|---------------|---------------|
 | `endpoint`[^1]     |               | URL of the HTTP request |
 | `method`[^1]       | `GET`         | HTTP method |
 | `headers`          |               | Map of additional headers to be sent (key is case insensitive) |
 | `timeout`          | `10s`         | Timeout specifies a time limit for the request to be made |
+
+!!! abstract "Environment variables"
+    * `DIUN_NOTIF_WEBHOOK_ENDPOINT`
+    * `DIUN_NOTIF_WEBHOOK_METHOD`
+    * `DIUN_NOTIF_WEBHOOK_HEADERS_<KEY>`
+    * `DIUN_NOTIF_WEBHOOK_TIMEOUT`
 
 ## Sample
 

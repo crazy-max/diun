@@ -131,6 +131,10 @@ func TestLoadFile(t *testing.T) {
 						Topic:    "docker/diun",
 						QoS:      0,
 					},
+					Pushover: &model.NotifPushover{
+						Token:     "uQiRzpo4DXghDmr9QzzfQu27cmVRsG",
+						Recipient: "gznej3rKEVAvPUxu9vvNnqpmZpokzF",
+					},
 					RocketChat: &model.NotifRocketChat{
 						Endpoint: "http://rocket.foo.com:3000",
 						Channel:  "#general",

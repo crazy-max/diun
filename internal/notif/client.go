@@ -11,6 +11,7 @@ import (
 	"github.com/crazy-max/diun/v4/internal/notif/matrix"
 	"github.com/crazy-max/diun/v4/internal/notif/mqtt"
 	"github.com/crazy-max/diun/v4/internal/notif/notifier"
+	"github.com/crazy-max/diun/v4/internal/notif/pushover"
 	"github.com/crazy-max/diun/v4/internal/notif/rocketchat"
 	"github.com/crazy-max/diun/v4/internal/notif/script"
 	"github.com/crazy-max/diun/v4/internal/notif/slack"
@@ -58,6 +59,9 @@ func New(config *model.Notif, meta model.Meta) (*Client, error) {
 	}
 	if config.Mqtt != nil {
 		c.notifiers = append(c.notifiers, mqtt.New(config.Mqtt, meta))
+	}
+	if config.Pushover != nil {
+		c.notifiers = append(c.notifiers, pushover.New(config.Pushover, meta))
 	}
 	if config.RocketChat != nil {
 		c.notifiers = append(c.notifiers, rocketchat.New(config.RocketChat, meta))

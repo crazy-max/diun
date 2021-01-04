@@ -19,14 +19,14 @@ Multiple chat IDs can be provided in order to deliver notifications to multiple 
           - 987654321
     ```
 
-!!! abstract "Environment variables"
-    * `DIUN_NOTIF_TELEGRAM_TOKEN`
-    * `DIUN_NOTIF_TELEGRAM_CHATIDS` (comma separated)
-
 | Name               | Default       | Description   |
 |--------------------|---------------|---------------|
 | `token`[^1]        |               | Telegram bot token |
 | `chatIDs`[^1]      |               | List of chat IDs to send notifications to |
+
+!!! abstract "Environment variables"
+    * `DIUN_NOTIF_TELEGRAM_TOKEN`
+    * `DIUN_NOTIF_TELEGRAM_CHATIDS` (comma separated)
 
 ## Sample
 

@@ -94,6 +94,7 @@ nav:
     - Mail: notif/mail.md
     - Matrix: notif/matrix.md
     - MQTT: notif/mqtt.md
+    - Pushover: notif/pushover.md
     - Rocket.Chat: notif/rocketchat.md
     - Script: notif/script.md
     - Slack: notif/slack.md

@@ -29,6 +29,17 @@ You can send notifications to any MQTT compatible server with the following sett
 | `topic`[^1]        |               | Topic the message will be sent to |
 | `qos`              | `0`           | Ensured message delivery at specified Quality of Service (QoS) |
 
+!!! abstract "Environment variables"
+    * `DIUN_NOTIF_MQTT_HOST`
+    * `DIUN_NOTIF_MQTT_PORT`
+    * `DIUN_NOTIF_MQTT_USERNAME`
+    * `DIUN_NOTIF_MQTT_USERNAMEFILE`
+    * `DIUN_NOTIF_MQTT_PASSWORD`
+    * `DIUN_NOTIF_MQTT_PASSWORDFILE`
+    * `DIUN_NOTIF_MQTT_CLIENT`
+    * `DIUN_NOTIF_MQTT_TOPIC`
+    * `DIUN_NOTIF_MQTT_QOS`
+
 ## Sample
 
 The JSON response will look like this:

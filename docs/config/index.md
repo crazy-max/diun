@@ -206,6 +206,7 @@ Can be transposed to:
     * [mail](../notif/mail.md)
     * [matrix](../notif/matrix.md)
     * [mqtt](../notif/mqtt.md)
+    * [pushover](../notif/pushover.md)
     * [rocketchat](../notif/rocketchat.md)
     * [script](../notif/script.md)
     * [slack](../notif/slack.md)

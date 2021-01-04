@@ -51,6 +51,9 @@ notif:
     client: "diun"
     topic: "docker/diun"
     qos: 0
+  pushover:
+    token: uQiRzpo4DXghDmr9QzzfQu27cmVRsG
+    recipient: gznej3rKEVAvPUxu9vvNnqpmZpokzF
   rocketchat:
     endpoint: http://rocket.foo.com:3000
     channel: "#general"
