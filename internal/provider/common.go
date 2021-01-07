@@ -6,10 +6,12 @@ import (
 	"strings"
 
 	"github.com/crazy-max/diun/v4/internal/model"
+	"github.com/rs/zerolog/log"
 )
 
 // ValidateContainerImage returns a standard image through Docker labels
 func ValidateContainerImage(image string, labels map[string]string, watchByDef bool) (img model.Image, err error) {
+	log.Debug().Msgf("Validating %s", image)
 	if i := strings.Index(image, "@sha256:"); i > 0 {
 		image = image[:i]
 	}
