@@ -5,7 +5,7 @@ You can call a script when a notification occured. Following environment variabl
 ```
 DIUN_VERSION=3.0.0
 DIUN_ENTRY_STATUS=new
-DIUN_ENTRY_HOSTNAME=myserver
+DIUN_HOSTNAME=myserver
 DIUN_ENTRY_PROVIDER=file
 DIUN_ENTRY_IMAGE=docker.io/crazymax/diun:latest
 DIUN_ENTRY_HUBLINK=https://hub.docker.com/r/crazymax/diun
