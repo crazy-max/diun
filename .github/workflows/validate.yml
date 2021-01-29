@@ -25,6 +25,6 @@ jobs:
           version: latest
       -
         name: Validate
-        uses: crazy-max/ghaction-docker-buildx-bake@v1
+        uses: docker/bake-action@v1
         with:
           targets: validate
