@@ -36,7 +36,7 @@ jobs:
           version: latest
       -
         name: Build docs
-        uses: crazy-max/ghaction-docker-buildx-bake@v1
+        uses: docker/bake-action@v1
         with:
           targets: docs
       -
