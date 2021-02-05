@@ -2,7 +2,7 @@
 ARG GO_VERSION=1.15
 
 FROM golang:${GO_VERSION}-alpine AS base
-RUN apk add --no-cache gcc musl-dev
+RUN apk add --no-cache gcc linux-headers musl-dev
 WORKDIR /src
 
 FROM base AS gomod

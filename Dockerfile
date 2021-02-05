@@ -4,7 +4,7 @@ ARG GORELEASER_VERSION=0.149.0
 
 FROM --platform=$BUILDPLATFORM golang:${GO_VERSION}-alpine AS base
 ARG GORELEASER_VERSION
-RUN apk add --no-cache ca-certificates curl gcc file git musl-dev tar
+RUN apk add --no-cache ca-certificates curl gcc file git linux-headers musl-dev tar
 RUN wget -qO- https://github.com/goreleaser/goreleaser/releases/download/v${GORELEASER_VERSION}/goreleaser_Linux_x86_64.tar.gz | tar -zxvf - goreleaser \
   && mv goreleaser /usr/local/bin/goreleaser
 WORKDIR /src
