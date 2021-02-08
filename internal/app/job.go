@@ -185,7 +185,7 @@ func (di *Diun) runJob(job model.Job) (entry model.NotifEntry) {
 	if len(dbManifest.Name) == 0 {
 		entry.Status = model.ImageStatusNew
 		sublog.Info().Msg("New image found")
-	} else if !entry.Manifest.Created.Equal(*dbManifest.Created) {
+	} else if entry.Manifest.Digest.String() != dbManifest.Digest.String() {
 		entry.Status = model.ImageStatusUpdate
 		sublog.Info().Msg("Image update found")
 	} else {
