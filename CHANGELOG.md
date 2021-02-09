@@ -1,5 +1,15 @@
 # Changelog
 
+## 4.12.0 (2021/02/09)
+
+* Use digest as comparison footprint (#269)
+* Bump github.com/alecthomas/kong from 0.2.12 to 0.2.15 (#270)
+* Bump github.com/eclipse/paho.mqtt.golang from 1.3.1 to 1.3.2 (#268)
+* Bump github.com/containers/image/v5 from 5.9.0 to 5.10.1 (#265)
+* Move to [docker/bake-action](https://github.com/docker/bake-action) (#266)
+* Typo in documentation (#258)
+* Log image validation
+
 ## 4.11.0 (2021/01/04)
 
 * Fix DB migration (#255)
