@@ -115,7 +115,7 @@ jobs:
           path: ./dist/*
           if-no-files-found: error
       -
-        name: Build image
+        name: Build
         uses: docker/bake-action@v1
         with:
           files: |
