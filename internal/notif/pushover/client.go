@@ -1,13 +1,11 @@
 package pushover
 
 import (
-	"bytes"
 	"errors"
-	"fmt"
-	"text/template"
 	"time"
 
 	"github.com/crazy-max/diun/v4/internal/model"
+	"github.com/crazy-max/diun/v4/internal/msg"
 	"github.com/crazy-max/diun/v4/internal/notif/notifier"
 	"github.com/crazy-max/diun/v4/pkg/utl"
 	"github.com/gregdel/pushover"
@@ -50,25 +48,16 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	app := pushover.New(token)
 	user := pushover.NewRecipient(recipient)
 
-	title := fmt.Sprintf("Image update for %s", entry.Image.String())
-	if entry.Status == model.ImageStatusNew {
-		title = fmt.Sprintf("New image %s has been added", entry.Image.String())
+	message, err := msg.New(msg.Options{
+		Meta:  c.meta,
+		Entry: entry,
+	})
+	if err != nil {
+		return err
 	}
 
-	tagTpl := "{{ .Entry.Image.Domain }}/{{ .Entry.Image.Path }}:{{ .Entry.Image.Tag }}"
-	if len(entry.Image.HubLink) > 0 {
-		tagTpl = `<a href="{{ .Entry.Image.HubLink }}">{{ .Entry.Image.Domain }}/{{ .Entry.Image.Path }}:{{ .Entry.Image.Tag }}</a>`
-	}
-
-	var msgBuf bytes.Buffer
-	msgTpl := template.Must(template.New("email").Parse(fmt.Sprintf("Docker tag %s which you subscribed to through {{ .Entry.Provider }} provider has been {{ if (eq .Entry.Status \"new\") }}newly added{{ else }}updated{{ end }} on {{ .Hostname }}.", tagTpl)))
-	if err := msgTpl.Execute(&msgBuf, struct {
-		Hostname string
-		Entry    model.NotifEntry
-	}{
-		Hostname: c.meta.Hostname,
-		Entry:    entry,
-	}); err != nil {
+	title, text, err := message.RenderHTML()
+	if err != nil {
 		return err
 	}
 
@@ -78,7 +67,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	}
 
 	_, err = app.SendMessage(&pushover.Message{
-		Message:   msgBuf.String(),
+		Message:   string(text),
 		Title:     title,
 		Priority:  c.cfg.Priority,
 		URL:       c.meta.URL,

@@ -1,12 +1,11 @@
 package telegram
 
 import (
-	"bytes"
-	"fmt"
 	"strings"
 	"text/template"
 
 	"github.com/crazy-max/diun/v4/internal/model"
+	"github.com/crazy-max/diun/v4/internal/msg"
 	"github.com/crazy-max/diun/v4/internal/notif/notifier"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
@@ -17,6 +16,10 @@ type Client struct {
 	cfg  *model.NotifTelegram
 	meta model.Meta
 }
+
+const customTpl = `Docker tag {{ if .Entry.Image.HubLink }}[{{ .Entry.Image }}]({{ .Entry.Image.HubLink }}){{ else }}{{ .Entry.Image }}{{ end }}
+which you subscribed to through {{ .Entry.Provider }} provider has been {{ if (eq .Entry.Status "new") }}newly added{{ else }}updated{{ end }}
+on {{ escapeMarkdown .Meta.Hostname }}.`
 
 // New creates a new Telegram notification instance
 func New(config *model.NotifTelegram, meta model.Meta) notifier.Notifier {
@@ -40,20 +43,25 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		return err
 	}
 
-	tagTpl := "{{ .Entry.Image.Domain }}/{{ .Entry.Image.Path }}:{{ .Entry.Image.Tag }}"
-	if len(entry.Image.HubLink) > 0 {
-		tagTpl = "[{{ .Entry.Image.Domain }}/{{ .Entry.Image.Path }}:{{ .Entry.Image.Tag }}]({{ .Entry.Image.HubLink }})"
+	message, err := msg.New(msg.Options{
+		Meta:  c.meta,
+		Entry: entry,
+		TplFuncs: template.FuncMap{
+			"escapeMarkdown": func(text string) string {
+				text = strings.ReplaceAll(text, "_", "\\_")
+				text = strings.ReplaceAll(text, "*", "\\*")
+				text = strings.ReplaceAll(text, "[", "\\[")
+				text = strings.ReplaceAll(text, "`", "\\`")
+				return text
+			},
+		},
+	})
+	if err != nil {
+		return err
 	}
 
-	var msgBuf bytes.Buffer
-	msgTpl := template.Must(template.New("email").Parse(fmt.Sprintf("Docker tag %s which you subscribed to through {{ .Entry.Provider }} provider has been {{ if (eq .Entry.Status \"new\") }}newly added{{ else }}updated{{ end }} on {{ .Hostname }}.", tagTpl)))
-	if err := msgTpl.Execute(&msgBuf, struct {
-		Hostname string
-		Entry    model.NotifEntry
-	}{
-		Hostname: escapeMarkdown(c.meta.Hostname),
-		Entry:    entry,
-	}); err != nil {
+	_, text, err := message.RenderMarkdownTemplate(strings.ReplaceAll(customTpl, "\n", " "))
+	if err != nil {
 		return err
 	}
 
@@ -62,7 +70,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 			BaseChat: tgbotapi.BaseChat{
 				ChatID: chatID,
 			},
-			Text:                  msgBuf.String(),
+			Text:                  string(text),
 			ParseMode:             "markdown",
 			DisableWebPagePreview: true,
 		})
@@ -72,12 +80,4 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	}
 
 	return nil
-}
-
-func escapeMarkdown(txt string) string {
-	txt = strings.ReplaceAll(txt, "_", "\\_")
-	txt = strings.ReplaceAll(txt, "*", "\\*")
-	txt = strings.ReplaceAll(txt, "[", "\\[")
-	txt = strings.ReplaceAll(txt, "`", "\\`")
-	return txt
 }

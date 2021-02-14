@@ -3,12 +3,11 @@ package teams
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"net/http"
-	"text/template"
 	"time"
 
 	"github.com/crazy-max/diun/v4/internal/model"
+	"github.com/crazy-max/diun/v4/internal/msg"
 	"github.com/crazy-max/diun/v4/internal/notif/notifier"
 )
 
@@ -18,6 +17,9 @@ type Client struct {
 	cfg  *model.NotifTeams
 	meta model.Meta
 }
+
+const customTpl = "Docker tag {{ if .Entry.Image.HubLink }}[`{{ .Entry.Image }}`]({{ .Entry.Image.HubLink }}){{ else }}`{{ .Entry.Image }}`{{ end }}" +
+	"{{ if (eq .Entry.Status \"new\") }}newly added{{ else }}updated{{ end }}."
 
 // New creates a new webhook notification instance
 func New(config *model.NotifTeams, meta model.Meta) notifier.Notifier {
@@ -53,20 +55,16 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		Timeout: time.Duration(10) * time.Second,
 	}
 
-	tagTpl := "`{{ .Entry.Image.Domain }}/{{ .Entry.Image.Path }}:{{ .Entry.Image.Tag }}`"
-	if len(entry.Image.HubLink) > 0 {
-		tagTpl = "[`{{ .Entry.Image.Domain }}/{{ .Entry.Image.Path }}:{{ .Entry.Image.Tag }}`]({{ .Entry.Image.HubLink }})"
-	}
-
-	var textBuf bytes.Buffer
-	textTpl := template.Must(template.New("text").Parse(fmt.Sprintf("Docker tag %s {{ if (eq .Entry.Status \"new\") }}newly added{{ else }}updated{{ end }}.", tagTpl)))
-	if err := textTpl.Execute(&textBuf, struct {
-		Meta  model.Meta
-		Entry model.NotifEntry
-	}{
+	message, err := msg.New(msg.Options{
 		Meta:  c.meta,
 		Entry: entry,
-	}); err != nil {
+	})
+	if err != nil {
+		return err
+	}
+
+	_, text, err := message.RenderMarkdownTemplate(customTpl)
+	if err != nil {
 		return err
 	}
 
@@ -75,7 +73,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		themeColor = "0076D7"
 	}
 
-	var body, err = json.Marshal(struct {
+	body, err := json.Marshal(struct {
 		Type       string     `json:"@type"`
 		Context    string     `json:"@context"`
 		ThemeColor string     `json:"themeColor"`
@@ -85,9 +83,9 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		Type:       "MessageCard",
 		Context:    "http://schema.org/extensions",
 		ThemeColor: themeColor,
-		Summary:    textBuf.String(),
+		Summary:    string(text),
 		Sections: []Sections{{
-			ActivityTitle:    textBuf.String(),
+			ActivityTitle:    string(text),
 			ActivitySubtitle: "Provider: " + entry.Provider,
 			Facts: []Fact{
 				{"Hostname", c.meta.Hostname},

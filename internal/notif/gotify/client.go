@@ -8,9 +8,9 @@ import (
 	"net/url"
 	"path"
 	"strconv"
-	"text/template"
 
 	"github.com/crazy-max/diun/v4/internal/model"
+	"github.com/crazy-max/diun/v4/internal/msg"
 	"github.com/crazy-max/diun/v4/internal/notif/notifier"
 )
 
@@ -42,35 +42,26 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		Timeout: *c.cfg.Timeout,
 	}
 
-	title := fmt.Sprintf("Image update for %s", entry.Image.String())
-	if entry.Status == model.ImageStatusNew {
-		title = fmt.Sprintf("New image %s has been added", entry.Image.String())
-	}
-
-	tagTpl := "`{{ .Entry.Image.Domain }}/{{ .Entry.Image.Path }}:{{ .Entry.Image.Tag }}`"
-	if len(entry.Image.HubLink) > 0 {
-		tagTpl = "[`{{ .Entry.Image.Domain }}/{{ .Entry.Image.Path }}:{{ .Entry.Image.Tag }}`]({{ .Entry.Image.HubLink }})"
-	}
-
-	var msgBuf bytes.Buffer
-	msgTpl := template.Must(template.New("gotify").Parse(fmt.Sprintf("Docker tag %s which you subscribed to through {{ .Entry.Provider }} provider has been {{ if (eq .Entry.Status \"new\") }}newly added{{ else }}updated{{ end }} on {{ .Meta.Hostname }}.", tagTpl)))
-	if err := msgTpl.Execute(&msgBuf, struct {
-		Meta  model.Meta
-		Entry model.NotifEntry
-	}{
+	message, err := msg.New(msg.Options{
 		Meta:  c.meta,
 		Entry: entry,
-	}); err != nil {
+	})
+	if err != nil {
 		return err
 	}
 
-	var body, err = json.Marshal(struct {
+	title, text, err := message.RenderMarkdown()
+	if err != nil {
+		return err
+	}
+
+	body, err := json.Marshal(struct {
 		Message  string                 `json:"message"`
 		Title    string                 `json:"title"`
 		Priority int                    `json:"priority"`
 		Extras   map[string]interface{} `json:"extras"`
 	}{
-		Message:  msgBuf.String(),
+		Message:  string(text),
 		Title:    title,
 		Priority: c.cfg.Priority,
 		Extras: map[string]interface{}{

@@ -1,11 +1,10 @@
 package mqtt
 
 import (
-	"encoding/json"
 	"fmt"
-	"time"
 
 	"github.com/crazy-max/diun/v4/internal/model"
+	"github.com/crazy-max/diun/v4/internal/msg"
 	"github.com/crazy-max/diun/v4/internal/notif/notifier"
 	"github.com/crazy-max/diun/v4/pkg/utl"
 	MQTT "github.com/eclipse/paho.mqtt.golang"
@@ -64,32 +63,20 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		}
 	}
 
-	message, err := json.Marshal(struct {
-		Version  string     `json:"diun_version"`
-		Hostname string     `json:"hostname"`
-		Status   string     `json:"status"`
-		Provider string     `json:"provider"`
-		Image    string     `json:"image"`
-		HubLink  string     `json:"hub_link"`
-		MIMEType string     `json:"mime_type"`
-		Created  *time.Time `json:"created"`
-		Platform string     `json:"platform"`
-	}{
-		Version:  c.meta.Version,
-		Hostname: c.meta.Hostname,
-		Status:   string(entry.Status),
-		Provider: entry.Provider,
-		Image:    entry.Image.String(),
-		HubLink:  entry.Image.HubLink,
-		MIMEType: entry.Manifest.MIMEType,
-		Created:  entry.Manifest.Created,
-		Platform: entry.Manifest.Platform,
+	message, err := msg.New(msg.Options{
+		Meta:  c.meta,
+		Entry: entry,
 	})
 	if err != nil {
 		return err
 	}
 
-	token := c.mqttClient.Publish(c.cfg.Topic, byte(c.cfg.QoS), false, message)
+	body, err := message.RenderJSON()
+	if err != nil {
+		return err
+	}
+
+	token := c.mqttClient.Publish(c.cfg.Topic, byte(c.cfg.QoS), false, body)
 	token.Wait()
 	return token.Error()
 }

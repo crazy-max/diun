@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"text/template"
 	"time"
 
 	"github.com/crazy-max/diun/v4/internal/model"
+	"github.com/crazy-max/diun/v4/internal/msg"
 	"github.com/crazy-max/diun/v4/internal/notif/notifier"
 )
 
@@ -44,33 +44,25 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		Timeout: *c.cfg.Timeout,
 	}
 
+	message, err := msg.New(msg.Options{
+		Meta:  c.meta,
+		Entry: entry,
+	})
+	if err != nil {
+		return err
+	}
+
+	title, text, err := message.RenderMarkdown()
+	if err != nil {
+		return err
+	}
+
 	if len(c.cfg.Mentions) > 0 {
 		for _, mention := range c.cfg.Mentions {
 			content.WriteString(fmt.Sprintf("%s ", mention))
 		}
 	}
-	if entry.Status == model.ImageStatusNew {
-		content.WriteString(fmt.Sprintf("New image %s has been added", entry.Image.String()))
-	} else {
-		content.WriteString(fmt.Sprintf("Image update for %s", entry.Image.String()))
-	}
-
-	tagTpl := "**{{ .Entry.Image.Domain }}/{{ .Entry.Image.Path }}:{{ .Entry.Image.Tag }}**"
-	if len(entry.Image.HubLink) > 0 {
-		tagTpl = "[**{{ .Entry.Image.Domain }}/{{ .Entry.Image.Path }}:{{ .Entry.Image.Tag }}**]({{ .Entry.Image.HubLink }})"
-	}
-
-	var textBuf bytes.Buffer
-	textTpl := template.Must(template.New("discord").Parse(fmt.Sprintf(`Docker tag %s which you subscribed to through **{{ .Entry.Provider }}** provider has been {{ if (eq .Entry.Status "new") }}newly added{{ else }}updated{{ end }} on **{{ .Meta.Hostname }}**.`, tagTpl)))
-	if err := textTpl.Execute(&textBuf, struct {
-		Meta  model.Meta
-		Entry model.NotifEntry
-	}{
-		Meta:  c.meta,
-		Entry: entry,
-	}); err != nil {
-		return err
-	}
+	content.WriteString(title)
 
 	fields := []EmbedField{
 		{
@@ -108,7 +100,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		AvatarURL: c.meta.Logo,
 		Embeds: []Embed{
 			{
-				Description: textBuf.String(),
+				Description: string(text),
 				Footer: EmbedFooter{
 					Text:    fmt.Sprintf("%s © %d %s %s", c.meta.Author, time.Now().Year(), c.meta.Name, c.meta.Version),
 					IconURL: c.meta.Logo,
