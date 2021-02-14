@@ -8,10 +8,10 @@ import (
 	"net/url"
 	"path"
 	"strconv"
-	"text/template"
 	"time"
 
 	"github.com/crazy-max/diun/v4/internal/model"
+	"github.com/crazy-max/diun/v4/internal/msg"
 	"github.com/crazy-max/diun/v4/internal/notif/notifier"
 )
 
@@ -21,6 +21,8 @@ type Client struct {
 	cfg  *model.NotifRocketChat
 	meta model.Meta
 }
+
+const customTpl = `Docker tag {{ .Entry.Image }} which you subscribed to through {{ .Entry.Provider }} provider has been {{ if (eq .Entry.Status "new") }}newly added{{ else }}updated{{ end }} on {{ .Meta.Hostname }}.`
 
 // New creates a new rocketchat notification instance
 func New(config *model.NotifRocketChat, meta model.Meta) notifier.Notifier {
@@ -44,20 +46,16 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		Timeout: *c.cfg.Timeout,
 	}
 
-	title := fmt.Sprintf("Image update for %s", entry.Image.String())
-	if entry.Status == model.ImageStatusNew {
-		title = fmt.Sprintf("New image %s has been added", entry.Image.String())
-	}
-
-	var textBuf bytes.Buffer
-	textTpl := template.Must(template.New("rocketchat").Parse(`Docker tag {{ .Entry.Image.Domain }}/{{ .Entry.Image.Path }}:{{ .Entry.Image.Tag }} which you subscribed to through {{ .Entry.Provider }} provider has been {{ if (eq .Entry.Status "new") }}newly added{{ else }}updated{{ end }}.`))
-	if err := textTpl.Execute(&textBuf, struct {
-		Meta  model.Meta
-		Entry model.NotifEntry
-	}{
+	message, err := msg.New(msg.Options{
 		Meta:  c.meta,
 		Entry: entry,
-	}); err != nil {
+	})
+	if err != nil {
+		return err
+	}
+
+	title, text, err := message.RenderMarkdownTemplate(customTpl)
+	if err != nil {
 		return err
 	}
 
@@ -104,7 +102,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		Text:    title,
 		Attachments: []Attachment{
 			{
-				Text:   textBuf.String(),
+				Text:   string(text),
 				Ts:     json.Number(strconv.FormatInt(time.Now().Unix(), 10)),
 				Fields: fields,
 			},

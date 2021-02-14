@@ -1,14 +1,13 @@
 package slack
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"strconv"
-	"text/template"
 	"time"
 
 	"github.com/crazy-max/diun/v4/internal/model"
+	"github.com/crazy-max/diun/v4/internal/msg"
 	"github.com/crazy-max/diun/v4/internal/notif/notifier"
 	"github.com/nlopes/slack"
 )
@@ -19,6 +18,8 @@ type Client struct {
 	cfg  *model.NotifSlack
 	meta model.Meta
 }
+
+const customTpl = "<!channel> Docker tag `{{ .Entry.Image }}` {{ if (eq .Entry.Status \"new\") }}newly added{{ else }}updated{{ end }}."
 
 // New creates a new slack notification instance
 func New(config *model.NotifSlack, meta model.Meta) notifier.Notifier {
@@ -37,15 +38,16 @@ func (c *Client) Name() string {
 
 // Send creates and sends a slack notification with an entry
 func (c *Client) Send(entry model.NotifEntry) error {
-	var textBuf bytes.Buffer
-	textTpl := template.Must(template.New("text").Parse("<!channel> Docker tag `{{ .Entry.Image.Domain }}/{{ .Entry.Image.Path }}:{{ .Entry.Image.Tag }}` {{ if (eq .Entry.Status \"new\") }}newly added{{ else }}updated{{ end }}."))
-	if err := textTpl.Execute(&textBuf, struct {
-		Meta  model.Meta
-		Entry model.NotifEntry
-	}{
+	message, err := msg.New(msg.Options{
 		Meta:  c.meta,
 		Entry: entry,
-	}); err != nil {
+	})
+	if err != nil {
+		return err
+	}
+
+	_, text, err := message.RenderMarkdownTemplate(customTpl)
+	if err != nil {
 		return err
 	}
 
@@ -97,7 +99,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 				AuthorSubname: "github.com/crazy-max/diun",
 				AuthorLink:    c.meta.URL,
 				AuthorIcon:    c.meta.Logo,
-				Text:          textBuf.String(),
+				Text:          string(text),
 				Footer:        fmt.Sprintf("%s © %d %s %s", c.meta.Author, time.Now().Year(), c.meta.Name, c.meta.Version),
 				Fields:        fields,
 				Ts:            json.Number(strconv.FormatInt(time.Now().Unix(), 10)),

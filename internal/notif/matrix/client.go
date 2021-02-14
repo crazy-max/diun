@@ -1,18 +1,15 @@
 package matrix
 
 import (
-	"bytes"
 	"fmt"
-	"text/template"
 
 	"github.com/crazy-max/diun/v4/internal/model"
+	"github.com/crazy-max/diun/v4/internal/msg"
 	"github.com/crazy-max/diun/v4/internal/notif/notifier"
 	"github.com/crazy-max/diun/v4/pkg/utl"
 	"github.com/matrix-org/gomatrix"
-	"github.com/microcosm-cc/bluemonday"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
-	"github.com/russross/blackfriday/v2"
 )
 
 // Client represents an active rocketchat notification object
@@ -74,29 +71,26 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		return errors.Wrap(err, "failed to join room")
 	}
 
-	tagTpl := "**{{ .Entry.Image.Domain }}/{{ .Entry.Image.Path }}:{{ .Entry.Image.Tag }}**"
-	if len(entry.Image.HubLink) > 0 {
-		tagTpl = "[**{{ .Entry.Image.Domain }}/{{ .Entry.Image.Path }}:{{ .Entry.Image.Tag }}**]({{ .Entry.Image.HubLink }})"
-	}
-
-	var msgBuf bytes.Buffer
-	msgTpl := template.Must(template.New("text").Parse(fmt.Sprintf("Docker tag %s which you subscribed to through {{ .Entry.Provider }} provider has been {{ if (eq .Entry.Status \"new\") }}newly added{{ else }}updated{{ end }} on {{ .Meta.Hostname }}.", tagTpl)))
-	if err := msgTpl.Execute(&msgBuf, struct {
-		Meta  model.Meta
-		Entry model.NotifEntry
-	}{
+	message, err := msg.New(msg.Options{
 		Meta:  c.meta,
 		Entry: entry,
-	}); err != nil {
+	})
+	if err != nil {
 		return err
 	}
 
-	msgHTML := bluemonday.UGCPolicy().SanitizeBytes(
-		blackfriday.Run(msgBuf.Bytes()),
-	)
+	_, msgText, err := message.RenderMarkdown()
+	if err != nil {
+		return err
+	}
+
+	_, msgHTML, err := message.RenderHTML()
+	if err != nil {
+		return err
+	}
 
 	if _, err := m.SendMessageEvent(joined.RoomID, "m.room.message", gomatrix.HTMLMessage{
-		Body:          msgBuf.String(),
+		Body:          string(msgText),
 		MsgType:       fmt.Sprintf("m.%s", c.cfg.MsgType),
 		Format:        "org.matrix.custom.html",
 		FormattedBody: string(msgHTML),

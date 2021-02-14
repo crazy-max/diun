@@ -1,13 +1,12 @@
 package mail
 
 import (
-	"bytes"
 	"crypto/tls"
 	"fmt"
-	"text/template"
 	"time"
 
 	"github.com/crazy-max/diun/v4/internal/model"
+	"github.com/crazy-max/diun/v4/internal/msg"
 	"github.com/crazy-max/diun/v4/internal/notif/notifier"
 	"github.com/crazy-max/diun/v4/pkg/utl"
 	"github.com/go-gomail/gomail"
@@ -21,6 +20,16 @@ type Client struct {
 	cfg  *model.NotifMail
 	meta model.Meta
 }
+
+const customTpl = `Docker tag {{ if .Entry.Image.HubLink }}[**{{ .Entry.Image }}**]({{ .Entry.Image.HubLink }}){{ else }}**{{ .Entry.Image }}**{{ end }}
+which you subscribed to through {{ .Entry.Provider }} provider has been {{ if (eq .Entry.Status "new") }}newly added{{ else }}updated{{ end }}
+on {{ .Meta.Hostname }}.
+
+This image has been {{ if (eq .Entry.Status "new") }}created{{ else }}updated{{ end }} at
+<code>{{ .Entry.Manifest.Created.Format "Jan 02, 2006 15:04:05 UTC" }}</code> with digest <code>{{ .Entry.Manifest.Digest }}</code>
+for <code>{{ .Entry.Manifest.Platform }}</code> platform.
+
+Need help, or have questions? Go to {{ .Meta.URL }} and leave an issue.`
 
 // New creates a new mail notification instance
 func New(config *model.NotifMail, meta model.Meta) notifier.Notifier {
@@ -53,43 +62,24 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		},
 	}
 
-	// Subject
-	subject := fmt.Sprintf("Image update for %s", entry.Image.String())
-	if entry.Status == model.ImageStatusNew {
-		subject = fmt.Sprintf("New image %s has been added", entry.Image.String())
-	}
-
-	tagTpl := "**{{ .Entry.Image.Domain }}/{{ .Entry.Image.Path }}:{{ .Entry.Image.Tag }}**"
-	if len(entry.Image.HubLink) > 0 {
-		tagTpl = "[**{{ .Entry.Image.Domain }}/{{ .Entry.Image.Path }}:{{ .Entry.Image.Tag }}**]({{ .Entry.Image.HubLink }})"
-	}
-
-	// Body
-	var emailBuf bytes.Buffer
-	emailTpl := template.Must(template.New("email").Parse(fmt.Sprintf(`
-
-Docker tag %s which you subscribed to through **{{ .Entry.Provider }}** provider has been {{ if (eq .Entry.Status "new") }}newly added{{ else }}updated{{ end }} on **{{ .Meta.Hostname }}**.
-
-This image has been {{ if (eq .Entry.Status "new") }}created{{ else }}updated{{ end }} at <code>{{ .Entry.Manifest.Created.Format "Jan 02, 2006 15:04:05 UTC" }}</code>
-with digest <code>{{ .Entry.Manifest.Digest }}</code> for <code>{{ .Entry.Manifest.Platform }}</code> platform.
-
-Need help, or have questions? Go to https://github.com/crazy-max/diun and leave an issue.
-
-`, tagTpl)))
-	if err := emailTpl.Execute(&emailBuf, struct {
-		Meta  model.Meta
-		Entry model.NotifEntry
-	}{
+	message, err := msg.New(msg.Options{
 		Meta:  c.meta,
 		Entry: entry,
-	}); err != nil {
+	})
+	if err != nil {
 		return err
 	}
+
+	title, text, err := message.RenderMarkdownTemplate(customTpl)
+	if err != nil {
+		return err
+	}
+
 	email := hermes.Email{
 		Body: hermes.Body{
 			Title:        fmt.Sprintf("%s 🔔 notification", c.meta.Name),
-			FreeMarkdown: hermes.Markdown(emailBuf.String()),
-			Signature:    "Thanks for your support",
+			FreeMarkdown: hermes.Markdown(text),
+			Signature:    "Thanks for your support!",
 		},
 	}
 
@@ -108,7 +98,7 @@ Need help, or have questions? Go to https://github.com/crazy-max/diun and leave 
 	msg := gomail.NewMessage()
 	msg.SetHeader("From", fmt.Sprintf("%s <%s>", c.meta.Name, c.cfg.From))
 	msg.SetHeader("To", c.cfg.To)
-	msg.SetHeader("Subject", subject)
+	msg.SetHeader("Subject", title)
 	msg.SetBody("text/plain", textpart)
 	msg.AddAlternative("text/html", htmlpart)
 

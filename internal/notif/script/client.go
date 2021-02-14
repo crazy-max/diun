@@ -2,12 +2,12 @@ package script
 
 import (
 	"bytes"
-	"fmt"
 	"os"
 	"os/exec"
 	"strings"
 
 	"github.com/crazy-max/diun/v4/internal/model"
+	"github.com/crazy-max/diun/v4/internal/msg"
 	"github.com/crazy-max/diun/v4/internal/notif/notifier"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
@@ -50,19 +50,16 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		cmd.Dir = c.cfg.Dir
 	}
 
+	message, err := msg.New(msg.Options{
+		Meta:  c.meta,
+		Entry: entry,
+	})
+	if err != nil {
+		return err
+	}
+
 	// Set env vars
-	cmd.Env = append(os.Environ(), []string{
-		fmt.Sprintf("DIUN_VERSION=%s", c.meta.Version),
-		fmt.Sprintf("DIUN_HOSTNAME=%s", c.meta.Hostname),
-		fmt.Sprintf("DIUN_ENTRY_STATUS=%s", string(entry.Status)),
-		fmt.Sprintf("DIUN_ENTRY_PROVIDER=%s", entry.Provider),
-		fmt.Sprintf("DIUN_ENTRY_IMAGE=%s", entry.Image.String()),
-		fmt.Sprintf("DIUN_ENTRY_HUBLINK=%s", entry.Image.HubLink),
-		fmt.Sprintf("DIUN_ENTRY_MIMETYPE=%s", entry.Manifest.MIMEType),
-		fmt.Sprintf("DIUN_ENTRY_DIGEST=%s", entry.Manifest.Digest),
-		fmt.Sprintf("DIUN_ENTRY_CREATED=%s", entry.Manifest.Created),
-		fmt.Sprintf("DIUN_ENTRY_PLATFORM=%s", entry.Manifest.Platform),
-	}...)
+	cmd.Env = append(os.Environ(), message.RenderEnv()...)
 
 	// Run
 	if err := cmd.Run(); err != nil {
