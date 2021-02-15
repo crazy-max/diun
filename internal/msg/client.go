@@ -39,7 +39,7 @@ func New(opts Options) (*Client, error) {
 
 // RenderMarkdown returns a notification message as markdown
 func (c *Client) RenderMarkdown() (title string, text []byte, err error) {
-	return c.RenderHTMLTemplate(strings.ReplaceAll(defaultTpl, "\n", " "))
+	return c.RenderMarkdownTemplate(strings.ReplaceAll(defaultTpl, "\n", " "))
 }
 
 // RenderMarkdownTemplate returns a notification message as markdown with a custom template
