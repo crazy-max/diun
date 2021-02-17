@@ -1,7 +1,6 @@
 package pushover
 
 import (
-	"errors"
 	"time"
 
 	"github.com/crazy-max/diun/v4/internal/model"
@@ -9,6 +8,7 @@ import (
 	"github.com/crazy-max/diun/v4/internal/notif/notifier"
 	"github.com/crazy-max/diun/v4/pkg/utl"
 	"github.com/gregdel/pushover"
+	"github.com/pkg/errors"
 )
 
 // Client represents an active Pushover notification object
@@ -45,9 +45,6 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		return errors.New("Cannot retrieve recipient secret for Pushover notifier")
 	}
 
-	app := pushover.New(token)
-	user := pushover.NewRecipient(recipient)
-
 	message, err := msg.New(msg.Options{
 		Meta:  c.meta,
 		Entry: entry,
@@ -61,12 +58,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		return err
 	}
 
-	_, err = app.GetRecipientDetails(user)
-	if err != nil {
-		return err
-	}
-
-	_, err = app.SendMessage(&pushover.Message{
+	_, err = pushover.New(token).SendMessage(&pushover.Message{
 		Message:   string(text),
 		Title:     title,
 		Priority:  c.cfg.Priority,
@@ -74,7 +66,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		URLTitle:  c.meta.Name,
 		Timestamp: time.Now().Unix(),
 		HTML:      true,
-	}, user)
+	}, pushover.NewRecipient(recipient))
 
 	return err
 }
