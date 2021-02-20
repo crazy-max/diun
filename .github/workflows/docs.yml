@@ -32,8 +32,6 @@ jobs:
       -
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
-        with:
-          version: latest
       -
         name: Build docs
         uses: docker/bake-action@v1

@@ -1,5 +1,8 @@
 #!/usr/bin/env sh
 
+APPNAME=$1
+DISTPATH=$2
+
 : ${TARGETPLATFORM=}
 : ${TARGETOS=}
 : ${TARGETARCH=}
@@ -8,15 +11,25 @@
 : ${GOARCH=}
 : ${GOOS=}
 : ${GOARM=}
+: ${GOMIPS=}
 : ${GOBIN=}
 : ${GIT_REF=}
 
 set -eu
 
-if [ ! -z "$TARGETPLATFORM" ]; then
+usage() {
+  echo "usage: $0 <appname> <distpath>"
+  exit 1
+}
+
+if [ -z "$APPNAME" ] || [ -z "$DISTPATH" ]; then
+  usage
+fi
+
+if [ -n "$TARGETPLATFORM" ]; then
   os="$(echo $TARGETPLATFORM | cut -d"/" -f1)"
   arch="$(echo $TARGETPLATFORM | cut -d"/" -f2)"
-  if [ ! -z "$os" ] && [ ! -z "$arch" ]; then
+  if [ -n "$os" ] && [ -n "$arch" ]; then
     export GOOS="$os"
     export GOARCH="$arch"
     if [ "$arch" = "arm" ]; then
@@ -35,16 +48,16 @@ if [ ! -z "$TARGETPLATFORM" ]; then
   fi
 fi
 
-if [ ! -z "$TARGETOS" ]; then
+if [ -n "$TARGETOS" ]; then
   export GOOS="$TARGETOS"
 fi
 
-if [ ! -z "$TARGETARCH" ]; then
+if [ -n "$TARGETARCH" ]; then
   export GOARCH="$TARGETARCH"
 fi
 
 if [ "$TARGETARCH" = "arm" ]; then
-  if [ ! -z "$TARGETVARIANT" ]; then
+  if [ -n "$TARGETVARIANT" ]; then
     case "$TARGETVARIANT" in
     "v5")
       export GOARM="5"
@@ -61,31 +74,12 @@ if [ "$TARGETARCH" = "arm" ]; then
   fi
 fi
 
-if [ "$CGO_ENABLED" = "1" ]; then
-  case "$GOARCH" in
-  "amd64")
-    export CC="x86_64-linux-gnu-gcc"
-    ;;
-  "ppc64le")
-    export CC="powerpc64le-linux-gnu-gcc"
-    ;;
-  "s390x")
-    export CC="s390x-linux-gnu-gcc"
-    ;;
-  "arm64")
-    export CC="aarch64-linux-gnu-gcc"
-    ;;
-  "arm")
-    case "$GOARM" in
-    "5")
-      export CC="arm-linux-gnueabi-gcc"
-      ;;
-    *)
-      export CC="arm-linux-gnueabihf-gcc"
-      ;;
-    esac
-    ;;
-  esac
+if case $TARGETARCH in "mips"*) true;; *) false;; esac; then
+  if [ -n "$TARGETVARIANT" ]; then
+    export GOMIPS="$TARGETVARIANT"
+  else
+    export GOMIPS="hardfloat"
+  fi
 fi
 
 if [ "$GOOS" = "wasi" ]; then
@@ -97,7 +91,8 @@ if [ -z "$GOBIN" ] && [ -n "$GOPATH" ] && [ -n "$GOARCH" ] && [ -n "$GOOS" ]; th
 fi
 
 cat > ./.goreleaser.yml <<EOL
-dist: /out
+project_name: ${APPNAME}
+dist: ${DISTPATH}
 
 builds:
   -
@@ -112,9 +107,11 @@ builds:
       - ${GOARCH}
     goarm:
       - ${GOARM}
+    gomips:
+      - ${GOMIPS}
     hooks:
       post:
-        - cp "{{ .Path }}" /usr/local/bin/diun
+        - cp "{{ .Path }}" /usr/local/bin/${APPNAME}
 
 archives:
   -

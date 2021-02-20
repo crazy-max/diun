@@ -5,7 +5,7 @@ FROM golang:${GO_VERSION}-alpine AS base
 RUN apk add --no-cache gcc linux-headers musl-dev
 WORKDIR /src
 
-FROM golangci/golangci-lint:v1.27-alpine AS golangci-lint
+FROM golangci/golangci-lint:v1.37-alpine AS golangci-lint
 
 FROM base AS lint
 RUN --mount=type=bind,target=. \
