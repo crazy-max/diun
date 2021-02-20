@@ -23,7 +23,7 @@ ARG GIT_REF
 RUN --mount=type=bind,target=/src,rw \
   --mount=type=cache,target=/root/.cache/go-build \
   --mount=target=/go/pkg/mod,type=cache \
-  ./hack/goreleaser.sh
+  ./hack/goreleaser.sh "diun" "/out"
 
 FROM scratch AS artifacts
 COPY --from=build /out/*.tar.gz /

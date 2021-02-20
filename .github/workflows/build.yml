@@ -36,9 +36,6 @@ jobs:
       -
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
-        with:
-          version: latest
-          buildkitd-flags: --debug
       -
         name: Test
         uses: docker/bake-action@v1
@@ -80,9 +77,6 @@ jobs:
       -
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
-        with:
-          version: latest
-          buildkitd-flags: --debug
       -
         name: Login to DockerHub
         if: github.event_name != 'pull_request'
