@@ -8,10 +8,11 @@ import (
 
 // NotifGotify holds gotify notification configuration details
 type NotifGotify struct {
-	Endpoint string         `yaml:"endpoint,omitempty" json:"endpoint,omitempty" validate:"required"`
-	Token    string         `yaml:"token,omitempty" json:"token,omitempty" validate:"required"`
-	Priority int            `yaml:"priority,omitempty" json:"priority,omitempty" validate:"omitempty,min=0"`
-	Timeout  *time.Duration `yaml:"timeout,omitempty" json:"timeout,omitempty" validate:"required"`
+	Endpoint  string         `yaml:"endpoint,omitempty" json:"endpoint,omitempty" validate:"required"`
+	Token     string         `yaml:"token,omitempty" json:"token,omitempty" validate:"omitempty"`
+	TokenFile string         `yaml:"tokenFile,omitempty" json:"tokenFile,omitempty" validate:"omitempty,file"`
+	Priority  int            `yaml:"priority,omitempty" json:"priority,omitempty" validate:"omitempty,min=0"`
+	Timeout   *time.Duration `yaml:"timeout,omitempty" json:"timeout,omitempty" validate:"required"`
 }
 
 // GetDefaults gets the default values

@@ -20,7 +20,8 @@ Allow to send notifications to your Rocket.Chat channel.
 | `endpoint`[^1]     |               | Rocket.Chat base URL |
 | `channel`[^1]      |               | Channel name with the prefix in front of it |
 | `userID`[^1]       |               | User ID |
-| `token`[^1]        |               | Authentication token |
+| `token`            |               | Authentication token |
+| `tokenFile`        |               | Use content of secret file as authentication token if `token` not defined |
 | `timeout`          | `10s`         | Timeout specifies a time limit for the request to be made |
 
 !!! warning
@@ -31,6 +32,7 @@ Allow to send notifications to your Rocket.Chat channel.
     * `DIUN_NOTIF_ROCKETCHAT_CHANNEL`
     * `DIUN_NOTIF_ROCKETCHAT_USERID`
     * `DIUN_NOTIF_ROCKETCHAT_TOKEN`
+    * `DIUN_NOTIF_ROCKETCHAT_TOKENFILE`
     * `DIUN_NOTIF_ROCKETCHAT_TIMEOUT`
 
 ## Sample

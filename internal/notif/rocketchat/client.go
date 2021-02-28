@@ -13,6 +13,8 @@ import (
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/internal/msg"
 	"github.com/crazy-max/diun/v4/internal/notif/notifier"
+	"github.com/crazy-max/diun/v4/pkg/utl"
+	"github.com/pkg/errors"
 )
 
 // Client represents an active rocketchat notification object
@@ -42,6 +44,11 @@ func (c *Client) Name() string {
 // Send creates and sends a rocketchat notification with an entry
 // https://rocket.chat/docs/developer-guides/rest-api/chat/postmessage/
 func (c *Client) Send(entry model.NotifEntry) error {
+	token, err := utl.GetSecret(c.cfg.Token, c.cfg.TokenFile)
+	if err != nil {
+		return errors.New("Cannot retrieve token secret for RocketChat notifier")
+	}
+
 	hc := http.Client{
 		Timeout: *c.cfg.Timeout,
 	}
@@ -125,7 +132,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("User-Agent", c.meta.UserAgent)
 	req.Header.Add("X-User-Id", c.cfg.UserID)
-	req.Header.Add("X-Auth-Token", c.cfg.Token)
+	req.Header.Add("X-Auth-Token", token)
 
 	resp, err := hc.Do(req)
 	if err != nil {
