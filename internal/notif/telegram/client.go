@@ -7,7 +7,9 @@ import (
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/internal/msg"
 	"github.com/crazy-max/diun/v4/internal/notif/notifier"
+	"github.com/crazy-max/diun/v4/pkg/utl"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	"github.com/pkg/errors"
 )
 
 // Client represents an active Telegram notification object
@@ -38,7 +40,12 @@ func (c *Client) Name() string {
 
 // Send creates and sends a Telegram notification with an entry
 func (c *Client) Send(entry model.NotifEntry) error {
-	bot, err := tgbotapi.NewBotAPI(c.cfg.Token)
+	token, err := utl.GetSecret(c.cfg.Token, c.cfg.TokenFile)
+	if err != nil {
+		return errors.New("Cannot retrieve token secret for Telegram notifier")
+	}
+
+	bot, err := tgbotapi.NewBotAPI(token)
 	if err != nil {
 		return err
 	}

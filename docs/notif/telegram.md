@@ -21,11 +21,13 @@ Multiple chat IDs can be provided in order to deliver notifications to multiple 
 
 | Name               | Default       | Description   |
 |--------------------|---------------|---------------|
-| `token`[^1]        |               | Telegram bot token |
+| `token`            |               | Telegram bot token |
+| `tokenFile`        |               | Use content of secret file as Telegram bot token if `token` not defined |
 | `chatIDs`[^1]      |               | List of chat IDs to send notifications to |
 
 !!! abstract "Environment variables"
     * `DIUN_NOTIF_TELEGRAM_TOKEN`
+    * `DIUN_NOTIF_TELEGRAM_TOKENFILE`
     * `DIUN_NOTIF_TELEGRAM_CHATIDS` (comma separated)
 
 ## Sample

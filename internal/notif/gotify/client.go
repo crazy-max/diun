@@ -12,6 +12,8 @@ import (
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/internal/msg"
 	"github.com/crazy-max/diun/v4/internal/notif/notifier"
+	"github.com/crazy-max/diun/v4/pkg/utl"
+	"github.com/pkg/errors"
 )
 
 // Client represents an active gotify notification object
@@ -38,6 +40,11 @@ func (c *Client) Name() string {
 
 // Send creates and sends a gotify notification with an entry
 func (c *Client) Send(entry model.NotifEntry) error {
+	token, err := utl.GetSecret(c.cfg.Token, c.cfg.TokenFile)
+	if err != nil {
+		return errors.New("Cannot retrieve token secret for Gotify notifier")
+	}
+
 	hc := http.Client{
 		Timeout: *c.cfg.Timeout,
 	}
@@ -81,7 +88,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	u.Path = path.Join(u.Path, "message")
 
 	q := u.Query()
-	q.Set("token", c.cfg.Token)
+	q.Set("token", token)
 	u.RawQuery = q.Encode()
 
 	req, err := http.NewRequest("POST", u.String(), bytes.NewBuffer(body))
