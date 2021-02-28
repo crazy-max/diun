@@ -1,5 +1,16 @@
 # Changelog
 
+## 4.13.0 (2021/03/01)
+
+* Missing token as secret setting for some notifiers (#289)
+* Allow disabling log color output (#288)
+* Bump github.com/containers/image/v5 from 5.10.1 to 5.10.4 (#271 #282 #284)
+* Cleanup workflows (#281 #287)
+* Do not check recipient details for Pushover (#277)
+* MkDocs Materials 6.2.8 (#276)
+* Fix markdown renderer (#275)
+* Add message client for notifiers (#273)
+
 ## 4.12.0 (2021/02/09)
 
 * Use digest as comparison footprint (#269)
