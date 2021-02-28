@@ -21,6 +21,7 @@ Flags:
   --log-level="info"    Set log level ($LOG_LEVEL).
   --log-json            Enable JSON logging output ($LOG_JSON).
   --log-caller          Add file:line of the caller to log output ($LOG_CALLER).
+  --log-nocolor         Disables the colorized output ($LOG_NOCOLOR).
   --test-notif          Test notification settings.
 ```
 
@@ -34,3 +35,4 @@ Following environment variables can be used in place:
 | `LOG_LEVEL`        | `info`        | Log level output |
 | `LOG_JSON`         | `false`       | Enable JSON logging output |
 | `LOG_CALLER`       | `false`       | Enable to add `file:line` of the caller |
+| `LOG_NOCOLOR`      | `false`       | Disables the colorized output |

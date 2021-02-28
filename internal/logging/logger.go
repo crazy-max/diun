@@ -20,6 +20,7 @@ func Configure(cli *model.Cli) {
 	if !cli.LogJSON {
 		w = zerolog.ConsoleWriter{
 			Out:        os.Stdout,
+			NoColor:    cli.LogNoColor,
 			TimeFormat: time.RFC1123,
 		}
 	} else {
