@@ -8,6 +8,7 @@ You can send notifications to any MQTT compatible server with the following sett
     ```yaml
     notif:
       mqtt:
+        scheme: mqtt
         host: localhost
         port: 1883
         username: guest
@@ -19,6 +20,7 @@ You can send notifications to any MQTT compatible server with the following sett
 
 | Name               | Default       | Description   |
 |--------------------|---------------|---------------|
+| `scheme`[^1]       | `mqtt`        | MQTT server scheme (`mqtt`, `mqtts`, `ws` or `wss`) |
 | `host`[^1]         | `localhost`   | MQTT server host |
 | `port`[^1]         | `1883`        | MQTT server port |
 | `username`         |               | MQTT username |
@@ -30,6 +32,7 @@ You can send notifications to any MQTT compatible server with the following sett
 | `qos`              | `0`           | Ensured message delivery at specified Quality of Service (QoS) |
 
 !!! abstract "Environment variables"
+    * `DIUN_NOTIF_MQTT_SCHEME`
     * `DIUN_NOTIF_MQTT_HOST`
     * `DIUN_NOTIF_MQTT_PORT`
     * `DIUN_NOTIF_MQTT_USERNAME`

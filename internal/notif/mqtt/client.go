@@ -49,7 +49,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		return err
 	}
 
-	broker := fmt.Sprintf("tcp://%s:%d", c.cfg.Host, c.cfg.Port)
+	broker := fmt.Sprintf("%s://%s:%d", c.cfg.Scheme, c.cfg.Host, c.cfg.Port)
 	opts := MQTT.NewClientOptions().AddBroker(broker).SetClientID(c.cfg.Client)
 	opts.Username = username
 	opts.Password = password
