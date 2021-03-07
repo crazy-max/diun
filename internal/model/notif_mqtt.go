@@ -1,6 +1,7 @@
 package model
 
 type NotifMqtt struct {
+	Scheme       string `yaml:"scheme,omitempty" json:"scheme,omitempty" validate:"required,oneof=mqtt mqtts ws wss"`
 	Host         string `yaml:"host,omitempty" json:"host,omitempty" validate:"required"`
 	Port         int    `yaml:"port,omitempty" json:"port,omitempty" validate:"required,min=1"`
 	Username     string `yaml:"username,omitempty" json:"username,omitempty" validate:"omitempty"`
@@ -21,6 +22,7 @@ func (s *NotifMqtt) GetDefaults() *NotifMqtt {
 
 // SetDefaults sets the default values
 func (s *NotifMqtt) SetDefaults() {
+	s.Scheme = "mqtt"
 	s.Host = "localhost"
 	s.Port = 1883
 	s.QoS = 0

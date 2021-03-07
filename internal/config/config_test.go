@@ -123,6 +123,7 @@ func TestLoadFile(t *testing.T) {
 						MsgType:       model.NotifMatrixMsgTypeNotice,
 					},
 					Mqtt: &model.NotifMqtt{
+						Scheme:   "mqtt",
 						Host:     "localhost",
 						Port:     1883,
 						Username: "guest",
