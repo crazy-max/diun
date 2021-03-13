@@ -3,14 +3,20 @@ variable "GO_VERSION" {
   default = "1.15"
 }
 
+target "go-version" {
+  args = {
+    GO_VERSION = GO_VERSION
+  }
+}
+
 // GitHub reference as defined in GitHub Actions (eg. refs/head/master))
 variable "GITHUB_REF" {
   default = ""
 }
 
-target "go-version" {
+target "git-ref" {
   args = {
-    GO_VERSION = GO_VERSION
+    GIT_REF = GITHUB_REF
   }
 }
 
@@ -60,10 +66,7 @@ target "docs" {
 }
 
 target "artifact" {
-  args = {
-    GIT_REF = GITHUB_REF
-  }
-  inherits = ["go-version"]
+  inherits = ["go-version", "git-ref"]
   target = "artifacts"
   output = ["./dist"]
 }
@@ -86,7 +89,7 @@ target "artifact-all" {
 }
 
 target "image" {
-  inherits = ["go-version", "ghaction-docker-meta"]
+  inherits = ["go-version", "git-ref", "ghaction-docker-meta"]
 }
 
 target "image-local" {
