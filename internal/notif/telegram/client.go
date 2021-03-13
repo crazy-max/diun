@@ -1,6 +1,7 @@
 package telegram
 
 import (
+	"encoding/json"
 	"strings"
 	"text/template"
 
@@ -45,6 +46,17 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		return errors.New("Cannot retrieve token secret for Telegram notifier")
 	}
 
+	chatIDs := c.cfg.ChatIDs
+	chatIDsRaw, err := utl.GetSecret("", c.cfg.ChatIDsFile)
+	if err != nil {
+		return errors.New("Cannot retrieve chat IDs secret for Telegram notifier")
+	}
+	if len(chatIDsRaw) > 0 {
+		if err = json.Unmarshal([]byte(chatIDsRaw), &chatIDs); err != nil {
+			return errors.New("Cannot unmarshal chat IDs secret for Telegram notifier")
+		}
+	}
+
 	bot, err := tgbotapi.NewBotAPI(token)
 	if err != nil {
 		return err
@@ -72,7 +84,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		return err
 	}
 
-	for _, chatID := range c.cfg.ChatIDs {
+	for _, chatID := range chatIDs {
 		_, err := bot.Send(tgbotapi.MessageConfig{
 			BaseChat: tgbotapi.BaseChat{
 				ChatID: chatID,
