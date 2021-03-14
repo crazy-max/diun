@@ -23,12 +23,17 @@ Multiple chat IDs can be provided in order to deliver notifications to multiple 
 |--------------------|---------------|---------------|
 | `token`            |               | Telegram bot token |
 | `tokenFile`        |               | Use content of secret file as Telegram bot token if `token` not defined |
-| `chatIDs`[^1]      |               | List of chat IDs to send notifications to |
+| `chatIDs`          |               | List of chat IDs to send notifications to |
+| `chatIDsFile`      |               | Use content of secret file as chat IDs if `chatIDs` not defined |
 
 !!! abstract "Environment variables"
     * `DIUN_NOTIF_TELEGRAM_TOKEN`
     * `DIUN_NOTIF_TELEGRAM_TOKENFILE`
     * `DIUN_NOTIF_TELEGRAM_CHATIDS` (comma separated)
+    * `DIUN_NOTIF_TELEGRAM_CHATIDSFILE`
+
+!!! example "chat IDs secret file"
+    Chat IDs secret file must be a valid JSON array like: `[123456789,987654321]`
 
 ## Sample
 
