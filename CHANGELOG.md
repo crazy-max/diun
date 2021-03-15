@@ -1,5 +1,19 @@
 # Changelog
 
+## 4.14.0 (2021/03/15)
+
+* Bump k8s.io/client-go from 0.19.4 to 0.20.4 (#280)
+* Docker client 20.10.5 (#303)
+* Allow telegram chat IDs as file (#301)
+* Go 1.16 (#302)
+* Handle git ref for artifact target
+* Bump github.com/imdario/mergo from 0.3.11 to 0.3.12 (#298)
+* Bump github.com/crazy-max/gohealthchecks from 0.2.0 to 0.3.0 (#296)
+* Bump github.com/alecthomas/kong from 0.2.15 to 0.2.16 (#295)
+* Allow to configure scheme for MQTT broker (#292)
+* Switch to [goreleaser-xx](https://github.com/crazy-max/goreleaser-xx) (#291)
+* Bump github.com/containers/image/v5 from 5.10.4 to 5.10.5 (#290)
+
 ## 4.13.0 (2021/03/01)
 
 * Missing token as secret setting for some notifiers (#289)
