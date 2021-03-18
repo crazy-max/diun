@@ -14,7 +14,7 @@ jobs:
     steps:
       -
         name: Set sponsor label
-        uses: JasonEtco/is-sponsor-label-action@v1
+        uses: JasonEtco/is-sponsor-label-action@bf60e2afe013f9d3d7656c3315bcb6993604ccf7
         with:
           label: ":sparkling_heart: sponsor"
         env:
