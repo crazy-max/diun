@@ -67,6 +67,10 @@
   name: ":question: question"
   color: "3f51b5"
   description: ""
+- # sponsor
+  name: ":sparkling_heart: sponsor"
+  color: "fedbf0"
+  description: ""
 - # stale
   name: ":skull: stale"
   color: "237da0"

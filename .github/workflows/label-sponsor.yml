@@ -1,0 +1,21 @@
+name: label-sponsor
+
+on:
+  pull_request:
+    types:
+      - 'opened'
+  issues:
+    types:
+      - 'opened'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Set sponsor label
+        uses: JasonEtco/is-sponsor-label-action@v1
+        with:
+          label: ":sparkling_heart: sponsor"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
