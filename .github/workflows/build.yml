@@ -59,7 +59,7 @@ jobs:
       -
         name: Docker meta
         id: docker_meta
-        uses: crazy-max/ghaction-docker-meta@v1
+        uses: crazy-max/ghaction-docker-meta@v2.1.1
         with:
           images: |
             ${{ env.DOCKERHUB_SLUG }}
