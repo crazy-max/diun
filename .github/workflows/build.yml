@@ -58,16 +58,17 @@ jobs:
           fetch-depth: 0
       -
         name: Docker meta
-        id: docker_meta
-        uses: crazy-max/ghaction-docker-meta@v1
+        id: meta
+        uses: crazy-max/ghaction-docker-meta@v2
         with:
           images: |
             ${{ env.DOCKERHUB_SLUG }}
             ${{ env.GHCR_SLUG }}
-          tag-semver: |
-            {{version}}
-          tag-edge: true
-          label-custom: |
+          tags: |
+            type=semver,pattern={{version}}
+            type=ref,event=pr
+            type=edge
+          labels: |
             org.opencontainers.image.title=Diun
             org.opencontainers.image.description=Docker image update notifier
             org.opencontainers.image.vendor=CrazyMax
@@ -114,7 +115,7 @@ jobs:
         with:
           files: |
             ./docker-bake.hcl
-            ${{ steps.docker_meta.outputs.bake-file }}
+            ${{ steps.meta.outputs.bake-file }}
           targets: image-all
           push: ${{ github.event_name != 'pull_request' }}
       -
@@ -132,13 +133,13 @@ jobs:
         name: Check manifest
         if: github.event_name != 'pull_request'
         run: |
-          docker buildx imagetools inspect ${{ env.DOCKERHUB_SLUG }}:${{ steps.docker_meta.outputs.version }}
-          docker buildx imagetools inspect ${{ env.GHCR_SLUG }}:${{ steps.docker_meta.outputs.version }}
+          docker buildx imagetools inspect ${{ env.DOCKERHUB_SLUG }}:${{ steps.meta.outputs.version }}
+          docker buildx imagetools inspect ${{ env.GHCR_SLUG }}:${{ steps.meta.outputs.version }}
       -
         name: Inspect image
         if: github.event_name != 'pull_request'
         run: |
-          docker pull ${{ env.DOCKERHUB_SLUG }}:${{ steps.docker_meta.outputs.version }}
-          docker image inspect ${{ env.DOCKERHUB_SLUG }}:${{ steps.docker_meta.outputs.version }}
-          docker pull ${{ env.GHCR_SLUG }}:${{ steps.docker_meta.outputs.version }}
-          docker image inspect ${{ env.GHCR_SLUG }}:${{ steps.docker_meta.outputs.version }}
+          docker pull ${{ env.DOCKERHUB_SLUG }}:${{ steps.meta.outputs.version }}
+          docker image inspect ${{ env.DOCKERHUB_SLUG }}:${{ steps.meta.outputs.version }}
+          docker pull ${{ env.GHCR_SLUG }}:${{ steps.meta.outputs.version }}
+          docker image inspect ${{ env.GHCR_SLUG }}:${{ steps.meta.outputs.version }}

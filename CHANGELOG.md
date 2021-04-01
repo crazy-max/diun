@@ -47,10 +47,10 @@
 ## 4.10.0 (2020/12/26)
 
 * Refactor CI and dev workflow with buildx bake (#247)
-  * Upload artifacts
-  * Add `image-local` target
-  * Single job for artifacts and image
-  * Add `armv5` artifact
+    * Upload artifacts
+    * Add `image-local` target
+    * Single job for artifacts and image
+    * Add `armv5` artifact
 * MQTT Reconnection Log Spam (#241)
 * Add Docker + File providers user guide (#239)
 * Bump github.com/alecthomas/kong from 0.2.11 to 0.2.12 (#231)
