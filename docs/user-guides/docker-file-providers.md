@@ -53,5 +53,5 @@ through the [File provider](../providers/file.md) **every 6 hours**.
 That's it. Now you can launch Diun with the following command:
 
 ```shell
-$ docker-compose up -d
+docker-compose up -d
 ```

@@ -33,7 +33,7 @@ Maximum number of workers that will execute tasks concurrently. (default `10`)
 [CRON expression](https://godoc.org/github.com/robfig/cron#hdr-CRON_Expression_Format) to schedule Diun.
 
 !!! warning
-  Remove this setting if you want to run Diun directly.
+    Remove this setting if you want to run Diun directly.
 
 !!! example "Config file"
     ```yaml

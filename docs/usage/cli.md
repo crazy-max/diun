@@ -3,7 +3,7 @@
 ## Usage
 
 ```shell
-$ diun [options]
+diun [options]
 ```
 
 ## Options

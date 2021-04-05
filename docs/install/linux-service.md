@@ -33,12 +33,12 @@ Change the user, group, and other required startup values following your needs.
 Enable and start Diun at boot:
 
 ```shell
-$ sudo systemctl enable diun
-$ sudo systemctl start diun
+sudo systemctl enable diun
+sudo systemctl start diun
 ```
 
 To view logs:
 
 ```shell
-$ journalctl -fu diun.service
+journalctl -fu diun.service
 ```

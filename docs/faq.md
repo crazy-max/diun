@@ -17,13 +17,13 @@ watch:
 Through the [command line](usage/cli.md) with:
 
 ```shell
-$ diun --config ./diun.yml --test-notif
+diun --config ./diun.yml --test-notif
 ```
 
 Or within a container:
 
 ```shell
-$ docker-compose exec diun diun --test-notif
+docker-compose exec diun diun --test-notif
 ```
 
 ## field docker|swarm uses unsupported type: invalid

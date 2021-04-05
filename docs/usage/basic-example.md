@@ -32,7 +32,7 @@ your **local Docker** instance **every 6 hours**.
 That's it. Now you can launch Diun with the following command:
 
 ```shell
-$ docker-compose up -d
+docker-compose up -d
 ```
 
 If you prefer to rely on the configuration file instead of environment variables:

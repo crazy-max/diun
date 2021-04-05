@@ -13,7 +13,7 @@ It is possible to always use the latest stable tag or to use another service tha
 
 Following platforms for this image are available:
 
-```shell
+```
 $ docker run --rm mplatform/mquery crazymax/diun:latest
 Image: crazymax/diun:latest
  * Manifest List: Yes
@@ -70,33 +70,33 @@ services:
 Edit this example with your preferences and run the following commands to bring up Diun:
 
 ```shell
-$ docker-compose up -d
-$ docker-compose logs -f
+docker-compose up -d
+docker-compose logs -f
 ```
 
 Or use the following command:
 
 ```shell
-$ docker run -d --name diun \
-    -e "TZ=Europe/Paris" \
-    -e "LOG_LEVEL=info" \
-    -e "LOG_JSON=false" \
-    -e "DIUN_WATCH_WORKERS=20" \
-    -e "DIUN_WATCH_SCHEDULE=0 */6 * * *" \
-    -e "DIUN_PROVIDERS_DOCKER=true" \
-    -e "DIUN_PROVIDERS_DOCKER_WATCHSTOPPED=true" \
-    -v "$(pwd)/data:/data" \
-    -v "/var/run/docker.sock:/var/run/docker.sock" \
-    -l "diun.enable=true" \
-    -l "diun.watch_repo=true" \
-    crazymax/diun:latest
+docker run -d --name diun \
+  -e "TZ=Europe/Paris" \
+  -e "LOG_LEVEL=info" \
+  -e "LOG_JSON=false" \
+  -e "DIUN_WATCH_WORKERS=20" \
+  -e "DIUN_WATCH_SCHEDULE=0 */6 * * *" \
+  -e "DIUN_PROVIDERS_DOCKER=true" \
+  -e "DIUN_PROVIDERS_DOCKER_WATCHSTOPPED=true" \
+  -v "$(pwd)/data:/data" \
+  -v "/var/run/docker.sock:/var/run/docker.sock" \
+  -l "diun.enable=true" \
+  -l "diun.watch_repo=true" \
+  crazymax/diun:latest
 ```
 
 To upgrade your installation to the latest release:
 
 ```shell
-$ docker-compose pull
-$ docker-compose up -d
+docker-compose pull
+docker-compose up -d
 ```
 
 If you prefer to rely on the configuration file instead of environment variables:
