@@ -579,8 +579,8 @@ github.com/mattn/go-shellwords v1.0.11/go.mod h1:EZzvwXDESEeg03EKmM+RmDnNOPKG4lL
 github.com/matttproud/golang_protobuf_extensions v1.0.1/go.mod h1:D8He9yQNgCq6Z5Ld7szi9bcBfOoFv/3dc6xSMkL2PC0=
 github.com/matttproud/golang_protobuf_extensions v1.0.2-0.20181231171920-c182affec369 h1:I0XW9+e1XWDxdcEniV4rQAIOPUGDq67JSCiRCgGCZLI=
 github.com/matttproud/golang_protobuf_extensions v1.0.2-0.20181231171920-c182affec369/go.mod h1:BSXmuO+STAnVfrANrmjBb36TMTDstsz7MSK+HVaYKv4=
-github.com/microcosm-cc/bluemonday v1.0.7 h1:6yAQfk4XT+PI/dk1ZeBp1gr3Q2Hd1DR0O3aEyPUJVTE=
-github.com/microcosm-cc/bluemonday v1.0.7/go.mod h1:HOT/6NaBlR0f9XlxD3zolN6Z3N8Lp4pvhp+jLS5ihnI=
+github.com/microcosm-cc/bluemonday v1.0.8 h1:JGc6zQRHqlp+UlLrsbUbbp0mOaJLV44vvQmBSU0Sfj0=
+github.com/microcosm-cc/bluemonday v1.0.8/go.mod h1:HOT/6NaBlR0f9XlxD3zolN6Z3N8Lp4pvhp+jLS5ihnI=
 github.com/miekg/pkcs11 v1.0.3 h1:iMwmD7I5225wv84WxIG/bmxz9AXjWvTWIbM/TYHvWtw=
 github.com/miekg/pkcs11 v1.0.3/go.mod h1:XsNlhZGX73bx86s2hdc/FuaLm2CPZJemRLMA+WTFxgs=
 github.com/mistifyio/go-zfs v2.1.2-0.20190413222219-f784269be439+incompatible h1:aKW/4cBs+yK6gpqU3K/oIwk9Q/XICqd3zOX/UFuvqmk=
