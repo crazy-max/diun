@@ -4,7 +4,7 @@ go 1.15
 
 require (
 	github.com/alecthomas/kong v0.2.16
-	github.com/containers/image/v5 v5.10.5
+	github.com/containers/image/v5 v5.11.0
 	github.com/crazy-max/gohealthchecks v0.3.0
 	github.com/crazy-max/gonfig v0.4.0
 	github.com/docker/docker v20.10.5+incompatible
@@ -27,7 +27,7 @@ require (
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/rs/zerolog v1.21.0
 	github.com/russross/blackfriday/v2 v2.1.0
-	github.com/sirupsen/logrus v1.7.0
+	github.com/sirupsen/logrus v1.8.1
 	github.com/streadway/amqp v0.0.0-20200108173154-1c71cc93ed71
 	github.com/stretchr/testify v1.7.0
 	github.com/technoweenie/multipartstreamer v1.0.1 // indirect
