@@ -36,28 +36,73 @@ func (c *Client) listContainerImage() []model.Image {
 
 	var list []model.Image
 	for _, ctn := range ctns {
-		imageRaw, err := cli.RawImage(ctn.Image)
+		imageName := ctn.Image
+		imageRaw, err := cli.ImageInspectWithRaw(imageName)
 		if err != nil {
-			c.logger.Error().Err(err).Msgf("Cannot inspect image from container %s", ctn.ID)
-			continue
-		}
-		if local := cli.IsLocalImage(imageRaw); local {
-			c.logger.Debug().Msgf("Skip locally built image from container %s", ctn.ID)
-			continue
-		}
-		if dangling := cli.IsDanglingImage(imageRaw); dangling {
-			c.logger.Debug().Msgf("Skip dangling image from container %s", ctn.ID)
+			c.logger.Error().Err(err).
+				Str("ctn_id", ctn.ID).
+				Str("ctn_image", imageName).
+				Msg("Cannot inspect image")
 			continue
 		}
 
-		image, err := provider.ValidateContainerImage(ctn.Image, ctn.Labels, *c.config.WatchByDefault)
-		if err != nil {
-			c.logger.Error().Err(err).Msgf("Cannot get image from container %s", ctn.ID)
-			continue
-		} else if reflect.DeepEqual(image, model.Image{}) {
-			c.logger.Debug().Msgf("Watch disabled for container %s", ctn.ID)
+		if local := cli.IsLocalImage(imageRaw); local {
+			c.logger.Debug().
+				Str("ctn_id", ctn.ID).
+				Str("ctn_image", imageName).
+				Msg("Skip locally built image")
 			continue
 		}
+
+		if dangling := cli.IsDanglingImage(imageRaw); dangling {
+			c.logger.Debug().
+				Str("ctn_id", ctn.ID).
+				Str("ctn_image", imageName).
+				Msg("Skip dangling image")
+			continue
+		}
+
+		if cli.IsDigest(imageName) {
+			if len(imageRaw.RepoDigests) > 0 {
+				c.logger.Debug().
+					Str("ctn_id", ctn.ID).
+					Str("ctn_image", imageName).
+					Strs("img_repodigests", imageRaw.RepoDigests).
+					Msg("Using first image repo digest available as image name")
+				imageName = imageRaw.RepoDigests[0]
+			} else {
+				c.logger.Debug().
+					Str("ctn_id", ctn.ID).
+					Str("ctn_image", imageName).
+					Strs("img_repodigests", imageRaw.RepoDigests).
+					Msg("Skip unknown image digest ref")
+				continue
+			}
+		}
+
+		c.logger.Debug().
+			Str("ctn_id", ctn.ID).
+			Str("ctn_image", imageName).
+			Interface("ctn_labels", ctn.Labels).
+			Msg("Validate image")
+		image, err := provider.ValidateImage(imageName, ctn.Labels, *c.config.WatchByDefault)
+
+		if err != nil {
+			c.logger.Error().Err(err).
+				Str("ctn_id", ctn.ID).
+				Str("ctn_image", imageName).
+				Interface("ctn_labels", ctn.Labels).
+				Msg("Invalid image")
+			continue
+		} else if reflect.DeepEqual(image, model.Image{}) {
+			c.logger.Debug().
+				Str("ctn_id", ctn.ID).
+				Str("ctn_image", imageName).
+				Interface("ctn_labels", ctn.Labels).
+				Msg("Watch disabled")
+			continue
+		}
+
 		list = append(list, image)
 	}
 
