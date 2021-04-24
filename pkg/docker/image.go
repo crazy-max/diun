@@ -1,10 +1,24 @@
 package docker
 
-import "github.com/docker/docker/api/types"
+import (
+	"regexp"
 
-// RawImage returns the image information and its raw representation
-func (c *Client) RawImage(image string) (types.ImageInspect, error) {
-	imageRaw, _, err := c.API.ImageInspectWithRaw(c.ctx, image)
+	"github.com/docker/docker/api/types"
+)
+
+// ContainerInspect returns the container information.
+func (c *Client) ContainerInspect(containerID string) (types.ContainerJSON, error) {
+	return c.API.ContainerInspect(c.ctx, containerID)
+}
+
+// IsDigest determines image it looks like a digest based image reference.
+func (c *Client) IsDigest(imageID string) bool {
+	return regexp.MustCompile(`^(@|sha256:|@sha256:)([0-9a-f]{64})$`).MatchString(imageID)
+}
+
+// ImageInspectWithRaw returns the image information and its raw representation.
+func (c *Client) ImageInspectWithRaw(imageID string) (types.ImageInspect, error) {
+	imageRaw, _, err := c.API.ImageInspectWithRaw(c.ctx, imageID)
 	return imageRaw, err
 }
 

@@ -29,25 +29,73 @@ func (c *Client) listServiceImage() []model.Image {
 
 	var list []model.Image
 	for _, svc := range svcs {
-		if imageRaw, err := cli.RawImage(svc.Spec.TaskTemplate.ContainerSpec.Image); err == nil {
-			if local := cli.IsLocalImage(imageRaw); local {
-				c.logger.Debug().Msgf("Skip locally built image for service %s", svc.Spec.Name)
-				continue
-			}
-			if dangling := cli.IsDanglingImage(imageRaw); dangling {
-				c.logger.Debug().Msgf("Skip dangling image for service %s", svc.Spec.Name)
+		imageName := svc.Spec.TaskTemplate.ContainerSpec.Image
+		imageRaw, err := cli.ImageInspectWithRaw(svc.Spec.TaskTemplate.ContainerSpec.Image)
+		if err != nil {
+			c.logger.Error().Err(err).
+				Str("svc_name", svc.Spec.Name).
+				Str("ctn_image", imageName).
+				Msg("Cannot inspect image")
+			continue
+		}
+
+		if local := cli.IsLocalImage(imageRaw); local {
+			c.logger.Debug().
+				Str("svc_name", svc.Spec.Name).
+				Str("ctn_image", imageName).
+				Msg("Skip locally built image")
+			continue
+		}
+
+		if dangling := cli.IsDanglingImage(imageRaw); dangling {
+			c.logger.Debug().
+				Str("svc_name", svc.Spec.Name).
+				Str("ctn_image", imageName).
+				Msg("Skip dangling image")
+			continue
+		}
+
+		if cli.IsDigest(imageName) {
+			if len(imageRaw.RepoDigests) > 0 {
+				c.logger.Debug().
+					Str("svc_name", svc.Spec.Name).
+					Str("ctn_image", imageName).
+					Strs("img_repodigests", imageRaw.RepoDigests).
+					Msg("Using first image repo digest available as image name")
+				imageName = imageRaw.RepoDigests[0]
+			} else {
+				c.logger.Debug().
+					Str("svc_name", svc.Spec.Name).
+					Str("ctn_image", imageName).
+					Strs("img_repodigests", imageRaw.RepoDigests).
+					Msg("Skip unknown image digest ref")
 				continue
 			}
 		}
 
-		image, err := provider.ValidateContainerImage(svc.Spec.TaskTemplate.ContainerSpec.Image, svc.Spec.Labels, *c.config.WatchByDefault)
+		c.logger.Debug().
+			Str("svc_name", svc.Spec.Name).
+			Interface("svc_labels", svc.Spec.Labels).
+			Str("ctn_image", imageName).
+			Msg("Validate image")
+
+		image, err := provider.ValidateImage(imageName, svc.Spec.Labels, *c.config.WatchByDefault)
 		if err != nil {
-			c.logger.Error().Err(err).Msgf("Cannot get image from service %s", svc.Spec.Name)
+			c.logger.Error().Err(err).
+				Str("svc_name", svc.Spec.Name).
+				Interface("svc_labels", svc.Spec.Labels).
+				Str("ctn_image", svc.Spec.TaskTemplate.ContainerSpec.Image).
+				Msg("Invalid image")
 			continue
 		} else if reflect.DeepEqual(image, model.Image{}) {
-			c.logger.Debug().Msgf("Watch disabled for service %s", svc.Spec.Name)
+			c.logger.Debug().
+				Str("svc_name", svc.Spec.Name).
+				Interface("svc_labels", svc.Spec.Labels).
+				Str("ctn_image", svc.Spec.TaskTemplate.ContainerSpec.Image).
+				Msg("Watch disabled")
 			continue
 		}
+
 		list = append(list, image)
 	}
 

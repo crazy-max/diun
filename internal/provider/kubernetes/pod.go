@@ -32,14 +32,32 @@ func (c *Client) listPodImage() []model.Image {
 	var list []model.Image
 	for _, pod := range pods {
 		for _, ctn := range pod.Spec.Containers {
-			image, err := provider.ValidateContainerImage(ctn.Image, pod.Annotations, *c.config.WatchByDefault)
+			c.logger.Debug().
+				Str("pod_name", pod.Name).
+				Interface("pod_annot", pod.Annotations).
+				Str("ctn_name", ctn.Name).
+				Str("ctn_image", ctn.Image).
+				Msg("Validate image")
+
+			image, err := provider.ValidateImage(ctn.Image, pod.Annotations, *c.config.WatchByDefault)
 			if err != nil {
-				c.logger.Error().Err(err).Msgf("Cannot get image from container %s (pod %s)", ctn.Name, pod.Name)
+				c.logger.Error().Err(err).
+					Str("pod_name", pod.Name).
+					Interface("pod_annot", pod.Annotations).
+					Str("ctn_name", ctn.Name).
+					Str("ctn_image", ctn.Image).
+					Msg("Invalid image")
 				continue
 			} else if reflect.DeepEqual(image, model.Image{}) {
-				c.logger.Debug().Msgf("Watch disabled for container %s (pod %s)", ctn.Name, pod.Name)
+				c.logger.Debug().
+					Str("pod_name", pod.Name).
+					Interface("pod_annot", pod.Annotations).
+					Str("ctn_name", ctn.Name).
+					Str("ctn_image", ctn.Image).
+					Msg("Watch disabled")
 				continue
 			}
+
 			list = append(list, image)
 		}
 	}
