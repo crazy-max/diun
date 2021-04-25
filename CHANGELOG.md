@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.15.1 (2021/04/25)
+
+* Fix profiler path (#339)
+
 ## 4.15.0 (2021/04/25)
 
 * Add `darwin/arm64` artifact (#338)
