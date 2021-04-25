@@ -20,6 +20,7 @@ func (c *Client) listContainerImage() []model.Image {
 		c.logger.Error().Err(err).Msg("Cannot create Docker client")
 		return []model.Image{}
 	}
+	defer cli.Close()
 
 	ctnFilter := filters.NewArgs()
 	ctnFilter.Add("status", "running")

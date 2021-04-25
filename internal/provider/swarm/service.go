@@ -20,6 +20,7 @@ func (c *Client) listServiceImage() []model.Image {
 		c.logger.Error().Err(err).Msg("Cannot create Docker client")
 		return []model.Image{}
 	}
+	defer cli.Close()
 
 	svcs, err := cli.ServiceList(filters.NewArgs())
 	if err != nil {

@@ -69,3 +69,10 @@ func New(opts Options) (*Client, error) {
 		API: cli,
 	}, err
 }
+
+// Close closes docker client
+func (c *Client) Close() {
+	if c.API != nil {
+		_ = c.API.Close()
+	}
+}
