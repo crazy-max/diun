@@ -39,7 +39,8 @@ RUN apk --update --no-cache add \
 COPY --from=build /usr/local/bin/diun /usr/local/bin/diun
 RUN diun --version
 
-ENV DIUN_DB_PATH="/data/diun.db"
+ENV PROFILER_PATH="/profiler" \
+  DIUN_DB_PATH="/data/diun.db"
 
-VOLUME [ "/data" ]
+VOLUME [ "/data", "/profiler" ]
 ENTRYPOINT [ "diun" ]

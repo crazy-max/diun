@@ -121,3 +121,37 @@ regopts:
 ```
 
 Or you can tweak the [`schedule` setting](config/watch.md#schedule) with something like `0 */6 * * *` (every 6 hours).
+
+## Profiling
+
+Diun provides a simple way to manage runtime/pprof profiling through [`--profiler-path` and `--profiler` flags](usage/cli.md#options):
+
+```yaml
+version: "3.5"
+
+services:
+  diun:
+    image: crazymax/diun:latest
+    volumes:
+      - "./data:/data"
+      - "./profiler:/profiler"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    environment:
+      - "TZ=Europe/Paris"
+      - "LOG_LEVEL=info"
+      - "PROFILER_PATH=/profiler"
+      - "PROFILER=mem"
+      - "DIUN_PROVIDERS_DOCKER=true"
+    restart: always
+```
+
+Following profilers are available:
+
+* `cpu` enables cpu profiling
+* `mem` enables memory profiling
+* `alloc` enables memory profiling and changes which type of memory to profile allocations
+* `heap` enables memory profiling and changes which type of memory profiling to profile the heap
+* `routines` enables goroutine profiling
+* `mutex` enables mutex profiling
+* `threads` enables thread creation profiling
+* `block` enables block (contention) profiling
