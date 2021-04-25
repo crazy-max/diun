@@ -14,6 +14,7 @@ import (
 	"github.com/crazy-max/diun/v4/internal/config"
 	"github.com/crazy-max/diun/v4/internal/logging"
 	"github.com/crazy-max/diun/v4/internal/model"
+	"github.com/pkg/profile"
 	"github.com/rs/zerolog/log"
 )
 
@@ -74,6 +75,31 @@ func main() {
 		log.Fatal().Err(err).Msg("Cannot load configuration")
 	}
 	log.Debug().Msg(cfg.String())
+
+	// Profiler
+	if len(cli.Profiler) > 0 {
+		profilePath := profile.ProfilePath(cfg.Db.Path)
+		switch cli.Profiler {
+		case "cpu":
+			defer profile.Start(profile.CPUProfile, profilePath).Stop()
+		case "mem":
+			defer profile.Start(profile.MemProfile, profilePath).Stop()
+		case "alloc":
+			defer profile.Start(profile.MemProfile, profile.MemProfileAllocs(), profilePath).Stop()
+		case "heap":
+			defer profile.Start(profile.MemProfile, profile.MemProfileHeap(), profilePath).Stop()
+		case "routines":
+			defer profile.Start(profile.GoroutineProfile, profilePath).Stop()
+		case "mutex":
+			defer profile.Start(profile.MutexProfile, profilePath).Stop()
+		case "threads":
+			defer profile.Start(profile.ThreadcreationProfile, profilePath).Stop()
+		case "block":
+			defer profile.Start(profile.BlockProfile, profilePath).Stop()
+		default:
+			log.Fatal().Msgf("Unknown profiler: %s", cli.Profiler)
+		}
+	}
 
 	// Init
 	if diun, err = app.New(meta, cli, cfg); err != nil {
