@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"path"
 	"runtime"
 	"strings"
 	"syscall"
@@ -77,8 +78,12 @@ func main() {
 	log.Debug().Msg(cfg.String())
 
 	// Profiler
-	if len(cli.Profiler) > 0 {
-		profilePath := profile.ProfilePath(cfg.Db.Path)
+	if len(cli.Profiler) > 0 && len(cli.ProfilerPath) > 0 {
+		profilerPath := path.Clean(cli.ProfilerPath)
+		if err = os.MkdirAll(profilerPath, os.ModePerm); err != nil {
+			log.Fatal().Err(err).Msg("Cannot create profiler folder")
+		}
+		profilePath := profile.ProfilePath(profilerPath)
 		switch cli.Profiler {
 		case "cpu":
 			defer profile.Start(profile.CPUProfile, profilePath).Stop()
