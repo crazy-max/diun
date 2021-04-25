@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.15.2 (2021/04/25)
+
+* Make profiler optional (#341)
+
 ## 4.15.1 (2021/04/25)
 
 * Fix profiler path (#339)
