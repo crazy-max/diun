@@ -6,6 +6,7 @@ Diun binaries are available on [releases]({{ config.repo_url }}releases) page.
 
 Choose the archive matching the destination platform:
 
+* [diun_{{ git.tag | trim('v') }}_darwin_arm64.tar.gz]({{ config.repo_url }}/releases/download/v{{ git.tag | trim('v') }}/diun_{{ git.tag | trim('v') }}_darwin_arm64.tar.gz)
 * [diun_{{ git.tag | trim('v') }}_darwin_x86_64.tar.gz]({{ config.repo_url }}/releases/download/v{{ git.tag | trim('v') }}/diun_{{ git.tag | trim('v') }}_darwin_x86_64.tar.gz)
 * [diun_{{ git.tag | trim('v') }}_linux_arm64.tar.gz]({{ config.repo_url }}/releases/download/v{{ git.tag | trim('v') }}/diun_{{ git.tag | trim('v') }}_linux_arm64.tar.gz)
 * [diun_{{ git.tag | trim('v') }}_linux_armv5.tar.gz]({{ config.repo_url }}/releases/download/v{{ git.tag | trim('v') }}/diun_{{ git.tag | trim('v') }}_linux_armv5.tar.gz)
@@ -24,7 +25,8 @@ And extract diun:
 wget -qO- {{ config.repo_url }}releases/download/v{{ git.tag | trim('v') }}/diun_{{ git.tag | trim('v') }}_linux_x86_64.tar.gz | tar -zxvf - diun
 ```
 
-After getting the binary, it can be tested with [`./diun --help`](../usage/cli.md) command and moved to a permanent location.
+After getting the binary, it can be tested with [`./diun --help`](../usage/cli.md) command and moved to a permanent
+location.
 
 ## Server configuration
 
@@ -84,6 +86,8 @@ DIUN_DB_PATH=/var/lib/diun/diun.db /usr/local/bin/diun --config /etc/diun/diun.y
 
 ## Updating to a new version
 
-You can update to a new version of Diun by stopping it, replacing the binary at `/usr/local/bin/diun` and restarting the instance.
+You can update to a new version of Diun by stopping it, replacing the binary at `/usr/local/bin/diun` and restarting
+the instance.
 
-If you have carried out the installation steps as described above, the binary should have the generic name `diun`. Do not change this, i.e. to include the version number.
+If you have carried out the installation steps as described above, the binary should have the generic name `diun`. Do
+not change this, i.e. to include the version number.
