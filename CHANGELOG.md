@@ -1,5 +1,20 @@
 # Changelog
 
+## 4.15.0 (2021/04/25)
+
+* Add `darwin/arm64` artifact (#338)
+* MkDocs Materials 7.1.3 (#337)
+* Add profiler flag (#336)
+* Handle digest based image reference (#335)
+* Bump github.com/docker/docker from 20.10.5+incompatible to 20.10.6+incompatible (#324)
+* Bump github.com/containers/image/v5 from 5.10.5 to 5.11.1 (#323 #330)
+* Bump github.com/go-playground/validator/v10 from 10.4.1 to 10.5.0 (#319)
+* Bump github.com/panjf2000/ants/v2 from 2.4.3 to 2.4.4 (#312)
+* Bump github.com/rs/zerolog from 1.20.0 to 1.21.0 (#309)
+* Bump github.com/microcosm-cc/bluemonday from 1.0.4 to 1.0.9 (#311 #321 #325 #333)
+* Bump github.com/eclipse/paho.mqtt.golang from 1.3.2 to 1.3.3 (#316)
+* Deploy docs on workflow dispatch or tag (#305)
+
 ## 4.14.0 (2021/03/15)
 
 * Bump k8s.io/client-go from 0.19.4 to 0.20.4 (#280)
