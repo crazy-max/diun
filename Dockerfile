@@ -42,5 +42,5 @@ RUN diun --version
 ENV PROFILER_PATH="/profiler" \
   DIUN_DB_PATH="/data/diun.db"
 
-VOLUME [ "/data", "/profiler" ]
+VOLUME [ "/data" ]
 ENTRYPOINT [ "diun" ]
