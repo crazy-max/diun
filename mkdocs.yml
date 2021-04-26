@@ -86,6 +86,7 @@ nav:
   - Home: index.md
   - Installation:
     - From Docker image: install/docker.md
+    - Podman: install/podman.md
     - From binary: install/binary.md
     - Linux service: install/linux-service.md
   - Usage:
