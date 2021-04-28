@@ -2,13 +2,15 @@
 
 ## About
 
-The Swarm provider allows you to analyze the services of your Swarm cluster to extract images found and check for updates on the registry.
+The Swarm provider allows you to analyze the services of your Swarm cluster to extract images found and check for
+updates on the registry.
 
 ## Quick start
 
 In this section we quickly go over a basic stack using your local swarm cluster.
 
-Here we use our local Swarm provider with a minimum configuration to analyze labeled containers (watch by default disabled).
+Here we use our local Swarm provider with a minimum configuration to analyze labeled containers (watch by default
+disabled).
 
 Now let's create a simple stack for Diun:
 
@@ -56,7 +58,8 @@ services:
         - "diun.watch_repo=true"
 ```
 
-As an example we use [nginx](https://hub.docker.com/_/nginx/) Docker image. A few [labels](#docker-labels) are added to configure the image analysis of this service for Diun. We can now start these 2 stacks:
+As an example we use [nginx](https://hub.docker.com/_/nginx/) Docker image. A few [labels](#docker-labels) are added
+to configure the image analysis of this service for Diun. We can now start these 2 stacks:
 
 ```
 docker stack deploy -c diun.yml diun
@@ -175,7 +178,7 @@ You can configure more finely the way to analyze the image of your service throu
 |-------------------------------|---------------|---------------|
 | `diun.enable`                 |               | Set to true to enable image analysis of this service |
 | `diun.regopt`                 |               | [Registry options](../config/regopts.md) name to use |
-| `diun.watch_repo`             | `false`       | Watch all tags of this service image |
+| `diun.watch_repo`             | `false`       | Watch all tags of this service image ([be careful](../faq.md#docker-hub-rate-limits) with this setting) |
 | `diun.max_tags`               | `0`           | Maximum number of tags to watch if `diun.watch_repo` enabled. `0` means all of them |
 | `diun.include_tags`           |               | Semi-colon separated list of regular expressions to include tags. Can be useful if you enable `diun.watch_repo` |
 | `diun.exclude_tags`           |               | Semi-colon separated list of regular expressions to exclude tags. Can be useful if you enable `diun.watch_repo` |
