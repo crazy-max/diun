@@ -67,6 +67,9 @@ services:
     restart: always
 ```
 
+!!! note
+    If you are running [Podman](https://podman.io/), please check the appropriate [page](./podman.md)
+
 Edit this example with your preferences and run the following commands to bring up Diun:
 
 ```shell
