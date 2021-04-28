@@ -47,7 +47,7 @@ should be:
 
 ## No image found in manifest list for architecture, variant, OS
 
-If you encounter this kind of warning, you are probably using the [file provider](providers/file.md) containing an
+If you encounter this kind of warning, you are probably using the [file provider](providers/file.md) for an
 image with an erroneous or empty platform. If the platform is not filled in, it will be deduced automatically from the
 information of your operating system on which Diun is running.
 
@@ -121,6 +121,9 @@ regopts:
 ```
 
 Or you can tweak the [`schedule` setting](config/watch.md#schedule) with something like `0 */6 * * *` (every 6 hours).
+
+!!! warning
+    Also be careful with the `watch_repo` setting as it will fetch manifest for **ALL** tags available for the image.
 
 ## Profiling
 

@@ -35,15 +35,13 @@ services:
 ```yaml
 # /custom-images.yml
 - name: ghcr.io/crazy-max/diun
-  watch_repo: true
 - name: alpine
-  watch_repo: true
 - name: debian:stretch-slim
 - name: nginx:stable-alpine
 - name: traefik
   watch_repo: true
   include_tags:
-    - ^(0|[1-9]\d*)\..*-alpine
+    - ^(0|[1-9]\d*)\..*
 ```
 
 Here we use a minimal configuration to analyze **all running containers** (watch by default enabled) of
