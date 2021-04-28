@@ -24,6 +24,18 @@ Here are a few things you can do that will increase the likelihood of your pull 
 * Keep your change as focused as possible. If there are multiple changes you would like to make that are not dependent upon each other, consider submitting them as **separate pull requests**.
 * Write a [good commit message](http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html).
 
+## Documentation
+
+If you want to contribute to the documentation you can test its rendering locally with the following commands:
+
+```shell
+# Build mkdocs image
+docker build -t mkdocs -f ./hack/docs.Dockerfile --target base .
+# Run mkdocs image and watch for changes
+docker run --rm -it -p 8000:8000 -v $(pwd):/docs mkdocs
+# Open http://localhost:8000 on your browser
+```
+
 ## Resources
 
 * [How to Contribute to Open Source](https://opensource.guide/how-to-contribute/)
