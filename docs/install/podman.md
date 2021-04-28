@@ -1,19 +1,17 @@
-# Podman monitoring
+# Installation with Podman
 
 ## About
 
 [Podman](https://podman.io) is now the default container runtime in some, *mainly RPM-based*, Linux distributions like RHEL.
 
-Podman needs only a config tweak to work with diun as it is backwards-compatible with the Docker API
+Podman needs only a config tweak to work with diun as it is backwards-compatible with the Docker API.
 
 ## Prerequisites
 
 !!! warning
-    Package `podman-docker` is not available in debian-based environnement, only native method is supported
+    Package `podman-docker` is not available in debian-based environment, only native method is supported
 
-At first you need to check if you have the `podman-docker` package installed and then follow the appropriate section :
-
-You can use :
+First of all you need to check if you have the `podman-docker` package installed with the following command:
 
 ```shell
 rpm -q podman-docker
@@ -27,17 +25,15 @@ rpm -q podman-docker
 !!! note
     You need [Podman Compose](https://github.com/containers/podman-compose) to process `docker-compose` files
 
-
-Enable and start the socket :
+Enable and start the socket:
 
 ```shell
-# When monitoring root instance :
-  sudo systemctl enable podman.socket
-  sudo systemctl start podman.socket
-# When monitoring user instance (connected as the user)
-  systemctl enable --user podman.socket
-  systemctl start --user podman.socket
-```
+# monitoring root instance
+sudo systemctl enable podman.socket
+sudo systemctl start podman.socket
+# monitoring user instance
+systemctl enable --user podman.socket
+systemctl start --user podman.socket
 
 Without `podman-docker`, you need to modfiy the socket location
 
