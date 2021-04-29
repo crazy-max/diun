@@ -31,8 +31,8 @@ This support includes Linux, macOS, and Windows, on architectures like amd64, i3
 * Internal cron implementation through go routines
 * Worker pool to parallelize analyses
 * Allow overriding image os and architecture
-* [Docker](providers/docker.md), [Swarm](providers/swarm.md), [Kubernetes](providers/kubernetes.md)
-and [File](providers/file.md) providers available
+* [Docker](providers/docker.md), [Swarm](providers/swarm.md), [Kubernetes](providers/kubernetes.md),
+[Dockerfile](providers/dockerfile.md) and [File](providers/file.md) providers available
 * Get notified through Gotify, Mail, Slack, Telegram and [more](config/index.md#reference)
 * [Healthchecks support](config/watch.md#healthchecks) to monitor Diun watcher
 * Enhanced logging

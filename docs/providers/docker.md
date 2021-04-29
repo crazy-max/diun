@@ -177,3 +177,4 @@ You can configure more finely the way to analyze the image of your container thr
 | `diun.max_tags`               | `0`           | Maximum number of tags to watch if `diun.watch_repo` enabled. `0` means all of them |
 | `diun.include_tags`           |               | Semi-colon separated list of regular expressions to include tags. Can be useful if you enable `diun.watch_repo` |
 | `diun.exclude_tags`           |               | Semi-colon separated list of regular expressions to exclude tags. Can be useful if you enable `diun.watch_repo` |
+| `diun.platform`               | _automatic_   | Platform to use (e.g. `linux/amd64`) |

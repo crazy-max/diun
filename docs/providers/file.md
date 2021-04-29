@@ -60,12 +60,12 @@ providers:
 
 # Watch portainer/portainer image on docker.io (DockerHub) and assume latest tag
 # with registry options named 'docker.io' (image selector).
-# Only watch latest 10 tags and include tags matching regexp ^(0|[1-9]\d*)\..*
+# Only watch latest 10 tags and include tags matching regexp ^\d+\.\d+\..*
 - name: docker.io/portainer/portainer
   watch_repo: true
   max_tags: 10
   include_tags:
-    - ^(0|[1-9]\d*)\..*
+    - ^\d+\.\d+\..*
 
 # Watch alpine image (library) and assume docker.io registry and latest tag
 # with registry options named 'docker.io' (image selector).
@@ -178,6 +178,6 @@ The configuration file(s) defines a slice of images to analyze with the followin
 | `max_tags`                    | `0`                              | Maximum number of tags to watch if `watch_repo` enabled. `0` means all of them |
 | `include_tags`                |                                  | List of regular expressions to include tags. Can be useful if you enable `watch_repo` |
 | `exclude_tags`                |                                  | List of regular expressions to exclude tags. Can be useful if you enable `watch_repo` |
-| `platform.os`                 | dynamic based on your OS specs   | Operating system to use as custom platform |
-| `platform.arch`               | dynamic based on your OS specs   | CPU architecture to use as custom platform |
-| `platform.variant`            | dynamic based on your OS specs   | Variant of the CPU to use as custom platform |
+| `platform.os`                 | _automatic_                      | Operating system to use as custom platform |
+| `platform.arch`               | _automatic_                      | CPU architecture to use as custom platform |
+| `platform.variant`            | _automatic_                      | Variant of the CPU to use as custom platform |

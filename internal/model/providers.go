@@ -6,6 +6,7 @@ type Providers struct {
 	Swarm      *PrdSwarm      `yaml:"swarm,omitempty" json:"swarm,omitempty" label:"allowEmpty" file:"allowEmpty"`
 	Kubernetes *PrdKubernetes `yaml:"kubernetes,omitempty" json:"kubernetes,omitempty" label:"allowEmpty" file:"allowEmpty"`
 	File       *PrdFile       `yaml:"file,omitempty" json:"file,omitempty"`
+	Dockerfile *PrdDockerfile `yaml:"dockerfile,omitempty" json:"dockerfile,omitempty"`
 }
 
 // GetDefaults gets the default values
