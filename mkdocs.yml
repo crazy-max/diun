@@ -114,9 +114,10 @@ nav:
     - Webhook: notif/webhook.md
   - Providers:
     - Docker: providers/docker.md
-    - File: providers/file.md
     - Kubernetes: providers/kubernetes.md
     - Swarm: providers/swarm.md
+    - Dockerfile: providers/dockerfile.md
+    - File: providers/file.md
   - User guides:
     - Docker + File providers: user-guides/docker-file-providers.md
   - FAQ: faq.md

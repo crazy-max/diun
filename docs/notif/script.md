@@ -35,7 +35,7 @@ DIUN_ENTRY_PLATFORM=linux/amd64
 
 !!! abstract "Environment variables"
     * `DIUN_NOTIF_SCRIPT_CMD`
-    * `DIUN_NOTIF_SCRIPT_ARGS`
+    * `DIUN_NOTIF_SCRIPT_ARGS` (comma separated)
     * `DIUN_NOTIF_SCRIPT_DIR`
 
 [^1]: Value required

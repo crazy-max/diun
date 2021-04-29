@@ -43,7 +43,7 @@ services:
 - name: traefik
   watch_repo: true
   include_tags:
-    - ^(0|[1-9]\d*)\..*-alpine
+    - ^\d+\.\d+\..*
 ```
 
 Here we use a minimal configuration to analyze **all running containers** (watch by default enabled) of

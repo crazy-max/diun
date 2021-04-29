@@ -8,7 +8,7 @@
   watch_repo: true
   max_tags: 10
   include_tags:
-    - ^(0|[1-9]\d*)\..*
+    - ^\d+\.\d+\..*
 - name: traefik
   watch_repo: true
 - name: alpine
