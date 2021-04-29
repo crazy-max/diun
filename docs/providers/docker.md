@@ -2,13 +2,15 @@
 
 ## About
 
-The Docker provider allows you to analyze the containers of your Docker instance to extract images found and check for updates on the registry.
+The Docker provider allows you to analyze the containers of your Docker instance to extract images found and check
+for updates on the registry.
 
 ## Quick start
 
 In this section we quickly go over a basic docker-compose file using your local docker provider.
 
-Here we use a single Docker provider with a minimum configuration to analyze labeled containers (watch by default disabled), even stopped ones, of your local Docker instance.
+Here we use a single Docker provider with a minimum configuration to analyze labeled containers
+(watch by default disabled), even stopped ones, of your local Docker instance.
 
 Now let's create a simple docker-compose file with Diun and some simple services:
 
@@ -28,7 +30,6 @@ services:
       - "DIUN_WATCH_WORKERS=20"
       - "DIUN_WATCH_SCHEDULE=0 */6 * * *"
       - "DIUN_PROVIDERS_DOCKER=true"
-      - "DIUN_PROVIDERS_DOCKER_WATCHSTOPPED=true"
     restart: always
 
   cloudflared:
@@ -45,11 +46,12 @@ services:
       - "TUNNEL_DNS_UPSTREAM=https://1.1.1.1/dns-query,https://1.0.0.1/dns-query"
     labels:
       - "diun.enable=true"
-      - "diun.watch_repo=true"
     restart: always
 ```
 
-As an example we use [crazymax/cloudflared:latest](https://github.com/crazy-max/docker-cloudflared) Docker image. A few [labels](#docker-labels) are added to configure the image analysis of this container for Diun. Now start this composition with `docker-composes up -d` and take a look at the logs:
+As an example we use [crazymax/cloudflared:latest](https://github.com/crazy-max/docker-cloudflared) Docker image.
+A few [labels](#docker-labels) are added to configure the image analysis of this container for Diun. Now start this
+composition with `docker-composes up -d` and take a look at the logs:
 
 ```
 $ docker-compose logs -f
@@ -171,7 +173,7 @@ You can configure more finely the way to analyze the image of your container thr
 |-------------------------------|---------------|---------------|
 | `diun.enable`                 |               | Set to true to enable image analysis of this container |
 | `diun.regopt`                 |               | [Registry options](../config/regopts.md) name to use |
-| `diun.watch_repo`             | `false`       | Watch all tags of this container image |
+| `diun.watch_repo`             | `false`       | Watch all tags of this container image ([be careful](../faq.md#docker-hub-rate-limits) with this setting) |
 | `diun.max_tags`               | `0`           | Maximum number of tags to watch if `diun.watch_repo` enabled. `0` means all of them |
 | `diun.include_tags`           |               | Semi-colon separated list of regular expressions to include tags. Can be useful if you enable `diun.watch_repo` |
 | `diun.exclude_tags`           |               | Semi-colon separated list of regular expressions to exclude tags. Can be useful if you enable `diun.watch_repo` |

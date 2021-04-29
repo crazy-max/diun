@@ -35,9 +35,7 @@ services:
 ```yaml
 # /custom-images.yml
 - name: ghcr.io/crazy-max/diun
-  watch_repo: true
 - name: alpine
-  watch_repo: true
 - name: debian:stretch-slim
 - name: nginx:stable-alpine
 - name: traefik
