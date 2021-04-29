@@ -1,5 +1,13 @@
 # Changelog
 
+## 4.16.0 (2021/04/29)
+
+* Dockerfile provider (#329)
+* Note about `watch_repo` setting (#348)
+* Contribute to doc (#347)
+* Update docs for Podman support (#345)
+* Optional profiler volume (#344)
+
 ## 4.15.2 (2021/04/25)
 
 * Make profiler optional (#341)
