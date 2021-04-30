@@ -119,6 +119,7 @@ nav:
     - Dockerfile: providers/dockerfile.md
     - File: providers/file.md
   - User guides:
+    - Blog posts: user-guides/blog-posts.md
     - Docker + File providers: user-guides/docker-file-providers.md
   - FAQ: faq.md
   - Changelog: changelog.md
