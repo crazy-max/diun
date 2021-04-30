@@ -30,57 +30,13 @@ func (c *Client) listServiceImage() []model.Image {
 
 	var list []model.Image
 	for _, svc := range svcs {
-		imageName := svc.Spec.TaskTemplate.ContainerSpec.Image
-		imageRaw, err := cli.ImageInspectWithRaw(svc.Spec.TaskTemplate.ContainerSpec.Image)
-		if err != nil {
-			c.logger.Error().Err(err).
-				Str("svc_name", svc.Spec.Name).
-				Str("ctn_image", imageName).
-				Msg("Cannot inspect image")
-			continue
-		}
-
-		if local := cli.IsLocalImage(imageRaw); local {
-			c.logger.Debug().
-				Str("svc_name", svc.Spec.Name).
-				Str("ctn_image", imageName).
-				Msg("Skip locally built image")
-			continue
-		}
-
-		if dangling := cli.IsDanglingImage(imageRaw); dangling {
-			c.logger.Debug().
-				Str("svc_name", svc.Spec.Name).
-				Str("ctn_image", imageName).
-				Msg("Skip dangling image")
-			continue
-		}
-
-		if cli.IsDigest(imageName) {
-			if len(imageRaw.RepoDigests) > 0 {
-				c.logger.Debug().
-					Str("svc_name", svc.Spec.Name).
-					Str("ctn_image", imageName).
-					Strs("img_repodigests", imageRaw.RepoDigests).
-					Msg("Using first image repo digest available as image name")
-				imageName = imageRaw.RepoDigests[0]
-			} else {
-				c.logger.Debug().
-					Str("svc_name", svc.Spec.Name).
-					Str("ctn_image", imageName).
-					Strs("img_repodigests", imageRaw.RepoDigests).
-					Msg("Skip unknown image digest ref")
-				continue
-			}
-		}
-
 		c.logger.Debug().
 			Str("svc_name", svc.Spec.Name).
 			Interface("svc_labels", svc.Spec.Labels).
-			Str("ctn_image", imageName).
+			Str("ctn_image", svc.Spec.TaskTemplate.ContainerSpec.Image).
 			Msg("Validate image")
 
-		image, err := provider.ValidateImage(imageName, svc.Spec.Labels, *c.config.WatchByDefault)
+		image, err := provider.ValidateImage(svc.Spec.TaskTemplate.ContainerSpec.Image, svc.Spec.Labels, *c.config.WatchByDefault)
 		if err != nil {
 			c.logger.Error().Err(err).
 				Str("svc_name", svc.Spec.Name).
