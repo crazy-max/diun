@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.16.1 (2021/04/30)
+
+* Fix Swarm Provider (#351)
+
 ## 4.16.0 (2021/04/29)
 
 * Dockerfile provider (#329)
