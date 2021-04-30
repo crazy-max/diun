@@ -21,9 +21,9 @@ Multiple chat IDs can be provided in order to deliver notifications to multiple 
 
 | Name               | Default       | Description   |
 |--------------------|---------------|---------------|
-| `token`            |               | Telegram bot token |
+| `token`            |               | Telegram bot token (you get your token over the Telegram User @BotFather > `/mybots` > "API Token") |
 | `tokenFile`        |               | Use content of secret file as Telegram bot token if `token` not defined |
-| `chatIDs`          |               | List of chat IDs to send notifications to |
+| `chatIDs`          |               | List of chat IDs to send notifications to (your chat IDs you get if you go to your BOT and send a message to `@getidsbot` `ID: 123456789`) |
 | `chatIDsFile`      |               | Use content of secret file as chat IDs if `chatIDs` not defined |
 
 !!! abstract "Environment variables"
