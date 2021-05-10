@@ -20,8 +20,8 @@ target "git-ref" {
   }
 }
 
-// Special target: https://github.com/crazy-max/ghaction-docker-meta#bake-definition
-target "ghaction-docker-meta" {
+// Special target: https://github.com/docker/metadata-action#bake-definition
+target "docker-metadata-action" {
   tags = ["crazymax/diun:local"]
 }
 
@@ -90,7 +90,7 @@ target "artifact-all" {
 }
 
 target "image" {
-  inherits = ["go-version", "git-ref", "ghaction-docker-meta"]
+  inherits = ["go-version", "git-ref", "docker-metadata-action"]
 }
 
 target "image-local" {
