@@ -51,3 +51,25 @@ func (c *Client) PutManifest(image registry.Image, manifest registry.Manifest) e
 
 	return err
 }
+
+// GetAllManifests returns a list of all Docker image manifests
+func (c *Client) GetAllManifests() ([]registry.Manifest, error) {
+	tx, err := c.Begin(true)
+	if err != nil {
+		return nil, err
+	}
+
+    var manifests []registry.Manifest
+
+	bucket := tx.Bucket([]byte(bucketManifest))
+	curs := bucket.Cursor()
+	for k, v := curs.First(); k != nil; k, v = curs.Next() {
+		var manifest registry.Manifest
+		if err := json.Unmarshal(v, &manifest); err != nil {
+			return nil, err
+		}
+        manifests = append(manifests, manifest)
+	}
+
+    return manifests, err
+}

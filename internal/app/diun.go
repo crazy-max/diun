@@ -1,6 +1,7 @@
 package app
 
 import (
+	"encoding/json"
 	"net/url"
 	"sync"
 	"sync/atomic"
@@ -175,6 +176,27 @@ func (di *Diun) Close() {
 	if err := di.db.Close(); err != nil {
 		log.Warn().Err(err).Msg("Cannot close database")
 	}
+}
+
+// List show all checked images
+func (di *Diun) List() {
+  manifests, err := di.db.GetAllManifests()
+  if err != nil {
+    log.Error().Err(err).Msg("Failed to get manifests")
+    return
+  }
+
+  for _, manifest := range manifests {
+    jsonStr, err := json.Marshal(manifest)
+    if err != nil {
+      log.Error().Err(err).Msg("Could not marshal JSON")
+      return
+    }
+
+    log.Info().RawJSON("manifest", jsonStr).Msg("")
+  }
+  
+  log.Info().Int("manifests", len(manifests)).Msg("List all manifests")
 }
 
 // TestNotif test the notification settings

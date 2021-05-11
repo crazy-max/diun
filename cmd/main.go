@@ -111,6 +111,12 @@ func main() {
 		log.Fatal().Err(err).Msgf("Cannot initialize %s", meta.Name)
 	}
 
+    // List images
+    if cli.List {
+        diun.List()
+        return
+    }
+
 	// Test notif
 	if cli.TestNotif {
 		diun.TestNotif()
