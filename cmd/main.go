@@ -90,9 +90,9 @@ func main() {
 		case "mem":
 			defer profile.Start(profile.MemProfile, profilePath).Stop()
 		case "alloc":
-			defer profile.Start(profile.MemProfile, profile.MemProfileAllocs(), profilePath).Stop()
+			defer profile.Start(profile.MemProfileAllocs, profilePath).Stop()
 		case "heap":
-			defer profile.Start(profile.MemProfile, profile.MemProfileHeap(), profilePath).Stop()
+			defer profile.Start(profile.MemProfileHeap, profilePath).Stop()
 		case "routines":
 			defer profile.Start(profile.GoroutineProfile, profilePath).Stop()
 		case "mutex":
