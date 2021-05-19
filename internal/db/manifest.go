@@ -25,6 +25,25 @@ func (c *Client) First(image registry.Image) (bool, error) {
 	return !found, err
 }
 
+// ListManifest return a list of Docker images manifests
+func (c *Client) ListManifest() ([]registry.Manifest, error) {
+	var manifests []registry.Manifest
+
+	err := c.View(func(tx *bolt.Tx) error {
+		c := tx.Bucket([]byte(bucketManifest)).Cursor()
+		for k, v := c.First(); k != nil; k, v = c.Next() {
+			var manifest registry.Manifest
+			if err := json.Unmarshal(v, &manifest); err != nil {
+				return err
+			}
+			manifests = append(manifests, manifest)
+		}
+		return nil
+	})
+
+	return manifests, err
+}
+
 // GetManifest returns Docker image manifest
 func (c *Client) GetManifest(image registry.Image) (registry.Manifest, error) {
 	var manifest registry.Manifest
@@ -43,11 +62,55 @@ func (c *Client) GetManifest(image registry.Image) (registry.Manifest, error) {
 // PutManifest add Docker image manifest in db
 func (c *Client) PutManifest(image registry.Image, manifest registry.Manifest) error {
 	entryBytes, _ := json.Marshal(manifest)
-
-	err := c.Update(func(tx *bolt.Tx) error {
+	return c.Update(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(bucketManifest))
 		return b.Put([]byte(image.String()), entryBytes)
 	})
+}
 
-	return err
+// ListImage return a list of Docker images with their linked manifests
+func (c *Client) ListImage() (map[string][]registry.Manifest, error) {
+	images := make(map[string][]registry.Manifest)
+
+	err := c.View(func(tx *bolt.Tx) error {
+		c := tx.Bucket([]byte(bucketManifest)).Cursor()
+		for k, v := c.First(); k != nil; k, v = c.Next() {
+			var manifest registry.Manifest
+			if err := json.Unmarshal(v, &manifest); err != nil {
+				return err
+			}
+			if _, ok := images[manifest.Name]; !ok {
+				images[manifest.Name] = []registry.Manifest{}
+			}
+			images[manifest.Name] = append(images[manifest.Name], manifest)
+		}
+		return nil
+	})
+
+	return images, err
+}
+
+// ListImageLatest return a list of Docker images with its most recent manifest
+func (c *Client) ListImageLatest() (map[string]registry.Manifest, error) {
+	images := make(map[string]registry.Manifest)
+
+	err := c.View(func(tx *bolt.Tx) error {
+		c := tx.Bucket([]byte(bucketManifest)).Cursor()
+		for k, v := c.First(); k != nil; k, v = c.Next() {
+			var manifest registry.Manifest
+			if err := json.Unmarshal(v, &manifest); err != nil {
+				return err
+			}
+			if cur, ok := images[manifest.Name]; ok {
+				if cur.Created.Before(*manifest.Created) {
+					images[manifest.Name] = manifest
+				}
+			} else {
+				images[manifest.Name] = manifest
+			}
+		}
+		return nil
+	})
+
+	return images, err
 }

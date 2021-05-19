@@ -18,55 +18,33 @@ import (
 func TestLoadFile(t *testing.T) {
 	cases := []struct {
 		name     string
-		cli      model.Cli
+		cfg      string
 		wantData *config.Config
 		wantErr  bool
 	}{
 		{
-			name: "Failed on non-existing file",
-			cli: model.Cli{
-				TestNotif: false,
-			},
+			name:    "Failed on non-existing file",
+			cfg:     "",
 			wantErr: true,
 		},
 		{
-			name: "Fail on wrong file format",
-			cli: model.Cli{
-				Cfgfile:   "./fixtures/config.invalid.yml",
-				TestNotif: false,
-			},
+			name:    "Fail on wrong file format",
+			cfg:     "./fixtures/config.invalid.yml",
 			wantErr: true,
 		},
 		{
-			name: "Fail on no UUID for Healthchecks",
-			cli: model.Cli{
-				Cfgfile:   "./fixtures/config.err.hc.yml",
-				TestNotif: false,
-			},
+			name:    "Fail on no UUID for Healthchecks",
+			cfg:     "./fixtures/config.err.hc.yml",
 			wantErr: true,
 		},
 		{
-			name: "Fail on no notifier if test notif",
-			cli: model.Cli{
-				Cfgfile:   "./fixtures/config.err.notif.yml",
-				TestNotif: true,
-			},
-			wantErr: true,
-		},
-		{
-			name: "Fail on no provider",
-			cli: model.Cli{
-				Cfgfile:   "./fixtures/config.err.provider.yml",
-				TestNotif: false,
-			},
+			name:    "Fail on no provider",
+			cfg:     "./fixtures/config.err.provider.yml",
 			wantErr: true,
 		},
 		{
 			name: "Success",
-			cli: model.Cli{
-				Cfgfile:   "./fixtures/config.test.yml",
-				TestNotif: false,
-			},
+			cfg:  "./fixtures/config.test.yml",
 			wantData: &config.Config{
 				Db: &model.Db{
 					Path: "diun.db",
@@ -218,7 +196,7 @@ func TestLoadFile(t *testing.T) {
 	}
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
-			cfg, err := config.Load(tt.cli)
+			cfg, err := config.Load(tt.cfg)
 			if tt.wantErr {
 				require.Error(t, err)
 				return
@@ -237,7 +215,7 @@ func TestLoadEnv(t *testing.T) {
 
 	testCases := []struct {
 		desc     string
-		cli      model.Cli
+		cfg      string
 		environ  []string
 		expected interface{}
 		wantErr  bool
@@ -365,7 +343,7 @@ func TestLoadEnv(t *testing.T) {
 				}
 			}
 
-			cfg, err := config.Load(tt.cli)
+			cfg, err := config.Load(tt.cfg)
 			if tt.wantErr {
 				require.Error(t, err)
 				return
@@ -382,17 +360,14 @@ func TestLoadMixed(t *testing.T) {
 
 	testCases := []struct {
 		desc     string
-		cli      model.Cli
+		cfg      string
 		environ  []string
 		expected interface{}
 		wantErr  bool
 	}{
 		{
 			desc: "env vars and invalid file",
-			cli: model.Cli{
-				Cfgfile:   "./fixtures/config.invalid.yml",
-				TestNotif: false,
-			},
+			cfg:  "./fixtures/config.invalid.yml",
 			environ: []string{
 				"DIUN_PROVIDERS_DOCKER=true",
 			},
@@ -401,10 +376,7 @@ func TestLoadMixed(t *testing.T) {
 		},
 		{
 			desc: "docker provider (file) and notif mails (envs)",
-			cli: model.Cli{
-				Cfgfile:   "./fixtures/config.docker.yml",
-				TestNotif: false,
-			},
+			cfg:  "./fixtures/config.docker.yml",
 			environ: []string{
 				"DIUN_NOTIF_MAIL_HOST=127.0.0.1",
 				"DIUN_NOTIF_MAIL_PORT=25",
@@ -441,10 +413,7 @@ func TestLoadMixed(t *testing.T) {
 		},
 		{
 			desc: "file provider and notif webhook env override",
-			cli: model.Cli{
-				Cfgfile:   "./fixtures/config.file.yml",
-				TestNotif: false,
-			},
+			cfg:  "./fixtures/config.file.yml",
 			environ: []string{
 				"DIUN_NOTIF_WEBHOOK_ENDPOINT=http://webhook.foo.com/sd54qad89azd5a",
 				"DIUN_NOTIF_WEBHOOK_HEADERS_AUTHORIZATION=Token78910",
@@ -488,7 +457,7 @@ func TestLoadMixed(t *testing.T) {
 				}
 			}
 
-			cfg, err := config.Load(tt.cli)
+			cfg, err := config.Load(tt.cfg)
 			if tt.wantErr {
 				require.Error(t, err)
 				return
@@ -503,19 +472,16 @@ func TestLoadMixed(t *testing.T) {
 func TestValidation(t *testing.T) {
 	cases := []struct {
 		name string
-		cli  model.Cli
+		cfg  string
 	}{
 		{
 			name: "Success",
-			cli: model.Cli{
-				Cfgfile:   "./fixtures/config.validate.yml",
-				TestNotif: false,
-			},
+			cfg:  "./fixtures/config.validate.yml",
 		},
 	}
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
-			cfg, err := config.Load(tt.cli)
+			cfg, err := config.Load(tt.cfg)
 			require.NoError(t, err)
 
 			dec, err := env.Encode("DIUN_", cfg)

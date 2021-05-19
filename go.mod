@@ -1,6 +1,6 @@
 module github.com/crazy-max/diun/v4
 
-go 1.15
+go 1.16
 
 require (
 	github.com/alecthomas/kong v0.2.16
@@ -18,6 +18,7 @@ require (
 	github.com/gregdel/pushover v0.0.0-20201104094836-ddbe0c1d3a38
 	github.com/hako/durafmt v0.0.0-20190612201238-650ed9f29a84
 	github.com/imdario/mergo v0.3.12
+	github.com/jedib0t/go-pretty/v6 v6.2.1
 	github.com/matcornic/hermes/v2 v2.1.0
 	github.com/matrix-org/gomatrix v0.0.0-20200501121722-e5578b12c752
 	github.com/microcosm-cc/bluemonday v1.0.9
@@ -36,6 +37,9 @@ require (
 	github.com/stretchr/testify v1.7.0
 	github.com/technoweenie/multipartstreamer v1.0.1 // indirect
 	go.etcd.io/bbolt v1.3.5
+	google.golang.org/grpc v1.37.0
+	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.1.0
+	google.golang.org/protobuf v1.26.0
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df // indirect
 	gopkg.in/yaml.v2 v2.4.0

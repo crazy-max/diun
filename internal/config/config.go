@@ -22,14 +22,14 @@ type Config struct {
 }
 
 // Load returns Config struct
-func Load(cli model.Cli) (*Config, error) {
+func Load(config string) (*Config, error) {
 	cfg := Config{
 		Db:    (&model.Db{}).GetDefaults(),
 		Watch: (&model.Watch{}).GetDefaults(),
 	}
 
 	fileLoader := gonfig.NewFileLoader(gonfig.FileLoaderConfig{
-		Filename: cli.Cfgfile,
+		Filename: config,
 		Finder: gonfig.Finder{
 			BasePaths:  []string{"/etc/diun/diun", "$XDG_CONFIG_HOME/diun", "$HOME/.config/diun", "./diun"},
 			Extensions: []string{"yaml", "yml"},
@@ -54,14 +54,14 @@ func Load(cli model.Cli) (*Config, error) {
 		log.Info().Msgf("Configuration loaded from %d environment variable(s)", len(envLoader.GetVars()))
 	}
 
-	if err := cfg.validate(cli); err != nil {
+	if err := cfg.validate(); err != nil {
 		return nil, err
 	}
 
 	return &cfg, nil
 }
 
-func (cfg *Config) validate(cli model.Cli) error {
+func (cfg *Config) validate() error {
 	if len(cfg.Db.Path) > 0 {
 		if err := os.MkdirAll(path.Dir(cfg.Db.Path), os.ModePerm); err != nil {
 			return errors.Wrap(err, "Cannot create database destination folder")
@@ -72,11 +72,7 @@ func (cfg *Config) validate(cli model.Cli) error {
 		return errors.New("Healthchecks UUID is required")
 	}
 
-	if cfg.Notif == nil && cli.TestNotif {
-		return errors.New("At least one notifier is required")
-	}
-
-	if cfg.Providers == nil && !cli.TestNotif {
+	if cfg.Providers == nil {
 		return errors.New("At least one provider is required")
 	}
 

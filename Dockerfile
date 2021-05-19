@@ -18,7 +18,7 @@ RUN --mount=type=bind,target=/src,rw \
     --dist "/out" \
     --hooks="go mod tidy" \
     --hooks="go mod download" \
-    --main="./cmd/main.go" \
+    --main="./cmd" \
     --ldflags="-s -w -X 'main.version={{.Version}}'" \
     --files="CHANGELOG.md" \
     --files="LICENSE" \
