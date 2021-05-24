@@ -3,6 +3,7 @@ package db
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 
 	"github.com/crazy-max/diun/v4/pkg/registry"
 	bolt "go.etcd.io/bbolt"
@@ -68,6 +69,13 @@ func (c *Client) PutManifest(image registry.Image, manifest registry.Manifest) e
 	})
 }
 
+// DeleteManifest deletes a Docker image manifest
+func (c *Client) DeleteManifest(manifest registry.Manifest) error {
+	return c.Update(func(tx *bolt.Tx) error {
+		return tx.Bucket([]byte(bucketManifest)).Delete([]byte(fmt.Sprintf("%s:%s", manifest.Name, manifest.Tag)))
+	})
+}
+
 // ListImage return a list of Docker images with their linked manifests
 func (c *Client) ListImage() (map[string][]registry.Manifest, error) {
 	images := make(map[string][]registry.Manifest)
@@ -83,31 +91,6 @@ func (c *Client) ListImage() (map[string][]registry.Manifest, error) {
 				images[manifest.Name] = []registry.Manifest{}
 			}
 			images[manifest.Name] = append(images[manifest.Name], manifest)
-		}
-		return nil
-	})
-
-	return images, err
-}
-
-// ListImageLatest return a list of Docker images with its most recent manifest
-func (c *Client) ListImageLatest() (map[string]registry.Manifest, error) {
-	images := make(map[string]registry.Manifest)
-
-	err := c.View(func(tx *bolt.Tx) error {
-		c := tx.Bucket([]byte(bucketManifest)).Cursor()
-		for k, v := c.First(); k != nil; k, v = c.Next() {
-			var manifest registry.Manifest
-			if err := json.Unmarshal(v, &manifest); err != nil {
-				return err
-			}
-			if cur, ok := images[manifest.Name]; ok {
-				if cur.Created.Before(*manifest.Created) {
-					images[manifest.Name] = manifest
-				}
-			} else {
-				images[manifest.Name] = manifest
-			}
 		}
 		return nil
 	})

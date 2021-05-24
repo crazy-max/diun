@@ -1,20 +1,29 @@
 syntax = "proto3";
 option go_package = "github.com/crazy-max/diun/pb";
 
-package image;
+package pb;
 
 import "google/protobuf/timestamp.proto";
+
+message Manifest {
+  string tag = 1;
+  string mime_type = 2;
+  string digest = 3;
+  google.protobuf.Timestamp created = 4;
+  map<string, string> labels = 5;
+  string platform = 6;
+  int64 size = 7;
+}
 
 message ImageListRequest {}
 
 message ImageListResponse {
   message Image {
     string name = 1;
-    google.protobuf.Timestamp last_updated = 2;
-    string last_tag = 3;
-    string last_digest = 4;
+    int64 manifestsCount = 2;
+    Manifest latest = 3;
   }
-  repeated Image image = 1;
+  repeated Image images = 1;
 }
 
 message ImageInspectRequest {
@@ -24,14 +33,7 @@ message ImageInspectRequest {
 message ImageInspectResponse {
   message Image {
     string name = 1;
-    message Manifest {
-      string tag = 1;
-      string mime_type = 2;
-      string digest = 3;
-      google.protobuf.Timestamp created = 4;
-      map<string, string> labels = 5;
-      string platform = 6;
-    }
+    repeated Manifest manifests = 2;
   }
   Image image = 1;
 }
@@ -41,7 +43,7 @@ message ImageRemoveRequest {
 }
 
 message ImageRemoveResponse {
-  string message = 1;
+  repeated Manifest manifests = 1;
 }
 
 service ImageService {

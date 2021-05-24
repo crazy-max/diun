@@ -4,8 +4,12 @@ import (
 	"net"
 
 	"github.com/crazy-max/diun/v4/internal/db"
+	grpclogger "github.com/crazy-max/diun/v4/internal/grpc/logger"
+	"github.com/crazy-max/diun/v4/internal/notif"
 	"github.com/crazy-max/diun/v4/pb"
 	"github.com/pkg/errors"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc"
 )
 
@@ -14,18 +18,24 @@ type Client struct {
 	server    *grpc.Server
 	authority string
 	db        *db.Client
+	notif     *notif.Client
 	pb.UnimplementedImageServiceServer
+	pb.UnimplementedNotifServiceServer
 }
 
 // New creates a new grpc instance
-func New(authority string, db *db.Client) (*Client, error) {
+func New(authority string, db *db.Client, notif *notif.Client) (*Client, error) {
+	grpclogger.SetGrpcLogger(log.Level(zerolog.ErrorLevel))
+
 	c := &Client{
 		authority: authority,
 		db:        db,
+		notif:     notif,
 	}
 
 	c.server = grpc.NewServer()
 	pb.RegisterImageServiceServer(c.server, c)
+	pb.RegisterNotifServiceServer(c.server, c)
 
 	return c, nil
 }

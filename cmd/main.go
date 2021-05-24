@@ -16,8 +16,9 @@ var (
 	version = "dev"
 	cli     struct {
 		Version kong.VersionFlag
-		Serve   ServeCmd `kong:"cmd='serve',help='Start Diun server.'"`
-		Cli     CliCmd   `kong:"cmd='cli',help='CLI to interact with Diun.'"`
+		Serve   ServeCmd `kong:"cmd,help='Start Diun server.'"`
+		Image   ImageCmd `kong:"cmd,help='Manage image manifests.'"`
+		Notif   NotifCmd `kong:"cmd,help='Manage notifications.'"`
 	}
 )
 
@@ -55,5 +56,5 @@ func main() {
 			Summary: true,
 		}))
 
-	_ = ctx.Run(&Context{Meta: meta})
+	ctx.FatalIfErrorf(ctx.Run(&Context{Meta: meta}))
 }

@@ -64,7 +64,7 @@ func New(meta model.Meta, cfg *config.Config, grpcAuthority string) (*Diun, erro
 		return nil, err
 	}
 
-	diun.grpc, err = grpc.New(grpcAuthority, diun.db)
+	diun.grpc, err = grpc.New(grpcAuthority, diun.db, diun.notif)
 	if err != nil {
 		return nil, err
 	}

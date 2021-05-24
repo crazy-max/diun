@@ -10,17 +10,13 @@ type CliHandler interface {
 	BeforeApply() error
 }
 
-// CliCmd holds cli command args and flags
-type CliCmd struct {
-	Image ImageCmd `kong:"cmd='image',help='Manage images manifests.'"`
-}
-
 // CliGlobals holds globals cli attributes
 type CliGlobals struct {
 	CliHandler `kong:"-"`
 
 	conn     *grpc.ClientConn      `kong:"-"`
 	imageSvc pb.ImageServiceClient `kong:"-"`
+	notifSvc pb.NotifServiceClient `kong:"-"`
 
 	GRPCAuthority string `kong:"name='grpc-authority',default='127.0.0.1:42286',help='Link to Diun gRPC API.'"`
 }
@@ -33,5 +29,6 @@ func (s *CliGlobals) BeforeApply() (err error) {
 	}
 
 	s.imageSvc = pb.NewImageServiceClient(s.conn)
+	s.notifSvc = pb.NewNotifServiceClient(s.conn)
 	return
 }

@@ -33,7 +33,7 @@ func NewImageServiceClient(cc grpc.ClientConnInterface) ImageServiceClient {
 
 func (c *imageServiceClient) ImageList(ctx context.Context, in *ImageListRequest, opts ...grpc.CallOption) (*ImageListResponse, error) {
 	out := new(ImageListResponse)
-	err := c.cc.Invoke(ctx, "/image.ImageService/ImageList", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/pb.ImageService/ImageList", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -42,7 +42,7 @@ func (c *imageServiceClient) ImageList(ctx context.Context, in *ImageListRequest
 
 func (c *imageServiceClient) ImageInspect(ctx context.Context, in *ImageInspectRequest, opts ...grpc.CallOption) (*ImageInspectResponse, error) {
 	out := new(ImageInspectResponse)
-	err := c.cc.Invoke(ctx, "/image.ImageService/ImageInspect", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/pb.ImageService/ImageInspect", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +51,7 @@ func (c *imageServiceClient) ImageInspect(ctx context.Context, in *ImageInspectR
 
 func (c *imageServiceClient) ImageRemove(ctx context.Context, in *ImageRemoveRequest, opts ...grpc.CallOption) (*ImageRemoveResponse, error) {
 	out := new(ImageRemoveResponse)
-	err := c.cc.Invoke(ctx, "/image.ImageService/ImageRemove", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/pb.ImageService/ImageRemove", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -104,7 +104,7 @@ func _ImageService_ImageList_Handler(srv interface{}, ctx context.Context, dec f
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/image.ImageService/ImageList",
+		FullMethod: "/pb.ImageService/ImageList",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ImageServiceServer).ImageList(ctx, req.(*ImageListRequest))
@@ -122,7 +122,7 @@ func _ImageService_ImageInspect_Handler(srv interface{}, ctx context.Context, de
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/image.ImageService/ImageInspect",
+		FullMethod: "/pb.ImageService/ImageInspect",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ImageServiceServer).ImageInspect(ctx, req.(*ImageInspectRequest))
@@ -140,7 +140,7 @@ func _ImageService_ImageRemove_Handler(srv interface{}, ctx context.Context, dec
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/image.ImageService/ImageRemove",
+		FullMethod: "/pb.ImageService/ImageRemove",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ImageServiceServer).ImageRemove(ctx, req.(*ImageRemoveRequest))
@@ -152,7 +152,7 @@ func _ImageService_ImageRemove_Handler(srv interface{}, ctx context.Context, dec
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var ImageService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "image.ImageService",
+	ServiceName: "pb.ImageService",
 	HandlerType: (*ImageServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

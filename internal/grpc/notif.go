@@ -1,23 +1,24 @@
-package app
+package grpc
 
 import (
+	"context"
+	"fmt"
+	"strings"
 	"time"
 
 	"github.com/crazy-max/diun/v4/internal/model"
+	"github.com/crazy-max/diun/v4/pb"
 	"github.com/crazy-max/diun/v4/pkg/registry"
-	"github.com/rs/zerolog/log"
 )
 
-// TestNotif test the notification settings
-func (di *Diun) TestNotif() {
+func (c *Client) NotifTest(ctx context.Context, request *pb.NotifTestRequest) (*pb.NotifTestResponse, error) {
 	createdAt, _ := time.Parse("2006-01-02T15:04:05Z", "2020-03-26T12:23:56Z")
 	image, _ := registry.ParseImage(registry.ParseImageOptions{
 		Name: "diun/testnotif:latest",
 	})
 	image.HubLink = ""
 
-	log.Info().Msg("Testing notification settings...")
-	di.notif.Send(model.NotifEntry{
+	entry := model.NotifEntry{
 		Status:   "new",
 		Provider: "file",
 		Image:    image,
@@ -49,5 +50,23 @@ func (di *Diun) TestNotif() {
 			},
 			Platform: "linux/amd64",
 		},
-	})
+	}
+
+	if len(c.notif.List()) == 0 {
+		return &pb.NotifTestResponse{
+			Message: "No notifier available",
+		}, nil
+	}
+
+	var sent []string
+	for _, n := range c.notif.List() {
+		if err := n.Send(entry); err != nil {
+			return nil, err
+		}
+		sent = append(sent, n.Name())
+	}
+
+	return &pb.NotifTestResponse{
+		Message: fmt.Sprintf("Notifcation sent for %s notifier(s)", strings.Join(sent, ", ")),
+	}, nil
 }
