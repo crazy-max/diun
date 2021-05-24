@@ -112,18 +112,20 @@ func (s *ImageRemoveCmd) Run(ctx *Context) error {
 	removed, err := s.imageSvc.ImageRemove(context.Background(), &pb.ImageRemoveRequest{
 		Name: s.Image,
 	})
-	if removed != nil {
-		t := table.NewWriter()
-		t.SetOutputMirror(os.Stdout)
-		t.AppendHeader(table.Row{"Tag", "Created", "Digest", "Size"})
-		var totalSize int64
-		for _, image := range removed.Manifests {
-			t.AppendRow(table.Row{image.Tag, image.Created.AsTime().Format(time.RFC3339), image.Digest, units.HumanSize(float64(image.Size))})
-			totalSize += image.Size
-		}
-		t.AppendFooter(table.Row{"Total", fmt.Sprintf("%d (%s)", len(removed.Manifests), units.HumanSize(float64(totalSize)))})
-		t.Render()
+	if err != nil {
+		return err
 	}
 
-	return err
+	t := table.NewWriter()
+	t.SetOutputMirror(os.Stdout)
+	t.AppendHeader(table.Row{"Tag", "Created", "Digest", "Size"})
+	var totalSize int64
+	for _, image := range removed.Manifests {
+		t.AppendRow(table.Row{image.Tag, image.Created.AsTime().Format(time.RFC3339), image.Digest, units.HumanSize(float64(image.Size))})
+		totalSize += image.Size
+	}
+	t.AppendFooter(table.Row{"Total", fmt.Sprintf("%d (%s)", len(removed.Manifests), units.HumanSize(float64(totalSize)))})
+	t.Render()
+
+	return nil
 }

@@ -21,9 +21,10 @@ func (s *NotifTestCmd) Run(ctx *Context) error {
 	defer s.conn.Close()
 
 	nt, err := s.notifSvc.NotifTest(context.Background(), &pb.NotifTestRequest{})
-	if nt != nil {
-		fmt.Println(nt.Message)
+	if err != nil {
+		return err
 	}
 
-	return err
+	fmt.Println(nt.Message)
+	return nil
 }
