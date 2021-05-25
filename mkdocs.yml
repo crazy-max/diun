@@ -89,7 +89,7 @@ nav:
     - From binary: install/binary.md
     - Linux service: install/linux-service.md
   - Usage:
-    - Command line: usage/cli.md
+    - Command line: usage/command-line.md
     - Basic example: usage/basic-example.md
   - Configuration:
     - Overview: config/index.md

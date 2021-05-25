@@ -63,7 +63,7 @@ func (s *ImageListCmd) Run(ctx *Context) error {
 // ImageInspectCmd holds image inspect command
 type ImageInspectCmd struct {
 	CliGlobals
-	Image string `kong:"arg,name='image',required,help='Image to inspect.'"`
+	Image string `kong:"name='image',required,help='Image to inspect.'"`
 	Raw   bool   `kong:"name='raw',default='false',help='JSON output.'"`
 }
 
@@ -102,7 +102,7 @@ func (s *ImageInspectCmd) Run(ctx *Context) error {
 // ImageRemoveCmd holds image remove command
 type ImageRemoveCmd struct {
 	CliGlobals
-	Image string `kong:"arg,name='image',required,help='Image to remove.'"`
+	Image string `kong:"name='image',required,help='Image to remove.'"`
 	All   bool   `kong:"name='all',default='false',help='Remove all manifests from the database.'"`
 }
 

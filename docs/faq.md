@@ -14,16 +14,16 @@ watch:
 
 ## Test notifications
 
-Through the [command line](usage/cli.md) with:
+Through the [command line](usage/command-line.md#notif-test) with:
 
 ```shell
-diun --config ./diun.yml --test-notif
+diun notif test
 ```
 
 Or within a container:
 
 ```shell
-docker-compose exec diun diun --test-notif
+docker-compose exec diun notif test
 ```
 
 ## field docker|swarm uses unsupported type: invalid
@@ -127,7 +127,8 @@ Or you can tweak the [`schedule` setting](config/watch.md#schedule) with somethi
 
 ## Profiling
 
-Diun provides a simple way to manage runtime/pprof profiling through [`--profiler-path` and `--profiler` flags](usage/cli.md#options):
+Diun provides a simple way to manage runtime/pprof profiling through the
+[`--profiler-path` and `--profiler` flags with `serve` command](usage/command-line.md#serve):
 
 ```yaml
 version: "3.5"
