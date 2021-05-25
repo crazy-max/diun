@@ -44,3 +44,4 @@ ENV PROFILER_PATH="/profiler" \
 
 VOLUME [ "/data" ]
 ENTRYPOINT [ "diun" ]
+CMD [ "serve" ]

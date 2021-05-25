@@ -23,7 +23,7 @@ diun notif test
 Or within a container:
 
 ```shell
-docker-compose exec diun notif test
+docker-compose exec diun diun notif test
 ```
 
 ## field docker|swarm uses unsupported type: invalid
