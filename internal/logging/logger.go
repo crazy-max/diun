@@ -17,10 +17,13 @@ func Configure(cli *model.Cli) {
 	var err error
 	var w io.Writer
 
+	// Adds support for NO_COLOR. More info https://no-color.org/
+	_, noColor := os.LookupEnv("NO_COLOR")
+
 	if !cli.LogJSON {
 		w = zerolog.ConsoleWriter{
 			Out:        os.Stdout,
-			NoColor:    cli.LogNoColor,
+			NoColor:    noColor || cli.LogNoColor,
 			TimeFormat: time.RFC1123,
 		}
 	} else {
