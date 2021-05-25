@@ -23,10 +23,13 @@ func Configure(opts Options) {
 	var err error
 	var w io.Writer
 
-	if !opts.LogJSON {
+	// Adds support for NO_COLOR. More info https://no-color.org/
+	_, noColor := os.LookupEnv("NO_COLOR")
+
+	if !cli.LogJSON {
 		w = zerolog.ConsoleWriter{
 			Out:        os.Stdout,
-			NoColor:    opts.LogNoColor,
+			NoColor:    noColor || opts.LogNoColor,
 			TimeFormat: time.RFC1123,
 		}
 	} else {
