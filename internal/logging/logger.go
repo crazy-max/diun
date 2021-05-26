@@ -26,7 +26,7 @@ func Configure(opts Options) {
 	// Adds support for NO_COLOR. More info https://no-color.org/
 	_, noColor := os.LookupEnv("NO_COLOR")
 
-	if !cli.LogJSON {
+	if !opts.LogJSON {
 		w = zerolog.ConsoleWriter{
 			Out:        os.Stdout,
 			NoColor:    noColor || opts.LogNoColor,
