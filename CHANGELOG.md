@@ -1,5 +1,32 @@
 # Changelog
 
+## 4.17.0 (2021/05/26)
+
+:warning: See **Migration notes** in the documentation before upgrading.
+
+* Add CLI to interact with Diun through gRPC (#382)
+    * Create `image` and `notif` proto services
+    * Implement proto definitions
+    * New commands `serve`, `image` and `notif`
+    * Refactor command line usage doc
+    * Better CLI error handling
+    * Tools build constraint to manage tools deps through go modules
+    * Compile and validate protos through a dedicated Dockerfile and a bake target    
+    * Merge validate and build workflow
+    * Add upgrade notes
+* Bump github.com/eclipse/paho.mqtt.golang from 1.3.3 to 1.3.4 (#359)
+* Bump github.com/panjf2000/ants/v2 from 2.4.4 to 2.4.5 (#380)
+* Bump github.com/rs/zerolog from 1.21.0 to 1.22.0 (#379)
+* Bump github.com/go-playground/validator/v10 from 10.5.0 to 10.6.1 (#377)
+* MkDocs Materials 7.1.5 (#386)
+* Add `NO_COLOR` support (#384)
+* Bump github.com/pkg/profile from 1.5.0 to 1.6.0 (#363)
+* Move to docker/metadata-action (#366)
+* Bump github.com/containers/image/v5 from 5.11.1 to 5.12.0 (#360)
+* Bump github.com/containerd/containerd from 1.5.0-beta.4 to 1.5.2 (#353 #361 #362 #383)
+* Add blog posts (#355 #385)
+* Bump github.com/moby/buildkit from 0.8.2 to 0.8.3 (#354)
+
 ## 4.16.1 (2021/04/30)
 
 * Fix Swarm Provider (#351)
