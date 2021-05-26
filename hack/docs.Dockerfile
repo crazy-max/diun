@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.2
 
-FROM squidfunk/mkdocs-material:7.1.3 AS base
+FROM squidfunk/mkdocs-material:7.1.5 AS base
 RUN apk add --no-cache \
     git \
     git-fast-import \
