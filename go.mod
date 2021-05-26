@@ -49,6 +49,3 @@ require (
 	k8s.io/apimachinery v0.20.6
 	k8s.io/client-go v0.20.6
 )
-
-// containerd: corresponds to buildkit
-replace github.com/containerd/containerd => github.com/containerd/containerd v1.4.1-0.20201117152358-0edc412565dc
