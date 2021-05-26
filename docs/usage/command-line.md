@@ -49,6 +49,9 @@ Following environment variables can also be used in place:
 
 ### `image list`
 
+!!! note
+    Diun needs to be started through [`serve`](#serve) command to be able to use this command.
+
 List images in database.
 
 * `--raw`: JSON output
@@ -64,6 +67,9 @@ diun image list --raw
 ```
 
 ### `image inspect`
+
+!!! note
+    Diun needs to be started through [`serve`](#serve) command to be able to use this command.
 
 Display information of an image in database.
 
@@ -81,6 +87,9 @@ diun image inspect drone/drone --raw
 ```
 
 ### `image remove`
+
+!!! note
+    Diun needs to be started through [`serve`](#serve) command to be able to use this command.
 
 Remove an image manifest from database.
 
@@ -100,6 +109,9 @@ diun image inspect drone/drone
     All manifest for an image will be removed if no tag is specified
 
 ### `notif test`
+
+!!! note
+    Diun needs to be started through [`serve`](#serve) command to be able to use this command.
 
 Test notification settings.
 
