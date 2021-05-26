@@ -90,7 +90,7 @@ nav:
     - From binary: install/binary.md
     - Linux service: install/linux-service.md
   - Usage:
-    - Command line: usage/cli.md
+    - Command line: usage/command-line.md
     - Basic example: usage/basic-example.md
   - Configuration:
     - Overview: config/index.md
@@ -125,6 +125,7 @@ nav:
   - FAQ: faq.md
   - Changelog: changelog.md
   - Migration:
+    - Diun v4.0 to v4.17: migration/v4.0-to-v4.17.md
     - Diun v3 to v4: migration/v3-to-v4.md
     - Diun v2 to v3: migration/v2-to-v3.md
     - Diun v1 to v2: migration/v1-to-v2.md

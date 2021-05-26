@@ -1,0 +1,53 @@
+syntax = "proto3";
+option go_package = "github.com/crazy-max/diun/pb";
+
+package pb;
+
+import "google/protobuf/timestamp.proto";
+
+message Manifest {
+  string tag = 1;
+  string mime_type = 2;
+  string digest = 3;
+  google.protobuf.Timestamp created = 4;
+  map<string, string> labels = 5;
+  string platform = 6;
+  int64 size = 7;
+}
+
+message ImageListRequest {}
+
+message ImageListResponse {
+  message Image {
+    string name = 1;
+    int64 manifestsCount = 2;
+    Manifest latest = 3;
+  }
+  repeated Image images = 1;
+}
+
+message ImageInspectRequest {
+  string name = 1;
+}
+
+message ImageInspectResponse {
+  message Image {
+    string name = 1;
+    repeated Manifest manifests = 2;
+  }
+  Image image = 1;
+}
+
+message ImageRemoveRequest {
+  string name = 1;
+}
+
+message ImageRemoveResponse {
+  repeated Manifest manifests = 1;
+}
+
+service ImageService {
+  rpc ImageList(ImageListRequest) returns (ImageListResponse) {}
+  rpc ImageInspect(ImageInspectRequest) returns (ImageInspectResponse) {}
+  rpc ImageRemove(ImageRemoveRequest) returns (ImageRemoveResponse) {}
+}

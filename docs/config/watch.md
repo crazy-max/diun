@@ -60,7 +60,7 @@ Send notification at the very first analysis of an image. (default `false`)
 ### `compareDigest`
 
 Compare the digest of an image with the registry before downloading the image manifest. It is strongly
-recommended to leave this value at `true`, especially with [Docker Hub which imposes a rate-limit](../faq.md#docker-hub-rate-limits)
+recommended leaving this value at `true`, especially with [Docker Hub which imposes a rate-limit](../faq.md#docker-hub-rate-limits)
 on image pull. (default `true`)
 
 !!! example "Config file"
@@ -74,7 +74,7 @@ on image pull. (default `true`)
 
 ### `healthchecks`
 
-Healthchecks allows to monitor Diun watcher by sending start and success notification
+Healthchecks allows monitoring Diun watcher by sending start and success notification
 events to [healthchecks.io](https://healthchecks.io/).
 
 !!! tip

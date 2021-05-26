@@ -22,7 +22,7 @@ At startup, Diun searches for a file named `diun.yml` (or `diun.yaml`) in:
 * `$HOME/.config/`
 * `.` _(the working directory)_
 
-You can override this using the [`--config` flag or `CONFIG` env var](../usage/cli.md).
+You can override this using the [`--config` flag or `CONFIG` env var with `serve` command](../usage/command-line.md#serve).
 
 ??? example "diun.yml"
     ```yaml

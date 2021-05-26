@@ -75,9 +75,5 @@ func (c *Client) migration2() error {
 		}
 	}
 
-	if err := tx.Commit(); err != nil {
-		return err
-	}
-
-	return nil
+	return tx.Commit()
 }

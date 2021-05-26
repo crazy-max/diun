@@ -95,3 +95,8 @@ func (c *Client) Send(entry model.NotifEntry) {
 		}
 	}
 }
+
+// List returns created notifiers
+func (c *Client) List() []notifier.Notifier {
+	return c.notifiers
+}

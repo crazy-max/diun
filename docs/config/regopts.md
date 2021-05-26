@@ -20,13 +20,11 @@ regopts:
     passwordFile: /run/secrets/password
 ```
 
-`myregistry` will be used as a `name` selector (default) if referenced by its [name](#name).
-
-`docker.io` will be used as an `image` selector. If an image is on DockerHub (`docker.io` domain), this registry options will
-be selected if not referenced as a `regopt` name.
-
-`docker.io/crazymax` will be used as an `image` selector. If an image is on DockerHub and in `crazymax` namespace, this registry options will
-be selected if not referenced as a `regopt` name.
+* `myregistry` will be used as a `name` selector (default) if referenced by its [name](#name).
+* `docker.io` will be used as an `image` selector. If an image is on DockerHub (`docker.io` domain), this registry
+options will be selected if not referenced as a `regopt` name.
+* `docker.io/crazymax` will be used as an `image` selector. If an image is on DockerHub and in `crazymax` namespace,
+this registry options will be selected if not referenced as a `regopt` name.
 
 ## Configuration
 

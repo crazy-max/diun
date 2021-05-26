@@ -233,7 +233,8 @@ Following the transposition of the configuration into environment variables, the
 is no longer loaded by default in the official Docker image.
 
 If you want to load a configuration file through the Docker image you will have to declare the
-[`CONFIG` environment variable](../usage/cli.md#environment-variables) pointing to the assigned configuration file:
+[`CONFIG` environment variable with `serve` command](../usage/command-line.md#serve) pointing to the assigned
+configuration file:
 
 !!! tip
     This is no longer required since version 4.2.0. Now configuration file can be loaded from

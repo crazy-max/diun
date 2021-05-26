@@ -9,6 +9,17 @@ target "go-version" {
   }
 }
 
+// protoc version
+variable "PROTOC_VERSION" {
+  default = "3.17.0"
+}
+
+target "protoc-version" {
+  args = {
+    PROTOC_VERSION = PROTOC_VERSION
+  }
+}
+
 // GitHub reference as defined in GitHub Actions (eg. refs/head/master))
 variable "GITHUB_REF" {
   default = ""
@@ -30,7 +41,7 @@ group "default" {
 }
 
 group "validate" {
-  targets = ["lint", "vendor-validate"]
+  targets = ["lint", "vendor-validate", "gen-validate"]
 }
 
 target "lint" {
@@ -48,6 +59,19 @@ target "vendor-validate" {
 target "vendor-update" {
   inherits = ["go-version"]
   dockerfile = "./hack/vendor.Dockerfile"
+  target = "update"
+  output = ["."]
+}
+
+target "gen-validate" {
+  inherits = ["go-version", "protoc-version"]
+  dockerfile = "./hack/gen.Dockerfile"
+  target = "validate"
+}
+
+target "gen-update" {
+  inherits = ["go-version", "protoc-version"]
+  dockerfile = "./hack/gen.Dockerfile"
   target = "update"
   output = ["."]
 }

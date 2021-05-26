@@ -6,24 +6,30 @@ import (
 	"os"
 	"time"
 
-	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/sirupsen/logrus"
 )
 
+type Options struct {
+	LogLevel   string
+	LogJSON    bool
+	LogCaller  bool
+	LogNoColor bool
+}
+
 // Configure configures logger
-func Configure(cli *model.Cli) {
+func Configure(opts Options) {
 	var err error
 	var w io.Writer
 
 	// Adds support for NO_COLOR. More info https://no-color.org/
 	_, noColor := os.LookupEnv("NO_COLOR")
 
-	if !cli.LogJSON {
+	if !opts.LogJSON {
 		w = zerolog.ConsoleWriter{
 			Out:        os.Stdout,
-			NoColor:    noColor || cli.LogNoColor,
+			NoColor:    noColor || opts.LogNoColor,
 			TimeFormat: time.RFC1123,
 		}
 	} else {
@@ -31,20 +37,20 @@ func Configure(cli *model.Cli) {
 	}
 
 	ctx := zerolog.New(w).With().Timestamp()
-	if cli.LogCaller {
+	if opts.LogCaller {
 		ctx = ctx.Caller()
 	}
 
 	log.Logger = ctx.Logger()
 
-	logLevel, err := zerolog.ParseLevel(cli.LogLevel)
+	logLevel, err := zerolog.ParseLevel(opts.LogLevel)
 	if err != nil {
 		log.Fatal().Err(err).Msgf("Unknown log level")
 	} else {
 		zerolog.SetGlobalLevel(logLevel)
 	}
 
-	logrusLevel, err := logrus.ParseLevel(cli.LogLevel)
+	logrusLevel, err := logrus.ParseLevel(opts.LogLevel)
 	if err != nil {
 		log.Fatal().Err(err).Msgf("Unknown log level")
 	} else {

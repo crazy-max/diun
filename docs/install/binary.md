@@ -25,8 +25,8 @@ And extract diun:
 wget -qO- {{ config.repo_url }}releases/download/v{{ git.tag | trim('v') }}/diun_{{ git.tag | trim('v') }}_linux_x86_64.tar.gz | tar -zxvf - diun
 ```
 
-After getting the binary, it can be tested with [`./diun --help`](../usage/cli.md) command and moved to a permanent
-location.
+After getting the binary, it can be tested with [`./diun --help`](../usage/command-line.md#global-options) command
+and moved to a permanent location.
 
 ## Server configuration
 
