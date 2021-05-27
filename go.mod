@@ -37,7 +37,7 @@ require (
 	github.com/streadway/amqp v0.0.0-20200108173154-1c71cc93ed71
 	github.com/stretchr/testify v1.7.0
 	github.com/technoweenie/multipartstreamer v1.0.1 // indirect
-	github.com/tidwall/pretty v1.1.0
+	github.com/tidwall/pretty v1.1.1
 	go.etcd.io/bbolt v1.3.5
 	google.golang.org/grpc v1.37.0
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.1.0
