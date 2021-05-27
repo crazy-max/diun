@@ -80,10 +80,10 @@ Display information of an image in database.
 Examples:
 
 ```shell
-diun image inspect alpine
+diun image inspect --image alpine
 ```
 ```shell
-diun image inspect drone/drone --raw
+diun image inspect --image drone/drone --raw
 ```
 
 ### `image remove`
@@ -99,10 +99,10 @@ Remove an image manifest from database.
 Examples:
 
 ```shell
-diun image remove alpine:latest
+diun image remove --image alpine:latest
 ```
 ```shell
-diun image inspect drone/drone
+diun image inspect --image drone/drone
 ```
 
 !!! warning
