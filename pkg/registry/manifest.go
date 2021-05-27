@@ -21,7 +21,8 @@ type Manifest struct {
 	DockerVersion string
 	Labels        map[string]string
 	Layers        []string
-	Platform      string `json:"-"`
+	Platform      string
+	Raw           []byte
 }
 
 // Manifest returns the manifest for a specific image
@@ -99,5 +100,6 @@ func (c *Client) Manifest(image Image, dbManifest Manifest) (Manifest, error) {
 		Labels:        imgInspect.Labels,
 		Layers:        imgInspect.Layers,
 		Platform:      imgPlatform,
+		Raw:           rawManifest,
 	}, nil
 }
