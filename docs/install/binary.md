@@ -81,7 +81,7 @@ See how to create [Linux service](linux-service.md) to start Diun automatically.
 ### 2. Running from terminal
 
 ```shell
-DIUN_DB_PATH=/var/lib/diun/diun.db /usr/local/bin/diun --config /etc/diun/diun.yml
+DIUN_DB_PATH=/var/lib/diun/diun.db /usr/local/bin/diun serve --config /etc/diun/diun.yml
 ```
 
 ## Updating to a new version

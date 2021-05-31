@@ -19,7 +19,7 @@ RestartSec=2s
 Type=simple
 User=diun
 Group=diun
-ExecStart=/usr/local/bin/diun --config /etc/diun/diun.yml --log-level info
+ExecStart=/usr/local/bin/diun serve --config /etc/diun/diun.yml --log-level info
 Restart=always
 #Environment=TZ=Europe/Paris
 Environment=DIUN_DB_PATH=/var/lib/diun/diun.db

@@ -112,7 +112,7 @@ Here we want to analyze all tags of `crazymax/cloudflared` and `docker.bintray.i
 Now let's start Diun:
 
 ```
-$ diun --config diun.yml
+$ diun serve --config diun.yml
 Sat, 14 Dec 2019 15:32:23 UTC INF Starting Diun 2.0.0
 Sat, 14 Dec 2019 15:32:23 UTC INF Found 2 image(s) to analyze... provider=file
 Sat, 14 Dec 2019 15:32:25 UTC INF New image found id=crazymax/cloudflared image=docker.io/crazymax/cloudflared:latest provider=file

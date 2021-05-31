@@ -61,7 +61,7 @@ With this Dockerfile the following images will be analyzed:
 Now let's start Diun:
 
 ```
-$ diun --config /etc/diun/diun.yml
+$ diun serve --config /etc/diun/diun.yml
 Thu, 29 Apr 2021 14:41:55 CEST INF Starting Diun version=4.16.0
 Thu, 29 Apr 2021 14:41:55 CEST INF Configuration loaded from file: /etc/diun/diun.yml
 Thu, 29 Apr 2021 14:41:55 CEST WRN No notifier available
