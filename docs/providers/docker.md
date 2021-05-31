@@ -20,6 +20,8 @@ version: "3.5"
 services:
   diun:
     image: crazymax/diun:latest
+    container_name: diun
+    command: serve
     volumes:
       - "./data:/data"
       - "/var/run/docker.sock:/var/run/docker.sock"
@@ -34,6 +36,7 @@ services:
 
   cloudflared:
     image: crazymax/cloudflared:latest
+    container_name: cloudflared
     ports:
       - target: 5053
         published: 5053

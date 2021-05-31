@@ -50,6 +50,7 @@ services:
   diun:
     image: crazymax/diun:latest
     container_name: diun
+    command: serve
     volumes:
       - "./data:/data"
       - "/var/run/docker.sock:/var/run/docker.sock"
@@ -105,6 +106,8 @@ version: "3.5"
 services:
   diun:
     image: crazymax/diun:latest
+    container_name: diun
+    command: serve
     volumes:
       - "./data:/data"
       - "./diun.yml:/diun.yml:ro"
