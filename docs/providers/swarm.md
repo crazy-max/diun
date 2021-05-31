@@ -20,6 +20,7 @@ version: "3.5"
 services:
   diun:
     image: crazymax/diun:latest
+    command: serve
     volumes:
       - "./data:/data"
       - "/var/run/docker.sock:/var/run/docker.sock"

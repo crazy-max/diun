@@ -71,6 +71,7 @@ spec:
         - name: diun
           image: crazymax/diun:latest
           imagePullPolicy: Always
+          command: ["serve"]
           env:
             - name: TZ
               value: "Europe/Paris"
