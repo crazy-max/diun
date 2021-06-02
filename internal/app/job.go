@@ -176,7 +176,7 @@ func (di *Diun) runJob(job model.Job) (entry model.NotifEntry) {
 		return
 	}
 
-	entry.Manifest, err = job.Registry.Manifest(job.RegImage, dbManifest)
+	entry.Manifest, err = job.Registry.Manifest(job.RegImage, dbManifest, job.Image.RepoDigests)
 	if err != nil {
 		sublog.Warn().Err(err).Msg("Cannot get remote manifest")
 		return

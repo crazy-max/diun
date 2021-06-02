@@ -2,6 +2,7 @@ package registry
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/containers/image/v5/docker"
@@ -9,6 +10,7 @@ import (
 	"github.com/containers/image/v5/types"
 	"github.com/opencontainers/go-digest"
 	"github.com/pkg/errors"
+	"github.com/rs/zerolog/log"
 )
 
 // Manifest is the Docker image manifest information
@@ -26,7 +28,7 @@ type Manifest struct {
 }
 
 // Manifest returns the manifest for a specific image
-func (c *Client) Manifest(image Image, dbManifest Manifest) (Manifest, error) {
+func (c *Client) Manifest(image Image, dbManifest Manifest, repoDigests []string) (Manifest, error) {
 	ctx, cancel := c.timeoutContext()
 	defer cancel()
 
@@ -51,9 +53,21 @@ func (c *Client) Manifest(image Image, dbManifest Manifest) (Manifest, error) {
 		if err != nil {
 			return Manifest{}, errors.Wrap(err, "Cannot get image digest from HEAD request")
 		}
-
-		if dbManifest.Digest != "" && dbManifest.Digest == imgDigest {
-			return dbManifest, nil
+		if len(dbManifest.Digest.String()) > 0 {
+			remDigests := []string{imgDigest.String()}
+			for _, repoDigest := range repoDigests {
+				remDigests = append(remDigests, strings.Split(repoDigest, "@")[1])
+			}
+			for _, d := range remDigests {
+				log.Debug().
+					Str("image", image.String()).
+					Str("db_digest", dbManifest.Digest.String()).
+					Str("remote_digest", d).
+					Msg("Comparing digests")
+				if dbManifest.Digest.String() == d {
+					return dbManifest, nil
+				}
+			}
 		}
 	}
 

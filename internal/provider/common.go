@@ -9,16 +9,22 @@ import (
 	"github.com/crazy-max/diun/v4/internal/model"
 )
 
+type ValidateImageOpts struct {
+	Name           string
+	Labels         map[string]string
+	WatchByDefault bool
+}
+
 // ValidateImage returns a standard image through Docker labels
-func ValidateImage(image string, labels map[string]string, watchByDef bool) (img model.Image, err error) {
-	if i := strings.Index(image, "@sha256:"); i > 0 {
-		image = image[:i]
+func ValidateImage(opts ValidateImageOpts) (img model.Image, err error) {
+	if i := strings.Index(opts.Name, "@sha256:"); i > 0 {
+		opts.Name = opts.Name[:i]
 	}
 	img = model.Image{
-		Name: image,
+		Name: opts.Name,
 	}
 
-	if enableStr, ok := labels["diun.enable"]; ok {
+	if enableStr, ok := opts.Labels["diun.enable"]; ok {
 		enable, err := strconv.ParseBool(enableStr)
 		if err != nil {
 			return img, fmt.Errorf("cannot parse %s value of label diun.enable", enableStr)
@@ -26,11 +32,11 @@ func ValidateImage(image string, labels map[string]string, watchByDef bool) (img
 		if !enable {
 			return model.Image{}, nil
 		}
-	} else if !watchByDef {
+	} else if !opts.WatchByDefault {
 		return model.Image{}, nil
 	}
 
-	for key, value := range labels {
+	for key, value := range opts.Labels {
 		switch key {
 		case "diun.regopt":
 			img.RegOpt = value

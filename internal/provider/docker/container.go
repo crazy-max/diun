@@ -86,7 +86,11 @@ func (c *Client) listContainerImage() []model.Image {
 			Str("ctn_image", imageName).
 			Interface("ctn_labels", ctn.Labels).
 			Msg("Validate image")
-		image, err := provider.ValidateImage(imageName, ctn.Labels, *c.config.WatchByDefault)
+		image, err := provider.ValidateImage(provider.ValidateImageOpts{
+			Name:           imageName,
+			Labels:         ctn.Labels,
+			WatchByDefault: *c.config.WatchByDefault,
+		})
 
 		if err != nil {
 			c.logger.Error().Err(err).
@@ -104,6 +108,7 @@ func (c *Client) listContainerImage() []model.Image {
 			continue
 		}
 
+		image.RepoDigests = imageRaw.RepoDigests
 		list = append(list, image)
 	}
 

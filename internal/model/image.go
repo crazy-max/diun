@@ -10,6 +10,7 @@ type Image struct {
 	IncludeTags []string      `yaml:"include_tags,omitempty" json:",omitempty"`
 	ExcludeTags []string      `yaml:"exclude_tags,omitempty" json:",omitempty"`
 	HubTpl      string        `yaml:"hub_tpl,omitempty" json:",omitempty"`
+	RepoDigests []string      `yaml:"-" json:"-"`
 }
 
 // ImagePlatform holds image platform configuration

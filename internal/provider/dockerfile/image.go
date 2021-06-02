@@ -32,7 +32,12 @@ func (c *Client) listExtImage() (list []model.Image) {
 				Interface("dfile_comments", fromImage.Comments).
 				Int("dfile_line", fromImage.Line).
 				Msg("Validate image")
-			image, err := provider.ValidateImage(fromImage.Name, c.extractLabels(fromImage.Comments), true)
+
+			image, err := provider.ValidateImage(provider.ValidateImageOpts{
+				Name:           fromImage.Name,
+				Labels:         c.extractLabels(fromImage.Comments),
+				WatchByDefault: true,
+			})
 			if err != nil {
 				c.logger.Error().Err(err).
 					Str("dfile_image", fromImage.Name).
@@ -50,6 +55,7 @@ func (c *Client) listExtImage() (list []model.Image) {
 					Msg("Watch disabled")
 				continue
 			}
+
 			list = append(list, image)
 		}
 	}
