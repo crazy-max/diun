@@ -48,12 +48,14 @@ target "lint" {
   inherits = ["go-version"]
   dockerfile = "./hack/lint.Dockerfile"
   target = "lint"
+  output = ["type=cacheonly"]
 }
 
 target "vendor-validate" {
   inherits = ["go-version"]
   dockerfile = "./hack/vendor.Dockerfile"
   target = "validate"
+  output = ["type=cacheonly"]
 }
 
 target "vendor-update" {
@@ -67,6 +69,7 @@ target "gen-validate" {
   inherits = ["go-version", "protoc-version"]
   dockerfile = "./hack/gen.Dockerfile"
   target = "validate"
+  output = ["type=cacheonly"]
 }
 
 target "gen-update" {
