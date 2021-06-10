@@ -9,7 +9,7 @@ require (
 	github.com/containers/image/v5 v5.12.0
 	github.com/crazy-max/gohealthchecks v0.3.0
 	github.com/crazy-max/gonfig v0.4.0
-	github.com/docker/docker v20.10.6+incompatible
+	github.com/docker/docker v20.10.7+incompatible
 	github.com/docker/go-connections v0.4.0
 	github.com/docker/go-units v0.4.0
 	github.com/eclipse/paho.mqtt.golang v1.3.5
