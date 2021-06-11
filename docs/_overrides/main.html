@@ -10,6 +10,10 @@
 {% set assets = config.site_url ~ 'assets' %}
 
 {% block extrahead %}
+<link rel="preconnect" href="https://{{ config.extra.plausible.server }}">
+<script defer data-domain="{{ config.extra.plausible.domain }}" src="https://{{ config.extra.plausible.server }}/js/plausible.outbound-links.js" ></script>
+<script>window.plausible = window.plausible || function() { (window.plausible.q = window.plausible.q || []).push(arguments) }</script>
+
 <meta name="application-name" content="{{ config.site_name }}">
 <meta name="msapplication-TileColor" content="#FFFFFF">
 <meta name="msapplication-TileImage" content="{{ assets }}/meta/mstile-144x144.png">

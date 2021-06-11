@@ -1,7 +1,7 @@
 site_name: Diun
 site_description: Receive notifications when a Docker image is updated on a Docker registry
 site_author: CrazyMax
-site_url: https://crazy-max.github.io/diun/
+site_url: https://crazymax.dev/diun/
 edit_uri: edit/master/docs/
 docs_dir: docs
 
@@ -19,6 +19,9 @@ extra:
       link: https://github.com/crazy-max/diun
     - icon: fontawesome/brands/twitter
       link: https://twitter.com/crazyws
+  plausible:
+    server: plausible.re4per.com
+    domain: crazymax.dev/diun
 
 theme:
   name: material
@@ -78,10 +81,6 @@ plugins:
       prebuild_index: python
       lang:
         - en
-
-google_analytics:
-  - UA-12516800-10
-  - auto
 
 nav:
   - Home: index.md
