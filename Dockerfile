@@ -33,7 +33,7 @@ LABEL maintainer="CrazyMax"
 
 RUN apk --update --no-cache add \
     ca-certificates \
-    libressl \
+    openssl \
   && rm -rf /tmp/* /var/cache/apk/*
 
 COPY --from=build /usr/local/bin/diun /usr/local/bin/diun
