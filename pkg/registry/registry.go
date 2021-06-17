@@ -15,8 +15,7 @@ type Client struct {
 
 // Options holds docker registry object options
 type Options struct {
-	Username      string
-	Password      string
+	Auth          types.DockerAuthConfig
 	InsecureTLS   bool
 	Timeout       time.Duration
 	UserAgent     string
@@ -28,39 +27,17 @@ type Options struct {
 
 // New creates new docker registry client instance
 func New(opts Options) (*Client, error) {
-	// Auth
-	var auth *types.DockerAuthConfig
-	if opts.Username != "" {
-		auth = &types.DockerAuthConfig{
-			Username: opts.Username,
-			Password: opts.Password,
-		}
-	}
-
-	if auth == nil {
-		auth = &types.DockerAuthConfig{}
-		// TODO: Seek credentials
-		//auth, err := config.GetCredentials(c.sysCtx, reference.Domain(ref.DockerReference()))
-		//if err != nil {
-		//	return nil, errors.Wrap(err, "Cannot get registry credentials")
-		//}
-		//*c.sysCtx.DockerAuthConfig = auth
-	}
-
-	// Sys context
-	sysCtx := &types.SystemContext{
-		DockerAuthConfig:                  auth,
-		DockerDaemonInsecureSkipTLSVerify: opts.InsecureTLS,
-		DockerInsecureSkipTLSVerify:       types.NewOptionalBool(opts.InsecureTLS),
-		DockerRegistryUserAgent:           opts.UserAgent,
-		OSChoice:                          opts.ImageOs,
-		ArchitectureChoice:                opts.ImageArch,
-		VariantChoice:                     opts.ImageVariant,
-	}
-
 	return &Client{
-		opts:   opts,
-		sysCtx: sysCtx,
+		opts: opts,
+		sysCtx: &types.SystemContext{
+			DockerAuthConfig:                  &opts.Auth,
+			DockerDaemonInsecureSkipTLSVerify: opts.InsecureTLS,
+			DockerInsecureSkipTLSVerify:       types.NewOptionalBool(opts.InsecureTLS),
+			DockerRegistryUserAgent:           opts.UserAgent,
+			OSChoice:                          opts.ImageOs,
+			ArchitectureChoice:                opts.ImageArch,
+			VariantChoice:                     opts.ImageVariant,
+		},
 	}, nil
 }
 
