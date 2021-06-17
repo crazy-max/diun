@@ -26,6 +26,31 @@ Or within a container:
 docker-compose exec diun diun notif test
 ```
 
+## Authentication against the registry
+
+You can authenticate against the registry through the [`regopts` settings](config/regopts.md) or you can mount
+your docker config file `$HOME/.docker/config.json` if you are already connected to the registry with `docker login`:
+
+```yaml
+version: "3.5"
+
+services:
+  diun:
+    image: crazymax/diun:latest
+    container_name: diun
+    command: serve
+    volumes:
+      - "./data:/data"
+      - "/root/.docker/config.json:/root/.docker/config.json:ro"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    environment:
+      - "TZ=Europe/Paris"
+      - "DIUN_WATCH_SCHEDULE=0 */6 * * *"
+      - "DIUN_PROVIDERS_DOCKER=true"
+      - "DIUN_PROVIDERS_DOCKER_WATCHBYDEFAULT=true"
+    restart: always
+```
+
 ## field docker|swarm uses unsupported type: invalid
 
 If you have the error `failed to decode configuration from file: field docker uses unsupported type: invalid` that's
