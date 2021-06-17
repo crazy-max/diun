@@ -37,6 +37,16 @@ func New(opts Options) (*Client, error) {
 		}
 	}
 
+	if auth == nil {
+		auth = &types.DockerAuthConfig{}
+		// TODO: Seek credentials
+		//auth, err := config.GetCredentials(c.sysCtx, reference.Domain(ref.DockerReference()))
+		//if err != nil {
+		//	return nil, errors.Wrap(err, "Cannot get registry credentials")
+		//}
+		//*c.sysCtx.DockerAuthConfig = auth
+	}
+
 	// Sys context
 	sysCtx := &types.SystemContext{
 		DockerAuthConfig:                  auth,

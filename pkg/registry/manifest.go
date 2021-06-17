@@ -6,8 +6,8 @@ import (
 
 	"github.com/containers/image/v5/docker"
 	"github.com/containers/image/v5/manifest"
-	"github.com/containers/image/v5/types"
 	"github.com/opencontainers/go-digest"
+	imgspecv1 "github.com/opencontainers/image-spec/specs-go/v1"
 	"github.com/pkg/errors"
 )
 
@@ -26,80 +26,91 @@ type Manifest struct {
 }
 
 // Manifest returns the manifest for a specific image
-func (c *Client) Manifest(image Image, dbManifest Manifest) (Manifest, error) {
+func (c *Client) Manifest(image Image, dbManifest Manifest) (Manifest, bool, error) {
 	ctx, cancel := c.timeoutContext()
 	defer cancel()
 
-	if c.sysCtx.DockerAuthConfig == nil {
-		c.sysCtx.DockerAuthConfig = &types.DockerAuthConfig{}
-		// TODO: Seek credentials
-		//auth, err := config.GetCredentials(c.sysCtx, reference.Domain(ref.DockerReference()))
-		//if err != nil {
-		//	return nil, errors.Wrap(err, "Cannot get registry credentials")
-		//}
-		//*c.sysCtx.DockerAuthConfig = auth
-	}
-
-	imgRef, err := ParseReference(image.String())
+	rmRef, err := ParseReference(image.String())
 	if err != nil {
-		return Manifest{}, errors.Wrap(err, "Cannot parse reference")
+		return Manifest{}, false, errors.Wrap(err, "Cannot parse reference")
 	}
 
-	var imgDigest digest.Digest
-	if c.opts.CompareDigest {
-		imgDigest, err = docker.GetDigest(ctx, c.sysCtx, imgRef)
+	// Retrieve remote digest through HEAD request
+	rmDigest, err := docker.GetDigest(ctx, c.sysCtx, rmRef)
+	if err != nil {
+		return Manifest{}, false, errors.Wrap(err, "Cannot get image digest from HEAD request")
+	}
+
+	// Digest match, returns db manifest
+	if c.opts.CompareDigest && len(dbManifest.Digest) > 0 && dbManifest.Digest == rmDigest {
+		return dbManifest, false, nil
+	}
+
+	rmCloser, err := rmRef.NewImage(ctx, c.sysCtx)
+	if err != nil {
+		return Manifest{}, false, errors.Wrap(err, "Cannot create image closer")
+	}
+	defer rmCloser.Close()
+
+	rmRawManifest, rmManifestMimeType, err := rmCloser.Manifest(ctx)
+	if err != nil {
+		return Manifest{}, false, errors.Wrap(err, "Cannot get raw manifest")
+	}
+
+	// For manifests list compare also digest matching the platform
+	updated := dbManifest.Digest != rmDigest
+	if c.opts.CompareDigest && len(dbManifest.Raw) > 0 && dbManifest.isManifestList() && isManifestList(rmManifestMimeType) {
+		dbManifestList, err := manifest.ListFromBlob(dbManifest.Raw, dbManifest.MIMEType)
 		if err != nil {
-			return Manifest{}, errors.Wrap(err, "Cannot get image digest from HEAD request")
+			return Manifest{}, false, errors.Wrap(err, "Cannot parse manifest list")
 		}
-
-		if dbManifest.Digest != "" && dbManifest.Digest == imgDigest {
-			return dbManifest, nil
-		}
-	}
-
-	imgCloser, err := imgRef.NewImage(ctx, c.sysCtx)
-	if err != nil {
-		return Manifest{}, errors.Wrap(err, "Cannot create image closer")
-	}
-	defer imgCloser.Close()
-
-	rawManifest, _, err := imgCloser.Manifest(ctx)
-	if err != nil {
-		return Manifest{}, errors.Wrap(err, "Cannot get raw manifest")
-	}
-
-	if !c.opts.CompareDigest {
-		imgDigest, err = manifest.Digest(rawManifest)
+		dbManifestPlatformDigest, err := dbManifestList.ChooseInstance(c.sysCtx)
 		if err != nil {
-			return Manifest{}, errors.Wrap(err, "Cannot get digest")
+			return Manifest{}, false, errors.Wrapf(err, "Error choosing image instance")
 		}
+		rmManifestList, err := manifest.ListFromBlob(rmRawManifest, rmManifestMimeType)
+		if err != nil {
+			return Manifest{}, false, errors.Wrap(err, "Cannot parse manifest list")
+		}
+		rmManifestPlatformDigest, err := rmManifestList.ChooseInstance(c.sysCtx)
+		if err != nil {
+			return Manifest{}, false, errors.Wrapf(err, "Error choosing image instance")
+		}
+		updated = dbManifestPlatformDigest != rmManifestPlatformDigest
 	}
 
-	imgInspect, err := imgCloser.Inspect(ctx)
+	// Metadata describing the Docker image
+	rmInspect, err := rmCloser.Inspect(ctx)
 	if err != nil {
-		return Manifest{}, errors.Wrap(err, "Cannot inspect")
+		return Manifest{}, false, errors.Wrap(err, "Cannot inspect")
 	}
-
-	imgTag := imgInspect.Tag
-	if len(imgTag) == 0 {
-		imgTag = image.Tag
+	rmTag := rmInspect.Tag
+	if len(rmTag) == 0 {
+		rmTag = image.Tag
 	}
-
-	imgPlatform := fmt.Sprintf("%s/%s", imgInspect.Os, imgInspect.Architecture)
-	if imgInspect.Variant != "" {
-		imgPlatform = fmt.Sprintf("%s/%s", imgPlatform, imgInspect.Variant)
+	rmPlatform := fmt.Sprintf("%s/%s", rmInspect.Os, rmInspect.Architecture)
+	if rmInspect.Variant != "" {
+		rmPlatform = fmt.Sprintf("%s/%s", rmPlatform, rmInspect.Variant)
 	}
 
 	return Manifest{
-		Name:          imgCloser.Reference().DockerReference().Name(),
-		Tag:           imgTag,
-		MIMEType:      manifest.GuessMIMEType(rawManifest),
-		Digest:        imgDigest,
-		Created:       imgInspect.Created,
-		DockerVersion: imgInspect.DockerVersion,
-		Labels:        imgInspect.Labels,
-		Layers:        imgInspect.Layers,
-		Platform:      imgPlatform,
-		Raw:           rawManifest,
-	}, nil
+		Name:          rmCloser.Reference().DockerReference().Name(),
+		Tag:           rmTag,
+		MIMEType:      rmManifestMimeType,
+		Digest:        rmDigest,
+		Created:       rmInspect.Created,
+		DockerVersion: rmInspect.DockerVersion,
+		Labels:        rmInspect.Labels,
+		Layers:        rmInspect.Layers,
+		Platform:      rmPlatform,
+		Raw:           rmRawManifest,
+	}, updated, nil
+}
+
+func (m Manifest) isManifestList() bool {
+	return isManifestList(m.MIMEType)
+}
+
+func isManifestList(mimeType string) bool {
+	return mimeType == manifest.DockerV2ListMediaType || mimeType == imgspecv1.MediaTypeImageIndex
 }

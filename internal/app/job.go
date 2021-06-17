@@ -176,7 +176,8 @@ func (di *Diun) runJob(job model.Job) (entry model.NotifEntry) {
 		return
 	}
 
-	entry.Manifest, err = job.Registry.Manifest(job.RegImage, dbManifest)
+	var updated bool
+	entry.Manifest, updated, err = job.Registry.Manifest(job.RegImage, dbManifest)
 	if err != nil {
 		sublog.Warn().Err(err).Msg("Cannot get remote manifest")
 		return
@@ -185,13 +186,12 @@ func (di *Diun) runJob(job model.Job) (entry model.NotifEntry) {
 	if len(dbManifest.Name) == 0 {
 		entry.Status = model.ImageStatusNew
 		sublog.Info().Msg("New image found")
-	} else if entry.Manifest.Digest.String() != dbManifest.Digest.String() {
+	} else if updated {
 		entry.Status = model.ImageStatusUpdate
 		sublog.Info().Msg("Image update found")
 	} else {
 		entry.Status = model.ImageStatusUnchange
 		sublog.Debug().Msg("No changes")
-		return
 	}
 
 	if err := di.db.PutManifest(job.RegImage, entry.Manifest); err != nil {
@@ -199,6 +199,9 @@ func (di *Diun) runJob(job model.Job) (entry model.NotifEntry) {
 		return
 	}
 	sublog.Debug().Msg("Manifest saved to database")
+	if entry.Status == model.ImageStatusUnchange {
+		return
+	}
 
 	if job.FirstCheck && !*di.cfg.Watch.FirstCheckNotif {
 		sublog.Debug().Msg("Skipping notification (first check)")
