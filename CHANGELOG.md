@@ -1,5 +1,25 @@
 # Changelog
 
+## 4.18.0 (2021/06/18)
+
+* Handle registry auth config (#411)
+* Bump k8s.io/client-go from 0.20.6 to 0.21.1 (#381)
+* Bump github.com/containers/image/v5 from 5.12.0 to 5.13.1 (#409)
+* Avoid notification for unupdated image (#406)
+* Use `openssl` pkg (#407)
+* Bump github.com/rs/zerolog from 1.22.0 to 1.23.0 (#405)
+* Bump google.golang.org/grpc from 1.37.0 to 1.38.0 (#389)
+* Bump github.com/microcosm-cc/bluemonday from 1.0.9 to 1.0.13 (#403 #410)
+* Bumps github.com/docker/docker from 20.10.6+incompatible to 20.10.7+incompatible (#397)
+* Bump github.com/jedib0t/go-pretty/v6 from 6.2.1 to 6.2.2 (#388)
+* Bump go.etcd.io/bbolt from 1.3.5 to 1.3.6 (#394)
+* Bump github.com/eclipse/paho.mqtt.golang from 1.3.4 to 1.3.5 (#400)
+* Bump github.com/alecthomas/kong from 0.2.16 to 0.2.17 (#401)
+* Bump github.com/tidwall/pretty from 1.1.0 to 1.2.0 (#390 #402)
+* Set `cacheonly` output for validators (#395)
+* Define serve command (#393)
+* Save raw manifest in db (#391)
+
 ## 4.17.0 (2021/05/26)
 
 :warning: See **Migration notes** in the documentation before upgrading.
