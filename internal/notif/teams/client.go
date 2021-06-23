@@ -18,9 +18,6 @@ type Client struct {
 	meta model.Meta
 }
 
-const customTpl = "Docker tag {{ if .Entry.Image.HubLink }}[`{{ .Entry.Image }}`]({{ .Entry.Image.HubLink }}){{ else }}`{{ .Entry.Image }}`{{ end }}" +
-	"{{ if (eq .Entry.Status \"new\") }}newly added{{ else }}updated{{ end }}."
-
 // New creates a new webhook notification instance
 func New(config *model.NotifTeams, meta model.Meta) notifier.Notifier {
 	return notifier.Notifier{
@@ -56,14 +53,15 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	}
 
 	message, err := msg.New(msg.Options{
-		Meta:  c.meta,
-		Entry: entry,
+		Meta:         c.meta,
+		Entry:        entry,
+		TemplateBody: c.cfg.TemplateBody,
 	})
 	if err != nil {
 		return err
 	}
 
-	_, text, err := message.RenderMarkdownTemplate(customTpl)
+	_, body, err := message.RenderMarkdown()
 	if err != nil {
 		return err
 	}
@@ -73,7 +71,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		themeColor = "0076D7"
 	}
 
-	body, err := json.Marshal(struct {
+	jsonBody, err := json.Marshal(struct {
 		Type       string     `json:"@type"`
 		Context    string     `json:"@context"`
 		ThemeColor string     `json:"themeColor"`
@@ -81,11 +79,11 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		Sections   []Sections `json:"sections"`
 	}{
 		Type:       "MessageCard",
-		Context:    "http://schema.org/extensions",
+		Context:    "https://schema.org/extensions",
 		ThemeColor: themeColor,
-		Summary:    string(text),
+		Summary:    string(body),
 		Sections: []Sections{{
-			ActivityTitle:    string(text),
+			ActivityTitle:    string(body),
 			ActivitySubtitle: "Provider: " + entry.Provider,
 			Facts: []Fact{
 				{"Hostname", c.meta.Hostname},
@@ -99,7 +97,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		return err
 	}
 
-	req, err := http.NewRequest("POST", c.cfg.WebhookURL, bytes.NewBuffer(body))
+	req, err := http.NewRequest("POST", c.cfg.WebhookURL, bytes.NewBuffer(jsonBody))
 	if err != nil {
 		return err
 	}

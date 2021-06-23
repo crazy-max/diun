@@ -8,8 +8,6 @@ import (
 	"github.com/crazy-max/diun/v4/internal/notif/notifier"
 	"github.com/crazy-max/diun/v4/pkg/utl"
 	MQTT "github.com/eclipse/paho.mqtt.golang"
-	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
 )
 
 // Client represents an active mqtt notification object
@@ -17,7 +15,6 @@ type Client struct {
 	*notifier.Notifier
 	cfg        *model.NotifMqtt
 	meta       model.Meta
-	logger     zerolog.Logger
 	mqttClient MQTT.Client
 }
 
@@ -25,9 +22,8 @@ type Client struct {
 func New(config *model.NotifMqtt, meta model.Meta) notifier.Notifier {
 	return notifier.Notifier{
 		Handler: &Client{
-			cfg:    config,
-			meta:   meta,
-			logger: log.With().Str("notif", "mqtt").Logger(),
+			cfg:  config,
+			meta: meta,
 		},
 	}
 }

@@ -76,13 +76,17 @@ func TestLoadFile(t *testing.T) {
 							"<@125>",
 							"<@&200>",
 						},
-						Timeout: utl.NewDuration(10 * time.Second),
+						Timeout:       utl.NewDuration(10 * time.Second),
+						TemplateTitle: model.NotifDefaultTemplateTitle,
+						TemplateBody:  model.NotifDefaultTemplateBody,
 					},
 					Gotify: &model.NotifGotify{
-						Endpoint: "http://gotify.foo.com",
-						Token:    "Token123456",
-						Priority: 1,
-						Timeout:  utl.NewDuration(10 * time.Second),
+						Endpoint:      "http://gotify.foo.com",
+						Token:         "Token123456",
+						Priority:      1,
+						Timeout:       utl.NewDuration(10 * time.Second),
+						TemplateTitle: model.NotifDefaultTemplateTitle,
+						TemplateBody:  model.NotifDefaultTemplateBody,
 					},
 					Mail: &model.NotifMail{
 						Host:               "localhost",
@@ -92,6 +96,14 @@ func TestLoadFile(t *testing.T) {
 						LocalName:          "localhost",
 						From:               "diun@example.com",
 						To:                 "webmaster@example.com",
+						TemplateTitle:      model.NotifDefaultTemplateTitle,
+						TemplateBody: `Docker tag {{ if .Entry.Image.HubLink }}[**{{ .Entry.Image }}**]({{ .Entry.Image.HubLink }}){{ else }}**{{ .Entry.Image }}**{{ end }}
+which you subscribed to through {{ .Entry.Provider }} provider has been {{ if (eq .Entry.Status "new") }}newly added{{ else }}updated{{ end }}.
+
+This image has been {{ if (eq .Entry.Status "new") }}created{{ else }}updated{{ end }} at
+<code>{{ .Entry.Manifest.Created.Format "Jan 02, 2006 15:04:05 UTC" }}</code> with digest <code>{{ .Entry.Manifest.Digest }}</code>
+for <code>{{ .Entry.Manifest.Platform }}</code> platform.
+`,
 					},
 					Matrix: &model.NotifMatrix{
 						HomeserverURL: "https://matrix.org",
@@ -99,6 +111,7 @@ func TestLoadFile(t *testing.T) {
 						Password:      "bar",
 						RoomID:        "!abcdefGHIjklmno:matrix.org",
 						MsgType:       model.NotifMatrixMsgTypeNotice,
+						TemplateBody:  model.NotifDefaultTemplateBody,
 					},
 					Mqtt: &model.NotifMqtt{
 						Scheme:   "mqtt",
@@ -111,15 +124,19 @@ func TestLoadFile(t *testing.T) {
 						QoS:      0,
 					},
 					Pushover: &model.NotifPushover{
-						Token:     "uQiRzpo4DXghDmr9QzzfQu27cmVRsG",
-						Recipient: "gznej3rKEVAvPUxu9vvNnqpmZpokzF",
+						Token:         "uQiRzpo4DXghDmr9QzzfQu27cmVRsG",
+						Recipient:     "gznej3rKEVAvPUxu9vvNnqpmZpokzF",
+						TemplateTitle: model.NotifDefaultTemplateTitle,
+						TemplateBody:  model.NotifDefaultTemplateBody,
 					},
 					RocketChat: &model.NotifRocketChat{
-						Endpoint: "http://rocket.foo.com:3000",
-						Channel:  "#general",
-						UserID:   "abcdEFGH012345678",
-						Token:    "Token123456",
-						Timeout:  utl.NewDuration(10 * time.Second),
+						Endpoint:      "http://rocket.foo.com:3000",
+						Channel:       "#general",
+						UserID:        "abcdEFGH012345678",
+						Token:         "Token123456",
+						Timeout:       utl.NewDuration(10 * time.Second),
+						TemplateTitle: model.NotifDefaultTemplateTitle,
+						TemplateBody:  model.NotifRocketChatDefaultTemplateBody,
 					},
 					Script: &model.NotifScript{
 						Cmd: "uname",
@@ -128,14 +145,17 @@ func TestLoadFile(t *testing.T) {
 						},
 					},
 					Slack: &model.NotifSlack{
-						WebhookURL: "https://hooks.slack.com/services/ABCD12EFG/HIJK34LMN/01234567890abcdefghij",
+						WebhookURL:   "https://hooks.slack.com/services/ABCD12EFG/HIJK34LMN/01234567890abcdefghij",
+						TemplateBody: model.NotifSlackDefaultTemplateBody,
 					},
 					Teams: &model.NotifTeams{
-						WebhookURL: "https://outlook.office.com/webhook/ABCD12EFG/HIJK34LMN/01234567890abcdefghij",
+						WebhookURL:   "https://outlook.office.com/webhook/ABCD12EFG/HIJK34LMN/01234567890abcdefghij",
+						TemplateBody: model.NotifTeamsDefaultTemplateBody,
 					},
 					Telegram: &model.NotifTelegram{
-						Token:   "abcdef123456",
-						ChatIDs: []int64{8547439, 1234567},
+						Token:        "abcdef123456",
+						ChatIDs:      []int64{8547439, 1234567},
+						TemplateBody: model.NotifTelegramDefaultTemplateBody,
 					},
 					Webhook: &model.NotifWebhook{
 						Endpoint: "http://webhook.foo.com/sd54qad89azd5a",
@@ -291,8 +311,9 @@ func TestLoadEnv(t *testing.T) {
 				Watch: (&model.Watch{}).GetDefaults(),
 				Notif: &model.Notif{
 					Telegram: &model.NotifTelegram{
-						Token:   "abcdef123456",
-						ChatIDs: []int64{8547439, 1234567},
+						Token:        "abcdef123456",
+						ChatIDs:      []int64{8547439, 1234567},
+						TemplateBody: model.NotifTelegramDefaultTemplateBody,
 					},
 				},
 				Providers: &model.Providers{
@@ -398,6 +419,14 @@ func TestLoadMixed(t *testing.T) {
 						LocalName:          "foo.com",
 						From:               "diun@foo.com",
 						To:                 "webmaster@foo.com",
+						TemplateTitle:      model.NotifDefaultTemplateTitle,
+						TemplateBody: `Docker tag {{ if .Entry.Image.HubLink }}[**{{ .Entry.Image }}**]({{ .Entry.Image.HubLink }}){{ else }}**{{ .Entry.Image }}**{{ end }}
+which you subscribed to through {{ .Entry.Provider }} provider has been {{ if (eq .Entry.Status "new") }}newly added{{ else }}updated{{ end }}.
+
+This image has been {{ if (eq .Entry.Status "new") }}created{{ else }}updated{{ end }} at
+<code>{{ .Entry.Manifest.Created.Format "Jan 02, 2006 15:04:05 UTC" }}</code> with digest <code>{{ .Entry.Manifest.Digest }}</code>
+for <code>{{ .Entry.Manifest.Platform }}</code> platform.
+`,
 					},
 				},
 				RegOpts: nil,

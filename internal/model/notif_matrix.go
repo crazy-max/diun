@@ -9,6 +9,7 @@ type NotifMatrix struct {
 	PasswordFile  string             `yaml:"passwordFile,omitempty" json:"passwordFile,omitempty" validate:"omitempty,file"`
 	RoomID        string             `yaml:"roomID,omitempty" json:"roomID,omitempty" validate:"required"`
 	MsgType       NotifMatrixMsgType `yaml:"msgType,omitempty" json:"msgType,omitempty" validate:"required,oneof=notice text"`
+	TemplateBody  string             `yaml:"templateBody,omitempty" json:"templateBody,omitempty" validate:"required"`
 }
 
 // NotifMatrix message type constants
@@ -31,4 +32,5 @@ func (s *NotifMatrix) GetDefaults() *NotifMatrix {
 func (s *NotifMatrix) SetDefaults() {
 	s.HomeserverURL = "https://matrix.org"
 	s.MsgType = NotifMatrixMsgTypeNotice
+	s.TemplateBody = NotifDefaultTemplateBody
 }

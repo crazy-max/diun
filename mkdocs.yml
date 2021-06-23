@@ -22,6 +22,13 @@ extra:
   plausible:
     server: plausible.re4per.com
     domain: crazymax.dev/diun
+  template:
+    defaultTitle: |
+      {{ if (eq .Entry.Status "new") }}New image {{ .Entry.Image }} has been added{{ else }}Image update for {{ .Entry.Image }}{{ end }}
+    defaultBody: |
+      Docker tag {{ if .Entry.Image.HubLink }}[**{{ .Entry.Image }}**]({{ .Entry.Image.HubLink }}){{ else }}**{{ .Entry.Image }}**{{ end }}
+      which you subscribed to through {{ .Entry.Provider }} provider has been {{ if (eq .Entry.Status "new") }}newly added{{ else }}updated{{ end }}
+      on {{ .Meta.Hostname }}.
 
 theme:
   name: material
@@ -76,7 +83,11 @@ plugins:
   - git-revision-date-localized:
       type: iso_datetime
       enable_creation_date: true
-  - macros
+  - macros:
+      j2_block_start_string: '[[%'
+      j2_block_end_string: '%]]'
+      j2_variable_start_string: '[['
+      j2_variable_end_string: ']]'
   - search:
       prebuild_index: python
       lang:

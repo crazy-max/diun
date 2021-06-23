@@ -21,16 +21,6 @@ type Client struct {
 	meta model.Meta
 }
 
-const customTpl = `Docker tag {{ if .Entry.Image.HubLink }}[**{{ .Entry.Image }}**]({{ .Entry.Image.HubLink }}){{ else }}**{{ .Entry.Image }}**{{ end }}
-which you subscribed to through {{ .Entry.Provider }} provider has been {{ if (eq .Entry.Status "new") }}newly added{{ else }}updated{{ end }}
-on {{ .Meta.Hostname }}.
-
-This image has been {{ if (eq .Entry.Status "new") }}created{{ else }}updated{{ end }} at
-<code>{{ .Entry.Manifest.Created.Format "Jan 02, 2006 15:04:05 UTC" }}</code> with digest <code>{{ .Entry.Manifest.Digest }}</code>
-for <code>{{ .Entry.Manifest.Platform }}</code> platform.
-
-Need help, or have questions? Go to {{ .Meta.URL }} and leave an issue.`
-
 // New creates a new mail notification instance
 func New(config *model.NotifMail, meta model.Meta) notifier.Notifier {
 	return notifier.Notifier{
@@ -63,14 +53,16 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	}
 
 	message, err := msg.New(msg.Options{
-		Meta:  c.meta,
-		Entry: entry,
+		Meta:          c.meta,
+		Entry:         entry,
+		TemplateTitle: c.cfg.TemplateTitle,
+		TemplateBody:  c.cfg.TemplateBody,
 	})
 	if err != nil {
 		return err
 	}
 
-	title, text, err := message.RenderMarkdownTemplate(customTpl)
+	title, body, err := message.RenderMarkdown()
 	if err != nil {
 		return err
 	}
@@ -78,7 +70,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	email := hermes.Email{
 		Body: hermes.Body{
 			Title:        fmt.Sprintf("%s 🔔 notification", c.meta.Name),
-			FreeMarkdown: hermes.Markdown(text),
+			FreeMarkdown: hermes.Markdown(body),
 			Signature:    "Thanks for your support!",
 		},
 	}
@@ -95,12 +87,12 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		return fmt.Errorf("hermes: %v", err)
 	}
 
-	msg := gomail.NewMessage()
-	msg.SetHeader("From", fmt.Sprintf("%s <%s>", c.meta.Name, c.cfg.From))
-	msg.SetHeader("To", c.cfg.To)
-	msg.SetHeader("Subject", title)
-	msg.SetBody("text/plain", textpart)
-	msg.AddAlternative("text/html", htmlpart)
+	mailMessage := gomail.NewMessage()
+	mailMessage.SetHeader("From", fmt.Sprintf("%s <%s>", c.meta.Name, c.cfg.From))
+	mailMessage.SetHeader("To", c.cfg.To)
+	mailMessage.SetHeader("Subject", string(title))
+	mailMessage.SetBody("text/plain", textpart)
+	mailMessage.AddAlternative("text/html", htmlpart)
 
 	var tlsConfig *tls.Config
 	if *c.cfg.InsecureSkipVerify {
@@ -128,5 +120,5 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		LocalName: c.cfg.LocalName,
 	}
 
-	return dialer.DialAndSend(msg)
+	return dialer.DialAndSend(mailMessage)
 }

@@ -20,10 +20,6 @@ type Client struct {
 	meta model.Meta
 }
 
-const customTpl = `Docker tag {{ if .Entry.Image.HubLink }}[{{ .Entry.Image }}]({{ .Entry.Image.HubLink }}){{ else }}{{ .Entry.Image }}{{ end }}
-which you subscribed to through {{ .Entry.Provider }} provider has been {{ if (eq .Entry.Status "new") }}newly added{{ else }}updated{{ end }}
-on {{ escapeMarkdown .Meta.Hostname }}.`
-
 // New creates a new Telegram notification instance
 func New(config *model.NotifTelegram, meta model.Meta) notifier.Notifier {
 	return notifier.Notifier{
@@ -63,9 +59,10 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	}
 
 	message, err := msg.New(msg.Options{
-		Meta:  c.meta,
-		Entry: entry,
-		TplFuncs: template.FuncMap{
+		Meta:         c.meta,
+		Entry:        entry,
+		TemplateBody: c.cfg.TemplateBody,
+		TemplateFuncs: template.FuncMap{
 			"escapeMarkdown": func(text string) string {
 				text = strings.ReplaceAll(text, "_", "\\_")
 				text = strings.ReplaceAll(text, "*", "\\*")
@@ -79,7 +76,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		return err
 	}
 
-	_, text, err := message.RenderMarkdownTemplate(strings.ReplaceAll(customTpl, "\n", " "))
+	_, body, err := message.RenderMarkdown()
 	if err != nil {
 		return err
 	}
@@ -89,7 +86,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 			BaseChat: tgbotapi.BaseChat{
 				ChatID: chatID,
 			},
-			Text:                  string(text),
+			Text:                  string(body),
 			ParseMode:             "markdown",
 			DisableWebPagePreview: true,
 		})

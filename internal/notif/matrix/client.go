@@ -72,8 +72,9 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	}
 
 	message, err := msg.New(msg.Options{
-		Meta:  c.meta,
-		Entry: entry,
+		Meta:         c.meta,
+		Entry:        entry,
+		TemplateBody: c.cfg.TemplateBody,
 	})
 	if err != nil {
 		return err

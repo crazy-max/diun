@@ -38,6 +38,13 @@ notif:
     insecureSkipVerify: false
     from: diun@example.com
     to: webmaster@example.com
+    templateBody: |
+      Docker tag {{ if .Entry.Image.HubLink }}[**{{ .Entry.Image }}**]({{ .Entry.Image.HubLink }}){{ else }}**{{ .Entry.Image }}**{{ end }}
+      which you subscribed to through {{ .Entry.Provider }} provider has been {{ if (eq .Entry.Status "new") }}newly added{{ else }}updated{{ end }}.
+
+      This image has been {{ if (eq .Entry.Status "new") }}created{{ else }}updated{{ end }} at
+      <code>{{ .Entry.Manifest.Created.Format "Jan 02, 2006 15:04:05 UTC" }}</code> with digest <code>{{ .Entry.Manifest.Digest }}</code>
+      for <code>{{ .Entry.Manifest.Platform }}</code> platform.
   matrix:
     homeserverURL: https://matrix.org
     user: "@foo:matrix.org"

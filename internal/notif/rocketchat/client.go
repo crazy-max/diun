@@ -24,8 +24,6 @@ type Client struct {
 	meta model.Meta
 }
 
-const customTpl = `Docker tag {{ .Entry.Image }} which you subscribed to through {{ .Entry.Provider }} provider has been {{ if (eq .Entry.Status "new") }}newly added{{ else }}updated{{ end }} on {{ .Meta.Hostname }}.`
-
 // New creates a new rocketchat notification instance
 func New(config *model.NotifRocketChat, meta model.Meta) notifier.Notifier {
 	return notifier.Notifier{
@@ -54,14 +52,16 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	}
 
 	message, err := msg.New(msg.Options{
-		Meta:  c.meta,
-		Entry: entry,
+		Meta:          c.meta,
+		Entry:         entry,
+		TemplateTitle: c.cfg.TemplateTitle,
+		TemplateBody:  c.cfg.TemplateBody,
 	})
 	if err != nil {
 		return err
 	}
 
-	title, text, err := message.RenderMarkdownTemplate(customTpl)
+	title, body, err := message.RenderMarkdown()
 	if err != nil {
 		return err
 	}
@@ -106,10 +106,10 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		Alias:   c.meta.Name,
 		Avatar:  c.meta.Logo,
 		Channel: c.cfg.Channel,
-		Text:    title,
+		Text:    string(title),
 		Attachments: []Attachment{
 			{
-				Text:   string(text),
+				Text:   string(body),
 				Ts:     json.Number(strconv.FormatInt(time.Now().Unix(), 10)),
 				Fields: fields,
 			},

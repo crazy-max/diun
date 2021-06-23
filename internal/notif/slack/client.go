@@ -19,8 +19,6 @@ type Client struct {
 	meta model.Meta
 }
 
-const customTpl = "<!channel> Docker tag `{{ .Entry.Image }}` {{ if (eq .Entry.Status \"new\") }}newly added{{ else }}updated{{ end }}."
-
 // New creates a new slack notification instance
 func New(config *model.NotifSlack, meta model.Meta) notifier.Notifier {
 	return notifier.Notifier{
@@ -39,14 +37,15 @@ func (c *Client) Name() string {
 // Send creates and sends a slack notification with an entry
 func (c *Client) Send(entry model.NotifEntry) error {
 	message, err := msg.New(msg.Options{
-		Meta:  c.meta,
-		Entry: entry,
+		Meta:         c.meta,
+		Entry:        entry,
+		TemplateBody: c.cfg.TemplateBody,
 	})
 	if err != nil {
 		return err
 	}
 
-	_, text, err := message.RenderMarkdownTemplate(customTpl)
+	_, body, err := message.RenderMarkdown()
 	if err != nil {
 		return err
 	}
@@ -99,7 +98,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 				AuthorSubname: "github.com/crazy-max/diun",
 				AuthorLink:    c.meta.URL,
 				AuthorIcon:    c.meta.Logo,
-				Text:          string(text),
+				Text:          string(body),
 				Footer:        fmt.Sprintf("%s © %d %s %s", c.meta.Author, time.Now().Year(), c.meta.Name, c.meta.Version),
 				Fields:        fields,
 				Ts:            json.Number(strconv.FormatInt(time.Now().Unix(), 10)),

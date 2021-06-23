@@ -46,21 +46,23 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	}
 
 	message, err := msg.New(msg.Options{
-		Meta:  c.meta,
-		Entry: entry,
+		Meta:          c.meta,
+		Entry:         entry,
+		TemplateTitle: c.cfg.TemplateTitle,
+		TemplateBody:  c.cfg.TemplateBody,
 	})
 	if err != nil {
 		return err
 	}
 
-	title, text, err := message.RenderHTML()
+	title, body, err := message.RenderHTML()
 	if err != nil {
 		return err
 	}
 
 	_, err = pushover.New(token).SendMessage(&pushover.Message{
-		Message:   string(text),
-		Title:     title,
+		Title:     string(title),
+		Message:   string(body),
 		Priority:  c.cfg.Priority,
 		URL:       c.meta.URL,
 		URLTitle:  c.meta.Name,
