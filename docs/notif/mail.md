@@ -14,21 +14,26 @@ Notifications can be sent through SMTP.
         insecureSkipVerify: false
         from: diun@example.com
         to: webmaster@example.com
+        templateTitle: "{{ .Entry.Image }} released"
+        templateBody: |
+          Docker tag {{ .Entry.Image }} which you subscribed to through {{ .Entry.Provider }} provider has been released.
     ```
 
-| Name                  | Default       | Description   |
-|-----------------------|---------------|---------------|
-| `host`[^1]            | `localhost`   | SMTP server host |
-| `port`[^1]            | `25`          | SMTP server port |
-| `ssl`                 | `false`       | SSL defines whether an SSL connection is used. Should be false in most cases since the auth mechanism should use STARTTLS |
-| `insecureSkipVerify`  | `false`       | Controls whether a client verifies the server's certificate chain and hostname |
-| `localName`           | `localhost`   | Hostname sent to the SMTP server with the HELO command |
-| `username`            |               | SMTP username |
-| `usernameFile`        |               | Use content of secret file as SMTP username if `username` not defined |
-| `password`            |               | SMTP password |
-| `passwordFile`        |               | Use content of secret file as SMTP password if `password` not defined |
-| `from`[^1]            |               | Sender email address |
-| `to`[^1]              |               | Recipient email address |
+| Name                  | Default                                    | Description   |
+|-----------------------|--------------------------------------------|---------------|
+| `host`[^1]            | `localhost`                                | SMTP server host |
+| `port`[^1]            | `25`                                       | SMTP server port |
+| `ssl`                 | `false`                                    | SSL defines whether an SSL connection is used. Should be false in most cases since the auth mechanism should use STARTTLS |
+| `insecureSkipVerify`  | `false`                                    | Controls whether a client verifies the server's certificate chain and hostname |
+| `localName`           | `localhost`                                | Hostname sent to the SMTP server with the HELO command |
+| `username`            |                                            | SMTP username |
+| `usernameFile`        |                                            | Use content of secret file as SMTP username if `username` not defined |
+| `password`            |                                            | SMTP password |
+| `passwordFile`        |                                            | Use content of secret file as SMTP password if `password` not defined |
+| `from`[^1]            |                                            | Sender email address |
+| `to`[^1]              |                                            | Recipient email address |
+| `templateTitle`[^1]   | See [below](#default-templatetitle)        | [Notification template](../faq.md#notification-template) for message title |
+| `templateBody`[^1]    | See [below](#default-templatebody)         | [Notification template](../faq.md#notification-template) for message body |
 
 !!! abstract "Environment variables"
     * `DIUN_NOTIF_MAIL_HOST`
@@ -42,6 +47,28 @@ Notifications can be sent through SMTP.
     * `DIUN_NOTIF_MAIL_PASSWORDFILE`
     * `DIUN_NOTIF_MAIL_FROM`
     * `DIUN_NOTIF_MAIL_TO`
+    * `DIUN_NOTIF_MAIL_TEMPLATETITLE`
+    * `DIUN_NOTIF_MAIL_TEMPLATEBODY`
+
+### Default `templateTitle`
+
+```
+[[ config.extra.template.defaultTitle ]]
+```
+
+### Default `templateBody`
+
+```
+Docker tag {{ if .Entry.Image.HubLink }}[**{{ .Entry.Image }}**]({{ .Entry.Image.HubLink }}){{ else }}**{{ .Entry.Image }}**{{ end }}
+which you subscribed to through {{ .Entry.Provider }} provider has been {{ if (eq .Entry.Status "new") }}newly added{{ else }}updated{{ end }}
+on {{ .Meta.Hostname }}.
+
+This image has been {{ if (eq .Entry.Status "new") }}created{{ else }}updated{{ end }} at
+<code>{{ .Entry.Manifest.Created.Format "Jan 02, 2006 15:04:05 UTC" }}</code> with digest <code>{{ .Entry.Manifest.Digest }}</code>
+for <code>{{ .Entry.Manifest.Platform }}</code> platform.
+
+Need help, or have questions? Go to {{ .Meta.URL }} and leave an issue.
+```
 
 ## Sample
 

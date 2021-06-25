@@ -7,14 +7,19 @@ type NotifPushover struct {
 	Recipient     string `yaml:"recipient,omitempty" json:"recipient,omitempty" validate:"omitempty"`
 	RecipientFile string `yaml:"recipientFile,omitempty" json:"recipientFile,omitempty" validate:"omitempty,file"`
 	Priority      int    `yaml:"priority,omitempty" json:"priority,omitempty" validate:"omitempty,min=-2,max=2"`
+	TemplateTitle string `yaml:"templateTitle,omitempty" json:"templateTitle,omitempty" validate:"required"`
+	TemplateBody  string `yaml:"templateBody,omitempty" json:"templateBody,omitempty" validate:"required"`
 }
 
 // GetDefaults gets the default values
 func (s *NotifPushover) GetDefaults() *NotifPushover {
-	return nil
+	n := &NotifPushover{}
+	n.SetDefaults()
+	return n
 }
 
 // SetDefaults sets the default values
 func (s *NotifPushover) SetDefaults() {
-	// noop
+	s.TemplateTitle = NotifDefaultTemplateTitle
+	s.TemplateBody = NotifDefaultTemplateBody
 }

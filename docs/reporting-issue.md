@@ -4,7 +4,7 @@
 
 First, [be a good guy](https://github.com/kossnocorp/etiquette/blob/master/README.md).
 
-Please do a search in [open issues]({{ config.repo_url }}issues?utf8=%E2%9C%93&q=) to see if the issue or feature request has already been filed and read the [FAQ](faq.md) page first.
+Please do a search in [open issues]([[ config.repo_url ]]issues?utf8=%E2%9C%93&q=) to see if the issue or feature request has already been filed and read the [FAQ](faq.md) page first.
 
 If you find your issue already exists, make relevant comments and add your [reaction](https://github.com/blog/2119-add-reactions-to-pull-requests-issues-and-comments). Use a reaction in place of a "+1" comment.
 
@@ -23,7 +23,7 @@ File a single issue per problem and feature request.
 
 The more information you can provide, the more likely someone will be successful reproducing the issue and finding a fix.
 
-You are now ready to [create a new issue]({{ config.repo_url }}issues/new/choose)!
+You are now ready to [create a new issue]([[ config.repo_url ]]issues/new/choose)!
 
 ## Closure policy
 

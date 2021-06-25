@@ -11,6 +11,7 @@ import (
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/microcosm-cc/bluemonday"
 	"github.com/opencontainers/go-digest"
+	"github.com/pkg/errors"
 	"github.com/russross/blackfriday/v2"
 )
 
@@ -21,14 +22,12 @@ type Client struct {
 
 // Options holds msg client object options
 type Options struct {
-	Meta     model.Meta
-	Entry    model.NotifEntry
-	TplFuncs template.FuncMap
+	Meta          model.Meta
+	Entry         model.NotifEntry
+	TemplateTitle string
+	TemplateBody  string
+	TemplateFuncs template.FuncMap
 }
-
-const defaultTpl = `Docker tag {{ if .Entry.Image.HubLink }}[**{{ .Entry.Image }}**]({{ .Entry.Image.HubLink }}){{ else }}**{{ .Entry.Image }}**{{ end }}
-which you subscribed to through {{ .Entry.Provider }} provider has been {{ if (eq .Entry.Status "new") }}newly added{{ else }}updated{{ end }}
-on {{ .Meta.Hostname }}.`
 
 // New initializes a new msg client
 func New(opts Options) (*Client, error) {
@@ -38,47 +37,49 @@ func New(opts Options) (*Client, error) {
 }
 
 // RenderMarkdown returns a notification message as markdown
-func (c *Client) RenderMarkdown() (title string, text []byte, err error) {
-	return c.RenderMarkdownTemplate(strings.ReplaceAll(defaultTpl, "\n", " "))
-}
-
-// RenderMarkdownTemplate returns a notification message as markdown with a custom template
-func (c *Client) RenderMarkdownTemplate(tpl string) (title string, text []byte, err error) {
-	title = fmt.Sprintf("Image update for %s", c.opts.Entry.Image.String())
-	if c.opts.Entry.Status == model.ImageStatusNew {
-		title = fmt.Sprintf("New image %s has been added", c.opts.Entry.Image.String())
-	}
-
-	var msgBuf bytes.Buffer
-	msgTpl := template.Must(template.New("notif").Funcs(c.opts.TplFuncs).Parse(tpl))
-	err = msgTpl.Execute(&msgBuf, struct {
+func (c *Client) RenderMarkdown() (title []byte, body []byte, err error) {
+	var titleBuf bytes.Buffer
+	titleTpl := template.Must(template.New("title").Funcs(c.opts.TemplateFuncs).Parse(strings.TrimSuffix(strings.TrimSpace(c.opts.TemplateTitle), "\n")))
+	err = titleTpl.Execute(&titleBuf, struct {
 		Meta  model.Meta
 		Entry model.NotifEntry
 	}{
 		Meta:  c.opts.Meta,
 		Entry: c.opts.Entry,
 	})
+	if err != nil {
+		return title, body, errors.Wrap(err, "Cannot render notif title")
+	}
+	title = titleBuf.Bytes()
 
-	text = msgBuf.Bytes()
+	var bodyBuf bytes.Buffer
+	bodyTpl := template.Must(template.New("body").Funcs(c.opts.TemplateFuncs).Parse(strings.TrimSuffix(strings.TrimSpace(c.opts.TemplateBody), "\n")))
+	err = bodyTpl.Execute(&bodyBuf, struct {
+		Meta  model.Meta
+		Entry model.NotifEntry
+	}{
+		Meta:  c.opts.Meta,
+		Entry: c.opts.Entry,
+	})
+	if err != nil {
+		return title, body, errors.Wrap(err, "Cannot render notif body")
+	}
+	body = bodyBuf.Bytes()
+
 	return
 }
 
 // RenderHTML returns a notification message as html
-func (c *Client) RenderHTML() (title string, text []byte, err error) {
-	return c.RenderHTMLTemplate(strings.ReplaceAll(defaultTpl, "\n", " "))
-}
-
-// RenderHTMLTemplate returns a notification message as html with a custom template
-func (c *Client) RenderHTMLTemplate(tpl string) (title string, text []byte, err error) {
-	title, text, err = c.RenderMarkdownTemplate(tpl)
+func (c *Client) RenderHTML() (title []byte, body []byte, err error) {
+	title, body, err = c.RenderMarkdown()
 	if err != nil {
-		return
+		return title, body, err
 	}
 
-	text = []byte(bluemonday.UGCPolicy().Sanitize(
+	body = []byte(bluemonday.UGCPolicy().Sanitize(
 		// Dirty way to remove wrapped <p></p> and newline
 		// https://github.com/russross/blackfriday/issues/237
-		strings.TrimRight(strings.TrimLeft(strings.TrimSpace(string(blackfriday.Run(text))), "<p>"), "</p>"),
+		strings.TrimRight(strings.TrimLeft(strings.TrimSpace(string(blackfriday.Run(body))), "<p>"), "</p>"),
 	))
 	return
 }

@@ -45,14 +45,16 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	}
 
 	message, err := msg.New(msg.Options{
-		Meta:  c.meta,
-		Entry: entry,
+		Meta:          c.meta,
+		Entry:         entry,
+		TemplateTitle: c.cfg.TemplateTitle,
+		TemplateBody:  c.cfg.TemplateBody,
 	})
 	if err != nil {
 		return err
 	}
 
-	title, text, err := message.RenderMarkdown()
+	title, body, err := message.RenderMarkdown()
 	if err != nil {
 		return err
 	}
@@ -62,7 +64,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 			content.WriteString(fmt.Sprintf("%s ", mention))
 		}
 	}
-	content.WriteString(title)
+	content.WriteString(string(title))
 
 	fields := []EmbedField{
 		{
@@ -100,7 +102,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		AvatarURL: c.meta.Logo,
 		Embeds: []Embed{
 			{
-				Description: string(text),
+				Description: string(body),
 				Footer: EmbedFooter{
 					Text:    fmt.Sprintf("%s © %d %s %s", c.meta.Author, time.Now().Year(), c.meta.Name, c.meta.Version),
 					IconURL: c.meta.Logo,

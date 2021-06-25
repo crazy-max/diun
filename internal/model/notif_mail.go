@@ -4,6 +4,17 @@ import (
 	"github.com/crazy-max/diun/v4/pkg/utl"
 )
 
+// NotifMailDefaultTemplateBody ...
+const NotifMailDefaultTemplateBody = `Docker tag {{ if .Entry.Image.HubLink }}[**{{ .Entry.Image }}**]({{ .Entry.Image.HubLink }}){{ else }}**{{ .Entry.Image }}**{{ end }}
+which you subscribed to through {{ .Entry.Provider }} provider has been {{ if (eq .Entry.Status "new") }}newly added{{ else }}updated{{ end }}
+on {{ .Meta.Hostname }}.
+
+This image has been {{ if (eq .Entry.Status "new") }}created{{ else }}updated{{ end }} at
+<code>{{ .Entry.Manifest.Created.Format "Jan 02, 2006 15:04:05 UTC" }}</code> with digest <code>{{ .Entry.Manifest.Digest }}</code>
+for <code>{{ .Entry.Manifest.Platform }}</code> platform.
+
+Need help, or have questions? Go to {{ .Meta.URL }} and leave an issue.`
+
 // NotifMail holds mail notification configuration details
 type NotifMail struct {
 	Host               string `yaml:"host,omitempty" json:"host,omitempty" validate:"required"`
@@ -17,6 +28,8 @@ type NotifMail struct {
 	PasswordFile       string `yaml:"passwordFile,omitempty" json:"passwordFile,omitempty" validate:"omitempty,file"`
 	From               string `yaml:"from,omitempty" json:"from,omitempty" validate:"required,email"`
 	To                 string `yaml:"to,omitempty" json:"to,omitempty" validate:"required,email"`
+	TemplateTitle      string `yaml:"templateTitle,omitempty" json:"templateTitle,omitempty" validate:"required"`
+	TemplateBody       string `yaml:"templateBody,omitempty" json:"templateBody,omitempty" validate:"required"`
 }
 
 // GetDefaults gets the default values
@@ -33,4 +46,6 @@ func (s *NotifMail) SetDefaults() {
 	s.SSL = utl.NewFalse()
 	s.InsecureSkipVerify = utl.NewFalse()
 	s.LocalName = "localhost"
+	s.TemplateTitle = NotifDefaultTemplateTitle
+	s.TemplateBody = NotifMailDefaultTemplateBody
 }

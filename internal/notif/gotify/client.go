@@ -50,26 +50,28 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	}
 
 	message, err := msg.New(msg.Options{
-		Meta:  c.meta,
-		Entry: entry,
+		Meta:          c.meta,
+		Entry:         entry,
+		TemplateTitle: c.cfg.TemplateTitle,
+		TemplateBody:  c.cfg.TemplateBody,
 	})
 	if err != nil {
 		return err
 	}
 
-	title, text, err := message.RenderMarkdown()
+	title, body, err := message.RenderMarkdown()
 	if err != nil {
 		return err
 	}
 
-	body, err := json.Marshal(struct {
+	jsonBody, err := json.Marshal(struct {
 		Message  string                 `json:"message"`
 		Title    string                 `json:"title"`
 		Priority int                    `json:"priority"`
 		Extras   map[string]interface{} `json:"extras"`
 	}{
-		Message:  string(text),
-		Title:    title,
+		Message:  string(body),
+		Title:    string(title),
 		Priority: c.cfg.Priority,
 		Extras: map[string]interface{}{
 			"client::display": map[string]string{
@@ -91,13 +93,13 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	q.Set("token", token)
 	u.RawQuery = q.Encode()
 
-	req, err := http.NewRequest("POST", u.String(), bytes.NewBuffer(body))
+	req, err := http.NewRequest("POST", u.String(), bytes.NewBuffer(jsonBody))
 	if err != nil {
 		return err
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Add("Content-Length", strconv.Itoa(len(string(body))))
+	req.Header.Add("Content-Length", strconv.Itoa(len(string(jsonBody))))
 	req.Header.Set("User-Agent", c.meta.UserAgent)
 
 	resp, err := hc.Do(req)

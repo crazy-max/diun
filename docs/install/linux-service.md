@@ -10,7 +10,7 @@ To create a new service, paste this content in `/etc/systemd/system/diun.service
 ```
 [Unit]
 Description=Diun
-Documentation={{ config.site_url }}
+Documentation=[[ config.site_url ]]
 After=syslog.target
 After=network.target
 

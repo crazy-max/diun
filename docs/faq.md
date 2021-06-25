@@ -26,6 +26,43 @@ Or within a container:
 docker-compose exec diun diun notif test
 ```
 
+## Notification template
+
+The title and body of a notification message can be customized for each notifier through `templateTitle` and
+`templateBody` fields except for those rendering _JSON_ or _Env_ like [Amqp](notif/amqp.md),
+[MQTT](notif/mqtt.md), [Script](notif/script.md) and [Webhook](notif/webhook.md).
+
+Templating is supported with the following fields:
+
+| Key                              | Description |
+|----------------------------------|-------------|
+| `.Meta.ID`                       | App ID: `diun` |
+| `.Meta.Name`                     | App Name: `Diun` |
+| `.Meta.Desc`                     | App description: `Docker image update notifier` |
+| `.Meta.URL`                      | App repo URL: `https://github.com/crazy-max/diun` |
+| `.Meta.Logo`                     | App logo URL: `https://raw.githubusercontent.com/crazy-max/diun/master/.res/diun.png` |
+| `.Meta.Author`                   | App author: `CrazyMax` |
+| `.Meta.Version`                  | App version: `v4.19.0` |
+| `.Meta.UserAgent`                | App user-agent used to talk with registries: `diun/4.19.0 go/1.16 Linux` |
+| `.Meta.Hostname`                 | Hostname |
+| `.Entry.Status`                  | Entry status. Can be `new`, `update`, `unchange`, `skip` or `error` |
+| `.Entry.Provider`                | [Provider](config/providers.md) used |
+| `.Entry.Image`                   | Docker image name. e.g. `docker.io/crazymax/diun:latest` |
+| `.Entry.Image.Domain`            | Docker image domain. e.g. `docker.io` |
+| `.Entry.Image.Path`              | Docker image path. e.g. `crazymax/diun` |
+| `.Entry.Image.Tag`               | Docker image tag. e.g. `latest` |
+| `.Entry.Image.Digest`            | Docker image digest |
+| `.Entry.Image.HubLink`           | Docker image hub link (if available). e.g. `https://hub.docker.com/r/crazymax/diun` |
+| `.Entry.Manifest.Name`           | Manifest name. e.g. `docker.io/crazymax/diun` |
+| `.Entry.Manifest.Tag`            | Manifest tag. e.g. `latest` |
+| `.Entry.Manifest.MIMEType`       | Manifest MIME type. e.g. `application/vnd.docker.distribution.manifest.list.v2+json` |
+| `.Entry.Manifest.Digest`         | Manifest digest |
+| `.Entry.Manifest.Created`        | Manifest created date. e.g. `2021-06-20T12:23:56Z` |
+| `.Entry.Manifest.DockerVersion`  | Version of Docker that was used to build the image. e.g. `20.10.7` |
+| `.Entry.Manifest.Labels`         | Image labels |
+| `.Entry.Manifest.Layers`         | Image layers |
+| `.Entry.Manifest.Platform`       | Platform that the image is runs on. e.g. `linux/amd64` |
+
 ## Authentication against the registry
 
 You can authenticate against the registry through the [`regopts` settings](config/regopts.md) or you can mount
