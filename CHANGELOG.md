@@ -1,5 +1,13 @@
 # Changelog
 
+## 4.19.0 (2021/06/26)
+
+* Allow to customize notification message (#415)
+* Bump github.com/panjf2000/ants/v2 from 2.4.5 to 2.4.6 (#416)
+* Bump k8s.io/client-go from 0.21.1 to 0.21.2 (#414)
+* Bump github.com/microcosm-cc/bluemonday from 1.0.13 to 1.0.14 (#413)
+* Bump github.com/containers/image/v5 from 5.13.1 to 5.13.2 (#412)
+
 ## 4.18.0 (2021/06/18)
 
 * Handle registry auth config (#411)
