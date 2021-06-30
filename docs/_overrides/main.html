@@ -10,48 +10,48 @@
 {% set assets = config.site_url ~ 'assets' %}
 
 {% block extrahead %}
-<link rel="preconnect" href="https://[[ config.extra.plausible.server ]]">
-<script defer data-domain="[[ config.extra.plausible.domain ]]" src="https://[[ config.extra.plausible.server ]]/js/plausible.outbound-links.js" ></script>
+<link rel="preconnect" href="https://{{ config.extra.plausible.server }}">
+<script defer data-domain="{{ config.extra.plausible.domain }}" src="https://{{ config.extra.plausible.server }}/js/plausible.outbound-links.js" ></script>
 <script>window.plausible = window.plausible || function() { (window.plausible.q = window.plausible.q || []).push(arguments) }</script>
 
-<meta name="application-name" content="[[ config.site_name ]]">
+<meta name="application-name" content="{{ config.site_name }}">
 <meta name="msapplication-TileColor" content="#FFFFFF">
-<meta name="msapplication-TileImage" content="[[ assets ]]/meta/mstile-144x144.png">
-<meta name="msapplication-square70x70logo" content="[[ assets ]]/meta/mstile-70x70.png">
-<meta name="msapplication-square150x150logo" content="[[ assets ]]/meta/mstile-150x150.png">
-<meta name="msapplication-wide310x150logo" content="[[ assets ]]/meta/mstile-310x150.png">
-<meta name="msapplication-square310x310logo" content="[[ assets ]]/meta/mstile-310x310.png">
+<meta name="msapplication-TileImage" content="{{ assets }}/meta/mstile-144x144.png">
+<meta name="msapplication-square70x70logo" content="{{ assets }}/meta/mstile-70x70.png">
+<meta name="msapplication-square150x150logo" content="{{ assets }}/meta/mstile-150x150.png">
+<meta name="msapplication-wide310x150logo" content="{{ assets }}/meta/mstile-310x150.png">
+<meta name="msapplication-square310x310logo" content="{{ assets }}/meta/mstile-310x310.png">
 <meta property="og:type" content="website">
-<meta property="og:title" content="[[ title ]]">
-<meta property="og:description" content="[[ config.site_description ]]">
-<meta property="og:url" content="[[ page.canonical_url ]]">
-<meta property="og:image" content="[[ assets ]]/meta/card.png">
-<meta property="og:image:alt" content="[[ config.site_name ]]">
+<meta property="og:title" content="{{ title }}">
+<meta property="og:description" content="{{ config.site_description }}">
+<meta property="og:url" content="{{ page.canonical_url }}">
+<meta property="og:image" content="{{ assets }}/meta/card.png">
+<meta property="og:image:alt" content="{{ config.site_name }}">
 <meta property="og:image:type" content="image/png">
 <meta property="og:image:width" content="1280">
 <meta property="og:image:height" content="640">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="@crazyws">
 <meta name="twitter:creator" content="@crazyws">
-<meta name="twitter:title" content="[[ title ]]">
-<meta name="twitter:description" content="[[ config.site_description ]]">
-<meta name="twitter:image" content="[[ assets ]]/meta/card.png">
-<meta name="google-site-verification" content="[[ config.extra.seo.google ]]">
-<meta name="msvalidate.01" content="[[ config.extra.seo.bing ]]">
+<meta name="twitter:title" content="{{ title }}">
+<meta name="twitter:description" content="{{ config.site_description }}">
+<meta name="twitter:image" content="{{ assets }}/meta/card.png">
+<meta name="google-site-verification" content="{{ config.extra.seo.google }}">
+<meta name="msvalidate.01" content="{{ config.extra.seo.bing }}">
 
-<link rel="apple-touch-icon-precomposed" sizes="57x57" href="[[ assets ]]/meta/apple-touch-icon-57x57.png">
-<link rel="apple-touch-icon-precomposed" sizes="114x114" href="[[ assets ]]/meta/apple-touch-icon-114x114.png">
-<link rel="apple-touch-icon-precomposed" sizes="72x72" href="[[ assets ]]/meta/apple-touch-icon-72x72.png">
-<link rel="apple-touch-icon-precomposed" sizes="144x144" href="[[ assets ]]/meta/apple-touch-icon-144x144.png">
-<link rel="apple-touch-icon-precomposed" sizes="60x60" href="[[ assets ]]/meta/apple-touch-icon-60x60.png">
-<link rel="apple-touch-icon-precomposed" sizes="120x120" href="[[ assets ]]/meta/apple-touch-icon-120x120.png">
-<link rel="apple-touch-icon-precomposed" sizes="76x76" href="[[ assets ]]/meta/apple-touch-icon-76x76.png">
-<link rel="apple-touch-icon-precomposed" sizes="152x152" href="[[ assets ]]/meta/apple-touch-icon-152x152.png">
-<link rel="icon" type="image/png" href="[[ assets ]]/meta/favicon-196x196.png" sizes="196x196">
-<link rel="icon" type="image/png" href="[[ assets ]]/meta/favicon-96x96.png" sizes="96x96">
-<link rel="icon" type="image/png" href="[[ assets ]]/meta/favicon-32x32.png" sizes="32x32">
-<link rel="icon" type="image/png" href="[[ assets ]]/meta/favicon-16x16.png" sizes="16x16">
-<link rel="icon" type="image/png" href="[[ assets ]]/meta/favicon-128.png" sizes="128x128">
+<link rel="apple-touch-icon-precomposed" sizes="57x57" href="{{ assets }}/meta/apple-touch-icon-57x57.png">
+<link rel="apple-touch-icon-precomposed" sizes="114x114" href="{{ assets }}/meta/apple-touch-icon-114x114.png">
+<link rel="apple-touch-icon-precomposed" sizes="72x72" href="{{ assets }}/meta/apple-touch-icon-72x72.png">
+<link rel="apple-touch-icon-precomposed" sizes="144x144" href="{{ assets }}/meta/apple-touch-icon-144x144.png">
+<link rel="apple-touch-icon-precomposed" sizes="60x60" href="{{ assets }}/meta/apple-touch-icon-60x60.png">
+<link rel="apple-touch-icon-precomposed" sizes="120x120" href="{{ assets }}/meta/apple-touch-icon-120x120.png">
+<link rel="apple-touch-icon-precomposed" sizes="76x76" href="{{ assets }}/meta/apple-touch-icon-76x76.png">
+<link rel="apple-touch-icon-precomposed" sizes="152x152" href="{{ assets }}/meta/apple-touch-icon-152x152.png">
+<link rel="icon" type="image/png" href="{{ assets }}/meta/favicon-196x196.png" sizes="196x196">
+<link rel="icon" type="image/png" href="{{ assets }}/meta/favicon-96x96.png" sizes="96x96">
+<link rel="icon" type="image/png" href="{{ assets }}/meta/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="{{ assets }}/meta/favicon-16x16.png" sizes="16x16">
+<link rel="icon" type="image/png" href="{{ assets }}/meta/favicon-128.png" sizes="128x128">
 {% endblock %}
 
 <!-- Announcement bar -->
