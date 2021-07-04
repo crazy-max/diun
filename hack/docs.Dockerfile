@@ -1,12 +1,13 @@
 # syntax=docker/dockerfile:1.2
 
-FROM squidfunk/mkdocs-material:7.1.5 AS base
+FROM squidfunk/mkdocs-material:7.1.9 AS base
 RUN apk add --no-cache \
     git \
     git-fast-import \
     openssh \
   && apk add --no-cache --virtual .build gcc musl-dev \
   && pip install --no-cache-dir \
+    'lunr' \
     'markdown-include' \
     'mkdocs-awesome-pages-plugin' \
     'mkdocs-exclude' \
