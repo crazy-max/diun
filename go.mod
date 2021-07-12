@@ -19,7 +19,7 @@ require (
 	github.com/gregdel/pushover v0.0.0-20201104094836-ddbe0c1d3a38
 	github.com/hako/durafmt v0.0.0-20190612201238-650ed9f29a84
 	github.com/imdario/mergo v0.3.12
-	github.com/jedib0t/go-pretty/v6 v6.2.2
+	github.com/jedib0t/go-pretty/v6 v6.2.4
 	github.com/matcornic/hermes/v2 v2.1.0
 	github.com/matrix-org/gomatrix v0.0.0-20200501121722-e5578b12c752
 	github.com/microcosm-cc/bluemonday v1.0.14
