@@ -33,6 +33,7 @@ FROM alpine:3.14
 RUN apk --update --no-cache add \
     ca-certificates \
     openssl \
+    tzdata \
   && rm -rf /tmp/* /var/cache/apk/*
 
 COPY --from=build /usr/local/bin/diun /usr/local/bin/diun
