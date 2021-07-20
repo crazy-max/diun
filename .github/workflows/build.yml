@@ -58,7 +58,7 @@ jobs:
           targets: test
       -
         name: Upload coverage
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v2.0.1
         with:
           file: ./coverage.txt
 
