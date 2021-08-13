@@ -40,7 +40,7 @@ require (
 	github.com/technoweenie/multipartstreamer v1.0.1 // indirect
 	github.com/tidwall/pretty v1.2.0
 	go.etcd.io/bbolt v1.3.6
-	google.golang.org/grpc v1.39.1
+	google.golang.org/grpc v1.40.0
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.1.0
 	google.golang.org/protobuf v1.27.1
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
