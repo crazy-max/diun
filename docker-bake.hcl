@@ -1,6 +1,6 @@
 // Go version
 variable "GO_VERSION" {
-  default = "1.16"
+  default = "1.17"
 }
 
 target "go-version" {
