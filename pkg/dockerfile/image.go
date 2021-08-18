@@ -1,6 +1,8 @@
 package dockerfile
 
 import (
+	"strings"
+
 	"github.com/moby/buildkit/frontend/dockerfile/command"
 	"github.com/moby/buildkit/frontend/dockerfile/instructions"
 	"github.com/pkg/errors"
@@ -29,7 +31,7 @@ func (c *Client) FromImages() (Images, error) {
 	images := Images{}
 
 	for _, node := range c.ast.Children {
-		switch node.Value {
+		switch strings.ToLower(node.Value) {
 		case command.From:
 			ins, err := instructions.ParseInstruction(node)
 			if err != nil {
