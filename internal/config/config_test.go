@@ -95,8 +95,11 @@ func TestLoadFile(t *testing.T) {
 						InsecureSkipVerify: utl.NewFalse(),
 						LocalName:          "localhost",
 						From:               "diun@example.com",
-						To:                 "webmaster@example.com",
-						TemplateTitle:      model.NotifDefaultTemplateTitle,
+						To: []string{
+							"webmaster@example.com",
+							"me@example.com",
+						},
+						TemplateTitle: model.NotifDefaultTemplateTitle,
 						TemplateBody: `Docker tag {{ if .Entry.Image.HubLink }}[**{{ .Entry.Image }}**]({{ .Entry.Image.HubLink }}){{ else }}**{{ .Entry.Image }}**{{ end }}
 which you subscribed to through {{ .Entry.Provider }} provider has been {{ if (eq .Entry.Status "new") }}newly added{{ else }}updated{{ end }}.
 
@@ -418,8 +421,10 @@ func TestLoadMixed(t *testing.T) {
 						InsecureSkipVerify: utl.NewTrue(),
 						LocalName:          "foo.com",
 						From:               "diun@foo.com",
-						To:                 "webmaster@foo.com",
-						TemplateTitle:      model.NotifDefaultTemplateTitle,
+						To: []string{
+							"webmaster@foo.com",
+						},
+						TemplateTitle: model.NotifDefaultTemplateTitle,
 						TemplateBody: `Docker tag {{ if .Entry.Image.HubLink }}[**{{ .Entry.Image }}**]({{ .Entry.Image.HubLink }}){{ else }}**{{ .Entry.Image }}**{{ end }}
 which you subscribed to through {{ .Entry.Provider }} provider has been {{ if (eq .Entry.Status "new") }}newly added{{ else }}updated{{ end }}.
 

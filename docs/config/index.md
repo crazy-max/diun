@@ -52,7 +52,9 @@ You can override this using the [`--config` flag or `CONFIG` env var with `serve
         ssl: false
         insecureSkipVerify: false
         from: diun@example.com
-        to: webmaster@example.com
+        to:
+          - webmaster@example.com
+          - me@example.com
       rocketchat:
         endpoint: http://rocket.foo.com:3000
         channel: "#general"
