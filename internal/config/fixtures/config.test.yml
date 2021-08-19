@@ -37,7 +37,9 @@ notif:
     ssl: false
     insecureSkipVerify: false
     from: diun@example.com
-    to: webmaster@example.com
+    to:
+      - webmaster@example.com
+      - me@example.com
     templateBody: |
       Docker tag {{ if .Entry.Image.HubLink }}[**{{ .Entry.Image }}**]({{ .Entry.Image.HubLink }}){{ else }}**{{ .Entry.Image }}**{{ end }}
       which you subscribed to through {{ .Entry.Provider }} provider has been {{ if (eq .Entry.Status "new") }}newly added{{ else }}updated{{ end }}.

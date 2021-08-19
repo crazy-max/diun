@@ -89,7 +89,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 
 	mailMessage := gomail.NewMessage()
 	mailMessage.SetHeader("From", fmt.Sprintf("%s <%s>", c.meta.Name, c.cfg.From))
-	mailMessage.SetHeader("To", c.cfg.To)
+	mailMessage.SetHeader("To", c.cfg.To...)
 	mailMessage.SetHeader("Subject", string(title))
 	mailMessage.SetBody("text/plain", textpart)
 	mailMessage.AddAlternative("text/html", htmlpart)

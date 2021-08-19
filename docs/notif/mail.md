@@ -13,7 +13,9 @@ Notifications can be sent through SMTP.
         ssl: false
         insecureSkipVerify: false
         from: diun@example.com
-        to: webmaster@example.com
+        to:
+          - webmaster@example.com
+          - me@example.com
         templateTitle: "{{ .Entry.Image }} released"
         templateBody: |
           Docker tag {{ .Entry.Image }} which you subscribed to through {{ .Entry.Provider }} provider has been released.
@@ -31,7 +33,7 @@ Notifications can be sent through SMTP.
 | `password`            |                                            | SMTP password |
 | `passwordFile`        |                                            | Use content of secret file as SMTP password if `password` not defined |
 | `from`[^1]            |                                            | Sender email address |
-| `to`[^1]              |                                            | Recipient email address |
+| `to`[^1]              |                                            | List of recipients email addresses |
 | `templateTitle`[^1]   | See [below](#default-templatetitle)        | [Notification template](../faq.md#notification-template) for message title |
 | `templateBody`[^1]    | See [below](#default-templatebody)         | [Notification template](../faq.md#notification-template) for message body |
 
@@ -46,7 +48,7 @@ Notifications can be sent through SMTP.
     * `DIUN_NOTIF_MAIL_PASSWORD`
     * `DIUN_NOTIF_MAIL_PASSWORDFILE`
     * `DIUN_NOTIF_MAIL_FROM`
-    * `DIUN_NOTIF_MAIL_TO`
+    * `DIUN_NOTIF_MAIL_TO` (comma separated)
     * `DIUN_NOTIF_MAIL_TEMPLATETITLE`
     * `DIUN_NOTIF_MAIL_TEMPLATEBODY`
 
