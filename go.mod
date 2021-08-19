@@ -6,7 +6,7 @@ require (
 	github.com/alecthomas/kong v0.2.17
 	github.com/bmatcuk/doublestar/v3 v3.0.0
 	github.com/containerd/containerd v1.5.5
-	github.com/containers/image/v5 v5.13.2
+	github.com/containers/image/v5 v5.15.2
 	github.com/crazy-max/gohealthchecks v0.3.0
 	github.com/crazy-max/gonfig v0.4.0
 	github.com/docker/docker v20.10.8+incompatible
@@ -52,7 +52,7 @@ require (
 )
 
 require (
-	github.com/BurntSushi/toml v0.3.1 // indirect
+	github.com/BurntSushi/toml v0.4.1 // indirect
 	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/Masterminds/sprig v2.16.0+incompatible // indirect
 	github.com/Microsoft/go-winio v0.5.0 // indirect
@@ -65,8 +65,8 @@ require (
 	github.com/cespare/xxhash/v2 v2.1.1 // indirect
 	github.com/containerd/typeurl v1.0.2 // indirect
 	github.com/containers/libtrust v0.0.0-20190913040956-14b96171aa3b // indirect
-	github.com/containers/ocicrypt v1.1.1 // indirect
-	github.com/containers/storage v1.32.2 // indirect
+	github.com/containers/ocicrypt v1.1.2 // indirect
+	github.com/containers/storage v1.34.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/docker/distribution v2.7.1+incompatible // indirect
 	github.com/docker/docker-credential-helpers v0.6.4 // indirect
@@ -90,7 +90,7 @@ require (
 	github.com/huandu/xstrings v1.2.0 // indirect
 	github.com/jaytaylor/html2text v0.0.0-20180606194806-57d518f124b0 // indirect
 	github.com/json-iterator/go v1.1.11 // indirect
-	github.com/klauspost/compress v1.13.1 // indirect
+	github.com/klauspost/compress v1.13.4 // indirect
 	github.com/klauspost/pgzip v1.2.5 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/mattn/go-runewidth v0.0.13 // indirect
@@ -113,6 +113,7 @@ require (
 	github.com/ulikunitz/xz v0.5.10 // indirect
 	github.com/vanng822/css v0.0.0-20190504095207-a21e860bcd04 // indirect
 	github.com/vanng822/go-premailer v0.0.0-20191214114701-be27abe028fe // indirect
+	github.com/vbatts/tar-split v0.11.1 // indirect
 	golang.org/x/crypto v0.0.0-20210711020723-a769d52b0f97 // indirect
 	golang.org/x/net v0.0.0-20210614182718-04defd469f4e // indirect
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d // indirect
