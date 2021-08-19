@@ -11,7 +11,7 @@ target "go-version" {
 
 // protoc version
 variable "PROTOC_VERSION" {
-  default = "3.17.0"
+  default = "3.17.3"
 }
 
 target "protoc-version" {
