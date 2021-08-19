@@ -83,6 +83,8 @@ jobs:
             ${{ env.GHCR_SLUG }}
           tags: |
             type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
             type=ref,event=pr
             type=edge
           labels: |
