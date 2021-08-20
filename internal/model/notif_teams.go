@@ -1,7 +1,7 @@
 package model
 
 // NotifTeamsDefaultTemplateBody ...
-const NotifTeamsDefaultTemplateBody = "Docker tag {{ if .Entry.Image.HubLink }}[`{{ .Entry.Image }}`]({{ .Entry.Image.HubLink }}){{ else }}`{{ .Entry.Image }}`{{ end }}{{ if (eq .Entry.Status \"new\") }}newly added{{ else }}updated{{ end }}."
+const NotifTeamsDefaultTemplateBody = "Docker tag {{ if .Entry.Image.HubLink }}[`{{ .Entry.Image }}`]({{ .Entry.Image.HubLink }}){{ else }}`{{ .Entry.Image }}`{{ end }} {{ if (eq .Entry.Status \"new\") }}available{{ else }}updated{{ end }}."
 
 // NotifTeams holds Teams notification configuration details
 type NotifTeams struct {

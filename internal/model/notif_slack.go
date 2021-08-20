@@ -1,7 +1,7 @@
 package model
 
 // NotifSlackDefaultTemplateBody ...
-const NotifSlackDefaultTemplateBody = "<!channel> Docker tag `{{ .Entry.Image }}` {{ if (eq .Entry.Status \"new\") }}newly added{{ else }}updated{{ end }}."
+const NotifSlackDefaultTemplateBody = "<!channel> Docker tag `{{ .Entry.Image }}` {{ if (eq .Entry.Status \"new\") }}available{{ else }}updated{{ end }}."
 
 // NotifSlack holds slack notification configuration details
 type NotifSlack struct {

@@ -6,8 +6,8 @@ import (
 
 // Defaults used for notification template
 const (
-	NotifDefaultTemplateTitle = `{{ if (eq .Entry.Status "new") }}New image {{ .Entry.Image }} has been added{{ else }}Image update for {{ .Entry.Image }}{{ end }}`
-	NotifDefaultTemplateBody  = `Docker tag {{ if .Entry.Image.HubLink }}[**{{ .Entry.Image }}**]({{ .Entry.Image.HubLink }}){{ else }}**{{ .Entry.Image }}**{{ end }} which you subscribed to through {{ .Entry.Provider }} provider has been {{ if (eq .Entry.Status "new") }}newly added{{ else }}updated{{ end }} on {{ .Meta.Hostname }}.`
+	NotifDefaultTemplateTitle = `{{ .Entry.Image }} {{ if (eq .Entry.Status "new") }}is available{{ else }}has been updated{{ .Entry.Image }}{{ end }}`
+	NotifDefaultTemplateBody  = `Docker tag {{ if .Entry.Image.HubLink }}[**{{ .Entry.Image }}**]({{ .Entry.Image.HubLink }}){{ else }}**{{ .Entry.Image }}**{{ end }} which you subscribed to through {{ .Entry.Provider }} provider {{ if (eq .Entry.Status "new") }}is available{{ else }}has been updated{{ end }} on {{ .Entry.Image.Domain }} registry (triggered by {{ .Meta.Hostname }} host).`
 )
 
 // NotifEntries represents a list of notification entries
