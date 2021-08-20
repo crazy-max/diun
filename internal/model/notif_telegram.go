@@ -1,7 +1,7 @@
 package model
 
 // NotifTelegramDefaultTemplateBody ...
-const NotifTelegramDefaultTemplateBody = `Docker tag {{ if .Entry.Image.HubLink }}[{{ .Entry.Image }}]({{ .Entry.Image.HubLink }}){{ else }}{{ .Entry.Image }}{{ end }} which you subscribed to through {{ .Entry.Provider }} provider has been {{ if (eq .Entry.Status "new") }}newly added{{ else }}updated{{ end }} on {{ escapeMarkdown .Meta.Hostname }}.`
+const NotifTelegramDefaultTemplateBody = `Docker tag {{ if .Entry.Image.HubLink }}[{{ .Entry.Image }}]({{ .Entry.Image.HubLink }}){{ else }}{{ .Entry.Image }}{{ end }} which you subscribed to through {{ .Entry.Provider }} provider {{ if (eq .Entry.Status "new") }}is available{{ else }}has been updated{{ end }} on {{ .Entry.Image.Domain }} registry (triggered by {{ escapeMarkdown .Meta.Hostname }} host).`
 
 // NotifTelegram holds Telegram notification configuration details
 type NotifTelegram struct {

@@ -7,7 +7,7 @@ import (
 )
 
 // NotifRocketChatDefaultTemplateBody ...
-const NotifRocketChatDefaultTemplateBody = `Docker tag {{ .Entry.Image }} which you subscribed to through {{ .Entry.Provider }} provider has been {{ if (eq .Entry.Status "new") }}newly added{{ else }}updated{{ end }} on {{ .Meta.Hostname }}.`
+const NotifRocketChatDefaultTemplateBody = `Docker tag {{ .Entry.Image }} which you subscribed to through {{ .Entry.Provider }} provider {{ if (eq .Entry.Status "new") }}is available{{ else }}has been updated{{ end }} on {{ .Entry.Image.Domain }} registry (triggered by {{ .Meta.Hostname }} host).`
 
 // NotifRocketChat holds Rocket.Chat notification configuration details
 type NotifRocketChat struct {
