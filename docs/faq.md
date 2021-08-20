@@ -26,6 +26,26 @@ Or within a container:
 docker-compose exec diun diun notif test
 ```
 
+## Customize the hostname
+
+The hostname that appears in your notifications is the one associated with the
+container if you use the Diun image with `docker run` or `docker-compose up -d`.
+By default, it's a random string like `d2219b854598`. To change it:
+
+```console
+$ docker run --hostname "diun" ...
+```
+
+Or if you use docker-compose:
+
+```yaml
+services:
+  diun:
+    image: crazymax/diun:latest
+    hostname: diun
+    ...
+```
+
 ## Notification template
 
 The title and body of a notification message can be customized for each notifier through `templateTitle` and
