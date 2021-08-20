@@ -17,7 +17,7 @@ require (
 	github.com/go-playground/validator/v10 v10.9.0
 	github.com/go-telegram-bot-api/telegram-bot-api v4.6.4+incompatible
 	github.com/gregdel/pushover v0.0.0-20201104094836-ddbe0c1d3a38
-	github.com/hako/durafmt v0.0.0-20190612201238-650ed9f29a84
+	github.com/hako/durafmt v0.0.0-20210608085754-5c1018a4e16b
 	github.com/imdario/mergo v0.3.12
 	github.com/jedib0t/go-pretty/v6 v6.2.4
 	github.com/matcornic/hermes/v2 v2.1.0
