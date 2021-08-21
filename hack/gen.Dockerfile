@@ -33,8 +33,8 @@ COPY --from=generate /out /
 FROM generate AS validate
 RUN --mount=type=bind,target=.,rw \
   git add -A && cp -rf /out/* .; \
-  if [ -n "$(git status --porcelain)" ]; then \
+  if [ -n "$(git status --porcelain -- pb)" ]; then \
     echo >&2 'ERROR: Generate result differs. Please update with "docker buildx bake gen-update"'; \
-    git status --porcelain; \
+    git status --porcelain -- pb; \
     exit 1; \
   fi
