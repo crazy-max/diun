@@ -1,8 +1,10 @@
+/.dev
 /.idea
 /*.iml
 
-.dev
+/.github
 /bin
 /dist
 /site
 /coverage.txt
+/test
