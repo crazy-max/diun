@@ -40,9 +40,6 @@ jobs:
         with:
           targets: validate
           pull: true
-          set: |
-            *.cache-from=type=gha,scope=diun-validate
-            *.cache-to=type=gha,scope=diun-validate,mode=max
 
   test:
     runs-on: ubuntu-latest
@@ -61,9 +58,6 @@ jobs:
         with:
           targets: test
           pull: true
-          set: |
-            *.cache-from=type=gha,scope=diun-test
-            *.cache-to=type=gha,scope=diun-test,mode=max
       -
         name: Upload coverage
         uses: codecov/codecov-action@v2
@@ -126,9 +120,6 @@ jobs:
         with:
           targets: artifact-all
           pull: true
-          set: |
-            *.cache-from=type=gha,scope=diun-artifact
-            *.cache-to=type=gha,scope=diun-artifact,mode=max
       -
         name: Move artifacts
         run: |
@@ -150,10 +141,6 @@ jobs:
           targets: image-all
           pull: true
           push: ${{ github.event_name != 'pull_request' }}
-          set: |
-            *.cache-from=type=gha,scope=diun-artifact
-            *.cache-from=type=gha,scope=diun-image
-            *.cache-to=type=gha,scope=diun-image,mode=max
       -
         name: GitHub Release
         uses: softprops/action-gh-release@v1

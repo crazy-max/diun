@@ -19,6 +19,7 @@ Choose the archive matching the destination platform:
 * [diun_[[ git.tag | trim('v') ]]_linux_s390x.tar.gz]([[ config.repo_url ]]/releases/download/v[[ git.tag | trim('v') ]]/diun_[[ git.tag | trim('v') ]]_linux_s390x.tar.gz)
 * [diun_[[ git.tag | trim('v') ]]_windows_386.zip]([[ config.repo_url ]]/releases/download/v[[ git.tag | trim('v') ]]/diun_[[ git.tag | trim('v') ]]_windows_386.zip)
 * [diun_[[ git.tag | trim('v') ]]_windows_amd64.zip]([[ config.repo_url ]]/releases/download/v[[ git.tag | trim('v') ]]/diun_[[ git.tag | trim('v') ]]_windows_amd64.zip)
+* [diun_[[ git.tag | trim('v') ]]_windows_arm64.zip]([[ config.repo_url ]]/releases/download/v[[ git.tag | trim('v') ]]/diun_[[ git.tag | trim('v') ]]_windows_arm64.zip)
 
 And extract diun:
 
