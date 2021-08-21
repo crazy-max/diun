@@ -58,10 +58,6 @@ jobs:
         with:
           targets: image-local
           pull: true
-          set: |
-            *.cache-from=type=gha,scope=diun-image
-            *.cache-from=type=gha,scope=diun-e2e-${{ matrix.folder }}
-            *.cache-to=type=gha,scope=diun-e2e-${{ matrix.folder }},mode=max
       -
         name: Start container
         run: |
