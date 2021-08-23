@@ -14,7 +14,8 @@ FROM gomod AS test
 RUN --mount=type=bind,target=. \
   --mount=type=cache,target=/go/pkg/mod \
   --mount=type=cache,target=/root/.cache/go-build \
-  go test -v -coverprofile=/tmp/coverage.txt -covermode=atomic -race ./...
+  go test -v -coverprofile=/tmp/coverage.txt -covermode=atomic -race ./... && \
+  go tool cover -func=/tmp/coverage.txt
 
 FROM scratch AS test-coverage
 COPY --from=test /tmp/coverage.txt /coverage.txt

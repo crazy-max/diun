@@ -5,7 +5,9 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/containerd/containerd/platforms"
 	"github.com/crazy-max/diun/v4/internal/model"
+	ocispecs "github.com/opencontainers/image-spec/specs-go/v1"
 	"gopkg.in/yaml.v2"
 )
 
@@ -28,7 +30,43 @@ func (c *Client) listFileImage() []model.Image {
 			c.logger.Error().Err(err).Msgf("Unable to decode into struct %s", file)
 			continue
 		}
-		images = append(images, items...)
+		for _, item := range items {
+
+			// Check NotifyOn
+			if len(item.NotifyOn) == 0 {
+				item.NotifyOn = model.NotifyOnDefaults
+			} else {
+				for _, no := range item.NotifyOn {
+					if !no.Valid() {
+						c.logger.Error().
+							Str("file", file).
+							Str("img_name", item.Name).
+							Msgf("unknown notify status %q", no)
+					}
+				}
+			}
+
+			// Check Platform
+			if item.Platform != (model.ImagePlatform{}) {
+				_, err = platforms.Parse(platforms.Format(ocispecs.Platform{
+					OS:           item.Platform.OS,
+					Architecture: item.Platform.Arch,
+					Variant:      item.Platform.Variant,
+				}))
+				if err != nil {
+					c.logger.Error().
+						Str("file", file).
+						Str("img_name", item.Name).
+						Msgf("cannot parse %s platform", platforms.Format(ocispecs.Platform{
+							OS:           item.Platform.OS,
+							Architecture: item.Platform.Arch,
+							Variant:      item.Platform.Variant,
+						}))
+				}
+			}
+
+			images = append(images, item)
+		}
 	}
 
 	return images

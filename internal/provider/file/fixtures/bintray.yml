@@ -2,4 +2,6 @@
   regopt: bintrayoptions
 - name: docker.bintray.io/jfrog/xray-server:2.8.6
   watch_repo: true
+  notify_on:
+    - new
   max_tags: 50

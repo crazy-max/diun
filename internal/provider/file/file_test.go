@@ -13,8 +13,9 @@ var (
 		{
 			Provider: "file",
 			Image: model.Image{
-				Name:   "jfrog-docker-reg2.bintray.io/jfrog/artifactory-oss:4.0.0",
-				RegOpt: "bintrayoptions",
+				Name:     "jfrog-docker-reg2.bintray.io/jfrog/artifactory-oss:4.0.0",
+				RegOpt:   "bintrayoptions",
+				NotifyOn: model.NotifyOnDefaults,
 			},
 		},
 		{
@@ -22,7 +23,10 @@ var (
 			Image: model.Image{
 				Name:      "docker.bintray.io/jfrog/xray-server:2.8.6",
 				WatchRepo: true,
-				MaxTags:   50,
+				NotifyOn: []model.NotifyOn{
+					model.NotifyOnNew,
+				},
+				MaxTags: 50,
 			},
 		},
 	}
@@ -30,8 +34,9 @@ var (
 		{
 			Provider: "file",
 			Image: model.Image{
-				Name:   "docker.io/crazymax/nextcloud:latest",
-				RegOpt: "myregistry",
+				Name:     "docker.io/crazymax/nextcloud:latest",
+				RegOpt:   "myregistry",
+				NotifyOn: model.NotifyOnDefaults,
 			},
 		},
 		{
@@ -39,6 +44,7 @@ var (
 			Image: model.Image{
 				Name:      "crazymax/swarm-cronjob",
 				WatchRepo: true,
+				NotifyOn:  model.NotifyOnDefaults,
 				IncludeTags: []string{
 					`^1\.2\..*`,
 				},
@@ -49,6 +55,7 @@ var (
 			Image: model.Image{
 				Name:      "docker.io/portainer/portainer",
 				WatchRepo: true,
+				NotifyOn:  model.NotifyOnDefaults,
 				MaxTags:   10,
 				IncludeTags: []string{
 					`^(0|[1-9]\d*)\..*`,
@@ -60,14 +67,16 @@ var (
 			Image: model.Image{
 				Name:      "traefik",
 				WatchRepo: true,
+				NotifyOn:  model.NotifyOnDefaults,
 			},
 		},
 		{
 			Provider: "file",
 			Image: model.Image{
-				Name: "alpine",
+				Name:     "alpine",
+				NotifyOn: model.NotifyOnDefaults,
 				Platform: model.ImagePlatform{
-					Os:      "linux",
+					OS:      "linux",
 					Arch:    "arm64",
 					Variant: "v8",
 				},
@@ -76,13 +85,15 @@ var (
 		{
 			Provider: "file",
 			Image: model.Image{
-				Name: "docker.io/graylog/graylog:3.2.0",
+				Name:     "docker.io/graylog/graylog:3.2.0",
+				NotifyOn: model.NotifyOnDefaults,
 			},
 		},
 		{
 			Provider: "file",
 			Image: model.Image{
-				Name: "jacobalberty/unifi:5.9",
+				Name:     "jacobalberty/unifi:5.9",
+				NotifyOn: model.NotifyOnDefaults,
 			},
 		},
 		{
@@ -90,6 +101,7 @@ var (
 			Image: model.Image{
 				Name:      "crazymax/ddns-route53",
 				WatchRepo: true,
+				NotifyOn:  model.NotifyOnDefaults,
 				IncludeTags: []string{
 					`^1\..*`,
 				},
@@ -100,13 +112,15 @@ var (
 		{
 			Provider: "file",
 			Image: model.Image{
-				Name: "quay.io/coreos/hyperkube",
+				Name:     "quay.io/coreos/hyperkube",
+				NotifyOn: model.NotifyOnDefaults,
 			},
 		},
 		{
 			Provider: "file",
 			Image: model.Image{
-				Name: "quay.io/coreos/hyperkube:v1.1.7-coreos.1",
+				Name:     "quay.io/coreos/hyperkube:v1.1.7-coreos.1",
+				NotifyOn: model.NotifyOnDefaults,
 			},
 		},
 	}
