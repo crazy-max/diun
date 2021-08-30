@@ -6,6 +6,7 @@ type Image struct {
 	Platform    ImagePlatform `yaml:"platform,omitempty" json:",omitempty"`
 	RegOpt      string        `yaml:"regopt,omitempty" json:",omitempty"`
 	WatchRepo   bool          `yaml:"watch_repo,omitempty" json:",omitempty"`
+	NotifyOn    []NotifyOn    `yaml:"notify_on,omitempty" json:",omitempty"`
 	MaxTags     int           `yaml:"max_tags,omitempty" json:",omitempty"`
 	IncludeTags []string      `yaml:"include_tags,omitempty" json:",omitempty"`
 	ExcludeTags []string      `yaml:"exclude_tags,omitempty" json:",omitempty"`
@@ -14,12 +15,12 @@ type Image struct {
 
 // ImagePlatform holds image platform configuration
 type ImagePlatform struct {
-	Os      string `yaml:"os,omitempty" json:",omitempty"`
+	OS      string `yaml:"os,omitempty" json:",omitempty"`
 	Arch    string `yaml:"arch,omitempty" json:",omitempty"`
 	Variant string `yaml:"variant,omitempty" json:",omitempty"`
 }
 
-// Image status constants
+// ImageStatus constants
 const (
 	ImageStatusNew      = ImageStatus("new")
 	ImageStatusUpdate   = ImageStatus("update")
@@ -30,3 +31,33 @@ const (
 
 // ImageStatus holds Docker image status analysis
 type ImageStatus string
+
+// NotifyOn constants
+const (
+	NotifyOnNew    = NotifyOn(ImageStatusNew)
+	NotifyOnUpdate = NotifyOn(ImageStatusUpdate)
+)
+
+// NotifyOn holds notify status type
+type NotifyOn string
+
+// NotifyOnDefaults are the default notify status
+var NotifyOnDefaults = []NotifyOn{
+	NotifyOnNew,
+	NotifyOnUpdate,
+}
+
+// Valid checks notify status is valid
+func (ns *NotifyOn) Valid() bool {
+	return ns.OneOf(NotifyOnDefaults)
+}
+
+// OneOf checks if notify status is one of the values in the list
+func (ns *NotifyOn) OneOf(nsl []NotifyOn) bool {
+	for _, n := range nsl {
+		if n == *ns {
+			return true
+		}
+	}
+	return false
+}

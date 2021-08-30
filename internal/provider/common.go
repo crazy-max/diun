@@ -15,7 +15,8 @@ func ValidateImage(image string, labels map[string]string, watchByDef bool) (img
 		image = image[:i]
 	}
 	img = model.Image{
-		Name: image,
+		Name:     image,
+		NotifyOn: model.NotifyOnDefaults,
 	}
 
 	if enableStr, ok := labels["diun.enable"]; ok {
@@ -38,6 +39,18 @@ func ValidateImage(image string, labels map[string]string, watchByDef bool) (img
 			if img.WatchRepo, err = strconv.ParseBool(value); err != nil {
 				return img, fmt.Errorf("cannot parse %s value of label %s", value, key)
 			}
+		case "diun.notify_on":
+			if len(value) == 0 {
+				break
+			}
+			img.NotifyOn = []model.NotifyOn{}
+			for _, no := range strings.Split(value, ";") {
+				notifyOn := model.NotifyOn(no)
+				if !notifyOn.Valid() {
+					return img, fmt.Errorf("unknown notify status %q", value)
+				}
+				img.NotifyOn = append(img.NotifyOn, notifyOn)
+			}
 		case "diun.max_tags":
 			if img.MaxTags, err = strconv.Atoi(value); err != nil {
 				return img, fmt.Errorf("cannot parse %s value of label %s", value, key)
@@ -54,7 +67,7 @@ func ValidateImage(image string, labels map[string]string, watchByDef bool) (img
 				return img, fmt.Errorf("cannot parse %s platform of label %s", value, key)
 			}
 			img.Platform = model.ImagePlatform{
-				Os:      platform.OS,
+				OS:      platform.OS,
 				Arch:    platform.Architecture,
 				Variant: platform.Variant,
 			}

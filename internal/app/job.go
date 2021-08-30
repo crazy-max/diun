@@ -102,7 +102,7 @@ func (di *Diun) createJob(job model.Job) {
 		InsecureTLS:   *reg.InsecureTLS,
 		UserAgent:     di.meta.UserAgent,
 		CompareDigest: *di.cfg.Watch.CompareDigest,
-		ImageOs:       job.Image.Platform.Os,
+		ImageOs:       job.Image.Platform.OS,
 		ImageArch:     job.Image.Platform.Arch,
 		ImageVariant:  job.Image.Platform.Variant,
 	})
@@ -219,6 +219,12 @@ func (di *Diun) runJob(job model.Job) (entry model.NotifEntry) {
 
 	if job.FirstCheck && !*di.cfg.Watch.FirstCheckNotif {
 		sublog.Debug().Msg("Skipping notification (first check)")
+		return
+	}
+
+	notifyOn := model.NotifyOn(entry.Status)
+	if !notifyOn.OneOf(job.Image.NotifyOn) {
+		sublog.Debug().Msgf("Skipping notification (%s not part of specified notify status)", entry.Status)
 		return
 	}
 
