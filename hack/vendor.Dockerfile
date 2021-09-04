@@ -22,3 +22,10 @@ RUN --mount=type=bind,target=.,rw \
     git status --porcelain -- go.mod go.sum; \
     exit 1; \
   fi
+
+FROM psampaz/go-mod-outdated:v0.8.0 AS go-mod-outdated
+FROM base AS outdated
+RUN --mount=type=bind,target=.,ro \
+  --mount=type=cache,target=/go/pkg/mod \
+  --mount=from=go-mod-outdated,source=/home/go-mod-outdated,target=/usr/bin/go-mod-outdated \
+  go list -mod=readonly -u -m -json all | go-mod-outdated -update -direct
