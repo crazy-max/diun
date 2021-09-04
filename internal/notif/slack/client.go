@@ -50,44 +50,47 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		return err
 	}
 
+	var fields []slack.AttachmentField
+	if *c.cfg.RenderFields {
+		fields = []slack.AttachmentField{
+			{
+				Title: "Hostname",
+				Value: c.meta.Hostname,
+				Short: false,
+			},
+			{
+				Title: "Provider",
+				Value: entry.Provider,
+				Short: false,
+			},
+			{
+				Title: "Created",
+				Value: entry.Manifest.Created.Format("Jan 02, 2006 15:04:05 UTC"),
+				Short: false,
+			},
+			{
+				Title: "Digest",
+				Value: entry.Manifest.Digest.String(),
+				Short: false,
+			},
+			{
+				Title: "Platform",
+				Value: entry.Manifest.Platform,
+				Short: false,
+			},
+		}
+		if len(entry.Image.HubLink) > 0 {
+			fields = append(fields, slack.AttachmentField{
+				Title: "HubLink",
+				Value: entry.Image.HubLink,
+				Short: false,
+			})
+		}
+	}
+
 	color := "#4caf50"
 	if entry.Status == model.ImageStatusUpdate {
 		color = "#0054ca"
-	}
-
-	fields := []slack.AttachmentField{
-		{
-			Title: "Hostname",
-			Value: c.meta.Hostname,
-			Short: false,
-		},
-		{
-			Title: "Provider",
-			Value: entry.Provider,
-			Short: false,
-		},
-		{
-			Title: "Created",
-			Value: entry.Manifest.Created.Format("Jan 02, 2006 15:04:05 UTC"),
-			Short: false,
-		},
-		{
-			Title: "Digest",
-			Value: entry.Manifest.Digest.String(),
-			Short: false,
-		},
-		{
-			Title: "Platform",
-			Value: entry.Manifest.Platform,
-			Short: false,
-		},
-	}
-	if len(entry.Image.HubLink) > 0 {
-		fields = append(fields, slack.AttachmentField{
-			Title: "HubLink",
-			Value: entry.Image.HubLink,
-			Short: false,
-		})
 	}
 
 	return slack.PostWebhook(c.cfg.WebhookURL, &slack.WebhookMessage{

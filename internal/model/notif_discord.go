@@ -8,11 +8,11 @@ import (
 
 // NotifDiscord holds Discord notification configuration details
 type NotifDiscord struct {
-	WebhookURL    string         `yaml:"webhookURL,omitempty" json:"webhookURL,omitempty" validate:"required"`
-	Mentions      []string       `yaml:"mentions,omitempty" json:"mentions,omitempty"`
-	Timeout       *time.Duration `yaml:"timeout,omitempty" json:"timeout,omitempty" validate:"required"`
-	TemplateTitle string         `yaml:"templateTitle,omitempty" json:"templateTitle,omitempty" validate:"required"`
-	TemplateBody  string         `yaml:"templateBody,omitempty" json:"templateBody,omitempty" validate:"required"`
+	WebhookURL   string         `yaml:"webhookURL,omitempty" json:"webhookURL,omitempty" validate:"required"`
+	Mentions     []string       `yaml:"mentions,omitempty" json:"mentions,omitempty"`
+	RenderFields *bool          `yaml:"renderFields,omitempty" json:"renderFields,omitempty" validate:"required"`
+	Timeout      *time.Duration `yaml:"timeout,omitempty" json:"timeout,omitempty" validate:"required"`
+	TemplateBody string         `yaml:"templateBody,omitempty" json:"templateBody,omitempty" validate:"required"`
 }
 
 // GetDefaults gets the default values
@@ -24,7 +24,7 @@ func (s *NotifDiscord) GetDefaults() *NotifDiscord {
 
 // SetDefaults sets the default values
 func (s *NotifDiscord) SetDefaults() {
+	s.RenderFields = utl.NewTrue()
 	s.Timeout = utl.NewDuration(10 * time.Second)
-	s.TemplateTitle = NotifDefaultTemplateTitle
 	s.TemplateBody = NotifDefaultTemplateBody
 }

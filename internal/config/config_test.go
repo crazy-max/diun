@@ -76,9 +76,9 @@ func TestLoadFile(t *testing.T) {
 							"<@125>",
 							"<@&200>",
 						},
-						Timeout:       utl.NewDuration(10 * time.Second),
-						TemplateTitle: model.NotifDefaultTemplateTitle,
-						TemplateBody:  model.NotifDefaultTemplateBody,
+						RenderFields: utl.NewTrue(),
+						Timeout:      utl.NewDuration(10 * time.Second),
+						TemplateBody: model.NotifDefaultTemplateBody,
 					},
 					Gotify: &model.NotifGotify{
 						Endpoint:      "http://gotify.foo.com",
@@ -133,13 +133,14 @@ for <code>{{ .Entry.Manifest.Platform }}</code> platform.
 						TemplateBody:  model.NotifDefaultTemplateBody,
 					},
 					RocketChat: &model.NotifRocketChat{
-						Endpoint:      "http://rocket.foo.com:3000",
-						Channel:       "#general",
-						UserID:        "abcdEFGH012345678",
-						Token:         "Token123456",
-						Timeout:       utl.NewDuration(10 * time.Second),
-						TemplateTitle: model.NotifDefaultTemplateTitle,
-						TemplateBody:  model.NotifRocketChatDefaultTemplateBody,
+						Endpoint:         "http://rocket.foo.com:3000",
+						Channel:          "#general",
+						UserID:           "abcdEFGH012345678",
+						Token:            "Token123456",
+						RenderAttachment: utl.NewTrue(),
+						Timeout:          utl.NewDuration(10 * time.Second),
+						TemplateTitle:    model.NotifDefaultTemplateTitle,
+						TemplateBody:     model.NotifRocketChatDefaultTemplateBody,
 					},
 					Script: &model.NotifScript{
 						Cmd: "uname",
@@ -149,10 +150,12 @@ for <code>{{ .Entry.Manifest.Platform }}</code> platform.
 					},
 					Slack: &model.NotifSlack{
 						WebhookURL:   "https://hooks.slack.com/services/ABCD12EFG/HIJK34LMN/01234567890abcdefghij",
+						RenderFields: utl.NewFalse(),
 						TemplateBody: model.NotifSlackDefaultTemplateBody,
 					},
 					Teams: &model.NotifTeams{
 						WebhookURL:   "https://outlook.office.com/webhook/ABCD12EFG/HIJK34LMN/01234567890abcdefghij",
+						RenderFacts:  utl.NewFalse(),
 						TemplateBody: model.NotifTeamsDefaultTemplateBody,
 					},
 					Telegram: &model.NotifTelegram{
