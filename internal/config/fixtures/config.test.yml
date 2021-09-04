@@ -25,6 +25,7 @@ notif:
       - "<@124>"
       - "<@125>"
       - "<@&200>"
+    renderFields: true
     timeout: 10s
   gotify:
     endpoint: http://gotify.foo.com
@@ -69,6 +70,7 @@ notif:
     channel: "#general"
     userID: abcdEFGH012345678
     token: Token123456
+    renderAttachment: true
     timeout: 10s
   script:
     cmd: "uname"
@@ -76,8 +78,10 @@ notif:
       - "-a"
   slack:
     webhookURL: https://hooks.slack.com/services/ABCD12EFG/HIJK34LMN/01234567890abcdefghij
+    renderFields: false
   teams:
     webhookURL: https://outlook.office.com/webhook/ABCD12EFG/HIJK34LMN/01234567890abcdefghij
+    renderFacts: false
   telegram:
     token: abcdef123456
     chatIDs:

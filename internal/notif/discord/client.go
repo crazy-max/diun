@@ -45,16 +45,15 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	}
 
 	message, err := msg.New(msg.Options{
-		Meta:          c.meta,
-		Entry:         entry,
-		TemplateTitle: c.cfg.TemplateTitle,
-		TemplateBody:  c.cfg.TemplateBody,
+		Meta:         c.meta,
+		Entry:        entry,
+		TemplateBody: c.cfg.TemplateBody,
 	})
 	if err != nil {
 		return err
 	}
 
-	title, body, err := message.RenderMarkdown()
+	_, body, err := message.RenderMarkdown()
 	if err != nil {
 		return err
 	}
@@ -64,35 +63,38 @@ func (c *Client) Send(entry model.NotifEntry) error {
 			content.WriteString(fmt.Sprintf("%s ", mention))
 		}
 	}
-	content.WriteString(string(title))
+	content.WriteString(string(body))
 
-	fields := []EmbedField{
-		{
-			Name:  "Hostname",
-			Value: c.meta.Hostname,
-		},
-		{
-			Name:  "Provider",
-			Value: entry.Provider,
-		},
-		{
-			Name:  "Created",
-			Value: entry.Manifest.Created.Format("Jan 02, 2006 15:04:05 UTC"),
-		},
-		{
-			Name:  "Digest",
-			Value: entry.Manifest.Digest.String(),
-		},
-		{
-			Name:  "Platform",
-			Value: entry.Manifest.Platform,
-		},
-	}
-	if len(entry.Image.HubLink) > 0 {
-		fields = append(fields, EmbedField{
-			Name:  "HubLink",
-			Value: entry.Image.HubLink,
-		})
+	var fields []EmbedField
+	if *c.cfg.RenderFields {
+		fields = []EmbedField{
+			{
+				Name:  "Hostname",
+				Value: c.meta.Hostname,
+			},
+			{
+				Name:  "Provider",
+				Value: entry.Provider,
+			},
+			{
+				Name:  "Created",
+				Value: entry.Manifest.Created.Format("Jan 02, 2006 15:04:05 UTC"),
+			},
+			{
+				Name:  "Digest",
+				Value: entry.Manifest.Digest.String(),
+			},
+			{
+				Name:  "Platform",
+				Value: entry.Manifest.Platform,
+			},
+		}
+		if len(entry.Image.HubLink) > 0 {
+			fields = append(fields, EmbedField{
+				Name:  "HubLink",
+				Value: entry.Image.HubLink,
+			})
+		}
 	}
 
 	dataBuf := new(bytes.Buffer)
@@ -102,17 +104,15 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		AvatarURL: c.meta.Logo,
 		Embeds: []Embed{
 			{
-				Description: string(body),
-				Footer: EmbedFooter{
-					Text:    fmt.Sprintf("%s © %d %s %s", c.meta.Author, time.Now().Year(), c.meta.Name, c.meta.Version),
-					IconURL: c.meta.Logo,
-				},
 				Author: EmbedAuthor{
 					Name:    c.meta.Name,
 					URL:     c.meta.URL,
 					IconURL: c.meta.Logo,
 				},
 				Fields: fields,
+				Footer: EmbedFooter{
+					Text: fmt.Sprintf("%s © %d %s %s", c.meta.Author, time.Now().Year(), c.meta.Name, c.meta.Version),
+				},
 			},
 		},
 	}); err != nil {

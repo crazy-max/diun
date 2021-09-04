@@ -66,54 +66,56 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		return err
 	}
 
-	fields := []AttachmentField{
-		{
-			Title: "Hostname",
-			Value: c.meta.Hostname,
-			Short: false,
-		},
-		{
-			Title: "Provider",
-			Value: entry.Provider,
-			Short: false,
-		},
-		{
-			Title: "Created",
-			Value: entry.Manifest.Created.Format("Jan 02, 2006 15:04:05 UTC"),
-			Short: false,
-		},
-		{
-			Title: "Digest",
-			Value: entry.Manifest.Digest.String(),
-			Short: false,
-		},
-		{
-			Title: "Platform",
-			Value: entry.Manifest.Platform,
-			Short: false,
-		},
-	}
-	if len(entry.Image.HubLink) > 0 {
-		fields = append(fields, AttachmentField{
-			Title: "HubLink",
-			Value: entry.Image.HubLink,
-			Short: false,
+	var attachments []Attachment
+	if *c.cfg.RenderAttachment {
+		fields := []AttachmentField{
+			{
+				Title: "Hostname",
+				Value: c.meta.Hostname,
+				Short: false,
+			},
+			{
+				Title: "Provider",
+				Value: entry.Provider,
+				Short: false,
+			},
+			{
+				Title: "Created",
+				Value: entry.Manifest.Created.Format("Jan 02, 2006 15:04:05 UTC"),
+				Short: false,
+			},
+			{
+				Title: "Digest",
+				Value: entry.Manifest.Digest.String(),
+				Short: false,
+			},
+			{
+				Title: "Platform",
+				Value: entry.Manifest.Platform,
+				Short: false,
+			},
+		}
+		if len(entry.Image.HubLink) > 0 {
+			fields = append(fields, AttachmentField{
+				Title: "HubLink",
+				Value: entry.Image.HubLink,
+				Short: false,
+			})
+		}
+		attachments = append(attachments, Attachment{
+			Text:   string(body),
+			Ts:     json.Number(strconv.FormatInt(time.Now().Unix(), 10)),
+			Fields: fields,
 		})
 	}
 
 	dataBuf := new(bytes.Buffer)
 	if err := json.NewEncoder(dataBuf).Encode(Message{
-		Alias:   c.meta.Name,
-		Avatar:  c.meta.Logo,
-		Channel: c.cfg.Channel,
-		Text:    string(title),
-		Attachments: []Attachment{
-			{
-				Text:   string(body),
-				Ts:     json.Number(strconv.FormatInt(time.Now().Unix(), 10)),
-				Fields: fields,
-			},
-		},
+		Alias:       c.meta.Name,
+		Avatar:      c.meta.Logo,
+		Channel:     c.cfg.Channel,
+		Text:        string(title),
+		Attachments: attachments,
 	}); err != nil {
 		return err
 	}

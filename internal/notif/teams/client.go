@@ -3,6 +3,7 @@ package teams
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -71,6 +72,17 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		themeColor = "0076D7"
 	}
 
+	var facts []Fact
+	if *c.cfg.RenderFacts {
+		facts = []Fact{
+			{"Hostname", c.meta.Hostname},
+			{"Provider", entry.Provider},
+			{"Created", entry.Manifest.Created.Format("Jan 02, 2006 15:04:05 UTC")},
+			{"Digest", entry.Manifest.Digest.String()},
+			{"Platform", entry.Manifest.Platform},
+		}
+	}
+
 	jsonBody, err := json.Marshal(struct {
 		Type       string     `json:"@type"`
 		Context    string     `json:"@context"`
@@ -82,16 +94,13 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		Context:    "https://schema.org/extensions",
 		ThemeColor: themeColor,
 		Summary:    string(body),
-		Sections: []Sections{{
-			ActivityTitle:    string(body),
-			ActivitySubtitle: "Provider: " + entry.Provider,
-			Facts: []Fact{
-				{"Hostname", c.meta.Hostname},
-				{"Provider", entry.Provider},
-				{"Created", entry.Manifest.Created.Format("Jan 02, 2006 15:04:05 UTC")},
-				{"Digest", entry.Manifest.Digest.String()},
-				{"Platform", entry.Manifest.Platform},
-			}}},
+		Sections: []Sections{
+			{
+				ActivityTitle:    string(body),
+				ActivitySubtitle: fmt.Sprintf("%s © %d %s %s", c.meta.Author, time.Now().Year(), c.meta.Name, c.meta.Version),
+				Facts:            facts,
+			},
+		},
 	})
 	if err != nil {
 		return err
