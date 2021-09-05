@@ -1,6 +1,6 @@
 # Discord notifications
 
-Allow to send notifications to your Discord channel.
+Allow sending notifications to your Discord channel.
 
 ## Configuration
 

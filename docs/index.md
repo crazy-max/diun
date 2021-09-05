@@ -25,7 +25,7 @@ This support includes Linux, macOS, and Windows, on architectures like amd64, i3
 
 ## Features
 
-* Allow to watch a Docker repository and report new tags
+* Allow watching a Docker repository and report new tags
 * Include and exclude filters with regular expression for tags
 * Internal cron implementation through go routines
 * Worker pool to parallelize analyses

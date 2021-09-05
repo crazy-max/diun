@@ -2,7 +2,7 @@
 
 ## 4.19.0 (2021/06/26)
 
-* Allow to customize notification message (#415)
+* Allow customizing notification message (#415)
 * Bump github.com/panjf2000/ants/v2 from 2.4.5 to 2.4.6 (#416)
 * Bump k8s.io/client-go from 0.21.1 to 0.21.2 (#414)
 * Bump github.com/microcosm-cc/bluemonday from 1.0.13 to 1.0.14 (#413)
@@ -100,7 +100,7 @@
 * Bump github.com/imdario/mergo from 0.3.11 to 0.3.12 (#298)
 * Bump github.com/crazy-max/gohealthchecks from 0.2.0 to 0.3.0 (#296)
 * Bump github.com/alecthomas/kong from 0.2.15 to 0.2.16 (#295)
-* Allow to configure scheme for MQTT broker (#292)
+* Allow configuring scheme for MQTT broker (#292)
 * Switch to [goreleaser-xx](https://github.com/crazy-max/goreleaser-xx) (#291)
 * Bump github.com/containers/image/v5 from 5.10.4 to 5.10.5 (#290)
 
@@ -202,17 +202,17 @@
 
 ## 4.5.0 (2020/08/29)
 
-* Allow to set the hostname sent to the SMTP server with the HELO command for mail notification (#165)
+* Allow setting the hostname sent to the SMTP server with the HELO command for mail notification (#165)
 * Fix Telegram notification error (#162)
 
 ## 4.4.1 (2020/08/20)
 
-* Allow to use `--test-notif` without providers and DB connection (#157 #150)
+* Allow using `--test-notif` without providers and DB connection (#157 #150)
 * Update deps
 
 ## 4.4.0 (2020/08/08)
 
-* Allow to customize message type for Matrix notifications (#143)
+* Allow customizing message type for Matrix notifications (#143)
 
 ## 4.3.1 (2020/07/30)
 
@@ -366,7 +366,7 @@
 * Move documentation
 * Fix go mod
 * Remove `--docker` flag
-* Allow to override database path through `DIUN_DB` env var
+* Allow overriding database path through `DIUN_DB` env var
 
 ## 1.2.0 (2019/08/18)
 
