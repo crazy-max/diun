@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.20.1 (2021/09/06)
+
+* Fix notification title (#483)
+
 ## 4.20.0 (2021/09/05)
 
 * Option to render fields (#480)
