@@ -1,6 +1,6 @@
 # Rocket.Chat notifications
 
-Allow to send notifications to your Rocket.Chat channel.
+Allow sending notifications to your Rocket.Chat channel.
 
 ## Configuration
 
