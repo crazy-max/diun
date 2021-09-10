@@ -56,8 +56,11 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	}
 
 	r, err := m.Login(&gomatrix.ReqLogin{
-		Type:                     "m.login.password",
-		User:                     user,
+		Type: "m.login.password",
+		Identifier: gomatrix.UserIdentifier{
+			IDType: "m.id.user",
+			User:   user,
+		},
 		Password:                 password,
 		InitialDeviceDisplayName: c.meta.Name,
 	})
