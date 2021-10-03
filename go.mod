@@ -5,7 +5,7 @@ go 1.17
 require (
 	github.com/alecthomas/kong v0.2.17
 	github.com/bmatcuk/doublestar/v3 v3.0.0
-	github.com/containerd/containerd v1.5.5
+	github.com/containerd/containerd v1.5.6
 	github.com/containers/image/v5 v5.16.0
 	github.com/crazy-max/gohealthchecks v0.3.0
 	github.com/crazy-max/gonfig v0.5.0
