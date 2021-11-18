@@ -5,7 +5,7 @@ go 1.17
 require (
 	github.com/alecthomas/kong v0.2.18
 	github.com/bmatcuk/doublestar/v3 v3.0.0
-	github.com/containerd/containerd v1.5.7
+	github.com/containerd/containerd v1.5.8
 	github.com/containers/image/v5 v5.16.1
 	github.com/crazy-max/gohealthchecks v0.3.0
 	github.com/crazy-max/gonfig v0.5.0
@@ -22,7 +22,7 @@ require (
 	github.com/matcornic/hermes/v2 v2.1.0
 	github.com/matrix-org/gomatrix v0.0.0-20210324163249-be2af5ef2e16
 	github.com/microcosm-cc/bluemonday v1.0.16
-	github.com/moby/buildkit v0.9.2
+	github.com/moby/buildkit v0.9.3
 	github.com/nlopes/slack v0.6.0
 	github.com/opencontainers/go-digest v1.0.0
 	github.com/opencontainers/image-spec v1.0.2-0.20210819154149-5ad6f50d6283
