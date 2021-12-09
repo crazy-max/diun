@@ -85,6 +85,12 @@ target "docs" {
   output = ["./site"]
 }
 
+target "binary" {
+  inherits = ["_common"]
+  target = "binary"
+  output = ["./bin"]
+}
+
 target "artifact" {
   inherits = ["_common"]
   target = "artifacts"

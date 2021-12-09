@@ -28,12 +28,15 @@ FROM scratch AS artifacts
 COPY --from=build /out/*.tar.gz /
 COPY --from=build /out/*.zip /
 
+FROM scratch AS binary
+COPY --from=build /usr/local/bin/diun* /
+
 FROM alpine:3.14
 
 RUN apk --update --no-cache add \
     ca-certificates \
     openssl \
-  && rm -rf /tmp/* /var/cache/apk/*
+  && rm -rf /tmp/*
 
 COPY --from=build /usr/local/bin/diun /usr/local/bin/diun
 RUN diun --version
