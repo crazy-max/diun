@@ -108,6 +108,22 @@ diun image inspect --image drone/drone
 !!! warning
     All manifest for an image will be removed if no tag is specified
 
+### `image prune`
+
+!!! note
+    Diun needs to be started through [`serve`](#serve) command to be able to use this command.
+
+Remove all manifests from the database.
+
+* `--force`: Do not prompt for confirmation
+* `--grpc-authority <string>`: Link to Diun gRPC API (default `127.0.0.1:42286`)
+
+Examples:
+
+```shell
+diun image prune
+```
+
 ### `notif test`
 
 !!! note
