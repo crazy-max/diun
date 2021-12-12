@@ -41,9 +41,11 @@ Allow sending notifications to your Matrix server.
 ### Default `templateBody`
 
 ```
-[[ config.extra.template.defaultBody ]]
+[[ config.extra.template.notif.defaultBody ]]
 ```
 
 ## Sample
 
 ![](../assets/notif/matrix.png)
+
+[^1]: Value required

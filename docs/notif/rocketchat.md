@@ -48,7 +48,7 @@ Allow sending notifications to your Rocket.Chat channel.
 ### Default `templateTitle`
 
 ```
-[[ config.extra.template.defaultTitle ]]
+[[ config.extra.template.notif.defaultTitle ]]
 ```
 
 ### Default `templateBody`

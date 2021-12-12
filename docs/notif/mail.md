@@ -55,7 +55,7 @@ Notifications can be sent through SMTP.
 ### Default `templateTitle`
 
 ```
-[[ config.extra.template.defaultTitle ]]
+[[ config.extra.template.notif.defaultTitle ]]
 ```
 
 ### Default `templateBody`
