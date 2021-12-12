@@ -23,15 +23,20 @@ extra:
     server: plausible.re4per.com
     domain: crazymax.dev/diun
   template:
-    defaultTitle: |
-      {{ .Entry.Image }} {{ if (eq .Entry.Status "new") }}is available{{ else }}has been updated{{ end }}
-    defaultBody: |
-      Docker tag {{ if .Entry.Image.HubLink }}[**{{ .Entry.Image }}**]({{ .Entry.Image.HubLink }}){{ else }}**{{ .Entry.Image }}**{{ end }} which you subscribed to through {{ .Entry.Provider }} provider {{ if (eq .Entry.Status "new") }}is available{{ else }}has been updated{{ end }} on {{ .Entry.Image.Domain }} registry (triggered by {{ .Meta.Hostname }} host).
+    notif:
+      defaultTitle: |
+        {{ .Entry.Image }} {{ if (eq .Entry.Status "new") }}is available{{ else }}has been updated{{ end }}
+      defaultBody: |
+        Docker tag {{ if .Entry.Image.HubLink }}[**{{ .Entry.Image }}**]({{ .Entry.Image.HubLink }}){{ else }}**{{ .Entry.Image }}**{{ end }} which you subscribed to through {{ .Entry.Provider }} provider {{ if (eq .Entry.Status "new") }}is available{{ else }}has been updated{{ end }} on {{ .Entry.Image.Domain }} registry (triggered by {{ .Meta.Hostname }} host).
 
 theme:
   name: material
   custom_dir: docs/_overrides
   language: en
+  features:
+    - search.highlight
+    - search.share
+    - search.suggest
   palette:
     - media: "(prefers-color-scheme: light)"
       scheme: default
@@ -66,11 +71,14 @@ markdown_extensions:
       base_path: docs
   - meta
   - pymdownx.details
-  - pymdownx.tabbed
-  - pymdownx.superfences
   - pymdownx.emoji:
       emoji_index: !!python/name:materialx.emoji.twemoji
       emoji_generator: !!python/name:materialx.emoji.to_svg
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.superfences
+  - pymdownx.tasklist:
+      custom_checkbox: true
   - toc:
       permalink: true
 
@@ -87,7 +95,6 @@ plugins:
       j2_variable_start_string: '[['
       j2_variable_end_string: ']]'
   - search:
-      prebuild_index: python
       lang:
         - en
 

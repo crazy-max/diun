@@ -39,7 +39,7 @@ Allow sending notifications to your Discord channel.
 ### Default `templateBody`
 
 ```
-[[ config.extra.template.defaultBody ]]
+[[ config.extra.template.notif.defaultBody ]]
 ```
 
 ## Sample

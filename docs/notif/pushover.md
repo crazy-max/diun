@@ -35,15 +35,17 @@ You can send notifications using [Pushover](https://pushover.net/).
 ### Default `templateTitle`
 
 ```
-[[ config.extra.template.defaultTitle ]]
+[[ config.extra.template.notif.defaultTitle ]]
 ```
 
 ### Default `templateBody`
 
 ```
-[[ config.extra.template.defaultBody ]]
+[[ config.extra.template.notif.defaultBody ]]
 ```
 
 ## Sample
 
 ![](../assets/notif/pushover.png)
+
+[^1]: Value required

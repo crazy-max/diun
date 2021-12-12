@@ -39,13 +39,13 @@ Notifications can be sent using a [Gotify](https://gotify.net/) instance.
 ### Default `templateTitle`
 
 ```
-[[ config.extra.template.defaultTitle ]]
+[[ config.extra.template.notif.defaultTitle ]]
 ```
 
 ### Default `templateBody`
 
 ```
-[[ config.extra.template.defaultBody ]]
+[[ config.extra.template.notif.defaultBody ]]
 ```
 
 ## Sample
