@@ -21,6 +21,7 @@ type ImageServiceClient interface {
 	ImageList(ctx context.Context, in *ImageListRequest, opts ...grpc.CallOption) (*ImageListResponse, error)
 	ImageInspect(ctx context.Context, in *ImageInspectRequest, opts ...grpc.CallOption) (*ImageInspectResponse, error)
 	ImageRemove(ctx context.Context, in *ImageRemoveRequest, opts ...grpc.CallOption) (*ImageRemoveResponse, error)
+	ImagePrune(ctx context.Context, in *ImagePruneRequest, opts ...grpc.CallOption) (*ImagePruneResponse, error)
 }
 
 type imageServiceClient struct {
@@ -58,6 +59,15 @@ func (c *imageServiceClient) ImageRemove(ctx context.Context, in *ImageRemoveReq
 	return out, nil
 }
 
+func (c *imageServiceClient) ImagePrune(ctx context.Context, in *ImagePruneRequest, opts ...grpc.CallOption) (*ImagePruneResponse, error) {
+	out := new(ImagePruneResponse)
+	err := c.cc.Invoke(ctx, "/pb.ImageService/ImagePrune", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ImageServiceServer is the server API for ImageService service.
 // All implementations must embed UnimplementedImageServiceServer
 // for forward compatibility
@@ -65,6 +75,7 @@ type ImageServiceServer interface {
 	ImageList(context.Context, *ImageListRequest) (*ImageListResponse, error)
 	ImageInspect(context.Context, *ImageInspectRequest) (*ImageInspectResponse, error)
 	ImageRemove(context.Context, *ImageRemoveRequest) (*ImageRemoveResponse, error)
+	ImagePrune(context.Context, *ImagePruneRequest) (*ImagePruneResponse, error)
 	mustEmbedUnimplementedImageServiceServer()
 }
 
@@ -80,6 +91,9 @@ func (UnimplementedImageServiceServer) ImageInspect(context.Context, *ImageInspe
 }
 func (UnimplementedImageServiceServer) ImageRemove(context.Context, *ImageRemoveRequest) (*ImageRemoveResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ImageRemove not implemented")
+}
+func (UnimplementedImageServiceServer) ImagePrune(context.Context, *ImagePruneRequest) (*ImagePruneResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ImagePrune not implemented")
 }
 func (UnimplementedImageServiceServer) mustEmbedUnimplementedImageServiceServer() {}
 
@@ -148,6 +162,24 @@ func _ImageService_ImageRemove_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ImageService_ImagePrune_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ImagePruneRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ImageServiceServer).ImagePrune(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.ImageService/ImagePrune",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ImageServiceServer).ImagePrune(ctx, req.(*ImagePruneRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ImageService_ServiceDesc is the grpc.ServiceDesc for ImageService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -166,6 +198,10 @@ var ImageService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ImageRemove",
 			Handler:    _ImageService_ImageRemove_Handler,
+		},
+		{
+			MethodName: "ImagePrune",
+			Handler:    _ImageService_ImagePrune_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

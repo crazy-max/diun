@@ -121,3 +121,38 @@ func (c *Client) ImageRemove(ctx context.Context, request *pb.ImageRemoveRequest
 		Manifests: removed,
 	}, nil
 }
+
+func (c *Client) ImagePrune(ctx context.Context, request *pb.ImagePruneRequest) (*pb.ImagePruneResponse, error) {
+	images, err := c.db.ListImage()
+	if err != nil {
+		return nil, err
+	}
+
+	var removed []*pb.ImagePruneResponse_Image
+	for n, m := range images {
+		var manifests []*pb.Manifest
+		for _, manifest := range m {
+			if err = c.db.DeleteManifest(manifest); err != nil {
+				return nil, err
+			}
+			b, _ := json.Marshal(manifest)
+			manifests = append(manifests, &pb.Manifest{
+				Tag:      manifest.Tag,
+				MimeType: manifest.MIMEType,
+				Digest:   manifest.Digest.String(),
+				Created:  timestamppb.New(*manifest.Created),
+				Labels:   manifest.Labels,
+				Platform: manifest.Platform,
+				Size:     int64(len(b)),
+			})
+		}
+		removed = append(removed, &pb.ImagePruneResponse_Image{
+			Name:      n,
+			Manifests: manifests,
+		})
+	}
+
+	return &pb.ImagePruneResponse{
+		Images: removed,
+	}, nil
+}

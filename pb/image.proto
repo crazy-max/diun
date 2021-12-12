@@ -46,8 +46,22 @@ message ImageRemoveResponse {
   repeated Manifest manifests = 1;
 }
 
+message ImagePruneRequest {
+  bool all = 1;
+  string filter = 2;
+}
+
+message ImagePruneResponse {
+  message Image {
+    string name = 1;
+    repeated Manifest manifests = 2;
+  }
+  repeated Image images = 1;
+}
+
 service ImageService {
   rpc ImageList(ImageListRequest) returns (ImageListResponse) {}
   rpc ImageInspect(ImageInspectRequest) returns (ImageInspectResponse) {}
   rpc ImageRemove(ImageRemoveRequest) returns (ImageRemoveResponse) {}
+  rpc ImagePrune(ImagePruneRequest) returns (ImagePruneResponse) {}
 }

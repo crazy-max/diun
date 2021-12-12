@@ -9,6 +9,7 @@ import (
 	"time"
 	"unicode"
 
+	"github.com/AlecAivazis/survey/v2"
 	"github.com/crazy-max/diun/v4/pb"
 	"github.com/docker/go-units"
 	"github.com/jedib0t/go-pretty/v6/table"
@@ -21,7 +22,7 @@ type ImageCmd struct {
 	List    ImageListCmd    `kong:"cmd,default='1',help='List images in database.'"`
 	Inspect ImageInspectCmd `kong:"cmd,help='Display information of an image in database.'"`
 	Remove  ImageRemoveCmd  `kong:"cmd,help='Remove an image manifest from database.'"`
-	//Prune   ImagePruneCmd   `kong:"cmd,help='Remove unused manifests from the database.'"`
+	Prune   ImagePruneCmd   `kong:"cmd,help='Remove all manifests from the database.'"`
 }
 
 // ImageListCmd holds image list command
@@ -45,6 +46,11 @@ func (s *ImageListCmd) Run(ctx *Context) error {
 	if s.Raw {
 		b, _ := protojson.Marshal(il)
 		fmt.Println(string(pretty.Pretty(b)))
+		return nil
+	}
+
+	if len(il.Images) == 0 {
+		fmt.Println("No image found in the database")
 		return nil
 	}
 
@@ -103,7 +109,6 @@ func (s *ImageInspectCmd) Run(ctx *Context) error {
 type ImageRemoveCmd struct {
 	CliGlobals
 	Image string `kong:"name='image',required,help='Image to remove.'"`
-	All   bool   `kong:"name='all',default='false',help='Remove all manifests from the database.'"`
 }
 
 func (s *ImageRemoveCmd) Run(ctx *Context) error {
@@ -125,6 +130,65 @@ func (s *ImageRemoveCmd) Run(ctx *Context) error {
 		totalSize += image.Size
 	}
 	t.AppendFooter(table.Row{"Total", fmt.Sprintf("%d (%s)", len(removed.Manifests), units.HumanSize(float64(totalSize)))})
+	t.Render()
+
+	return nil
+}
+
+// ImagePruneCmd holds image prune command
+type ImagePruneCmd struct {
+	CliGlobals
+	//All    bool   `kong:"name='all',default='false',help='Remove all manifests from the database.'"`
+	//Filter string `kong:"name='filter',help='Provide filter values (e.g., until=24h).'"`
+	Force bool `kong:"name='force',default='false',help='Do not prompt for confirmation.'"`
+}
+
+const (
+	pruneAllWarning = `This will remove all manifests from the database. Are you sure you want to continue?`
+)
+
+func (s *ImagePruneCmd) Run(ctx *Context) error {
+	defer s.conn.Close()
+
+	if !s.Force {
+		var confirmed bool
+		prompt := &survey.Confirm{
+			Message: pruneAllWarning,
+		}
+		if err := survey.AskOne(prompt, &confirmed); err != nil {
+			return err
+		}
+		if !confirmed {
+			return nil
+		}
+	}
+
+	removed, err := s.imageSvc.ImagePrune(context.Background(), &pb.ImagePruneRequest{
+		//All:    s.All,
+		//Filter: s.Filter,
+	})
+	if err != nil {
+		return err
+	}
+
+	if len(removed.Images) == 0 {
+		fmt.Println("Nothing to be removed from the database")
+		return nil
+	}
+
+	t := table.NewWriter()
+	t.SetOutputMirror(os.Stdout)
+	t.AppendHeader(table.Row{"Tag", "Created", "Digest", "Size"})
+	var totalSize int64
+	var totalManifest int
+	for _, image := range removed.Images {
+		for _, manifest := range image.Manifests {
+			t.AppendRow(table.Row{manifest.Tag, manifest.Created.AsTime().Format(time.RFC3339), manifest.Digest, units.HumanSize(float64(manifest.Size))})
+			totalSize += manifest.Size
+		}
+		totalManifest += len(image.Manifests)
+	}
+	t.AppendFooter(table.Row{"Total", fmt.Sprintf("%d (%s)", totalManifest, units.HumanSize(float64(totalSize)))})
 	t.Render()
 
 	return nil
