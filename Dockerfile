@@ -51,12 +51,7 @@ FROM scratch AS binary
 COPY --from=build /usr/local/bin/diun* /
 
 FROM alpine:3.14
-
-RUN apk --update --no-cache add \
-    ca-certificates \
-    openssl \
-  && rm -rf /tmp/*
-
+RUN apk --update --no-cache add ca-certificates openssl
 COPY --from=build /usr/local/bin/diun /usr/local/bin/diun
 
 ENV PROFILER_PATH="/profiler" \
