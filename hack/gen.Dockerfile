@@ -1,7 +1,8 @@
-# syntax=docker/dockerfile:1.2
+# syntax=docker/dockerfile:1.3-labs
+
 ARG GO_VERSION
-ARG PROTOC_VERSION
-ARG GLIBC_VERSION=2.33-r0
+ARG PROTOC_VERSION="3.17.3"
+ARG GLIBC_VERSION="2.33-r0"
 
 FROM golang:${GO_VERSION}-alpine AS base
 ARG GLIBC_VERSION
@@ -17,24 +18,37 @@ RUN curl -sSL "https://github.com/protocolbuffers/protobuf/releases/download/v${
   && rm "protoc.zip"
 WORKDIR /src
 
-FROM base AS gomod
+FROM base AS vendored
 RUN --mount=type=bind,target=.,rw \
   --mount=type=cache,target=/go/pkg/mod \
-  go mod tidy && go mod download && go install -v $(sed -n -e 's|^\s*_\s*"\(.*\)".*$|\1| p' tools.go)
+  go mod tidy && go mod download
 
-FROM gomod AS generate
+FROM vendored AS tools
 RUN --mount=type=bind,target=.,rw \
   --mount=type=cache,target=/go/pkg/mod \
-  go generate ./... && mkdir /out && cp -Rf pb /out
+  go install -v $(sed -n -e 's|^\s*_\s*"\(.*\)".*$|\1| p' tools.go)
+
+FROM tools AS generate
+RUN --mount=type=bind,target=.,rw \
+  --mount=type=cache,target=/go/pkg/mod <<EOT
+set -e
+go generate ./...
+mkdir /out
+cp -Rf pb /out
+EOT
 
 FROM scratch AS update
 COPY --from=generate /out /
 
 FROM generate AS validate
-RUN --mount=type=bind,target=.,rw \
-  git add -A && cp -rf /out/* .; \
-  if [ -n "$(git status --porcelain -- pb)" ]; then \
-    echo >&2 'ERROR: Generate result differs. Please update with "docker buildx bake gen-update"'; \
-    git status --porcelain -- pb; \
-    exit 1; \
-  fi
+RUN --mount=type=bind,target=.,rw <<EOT
+set -e
+git add -A
+cp -rf /out/* .
+diff=$(git status --porcelain -- pb)
+if [ -n "$diff" ]; then
+  echo >&2 'ERROR: Vendor result differs. Please vendor your package with "docker buildx bake gen"'
+  echo "$diff"
+  exit 1
+fi
+EOT
