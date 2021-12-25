@@ -6,19 +6,7 @@ on:
       - 'master'
     tags:
       - 'v*'
-    paths-ignore:
-      - '**.md'
-      - '.github/workflows/docs.yml'
-      - 'docs/**'
-      - 'mkdocs.yml'
   pull_request:
-    branches:
-      - 'master'
-    paths-ignore:
-      - '**.md'
-      - '.github/workflows/docs.yml'
-      - 'docs/**'
-      - 'mkdocs.yml'
 
 env:
   DOCKERHUB_SLUG: crazymax/diun

@@ -15,7 +15,7 @@ on:
       - '**.md'
 
 env:
-  BUILD_TAG: 'crazymax/diun:local'
+  BUILD_TAG: 'diun:local'
   CONTAINER_NAME: 'diun'
   RUNNING_TIMEOUT: '240'
   RUNNING_LOG_CHECK: 'Next run in'

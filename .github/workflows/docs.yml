@@ -5,19 +5,7 @@ on:
   push:
     tags:
       - 'v*'
-    paths:
-      - '.github/workflows/docs.yml'
-      - 'docs/**'
-      - 'CHANGELOG.md'
-      - 'mkdocs.yml'
   pull_request:
-    branches:
-      - 'master'
-    paths:
-      - '.github/workflows/docs.yml'
-      - 'docs/**'
-      - 'CHANGELOG.md'
-      - 'mkdocs.yml'
 
 jobs:
   publish:

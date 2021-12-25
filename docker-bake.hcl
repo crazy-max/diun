@@ -1,88 +1,21 @@
 variable "GO_VERSION" {
   default = "1.17"
 }
-variable "PROTOC_VERSION" {
-  default = "3.17.3"
-}
-variable "GITHUB_REF" {
-  default = ""
-}
-
-// Special target: https://github.com/docker/metadata-action#bake-definition
-target "docker-metadata-action" {
-  tags = ["crazymax/diun:local"]
-}
 
 target "_common" {
   args = {
     GO_VERSION = GO_VERSION
-    PROTOC_VERSION = PROTOC_VERSION
-    GIT_REF = GITHUB_REF
     BUILDKIT_CONTEXT_KEEP_GIT_DIR = 1
   }
 }
 
+// Special target: https://github.com/docker/metadata-action#bake-definition
+target "docker-metadata-action" {
+  tags = ["diun:local"]
+}
+
 group "default" {
   targets = ["image-local"]
-}
-
-group "validate" {
-  targets = ["lint", "vendor-validate", "gen-validate"]
-}
-
-target "lint" {
-  inherits = ["_common"]
-  dockerfile = "./hack/lint.Dockerfile"
-  target = "lint"
-  output = ["type=cacheonly"]
-}
-
-target "vendor-validate" {
-  inherits = ["_common"]
-  dockerfile = "./hack/vendor.Dockerfile"
-  target = "validate"
-  output = ["type=cacheonly"]
-}
-
-target "vendor-update" {
-  inherits = ["_common"]
-  dockerfile = "./hack/vendor.Dockerfile"
-  target = "update"
-  output = ["."]
-}
-
-target "vendor-outdated" {
-  inherits = ["_common"]
-  dockerfile = "./hack/vendor.Dockerfile"
-  target = "outdated"
-  output = ["type=cacheonly"]
-}
-
-target "gen-validate" {
-  inherits = ["_common"]
-  dockerfile = "./hack/gen.Dockerfile"
-  target = "validate"
-  output = ["type=cacheonly"]
-}
-
-target "gen-update" {
-  inherits = ["_common"]
-  dockerfile = "./hack/gen.Dockerfile"
-  target = "update"
-  output = ["."]
-}
-
-target "test" {
-  inherits = ["_common"]
-  dockerfile = "./hack/test.Dockerfile"
-  target = "test-coverage"
-  output = ["."]
-}
-
-target "docs" {
-  dockerfile = "./hack/docs.Dockerfile"
-  target = "release"
-  output = ["./site"]
 }
 
 target "binary" {
@@ -93,7 +26,7 @@ target "binary" {
 
 target "artifact" {
   inherits = ["_common"]
-  target = "artifacts"
+  target = "artifact"
   output = ["./dist"]
 }
 
@@ -136,4 +69,62 @@ target "image-all" {
     "linux/arm64",
     "linux/ppc64le"
   ]
+}
+
+target "test" {
+  inherits = ["_common"]
+  target = "test-coverage"
+  output = ["."]
+}
+
+target "vendor" {
+  inherits = ["_common"]
+  dockerfile = "./hack/vendor.Dockerfile"
+  target = "update"
+  output = ["."]
+}
+
+target "gen" {
+  inherits = ["_common"]
+  dockerfile = "./hack/gen.Dockerfile"
+  target = "update"
+  output = ["."]
+}
+
+target "docs" {
+  dockerfile = "./hack/docs.Dockerfile"
+  target = "release"
+  output = ["./site"]
+}
+
+target "gomod-outdated" {
+  inherits = ["_common"]
+  dockerfile = "./hack/vendor.Dockerfile"
+  target = "outdated"
+  output = ["type=cacheonly"]
+}
+
+group "validate" {
+  targets = ["lint", "vendor-validate", "gen-validate"]
+}
+
+target "lint" {
+  inherits = ["_common"]
+  dockerfile = "./hack/lint.Dockerfile"
+  target = "lint"
+  output = ["type=cacheonly"]
+}
+
+target "vendor-validate" {
+  inherits = ["_common"]
+  dockerfile = "./hack/vendor.Dockerfile"
+  target = "validate"
+  output = ["type=cacheonly"]
+}
+
+target "gen-validate" {
+  inherits = ["_common"]
+  dockerfile = "./hack/gen.Dockerfile"
+  target = "validate"
+  output = ["type=cacheonly"]
 }
