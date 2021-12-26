@@ -2,7 +2,7 @@ package dockerfile
 
 import (
 	"bytes"
-	"io/ioutil"
+	"os"
 
 	"github.com/moby/buildkit/frontend/dockerfile/instructions"
 	"github.com/moby/buildkit/frontend/dockerfile/parser"
@@ -25,7 +25,7 @@ type Options struct {
 
 // New initializes a new dockerfile client
 func New(opts Options) (*Client, error) {
-	b, err := ioutil.ReadFile(opts.Filename)
+	b, err := os.ReadFile(opts.Filename)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Cannot read Dockerfile %s", opts.Filename)
 	}

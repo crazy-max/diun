@@ -1,7 +1,7 @@
 package file
 
 import (
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"strings"
 
@@ -21,7 +21,7 @@ func (c *Client) listFileImage() []model.Image {
 
 	for _, file := range files {
 		var items []model.Image
-		bytes, err := ioutil.ReadFile(file)
+		bytes, err := os.ReadFile(file)
 		if err != nil {
 			c.logger.Error().Err(err).Msgf("Unable to read config file %s", file)
 			continue
@@ -77,7 +77,7 @@ func (c *Client) getFiles() []string {
 
 	switch {
 	case len(c.config.Directory) > 0:
-		fileList, err := ioutil.ReadDir(c.config.Directory)
+		fileList, err := os.ReadDir(c.config.Directory)
 		if err != nil {
 			c.logger.Error().Err(err).Msgf("Unable to read directory %s", c.config.Directory)
 			return files

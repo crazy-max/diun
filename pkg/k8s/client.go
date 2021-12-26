@@ -2,7 +2,6 @@ package k8s
 
 import (
 	"context"
-	"io/ioutil"
 	"os"
 
 	"github.com/crazy-max/diun/v4/pkg/utl"
@@ -105,7 +104,7 @@ func newExternalClusterClient(opts Options) (*kubernetes.Clientset, error) {
 	}
 
 	if opts.CertAuthFilePath != "" {
-		caData, err := ioutil.ReadFile(opts.CertAuthFilePath)
+		caData, err := os.ReadFile(opts.CertAuthFilePath)
 		if err != nil {
 			return nil, errors.Wrap(err, "Failed to read CA file")
 		}
