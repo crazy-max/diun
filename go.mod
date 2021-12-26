@@ -39,6 +39,7 @@ require (
 	github.com/stretchr/testify v1.7.0
 	github.com/tidwall/pretty v1.2.0
 	go.etcd.io/bbolt v1.3.6
+	golang.org/x/sys v0.0.0-20211216021012-1d35b9e2eb4e
 	google.golang.org/grpc v1.42.0
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.1.0
 	google.golang.org/protobuf v1.27.1
@@ -119,7 +120,6 @@ require (
 	golang.org/x/crypto v0.0.0-20210711020723-a769d52b0f97 // indirect
 	golang.org/x/net v0.0.0-20210805182204-aaa1db679c0d // indirect
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d // indirect
-	golang.org/x/sys v0.0.0-20210910150752-751e447fb3d0 // indirect
 	golang.org/x/term v0.0.0-20210503060354-a79de5458b56 // indirect
 	golang.org/x/text v0.3.6 // indirect
 	golang.org/x/time v0.0.0-20210723032227-1f47c861a9ac // indirect

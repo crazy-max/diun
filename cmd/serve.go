@@ -4,11 +4,11 @@ import (
 	"os"
 	"os/signal"
 	"path"
-	"syscall"
 
 	"github.com/crazy-max/diun/v4/internal/app"
 	"github.com/crazy-max/diun/v4/internal/config"
 	"github.com/crazy-max/diun/v4/internal/logging"
+	"github.com/crazy-max/diun/v4/pkg/utl"
 	"github.com/pkg/profile"
 	"github.com/rs/zerolog/log"
 )
@@ -39,7 +39,7 @@ func (s *ServeCmd) Run(ctx *Context) error {
 
 	// Handle os signals
 	channel := make(chan os.Signal)
-	signal.Notify(channel, os.Interrupt, syscall.SIGTERM)
+	signal.Notify(channel, os.Interrupt, utl.SIGTERM)
 	go func() {
 		sig := <-channel
 		diun.Close()
