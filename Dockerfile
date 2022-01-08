@@ -1,6 +1,6 @@
-# syntax=docker/dockerfile:1.3-labs
+# syntax=docker/dockerfile:1-labs
 
-ARG GO_VERSION
+ARG GO_VERSION="1.17"
 ARG GORELEASER_XX_VERSION="1.2.2"
 
 FROM --platform=$BUILDPLATFORM crazymax/goreleaser-xx:${GORELEASER_XX_VERSION} AS goreleaser-xx
@@ -50,13 +50,11 @@ COPY --from=build /out/*.zip /
 FROM scratch AS binary
 COPY --from=build /usr/local/bin/diun* /
 
-FROM alpine:3.14
+FROM alpine:3.15
 RUN apk --update --no-cache add ca-certificates openssl
 COPY --from=build /usr/local/bin/diun /usr/local/bin/diun
-
 ENV PROFILER_PATH="/profiler" \
   DIUN_DB_PATH="/data/diun.db"
-
 VOLUME [ "/data" ]
 ENTRYPOINT [ "diun" ]
 CMD [ "serve" ]
