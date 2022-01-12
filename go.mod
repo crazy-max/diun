@@ -15,7 +15,7 @@ require (
 	github.com/docker/go-units v0.4.0
 	github.com/eclipse/paho.mqtt.golang v1.3.5
 	github.com/go-gomail/gomail v0.0.0-20160411212932-81ebce5c23df
-	github.com/go-playground/validator/v10 v10.9.0
+	github.com/go-playground/validator/v10 v10.10.0
 	github.com/go-telegram-bot-api/telegram-bot-api v4.6.4+incompatible
 	github.com/gregdel/pushover v1.1.0
 	github.com/hako/durafmt v0.0.0-20210608085754-5c1018a4e16b
