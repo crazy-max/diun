@@ -74,9 +74,9 @@ markdown_extensions:
   - pymdownx.emoji:
       emoji_index: !!python/name:materialx.emoji.twemoji
       emoji_generator: !!python/name:materialx.emoji.to_svg
+  - pymdownx.superfences
   - pymdownx.tabbed:
       alternate_style: true
-  - pymdownx.superfences
   - pymdownx.tasklist:
       custom_checkbox: true
   - toc:
