@@ -1,5 +1,32 @@
 # Changelog
 
+## 4.21.0 (2021/01/26)
+
+* Add `image prune` command (#519)
+* Fix matrix login scheme (#487)
+* Move `syscall` to `golang.org/x/sys` (#525)
+* Move from `io/ioutil` to `os` package (#524)
+* Fix notif template in docs
+* Enhance dockerfiles (#523)
+* Add binary bake target (#517)
+* MkDocs Material 8.1.8 (#520 #548)
+* Alpine Linux 3.15 (#527)
+* goreleaser-xx 1.2.5 (#539)
+* Bump github.com/alecthomas/kong from 0.2.17 to 0.3.0 (#507 #537)
+* Bump github.com/containerd/containerd from 1.5.5 to 1.5.8 (#494 #496 #509)
+* Bump github.com/containers/image/v5 from 5.16.0 to 5.19.0 (#498 #536 #546)
+* Bump github.com/docker/docker from 20.10.8+incompatible to 20.10.12+incompatible (#500 #510 #531)
+* Bump github.com/go-playground/validator/v10 from 10.9.0 to 10.10.0 (#538)
+* Bump github.com/jedib0t/go-pretty/v6 from 6.2.4 to 6.2.5 (#543)
+* Bump github.com/microcosm-cc/bluemonday from 1.0.15 to 1.0.17 (#499 #535)
+* Bump github.com/moby/buildkit from 0.9.0 to 0.9.3 (#495 #506 #512)
+* Bump github.com/opencontainers/image-spec to v1.0.2-0.20211117181255-693428a734f5 (#513)
+* Bump github.com/panjf2000/ants/v2 from 2.4.6 to 2.4.7 (#532)
+* Bump github.com/rs/zerolog from 1.24.0 to 1.26.1 (#485 #502 #534)
+* Bump google.golang.org/grpc from 1.40.0 to 1.44.0 (#492 #505 #529 #545)
+* Bump google.golang.org/grpc/cmd/protoc-gen-go-grpc from 1.1.0 to 1.2.0 (#533)
+* Bump k8s.io/client-go from 0.22.1 to 0.22.4 (#490 #511)
+
 ## 4.20.1 (2021/09/06)
 
 * Fix notification title (#483)
