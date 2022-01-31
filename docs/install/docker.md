@@ -63,7 +63,6 @@ services:
       - "DIUN_PROVIDERS_DOCKER=true"
     labels:
       - "diun.enable=true"
-      - "diun.watch_repo=true"
     restart: always
 ```
 
@@ -87,7 +86,6 @@ docker run -d --name diun \
   -v "$(pwd)/data:/data" \
   -v "/var/run/docker.sock:/var/run/docker.sock" \
   -l "diun.enable=true" \
-  -l "diun.watch_repo=true" \
   crazymax/diun:latest
 ```
 
@@ -158,7 +156,6 @@ services:
       - "DIUN_PROVIDERS_DOCKER=true"
     labels:
       - "diun.enable=true"
-      - "diun.watch_repo=true"
     restart: always
 ```
 

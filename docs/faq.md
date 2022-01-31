@@ -138,7 +138,6 @@ In the example below, Diun is running (`diun_x.x.x_windows_i386.zip`) on Windows
 
 ```yaml
 - name: crazymax/cloudflared:2020.2.1
-  watch_repo: true
 ```
 
 But this platform is not supported by this image as you can see [on DockerHub](https://hub.docker.com/layers/crazymax/cloudflared/2020.2.1/images/sha256-137eea4e84ec4c6cb5ceb2017b9788dcd7b04f135d756e1f37e3e6673c0dd9d2?context=explore):
@@ -150,7 +149,6 @@ You have to force the platform for this image if you are not on a supported plat
 
 ```yaml
 - name: crazymax/cloudflared:2020.2.1
-  watch_repo: true
   platform:
     os: linux
     arch: amd64

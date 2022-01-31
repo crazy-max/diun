@@ -64,7 +64,6 @@ spec:
         app: diun
       annotations:
         diun.enable: "true"
-        diun.watch_repo: "true"
     spec:
       serviceAccountName: diun
       containers:

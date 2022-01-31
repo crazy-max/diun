@@ -56,7 +56,6 @@ services:
       replicas: 2
       labels:
         - "diun.enable=true"
-        - "diun.watch_repo=true"
 ```
 
 As an example we use [nginx](https://hub.docker.com/_/nginx/) Docker image. A few [labels](#docker-labels) are added
