@@ -33,6 +33,8 @@ Allow sending notifications to your Rocket.Chat channel.
 
 !!! warning
     You must first create a _Personal Access Token_ through your account settings on your Rocket.Chat instance.
+    Additionally, your user **must** have the `bot` role.
+    Else, the notifications won't work since they contain `alias` and `avatar` properties (see this [reference](https://developer.rocket.chat/reference/api/rest-api/endpoints/team-collaboration-endpoints/chat-endpoints/postmessage#important) for details).
 
 !!! abstract "Environment variables"
     * `DIUN_NOTIF_ROCKETCHAT_ENDPOINT`
