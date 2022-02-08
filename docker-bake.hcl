@@ -2,10 +2,16 @@ variable "GO_VERSION" {
   default = "1.17"
 }
 
+// GITHUB_REF is the actual ref that triggers the workflow
+// https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables
+variable "GITHUB_REF" {
+  default = ""
+}
+
 target "_common" {
   args = {
     GO_VERSION = GO_VERSION
-    BUILDKIT_CONTEXT_KEEP_GIT_DIR = 1
+    GIT_REF = GITHUB_REF
   }
 }
 

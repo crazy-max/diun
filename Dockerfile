@@ -29,6 +29,7 @@ FROM scratch AS test-coverage
 COPY --from=test /tmp/coverage.txt /coverage.txt
 
 FROM vendored AS build
+ARG GIT_REF
 ARG TARGETPLATFORM
 RUN --mount=type=bind,target=. \
   --mount=type=cache,target=/root/.cache \
