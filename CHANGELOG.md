@@ -1,6 +1,6 @@
 # Changelog
 
-## 4.21.0 (2021/01/26)
+## 4.21.0 (2022/01/26)
 
 * Add `image prune` command (#519)
 * Fix matrix login scheme (#487)
