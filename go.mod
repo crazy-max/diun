@@ -36,7 +36,7 @@ require (
 	github.com/russross/blackfriday/v2 v2.1.0
 	github.com/sirupsen/logrus v1.8.1
 	github.com/streadway/amqp v1.0.0
-	github.com/stretchr/testify v1.7.0
+	github.com/stretchr/testify v1.7.1
 	github.com/tidwall/pretty v1.2.0
 	go.etcd.io/bbolt v1.3.6
 	golang.org/x/sys v0.0.0-20220114195835-da31bd327af9
