@@ -7,10 +7,10 @@ require (
 	github.com/alecthomas/kong v0.5.0
 	github.com/bmatcuk/doublestar/v3 v3.0.0
 	github.com/containerd/containerd v1.6.1
-	github.com/containers/image/v5 v5.19.1
+	github.com/containers/image/v5 v5.21.0
 	github.com/crazy-max/gohealthchecks v0.3.0
 	github.com/crazy-max/gonfig v0.5.0
-	github.com/docker/docker v20.10.13+incompatible
+	github.com/docker/docker v20.10.14+incompatible
 	github.com/docker/go-connections v0.4.0
 	github.com/docker/go-units v0.4.0
 	github.com/eclipse/paho.mqtt.golang v1.3.5
@@ -36,10 +36,10 @@ require (
 	github.com/russross/blackfriday/v2 v2.1.0
 	github.com/sirupsen/logrus v1.8.1
 	github.com/streadway/amqp v1.0.0
-	github.com/stretchr/testify v1.7.0
+	github.com/stretchr/testify v1.7.1
 	github.com/tidwall/pretty v1.2.0
 	go.etcd.io/bbolt v1.3.6
-	golang.org/x/sys v0.0.0-20220114195835-da31bd327af9
+	golang.org/x/sys v0.0.0-20220227234510-4e6760a101f9
 	google.golang.org/grpc v1.44.0
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.2.0
 	google.golang.org/protobuf v1.27.1
@@ -53,7 +53,7 @@ require (
 	github.com/BurntSushi/toml v1.0.0 // indirect
 	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/Masterminds/sprig v2.16.0+incompatible // indirect
-	github.com/Microsoft/go-winio v0.5.1 // indirect
+	github.com/Microsoft/go-winio v0.5.2 // indirect
 	github.com/PuerkitoBio/goquery v1.5.0 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/andybalholm/cascadia v1.0.0 // indirect
@@ -62,11 +62,11 @@ require (
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/containerd/typeurl v1.0.2 // indirect
-	github.com/containers/libtrust v0.0.0-20190913040956-14b96171aa3b // indirect
-	github.com/containers/ocicrypt v1.1.2 // indirect
-	github.com/containers/storage v1.38.2 // indirect
+	github.com/containers/libtrust v0.0.0-20200511145503-9c3a6c22cd9a // indirect
+	github.com/containers/ocicrypt v1.1.3 // indirect
+	github.com/containers/storage v1.38.3-0.20220301151551-d06b0f81c0aa // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/docker/distribution v2.8.0+incompatible // indirect
+	github.com/docker/distribution v2.8.1+incompatible // indirect
 	github.com/docker/docker-credential-helpers v0.6.4 // indirect
 	github.com/docker/go-metrics v0.0.1 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
@@ -88,7 +88,7 @@ require (
 	github.com/jaytaylor/html2text v0.0.0-20180606194806-57d518f124b0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect
-	github.com/klauspost/compress v1.15.0 // indirect
+	github.com/klauspost/compress v1.15.1 // indirect
 	github.com/klauspost/pgzip v1.2.5 // indirect
 	github.com/kr/pty v1.1.8 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
@@ -118,13 +118,13 @@ require (
 	github.com/vanng822/go-premailer v0.0.0-20191214114701-be27abe028fe // indirect
 	github.com/vbatts/tar-split v0.11.2 // indirect
 	golang.org/x/crypto v0.0.0-20211215165025-cf75a172585e // indirect
-	golang.org/x/net v0.0.0-20211216030914-fe4d6282115f // indirect
+	golang.org/x/net v0.0.0-20220225172249-27dd8689420f // indirect
 	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8 // indirect
-	golang.org/x/term v0.0.0-20210615171337-6886f2dfbf5b // indirect
+	golang.org/x/term v0.0.0-20210927222741-03fcf44c2211 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/time v0.0.0-20210723032227-1f47c861a9ac // indirect
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/genproto v0.0.0-20211208223120-3a66f561d7aa // indirect
+	google.golang.org/genproto v0.0.0-20220304144024-325a89244dc8 // indirect
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
