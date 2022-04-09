@@ -1,6 +1,6 @@
-# syntax=docker/dockerfile:1-labs
+# syntax=docker/dockerfile:1
 
-ARG GO_VERSION="1.17"
+ARG GO_VERSION="1.18"
 ARG PROTOC_VERSION="3.17.3"
 ARG GLIBC_VERSION="2.33-r0"
 

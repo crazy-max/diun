@@ -38,7 +38,7 @@ func (s *ServeCmd) Run(ctx *Context) error {
 	log.Info().Str("version", version).Msgf("Starting %s", ctx.Meta.Name)
 
 	// Handle os signals
-	channel := make(chan os.Signal)
+	channel := make(chan os.Signal, 1)
 	signal.Notify(channel, os.Interrupt, utl.SIGTERM)
 	go func() {
 		sig := <-channel

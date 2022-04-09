@@ -41,7 +41,7 @@ type Sections struct {
 	Facts            []Fact `json:"facts"`
 }
 
-// Fact is grouping data togheter to create a nested json element containg a name and an associated value
+// Fact is grouping data together to create a nested json element containing a name and an associated value
 type Fact struct {
 	Name  string `json:"Name"`
 	Value string `json:"Value"`
