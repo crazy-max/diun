@@ -1,6 +1,6 @@
-# syntax=docker/dockerfile:1-labs
+# syntax=docker/dockerfile:1
 
-ARG GO_VERSION="1.17"
+ARG GO_VERSION="1.18"
 ARG GOMOD_OUTDATED_VERSION="v0.8.0"
 
 FROM golang:${GO_VERSION}-alpine AS base

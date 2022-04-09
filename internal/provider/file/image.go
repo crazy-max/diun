@@ -31,7 +31,6 @@ func (c *Client) listFileImage() []model.Image {
 			continue
 		}
 		for _, item := range items {
-
 			// Check NotifyOn
 			if len(item.NotifyOn) == 0 {
 				item.NotifyOn = model.NotifyOnDefaults

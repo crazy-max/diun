@@ -1,6 +1,6 @@
-# syntax=docker/dockerfile:1-labs
+# syntax=docker/dockerfile:1
 
-ARG GO_VERSION="1.17"
+ARG GO_VERSION="1.18"
 ARG GORELEASER_XX_VERSION="1.2.5"
 
 FROM --platform=$BUILDPLATFORM crazymax/goreleaser-xx:${GORELEASER_XX_VERSION} AS goreleaser-xx
