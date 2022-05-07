@@ -1,5 +1,9 @@
 name: docs
 
+concurrency:
+  group: docs-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
   workflow_dispatch:
   push:
