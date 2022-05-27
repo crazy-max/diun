@@ -31,7 +31,7 @@ jobs:
           pull: true
       -
         name: Check GitHub Pages status
-        uses: crazy-max/ghaction-github-status@v2
+        uses: crazy-max/ghaction-github-status@v3
         with:
           pages_threshold: major_outage
       -
