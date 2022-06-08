@@ -3,7 +3,7 @@ module github.com/crazy-max/diun/v4
 go 1.18
 
 require (
-	github.com/AlecAivazis/survey/v2 v2.3.4
+	github.com/AlecAivazis/survey/v2 v2.3.5
 	github.com/alecthomas/kong v0.5.0
 	github.com/bmatcuk/doublestar/v3 v3.0.0
 	github.com/containerd/containerd v1.6.3-0.20220401172941-5ff8fce1fcc6
