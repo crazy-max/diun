@@ -89,6 +89,7 @@ plugins:
   - git-revision-date-localized:
       type: iso_datetime
       enable_creation_date: true
+      fallback_to_build_date: true
   - macros:
       j2_block_start_string: '[[%'
       j2_block_end_string: '%]]'
