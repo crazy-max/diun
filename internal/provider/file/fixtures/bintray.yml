@@ -4,4 +4,5 @@
   watch_repo: true
   notify_on:
     - new
+  sort_tags: lexicographical
   max_tags: 50

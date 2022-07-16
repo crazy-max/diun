@@ -124,6 +124,7 @@ func (di *Diun) createJob(job model.Job) {
 	tags, err := job.Registry.Tags(registry.TagsOptions{
 		Image:   job.RegImage,
 		Max:     job.Image.MaxTags,
+		Sort:    job.Image.SortTags,
 		Include: job.Image.IncludeTags,
 		Exclude: job.Image.ExcludeTags,
 	})

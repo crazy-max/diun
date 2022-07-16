@@ -360,6 +360,7 @@ func TestLoadEnv(t *testing.T) {
 	}
 
 	for _, tt := range testCases {
+		tt := tt
 		t.Run(tt.desc, func(t *testing.T) {
 			UnsetEnv("DIUN_")
 
@@ -484,6 +485,7 @@ for <code>{{ .Entry.Manifest.Platform }}</code> platform.
 	}
 
 	for _, tt := range testCases {
+		tt := tt
 		t.Run(tt.desc, func(t *testing.T) {
 			UnsetEnv("DIUN_")
 

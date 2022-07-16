@@ -54,34 +54,34 @@ The title and body of a notification message can be customized for each notifier
 
 Templating is supported with the following fields:
 
-| Key                              | Description |
-|----------------------------------|-------------|
-| `.Meta.ID`                       | App ID: `diun` |
-| `.Meta.Name`                     | App Name: `Diun` |
-| `.Meta.Desc`                     | App description: `Docker image update notifier` |
-| `.Meta.URL`                      | App repo URL: `https://github.com/crazy-max/diun` |
-| `.Meta.Logo`                     | App logo URL: `https://raw.githubusercontent.com/crazy-max/diun/master/.res/diun.png` |
-| `.Meta.Author`                   | App author: `CrazyMax` |
-| `.Meta.Version`                  | App version: `v4.19.0` |
-| `.Meta.UserAgent`                | App user-agent used to talk with registries: `diun/4.19.0 go/1.16 Linux` |
-| `.Meta.Hostname`                 | Hostname |
-| `.Entry.Status`                  | Entry status. Can be `new`, `update`, `unchange`, `skip` or `error` |
-| `.Entry.Provider`                | [Provider](config/providers.md) used |
-| `.Entry.Image`                   | Docker image name. e.g. `docker.io/crazymax/diun:latest` |
-| `.Entry.Image.Domain`            | Docker image domain. e.g. `docker.io` |
-| `.Entry.Image.Path`              | Docker image path. e.g. `crazymax/diun` |
-| `.Entry.Image.Tag`               | Docker image tag. e.g. `latest` |
-| `.Entry.Image.Digest`            | Docker image digest |
-| `.Entry.Image.HubLink`           | Docker image hub link (if available). e.g. `https://hub.docker.com/r/crazymax/diun` |
-| `.Entry.Manifest.Name`           | Manifest name. e.g. `docker.io/crazymax/diun` |
-| `.Entry.Manifest.Tag`            | Manifest tag. e.g. `latest` |
-| `.Entry.Manifest.MIMEType`       | Manifest MIME type. e.g. `application/vnd.docker.distribution.manifest.list.v2+json` |
-| `.Entry.Manifest.Digest`         | Manifest digest |
-| `.Entry.Manifest.Created`        | Manifest created date. e.g. `2021-06-20T12:23:56Z` |
-| `.Entry.Manifest.DockerVersion`  | Version of Docker that was used to build the image. e.g. `20.10.7` |
-| `.Entry.Manifest.Labels`         | Image labels |
-| `.Entry.Manifest.Layers`         | Image layers |
-| `.Entry.Manifest.Platform`       | Platform that the image is runs on. e.g. `linux/amd64` |
+| Key                             | Description                                                                           |
+|---------------------------------|---------------------------------------------------------------------------------------|
+| `.Meta.ID`                      | App ID: `diun`                                                                        |
+| `.Meta.Name`                    | App Name: `Diun`                                                                      |
+| `.Meta.Desc`                    | App description: `Docker image update notifier`                                       |
+| `.Meta.URL`                     | App repo URL: `https://github.com/crazy-max/diun`                                     |
+| `.Meta.Logo`                    | App logo URL: `https://raw.githubusercontent.com/crazy-max/diun/master/.res/diun.png` |
+| `.Meta.Author`                  | App author: `CrazyMax`                                                                |
+| `.Meta.Version`                 | App version: `v4.19.0`                                                                |
+| `.Meta.UserAgent`               | App user-agent used to talk with registries: `diun/4.19.0 go/1.16 Linux`              |
+| `.Meta.Hostname`                | Hostname                                                                              |
+| `.Entry.Status`                 | Entry status. Can be `new`, `update`, `unchange`, `skip` or `error`                   |
+| `.Entry.Provider`               | [Provider](config/providers.md) used                                                  |
+| `.Entry.Image`                  | Docker image name. e.g. `docker.io/crazymax/diun:latest`                              |
+| `.Entry.Image.Domain`           | Docker image domain. e.g. `docker.io`                                                 |
+| `.Entry.Image.Path`             | Docker image path. e.g. `crazymax/diun`                                               |
+| `.Entry.Image.Tag`              | Docker image tag. e.g. `latest`                                                       |
+| `.Entry.Image.Digest`           | Docker image digest                                                                   |
+| `.Entry.Image.HubLink`          | Docker image hub link (if available). e.g. `https://hub.docker.com/r/crazymax/diun`   |
+| `.Entry.Manifest.Name`          | Manifest name. e.g. `docker.io/crazymax/diun`                                         |
+| `.Entry.Manifest.Tag`           | Manifest tag. e.g. `latest`                                                           |
+| `.Entry.Manifest.MIMEType`      | Manifest MIME type. e.g. `application/vnd.docker.distribution.manifest.list.v2+json`  |
+| `.Entry.Manifest.Digest`        | Manifest digest                                                                       |
+| `.Entry.Manifest.Created`       | Manifest created date. e.g. `2021-06-20T12:23:56Z`                                    |
+| `.Entry.Manifest.DockerVersion` | Version of Docker that was used to build the image. e.g. `20.10.7`                    |
+| `.Entry.Manifest.Labels`        | Image labels                                                                          |
+| `.Entry.Manifest.Layers`        | Image layers                                                                          |
+| `.Entry.Manifest.Platform`      | Platform that the image is runs on. e.g. `linux/amd64`                                |
 
 ## Authentication against the registry
 
@@ -204,6 +204,97 @@ Or you can tweak the [`schedule` setting](config/watch.md#schedule) with somethi
 
 !!! warning
     Also be careful with the `watch_repo` setting as it will fetch manifest for **ALL** tags available for the image.
+
+## Tags sorting when using `watch_repo`
+
+When you use the `watch_repo` setting, Diun will fetch all tags available for
+the image. Depending on the registry, order of the tags list can change.
+
+You can use the `sort_tags` setting available for each provider to use a
+specific sorting method for the tags list.
+
+* `default`: do not sort and use the expected tags list from the registry
+* `reverse`: reverse order for the tags list from the registry
+* `lexicographical`: sort the tags list lexicographically
+* `semver`: sort the tags list using semantic versioning
+
+Given the following list of tags received from the registry:
+
+```json
+[
+  "0.1.0",
+  "0.4.0",
+  "3.0.0-beta.1",
+  "3.0.0-beta.4",
+  "4",
+  "4.0.0",
+  "4.0.0-beta.1",
+  "4.1.0",
+  "4.1.1",
+  "4.10.0",
+  "4.11.0",
+  "4.20",
+  "4.20.0",
+  "4.20.1",
+  "4.3.0",
+  "4.3.1",
+  "4.9.0",
+  "edge",
+  "latest"
+]
+```
+
+Here is the result for `reverse`:
+
+```json
+[
+  "latest",
+  "edge",
+  "4.9.0",
+  "4.3.1",
+  "4.3.0",
+  "4.20.1",
+  "4.20.0",
+  "4.20",
+  "4.11.0",
+  "4.10.0",
+  "4.1.1",
+  "4.1.0",
+  "4.0.0-beta.1",
+  "4.0.0",
+  "4",
+  "3.0.0-beta.4",
+  "3.0.0-beta.1",
+  "0.4.0",
+  "0.1.0"
+]
+```
+
+And for `semver`:
+
+```json
+[
+  "4.20.1",
+  "4.20.0",
+  "4.20",
+  "4.11.0",
+  "4.10.0",
+  "4.9.0",
+  "4.3.1",
+  "4.3.0",
+  "4.1.1",
+  "4.1.0",
+  "4.0.0",
+  "4",
+  "4.0.0-beta.1",
+  "3.0.0-beta.4",
+  "3.0.0-beta.1",
+  "0.4.0",
+  "0.1.0",
+  "edge",
+  "latest"
+]
+```
 
 ## Profiling
 

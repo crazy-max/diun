@@ -39,6 +39,7 @@ require (
 	github.com/stretchr/testify v1.8.0
 	github.com/tidwall/pretty v1.2.0
 	go.etcd.io/bbolt v1.3.6
+	golang.org/x/mod v0.5.1
 	golang.org/x/sys v0.0.0-20220422013727-9388b58f7150
 	google.golang.org/grpc v1.48.0
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.2.0

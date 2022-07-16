@@ -5,6 +5,7 @@ import (
 
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/internal/provider/file"
+	"github.com/crazy-max/diun/v4/pkg/registry"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -16,6 +17,7 @@ var (
 				Name:     "jfrog-docker-reg2.bintray.io/jfrog/artifactory-oss:4.0.0",
 				RegOpt:   "bintrayoptions",
 				NotifyOn: model.NotifyOnDefaults,
+				SortTags: registry.SortTagReverse,
 			},
 		},
 		{
@@ -26,7 +28,8 @@ var (
 				NotifyOn: []model.NotifyOn{
 					model.NotifyOnNew,
 				},
-				MaxTags: 50,
+				SortTags: registry.SortTagLexicographical,
+				MaxTags:  50,
 			},
 		},
 	}
@@ -37,6 +40,7 @@ var (
 				Name:     "docker.io/crazymax/nextcloud:latest",
 				RegOpt:   "myregistry",
 				NotifyOn: model.NotifyOnDefaults,
+				SortTags: registry.SortTagReverse,
 			},
 		},
 		{
@@ -45,6 +49,7 @@ var (
 				Name:      "crazymax/swarm-cronjob",
 				WatchRepo: true,
 				NotifyOn:  model.NotifyOnDefaults,
+				SortTags:  registry.SortTagSemver,
 				IncludeTags: []string{
 					`^1\.2\..*`,
 				},
@@ -57,6 +62,7 @@ var (
 				WatchRepo: true,
 				NotifyOn:  model.NotifyOnDefaults,
 				MaxTags:   10,
+				SortTags:  registry.SortTagReverse,
 				IncludeTags: []string{
 					`^(0|[1-9]\d*)\..*`,
 				},
@@ -68,6 +74,7 @@ var (
 				Name:      "traefik",
 				WatchRepo: true,
 				NotifyOn:  model.NotifyOnDefaults,
+				SortTags:  registry.SortTagDefault,
 			},
 		},
 		{
@@ -75,6 +82,7 @@ var (
 			Image: model.Image{
 				Name:     "alpine",
 				NotifyOn: model.NotifyOnDefaults,
+				SortTags: registry.SortTagReverse,
 				Platform: model.ImagePlatform{
 					OS:      "linux",
 					Arch:    "arm64",
@@ -87,6 +95,7 @@ var (
 			Image: model.Image{
 				Name:     "docker.io/graylog/graylog:3.2.0",
 				NotifyOn: model.NotifyOnDefaults,
+				SortTags: registry.SortTagReverse,
 			},
 		},
 		{
@@ -94,6 +103,7 @@ var (
 			Image: model.Image{
 				Name:     "jacobalberty/unifi:5.9",
 				NotifyOn: model.NotifyOnDefaults,
+				SortTags: registry.SortTagReverse,
 			},
 		},
 		{
@@ -102,6 +112,7 @@ var (
 				Name:      "crazymax/ddns-route53",
 				WatchRepo: true,
 				NotifyOn:  model.NotifyOnDefaults,
+				SortTags:  registry.SortTagReverse,
 				IncludeTags: []string{
 					`^1\..*`,
 				},
@@ -114,6 +125,7 @@ var (
 			Image: model.Image{
 				Name:     "quay.io/coreos/hyperkube",
 				NotifyOn: model.NotifyOnDefaults,
+				SortTags: registry.SortTagReverse,
 			},
 		},
 		{
@@ -121,6 +133,7 @@ var (
 			Image: model.Image{
 				Name:     "quay.io/coreos/hyperkube:v1.1.7-coreos.1",
 				NotifyOn: model.NotifyOnDefaults,
+				SortTags: registry.SortTagReverse,
 			},
 		},
 	}
