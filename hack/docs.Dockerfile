@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-ARG MKDOCS_VERSION="8.1.8"
+ARG MKDOCS_VERSION="8.3.9"
 
 FROM squidfunk/mkdocs-material:${MKDOCS_VERSION} AS base
 RUN apk add --no-cache git git-fast-import openssl \
