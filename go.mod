@@ -23,7 +23,7 @@ require (
 	github.com/jedib0t/go-pretty/v6 v6.3.1
 	github.com/matcornic/hermes/v2 v2.1.0
 	github.com/matrix-org/gomatrix v0.0.0-20210324163249-be2af5ef2e16
-	github.com/microcosm-cc/bluemonday v1.0.18
+	github.com/microcosm-cc/bluemonday v1.0.19
 	github.com/moby/buildkit v0.10.3
 	github.com/nlopes/slack v0.6.0
 	github.com/opencontainers/go-digest v1.0.0
