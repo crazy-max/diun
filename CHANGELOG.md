@@ -1,5 +1,32 @@
 # Changelog
 
+## 4.22.0 (2022/07/17)
+
+* Allow customizing the hub link (#648)
+* Use OCI image url label to override hub link (#646)
+* Tags sorting support (#645)
+* Alpine Linux 3.16 (#647)
+* Go 1.18 (#592)
+* MkDocs Material 8.3.9 (#644)
+* Explain roles required for rocketchat notification (#553)
+* Bump github.com/AlecAivazis/survey/v2 from 2.3.2 to 2.3.5 (#585 #625)
+* Bump github.com/alecthomas/kong from 0.3.0 to 0.6.1 (#549 #558 #576 #630)
+* Bump github.com/containerd/containerd from 1.5.9 to 1.6.0 (#557)
+* Bump github.com/containers/image/v5 from 5.19.0 to 5.21.1 (#552 #588 #603)
+* Bump github.com/docker/docker from 20.10.12 to 20.10.3-0.20220414164044-61404de7df1a (#575)
+* Bump github.com/eclipse/paho.mqtt.golang from 1.3.5 to 1.4.1 (#623)
+* Bump github.com/go-playground/validator/v10 from 10.10.0 to 10.11.0 (#568 #602)
+* Bump github.com/imdario/mergo from 0.3.12 to 0.3.13 (#617)
+* Bump github.com/jedib0t/go-pretty/v6 from 6.2.5 to 6.3.5 (#555 #584 #595 #642)
+* Bump github.com/microcosm-cc/bluemonday from 1.0.17 to 1.0.19 (#554 #636)
+* Bump github.com/moby/buildkit from 0.9.3 to 0.10.1-0.20220712094726-874eef9b70db (#578 #590 #610 #643)
+* Bump github.com/panjf2000/ants/v2 from 2.4.7 to 2.5.0 (#563 #611)
+* Bump github.com/rs/zerolog from 1.26.1 to 1.27.0 (#626)
+* Bump github.com/stretchr/testify from 1.7.1 to 1.8.0 (#635)
+* Bump google.golang.org/grpc from 1.45.0 to 1.48.0 (#615 #639)
+* Bump google.golang.org/protobuf from 1.27.1 to 1.28.0 (#582)
+* Bump k8s.io/client-go from 0.22.5 to 0.24.3 (#561 #580 #604 #640)
+
 ## 4.21.0 (2022/01/26)
 
 * Add `image prune` command (#519)
