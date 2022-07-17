@@ -182,6 +182,7 @@ The configuration file(s) defines a slice of images to analyze with the followin
 | `max_tags`         | `0`          | Maximum number of tags to watch if `watch_repo` enabled. `0` means all of them                                                                             |
 | `include_tags`     |              | List of regular expressions to include tags. Can be useful if you enable `watch_repo`                                                                      |
 | `exclude_tags`     |              | List of regular expressions to exclude tags. Can be useful if you enable `watch_repo`                                                                      |
+| `hub_link`         | _automatic_  | Set registry hub link for this image                                                                                                                       |
 | `platform.os`      | _automatic_  | Operating system to use as custom platform                                                                                                                 |
 | `platform.arch`    | _automatic_  | CPU architecture to use as custom platform                                                                                                                 |
 | `platform.variant` | _automatic_  | Variant of the CPU to use as custom platform                                                                                                               |

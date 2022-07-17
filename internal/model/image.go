@@ -14,6 +14,7 @@ type Image struct {
 	IncludeTags []string         `yaml:"include_tags,omitempty" json:",omitempty"`
 	ExcludeTags []string         `yaml:"exclude_tags,omitempty" json:",omitempty"`
 	HubTpl      string           `yaml:"hub_tpl,omitempty" json:",omitempty"`
+	HubLink     string           `yaml:"hub_link,omitempty" json:",omitempty"`
 }
 
 // ImagePlatform holds image platform configuration

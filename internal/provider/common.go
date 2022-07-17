@@ -72,6 +72,8 @@ func ValidateImage(image string, labels map[string]string, watchByDef bool) (img
 			img.ExcludeTags = strings.Split(value, ";")
 		case "diun.hub_tpl":
 			img.HubTpl = value
+		case "diun.hub_link":
+			img.HubLink = value
 		case "diun.platform":
 			platform, err := platforms.Parse(value)
 			if err != nil {

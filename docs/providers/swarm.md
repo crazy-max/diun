@@ -184,4 +184,5 @@ You can configure more finely the way to analyze the image of your service throu
 | `diun.max_tags`     | `0`          | Maximum number of tags to watch if `diun.watch_repo` enabled. `0` means all of them                                                                        |
 | `diun.include_tags` |              | Semicolon separated list of regular expressions to include tags. Can be useful if you enable `diun.watch_repo`                                             |
 | `diun.exclude_tags` |              | Semicolon separated list of regular expressions to exclude tags. Can be useful if you enable `diun.watch_repo`                                             |
+| `diun.hub_link`     | _automatic_  | Set registry hub link for this image                                                                                                                       |
 | `diun.platform`     | _automatic_  | Platform to use (e.g. `linux/amd64`)                                                                                                                       |

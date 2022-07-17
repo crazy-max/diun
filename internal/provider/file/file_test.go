@@ -137,6 +137,17 @@ var (
 			},
 		},
 	}
+	lscrFile = []model.Job{
+		{
+			Provider: "file",
+			Image: model.Image{
+				Name:     "lscr.io/linuxserver/heimdall",
+				NotifyOn: model.NotifyOnDefaults,
+				SortTags: registry.SortTagReverse,
+				HubLink:  "https://fleet.linuxserver.io/image?name=linuxserver/heimdall",
+			},
+		},
+	}
 )
 
 func TestListJobFilename(t *testing.T) {
@@ -150,5 +161,5 @@ func TestListJobDirectory(t *testing.T) {
 	fc := file.New(&model.PrdFile{
 		Directory: "./fixtures",
 	})
-	assert.Equal(t, append(append(bintrayFile, dockerhubFile...), quayFile...), fc.ListJob())
+	assert.Equal(t, append(append(bintrayFile, dockerhubFile...), append(lscrFile, quayFile...)...), fc.ListJob())
 }
