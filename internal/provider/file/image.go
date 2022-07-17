@@ -7,6 +7,7 @@ import (
 
 	"github.com/containerd/containerd/platforms"
 	"github.com/crazy-max/diun/v4/internal/model"
+	"github.com/crazy-max/diun/v4/pkg/registry"
 	ocispecs "github.com/opencontainers/image-spec/specs-go/v1"
 	"gopkg.in/yaml.v2"
 )
@@ -43,6 +44,17 @@ func (c *Client) listFileImage() []model.Image {
 							Msgf("unknown notify status %q", no)
 					}
 				}
+			}
+
+			// Check SortType
+			if item.SortTags == "" {
+				item.SortTags = registry.SortTagReverse
+			}
+			if !item.SortTags.Valid() {
+				c.logger.Error().
+					Str("file", file).
+					Str("img_name", item.Name).
+					Msgf("unknown sort tags type %q", item.SortTags)
 			}
 
 			// Check Platform

@@ -18,6 +18,7 @@ type Tags struct {
 type TagsOptions struct {
 	Image   Image
 	Max     int
+	Sort    SortTag
 	Include []string
 	Exclude []string
 }
@@ -43,6 +44,9 @@ func (c *Client) Tags(opts TagsOptions) (*Tags, error) {
 		Total:       len(tags),
 	}
 
+	// Sort tags
+	tags = SortTags(tags, opts.Sort)
+
 	// Filter
 	for _, tag := range tags {
 		if !utl.IsIncluded(tag, opts.Include) {
@@ -53,12 +57,6 @@ func (c *Client) Tags(opts TagsOptions) (*Tags, error) {
 			continue
 		}
 		res.List = append(res.List, tag)
-	}
-
-	// Reverse order (latest tags first)
-	for i := len(res.List)/2 - 1; i >= 0; i-- {
-		opp := len(res.List) - 1 - i
-		res.List[i], res.List[opp] = res.List[opp], res.List[i]
 	}
 
 	if opts.Max > 0 && len(res.List) >= opts.Max {

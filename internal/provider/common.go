@@ -7,6 +7,7 @@ import (
 
 	"github.com/containerd/containerd/platforms"
 	"github.com/crazy-max/diun/v4/internal/model"
+	"github.com/crazy-max/diun/v4/pkg/registry"
 )
 
 // ValidateImage returns a standard image through Docker labels
@@ -17,6 +18,7 @@ func ValidateImage(image string, labels map[string]string, watchByDef bool) (img
 	img = model.Image{
 		Name:     image,
 		NotifyOn: model.NotifyOnDefaults,
+		SortTags: registry.SortTagReverse,
 	}
 
 	if enableStr, ok := labels["diun.enable"]; ok {
@@ -51,6 +53,15 @@ func ValidateImage(image string, labels map[string]string, watchByDef bool) (img
 				}
 				img.NotifyOn = append(img.NotifyOn, notifyOn)
 			}
+		case "diun.sort_tags":
+			if value == "" {
+				break
+			}
+			sortTags := registry.SortTag(value)
+			if !sortTags.Valid() {
+				return img, fmt.Errorf("unknown sort tags type %q", value)
+			}
+			img.SortTags = sortTags
 		case "diun.max_tags":
 			if img.MaxTags, err = strconv.Atoi(value); err != nil {
 				return img, fmt.Errorf("cannot parse %s value of label %s", value, key)

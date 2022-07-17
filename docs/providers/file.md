@@ -172,15 +172,16 @@ Defines the path to the directory that contains the [configuration files](#yaml-
 
 The configuration file(s) defines a slice of images to analyze with the following fields:
 
-| Name                          | Default                          | Description   |
-|-------------------------------|----------------------------------|---------------|
-| `name`                        | `latest`                         | Docker image name to watch using `registry/path:tag` format. If registry omitted, `docker.io` will be used and if tag omitted, `latest` will be used |
-| `regopt`                      |                                  | [Registry options](../config/regopts.md) name to use |
-| `watch_repo`                  | `false`                          | Watch all tags of this image ([be careful](../faq.md#docker-hub-rate-limits) with this setting) |
-| `notify_on`                   | `new;update`                     | Semicolon separated list of status to be notified: `new`, `update`. |
-| `max_tags`                    | `0`                              | Maximum number of tags to watch if `watch_repo` enabled. `0` means all of them |
-| `include_tags`                |                                  | List of regular expressions to include tags. Can be useful if you enable `watch_repo` |
-| `exclude_tags`                |                                  | List of regular expressions to exclude tags. Can be useful if you enable `watch_repo` |
-| `platform.os`                 | _automatic_                      | Operating system to use as custom platform |
-| `platform.arch`               | _automatic_                      | CPU architecture to use as custom platform |
-| `platform.variant`            | _automatic_                      | Variant of the CPU to use as custom platform |
+| Name               | Default      | Description                                                                                                                                                |
+|--------------------|--------------|------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `name`             | `latest`     | Docker image name to watch using `registry/path:tag` format. If registry omitted, `docker.io` will be used and if tag omitted, `latest` will be used       |
+| `regopt`           |              | [Registry options](../config/regopts.md) name to use                                                                                                       |
+| `watch_repo`       | `false`      | Watch all tags of this image ([be careful](../faq.md#docker-hub-rate-limits) with this setting)                                                            |
+| `notify_on`        | `new;update` | Semicolon separated list of status to be notified: `new`, `update`                                                                                         |
+| `sort_tags`        | `reverse`    | [Sort tags method](../faq.md#tags-sorting-when-using-watch_repo) if `diun.watch_repo` enabled. One of `default`, `reverse`, `numerical`, `lexicographical` |
+| `max_tags`         | `0`          | Maximum number of tags to watch if `watch_repo` enabled. `0` means all of them                                                                             |
+| `include_tags`     |              | List of regular expressions to include tags. Can be useful if you enable `watch_repo`                                                                      |
+| `exclude_tags`     |              | List of regular expressions to exclude tags. Can be useful if you enable `watch_repo`                                                                      |
+| `platform.os`      | _automatic_  | Operating system to use as custom platform                                                                                                                 |
+| `platform.arch`    | _automatic_  | CPU architecture to use as custom platform                                                                                                                 |
+| `platform.variant` | _automatic_  | Variant of the CPU to use as custom platform                                                                                                               |

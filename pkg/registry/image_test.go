@@ -126,6 +126,7 @@ func TestParseImage(t *testing.T) {
 	}
 
 	for _, tt := range testCases {
+		tt := tt
 		t.Run(tt.desc, func(t *testing.T) {
 			img, err := registry.ParseImage(tt.parseOpts)
 			if err != nil {
@@ -239,6 +240,7 @@ func TestHubLink(t *testing.T) {
 	}
 
 	for _, tt := range testCases {
+		tt := tt
 		t.Run(tt.desc, func(t *testing.T) {
 			img, err := registry.ParseImage(tt.parseOpts)
 			if err != nil {

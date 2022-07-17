@@ -106,12 +106,13 @@ List of path patterns with [matching and globbing supporting patterns](https://g
 
 The following annotations can be added as comments before the target instruction to customize the image analysis:
 
-| Name                          | Default       | Description   |
-|-------------------------------|---------------|---------------|
-| `diun.regopt`                 |               | [Registry options](../config/regopts.md) name to use |
-| `diun.watch_repo`             | `false`       | Watch all tags of this image |
-| `diun.notify_on`              | `new;update`  | Semicolon separated list of status to be notified: `new`, `update`. |
-| `diun.max_tags`               | `0`           | Maximum number of tags to watch if `watch_repo` enabled. `0` means all of them |
-| `diun.include_tags`           |               | Semicolon separated list of regular expressions to include tags. Can be useful if you enable `diun.watch_repo` |
-| `diun.exclude_tags`           |               | Semicolon separated list of regular expressions to exclude tags. Can be useful if you enable `diun.watch_repo` |
-| `diun.platform`               | _automatic_   | Platform to use (e.g. `linux/amd64`) |
+| Name                | Default      | Description                                                                                                                                                |
+|---------------------|--------------|------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `diun.regopt`       |              | [Registry options](../config/regopts.md) name to use                                                                                                       |
+| `diun.watch_repo`   | `false`      | Watch all tags of this image                                                                                                                               |
+| `diun.notify_on`    | `new;update` | Semicolon separated list of status to be notified: `new`, `update`                                                                                         |
+| `diun.sort_tags`    | `reverse`    | [Sort tags method](../faq.md#tags-sorting-when-using-watch_repo) if `diun.watch_repo` enabled. One of `default`, `reverse`, `numerical`, `lexicographical` |
+| `diun.max_tags`     | `0`          | Maximum number of tags to watch if `watch_repo` enabled. `0` means all of them                                                                             |
+| `diun.include_tags` |              | Semicolon separated list of regular expressions to include tags. Can be useful if you enable `diun.watch_repo`                                             |
+| `diun.exclude_tags` |              | Semicolon separated list of regular expressions to exclude tags. Can be useful if you enable `diun.watch_repo`                                             |
+| `diun.platform`     | _automatic_  | Platform to use (e.g. `linux/amd64`)                                                                                                                       |

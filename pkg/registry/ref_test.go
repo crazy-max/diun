@@ -52,6 +52,7 @@ func TestParseReference(t *testing.T) {
 	}
 
 	for _, tt := range testCases {
+		tt := tt
 		t.Run(tt.input, func(t *testing.T) {
 			ref, err := registry.ParseReference(tt.input)
 			if tt.wantErr {

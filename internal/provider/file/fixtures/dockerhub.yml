@@ -2,15 +2,18 @@
   regopt: myregistry
 - name: crazymax/swarm-cronjob
   watch_repo: true
+  sort_tags: semver
   include_tags:
     - ^1\.2\..*
 - name: docker.io/portainer/portainer
   watch_repo: true
   max_tags: 10
+  sort_tags: reverse
   include_tags:
     - ^(0|[1-9]\d*)\..*
 - name: traefik
   watch_repo: true
+  sort_tags: default
 - name: alpine
   platform:
     os: linux
