@@ -198,6 +198,10 @@ func (di *Diun) runJob(job model.Job) (entry model.NotifEntry) {
 		return
 	}
 
+	if v, ok := entry.Manifest.Labels["org.opencontainers.image.url"]; ok {
+		entry.Image.HubLink = v
+	}
+
 	if len(dbManifest.Name) == 0 {
 		entry.Status = model.ImageStatusNew
 		sublog.Info().Msg("New image found")
