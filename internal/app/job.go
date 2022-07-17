@@ -32,6 +32,7 @@ func (di *Diun) createJob(job model.Job) {
 		return
 	}
 	job.RegImage = prvImage
+	job.HubLinkOverride = job.Image.HubLink
 
 	// First check?
 	job.FirstCheck, err = di.db.First(job.RegImage)
@@ -200,6 +201,9 @@ func (di *Diun) runJob(job model.Job) (entry model.NotifEntry) {
 
 	if v, ok := entry.Manifest.Labels["org.opencontainers.image.url"]; ok {
 		entry.Image.HubLink = v
+	}
+	if job.HubLinkOverride != "" {
+		entry.Image.HubLink = job.HubLinkOverride
 	}
 
 	if len(dbManifest.Name) == 0 {

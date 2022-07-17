@@ -1,0 +1,2 @@
+- name: lscr.io/linuxserver/heimdall
+  hub_link: https://fleet.linuxserver.io/image?name=linuxserver/heimdall
