@@ -178,7 +178,7 @@ You can configure more finely the way to analyze the image of your container thr
 | `diun.regopt`       |              | [Registry options](../config/regopts.md) name to use                                                                                                       |
 | `diun.watch_repo`   | `false`      | Watch all tags of this container image ([be careful](../faq.md#docker-hub-rate-limits) with this setting)                                                  |
 | `diun.notify_on`    | `new;update` | Semicolon separated list of status to be notified: `new`, `update`                                                                                         |
-| `diun.sort_tags`    | `reverse`    | [Sort tags method](../faq.md#tags-sorting-when-using-watch_repo) if `diun.watch_repo` enabled. One of `default`, `reverse`, `numerical`, `lexicographical` |
+| `diun.sort_tags`    | `reverse`    | [Sort tags method](../faq.md#tags-sorting-when-using-watch_repo) if `diun.watch_repo` enabled. One of `default`, `reverse`, `semver`, `lexicographical` |
 | `diun.max_tags`     | `0`          | Maximum number of tags to watch if `diun.watch_repo` enabled. `0` means all of them                                                                        |
 | `diun.include_tags` |              | Semicolon separated list of regular expressions to include tags. Can be useful if you enable `diun.watch_repo`                                             |
 | `diun.exclude_tags` |              | Semicolon separated list of regular expressions to exclude tags. Can be useful if you enable `diun.watch_repo`                                             |
