@@ -14,6 +14,7 @@ import (
 	"github.com/crazy-max/diun/v4/internal/notif/pushover"
 	"github.com/crazy-max/diun/v4/internal/notif/rocketchat"
 	"github.com/crazy-max/diun/v4/internal/notif/script"
+	"github.com/crazy-max/diun/v4/internal/notif/signalrest"
 	"github.com/crazy-max/diun/v4/internal/notif/slack"
 	"github.com/crazy-max/diun/v4/internal/notif/teams"
 	"github.com/crazy-max/diun/v4/internal/notif/telegram"
@@ -68,6 +69,9 @@ func New(config *model.Notif, meta model.Meta) (*Client, error) {
 	}
 	if config.Script != nil {
 		c.notifiers = append(c.notifiers, script.New(config.Script, meta))
+	}
+	if config.SignalRest != nil {
+		c.notifiers = append(c.notifiers, signalrest.New(config.SignalRest, meta))
 	}
 	if config.Slack != nil {
 		c.notifiers = append(c.notifiers, slack.New(config.Slack, meta))

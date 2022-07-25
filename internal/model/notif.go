@@ -40,6 +40,7 @@ type Notif struct {
 	Pushover   *NotifPushover   `yaml:"pushover,omitempty" json:"pushover,omitempty"`
 	RocketChat *NotifRocketChat `yaml:"rocketchat,omitempty" json:"rocketchat,omitempty"`
 	Script     *NotifScript     `yaml:"script,omitempty" json:"script,omitempty"`
+	SignalRest *NotifSignalRest `yaml:"signalrest,omitempty" json:"signalrest,omitempty"`
 	Slack      *NotifSlack      `yaml:"slack,omitempty" json:"slack,omitempty"`
 	Teams      *NotifTeams      `yaml:"teams,omitempty" json:"teams,omitempty"`
 	Telegram   *NotifTelegram   `yaml:"telegram,omitempty" json:"telegram,omitempty"`

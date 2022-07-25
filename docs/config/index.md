@@ -28,12 +28,12 @@ You can override this using the [`--config` flag or `CONFIG` env var with `serve
     ```yaml
     db:
       path: diun.db
-    
+
     watch:
       workers: 10
       schedule: "0 */6 * * *"
       firstCheckNotif: false
-    
+
     notif:
       amqp:
         host: localhost
@@ -82,7 +82,7 @@ You can override this using the [`--config` flag or `CONFIG` env var with `serve
           content-type: application/json
           authorization: Token123456
         timeout: 10s
-    
+
     regopts:
       - name: "myregistry"
         username: foo
@@ -93,7 +93,7 @@ You can override this using the [`--config` flag or `CONFIG` env var with `serve
         selector: image
         username: foo2
         password: bar2
-    
+
     providers:
       docker:
         watchStopped: true
@@ -115,12 +115,12 @@ All configuration from file can be transposed into environment variables. As an 
     ```yaml
     db:
       path: diun.db
-    
+
     watch:
       workers: 10
       schedule: "0 */6 * * *"
       firstCheckNotif: false
-    
+
     notif:
       gotify:
         endpoint: http://gotify.foo.com
@@ -139,7 +139,7 @@ All configuration from file can be transposed into environment variables. As an 
           content-type: application/json
           authorization: Token123456
         timeout: 10s
-    
+
     regopts:
       - name: "docker.io"
         selector: image
@@ -164,25 +164,25 @@ Can be transposed to:
 ??? example "environment variables"
     ```
     DIUN_DB_PATH=diun.db
-    
+
     DIUN_WATCH_WORKERS=10
     DIUN_WATCH_SCHEDULE=0 */6 * * *
     DIUN_WATCH_FIRSTCHECKNOTIF=false
-    
+
     DIUN_NOTIF_GOTIFY_ENDPOINT=http://gotify.foo.com
     DIUN_NOTIF_GOTIFY_TOKEN=Token123456
     DIUN_NOTIF_GOTIFY_PRIORITY=1
     DIUN_NOTIF_GOTIFY_TIMEOUT=10s
-    
+
     DIUN_NOTIF_TELEGRAM_TOKEN=aabbccdd:11223344
     DIUN_NOTIF_TELEGRAM_CHATIDS=123456789,987654321
-    
+
     DIUN_NOTIF_WEBHOOK_ENDPOINT=http://webhook.foo.com/sd54qad89azd5a
     DIUN_NOTIF_WEBHOOK_METHOD=GET
     DIUN_NOTIF_WEBHOOK_HEADERS_CONTENT-TYPE=application/json
     DIUN_NOTIF_WEBHOOK_HEADERS_AUTHORIZATION=Token123456
     DIUN_NOTIF_WEBHOOK_TIMEOUT=10s
-    
+
     DIUN_REGOPTS_0_NAME=docker.io
     DIUN_REGOPTS_0_SELECTOR=image
     DIUN_REGOPTS_0_USERNAME=foo
@@ -192,7 +192,7 @@ Can be transposed to:
     DIUN_REGOPTS_1_USERNAME=fii
     DIUN_REGOPTS_1_PASSWORD=bor
     DIUN_REGOPTS_1_TIMEOUT=20s
-    
+
     PROVIDERS_KUBERNETES_TLSINSECURE=false
     PROVIDERS_KUBERNETES_NAMESPACES=default,production
     ```
@@ -212,6 +212,7 @@ Can be transposed to:
     * [rocketchat](../notif/rocketchat.md)
     * [script](../notif/script.md)
     * [slack](../notif/slack.md)
+    * [signal-rest](../notif/signalrest.md)
     * [teams](../notif/teams.md)
     * [telegram](../notif/telegram.md)
     * [webhook](../notif/webhook.md)

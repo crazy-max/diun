@@ -9,6 +9,7 @@
 * [`pushover`](../notif/pushover.md)
 * [`rocketchat`](../notif/rocketchat.md)
 * [`script`](../notif/script.md)
+* [`signal-rest`](../notif/signalrest.md)
 * [`slack`](../notif/slack.md)
 * [`teams`](../notif/teams.md)
 * [`telegram`](../notif/telegram.md)

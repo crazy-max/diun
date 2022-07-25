@@ -125,6 +125,7 @@ nav:
     - Pushover: notif/pushover.md
     - Rocket.Chat: notif/rocketchat.md
     - Script: notif/script.md
+    - Signal (REST API): notif/signalrest.md
     - Slack: notif/slack.md
     - Teams: notif/teams.md
     - Telegram: notif/telegram.md
