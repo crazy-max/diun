@@ -67,6 +67,6 @@ func (c *Client) NotifTest(ctx context.Context, request *pb.NotifTestRequest) (*
 	}
 
 	return &pb.NotifTestResponse{
-		Message: fmt.Sprintf("Notifcation sent for %s notifier(s)", strings.Join(sent, ", ")),
+		Message: fmt.Sprintf("Notification sent for %s notifier(s)", strings.Join(sent, ", ")),
 	}, nil
 }
