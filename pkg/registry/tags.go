@@ -44,6 +44,9 @@ func (c *Client) Tags(opts TagsOptions) (*Tags, error) {
 		Total:       len(tags),
 	}
 
+	// Filter tags
+	tags = ExtractVersions(tags, opts.Include)
+
 	// Sort tags
 	tags = SortTags(tags, opts.Sort)
 

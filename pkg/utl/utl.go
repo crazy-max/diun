@@ -3,6 +3,7 @@ package utl
 import (
 	"os"
 	"regexp"
+	"strings"
 	"time"
 )
 
@@ -92,4 +93,21 @@ func Contains(s []string, e string) bool {
 		}
 	}
 	return false
+}
+
+// ExtractCaptureRegex extracts capture regex if capture groups are defined, if not it returns original string
+func ExtractCaptureRegex(source, regex string) string {
+	re, err := regexp.Compile(regex)
+
+	if err != nil {
+		return source
+	}
+
+	result := re.FindStringSubmatch(source)
+
+	if len(result) > 1 {
+		return strings.Join(result[1:(len(result))], "")
+	}
+
+	return source
 }

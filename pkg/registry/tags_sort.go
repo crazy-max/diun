@@ -5,8 +5,20 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/crazy-max/diun/v4/pkg/utl"
 	"golang.org/x/mod/semver"
 )
+
+// ExtractVersions extracts versions from tags using capture groups if applicable
+func ExtractVersions(tags, includes []string) []string {
+	for _, include := range includes {
+		for t, tag := range tags {
+			tags[t] = utl.ExtractCaptureRegex(tag, include)
+		}
+	}
+
+	return tags
+}
 
 // SortTags sorts tags list
 func SortTags(tags []string, sortTag SortTag) []string {

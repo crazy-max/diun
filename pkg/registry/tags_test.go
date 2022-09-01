@@ -28,6 +28,19 @@ func TestTags(t *testing.T) {
 	assert.True(t, len(tags.List) > 0)
 }
 
+func TestTagsExtraction(t *testing.T) {
+	repotags := []string{
+		"latest",
+		"v-1.0.0",
+		"version-1.1.0",
+		"v-1.2.0",
+		"version-1.2.3",
+	}
+
+	tags := registry.ExtractVersions(repotags, []string{`(v)-(\d+\.\d+\.\d+)`, `version-(\d+\.\d+\.\d+)`})
+	assert.Equal(t, []string{"latest", "v1.0.0", "1.1.0", "v1.2.0", "1.2.3"}, tags)
+}
+
 func TestTagsSort(t *testing.T) {
 	repotags := []string{
 		"0.1.0",
