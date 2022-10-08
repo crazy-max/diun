@@ -37,7 +37,7 @@ require (
 	github.com/sirupsen/logrus v1.8.1
 	github.com/streadway/amqp v1.0.0
 	github.com/stretchr/testify v1.8.0
-	github.com/tidwall/pretty v1.2.0
+	github.com/tidwall/pretty v1.2.1
 	go.etcd.io/bbolt v1.3.6
 	golang.org/x/mod v0.5.1
 	golang.org/x/sys v0.0.0-20220422013727-9388b58f7150
