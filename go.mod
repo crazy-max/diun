@@ -6,7 +6,7 @@ require (
 	github.com/AlecAivazis/survey/v2 v2.3.5
 	github.com/alecthomas/kong v0.6.1
 	github.com/bmatcuk/doublestar/v3 v3.0.0
-	github.com/containerd/containerd v1.6.6
+	github.com/containerd/containerd v1.6.8
 	github.com/containers/image/v5 v5.21.1
 	github.com/crazy-max/gohealthchecks v0.3.0
 	github.com/crazy-max/gonfig v0.6.0
@@ -15,7 +15,7 @@ require (
 	github.com/docker/go-units v0.4.0
 	github.com/eclipse/paho.mqtt.golang v1.4.1
 	github.com/go-gomail/gomail v0.0.0-20160411212932-81ebce5c23df
-	github.com/go-playground/validator/v10 v10.11.0
+	github.com/go-playground/validator/v10 v10.11.1
 	github.com/go-telegram-bot-api/telegram-bot-api v4.6.4+incompatible
 	github.com/gregdel/pushover v1.1.0
 	github.com/hako/durafmt v0.0.0-20210608085754-5c1018a4e16b
