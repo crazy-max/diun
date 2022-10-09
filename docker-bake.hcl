@@ -1,5 +1,5 @@
 variable "GO_VERSION" {
-  default = "1.18"
+  default = "1.19"
 }
 
 // GITHUB_REF is the actual ref that triggers the workflow
