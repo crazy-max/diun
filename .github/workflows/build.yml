@@ -113,15 +113,16 @@ jobs:
           targets: artifact-all
           pull: true
       -
-        name: Move artifacts
-        run: |
-          mv ./dist/**/* ./dist/
+        name: Release
+        uses: docker/bake-action@v2
+        with:
+          targets: release
       -
         name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
           name: diun
-          path: ./dist/*
+          path: ./release/*
           if-no-files-found: error
       -
         name: Build image
@@ -140,8 +141,7 @@ jobs:
         with:
           draft: true
           files: |
-            dist/*.tar.gz
-            dist/*.zip
+            release/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       -

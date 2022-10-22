@@ -79,6 +79,20 @@ EOT
 FROM scratch AS artifact
 COPY --link --from=build-artifact /out /
 
+FROM scratch AS artifacts
+FROM --platform=$BUILDPLATFORM alpine:${ALPINE_VERSION} AS releaser
+RUN apk add --no-cache bash coreutils
+WORKDIR /out
+RUN --mount=from=artifacts,source=.,target=/artifacts <<EOT
+  set -e
+  cp /artifacts/**/* /out/ 2>/dev/null || cp /artifacts/* /out/
+  sha256sum -b diun_* > ./checksums.txt
+  sha256sum -c --strict checksums.txt
+EOT
+
+FROM scratch AS release
+COPY --link --from=releaser /out /
+
 FROM alpine:${ALPINE_VERSION}
 RUN apk --update --no-cache add ca-certificates openssl
 COPY --from=build /usr/bin/diun /usr/local/bin/diun
