@@ -1,9 +1,1 @@
-/.idea
-/*.iml
-
-/.dev
 /bin
-/dist
-/release
-/site
-/coverage.txt

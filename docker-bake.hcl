@@ -2,6 +2,10 @@ variable "GO_VERSION" {
   default = "1.19"
 }
 
+variable "DESTDIR" {
+  default = "./bin"
+}
+
 target "_common" {
   args = {
     GO_VERSION = GO_VERSION
@@ -20,13 +24,13 @@ group "default" {
 target "binary" {
   inherits = ["_common"]
   target = "binary"
-  output = ["./bin"]
+  output = ["${DESTDIR}/build"]
 }
 
 target "artifact" {
   inherits = ["_common"]
   target = "artifact"
-  output = ["./dist"]
+  output = ["${DESTDIR}/artifact"]
 }
 
 target "artifact-all" {
@@ -51,9 +55,9 @@ target "artifact-all" {
 
 target "release" {
   target = "release"
-  output = ["./release"]
+  output = ["${DESTDIR}/release"]
   contexts = {
-    artifacts = "./dist"
+    artifacts = "${DESTDIR}/artifact"
   }
 }
 
@@ -81,7 +85,7 @@ target "image-all" {
 target "test" {
   inherits = ["_common"]
   target = "test-coverage"
-  output = ["."]
+  output = ["${DESTDIR}/coverage"]
 }
 
 target "vendor" {
@@ -101,7 +105,7 @@ target "gen" {
 target "docs" {
   dockerfile = "./hack/docs.Dockerfile"
   target = "release"
-  output = ["./site"]
+  output = ["${DESTDIR}/site"]
 }
 
 target "gomod-outdated" {

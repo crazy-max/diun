@@ -11,6 +11,9 @@ on:
       - 'v*'
   pull_request:
 
+env:
+  DESTDIR: ./bin
+
 jobs:
   publish:
     runs-on: ubuntu-latest
@@ -40,7 +43,7 @@ jobs:
         uses: crazy-max/ghaction-github-pages@v3
         with:
           target_branch: gh-pages
-          build_dir: site
+          build_dir: ${{ env.DESTDIR }}/site
           jekyll: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -15,6 +15,7 @@ on:
 env:
   DOCKERHUB_SLUG: crazymax/diun
   GHCR_SLUG: ghcr.io/crazy-max/diun
+  DESTDIR: ./bin
 
 jobs:
   validate:
@@ -54,7 +55,7 @@ jobs:
         name: Upload coverage
         uses: codecov/codecov-action@v3
         with:
-          file: ./coverage.txt
+          directory: ${{ env.DESTDIR }}/coverage
 
   build:
     runs-on: ubuntu-latest
@@ -122,7 +123,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: diun
-          path: ./release/*
+          path: ${{ env.DESTDIR }}/release/*
           if-no-files-found: error
       -
         name: Build image
@@ -141,7 +142,7 @@ jobs:
         with:
           draft: true
           files: |
-            release/*
+            ${{ env.DESTDIR }}/release/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       -
