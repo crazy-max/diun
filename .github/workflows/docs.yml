@@ -1,7 +1,7 @@
 name: docs
 
 concurrency:
-  group: docs-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 on:
@@ -10,6 +10,9 @@ on:
     tags:
       - 'v*'
   pull_request:
+
+env:
+  DESTDIR: ./bin
 
 jobs:
   publish:
@@ -40,7 +43,7 @@ jobs:
         uses: crazy-max/ghaction-github-pages@v3
         with:
           target_branch: gh-pages
-          build_dir: site
+          build_dir: ${{ env.DESTDIR }}/site
           jekyll: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
