@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/AlecAivazis/survey/v2 v2.3.6
-	github.com/alecthomas/kong v0.6.1
+	github.com/alecthomas/kong v0.7.1
 	github.com/bmatcuk/doublestar/v3 v3.0.0
 	github.com/containerd/containerd v1.6.10
 	github.com/containers/image/v5 v5.23.0
