@@ -7,7 +7,7 @@ require (
 	github.com/alecthomas/kong v0.6.1
 	github.com/bmatcuk/doublestar/v3 v3.0.0
 	github.com/containerd/containerd v1.6.10
-	github.com/containers/image/v5 v5.23.0
+	github.com/containers/image/v5 v5.23.1
 	github.com/crazy-max/gohealthchecks v0.3.0
 	github.com/crazy-max/gonfig v0.6.0
 	github.com/docker/docker v20.10.18+incompatible
