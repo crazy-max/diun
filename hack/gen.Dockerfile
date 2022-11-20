@@ -2,25 +2,18 @@
 
 ARG GO_VERSION="1.19"
 ARG PROTOC_VERSION="3.17.3"
-ARG GLIBC_VERSION="2.33-r0"
 
-FROM golang:${GO_VERSION}-alpine AS base
-ARG GLIBC_VERSION
-RUN apk add --no-cache curl file git unzip
-RUN <<EOT
-  set -e
-  curl -sSL "https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub" -o "/etc/apk/keys/sgerrand.rsa.pub"
-  curl -sSL "https://github.com/sgerrand/alpine-pkg-glibc/releases/download/${GLIBC_VERSION}/glibc-${GLIBC_VERSION}.apk" -o "glibc.apk"
-  apk add glibc.apk
-  rm /etc/apk/keys/sgerrand.rsa.pub glibc.apk
-EOT
+# protoc is dynamically linked to glibc so can't use alpine base
+FROM golang:${GO_VERSION}-bullseye AS base
+RUN apt-get update && apt-get --no-install-recommends install -y git unzip
 ARG PROTOC_VERSION
+ARG TARGETOS
+ARG TARGETARCH
 RUN <<EOT
   set -e
-  curl -sSL "https://github.com/protocolbuffers/protobuf/releases/download/v${PROTOC_VERSION}/protoc-${PROTOC_VERSION}-linux-x86_64.zip" -o "protoc.zip"
-  unzip "protoc.zip" -d "/usr/local"
-  protoc --version
-  rm "protoc.zip"
+  arch=$(echo $TARGETARCH | sed -e s/amd64/x86_64/ -e s/arm64/aarch_64/)
+  wget -q https://github.com/protocolbuffers/protobuf/releases/download/v${PROTOC_VERSION}/protoc-${PROTOC_VERSION}-${TARGETOS}-${arch}.zip
+  unzip protoc-${PROTOC_VERSION}-${TARGETOS}-${arch}.zip -d /usr/local
 EOT
 WORKDIR /src
 
@@ -30,15 +23,17 @@ RUN --mount=type=cache,target=/go/pkg/mod \
   go mod download
 
 FROM vendored AS tools
-RUN --mount=type=bind,target=.,rw \
+RUN --mount=type=bind,target=. \
     --mount=type=cache,target=/go/pkg/mod \
-  go install -v $(sed -n -e 's|^\s*_\s*"\(.*\)".*$|\1| p' tools.go)
+  go install \
+    google.golang.org/grpc/cmd/protoc-gen-go-grpc \
+    google.golang.org/protobuf/cmd/protoc-gen-go
 
 FROM tools AS generate
 RUN --mount=type=bind,target=.,rw \
     --mount=type=cache,target=/go/pkg/mod <<EOT
   set -e
-  go generate ./...
+  go generate -v ./...
   mkdir /out
   cp -Rf pb /out
 EOT
