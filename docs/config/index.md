@@ -105,6 +105,8 @@ You can override this using the [`--config` flag or `CONFIG` env var with `serve
           - production
       file:
         directory: ./imagesdir
+      nomad:
+        watchByDefault: true
     ```
 
 ## Environment variables

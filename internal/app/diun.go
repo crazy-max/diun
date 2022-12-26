@@ -16,6 +16,7 @@ import (
 	dockerfilePrd "github.com/crazy-max/diun/v4/internal/provider/dockerfile"
 	filePrd "github.com/crazy-max/diun/v4/internal/provider/file"
 	kubernetesPrd "github.com/crazy-max/diun/v4/internal/provider/kubernetes"
+	nomadPrd "github.com/crazy-max/diun/v4/internal/provider/nomad"
 	swarmPrd "github.com/crazy-max/diun/v4/internal/provider/swarm"
 	"github.com/crazy-max/gohealthchecks"
 	"github.com/hako/durafmt"
@@ -172,6 +173,11 @@ func (di *Diun) Run() {
 
 	// Dockerfile provider
 	for _, job := range dockerfilePrd.New(di.cfg.Providers.Dockerfile).ListJob() {
+		di.createJob(job)
+	}
+
+	// Nomad provider
+	for _, job := range nomadPrd.New(di.cfg.Providers.Nomad).ListJob() {
 		di.createJob(job)
 	}
 
