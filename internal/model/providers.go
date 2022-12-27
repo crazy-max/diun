@@ -7,6 +7,7 @@ type Providers struct {
 	Kubernetes *PrdKubernetes `yaml:"kubernetes,omitempty" json:"kubernetes,omitempty" label:"allowEmpty" file:"allowEmpty"`
 	File       *PrdFile       `yaml:"file,omitempty" json:"file,omitempty"`
 	Dockerfile *PrdDockerfile `yaml:"dockerfile,omitempty" json:"dockerfile,omitempty"`
+	Nomad      *PrdNomad      `yaml:"nomad,omitempty" json:"nomad,omitempty" label:"allowEmpty" file:"allowEmpty"`
 }
 
 // GetDefaults gets the default values
