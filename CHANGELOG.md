@@ -1,6 +1,10 @@
 # Changelog
 
-## 4.23.0
+## 4.23.1 (2022/12/28)
+
+* Fix release file extension (#743)
+
+## 4.23.0 (2022/12/28)
 
 * Nomad provider (#722 #739 #742)
 * Signal (REST API) notifications support (#650)
