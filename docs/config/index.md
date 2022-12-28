@@ -32,6 +32,7 @@ You can override this using the [`--config` flag or `CONFIG` env var with `serve
     watch:
       workers: 10
       schedule: "0 */6 * * *"
+      jitter: 30s
       firstCheckNotif: false
 
     notif:
@@ -121,6 +122,7 @@ All configuration from file can be transposed into environment variables. As an 
     watch:
       workers: 10
       schedule: "0 */6 * * *"
+      jitter: 30s
       firstCheckNotif: false
 
     notif:
@@ -169,6 +171,7 @@ Can be transposed to:
 
     DIUN_WATCH_WORKERS=10
     DIUN_WATCH_SCHEDULE=0 */6 * * *
+    DIUN_WATCH_JITTER=30s
     DIUN_WATCH_FIRSTCHECKNOTIF=false
 
     DIUN_NOTIF_GOTIFY_ENDPOINT=http://gotify.foo.com

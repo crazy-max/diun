@@ -52,6 +52,7 @@ func TestLoadFile(t *testing.T) {
 				Watch: &model.Watch{
 					Workers:         100,
 					Schedule:        "*/30 * * * *",
+					Jitter:          utl.NewDuration(30 * time.Second),
 					FirstCheckNotif: utl.NewTrue(),
 					CompareDigest:   utl.NewTrue(),
 					Healthchecks: &model.Healthchecks{

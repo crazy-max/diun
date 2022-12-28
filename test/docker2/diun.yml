@@ -1,6 +1,7 @@
 watch:
   workers: 20
   schedule: "0 */6 * * *"
+  jitter: 5m
 
 providers:
   docker:

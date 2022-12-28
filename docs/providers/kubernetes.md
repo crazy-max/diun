@@ -82,6 +82,8 @@ spec:
               value: "20"
             - name: DIUN_WATCH_SCHEDULE
               value: "0 */6 * * *"
+            - name: DIUN_WATCH_JITTER
+              value: "30s"
             - name: DIUN_PROVIDERS_KUBERNETES
               value: "true"
           volumeMounts:
