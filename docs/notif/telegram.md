@@ -46,7 +46,7 @@ Docker tag {{ if .Entry.Image.HubLink }}[{{ .Entry.Image }}]({{ .Entry.Image.Hub
 ```
 
 !!! note
-    `escapeMarkdown` is a special function to deal with a [makrdown strict parsing issue](https://github.com/crazy-max/diun/issues/162#issuecomment-683095898) on Telegram server.
+    `escapeMarkdown` is a special function to deal with a [markdown strict parsing issue](https://github.com/crazy-max/diun/issues/162#issuecomment-683095898) on Telegram server.
 
 ## Sample
 

@@ -3,6 +3,8 @@ package mail
 import (
 	"crypto/tls"
 	"fmt"
+	"strings"
+	"text/template"
 	"time"
 
 	"github.com/crazy-max/diun/v4/internal/model"
@@ -57,6 +59,15 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		Entry:         entry,
 		TemplateTitle: c.cfg.TemplateTitle,
 		TemplateBody:  c.cfg.TemplateBody,
+		TemplateFuncs: template.FuncMap{
+			"escapeMarkdown": func(text string) string {
+				text = strings.ReplaceAll(text, "_", "\\_")
+				text = strings.ReplaceAll(text, "*", "\\*")
+				text = strings.ReplaceAll(text, "[", "\\[")
+				text = strings.ReplaceAll(text, "`", "\\`")
+				return text
+			},
+		},
 	})
 	if err != nil {
 		return err

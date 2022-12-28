@@ -62,8 +62,8 @@ Notifications can be sent through SMTP.
 
 ```
 Docker tag {{ if .Entry.Image.HubLink }}[**{{ .Entry.Image }}**]({{ .Entry.Image.HubLink }}){{ else }}**{{ .Entry.Image }}**{{ end }}
-which you subscribed to through {{ .Entry.Provider }} provider has been {{ if (eq .Entry.Status "new") }}newly added{{ else }}updated{{ end }}
-on {{ .Meta.Hostname }}.
+which you subscribed to through {{ .Entry.Provider }} provider {{ if (eq .Entry.Status "new") }}is available{{ else }}has been updated{{ end }}
+on **{{ .Entry.Image.Domain }}** registry (triggered by _{{ escapeMarkdown .Meta.Hostname }}_ host).
 
 This image has been {{ if (eq .Entry.Status "new") }}created{{ else }}updated{{ end }} at
 <code>{{ .Entry.Manifest.Created.Format "Jan 02, 2006 15:04:05 UTC" }}</code> with digest <code>{{ .Entry.Manifest.Digest }}</code>
@@ -71,6 +71,9 @@ for <code>{{ .Entry.Manifest.Platform }}</code> platform.
 
 Need help, or have questions? Go to {{ .Meta.URL }} and leave an issue.
 ```
+
+!!! note
+    `escapeMarkdown` is a special function to deal with a [markdown strict parsing issue](https://github.com/crazy-max/diun/issues/656#issuecomment-1192886488) with the template engine.
 
 ## Sample
 

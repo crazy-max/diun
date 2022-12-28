@@ -7,7 +7,7 @@ import (
 // NotifMailDefaultTemplateBody ...
 const NotifMailDefaultTemplateBody = `Docker tag {{ if .Entry.Image.HubLink }}[**{{ .Entry.Image }}**]({{ .Entry.Image.HubLink }}){{ else }}**{{ .Entry.Image }}**{{ end }}
 which you subscribed to through {{ .Entry.Provider }} provider {{ if (eq .Entry.Status "new") }}is available{{ else }}has been updated{{ end }}
-on **{{ .Entry.Image.Domain }}** registry (triggered by _{{ .Meta.Hostname }}_ host).
+on **{{ .Entry.Image.Domain }}** registry (triggered by _{{ escapeMarkdown .Meta.Hostname }}_ host).
 
 This image has been {{ if (eq .Entry.Status "new") }}created{{ else }}updated{{ end }} at
 <code>{{ .Entry.Manifest.Created.Format "Jan 02, 2006 15:04:05 UTC" }}</code> with digest <code>{{ .Entry.Manifest.Digest }}</code>
