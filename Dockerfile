@@ -79,7 +79,7 @@ RUN --mount=type=bind,target=/src \
   if [ "$TARGETOS" = "windows" ]; then
     zip -r "/out/diun_${version#v}_${TARGETOS}_${TARGETARCH}${TARGETVARIANT}.zip" .
   else
-    tar -czvf "/out/diun_${version#v}_${TARGETOS}_${TARGETARCH}${TARGETVARIANT}.tar.tgz" .
+    tar -czvf "/out/diun_${version#v}_${TARGETOS}_${TARGETARCH}${TARGETVARIANT}.tar.gz" .
   fi
 EOT
 
