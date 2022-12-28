@@ -8,6 +8,7 @@ require (
 	github.com/bmatcuk/doublestar/v3 v3.0.0
 	github.com/containerd/containerd v1.6.14
 	github.com/containers/image/v5 v5.23.1
+	github.com/crazy-max/cron/v3 v3.1.1
 	github.com/crazy-max/gohealthchecks v0.3.0
 	github.com/crazy-max/gonfig v0.6.0
 	github.com/docker/docker v20.10.18+incompatible
@@ -32,7 +33,6 @@ require (
 	github.com/panjf2000/ants/v2 v2.7.1
 	github.com/pkg/errors v0.9.1
 	github.com/pkg/profile v1.7.0
-	github.com/robfig/cron/v3 v3.0.1
 	github.com/rs/zerolog v1.28.0
 	github.com/russross/blackfriday/v2 v2.1.0
 	github.com/sirupsen/logrus v1.9.0

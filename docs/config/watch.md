@@ -6,6 +6,7 @@
 watch:
   workers: 10
   schedule: "0 */6 * * *"
+  jitter: 30s
   firstCheckNotif: false
   compareDigest: true
   healthchecks:
@@ -43,6 +44,24 @@ Maximum number of workers that will execute tasks concurrently. (default `10`)
 
 !!! abstract "Environment variables"
     * `DIUN_WATCH_SCHEDULE`
+
+### `jitter`
+
+Enable time jitter. Prior to executing of a job, cron will sleep a random
+duration in the range from 0 to _jitter_. (default `30s`)
+
+!!! note
+    Only works with `schedule` setting. `0` disables time jitter.
+
+!!! example "Config file"
+    ```yaml
+    watch:
+      schedule: "0 */6 * * *"
+      jitter: 30s
+    ```
+
+!!! abstract "Environment variables"
+    * `DIUN_WATCH_JITTER`
 
 ### `firstCheckNotif`
 

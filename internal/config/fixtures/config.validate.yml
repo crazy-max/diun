@@ -4,6 +4,7 @@ db:
 watch:
   workers: 100
   schedule: "*/30 * * * *"
+  jitter: 30s
   firstCheckNotif: false
   compareDigest: true
   healthchecks:

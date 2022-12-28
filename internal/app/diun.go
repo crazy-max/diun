@@ -6,6 +6,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/crazy-max/cron/v3"
 	"github.com/crazy-max/diun/v4/internal/config"
 	"github.com/crazy-max/diun/v4/internal/db"
 	"github.com/crazy-max/diun/v4/internal/grpc"
@@ -22,7 +23,6 @@ import (
 	"github.com/hako/durafmt"
 	"github.com/panjf2000/ants/v2"
 	"github.com/pkg/errors"
-	"github.com/robfig/cron/v3"
 	"github.com/rs/zerolog/log"
 )
 
@@ -110,7 +110,7 @@ func (di *Diun) Start() error {
 	if len(di.cfg.Watch.Schedule) == 0 {
 		return nil
 	}
-	di.jobID, err = di.cron.AddJob(di.cfg.Watch.Schedule, di)
+	di.jobID, err = di.cron.AddJobWithJitter(di.cfg.Watch.Schedule, di, *di.cfg.Watch.Jitter)
 	if err != nil {
 		return err
 	}

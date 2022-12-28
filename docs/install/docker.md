@@ -60,6 +60,7 @@ services:
       - "LOG_JSON=false"
       - "DIUN_WATCH_WORKERS=20"
       - "DIUN_WATCH_SCHEDULE=0 */6 * * *"
+      - "DIUN_WATCH_JITTER=30s"
       - "DIUN_PROVIDERS_DOCKER=true"
     labels:
       - "diun.enable=true"
@@ -82,6 +83,7 @@ docker run -d --name diun \
   -e "LOG_JSON=false" \
   -e "DIUN_WATCH_WORKERS=20" \
   -e "DIUN_WATCH_SCHEDULE=0 */6 * * *" \
+  -e "DIUN_WATCH_JITTER=30s" \
   -e "DIUN_PROVIDERS_DOCKER=true" \
   -v "$(pwd)/data:/data" \
   -v "/var/run/docker.sock:/var/run/docker.sock" \
@@ -153,6 +155,7 @@ services:
       - "LOG_JSON=false"
       - "DIUN_WATCH_WORKERS=20"
       - "DIUN_WATCH_SCHEDULE=0 */6 * * *"
+      - "DIUN_WATCH_JITTER=30s"
       - "DIUN_PROVIDERS_DOCKER=true"
     labels:
       - "diun.enable=true"
