@@ -134,6 +134,7 @@ nav:
     - Docker: providers/docker.md
     - Kubernetes: providers/kubernetes.md
     - Swarm: providers/swarm.md
+    - Nomad: providers/nomad.md
     - Dockerfile: providers/dockerfile.md
     - File: providers/file.md
   - User guides:
