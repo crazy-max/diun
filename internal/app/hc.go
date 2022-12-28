@@ -36,6 +36,7 @@ func (di *Diun) HealthchecksSuccess(entries *model.NotifEntries) {
 * {{ .CountError }} tag(s) with error`))
 	if err := logsTpl.Execute(&logsBuf, entries); err != nil {
 		log.Error().Err(err).Msgf("Cannot create logs for Healthchecks success event")
+		return
 	}
 
 	if err := di.hc.Success(context.Background(), gohealthchecks.PingingOptions{

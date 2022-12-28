@@ -37,31 +37,35 @@ func New(opts Options) (*Client, error) {
 }
 
 // RenderMarkdown returns a notification message as markdown
-func (c *Client) RenderMarkdown() (title []byte, body []byte, err error) {
+func (c *Client) RenderMarkdown() (title []byte, body []byte, _ error) {
 	var titleBuf bytes.Buffer
-	titleTpl := template.Must(template.New("title").Funcs(c.opts.TemplateFuncs).Parse(strings.TrimSuffix(strings.TrimSpace(c.opts.TemplateTitle), "\n")))
-	err = titleTpl.Execute(&titleBuf, struct {
+	titleTpl, err := template.New("title").Funcs(c.opts.TemplateFuncs).Parse(strings.TrimSuffix(strings.TrimSpace(c.opts.TemplateTitle), "\n"))
+	if err != nil {
+		return title, body, errors.Wrap(err, "Cannot parse title template")
+	}
+	if err = titleTpl.Execute(&titleBuf, struct {
 		Meta  model.Meta
 		Entry model.NotifEntry
 	}{
 		Meta:  c.opts.Meta,
 		Entry: c.opts.Entry,
-	})
-	if err != nil {
+	}); err != nil {
 		return title, body, errors.Wrap(err, "Cannot render notif title")
 	}
 	title = titleBuf.Bytes()
 
 	var bodyBuf bytes.Buffer
-	bodyTpl := template.Must(template.New("body").Funcs(c.opts.TemplateFuncs).Parse(strings.TrimSuffix(strings.TrimSpace(c.opts.TemplateBody), "\n")))
-	err = bodyTpl.Execute(&bodyBuf, struct {
+	bodyTpl, err := template.New("body").Funcs(c.opts.TemplateFuncs).Parse(strings.TrimSuffix(strings.TrimSpace(c.opts.TemplateBody), "\n"))
+	if err != nil {
+		return title, body, errors.Wrap(err, "Cannot parse body template")
+	}
+	if err = bodyTpl.Execute(&bodyBuf, struct {
 		Meta  model.Meta
 		Entry model.NotifEntry
 	}{
 		Meta:  c.opts.Meta,
 		Entry: c.opts.Entry,
-	})
-	if err != nil {
+	}); err != nil {
 		return title, body, errors.Wrap(err, "Cannot render notif body")
 	}
 	body = bodyBuf.Bytes()
