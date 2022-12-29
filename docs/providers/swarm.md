@@ -175,15 +175,15 @@ Enable watch by default. If false, services that don't have `diun.enable=true` l
 
 You can configure more finely the way to analyze the image of your service through Docker labels:
 
-| Name                | Default      | Description                                                                                                                                                |
-|---------------------|--------------|------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `diun.enable`       |              | Set to true to enable image analysis of this service                                                                                                       |
-| `diun.regopt`       |              | [Registry options](../config/regopts.md) name to use                                                                                                       |
-| `diun.watch_repo`   | `false`      | Watch all tags of this service image ([be careful](../faq.md#docker-hub-rate-limits) with this setting)                                                    |
-| `diun.notify_on`    | `new;update` | Semicolon separated list of status to be notified: `new`, `update`.                                                                                        |
+| Name                | Default      | Description                                                                                                                                             |
+|---------------------|--------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `diun.enable`       |              | Set to true to enable image analysis of this service                                                                                                    |
+| `diun.regopt`       |              | [Registry options](../config/regopts.md) name to use                                                                                                    |
+| `diun.watch_repo`   | `false`      | Watch all tags of this service image ([be careful](../faq.md#docker-hub-rate-limits) with this setting)                                                 |
+| `diun.notify_on`    | `new;update` | Semicolon separated list of status to be notified: `new`, `update`.                                                                                     |
 | `diun.sort_tags`    | `reverse`    | [Sort tags method](../faq.md#tags-sorting-when-using-watch_repo) if `diun.watch_repo` enabled. One of `default`, `reverse`, `semver`, `lexicographical` |
-| `diun.max_tags`     | `0`          | Maximum number of tags to watch if `diun.watch_repo` enabled. `0` means all of them                                                                        |
-| `diun.include_tags` |              | Semicolon separated list of regular expressions to include tags. Can be useful if you enable `diun.watch_repo`                                             |
-| `diun.exclude_tags` |              | Semicolon separated list of regular expressions to exclude tags. Can be useful if you enable `diun.watch_repo`                                             |
-| `diun.hub_link`     | _automatic_  | Set registry hub link for this image                                                                                                                       |
-| `diun.platform`     | _automatic_  | Platform to use (e.g. `linux/amd64`)                                                                                                                       |
+| `diun.max_tags`     | `0`          | Maximum number of tags to watch if `diun.watch_repo` enabled. `0` means all of them                                                                     |
+| `diun.include_tags` |              | Semicolon separated list of regular expressions to include tags. Can be useful if you enable `diun.watch_repo`                                          |
+| `diun.exclude_tags` |              | Semicolon separated list of regular expressions to exclude tags. Can be useful if you enable `diun.watch_repo`                                          |
+| `diun.hub_link`     | _automatic_  | Set registry hub link for this image                                                                                                                    |
+| `diun.platform`     | _automatic_  | Platform to use (e.g. `linux/amd64`)                                                                                                                    |

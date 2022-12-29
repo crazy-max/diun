@@ -21,13 +21,13 @@ Multiple chat IDs can be provided in order to deliver notifications to multiple 
           Docker tag {{ .Entry.Image }} which you subscribed to through {{ .Entry.Provider }} provider has been released.
     ```
 
-| Name               | Default                                    | Description   |
-|--------------------|--------------------------------------------|---------------|
-| `token`            |                                            | Telegram bot token |
-| `tokenFile`        |                                            | Use content of secret file as Telegram bot token if `token` not defined |
-| `chatIDs`          |                                            | List of chat IDs to send notifications to |
-| `chatIDsFile`      |                                            | Use content of secret file as chat IDs if `chatIDs` not defined |
-| `templateBody`[^1] | See [below](#default-templatebody)         | [Notification template](../faq.md#notification-template) for message body |
+| Name               | Default                            | Description                                                               |
+|--------------------|------------------------------------|---------------------------------------------------------------------------|
+| `token`            |                                    | Telegram bot token                                                        |
+| `tokenFile`        |                                    | Use content of secret file as Telegram bot token if `token` not defined   |
+| `chatIDs`          |                                    | List of chat IDs to send notifications to                                 |
+| `chatIDsFile`      |                                    | Use content of secret file as chat IDs if `chatIDs` not defined           |
+| `templateBody`[^1] | See [below](#default-templatebody) | [Notification template](../faq.md#notification-template) for message body |
 
 !!! abstract "Environment variables"
     * `DIUN_NOTIF_TELEGRAM_TOKEN`

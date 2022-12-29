@@ -27,11 +27,11 @@ DIUN_ENTRY_PLATFORM=linux/amd64
           - "another"
     ```
 
-| Name                  | Default       | Description   |
-|-----------------------|---------------|---------------|
-| `cmd`[^1]             |               | Command or script to execute |
-| `args`                |               | List of args to pass to `cmd` |
-| `dir`                 |               | Specifies the working directory of the command |
+| Name      | Default | Description                                    |
+|-----------|---------|------------------------------------------------|
+| `cmd`[^1] |         | Command or script to execute                   |
+| `args`    |         | List of args to pass to `cmd`                  |
+| `dir`     |         | Specifies the working directory of the command |
 
 !!! abstract "Environment variables"
     * `DIUN_NOTIF_SCRIPT_CMD`
