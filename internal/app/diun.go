@@ -151,11 +151,37 @@ func (di *Diun) Run() {
 	}, ants.WithLogger(new(logging.AntsLogger)))
 	defer di.pool.Release()
 
-	for _, job := range di.providersJobs() {
+	// Docker provider
+	for _, job := range dockerPrd.New(di.cfg.Providers.Docker).ListJob() {
 		di.createJob(job)
 	}
-	di.wg.Wait()
 
+	// Swarm provider
+	for _, job := range swarmPrd.New(di.cfg.Providers.Swarm).ListJob() {
+		di.createJob(job)
+	}
+
+	// Kubernetes provider
+	for _, job := range kubernetesPrd.New(di.cfg.Providers.Kubernetes).ListJob() {
+		di.createJob(job)
+	}
+
+	// File provider
+	for _, job := range filePrd.New(di.cfg.Providers.File).ListJob() {
+		di.createJob(job)
+	}
+
+	// Dockerfile provider
+	for _, job := range dockerfilePrd.New(di.cfg.Providers.Dockerfile).ListJob() {
+		di.createJob(job)
+	}
+
+	// Nomad provider
+	for _, job := range nomadPrd.New(di.cfg.Providers.Nomad).ListJob() {
+		di.createJob(job)
+	}
+
+	di.wg.Wait()
 	log.Info().
 		Int("added", entries.CountNew).
 		Int("updated", entries.CountUpdate).
@@ -175,27 +201,4 @@ func (di *Diun) Close() {
 	if err := di.db.Close(); err != nil {
 		log.Warn().Err(err).Msg("Cannot close database")
 	}
-}
-
-func (di *Diun) providersJobs() []model.Job {
-	var jobs []model.Job
-	for _, job := range dockerPrd.New(di.cfg.Providers.Docker).ListJob() {
-		jobs = append(jobs, job)
-	}
-	for _, job := range swarmPrd.New(di.cfg.Providers.Swarm).ListJob() {
-		jobs = append(jobs, job)
-	}
-	for _, job := range kubernetesPrd.New(di.cfg.Providers.Kubernetes).ListJob() {
-		jobs = append(jobs, job)
-	}
-	for _, job := range filePrd.New(di.cfg.Providers.File).ListJob() {
-		jobs = append(jobs, job)
-	}
-	for _, job := range dockerfilePrd.New(di.cfg.Providers.Dockerfile).ListJob() {
-		jobs = append(jobs, job)
-	}
-	for _, job := range nomadPrd.New(di.cfg.Providers.Nomad).ListJob() {
-		jobs = append(jobs, job)
-	}
-	return jobs
 }
