@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.24.0 (2022/12/29)
+
+* Entry metadata field (#749)
+* Jitter watch option (#746)
+* Allow customizing Signal notification message (#748)
+
 ## 4.23.1 (2022/12/28)
 
 * Fix release file extension (#743)
