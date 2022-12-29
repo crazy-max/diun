@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/crazy-max/diun/v4/internal/model"
+	"github.com/crazy-max/diun/v4/internal/msg"
 	"github.com/crazy-max/diun/v4/internal/notif/notifier"
 )
 
@@ -37,12 +38,26 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		Timeout: *c.cfg.Timeout,
 	}
 
+	message, err := msg.New(msg.Options{
+		Meta:         c.meta,
+		Entry:        entry,
+		TemplateBody: c.cfg.TemplateBody,
+	})
+	if err != nil {
+		return err
+	}
+
+	_, bodyrender, err := message.RenderMarkdown()
+	if err != nil {
+		return err
+	}
+
 	body, err := json.Marshal(struct {
 		Message    string   `json:"message"`
 		Number     string   `json:"number"`
 		Recipients []string `json:"recipients"`
 	}{
-		Message:    "Docker tag " + entry.Image.String() + " which you subscribed to through " + entry.Provider + " provider " + string(entry.Status) + " has been updated on " + entry.Image.Domain + " registry (triggered by" + c.meta.Hostname + " host).",
+		Message:    string(bodyrender),
 		Number:     c.cfg.Number,
 		Recipients: c.cfg.Recipients,
 	})

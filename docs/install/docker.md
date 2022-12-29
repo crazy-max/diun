@@ -4,10 +4,10 @@
 
 Diun provides automatically updated Docker :whale: images within several registries:
 
-| Registry                                                                                         | Image                           |
-|--------------------------------------------------------------------------------------------------|---------------------------------|
-| [Docker Hub](https://hub.docker.com/r/crazymax/diun/)                                            | `crazymax/diun`                 |
-| [GitHub Container Registry](https://github.com/users/crazy-max/packages/container/package/diun)  | `ghcr.io/crazy-max/diun`        |
+| Registry                                                                                        | Image                    |
+|-------------------------------------------------------------------------------------------------|--------------------------|
+| [Docker Hub](https://hub.docker.com/r/crazymax/diun/)                                           | `crazymax/diun`          |
+| [GitHub Container Registry](https://github.com/users/crazy-max/packages/container/package/diun) | `ghcr.io/crazy-max/diun` |
 
 It is possible to always use the latest stable tag or to use another service that handles updating Docker images.
 
@@ -28,9 +28,9 @@ Image: crazymax/diun:latest
 
 ## Volumes
 
-| Path               | Description   |
-|--------------------|---------------|
-| `/data`            | Contains bbolt database which retains Docker images manifests |
+| Path    | Description                                                   |
+|---------|---------------------------------------------------------------|
+| `/data` | Contains bbolt database which retains Docker images manifests |
 
 ## Usage
 

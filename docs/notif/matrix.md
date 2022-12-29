@@ -17,16 +17,16 @@ Allow sending notifications to your Matrix server.
           Docker tag {{ .Entry.Image }} which you subscribed to through {{ .Entry.Provider }} provider has been released.
     ```
 
-| Name                  | Default                                    | Description       |
-|-----------------------|--------------------------------------------|-------------------|
-| `homeserverURL`       | `https://matrix.org`                       | Matrix server URL |
-| `user`                |                                            | Username for authentication |
-| `userFile`            |                                            | Use content of secret file as username authentication if `username` not defined |
-| `password`            |                                            | Password for authentication |
-| `passwordFile`        |                                            | Use content of secret file as password authentication if `password` not defined |
-| `roomID`              |                                            | Room ID to send messages |
-| `msgType`             | `notice`                                   | Type of message being sent. Can be `notice` or `text` |
-| `templateBody`[^1]    | See [below](#default-templatebody)         | [Notification template](../faq.md#notification-template) for message body |
+| Name               | Default                            | Description                                                                     |
+|--------------------|------------------------------------|---------------------------------------------------------------------------------|
+| `homeserverURL`    | `https://matrix.org`               | Matrix server URL                                                               |
+| `user`             |                                    | Username for authentication                                                     |
+| `userFile`         |                                    | Use content of secret file as username authentication if `username` not defined |
+| `password`         |                                    | Password for authentication                                                     |
+| `passwordFile`     |                                    | Use content of secret file as password authentication if `password` not defined |
+| `roomID`           |                                    | Room ID to send messages                                                        |
+| `msgType`          | `notice`                           | Type of message being sent. Can be `notice` or `text`                           |
+| `templateBody`[^1] | See [below](#default-templatebody) | [Notification template](../faq.md#notification-template) for message body       |
 
 !!! abstract "Environment variables"
     * `DIUN_NOTIF_MATRIX_HOMESERVERURL`

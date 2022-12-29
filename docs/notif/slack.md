@@ -17,11 +17,11 @@ You can send notifications to your Slack channel using an [incoming webhook URL]
           Docker tag {{ .Entry.Image }} which you subscribed to through {{ .Entry.Provider }} provider has been released.
     ```
 
-| Name               | Default                                    | Description   |
-|--------------------|--------------------------------------------|---------------|
-| `webhookURL`[^1]   |                                            | Slack [incoming webhook URL](https://api.slack.com/messaging/webhooks) |
-| `renderFields`     | `true`                                     | Render [field objects](https://api.slack.com/messaging/composing/layouts#stack_of_blocks) |
-| `templateBody`[^1] | See [below](#default-templatebody)         | [Notification template](../faq.md#notification-template) for message body |
+| Name               | Default                            | Description                                                                               |
+|--------------------|------------------------------------|-------------------------------------------------------------------------------------------|
+| `webhookURL`[^1]   |                                    | Slack [incoming webhook URL](https://api.slack.com/messaging/webhooks)                    |
+| `renderFields`     | `true`                             | Render [field objects](https://api.slack.com/messaging/composing/layouts#stack_of_blocks) |
+| `templateBody`[^1] | See [below](#default-templatebody) | [Notification template](../faq.md#notification-template) for message body                 |
 
 !!! abstract "Environment variables"
     * `DIUN_NOTIF_SLACK_WEBHOOKURL`

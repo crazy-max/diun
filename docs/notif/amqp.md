@@ -15,16 +15,16 @@ You can send notifications to any amqp compatible server with the following sett
         queue: queue
     ```
 
-| Name               | Default       | Description   |
-|--------------------|---------------|---------------|
-| `host`[^1]         | `localhost`   | AMQP server host |
-| `port`[^1]         | `5672`        | AMQP server port |
-| `username`         |               | AMQP username |
-| `usernameFile`     |               | Use content of secret file as AMQP username if `username` not defined |
-| `password`         |               | AMQP password |
-| `passwordFile`     |               | Use content of secret file as AMQP password if `password` not defined |
-| `exchange`         |               | Name of the exchange the message will be sent to |
-| `queue`[^1]        |               | Name of the queue the message will be sent to |
+| Name           | Default     | Description                                                           |
+|----------------|-------------|-----------------------------------------------------------------------|
+| `host`[^1]     | `localhost` | AMQP server host                                                      |
+| `port`[^1]     | `5672`      | AMQP server port                                                      |
+| `username`     |             | AMQP username                                                         |
+| `usernameFile` |             | Use content of secret file as AMQP username if `username` not defined |
+| `password`     |             | AMQP password                                                         |
+| `passwordFile` |             | Use content of secret file as AMQP password if `password` not defined |
+| `exchange`     |             | Name of the exchange the message will be sent to                      |
+| `queue`[^1]    |             | Name of the queue the message will be sent to                         |
 
 !!! abstract "Environment variables"
     * `DIUN_NOTIF_AMQP_HOST`

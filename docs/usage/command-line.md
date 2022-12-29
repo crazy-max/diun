@@ -36,16 +36,16 @@ diun serve --config diun.yml --log-level debug
 
 Following environment variables can also be used in place:
 
-| Name               | Default       | Description   |
-|--------------------|---------------|---------------|
-| `CONFIG`           |               | Diun configuration file |
-| `PROFILER_PATH`    |               | Base path where profiling files are written |
-| `PROFILER`         |               | [Profiler](../faq.md#profiling) to use |
-| `LOG_LEVEL`        | `info`        | One of `panic`, `fatal`, `error`, `warn`, `info`, `debug` or `trace` |
-| `LOG_JSON`         | `false`       | Enable JSON logging output |
-| `LOG_CALLER`       | `false`       | Enable to add `file:line` of the caller |
-| `LOG_NOCOLOR`      | `false`       | Disables the colorized output |
-| `GRPC_AUTHORITY`   | `:42286`      | Address used to expose the gRPC server |
+| Name             | Default  | Description                                                          |
+|------------------|----------|----------------------------------------------------------------------|
+| `CONFIG`         |          | Diun configuration file                                              |
+| `PROFILER_PATH`  |          | Base path where profiling files are written                          |
+| `PROFILER`       |          | [Profiler](../faq.md#profiling) to use                               |
+| `LOG_LEVEL`      | `info`   | One of `panic`, `fatal`, `error`, `warn`, `info`, `debug` or `trace` |
+| `LOG_JSON`       | `false`  | Enable JSON logging output                                           |
+| `LOG_CALLER`     | `false`  | Enable to add `file:line` of the caller                              |
+| `LOG_NOCOLOR`    | `false`  | Disables the colorized output                                        |
+| `GRPC_AUTHORITY` | `:42286` | Address used to expose the gRPC server                               |
 
 ### `image list`
 
