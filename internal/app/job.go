@@ -169,6 +169,7 @@ func (di *Diun) runJob(job model.Job) (entry model.NotifEntry) {
 		Status:   model.ImageStatusError,
 		Provider: job.Provider,
 		Image:    job.RegImage,
+		Metadata: job.Image.Metadata,
 	}
 
 	sublog := log.With().

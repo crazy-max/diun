@@ -48,7 +48,10 @@ providers:
   regopt: myregistry
 
 # Watch coreos/hyperkube image on quay.io (Quay) and assume latest tag.
+# Add foo=bar metadata to be used in notification template.
 - name: quay.io/coreos/hyperkube
+  metadata:
+    foo: bar
 
 # Watch crazymax/swarm-cronjob image and assume docker.io registry and latest tag
 # with registry options named 'docker.io/crazymax' (image selector).
@@ -186,3 +189,4 @@ The configuration file(s) defines a slice of images to analyze with the followin
 | `platform.os`      | _automatic_  | Operating system to use as custom platform                                                                                                              |
 | `platform.arch`    | _automatic_  | CPU architecture to use as custom platform                                                                                                              |
 | `platform.variant` | _automatic_  | Variant of the CPU to use as custom platform                                                                                                            |
+| `metadata.*`       |              | Additional metadata that can be used in [notification template](../faq.md#notification-template) (e.g. `metadata.foo=bar`)                              |

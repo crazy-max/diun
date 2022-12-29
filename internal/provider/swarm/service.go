@@ -7,6 +7,7 @@ import (
 	"github.com/crazy-max/diun/v4/internal/provider"
 	"github.com/crazy-max/diun/v4/pkg/docker"
 	"github.com/docker/docker/api/types/filters"
+	"github.com/docker/docker/api/types/swarm"
 )
 
 func (c *Client) listServiceImage() []model.Image {
@@ -36,7 +37,7 @@ func (c *Client) listServiceImage() []model.Image {
 			Str("ctn_image", svc.Spec.TaskTemplate.ContainerSpec.Image).
 			Msg("Validate image")
 
-		image, err := provider.ValidateImage(svc.Spec.TaskTemplate.ContainerSpec.Image, svc.Spec.Labels, *c.config.WatchByDefault)
+		image, err := provider.ValidateImage(svc.Spec.TaskTemplate.ContainerSpec.Image, metadata(svc), svc.Spec.Labels, *c.config.WatchByDefault)
 		if err != nil {
 			c.logger.Error().Err(err).
 				Str("svc_name", svc.Spec.Name).
@@ -57,4 +58,13 @@ func (c *Client) listServiceImage() []model.Image {
 	}
 
 	return list
+}
+
+func metadata(svc swarm.Service) map[string]string {
+	return map[string]string{
+		"svc_id":        svc.ID,
+		"svc_createdat": svc.CreatedAt.String(),
+		"svc_updatedat": svc.UpdatedAt.String(),
+		"ctn_name":      svc.Spec.Name,
+	}
 }

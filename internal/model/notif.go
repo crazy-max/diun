@@ -27,6 +27,7 @@ type NotifEntry struct {
 	Provider string            `json:"provider,omitempty"`
 	Image    registry.Image    `json:"image,omitempty"`
 	Manifest registry.Manifest `json:"manifest,omitempty"`
+	Metadata map[string]string `json:"metadata,omitempty"`
 }
 
 // Notif holds data necessary for notification configuration

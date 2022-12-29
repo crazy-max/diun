@@ -1,12 +1,17 @@
 package docker
 
 import (
+	"fmt"
 	"reflect"
+	"strings"
+	"time"
 
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/internal/provider"
 	"github.com/crazy-max/diun/v4/pkg/docker"
+	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
+	"github.com/docker/go-units"
 )
 
 func (c *Client) listContainerImage() []model.Image {
@@ -86,7 +91,7 @@ func (c *Client) listContainerImage() []model.Image {
 			Str("ctn_image", imageName).
 			Interface("ctn_labels", ctn.Labels).
 			Msg("Validate image")
-		image, err := provider.ValidateImage(imageName, ctn.Labels, *c.config.WatchByDefault)
+		image, err := provider.ValidateImage(imageName, metadata(ctn), ctn.Labels, *c.config.WatchByDefault)
 
 		if err != nil {
 			c.logger.Error().Err(err).
@@ -108,4 +113,34 @@ func (c *Client) listContainerImage() []model.Image {
 	}
 
 	return list
+}
+
+func metadata(ctn types.Container) map[string]string {
+	return map[string]string{
+		"ctn_id":        ctn.ID,
+		"ctn_names":     formatNames(ctn.Names),
+		"ctn_command":   ctn.Command,
+		"ctn_createdat": time.Unix(ctn.Created, 0).String(),
+		"ctn_state":     ctn.State,
+		"ctn_status":    ctn.Status,
+		"ctn_size":      formatSize(ctn.SizeRw, ctn.SizeRootFs),
+	}
+}
+
+func formatNames(names []string) string {
+	namesStripPrefix := make([]string, len(names))
+	for i, s := range names {
+		namesStripPrefix[i] = s[1:]
+	}
+	return strings.Join(namesStripPrefix, ",")
+}
+
+func formatSize(sizeRw, sizeRootFs int64) string {
+	srw := units.HumanSizeWithPrecision(float64(sizeRw), 3)
+	sv := units.HumanSizeWithPrecision(float64(sizeRootFs), 3)
+	sf := srw
+	if sizeRootFs > 0 {
+		sf = fmt.Sprintf("%s (virtual %s)", srw, sv)
+	}
+	return sf
 }
