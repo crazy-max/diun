@@ -2,10 +2,12 @@ package kubernetes
 
 import (
 	"reflect"
+	"strings"
 
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/internal/provider"
 	"github.com/crazy-max/diun/v4/pkg/k8s"
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -39,7 +41,7 @@ func (c *Client) listPodImage() []model.Image {
 				Str("ctn_image", ctn.Image).
 				Msg("Validate image")
 
-			image, err := provider.ValidateImage(ctn.Image, pod.Annotations, *c.config.WatchByDefault)
+			image, err := provider.ValidateImage(ctn.Image, metadata(pod, ctn), pod.Annotations, *c.config.WatchByDefault)
 			if err != nil {
 				c.logger.Error().Err(err).
 					Str("pod_name", pod.Name).
@@ -63,4 +65,15 @@ func (c *Client) listPodImage() []model.Image {
 	}
 
 	return list
+}
+
+func metadata(pod v1.Pod, ctn v1.Container) map[string]string {
+	return map[string]string{
+		"pod_name":      pod.Name,
+		"pod_status":    pod.Status.String(),
+		"pod_namespace": pod.Namespace,
+		"pod_createdat": pod.CreationTimestamp.String(),
+		"ctn_name":      ctn.Name,
+		"ctn_command":   strings.Join(ctn.Command, " "),
+	}
 }

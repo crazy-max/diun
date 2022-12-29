@@ -96,7 +96,7 @@ func (c *Client) listTaskImages() []model.Image {
 					// Finally, merge task meta values
 					labels = updateMap(labels, task.Meta)
 
-					image, err := provider.ValidateImage(imageName, labels, *c.config.WatchByDefault)
+					image, err := provider.ValidateImage(imageName, metadata(job, taskGroup, task), labels, *c.config.WatchByDefault)
 					if err != nil {
 						c.logger.Error().
 							Err(err).
@@ -123,4 +123,17 @@ func (c *Client) listTaskImages() []model.Image {
 	}
 
 	return list
+}
+
+func metadata(job *nomad.JobListStub, taskGroup *nomad.TaskGroup, task *nomad.Task) map[string]string {
+	return map[string]string{
+		"job_id":         job.ID,
+		"job_name":       job.Name,
+		"job_status":     job.Status,
+		"job_namespace":  job.Namespace,
+		"taskgroup_name": *taskGroup.Name,
+		"task_name":      task.Name,
+		"task_driver":    task.Driver,
+		"task_user":      task.User,
+	}
 }

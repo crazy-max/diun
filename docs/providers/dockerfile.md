@@ -37,6 +37,7 @@ providers:
 # syntax=docker/dockerfile:1.2
 
 # diun.platform=linux/amd64
+# diun.metadata.foo=bar
 FROM alpine:latest
 
 # diun.watch_repo=true
@@ -117,3 +118,4 @@ The following annotations can be added as comments before the target instruction
 | `diun.exclude_tags` |              | Semicolon separated list of regular expressions to exclude tags. Can be useful if you enable `diun.watch_repo`                                          |
 | `diun.hub_link`     | _automatic_  | Set registry hub link for this image                                                                                                                    |
 | `diun.platform`     | _automatic_  | Platform to use (e.g. `linux/amd64`)                                                                                                                    |
+| `diun.metadata.*`   |              | Additional metadata that can be used in [notification template](../faq.md#notification-template) (e.g. `metadata.foo=bar`)                              |

@@ -82,6 +82,7 @@ Templating is supported with the following fields:
 | `.Entry.Manifest.Labels`        | Image labels                                                                          |
 | `.Entry.Manifest.Layers`        | Image layers                                                                          |
 | `.Entry.Manifest.Platform`      | Platform that the image is runs on. e.g. `linux/amd64`                                |
+| `.Entry.Metadata`               | Key-value pair of image metadata specific to each provider                            |
 
 ## Authentication against the registry
 

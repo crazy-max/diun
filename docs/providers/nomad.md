@@ -197,15 +197,29 @@ Enable watch by default. If false, tasks that don't have `diun.enable = true` in
 
 You can configure more finely the way to analyze the image of your tasks through Nomad meta attributes or service tags:
 
-| Name                | Default      | Description                                                                                                                                             |
-|---------------------|--------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `diun.enable`       |              | Set to true to enable image analysis of this task                                                                                                       |
-| `diun.regopt`       |              | [Registry options](../config/regopts.md) name to use                                                                                                    |
-| `diun.watch_repo`   | `false`      | Watch all tags of this task image ([be careful](../faq.md#docker-hub-rate-limits) with this setting)                                                    |
-| `diun.notify_on`    | `new;update` | Semicolon separated list of status to be notified: `new`, `update`.                                                                                     |
-| `diun.sort_tags`    | `reverse`    | [Sort tags method](../faq.md#tags-sorting-when-using-watch_repo) if `diun.watch_repo` enabled. One of `default`, `reverse`, `semver`, `lexicographical` |
-| `diun.max_tags`     | `0`          | Maximum number of tags to watch if `diun.watch_repo` enabled. `0` means all of them                                                                     |
-| `diun.include_tags` |              | Semicolon separated list of regular expressions to include tags. Can be useful if you enable `diun.watch_repo`                                          |
-| `diun.exclude_tags` |              | Semicolon separated list of regular expressions to exclude tags. Can be useful if you enable `diun.watch_repo`                                          |
-| `diun.hub_link`     | _automatic_  | Set registry hub link for this image                                                                                                                    |
-| `diun.platform`     | _automatic_  | Platform to use (e.g. `linux/amd64`)                                                                                                                    |
+| Name                | Default                        | Description                                                                                                                                             |
+|---------------------|--------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `diun.enable`       |                                | Set to true to enable image analysis of this task                                                                                                       |
+| `diun.regopt`       |                                | [Registry options](../config/regopts.md) name to use                                                                                                    |
+| `diun.watch_repo`   | `false`                        | Watch all tags of this task image ([be careful](../faq.md#docker-hub-rate-limits) with this setting)                                                    |
+| `diun.notify_on`    | `new;update`                   | Semicolon separated list of status to be notified: `new`, `update`.                                                                                     |
+| `diun.sort_tags`    | `reverse`                      | [Sort tags method](../faq.md#tags-sorting-when-using-watch_repo) if `diun.watch_repo` enabled. One of `default`, `reverse`, `semver`, `lexicographical` |
+| `diun.max_tags`     | `0`                            | Maximum number of tags to watch if `diun.watch_repo` enabled. `0` means all of them                                                                     |
+| `diun.include_tags` |                                | Semicolon separated list of regular expressions to include tags. Can be useful if you enable `diun.watch_repo`                                          |
+| `diun.exclude_tags` |                                | Semicolon separated list of regular expressions to exclude tags. Can be useful if you enable `diun.watch_repo`                                          |
+| `diun.hub_link`     | _automatic_                    | Set registry hub link for this image                                                                                                                    |
+| `diun.platform`     | _automatic_                    | Platform to use (e.g. `linux/amd64`)                                                                                                                    |
+| `diun.metadata.*`   | See [below](#default-metadata) | Additional metadata that can be used in [notification template](../faq.md#notification-template) (e.g. `diun.metadata.foo=bar`)                         |
+
+## Default metadata
+
+| Key                            | Description     |
+|--------------------------------|-----------------|
+| `diun.metadata.job_id`         | Job ID          |
+| `diun.metadata.job_name`       | Job name        |
+| `diun.metadata.job_status`     | Job status      |
+| `diun.metadata.job_namespace`  | Job namespace   |
+| `diun.metadata.taskgroup_name` | Task group name |
+| `diun.metadata.task_name`      | Task name       |
+| `diun.metadata.task_driver`    | Task driver     |
+| `diun.metadata.task_user`      | Task user       |
