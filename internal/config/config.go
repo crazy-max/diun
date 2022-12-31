@@ -14,11 +14,12 @@ import (
 
 // Config holds configuration details
 type Config struct {
-	Db        *model.Db        `yaml:"db,omitempty" json:"db,omitempty"`
-	Watch     *model.Watch     `yaml:"watch,omitempty" json:"watch,omitempty"`
-	Notif     *model.Notif     `yaml:"notif,omitempty" json:"notif,omitempty"`
-	RegOpts   model.RegOpts    `yaml:"regopts,omitempty" json:"regopts,omitempty" validate:"unique=Name,dive"`
-	Providers *model.Providers `yaml:"providers,omitempty" json:"providers,omitempty"`
+	Db         *model.Db         `yaml:"db,omitempty" json:"db,omitempty"`
+	Watch      *model.Watch      `yaml:"watch,omitempty" json:"watch,omitempty"`
+	Notif      *model.Notif      `yaml:"notif,omitempty" json:"notif,omitempty"`
+	RegOpts    model.RegOpts     `yaml:"regopts,omitempty" json:"regopts,omitempty" validate:"unique=Name,dive"`
+	Providers  *model.Providers  `yaml:"providers,omitempty" json:"providers,omitempty"`
+	APIMetrics *model.APIMetrics `yaml:"apimetrics,omitempty" json:"metricsapi,omitempty"`
 }
 
 // Load returns Config struct

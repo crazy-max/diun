@@ -1,6 +1,7 @@
 package main
 
 import (
+	"net/http"
 	"os"
 	"os/signal"
 	"path"
@@ -11,6 +12,9 @@ import (
 	"github.com/crazy-max/diun/v4/pkg/utl"
 	"github.com/pkg/profile"
 	"github.com/rs/zerolog/log"
+
+	diunApi "github.com/crazy-max/diun/v4/pkg/api"
+	apiMetrics "github.com/crazy-max/diun/v4/pkg/api/metrics"
 )
 
 // ServeCmd holds serve command args and flags
@@ -89,6 +93,19 @@ func (s *ServeCmd) Run(ctx *Context) error {
 		log.Fatal().Err(err).Msgf("Cannot initialize %s", ctx.Meta.Name)
 	}
 
+	if *cfg.APIMetrics.Enable {
+		apiPort := cfg.APIMetrics.Port
+		apiPath := cfg.APIMetrics.Path
+		apiToken := cfg.APIMetrics.Token
+
+		httpAPI := diunApi.New(apiToken, apiPort)
+		metricsHandler := apiMetrics.New()
+		httpAPI.RegisterFunc(apiPath, metricsHandler.Handle)
+
+		if err := httpAPI.Start(false); err != nil && err != http.ErrServerClosed {
+			log.Fatal().Err(err).Msgf("failed to start API %s", err)
+		}
+	}
 	// Start
 	err = diun.Start()
 	if err != nil {

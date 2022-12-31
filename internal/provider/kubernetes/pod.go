@@ -33,7 +33,8 @@ func (c *Client) listPodImage() []model.Image {
 
 	var list []model.Image
 	for _, pod := range pods {
-		for _, ctn := range pod.Spec.Containers {
+		// for _, ctn := range pod.Spec.Containers {
+		for _, ctn := range pod.Status.ContainerStatuses {
 			c.logger.Debug().
 				Str("pod_name", pod.Name).
 				Interface("pod_annot", pod.Annotations).
@@ -41,7 +42,8 @@ func (c *Client) listPodImage() []model.Image {
 				Str("ctn_image", ctn.Image).
 				Msg("Validate image")
 
-			image, err := provider.ValidateImage(ctn.Image, metadata(pod, ctn), pod.Annotations, *c.config.WatchByDefault)
+			image, err := provider.ValidateImageWithDigest(ctn.Image, metadata(pod, ctn), pod.Annotations, *c.config.WatchByDefault, ctn.ImageID)
+
 			if err != nil {
 				c.logger.Error().Err(err).
 					Str("pod_name", pod.Name).

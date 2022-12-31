@@ -19,6 +19,7 @@ type NotifEntries struct {
 	CountSkip     int
 	CountError    int
 	CountTotal    int
+	CountStale    int
 }
 
 // NotifEntry represents a notification entry
@@ -76,6 +77,9 @@ func (s *NotifEntries) Add(entry NotifEntry) {
 		s.CountTotal++
 	case ImageStatusError:
 		s.CountError++
+		s.CountTotal++
+	case ImageStatusStale:
+		s.CountStale++
 		s.CountTotal++
 	}
 }
