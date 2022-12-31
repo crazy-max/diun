@@ -9,7 +9,7 @@ import (
 
 var metrics *Metrics
 
-var stale_images = prometheus.NewGaugeVec(
+var staleImages = prometheus.NewGaugeVec(
 	prometheus.GaugeOpts{
 		Name: "diun_stale_image",
 		Help: "todo",
@@ -27,14 +27,14 @@ type Metric struct {
 
 // Metrics is the handler processing all individual scan metrics
 type Metrics struct {
-	channel      chan *Metric
-	scanned      prometheus.Gauge
-	updated      prometheus.Gauge
-	failed       prometheus.Gauge
-	stale        prometheus.Gauge
-	total        prometheus.Counter
-	skipped      prometheus.Counter
-	stale_images []prometheus.GaugeVec
+	channel     chan *Metric
+	scanned     prometheus.Gauge
+	updated     prometheus.Gauge
+	failed      prometheus.Gauge
+	stale       prometheus.Gauge
+	total       prometheus.Counter
+	skipped     prometheus.Counter
+	staleImages []prometheus.GaugeVec
 }
 
 // Register registers metrics for an executed scan
@@ -48,7 +48,7 @@ func Default() *Metrics {
 		return metrics
 	}
 
-	prometheus.Register(stale_images)
+	prometheus.Register(staleImages)
 	metrics = &Metrics{
 		scanned: promauto.NewGauge(prometheus.GaugeOpts{
 			Name: "diun_containers_scanned",
@@ -88,9 +88,9 @@ func RegisterNotification(s model.NotifEntries) {
 
 	for _, item := range s.Entries {
 		if item.Status == model.ImageStatusStale {
-			stale_images.With(prometheus.Labels{"image": item.Image.String()}).Set(1)
+			staleImages.With(prometheus.Labels{"image": item.Image.String()}).Set(1)
 		} else {
-			stale_images.With(prometheus.Labels{"image": item.Image.String()}).Set(0)
+			staleImages.With(prometheus.Labels{"image": item.Image.String()}).Set(0)
 		}
 	}
 }
@@ -128,5 +128,4 @@ func (metrics *Metrics) HandleUpdate(channel <-chan *Metric) {
 		metrics.failed.Set(float64(change.Failed))
 		metrics.stale.Set(float64(change.Stale))
 	}
-
 }

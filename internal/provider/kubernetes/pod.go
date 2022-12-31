@@ -2,7 +2,6 @@ package kubernetes
 
 import (
 	"reflect"
-	"strings"
 
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/internal/provider"
@@ -33,7 +32,6 @@ func (c *Client) listPodImage() []model.Image {
 
 	var list []model.Image
 	for _, pod := range pods {
-		// for _, ctn := range pod.Spec.Containers {
 		for _, ctn := range pod.Status.ContainerStatuses {
 			c.logger.Debug().
 				Str("pod_name", pod.Name).
@@ -43,7 +41,6 @@ func (c *Client) listPodImage() []model.Image {
 				Msg("Validate image")
 
 			image, err := provider.ValidateImageWithDigest(ctn.Image, metadata(pod, ctn), pod.Annotations, *c.config.WatchByDefault, ctn.ImageID)
-
 			if err != nil {
 				c.logger.Error().Err(err).
 					Str("pod_name", pod.Name).
@@ -69,13 +66,13 @@ func (c *Client) listPodImage() []model.Image {
 	return list
 }
 
-func metadata(pod v1.Pod, ctn v1.Container) map[string]string {
+func metadata(pod v1.Pod, ctn v1.ContainerStatus) map[string]string {
 	return map[string]string{
 		"pod_name":      pod.Name,
 		"pod_status":    pod.Status.String(),
 		"pod_namespace": pod.Namespace,
 		"pod_createdat": pod.CreationTimestamp.String(),
 		"ctn_name":      ctn.Name,
-		"ctn_command":   strings.Join(ctn.Command, " "),
+		"ctn_command":   "",
 	}
 }

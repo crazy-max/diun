@@ -17,7 +17,7 @@ var (
 	metadataKeyRegexp = regexp.MustCompile(`^[` + metadataKeyChars + `]+$`)
 )
 
-func ValidateImageWithDigest(image string, labels map[string]string, watchByDef bool, digest string) (img model.Image, err error) {
+func ValidateImageWithDigest(image string, metadata, labels map[string]string, watchByDef bool, digest string) (img model.Image, err error) {
 	var imageID = ""
 
 	if i := strings.Index(image, "@sha256"); i > 0 {
@@ -116,8 +116,8 @@ func ValidateImageWithDigest(image string, labels map[string]string, watchByDef 
 }
 
 // ValidateImage returns a standard image through Docker labels
-func ValidateImage(image string, labels map[string]string, watchByDef bool) (img model.Image, err error) {
-	return ValidateImageWithDigest(image, labels, watchByDef, "")
+func ValidateImage(image string, metadata, labels map[string]string, watchByDef bool) (img model.Image, err error) {
+	return ValidateImageWithDigest(image, metadata, labels, watchByDef, "")
 }
 
 func validateMetadataKey(key string) error {

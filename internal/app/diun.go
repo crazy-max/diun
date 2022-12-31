@@ -194,7 +194,6 @@ func (di *Diun) Run() {
 		Msg("Jobs completed")
 
 	containerMetrics.RegisterNotification(*entries)
-
 }
 
 // Close closes diun
