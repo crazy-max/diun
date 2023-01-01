@@ -25,8 +25,9 @@ type Config struct {
 // Load returns Config struct
 func Load(config string) (*Config, error) {
 	cfg := Config{
-		Db:    (&model.Db{}).GetDefaults(),
-		Watch: (&model.Watch{}).GetDefaults(),
+		Db:         (&model.Db{}).GetDefaults(),
+		Watch:      (&model.Watch{}).GetDefaults(),
+		APIMetrics: (&model.APIMetrics{}).GetDefaults(),
 	}
 
 	fileLoader := gonfig.NewFileLoader(gonfig.FileLoaderConfig{
