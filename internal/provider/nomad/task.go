@@ -66,6 +66,8 @@ func (c *Client) listTaskImages() []model.Image {
 		for _, taskGroup := range jobInfo.TaskGroups {
 			// Get task group service labels
 			groupLabels := map[string]string{}
+			groupLabels = updateMap(groupLabels, taskGroup.Meta)
+
 			for _, service := range taskGroup.Services {
 				groupLabels = updateMap(groupLabels, parseServiceTags(service.Tags))
 			}
