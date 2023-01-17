@@ -1,9 +1,11 @@
 package main
 
 import (
+	"net/http"
 	"os"
 	"os/signal"
 	"path"
+	"strconv"
 
 	"github.com/crazy-max/diun/v4/internal/app"
 	"github.com/crazy-max/diun/v4/internal/config"
@@ -11,6 +13,10 @@ import (
 	"github.com/crazy-max/diun/v4/pkg/utl"
 	"github.com/pkg/profile"
 	"github.com/rs/zerolog/log"
+
+	diunApi "github.com/crazy-max/diun/v4/pkg/api"
+	apiMetrics "github.com/crazy-max/diun/v4/pkg/api/metrics"
+	apiScan "github.com/crazy-max/diun/v4/pkg/api/scan"
 )
 
 // ServeCmd holds serve command args and flags
@@ -87,6 +93,28 @@ func (s *ServeCmd) Run(ctx *Context) error {
 	diun, err = app.New(ctx.Meta, cfg, s.GRPCAuthority)
 	if err != nil {
 		log.Fatal().Err(err).Msgf("Cannot initialize %s", ctx.Meta.Name)
+	}
+
+	if *cfg.APIMetrics.EnableAPI || *cfg.APIMetrics.EnableScan {
+		httpAPI := diunApi.New(cfg.APIMetrics.Token, cfg.APIMetrics.Port)
+
+		if *cfg.APIMetrics.EnableAPI {
+			metricsHandler := apiMetrics.New()
+			httpAPI.RegisterFunc(cfg.APIMetrics.APIPath, metricsHandler.Handle)
+			log.Info().Msgf("API Server Registered: %s", cfg.APIMetrics.APIPath)
+		}
+
+		if *cfg.APIMetrics.EnableScan {
+			scanHandler := apiScan.New(func() { diun.Run() })
+			httpAPI.RegisterFunc(cfg.APIMetrics.ScanPath, scanHandler.Handle)
+			log.Info().Msgf("API Server Registered: %s", cfg.APIMetrics.ScanPath)
+		}
+
+		if err := httpAPI.Start(false); err != nil && err != http.ErrServerClosed {
+			log.Fatal().Err(err).Msgf("failed to start API %s", err)
+		}
+
+		log.Info().Msgf("API Server Started Port: %s EnableAPI: %s EnableScan: %s", cfg.APIMetrics.Port, strconv.FormatBool(*cfg.APIMetrics.EnableAPI), strconv.FormatBool(*cfg.APIMetrics.EnableScan))
 	}
 
 	// Start

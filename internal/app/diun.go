@@ -19,6 +19,7 @@ import (
 	kubernetesPrd "github.com/crazy-max/diun/v4/internal/provider/kubernetes"
 	nomadPrd "github.com/crazy-max/diun/v4/internal/provider/nomad"
 	swarmPrd "github.com/crazy-max/diun/v4/internal/provider/swarm"
+	containerMetrics "github.com/crazy-max/diun/v4/pkg/metrics"
 	"github.com/crazy-max/gohealthchecks"
 	"github.com/hako/durafmt"
 	"github.com/panjf2000/ants/v2"
@@ -188,7 +189,11 @@ func (di *Diun) Run() {
 		Int("unchanged", entries.CountUnchange).
 		Int("skipped", entries.CountSkip).
 		Int("failed", entries.CountError).
+		Int("stale", entries.CountStale).
+		Int("total", entries.CountTotal).
 		Msg("Jobs completed")
+
+	containerMetrics.RegisterNotification(*entries)
 }
 
 // Close closes diun

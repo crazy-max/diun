@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"sort"
 	"strings"
-	"unicode"
 
 	"golang.org/x/mod/semver"
 )
@@ -23,9 +22,9 @@ func SortTags(tags []string, sortTag SortTag) []string {
 		return tags
 	case SortTagSemver:
 		semverIsh := func(s string) string {
-			s = strings.TrimLeftFunc(s, func(r rune) bool {
-				return !unicode.IsNumber(r)
-			})
+			if semver.IsValid(s) {
+				return s
+			}
 			if vt := fmt.Sprintf("v%s", s); semver.IsValid(vt) {
 				return vt
 			}
@@ -37,13 +36,7 @@ func SortTags(tags []string, sortTag SortTag) []string {
 			} else if c < 0 {
 				return false
 			}
-			if c := strings.Count(tags[i], ".") - strings.Count(tags[j], "."); c > 0 {
-				return true
-			} else if c < 0 {
-				return false
-			}
-
-			return strings.Compare(tags[i], tags[j]) < 0
+			return strings.Count(tags[i], ".") > strings.Count(tags[j], ".")
 		})
 		return tags
 	default:
