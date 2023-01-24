@@ -6,10 +6,15 @@ import (
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/internal/provider/file"
 	"github.com/crazy-max/diun/v4/pkg/registry"
+	"github.com/crazy-max/diun/v4/pkg/utl"
 	"github.com/stretchr/testify/assert"
 )
 
 var (
+	defaultImageDefaults = model.Image{
+		NotifyOn: model.NotifyOnDefaults,
+		SortTags: registry.SortTagReverse,
+	}
 	bintrayFile = []model.Job{
 		{
 			Provider: "file",
@@ -24,7 +29,7 @@ var (
 			Provider: "file",
 			Image: model.Image{
 				Name:      "docker.bintray.io/jfrog/xray-server:2.8.6",
-				WatchRepo: true,
+				WatchRepo: utl.NewTrue(),
 				NotifyOn: []model.NotifyOn{
 					model.NotifyOnNew,
 				},
@@ -47,7 +52,7 @@ var (
 			Provider: "file",
 			Image: model.Image{
 				Name:      "crazymax/swarm-cronjob",
-				WatchRepo: true,
+				WatchRepo: utl.NewTrue(),
 				NotifyOn:  model.NotifyOnDefaults,
 				SortTags:  registry.SortTagSemver,
 				IncludeTags: []string{
@@ -59,7 +64,7 @@ var (
 			Provider: "file",
 			Image: model.Image{
 				Name:      "docker.io/portainer/portainer",
-				WatchRepo: true,
+				WatchRepo: utl.NewTrue(),
 				NotifyOn:  model.NotifyOnDefaults,
 				MaxTags:   10,
 				SortTags:  registry.SortTagReverse,
@@ -72,7 +77,7 @@ var (
 			Provider: "file",
 			Image: model.Image{
 				Name:      "traefik",
-				WatchRepo: true,
+				WatchRepo: utl.NewTrue(),
 				NotifyOn:  model.NotifyOnDefaults,
 				SortTags:  registry.SortTagDefault,
 			},
@@ -110,7 +115,7 @@ var (
 			Provider: "file",
 			Image: model.Image{
 				Name:      "crazymax/ddns-route53",
-				WatchRepo: true,
+				WatchRepo: utl.NewTrue(),
 				NotifyOn:  model.NotifyOnDefaults,
 				SortTags:  registry.SortTagReverse,
 				IncludeTags: []string{
@@ -153,13 +158,25 @@ var (
 func TestListJobFilename(t *testing.T) {
 	fc := file.New(&model.PrdFile{
 		Filename: "./fixtures/dockerhub.yml",
-	})
+	}, &defaultImageDefaults)
+
 	assert.Equal(t, dockerhubFile, fc.ListJob())
 }
 
 func TestListJobDirectory(t *testing.T) {
 	fc := file.New(&model.PrdFile{
 		Directory: "./fixtures",
-	})
+	}, &defaultImageDefaults)
+
 	assert.Equal(t, append(append(bintrayFile, dockerhubFile...), append(lscrFile, quayFile...)...), fc.ListJob())
+}
+
+func TestDefaultImageOptions(t *testing.T) {
+	fc := file.New(&model.PrdFile{
+		Filename: "./fixtures/dockerhub.yml",
+	}, &model.Image{WatchRepo: utl.NewTrue()})
+
+	for _, job := range fc.ListJob() {
+		assert.True(t, *job.Image.WatchRepo)
+	}
 }
