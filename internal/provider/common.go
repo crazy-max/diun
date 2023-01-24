@@ -18,16 +18,14 @@ var (
 )
 
 // ValidateImage returns a standard image through Docker labels
-func ValidateImage(image string, metadata, labels map[string]string, watchByDef bool) (img model.Image, err error) {
+func ValidateImage(image string, metadata, labels map[string]string, watchByDef bool, imageDefaults model.Image) (img model.Image, err error) {
 	if i := strings.Index(image, "@sha256:"); i > 0 {
 		image = image[:i]
 	}
-	img = model.Image{
-		Name:     image,
-		Metadata: metadata,
-		NotifyOn: model.NotifyOnDefaults,
-		SortTags: registry.SortTagReverse,
-	}
+
+	img = imageDefaults
+	img.Name = image
+	img.Metadata = metadata
 
 	if enableStr, ok := labels["diun.enable"]; ok {
 		enable, err := strconv.ParseBool(enableStr)

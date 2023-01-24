@@ -7,7 +7,6 @@ import (
 
 	"github.com/containerd/containerd/platforms"
 	"github.com/crazy-max/diun/v4/internal/model"
-	"github.com/crazy-max/diun/v4/pkg/registry"
 	ocispecs "github.com/opencontainers/image-spec/specs-go/v1"
 	"gopkg.in/yaml.v2"
 )
@@ -34,7 +33,7 @@ func (c *Client) listFileImage() []model.Image {
 		for _, item := range items {
 			// Check NotifyOn
 			if len(item.NotifyOn) == 0 {
-				item.NotifyOn = model.NotifyOnDefaults
+				item.NotifyOn = c.imageDefaults.NotifyOn
 			} else {
 				for _, no := range item.NotifyOn {
 					if !no.Valid() {
@@ -48,7 +47,7 @@ func (c *Client) listFileImage() []model.Image {
 
 			// Check SortType
 			if item.SortTags == "" {
-				item.SortTags = registry.SortTagReverse
+				item.SortTags = c.imageDefaults.SortTags
 			}
 			if !item.SortTags.Valid() {
 				c.logger.Error().

@@ -1,8 +1,9 @@
-package nomad
+package nomad_test
 
 import (
 	"testing"
 
+	"github.com/crazy-max/diun/v4/internal/provider/nomad"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -46,7 +47,7 @@ func TestParseServiceTags(t *testing.T) {
 	for _, tt := range testCases {
 		tt := tt
 		t.Run(tt.input[0], func(t *testing.T) {
-			result := parseServiceTags(tt.input)
+			result := nomad.ParseServiceTags(tt.input)
 			assert.Equal(t, tt.expected, result)
 		})
 	}

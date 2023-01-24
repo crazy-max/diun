@@ -9,7 +9,7 @@ import (
 	nomad "github.com/hashicorp/nomad/api"
 )
 
-func parseServiceTags(tags []string) map[string]string {
+func ParseServiceTags(tags []string) map[string]string {
 	labels := map[string]string{}
 
 	for _, tag := range tags {
@@ -69,7 +69,7 @@ func (c *Client) listTaskImages() []model.Image {
 			groupLabels = updateMap(groupLabels, taskGroup.Meta)
 
 			for _, service := range taskGroup.Services {
-				groupLabels = updateMap(groupLabels, parseServiceTags(service.Tags))
+				groupLabels = updateMap(groupLabels, ParseServiceTags(service.Tags))
 			}
 
 			for _, task := range taskGroup.Tasks {
@@ -92,13 +92,13 @@ func (c *Client) listTaskImages() []model.Image {
 					labels := map[string]string{}
 					labels = updateMap(labels, groupLabels)
 					for _, service := range task.Services {
-						labels = updateMap(labels, parseServiceTags(service.Tags))
+						labels = updateMap(labels, ParseServiceTags(service.Tags))
 					}
 
 					// Finally, merge task meta values
 					labels = updateMap(labels, task.Meta)
 
-					image, err := provider.ValidateImage(imageName, metadata(job, taskGroup, task), labels, *c.config.WatchByDefault)
+					image, err := provider.ValidateImage(imageName, metadata(job, taskGroup, task), labels, *c.config.WatchByDefault, *c.imageDefaults)
 					if err != nil {
 						c.logger.Error().
 							Err(err).

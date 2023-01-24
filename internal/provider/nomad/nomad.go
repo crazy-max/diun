@@ -10,16 +10,18 @@ import (
 // Client represents an active nomad provider object
 type Client struct {
 	*provider.Client
-	config *model.PrdNomad
-	logger zerolog.Logger
+	config        *model.PrdNomad
+	logger        zerolog.Logger
+	imageDefaults *model.Image
 }
 
-// New creates new kubernetes provider instance
-func New(config *model.PrdNomad) *provider.Client {
+// New creates new nomad provider instance
+func New(config *model.PrdNomad, imageDefaults *model.Image) *provider.Client {
 	return &provider.Client{
 		Handler: &Client{
-			config: config,
-			logger: log.With().Str("provider", "nomad").Logger(),
+			config:        config,
+			logger:        log.With().Str("provider", "nomad").Logger(),
+			imageDefaults: imageDefaults,
 		},
 	}
 }
