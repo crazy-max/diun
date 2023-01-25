@@ -42,7 +42,7 @@ require (
 	go.etcd.io/bbolt v1.3.6
 	golang.org/x/mod v0.7.0
 	golang.org/x/sys v0.4.0
-	google.golang.org/grpc v1.52.0
+	google.golang.org/grpc v1.52.1
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.2.0
 	google.golang.org/protobuf v1.28.1
 	gopkg.in/yaml.v2 v2.4.0
