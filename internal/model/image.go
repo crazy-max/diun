@@ -1,21 +1,27 @@
 package model
 
-import "github.com/crazy-max/diun/v4/pkg/registry"
+import (
+	"github.com/crazy-max/diun/v4/pkg/registry"
+	digest "github.com/opencontainers/go-digest"
+)
 
 // Image holds image configuration
 type Image struct {
-	Name        string            `yaml:"name,omitempty" json:",omitempty"`
-	Platform    ImagePlatform     `yaml:"platform,omitempty" json:",omitempty"`
-	RegOpt      string            `yaml:"regopt,omitempty" json:",omitempty"`
-	WatchRepo   bool              `yaml:"watch_repo,omitempty" json:",omitempty"`
-	NotifyOn    []NotifyOn        `yaml:"notify_on,omitempty" json:",omitempty"`
-	MaxTags     int               `yaml:"max_tags,omitempty" json:",omitempty"`
-	SortTags    registry.SortTag  `yaml:"sort_tags,omitempty" json:",omitempty"`
-	IncludeTags []string          `yaml:"include_tags,omitempty" json:",omitempty"`
-	ExcludeTags []string          `yaml:"exclude_tags,omitempty" json:",omitempty"`
-	HubTpl      string            `yaml:"hub_tpl,omitempty" json:",omitempty"`
-	HubLink     string            `yaml:"hub_link,omitempty" json:",omitempty"`
-	Metadata    map[string]string `yaml:"metadata,omitempty" json:",omitempty"`
+	Name            string            `yaml:"name,omitempty" json:",omitempty"`
+	Platform        ImagePlatform     `yaml:"platform,omitempty" json:",omitempty"`
+	RegOpt          string            `yaml:"regopt,omitempty" json:",omitempty"`
+	WatchRepo       bool              `yaml:"watch_repo,omitempty" json:",omitempty"`
+	NotifyOn        []NotifyOn        `yaml:"notify_on,omitempty" json:",omitempty"`
+	MaxTags         int               `yaml:"max_tags,omitempty" json:",omitempty"`
+	SortTags        registry.SortTag  `yaml:"sort_tags,omitempty" json:",omitempty"`
+	IncludeTags     []string          `yaml:"include_tags,omitempty" json:",omitempty"`
+	ExcludeTags     []string          `yaml:"exclude_tags,omitempty" json:",omitempty"`
+	HubTpl          string            `yaml:"hub_tpl,omitempty" json:",omitempty"`
+	HubLink         string            `yaml:"hub_link,omitempty" json:",omitempty"`
+	Metadata        map[string]string `yaml:"metadata,omitempty" json:",omitempty"`
+	Digests         []digest.Digest
+	ContainerName   string
+	ContainerLabels map[string]string
 }
 
 // ImagePlatform holds image platform configuration
@@ -32,6 +38,7 @@ const (
 	ImageStatusUnchange = ImageStatus("unchange")
 	ImageStatusSkip     = ImageStatus("skip")
 	ImageStatusError    = ImageStatus("error")
+	ImageStatusStale    = ImageStatus("stale")
 )
 
 // ImageStatus holds Docker image status analysis

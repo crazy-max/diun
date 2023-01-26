@@ -91,7 +91,7 @@ func (c *Client) listContainerImage() []model.Image {
 			Str("ctn_image", imageName).
 			Interface("ctn_labels", ctn.Labels).
 			Msg("Validate image")
-		image, err := provider.ValidateImage(imageName, metadata(ctn), ctn.Labels, *c.config.WatchByDefault)
+		image, err := provider.ValidateImageWithDigest(imageName, metadata(ctn), ctn.Labels, *c.config.WatchByDefault, imageRaw.RepoDigests)
 
 		if err != nil {
 			c.logger.Error().Err(err).
@@ -119,6 +119,7 @@ func metadata(ctn types.Container) map[string]string {
 	return map[string]string{
 		"ctn_id":        ctn.ID,
 		"ctn_names":     formatNames(ctn.Names),
+		"ctn_name":      formatNames(ctn.Names),
 		"ctn_command":   ctn.Command,
 		"ctn_createdat": time.Unix(ctn.Created, 0).String(),
 		"ctn_state":     ctn.State,

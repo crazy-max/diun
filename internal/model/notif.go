@@ -19,15 +19,18 @@ type NotifEntries struct {
 	CountSkip     int
 	CountError    int
 	CountTotal    int
+	CountStale    int
 }
 
 // NotifEntry represents a notification entry
 type NotifEntry struct {
-	Status   ImageStatus       `json:"status,omitempty"`
-	Provider string            `json:"provider,omitempty"`
-	Image    registry.Image    `json:"image,omitempty"`
-	Manifest registry.Manifest `json:"manifest,omitempty"`
-	Metadata map[string]string `json:"metadata,omitempty"`
+	Status          ImageStatus       `json:"status,omitempty"`
+	Provider        string            `json:"provider,omitempty"`
+	Image           registry.Image    `json:"image,omitempty"`
+	Manifest        registry.Manifest `json:"manifest,omitempty"`
+	Metadata        map[string]string `json:"metadata,omitempty"`
+	ContainerName   string            `json:"container,omitempty"`
+	ContainerLabels map[string]string
 }
 
 // Notif holds data necessary for notification configuration
@@ -76,6 +79,9 @@ func (s *NotifEntries) Add(entry NotifEntry) {
 		s.CountTotal++
 	case ImageStatusError:
 		s.CountError++
+		s.CountTotal++
+	case ImageStatusStale:
+		s.CountStale++
 		s.CountTotal++
 	}
 }

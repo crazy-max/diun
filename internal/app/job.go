@@ -6,6 +6,8 @@ import (
 
 	"github.com/containers/image/v5/pkg/docker/config"
 	"github.com/containers/image/v5/types"
+	"github.com/opencontainers/go-digest"
+
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/pkg/registry"
 	"github.com/crazy-max/diun/v4/pkg/utl"
@@ -166,10 +168,12 @@ func (di *Diun) createJob(job model.Job) {
 func (di *Diun) runJob(job model.Job) (entry model.NotifEntry) {
 	var err error
 	entry = model.NotifEntry{
-		Status:   model.ImageStatusError,
-		Provider: job.Provider,
-		Image:    job.RegImage,
-		Metadata: job.Image.Metadata,
+		Status:          model.ImageStatusError,
+		Provider:        job.Provider,
+		Image:           job.RegImage,
+		Metadata:        job.Image.Metadata,
+		ContainerName:   job.Image.ContainerName,
+		ContainerLabels: job.Image.ContainerLabels,
 	}
 
 	sublog := log.With().
@@ -207,9 +211,15 @@ func (di *Diun) runJob(job model.Job) (entry model.NotifEntry) {
 		entry.Image.HubLink = job.HubLinkOverride
 	}
 
+	stale := !digestInList(entry.Manifest.Digest.String(), job.Image.Digests)
+	sublog.Debug().Msgf("Image: %s Running Image Digests: %s Registry Image Digest: %s", job.Image.Name, job.Image.Digests, entry.Manifest.Digest.String())
+
 	if len(dbManifest.Name) == 0 {
 		entry.Status = model.ImageStatusNew
 		sublog.Info().Msg("New image found")
+	} else if stale {
+		entry.Status = model.ImageStatusStale
+		sublog.Info().Msgf("New Image found for %s - %s", job.Image.Name, entry.Manifest.Digest.String())
 	} else if updated {
 		entry.Status = model.ImageStatusUpdate
 		sublog.Info().Msg("Image update found")
@@ -240,4 +250,13 @@ func (di *Diun) runJob(job model.Job) (entry model.NotifEntry) {
 
 	di.notif.Send(entry)
 	return
+}
+
+func digestInList(a string, list []digest.Digest) bool {
+	for _, b := range list {
+		if b.String() == a {
+			return true
+		}
+	}
+	return false
 }
