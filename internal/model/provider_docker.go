@@ -12,6 +12,7 @@ type PrdDocker struct {
 	TLSVerify      *bool  `yaml:"tlsVerify" json:"tlsVerify,omitempty" validate:"required"`
 	WatchByDefault *bool  `yaml:"watchByDefault" json:"watchByDefault,omitempty" validate:"required"`
 	WatchStopped   *bool  `yaml:"watchStopped" json:"watchStopped,omitempty" validate:"required"`
+	PullImages     *bool  `yaml:"pullImages" json:"pullImages,omitempty" validate:"omitempty"`
 }
 
 // GetDefaults gets the default values
@@ -26,4 +27,5 @@ func (s *PrdDocker) SetDefaults() {
 	s.TLSVerify = utl.NewTrue()
 	s.WatchByDefault = utl.NewFalse()
 	s.WatchStopped = utl.NewFalse()
+	s.PullImages = utl.NewFalse()
 }

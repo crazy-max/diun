@@ -12,4 +12,5 @@ type Job struct {
 	Registry        *registry.Client
 	FirstCheck      bool
 	HubLinkOverride string
+	PullImage       bool
 }

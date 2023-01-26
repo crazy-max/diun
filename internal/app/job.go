@@ -242,6 +242,15 @@ func (di *Diun) runJob(job model.Job) (entry model.NotifEntry) {
 		return
 	}
 
+	// Pull Image if configured.
+	if job.PullImage && entry.Status == model.ImageStatusStale {
+		sublog.Debug().Msgf("Pulling image: %s", entry.Image.String())
+		err := job.Registry.PullImage(entry.Image.String())
+		if err != nil {
+			sublog.Error().Msgf("Unable to pull the image: %s", entry.Image.String())
+		}
+	}
+
 	notifyOn := model.NotifyOn(entry.Status)
 	if !notifyOn.OneOf(job.Image.NotifyOn) {
 		sublog.Debug().Msgf("Skipping notification (%s not part of specified notify status)", entry.Status)
