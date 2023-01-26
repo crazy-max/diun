@@ -9,6 +9,7 @@ import (
 	"github.com/containerd/containerd/platforms"
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/pkg/registry"
+	digest "github.com/opencontainers/go-digest"
 	"github.com/pkg/errors"
 )
 
@@ -17,16 +18,37 @@ var (
 	metadataKeyRegexp = regexp.MustCompile(`^[` + metadataKeyChars + `]+$`)
 )
 
-// ValidateImage returns a standard image through Docker labels
-func ValidateImage(image string, metadata, labels map[string]string, watchByDef bool) (img model.Image, err error) {
-	if i := strings.Index(image, "@sha256:"); i > 0 {
+func ValidateImageWithDigest(image string, metadata, labels map[string]string, watchByDef bool, digests []string) (img model.Image, err error) {
+	if i := strings.Index(image, "@sha256"); i > 0 {
 		image = image[:i]
 	}
+
+	l := make([]digest.Digest, len(digests)+1)
+	j := 0
+	for d := range digests {
+		digestString := digests[d]
+
+		if i := strings.Index(digestString, "@sha256"); i > 0 {
+			digestString = digestString[i+1:]
+
+			if len(digestString) > 0 {
+				dgst, err := digest.Parse(digestString)
+				if err != nil {
+					return img, fmt.Errorf("cannot parse %s value of image digest", digestString)
+				}
+
+				l[j] = dgst
+				j++
+			}
+		}
+	}
+
 	img = model.Image{
-		Name:     image,
-		Metadata: metadata,
-		NotifyOn: model.NotifyOnDefaults,
-		SortTags: registry.SortTagReverse,
+		Name:          image,
+		NotifyOn:      model.NotifyOnDefaults,
+		SortTags:      registry.SortTagReverse,
+		Digests:       l,
+		ContainerName: metadata["ctn_name"],
 	}
 
 	if enableStr, ok := labels["diun.enable"]; ok {
@@ -104,10 +126,21 @@ func ValidateImage(image string, metadata, labels map[string]string, watchByDef 
 				img.Metadata = map[string]string{}
 			}
 			img.Metadata[mkey] = value
+		case key == "diun.label-schema.group":
+			if img.ContainerLabels == nil {
+				img.ContainerLabels = map[string]string{}
+			}
+			img.ContainerLabels[key] = value
 		}
 	}
 
 	return img, nil
+}
+
+// ValidateImage returns a standard image through Docker labels
+func ValidateImage(image string, metadata, labels map[string]string, watchByDef bool) (img model.Image, err error) {
+	d := make([]string, 1, 2)
+	return ValidateImageWithDigest(image, metadata, labels, watchByDef, d)
 }
 
 func validateMetadataKey(key string) error {

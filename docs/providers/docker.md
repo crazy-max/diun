@@ -169,12 +169,28 @@ Include created and exited containers too (default `false`).
 !!! abstract "Environment variables"
     * `DIUN_PROVIDERS_DOCKER_WATCHSTOPPED`
 
+### `pullImages`
+
+Pull new image if found in the remote repository. (default `false`).
+This feature is used in conjunction with the apimetrics.
+
+!!! example "File"
+    ```yaml
+    providers:
+      docker:
+        pullImages: true
+    ```
+
+!!! abstract "Environment variables"
+    * `DIUN_PROVIDERS_DOCKER_PULLIMAGES`
+
+
 ## Docker labels
 
 You can configure more finely the way to analyze the image of your container through Docker labels:
 
 | Name                | Default                        | Description                                                                                                                                             |
-|---------------------|--------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
+| ------------------- | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `diun.enable`       |                                | Set to true to enable image analysis of this container                                                                                                  |
 | `diun.regopt`       |                                | [Registry options](../config/regopts.md) name to use                                                                                                    |
 | `diun.watch_repo`   | `false`                        | Watch all tags of this container image ([be careful](../faq.md#docker-hub-rate-limits) with this setting)                                               |
@@ -190,7 +206,7 @@ You can configure more finely the way to analyze the image of your container thr
 ## Default metadata
 
 | Key                           | Description             |
-|-------------------------------|-------------------------|
+| ----------------------------- | ----------------------- |
 | `diun.metadata.ctn_id`        | Container ID            |
 | `diun.metadata.ctn_names`     | Container names         |
 | `diun.metadata.ctn_command`   | Container command       |

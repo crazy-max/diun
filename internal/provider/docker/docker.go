@@ -40,8 +40,9 @@ func (c *Client) ListJob() []model.Job {
 	var list []model.Job
 	for _, image := range images {
 		list = append(list, model.Job{
-			Provider: "docker",
-			Image:    image,
+			Provider:  "docker",
+			Image:     image,
+			PullImage: *c.config.PullImages,
 		})
 	}
 
