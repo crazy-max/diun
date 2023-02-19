@@ -63,6 +63,13 @@ notif:
     client: "diun"
     topic: "docker/diun"
     qos: 0
+  ntfy:
+    endpoint: https://ntfy.sh
+    topic: diun-acce65a0-b777-46f9-9a11-58c67d1579c4
+    priority: 3
+    tags:
+      - package
+    timeout: 10s
   pushover:
     token: uQiRzpo4DXghDmr9QzzfQu27cmVRsG
     recipient: gznej3rKEVAvPUxu9vvNnqpmZpokzF

@@ -56,6 +56,11 @@ You can override this using the [`--config` flag or `CONFIG` env var with `serve
         to:
           - webmaster@example.com
           - me@example.com
+      ntfy:
+        endpoint: https://ntfy.sh
+        topic: diun-acce65a0-b777-46f9-9a11-58c67d1579c4
+        priority: 3
+        timeout: 5s
       rocketchat:
         endpoint: http://rocket.foo.com:3000
         channel: "#general"
@@ -131,6 +136,11 @@ All configuration from file can be transposed into environment variables. As an 
         token: Token123456
         priority: 1
         timeout: 10s
+      ntfy:
+        endpoint: https://ntfy.sh
+        topic: diun-acce65a0-b777-46f9-9a11-58c67d1579c4
+        priority: 3
+        timeout: 5s
       telegram:
         token: aabbccdd:11223344
         chatIDs:
@@ -179,6 +189,11 @@ Can be transposed to:
     DIUN_NOTIF_GOTIFY_PRIORITY=1
     DIUN_NOTIF_GOTIFY_TIMEOUT=10s
 
+    DIUN_NOTIF_NTFY_ENDPOINT=https://ntfy.sh
+    DIUN_NOTIF_NTFY_TOPIC=diun-acce65a0-b777-46f9-9a11-58c67d1579c4
+    DIUN_NOTIF_NTFY_TAGS=whale
+    DIUN_NOTIF_NTFY_TIMEOUT=10s
+
     DIUN_NOTIF_TELEGRAM_TOKEN=aabbccdd:11223344
     DIUN_NOTIF_TELEGRAM_CHATIDS=123456789,987654321
 
@@ -213,6 +228,7 @@ Can be transposed to:
     * [mail](../notif/mail.md)
     * [matrix](../notif/matrix.md)
     * [mqtt](../notif/mqtt.md)
+    * [ntfy](../notif/ntfy.md)
     * [pushover](../notif/pushover.md)
     * [rocketchat](../notif/rocketchat.md)
     * [script](../notif/script.md)

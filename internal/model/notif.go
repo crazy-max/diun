@@ -38,6 +38,7 @@ type Notif struct {
 	Mail       *NotifMail       `yaml:"mail,omitempty" json:"mail,omitempty"`
 	Matrix     *NotifMatrix     `yaml:"matrix,omitempty" json:"matrix,omitempty"`
 	Mqtt       *NotifMqtt       `yaml:"mqtt,omitempty" json:"mqtt,omitempty"`
+	Ntfy       *NotifNtfy       `yaml:"ntfy,omitempty" json:"ntfy,omitempty"`
 	Pushover   *NotifPushover   `yaml:"pushover,omitempty" json:"pushover,omitempty"`
 	RocketChat *NotifRocketChat `yaml:"rocketchat,omitempty" json:"rocketchat,omitempty"`
 	Script     *NotifScript     `yaml:"script,omitempty" json:"script,omitempty"`

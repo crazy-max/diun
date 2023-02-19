@@ -127,6 +127,15 @@ for <code>{{ .Entry.Manifest.Platform }}</code> platform.
 						Topic:    "docker/diun",
 						QoS:      0,
 					},
+					Ntfy: &model.NotifNtfy{
+						Endpoint:      "https://ntfy.sh",
+						Topic:         "diun-acce65a0-b777-46f9-9a11-58c67d1579c4",
+						Priority:      3,
+						Tags:          []string{"package"},
+						Timeout:       utl.NewDuration(10 * time.Second),
+						TemplateTitle: model.NotifDefaultTemplateTitle,
+						TemplateBody:  model.NotifDefaultTemplateBody,
+					},
 					Pushover: &model.NotifPushover{
 						Token:         "uQiRzpo4DXghDmr9QzzfQu27cmVRsG",
 						Recipient:     "gznej3rKEVAvPUxu9vvNnqpmZpokzF",
