@@ -2,7 +2,7 @@
 
 ## Download
 
-Diun binaries are available on [releases]([[ config.repo_url ]]releases) page.
+Diun binaries are available on [releases]([[ config.repo_url ]]/releases) page.
 
 Choose the archive matching the destination platform:
 
