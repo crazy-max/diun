@@ -11,6 +11,7 @@ Tutorials made by the community.
 - 2020-10-09 - selfhosted.show - [Podcast: Perils of Self-Hosting](https://selfhosted.show/29?t=637)
 - 2020-09-21 - blog.alexsguardian.net - [Docker Container Building via GitHub Actions with Diun](https://blog.alexsguardian.net/2020/09/21/docker-container-building-via-github-actions-with-diun/)
 - 2020-09-17 - spad.uk - [Monitoring For Docker Image Updates With Diun](https://spad.uk/monitoring-for-docker-image-updates-with-diun/)
+- 2020-05-25 - bacardi55.io - [Receive alerts when new images are available for your docker swarm cluster](https://bacardi55.io/2020/05/05/receive-alerts-when-new-images-are-available-for-your-docker-swarm-cluster-with-diun/)
 - 2019-06-10 - crazymax.medium.com - [Diun - Docker image update notifier](https://crazymax.medium.com/diun-docker-image-update-notifier-78f09e29b469)
 
 !!! tip
