@@ -30,7 +30,7 @@ require (
 	github.com/nlopes/slack v0.6.0
 	github.com/opencontainers/go-digest v1.0.0
 	github.com/opencontainers/image-spec v1.1.0-rc2
-	github.com/panjf2000/ants/v2 v2.7.1
+	github.com/panjf2000/ants/v2 v2.7.2
 	github.com/pkg/errors v0.9.1
 	github.com/pkg/profile v1.7.0
 	github.com/rs/zerolog v1.29.0
