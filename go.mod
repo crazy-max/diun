@@ -26,7 +26,7 @@ require (
 	github.com/matcornic/hermes/v2 v2.1.0
 	github.com/matrix-org/gomatrix v0.0.0-20210324163249-be2af5ef2e16
 	github.com/microcosm-cc/bluemonday v1.0.23
-	github.com/moby/buildkit v0.11.4
+	github.com/moby/buildkit v0.11.5
 	github.com/nlopes/slack v0.6.0
 	github.com/opencontainers/go-digest v1.0.0
 	github.com/opencontainers/image-spec v1.1.0-rc2
