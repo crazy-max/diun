@@ -3,6 +3,7 @@
 Tutorials made by the community.
 
 <!-- please, keep date sorting -->
+- 2023-03-29 - youtube.com (Digital Aloha) - [(DIUN) Docker Image Update Notifier Synology NAS Setup Guide](https://youtu.be/xVhIRrJYO3E)
 - 2022-03-11 - www.marcodaleo.com - [DIUN: Docker Image Update Notifier](https://www.marcodaleo.com/posts/diun/)
 - 2022-01-13 - youtube.com (GuiPoM) - [Comment mettre à jour ses conteneurs Docker en toute sécurité?](https://www.youtube.com/watch?v=Bcvboctk0Uw)
 - 2021-11-24 - razinj.dev - [Get Docker Images and Containers Updates Notifications](https://razinj.dev/docker-images-and-containers-update-notifications/#bonus-tool-diun)
