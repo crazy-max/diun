@@ -12,8 +12,8 @@ updates:
       time: "08:00"
       timezone: "Europe/Paris"
     labels:
-      - ":game_die: dependencies"
-      - ":robot: bot"
+      - "kind/dependencies"
+      - "bot"
   - package-ecosystem: "github-actions"
     open-pull-requests-limit: 10
     directory: "/"
@@ -22,5 +22,5 @@ updates:
       time: "08:00"
       timezone: "Europe/Paris"
     labels:
-      - ":game_die: dependencies"
-      - ":robot: bot"
+      - "kind/dependencies"
+      - "bot"
