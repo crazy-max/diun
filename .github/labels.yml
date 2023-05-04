@@ -3,17 +3,14 @@
   name: "bot"
   color: "69cde9"
   description: ""
-  from_name: ":robot: bot"
 -
   name: "good first issue"
   color: "7057ff"
   description: ""
-  from_name: ":hatching_chick: good first issue"
 -
   name: "help wanted"
   color: "4caf50"
   description: ""
-  from_name: ":pray: help wanted"
 -
   name: "area/ci"
   color: "ed9ca9"
@@ -26,62 +23,50 @@
   name: "kind/bug"
   color: "b60205"
   description: ""
-  from_name: ":bug: bug"
 -
   name: "kind/dependencies"
   color: "0366d6"
   description: ""
-  from_name: ":game_die: dependencies"
 -
   name: "kind/docs"
   color: "c5def5"
   description: ""
-  from_name: ":memo: documentation"
 -
   name: "kind/duplicate"
   color: "cccccc"
   description: ""
-  from_name: ":busts_in_silhouette: duplicate"
 -
   name: "kind/enhancement"
   color: "0054ca"
   description: ""
-  from_name: ":sparkles: enhancement"
 -
   name: "kind/invalid"
   color: "e6e6e6"
   description: ""
-  from_name: ":no_entry_sign: invalid"
 -
   name: "kind/upstream"
   color: "fbca04"
   description: ""
-  from_name: ":eyes: upstream"
 -
   name: "kind/wontfix"
   color: "ffffff"
   description: ""
-  from_name: ":coffin: wontfix"
 -
   name: "status/automerge"
   color: "8f4fbc"
   description: ""
-  from_name: ":bell: automerge"
 -
   name: "status/needs-investigation"
   color: "e6625b"
   description: ""
-  from_name: ":mag: investigate"
 -
   name: "status/needs-more-info"
   color: "795548"
   description: ""
-  from_name: ":thinking: needs more info"
 -
   name: "status/stale"
   color: "237da0"
   description: ""
-  from_name: ":skull: stale"
 -
   name: "status/triage"
   color: "dde4b7"
