@@ -23,7 +23,7 @@ File a single issue per problem and feature request.
 
 The more information you can provide, the more likely someone will be successful reproducing the issue and finding a fix.
 
-You are now ready to [create a new issue]([[ config.repo_url ]]issues/new/choose)!
+You are now ready to [create a new issue]([[ config.repo_url ]]/issues/new/choose)!
 
 ## Closure policy
 
