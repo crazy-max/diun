@@ -24,7 +24,7 @@ Choose the archive matching the destination platform:
 And extract diun:
 
 ```shell
-wget -qO- [[ config.repo_url ]]releases/download/v[[ git.tag | trim('v') ]]/diun_[[ git.tag | trim('v') ]]_linux_amd64.tar.gz | tar -zxvf - diun
+wget -qO- [[ config.repo_url ]]/releases/download/v[[ git.tag | trim('v') ]]/diun_[[ git.tag | trim('v') ]]_linux_amd64.tar.gz | tar -zxvf - diun
 ```
 
 After getting the binary, it can be tested with [`./diun --help`](../usage/command-line.md#global-options) command
