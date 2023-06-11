@@ -103,8 +103,9 @@ func (di *Diun) Start() error {
 		}
 	}()
 
-	// Run on startup
-	di.Run()
+	if *di.cfg.Watch.RunOnStartup {
+		di.Run()
+	}
 
 	// Init scheduler if defined
 	if len(di.cfg.Watch.Schedule) == 0 {

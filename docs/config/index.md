@@ -34,6 +34,7 @@ You can override this using the [`--config` flag or `CONFIG` env var with `serve
       schedule: "0 */6 * * *"
       jitter: 30s
       firstCheckNotif: false
+      runOnStartup: true
 
     notif:
       amqp:
@@ -129,6 +130,7 @@ All configuration from file can be transposed into environment variables. As an 
       schedule: "0 */6 * * *"
       jitter: 30s
       firstCheckNotif: false
+      runOnStartup: true
 
     notif:
       gotify:
@@ -183,6 +185,7 @@ Can be transposed to:
     DIUN_WATCH_SCHEDULE=0 */6 * * *
     DIUN_WATCH_JITTER=30s
     DIUN_WATCH_FIRSTCHECKNOTIF=false
+    DIUN_WATCH_RUNONSTARTUP=true
 
     DIUN_NOTIF_GOTIFY_ENDPOINT=http://gotify.foo.com
     DIUN_NOTIF_GOTIFY_TOKEN=Token123456
