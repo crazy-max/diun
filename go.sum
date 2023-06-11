@@ -58,8 +58,8 @@ github.com/cpuguy83/go-md2man/v2 v2.0.0-20190314233015-f79a8a8ca69d/go.mod h1:ma
 github.com/cpuguy83/go-md2man/v2 v2.0.2/go.mod h1:tgQtvFlXSQOSOSIRvRPT7W67SCa46tRHOmNcaadrF8o=
 github.com/crazy-max/cron/v3 v3.1.1 h1:8tsAXjV522daYSaN6/Mb/Nh8X/Ez+nedU0KuPV98rNU=
 github.com/crazy-max/cron/v3 v3.1.1/go.mod h1:yexi3kKoh3GcnmRCppyJKsvYIBWzDVaym0dwNWo+zdg=
-github.com/crazy-max/gohealthchecks v0.3.0 h1:mXtTsOinEOcvRcnT3ayRkxGdK18LfrFOWE/gFpfzEI4=
-github.com/crazy-max/gohealthchecks v0.3.0/go.mod h1:gkT8QSdEXZJahyswdTGDbd+q20fWm0DmWW7TWBNtgJg=
+github.com/crazy-max/gohealthchecks v0.4.1 h1:gbjZzF/GxwDyP78u37B2/c2iQfq8BEjAHS3eBLM6FcQ=
+github.com/crazy-max/gohealthchecks v0.4.1/go.mod h1:gkT8QSdEXZJahyswdTGDbd+q20fWm0DmWW7TWBNtgJg=
 github.com/crazy-max/gonfig v0.7.1 h1:cT+Wj7syVnsxmjl+u+Fs/cwZEcorHdGdHgcp3UZNWDE=
 github.com/crazy-max/gonfig v0.7.1/go.mod h1:csPFrGh/m0nIamCJbah1ZN2/+5s510nQQ7szHsk8HZ0=
 github.com/creack/pty v1.1.17 h1:QeVUsEDNrLBW4tMgZHvxy18sKtr6VI492kBhUfhDJNI=
