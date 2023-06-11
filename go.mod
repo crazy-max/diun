@@ -9,7 +9,7 @@ require (
 	github.com/containerd/containerd v1.6.20
 	github.com/containers/image/v5 v5.25.0
 	github.com/crazy-max/cron/v3 v3.1.1
-	github.com/crazy-max/gohealthchecks v0.3.0
+	github.com/crazy-max/gohealthchecks v0.4.1
 	github.com/crazy-max/gonfig v0.7.1
 	github.com/docker/docker v23.0.5+incompatible
 	github.com/docker/go-connections v0.4.0
