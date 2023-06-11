@@ -9,6 +9,8 @@ import (
 // NotifNtfy holds ntfy notification configuration details
 type NotifNtfy struct {
 	Endpoint      string         `yaml:"endpoint,omitempty" json:"endpoint,omitempty" validate:"required"`
+	Token         string         `yaml:"token,omitempty" json:"token,omitempty" validate:"omitempty"`
+	TokenFile     string         `yaml:"tokenFile,omitempty" json:"tokenFile,omitempty" validate:"omitempty,file"`
 	Topic         string         `yaml:"topic,omitempty" json:"topic,omitempty" validate:"required"`
 	Priority      int            `yaml:"priority,omitempty" json:"priority,omitempty" validate:"omitempty,min=0"`
 	Tags          []string       `yaml:"tags,omitempty" json:"tags,omitempty" validate:"required"`

@@ -20,10 +20,12 @@ Notifications can be sent using a [ntfy](https://ntfy.sh/) instance.
     ```
 
 | Name                | Default                             | Description                                                                |
-| ------------------- | ----------------------------------- | -------------------------------------------------------------------------- |
+|---------------------|-------------------------------------|----------------------------------------------------------------------------|
 | `endpoint`[^1]      | `https://ntfy.sh`                   | Ntfy base URL                                                              |
+| `token`             |                                     | [Access token](https://docs.ntfy.sh/publish/#access-tokens)                |
+| `tokenFile`         |                                     | Use content of secret file as acess token if `token` not defined           |
 | `topic`             |                                     | Ntfy topic                                                                 |
-| `priority`          | 3                          | The priority of the message                                                |
+| `priority`          | 3                                   | The priority of the message                                                |
 | `tags`              | `["package"]`                       | Emoji to go in your notiication                                            |
 | `timeout`           | `10s`                               | Timeout specifies a time limit for the request to be made                  |
 | `templateTitle`[^1] | See [below](#default-templatetitle) | [Notification template](../faq.md#notification-template) for message title |
@@ -31,6 +33,8 @@ Notifications can be sent using a [ntfy](https://ntfy.sh/) instance.
 
 !!! abstract "Environment variables"
     * `DIUN_NOTIF_NTFY_ENDPOINT`
+    * `DIUN_NOTIF_NTFY_TOKEN`
+    * `DIUN_NOTIF_NTFY_TOKENFILE`
     * `DIUN_NOTIF_NTFY_TOPIC`
     * `DIUN_NOTIF_NTFY_PRIORITY`
     * `DIUN_NOTIF_NTFY_TAGS`
