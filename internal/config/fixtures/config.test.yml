@@ -6,6 +6,7 @@ watch:
   schedule: "*/30 * * * *"
   jitter: 30s
   firstCheckNotif: true
+  runOnStartup: false
   compareDigest: true
   healthchecks:
     baseURL: https://hc-ping.com/

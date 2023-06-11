@@ -12,6 +12,7 @@ type Watch struct {
 	Schedule        string         `yaml:"schedule,omitempty" json:"schedule,omitempty"`
 	Jitter          *time.Duration `yaml:"jitter,omitempty" json:"jitter,omitempty" validate:"required"`
 	FirstCheckNotif *bool          `yaml:"firstCheckNotif,omitempty" json:"firstCheckNotif,omitempty" validate:"required"`
+	RunOnStartup    *bool          `yaml:"runOnStartup,omitempty" json:"runOnStartup,omitempty" validate:"required"`
 	CompareDigest   *bool          `yaml:"compareDigest,omitempty" json:"compareDigest,omitempty" validate:"required"`
 	Healthchecks    *Healthchecks  `yaml:"healthchecks,omitempty" json:"healthchecks,omitempty"`
 }
@@ -28,5 +29,6 @@ func (s *Watch) SetDefaults() {
 	s.Workers = 10
 	s.Jitter = utl.NewDuration(30 * time.Second)
 	s.FirstCheckNotif = utl.NewFalse()
+	s.RunOnStartup = utl.NewTrue()
 	s.CompareDigest = utl.NewTrue()
 }

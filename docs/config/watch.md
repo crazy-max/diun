@@ -8,6 +8,7 @@ watch:
   schedule: "0 */6 * * *"
   jitter: 30s
   firstCheckNotif: false
+  runOnStartup: true
   compareDigest: true
   healthchecks:
     baseURL: https://hc-ping.com/
@@ -75,6 +76,19 @@ Send notification at the very first analysis of an image. (default `false`)
 
 !!! abstract "Environment variables"
     * `DIUN_WATCH_FIRSTCHECKNOTIF`
+
+### `runOnStartup`
+
+Check for updates on startup. (default `true`)
+
+!!! example "Config file"
+    ```yaml
+    watch:
+      runOnStartup: true
+    ```
+
+!!! abstract "Environment variables"
+    * `DIUN_WATCH_RUNONSTARTUP`
 
 ### `compareDigest`
 

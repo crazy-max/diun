@@ -43,6 +43,8 @@ jobs:
             loglevel: info
           - folder: docker3
             loglevel: info
+          - folder: docker4
+            loglevel: info
           - folder: dockerfile1
             loglevel: debug
     steps:

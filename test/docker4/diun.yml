@@ -1,0 +1,9 @@
+watch:
+  workers: 20
+  schedule: "* * * * *"
+  runOnStartup: false
+
+providers:
+  docker:
+    watchByDefault: true
+    watchStopped: true
