@@ -10,6 +10,7 @@ import (
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/internal/msg"
 	"github.com/crazy-max/diun/v4/internal/notif/notifier"
+	"github.com/crazy-max/diun/v4/pkg/utl"
 )
 
 // Client represents an active ntfy notification object
@@ -85,6 +86,9 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		return err
 	}
 
+	if token, err := utl.GetSecret(c.cfg.Token, c.cfg.TokenFile); err == nil && token != "" {
+		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
+	}
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("User-Agent", c.meta.UserAgent)
 
