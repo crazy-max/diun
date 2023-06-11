@@ -4,7 +4,6 @@ github.com/AlecAivazis/survey/v2 v2.3.6/go.mod h1:4AuI9b7RjAR+G7v9+C4YSlX/YL3K3c
 github.com/Azure/go-ansiterm v0.0.0-20210617225240-d185dfc1b5a1 h1:UQHMgLO+TxOElx5B5HZ4hJQsoJ/PvUvKRhJHDQXO8P8=
 github.com/Azure/go-ansiterm v0.0.0-20210617225240-d185dfc1b5a1/go.mod h1:xomTg63KZ2rFqZQzSB4Vz2SUXa1BpHTVz9L5PTmPC4E=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
-github.com/BurntSushi/toml v1.1.0/go.mod h1:CxXYINrC8qIiEnFrOxCa7Jy5BFHlXnUU2pbicEuybxQ=
 github.com/BurntSushi/toml v1.2.1 h1:9F2/+DoOYIOksmaJFPw1tGFy1eDnIJXg+UHjuD8lTak=
 github.com/BurntSushi/toml v1.2.1/go.mod h1:CxXYINrC8qIiEnFrOxCa7Jy5BFHlXnUU2pbicEuybxQ=
 github.com/Masterminds/semver v1.4.2/go.mod h1:MB6lktGJrhw8PrUyiEoblNEGEQ+RzHPF078ddwwvV3Y=
@@ -61,8 +60,8 @@ github.com/crazy-max/cron/v3 v3.1.1 h1:8tsAXjV522daYSaN6/Mb/Nh8X/Ez+nedU0KuPV98r
 github.com/crazy-max/cron/v3 v3.1.1/go.mod h1:yexi3kKoh3GcnmRCppyJKsvYIBWzDVaym0dwNWo+zdg=
 github.com/crazy-max/gohealthchecks v0.3.0 h1:mXtTsOinEOcvRcnT3ayRkxGdK18LfrFOWE/gFpfzEI4=
 github.com/crazy-max/gohealthchecks v0.3.0/go.mod h1:gkT8QSdEXZJahyswdTGDbd+q20fWm0DmWW7TWBNtgJg=
-github.com/crazy-max/gonfig v0.6.0 h1:CwP+x1gfor4Ze8lLQKkZw/DOQEMVgwBcoocTYLo3c4A=
-github.com/crazy-max/gonfig v0.6.0/go.mod h1:Xj0XEnuoHd4OegWtnmdOP6CDNdP9emiwH7IrBM/ka1I=
+github.com/crazy-max/gonfig v0.7.1 h1:cT+Wj7syVnsxmjl+u+Fs/cwZEcorHdGdHgcp3UZNWDE=
+github.com/crazy-max/gonfig v0.7.1/go.mod h1:csPFrGh/m0nIamCJbah1ZN2/+5s510nQQ7szHsk8HZ0=
 github.com/creack/pty v1.1.17 h1:QeVUsEDNrLBW4tMgZHvxy18sKtr6VI492kBhUfhDJNI=
 github.com/creack/pty v1.1.17/go.mod h1:MOBLtS5ELjhRRrroQr9kyvTxUAFNvYEK993ew/Vr4O4=
 github.com/cyphar/filepath-securejoin v0.2.3/go.mod h1:aPGpWjXOXUn2NCNjFvBE6aRxGGx79pTxQpKOJNYHHl4=
