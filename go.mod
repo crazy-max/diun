@@ -36,7 +36,7 @@ require (
 	github.com/rs/zerolog v1.29.1
 	github.com/russross/blackfriday/v2 v2.1.0
 	github.com/sirupsen/logrus v1.9.0
-	github.com/streadway/amqp v1.0.0
+	github.com/streadway/amqp v1.1.0
 	github.com/stretchr/testify v1.8.4
 	github.com/tidwall/pretty v1.2.1
 	go.etcd.io/bbolt v1.3.7
