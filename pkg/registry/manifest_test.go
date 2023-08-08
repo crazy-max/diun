@@ -8,6 +8,7 @@ import (
 )
 
 func TestCompareDigest(t *testing.T) {
+	t.Parallel()
 	rc, err := registry.New(registry.Options{
 		CompareDigest: true,
 	})
@@ -38,6 +39,7 @@ func TestCompareDigest(t *testing.T) {
 }
 
 func TestManifest(t *testing.T) {
+	t.Parallel()
 	rc, err := registry.New(registry.Options{
 		CompareDigest: true,
 		ImageOs:       "linux",
@@ -98,6 +100,7 @@ func TestManifest(t *testing.T) {
 }
 
 func TestManifestMultiUpdatedPlatform(t *testing.T) {
+	t.Parallel()
 	rc, err := registry.New(registry.Options{
 		CompareDigest: true,
 		ImageOs:       "linux",
@@ -177,6 +180,7 @@ func TestManifestMultiUpdatedPlatform(t *testing.T) {
 }
 
 func TestManifestMultiNotUpdatedPlatform(t *testing.T) {
+	t.Parallel()
 	rc, err := registry.New(registry.Options{
 		CompareDigest: true,
 		ImageOs:       "linux",
@@ -256,6 +260,7 @@ func TestManifestMultiNotUpdatedPlatform(t *testing.T) {
 }
 
 func TestManifestVariant(t *testing.T) {
+	t.Parallel()
 	rc, err := registry.New(registry.Options{
 		ImageOs:      "linux",
 		ImageArch:    "arm",
