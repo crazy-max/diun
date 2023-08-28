@@ -38,8 +38,8 @@ github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e/go.mod h1:nSuG5e5P
 github.com/chzyer/test v0.0.0-20180213035817-a1ea475d72b1/go.mod h1:Q3SI9o4m/ZMnBNeIyt5eFwwo7qiLfzFZmjNmxjkiQlU=
 github.com/client9/misspell v0.3.4/go.mod h1:qj6jICC3Q7zFZvVWo7KLAzC3yx5G7kyvSDkc90ppPyw=
 github.com/cncf/udpa/go v0.0.0-20191209042840-269d4d468f6f/go.mod h1:M8M6+tZqaGXZJjfX53e64911xZQV5JYwmTeXPW+k8Sc=
-github.com/containerd/containerd v1.7.2 h1:UF2gdONnxO8I6byZXDi5sXWiWvlW3D/sci7dTQimEJo=
-github.com/containerd/containerd v1.7.2/go.mod h1:afcz74+K10M/+cjGHIVQrCt3RAQhUSCAjJ9iMYhhkuI=
+github.com/containerd/containerd v1.7.5 h1:i9T9XpAWMe11BHMN7pu1BZqOGjXaKTPyz2v+KYOZgkY=
+github.com/containerd/containerd v1.7.5/go.mod h1:ieJNCSzASw2shSGYLHx8NAE7WsZ/gEigo5fQ78W5Zvw=
 github.com/containerd/typeurl v1.0.2 h1:Chlt8zIieDbzQFzXzAeBEF92KhExuE4p9p92/QmY7aY=
 github.com/containerd/typeurl v1.0.2/go.mod h1:9trJWW2sRlGub4wZJRTW83VtbOLS6hwcDZXTn6oPz9s=
 github.com/containers/image/v5 v5.26.1 h1:8y3xq8GO/6y8FR+nAedHPsAFiAtOrab9qHTBpbqaX8g=
