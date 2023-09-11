@@ -7,6 +7,7 @@ import (
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/internal/provider"
 	nomad "github.com/hashicorp/nomad/api"
+	"github.com/imdario/mergo"
 )
 
 func parseServiceTags(tags []string) map[string]string {
@@ -22,14 +23,6 @@ func parseServiceTags(tags []string) map[string]string {
 	}
 
 	return labels
-}
-
-func updateMap(m1, m2 map[string]string) map[string]string {
-	for key, value := range m2 {
-		m1[key] = value
-	}
-
-	return m1
 }
 
 func (c *Client) listTaskImages() []model.Image {
@@ -66,10 +59,14 @@ func (c *Client) listTaskImages() []model.Image {
 		for _, taskGroup := range jobInfo.TaskGroups {
 			// Get task group service labels
 			groupLabels := map[string]string{}
-			groupLabels = updateMap(groupLabels, taskGroup.Meta)
+			if err := mergo.Merge(&groupLabels, taskGroup.Meta, mergo.WithOverride); err != nil {
+				c.logger.Error().Err(err).Msg("Cannot merge group labels and meta")
+			}
 
 			for _, service := range taskGroup.Services {
-				groupLabels = updateMap(groupLabels, parseServiceTags(service.Tags))
+				if err := mergo.Merge(&groupLabels, parseServiceTags(service.Tags), mergo.WithOverride); err != nil {
+					c.logger.Error().Err(err).Msg("Cannot merge group service labels")
+				}
 			}
 
 			for _, task := range taskGroup.Tasks {
@@ -90,13 +87,19 @@ func (c *Client) listTaskImages() []model.Image {
 
 					// Get task service labels
 					labels := map[string]string{}
-					labels = updateMap(labels, groupLabels)
+					if err := mergo.Merge(&labels, groupLabels, mergo.WithOverride); err != nil {
+						c.logger.Error().Err(err).Msg("Cannot merge task service with group service labels")
+					}
 					for _, service := range task.Services {
-						labels = updateMap(labels, parseServiceTags(service.Tags))
+						if err := mergo.Merge(&labels, parseServiceTags(service.Tags), mergo.WithOverride); err != nil {
+							c.logger.Error().Err(err).Msg("Cannot merge task service labels")
+						}
 					}
 
 					// Finally, merge task meta values
-					labels = updateMap(labels, task.Meta)
+					if err := mergo.Merge(&labels, task.Meta, mergo.WithOverride); err != nil {
+						c.logger.Error().Err(err).Msg("Cannot merge task metadata")
+					}
 
 					image, err := provider.ValidateImage(imageName, metadata(job, taskGroup, task), labels, *c.config.WatchByDefault)
 					if err != nil {
