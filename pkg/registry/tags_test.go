@@ -29,43 +29,6 @@ func TestTags(t *testing.T) {
 }
 
 func TestTagsSort(t *testing.T) {
-	repotags := []string{
-		"0.1.0",
-		"0.4.0",
-		"3.0.0-beta.1",
-		"3.0.0-beta.3",
-		"3.0.0-beta.4",
-		"4",
-		"4.0.0",
-		"4.0.0-beta.1",
-		"4.1.0",
-		"4.1.1",
-		"4.10.0",
-		"4.11.0",
-		"4.12.0",
-		"4.13.0",
-		"4.14.0",
-		"4.19.0",
-		"4.2.0",
-		"4.20",
-		"4.20.0",
-		"4.20.1",
-		"4.21",
-		"4.21.0",
-		"4.3.0",
-		"4.3.1",
-		"4.4.0",
-		"4.6.1",
-		"4.7.0",
-		"4.8.0",
-		"4.8.1",
-		"4.9.0",
-		"ubuntu-5.0",
-		"alpine-5.0",
-		"edge",
-		"latest",
-	}
-
 	testCases := []struct {
 		name     string
 		sortTag  registry.SortTag
@@ -155,10 +118,10 @@ func TestTagsSort(t *testing.T) {
 			name:    "sort reverse",
 			sortTag: registry.SortTagReverse,
 			expected: []string{
-				"ubuntu-5.0",
 				"latest",
 				"edge",
 				"alpine-5.0",
+				"ubuntu-5.0",
 				"4.9.0",
 				"4.8.1",
 				"4.8.0",
@@ -235,7 +198,45 @@ func TestTagsSort(t *testing.T) {
 
 	for _, tt := range testCases {
 		tt := tt
+		repotags := []string{
+			"0.1.0",
+			"0.4.0",
+			"3.0.0-beta.1",
+			"3.0.0-beta.3",
+			"3.0.0-beta.4",
+			"4",
+			"4.0.0",
+			"4.0.0-beta.1",
+			"4.1.0",
+			"4.1.1",
+			"4.10.0",
+			"4.11.0",
+			"4.12.0",
+			"4.13.0",
+			"4.14.0",
+			"4.19.0",
+			"4.2.0",
+			"4.20",
+			"4.20.0",
+			"4.20.1",
+			"4.21",
+			"4.21.0",
+			"4.3.0",
+			"4.3.1",
+			"4.4.0",
+			"4.6.1",
+			"4.7.0",
+			"4.8.0",
+			"4.8.1",
+			"4.9.0",
+			"ubuntu-5.0",
+			"alpine-5.0",
+			"edge",
+			"latest",
+		}
+
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			tags := registry.SortTags(repotags, tt.sortTag)
 			assert.Equal(t, tt.expected, tags)
 		})
