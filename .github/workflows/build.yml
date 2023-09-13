@@ -55,7 +55,7 @@ jobs:
         uses: docker/setup-buildx-action@v2
       -
         name: Validate
-        uses: docker/bake-action@v3
+        uses: docker/bake-action@v4
         with:
           targets: ${{ matrix.target }}
 
@@ -72,7 +72,7 @@ jobs:
         uses: docker/setup-buildx-action@v2
       -
         name: Test
-        uses: docker/bake-action@v3
+        uses: docker/bake-action@v4
         with:
           targets: test
           pull: true
@@ -110,7 +110,7 @@ jobs:
         uses: docker/setup-buildx-action@v2
       -
         name: Build
-        uses: docker/bake-action@v3
+        uses: docker/bake-action@v4
         with:
           targets: artifact
           pull: true
@@ -146,7 +146,7 @@ jobs:
         uses: docker/setup-buildx-action@v2
       -
         name: Build
-        uses: docker/bake-action@v3
+        uses: docker/bake-action@v4
         with:
           targets: release
       -
@@ -223,7 +223,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       -
         name: Build
-        uses: docker/bake-action@v3
+        uses: docker/bake-action@v4
         with:
           files: |
             ./docker-bake.hcl
