@@ -339,7 +339,7 @@ func TestManifestTaggedDigest(t *testing.T) {
 	assert.Equal(t, "linux/amd64", manifest.Platform)
 }
 
-func TestManifestTaggedDigestDummyTag(t *testing.T) {
+func TestManifestTaggedDigestUnknownTag(t *testing.T) {
 	rc, err := New(Options{
 		CompareDigest: true,
 		ImageOs:       "linux",
@@ -356,19 +356,8 @@ func TestManifestTaggedDigestDummyTag(t *testing.T) {
 		t.Error(err)
 	}
 
-	// download manifest
 	_, _, err = rc.Manifest(img, Manifest{})
-	assert.NoError(t, err)
-
-	// check manifest
-	manifest, updated, err := rc.Manifest(img, manifestCrazymaxDiun4250)
-	assert.NoError(t, err)
-	assert.Equal(t, false, updated)
-	assert.Equal(t, "docker.io/crazymax/diun", manifest.Name)
-	assert.Equal(t, "latest", manifest.Tag)
-	assert.Equal(t, "application/vnd.oci.image.index.v1+json", manifest.MIMEType)
-	assert.Equal(t, "sha256:3fca3dd86c2710586208b0f92d1ec4ce25382f4cad4ae76a2275db8e8bb24031", manifest.Digest.String())
-	assert.Equal(t, "linux/amd64", manifest.Platform)
+	assert.Error(t, err)
 }
 
 var manifestCrazymaxDiun4250 = Manifest{

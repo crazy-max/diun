@@ -21,11 +21,11 @@ func TestValidateImage(t *testing.T) {
 		expectedErr   interface{}
 	}{
 		{
-			name:       "Test strip digest",
+			name:       "Test with digest",
 			image:      "myimg@sha256:1234567890abcdef",
 			watchByDef: true,
 			expectedImage: model.Image{
-				Name: "myimg",
+				Name: "myimg@sha256:1234567890abcdef",
 			},
 			expectedErr: nil,
 		},

@@ -39,31 +39,28 @@ func namedReference(name string) (reference.Named, error) {
 		if err != nil {
 			return nil, errors.Wrapf(err, "normalizing tagged digested name %q", name)
 		}
-		return ref, nil
-	}
-	if _, hasDigest := ref.(reference.Digested); hasDigest {
-		return ref, nil
+	} else if _, hasDigest := ref.(reference.Digested); hasDigest {
+		ref = reference.TrimNamed(ref)
 	}
 
 	return reference.TagNameOnly(ref), nil
 }
 
-// normalizeTaggedDigestedNamed strips the tag off the specified named
-// reference if it is tagged and digested. Note that the tag is entirely
-// ignored.
+// normalizeTaggedDigestedNamed strips the digest off the specified named
+// reference if it is tagged and digested.
 func normalizeTaggedDigestedNamed(named reference.Named) (reference.Named, error) {
-	_, isTagged := named.(reference.NamedTagged)
-	if !isTagged {
-		return named, nil
-	}
-	digested, isDigested := named.(reference.Digested)
+	_, isDigested := named.(reference.Digested)
 	if !isDigested {
 		return named, nil
 	}
-	// strip off the tag
+	tag, isTagged := named.(reference.NamedTagged)
+	if !isTagged {
+		return named, nil
+	}
+	// strip off the tag and digest
 	newNamed := reference.TrimNamed(named)
-	// re-add the digest
-	newNamed, err := reference.WithDigest(newNamed, digested.Digest())
+	// re-add the tag
+	newNamed, err := reference.WithTag(newNamed, tag.Tag())
 	if err != nil {
 		return named, err
 	}
