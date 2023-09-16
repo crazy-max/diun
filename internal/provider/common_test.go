@@ -78,7 +78,7 @@ func TestValidateImage(t *testing.T) {
 			expectedImage: model.Image{
 				Name: "myimg",
 			},
-			expectedErr: ErrInvalidLabel,
+			expectedErr: errInvalidLabel,
 		},
 		// Test diun.regopt
 		{
@@ -164,7 +164,7 @@ func TestValidateImage(t *testing.T) {
 			expectedImage: model.Image{
 				Name: "myimg",
 			},
-			expectedErr: ErrInvalidLabel,
+			expectedErr: errInvalidLabel,
 		},
 		{
 			name:       "Override default image values with labels (true > false)",
@@ -225,7 +225,7 @@ func TestValidateImage(t *testing.T) {
 				Name:     "myimg",
 				NotifyOn: []model.NotifyOn{},
 			},
-			expectedErr: ErrInvalidLabel,
+			expectedErr: errInvalidLabel,
 		},
 		{
 			name:       "Set empty notify_on",
@@ -296,7 +296,7 @@ func TestValidateImage(t *testing.T) {
 			expectedImage: model.Image{
 				Name: "myimg",
 			},
-			expectedErr: ErrInvalidLabel,
+			expectedErr: errInvalidLabel,
 		},
 		{
 			name:  "Set empty sort_tags",
@@ -367,7 +367,7 @@ func TestValidateImage(t *testing.T) {
 			expectedImage: model.Image{
 				Name: "myimg",
 			},
-			expectedErr: ErrInvalidLabel,
+			expectedErr: errInvalidLabel,
 		},
 		{
 			name:  "Set empty max_tags",
@@ -380,7 +380,7 @@ func TestValidateImage(t *testing.T) {
 			expectedImage: model.Image{
 				Name: "myimg",
 			},
-			expectedErr: ErrInvalidLabel,
+			expectedErr: errInvalidLabel,
 		},
 		{
 			name:       "Default max_tags",
@@ -678,7 +678,7 @@ func TestValidateImage(t *testing.T) {
 			expectedImage: model.Image{
 				Name: "myimg",
 			},
-			expectedErr: ErrInvalidLabel,
+			expectedErr: errInvalidLabel,
 		},
 		{
 			name:  "Set empty platform",
@@ -692,7 +692,7 @@ func TestValidateImage(t *testing.T) {
 				Name:     "myimg",
 				Platform: model.ImagePlatform{},
 			},
-			expectedErr: ErrInvalidLabel,
+			expectedErr: errInvalidLabel,
 		},
 		{
 			name:       "Default platform",
@@ -768,7 +768,7 @@ func TestValidateImage(t *testing.T) {
 			expectedImage: model.Image{
 				Name: "myimg",
 			},
-			expectedErr: ErrInvalidLabel,
+			expectedErr: errInvalidLabel,
 		},
 		{
 			name:  "Set empty metadata key",
