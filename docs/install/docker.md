@@ -49,15 +49,12 @@ version: "3.5"
 services:
   diun:
     image: crazymax/diun:latest
-    container_name: diun
     command: serve
     volumes:
       - "./data:/data"
       - "/var/run/docker.sock:/var/run/docker.sock"
     environment:
       - "TZ=Europe/Paris"
-      - "LOG_LEVEL=info"
-      - "LOG_JSON=false"
       - "DIUN_WATCH_WORKERS=20"
       - "DIUN_WATCH_SCHEDULE=0 */6 * * *"
       - "DIUN_WATCH_JITTER=30s"
@@ -79,13 +76,11 @@ Or use the following command:
 ```shell
 docker run -d --name diun \
   -e "TZ=Europe/Paris" \
-  -e "LOG_LEVEL=info" \
-  -e "LOG_JSON=false" \
   -e "DIUN_WATCH_WORKERS=20" \
   -e "DIUN_WATCH_SCHEDULE=0 */6 * * *" \
   -e "DIUN_WATCH_JITTER=30s" \
   -e "DIUN_PROVIDERS_DOCKER=true" \
-  -v "$(pwd)/data:/data" \
+  -v "$PWD/data:/data" \
   -v "/var/run/docker.sock:/var/run/docker.sock" \
   -l "diun.enable=true" \
   crazymax/diun:latest
@@ -106,7 +101,6 @@ version: "3.5"
 services:
   diun:
     image: crazymax/diun:latest
-    container_name: diun
     command: serve
     volumes:
       - "./data:/data"
@@ -141,7 +135,6 @@ version: "3.5"
 services:
   diun_app:
     image: docker.io/crazymax/diun:latest
-    container_name: diun
     volumes:
       - "./data:/data"
       # root mode
@@ -151,8 +144,6 @@ services:
       #- "/run/user/1000/podman/podman.sock:/var/run/docker.sock"
     environment:
       - "TZ=Europe/Paris"
-      - "LOG_LEVEL=info"
-      - "LOG_JSON=false"
       - "DIUN_WATCH_WORKERS=20"
       - "DIUN_WATCH_SCHEDULE=0 */6 * * *"
       - "DIUN_WATCH_JITTER=30s"
