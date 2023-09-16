@@ -148,3 +148,7 @@ require (
 	sigs.k8s.io/structured-merge-diff/v4 v4.2.3 // indirect
 	sigs.k8s.io/yaml v1.3.0 // indirect
 )
+
+// needed by buildkit since health start interval addition
+// https://github.com/moby/buildkit/pull/3998
+replace github.com/docker/docker => github.com/docker/docker v24.0.0-rc.2.0.20230718135204-8e51b8b59cb8+incompatible // master (v25.0.0-dev)
