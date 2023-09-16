@@ -1,10 +1,9 @@
-package provider_test
+package provider
 
 import (
 	"testing"
 
 	"github.com/crazy-max/diun/v4/internal/model"
-	"github.com/crazy-max/diun/v4/internal/provider"
 	"github.com/crazy-max/diun/v4/pkg/registry"
 	"github.com/crazy-max/diun/v4/pkg/utl"
 	"github.com/stretchr/testify/assert"
@@ -79,7 +78,7 @@ func TestValidateImage(t *testing.T) {
 			expectedImage: model.Image{
 				Name: "myimg",
 			},
-			expectedErr: provider.ErrInvalidLabel,
+			expectedErr: ErrInvalidLabel,
 		},
 		// Test diun.regopt
 		{
@@ -165,7 +164,7 @@ func TestValidateImage(t *testing.T) {
 			expectedImage: model.Image{
 				Name: "myimg",
 			},
-			expectedErr: provider.ErrInvalidLabel,
+			expectedErr: ErrInvalidLabel,
 		},
 		{
 			name:       "Override default image values with labels (true > false)",
@@ -226,7 +225,7 @@ func TestValidateImage(t *testing.T) {
 				Name:     "myimg",
 				NotifyOn: []model.NotifyOn{},
 			},
-			expectedErr: provider.ErrInvalidLabel,
+			expectedErr: ErrInvalidLabel,
 		},
 		{
 			name:       "Set empty notify_on",
@@ -297,7 +296,7 @@ func TestValidateImage(t *testing.T) {
 			expectedImage: model.Image{
 				Name: "myimg",
 			},
-			expectedErr: provider.ErrInvalidLabel,
+			expectedErr: ErrInvalidLabel,
 		},
 		{
 			name:  "Set empty sort_tags",
@@ -368,7 +367,7 @@ func TestValidateImage(t *testing.T) {
 			expectedImage: model.Image{
 				Name: "myimg",
 			},
-			expectedErr: provider.ErrInvalidLabel,
+			expectedErr: ErrInvalidLabel,
 		},
 		{
 			name:  "Set empty max_tags",
@@ -381,7 +380,7 @@ func TestValidateImage(t *testing.T) {
 			expectedImage: model.Image{
 				Name: "myimg",
 			},
-			expectedErr: provider.ErrInvalidLabel,
+			expectedErr: ErrInvalidLabel,
 		},
 		{
 			name:       "Default max_tags",
@@ -679,7 +678,7 @@ func TestValidateImage(t *testing.T) {
 			expectedImage: model.Image{
 				Name: "myimg",
 			},
-			expectedErr: provider.ErrInvalidLabel,
+			expectedErr: ErrInvalidLabel,
 		},
 		{
 			name:  "Set empty platform",
@@ -693,7 +692,7 @@ func TestValidateImage(t *testing.T) {
 				Name:     "myimg",
 				Platform: model.ImagePlatform{},
 			},
-			expectedErr: provider.ErrInvalidLabel,
+			expectedErr: ErrInvalidLabel,
 		},
 		{
 			name:       "Default platform",
@@ -769,7 +768,7 @@ func TestValidateImage(t *testing.T) {
 			expectedImage: model.Image{
 				Name: "myimg",
 			},
-			expectedErr: provider.ErrInvalidLabel,
+			expectedErr: ErrInvalidLabel,
 		},
 		{
 			name:  "Set empty metadata key",
@@ -860,7 +859,7 @@ func TestValidateImage(t *testing.T) {
 		c := c
 		t.Run(c.name, func(t *testing.T) {
 			t.Parallel()
-			actualImg, actualErr := provider.ValidateImage(
+			actualImg, actualErr := ValidateImage(
 				c.image,
 				c.metadata,
 				c.labels,

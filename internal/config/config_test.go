@@ -1,11 +1,10 @@
-package config_test
+package config
 
 import (
 	"strings"
 	"testing"
 	"time"
 
-	"github.com/crazy-max/diun/v4/internal/config"
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/pkg/registry"
 	"github.com/crazy-max/diun/v4/pkg/utl"
@@ -18,7 +17,7 @@ func TestLoadFile(t *testing.T) {
 	cases := []struct {
 		name     string
 		cfg      string
-		wantData *config.Config
+		wantData *Config
 		wantErr  bool
 	}{
 		{
@@ -44,7 +43,7 @@ func TestLoadFile(t *testing.T) {
 		{
 			name: "Success",
 			cfg:  "./fixtures/config.test.yml",
-			wantData: &config.Config{
+			wantData: &Config{
 				Db: &model.Db{
 					Path: "diun.db",
 				},
@@ -236,7 +235,7 @@ for <code>{{ .Entry.Manifest.Platform }}</code> platform.
 	}
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
-			cfg, err := config.Load(tt.cfg)
+			cfg, err := Load(tt.cfg)
 			if tt.wantErr {
 				require.Error(t, err)
 				return
@@ -269,7 +268,7 @@ func TestLoadEnv(t *testing.T) {
 			environ: []string{
 				"DIUN_PROVIDERS_DOCKER=true",
 			},
-			expected: &config.Config{
+			expected: &Config{
 				Db:      (&model.Db{}).GetDefaults(),
 				Watch:   (&model.Watch{}).GetDefaults(),
 				Notif:   nil,
@@ -294,7 +293,7 @@ func TestLoadEnv(t *testing.T) {
 				"DIUN_REGOPTS_0_TIMEOUT=30s",
 				"DIUN_PROVIDERS_DOCKER=true",
 			},
-			expected: &config.Config{
+			expected: &Config{
 				Db:    (&model.Db{}).GetDefaults(),
 				Watch: (&model.Watch{}).GetDefaults(),
 				RegOpts: model.RegOpts{
@@ -324,7 +323,7 @@ func TestLoadEnv(t *testing.T) {
 				"DIUN_NOTIF_TELEGRAM_CHATIDS=8547439,1234567",
 				"DIUN_PROVIDERS_SWARM=true",
 			},
-			expected: &config.Config{
+			expected: &Config{
 				Db:    (&model.Db{}).GetDefaults(),
 				Watch: (&model.Watch{}).GetDefaults(),
 				Notif: &model.Notif{
@@ -350,7 +349,7 @@ func TestLoadEnv(t *testing.T) {
 				"DIUN_NOTIF_SCRIPT_ARGS=-a",
 				"DIUN_PROVIDERS_FILE_DIRECTORY=./fixtures",
 			},
-			expected: &config.Config{
+			expected: &Config{
 				Db:    (&model.Db{}).GetDefaults(),
 				Watch: (&model.Watch{}).GetDefaults(),
 				Notif: &model.Notif{
@@ -381,7 +380,7 @@ func TestLoadEnv(t *testing.T) {
 				}
 			}
 
-			cfg, err := config.Load(tt.cfg)
+			cfg, err := Load(tt.cfg)
 			if tt.wantErr {
 				require.Error(t, err)
 				return
@@ -422,7 +421,7 @@ func TestLoadMixed(t *testing.T) {
 				"DIUN_NOTIF_MAIL_TO=webmaster@foo.com",
 				"DIUN_NOTIF_MAIL_LOCALNAME=foo.com",
 			},
-			expected: &config.Config{
+			expected: &Config{
 				Db:    (&model.Db{}).GetDefaults(),
 				Watch: (&model.Watch{}).GetDefaults(),
 				Notif: &model.Notif{
@@ -467,7 +466,7 @@ for <code>{{ .Entry.Manifest.Platform }}</code> platform.
 				"DIUN_NOTIF_WEBHOOK_METHOD=GET",
 				"DIUN_NOTIF_WEBHOOK_TIMEOUT=1m",
 			},
-			expected: &config.Config{
+			expected: &Config{
 				Db:    (&model.Db{}).GetDefaults(),
 				Watch: (&model.Watch{}).GetDefaults(),
 				Notif: &model.Notif{
@@ -502,7 +501,7 @@ for <code>{{ .Entry.Manifest.Platform }}</code> platform.
 				}
 			}
 
-			cfg, err := config.Load(tt.cfg)
+			cfg, err := Load(tt.cfg)
 			if tt.wantErr {
 				require.Error(t, err)
 				return
@@ -526,7 +525,7 @@ func TestValidation(t *testing.T) {
 	}
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
-			cfg, err := config.Load(tt.cfg)
+			cfg, err := Load(tt.cfg)
 			require.NoError(t, err)
 			_, err = env.Encode("DIUN_", cfg)
 			require.NoError(t, err)

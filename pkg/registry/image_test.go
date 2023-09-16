@@ -1,24 +1,23 @@
-package registry_test
+package registry
 
 import (
 	"testing"
 
-	"github.com/crazy-max/diun/v4/pkg/registry"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestParseImage(t *testing.T) {
 	testCases := []struct {
 		desc      string
-		parseOpts registry.ParseImageOptions
-		expected  registry.Image
+		parseOpts ParseImageOptions
+		expected  Image
 	}{
 		{
 			desc: "bintray artifactory-oss",
-			parseOpts: registry.ParseImageOptions{
+			parseOpts: ParseImageOptions{
 				Name: "jfrog-docker-reg2.bintray.io/jfrog/artifactory-oss:4.0.0",
 			},
-			expected: registry.Image{
+			expected: Image{
 				Domain: "jfrog-docker-reg2.bintray.io",
 				Path:   "jfrog/artifactory-oss",
 				Tag:    "4.0.0",
@@ -26,10 +25,10 @@ func TestParseImage(t *testing.T) {
 		},
 		{
 			desc: "bintray xray-server",
-			parseOpts: registry.ParseImageOptions{
+			parseOpts: ParseImageOptions{
 				Name: "docker.bintray.io/jfrog/xray-server:2.8.6",
 			},
-			expected: registry.Image{
+			expected: Image{
 				Domain: "docker.bintray.io",
 				Path:   "jfrog/xray-server",
 				Tag:    "2.8.6",
@@ -37,10 +36,10 @@ func TestParseImage(t *testing.T) {
 		},
 		{
 			desc: "dockerhub alpine",
-			parseOpts: registry.ParseImageOptions{
+			parseOpts: ParseImageOptions{
 				Name: "alpine",
 			},
-			expected: registry.Image{
+			expected: Image{
 				Domain: "docker.io",
 				Path:   "library/alpine",
 				Tag:    "latest",
@@ -48,10 +47,10 @@ func TestParseImage(t *testing.T) {
 		},
 		{
 			desc: "dockerhub crazymax/nextcloud",
-			parseOpts: registry.ParseImageOptions{
+			parseOpts: ParseImageOptions{
 				Name: "docker.io/crazymax/nextcloud:latest",
 			},
-			expected: registry.Image{
+			expected: Image{
 				Domain: "docker.io",
 				Path:   "crazymax/nextcloud",
 				Tag:    "latest",
@@ -59,10 +58,10 @@ func TestParseImage(t *testing.T) {
 		},
 		{
 			desc: "gcr busybox",
-			parseOpts: registry.ParseImageOptions{
+			parseOpts: ParseImageOptions{
 				Name: "gcr.io/google-containers/busybox:latest",
 			},
-			expected: registry.Image{
+			expected: Image{
 				Domain: "gcr.io",
 				Path:   "google-containers/busybox",
 				Tag:    "latest",
@@ -70,10 +69,10 @@ func TestParseImage(t *testing.T) {
 		},
 		{
 			desc: "github ddns-route53",
-			parseOpts: registry.ParseImageOptions{
+			parseOpts: ParseImageOptions{
 				Name: "docker.pkg.github.com/crazy-max/ddns-route53/ddns-route53:latest",
 			},
-			expected: registry.Image{
+			expected: Image{
 				Domain: "docker.pkg.github.com",
 				Path:   "crazy-max/ddns-route53/ddns-route53",
 				Tag:    "latest",
@@ -81,10 +80,10 @@ func TestParseImage(t *testing.T) {
 		},
 		{
 			desc: "gitlab meltano",
-			parseOpts: registry.ParseImageOptions{
+			parseOpts: ParseImageOptions{
 				Name: "registry.gitlab.com/meltano/meltano",
 			},
-			expected: registry.Image{
+			expected: Image{
 				Domain: "registry.gitlab.com",
 				Path:   "meltano/meltano",
 				Tag:    "latest",
@@ -92,10 +91,10 @@ func TestParseImage(t *testing.T) {
 		},
 		{
 			desc: "quay hypercube",
-			parseOpts: registry.ParseImageOptions{
+			parseOpts: ParseImageOptions{
 				Name: "quay.io/coreos/hyperkube",
 			},
-			expected: registry.Image{
+			expected: Image{
 				Domain: "quay.io",
 				Path:   "coreos/hyperkube",
 				Tag:    "latest",
@@ -103,10 +102,10 @@ func TestParseImage(t *testing.T) {
 		},
 		{
 			desc: "ghcr ddns-route53",
-			parseOpts: registry.ParseImageOptions{
+			parseOpts: ParseImageOptions{
 				Name: "ghcr.io/crazy-max/ddns-route53",
 			},
-			expected: registry.Image{
+			expected: Image{
 				Domain: "ghcr.io",
 				Path:   "crazy-max/ddns-route53",
 				Tag:    "latest",
@@ -114,10 +113,10 @@ func TestParseImage(t *testing.T) {
 		},
 		{
 			desc: "ghcr radarr",
-			parseOpts: registry.ParseImageOptions{
+			parseOpts: ParseImageOptions{
 				Name: "ghcr.io/linuxserver/radarr",
 			},
-			expected: registry.Image{
+			expected: Image{
 				Domain: "ghcr.io",
 				Path:   "linuxserver/radarr",
 				Tag:    "latest",
@@ -128,7 +127,7 @@ func TestParseImage(t *testing.T) {
 	for _, tt := range testCases {
 		tt := tt
 		t.Run(tt.desc, func(t *testing.T) {
-			img, err := registry.ParseImage(tt.parseOpts)
+			img, err := ParseImage(tt.parseOpts)
 			if err != nil {
 				t.Error(err)
 			}
@@ -142,96 +141,96 @@ func TestParseImage(t *testing.T) {
 func TestHubLink(t *testing.T) {
 	testCases := []struct {
 		desc      string
-		parseOpts registry.ParseImageOptions
+		parseOpts ParseImageOptions
 		expected  string
 	}{
 		{
 			desc: "bintray artifactory-oss",
-			parseOpts: registry.ParseImageOptions{
+			parseOpts: ParseImageOptions{
 				Name: "jfrog-docker-reg2.bintray.io/jfrog/artifactory-oss:4.0.0",
 			},
 			expected: "https://bintray.com/jfrog/reg2/jfrog%3Aartifactory-oss",
 		},
 		{
 			desc: "bintray kubexray",
-			parseOpts: registry.ParseImageOptions{
+			parseOpts: ParseImageOptions{
 				Name: "jfrog-docker-reg2.bintray.io/kubexray:latest",
 			},
 			expected: "https://bintray.com/jfrog/reg2/kubexray",
 		},
 		{
 			desc: "bintray xray-server",
-			parseOpts: registry.ParseImageOptions{
+			parseOpts: ParseImageOptions{
 				Name: "docker.bintray.io/jfrog/xray-server:2.8.6",
 			},
 			expected: "https://bintray.com/jfrog/reg2/jfrog%3Axray-server",
 		},
 		{
 			desc: "dockerhub alpine",
-			parseOpts: registry.ParseImageOptions{
+			parseOpts: ParseImageOptions{
 				Name: "alpine",
 			},
 			expected: "https://hub.docker.com/_/alpine",
 		},
 		{
 			desc: "dockerhub crazymax/nextcloud",
-			parseOpts: registry.ParseImageOptions{
+			parseOpts: ParseImageOptions{
 				Name: "docker.io/crazymax/nextcloud:latest",
 			},
 			expected: "https://hub.docker.com/r/crazymax/nextcloud",
 		},
 		{
 			desc: "gcr busybox",
-			parseOpts: registry.ParseImageOptions{
+			parseOpts: ParseImageOptions{
 				Name: "gcr.io/google-containers/busybox:latest",
 			},
 			expected: "https://gcr.io/google-containers/busybox",
 		},
 		{
 			desc: "github ddns-route53",
-			parseOpts: registry.ParseImageOptions{
+			parseOpts: ParseImageOptions{
 				Name: "docker.pkg.github.com/crazy-max/ddns-route53/ddns-route53:latest",
 			},
 			expected: "https://github.com/crazy-max/ddns-route53/packages",
 		},
 		{
 			desc: "gitlab meltano",
-			parseOpts: registry.ParseImageOptions{
+			parseOpts: ParseImageOptions{
 				Name: "registry.gitlab.com/meltano/meltano",
 			},
 			expected: "https://gitlab.com/meltano/meltano/container_registry",
 		},
 		{
 			desc: "quay hypercube",
-			parseOpts: registry.ParseImageOptions{
+			parseOpts: ParseImageOptions{
 				Name: "quay.io/coreos/hyperkube",
 			},
 			expected: "https://quay.io/repository/coreos/hyperkube",
 		},
 		{
 			desc: "ghcr ddns-route53",
-			parseOpts: registry.ParseImageOptions{
+			parseOpts: ParseImageOptions{
 				Name: "ghcr.io/crazy-max/ddns-route53",
 			},
 			expected: "https://github.com/users/crazy-max/packages/container/package/ddns-route53",
 		},
 		{
 			desc: "ghcr radarr",
-			parseOpts: registry.ParseImageOptions{
+			parseOpts: ParseImageOptions{
 				Name: "ghcr.io/linuxserver/radarr",
 			},
 			expected: "https://github.com/users/linuxserver/packages/container/package/radarr",
 		},
 		{
 			desc: "redhat etcd",
-			parseOpts: registry.ParseImageOptions{
+			parseOpts: ParseImageOptions{
 				Name: "registry.access.redhat.com/rhel7/etcd",
 			},
 			expected: "https://access.redhat.com/containers/#/registry.access.redhat.com/rhel7/etcd",
 		},
 		{
 			desc: "private",
-			parseOpts: registry.ParseImageOptions{
+			parseOpts: ParseImageOptions{
 				Name:   "myregistry.example.com/an/image:latest",
 				HubTpl: "https://{{ .Domain }}/ui/repos/{{ .Path }}",
 			},
@@ -242,7 +241,7 @@ func TestHubLink(t *testing.T) {
 	for _, tt := range testCases {
 		tt := tt
 		t.Run(tt.desc, func(t *testing.T) {
-			img, err := registry.ParseImage(tt.parseOpts)
+			img, err := ParseImage(tt.parseOpts)
 			if err != nil {
 				t.Error(err)
 			}

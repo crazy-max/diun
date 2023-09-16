@@ -1,15 +1,14 @@
-package dockerfile_test
+package dockerfile
 
 import (
 	"testing"
 
-	"github.com/crazy-max/diun/v4/pkg/dockerfile"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func TestFromImages(t *testing.T) {
-	c, err := dockerfile.New(dockerfile.Options{
+	c, err := New(Options{
 		Filename: "./fixtures/valid.Dockerfile",
 	})
 	require.NoError(t, err)
