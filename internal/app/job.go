@@ -22,7 +22,7 @@ func (di *Diun) createJob(job model.Job) {
 		Str("image", job.Image.Name).
 		Logger()
 
-	// Validate image
+	// Parse image
 	prvImage, err = registry.ParseImage(registry.ParseImageOptions{
 		Name:   job.Image.Name,
 		HubTpl: job.Image.HubTpl,

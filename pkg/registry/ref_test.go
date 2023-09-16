@@ -36,11 +36,15 @@ func TestImageReference(t *testing.T) {
 		},
 		{
 			input:    "busybox" + sha256digest,
-			expected: "docker.io/library/busybox" + sha256digest,
+			expected: "docker.io/library/busybox:latest",
 		},
 		{
 			input:    "busybox:latest" + sha256digest,
-			expected: "docker.io/library/busybox" + sha256digest,
+			expected: "docker.io/library/busybox:latest",
+		},
+		{
+			input:    "busybox:v1.0.0" + sha256digest,
+			expected: "docker.io/library/busybox:v1.0.0",
 		},
 		{
 			input:    "UPPERCASEISINVALID",

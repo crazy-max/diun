@@ -19,10 +19,6 @@ var (
 
 // ValidateImage returns a standard image through Docker labels
 func ValidateImage(image string, metadata, labels map[string]string, watchByDef bool, imageDefaults model.Image) (img model.Image, err error) {
-	if i := strings.Index(image, "@sha256:"); i > 0 {
-		image = image[:i]
-	}
-
 	img = model.Image{
 		Name: image,
 	}

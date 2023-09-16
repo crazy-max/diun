@@ -6,7 +6,7 @@ FROM alpine:latest
 # diun.platform=linux/amd64
 # diun.metadata.foo=bar
 RUN --mount=type=bind,target=.,rw \
-  --mount=type=bind,from=crazymax/undock:0.5.0@sha256:736fdfde1268b93c2f733c53a7c45ece24e275318628fbb790bee7f89459961f,source=/usr/local/bin/undock,target=/usr/local/bin/undock \
+  --mount=type=bind,from=crazymax/undock@sha256:736fdfde1268b93c2f733c53a7c45ece24e275318628fbb790bee7f89459961f,source=/usr/local/bin/undock,target=/usr/local/bin/undock \
   undock --version
 
 # diun.platform=linux/amd64

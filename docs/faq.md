@@ -333,3 +333,17 @@ Following profilers are available:
 * `mutex` enables mutex profiling
 * `threads` enables thread creation profiling
 * `block` enables block (contention) profiling
+
+## Image with digest and `image:tag@digest` format
+
+Analysis of an image with a digest but without tag will be done using `latest`
+as a tag which could lead to false positives.
+
+For example `crazymax/diun@sha256:fa80af32a7c61128ffda667344547805b3c5e7721ecbbafd70e35bb7bb7c989f`
+is referring to `crazymax/diun:4.24.0` tag, so it's not correct to assume that
+we want to analyze `crazymax/diun:latest`.
+
+You can still pin an image to a specific digest and analyze the image if the
+tag is specified using the `image:tag@digest` format. Taking the previous
+example if we specify `crazymax/diun:4.24.0@sha256:fa80af32a7c61128ffda667344547805b3c5e7721ecbbafd70e35bb7bb7c989f`,
+then `crazymax/diun:4.24.0` will be analyzed.
