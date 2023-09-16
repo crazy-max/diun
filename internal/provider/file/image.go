@@ -7,7 +7,6 @@ import (
 
 	"github.com/containerd/containerd/platforms"
 	"github.com/crazy-max/diun/v4/internal/model"
-	"github.com/crazy-max/diun/v4/pkg/registry"
 	ocispecs "github.com/opencontainers/image-spec/specs-go/v1"
 	"gopkg.in/yaml.v2"
 )
@@ -31,10 +30,15 @@ func (c *Client) listFileImage() []model.Image {
 			c.logger.Error().Err(err).Msgf("Unable to decode into struct %s", file)
 			continue
 		}
+
 		for _, item := range items {
+			// Set default WatchRepo
+			if item.WatchRepo == nil {
+				item.WatchRepo = c.imageDefaults.WatchRepo
+			}
 			// Check NotifyOn
 			if len(item.NotifyOn) == 0 {
-				item.NotifyOn = model.NotifyOnDefaults
+				item.NotifyOn = c.imageDefaults.NotifyOn
 			} else {
 				for _, no := range item.NotifyOn {
 					if !no.Valid() {
@@ -48,7 +52,7 @@ func (c *Client) listFileImage() []model.Image {
 
 			// Check SortType
 			if item.SortTags == "" {
-				item.SortTags = registry.SortTagReverse
+				item.SortTags = c.imageDefaults.SortTags
 			}
 			if !item.SortTags.Valid() {
 				c.logger.Error().

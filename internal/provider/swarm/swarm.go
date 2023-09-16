@@ -10,16 +10,18 @@ import (
 // Client represents an active swarm provider object
 type Client struct {
 	*provider.Client
-	config *model.PrdSwarm
-	logger zerolog.Logger
+	config        *model.PrdSwarm
+	logger        zerolog.Logger
+	imageDefaults *model.Image
 }
 
 // New creates new swarm provider instance
-func New(config *model.PrdSwarm) *provider.Client {
+func New(config *model.PrdSwarm, imageDefaults *model.Image) *provider.Client {
 	return &provider.Client{
 		Handler: &Client{
-			config: config,
-			logger: log.With().Str("provider", "swarm").Logger(),
+			config:        config,
+			logger:        log.With().Str("provider", "swarm").Logger(),
+			imageDefaults: imageDefaults,
 		},
 	}
 }

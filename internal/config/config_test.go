@@ -7,6 +7,7 @@ import (
 
 	"github.com/crazy-max/diun/v4/internal/config"
 	"github.com/crazy-max/diun/v4/internal/model"
+	"github.com/crazy-max/diun/v4/pkg/registry"
 	"github.com/crazy-max/diun/v4/pkg/utl"
 	"github.com/crazy-max/gonfig/env"
 	"github.com/stretchr/testify/assert"
@@ -57,6 +58,10 @@ func TestLoadFile(t *testing.T) {
 					Healthchecks: &model.Healthchecks{
 						BaseURL: "https://hc-ping.com/",
 						UUID:    "5bf66975-d4c7-4bf5-bcc8-b8d8a82ea278",
+					},
+					ImageDefaults: &model.Image{
+						NotifyOn: model.NotifyOnDefaults,
+						SortTags: registry.SortTagReverse,
 					},
 				},
 				Notif: &model.Notif{

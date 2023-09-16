@@ -3,6 +3,7 @@ package model
 import (
 	"time"
 
+	"github.com/crazy-max/diun/v4/pkg/registry"
 	"github.com/crazy-max/diun/v4/pkg/utl"
 )
 
@@ -15,6 +16,7 @@ type Watch struct {
 	RunOnStartup    *bool          `yaml:"runOnStartup,omitempty" json:"runOnStartup,omitempty" validate:"required"`
 	CompareDigest   *bool          `yaml:"compareDigest,omitempty" json:"compareDigest,omitempty" validate:"required"`
 	Healthchecks    *Healthchecks  `yaml:"healthchecks,omitempty" json:"healthchecks,omitempty"`
+	ImageDefaults   *Image         `yaml:"defaults,omitempty" json:"defaults,omitempty"`
 }
 
 // GetDefaults gets the default values
@@ -31,4 +33,8 @@ func (s *Watch) SetDefaults() {
 	s.FirstCheckNotif = utl.NewFalse()
 	s.RunOnStartup = utl.NewTrue()
 	s.CompareDigest = utl.NewTrue()
+	s.ImageDefaults = &Image{
+		NotifyOn: NotifyOnDefaults,
+		SortTags: registry.SortTagReverse,
+	}
 }

@@ -63,7 +63,7 @@ func (di *Diun) createJob(job model.Job) {
 	// Set defaults
 	if err := mergo.Merge(&job.Image, model.Image{
 		Platform:  model.ImagePlatform{},
-		WatchRepo: false,
+		WatchRepo: utl.NewFalse(),
 		MaxTags:   0,
 	}); err != nil {
 		sublog.Error().Err(err).Msg("Cannot set default values")
@@ -118,7 +118,7 @@ func (di *Diun) createJob(job model.Job) {
 		sublog.Error().Err(err).Msgf("Invoking job")
 	}
 
-	if !job.Image.WatchRepo || len(job.RegImage.Domain) == 0 {
+	if job.Image.WatchRepo == nil || !*job.Image.WatchRepo || len(job.RegImage.Domain) == 0 {
 		return
 	}
 

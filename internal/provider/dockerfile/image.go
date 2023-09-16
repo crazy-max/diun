@@ -32,7 +32,7 @@ func (c *Client) listExtImage() (list []model.Image) {
 				Interface("dfile_comments", fromImage.Comments).
 				Int("dfile_line", fromImage.Line).
 				Msg("Validate image")
-			image, err := provider.ValidateImage(fromImage.Name, nil, c.extractLabels(fromImage.Comments), true)
+			image, err := provider.ValidateImage(fromImage.Name, nil, c.extractLabels(fromImage.Comments), true, *c.imageDefaults)
 			if err != nil {
 				c.logger.Error().Err(err).
 					Str("dfile_image", fromImage.Name).

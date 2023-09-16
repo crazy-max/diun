@@ -41,7 +41,7 @@ func (c *Client) listPodImage() []model.Image {
 				Str("ctn_image", ctn.Image).
 				Msg("Validate image")
 
-			image, err := provider.ValidateImage(ctn.Image, metadata(pod, ctn), pod.Annotations, *c.config.WatchByDefault)
+			image, err := provider.ValidateImage(ctn.Image, metadata(pod, ctn), pod.Annotations, *c.config.WatchByDefault, *c.imageDefaults)
 			if err != nil {
 				c.logger.Error().Err(err).
 					Str("pod_name", pod.Name).
