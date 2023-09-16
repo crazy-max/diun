@@ -13,6 +13,7 @@ import (
 	"github.com/crazy-max/diun/v4/pkg/utl"
 	"github.com/go-gomail/gomail"
 	"github.com/matcornic/hermes/v2"
+	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 )
 
@@ -89,13 +90,13 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	// Generate an HTML email with the provided contents (for modern clients)
 	htmlpart, err := h.GenerateHTML(email)
 	if err != nil {
-		return fmt.Errorf("hermes: %v", err)
+		return errors.Wrap(err, "cannot generate HTML email")
 	}
 
 	// Generate the plaintext version of the e-mail (for clients that do not support xHTML)
 	textpart, err := h.GeneratePlainText(email)
 	if err != nil {
-		return fmt.Errorf("hermes: %v", err)
+		return errors.Wrap(err, "cannot generate plaintext email")
 	}
 
 	mailMessage := gomail.NewMessage()

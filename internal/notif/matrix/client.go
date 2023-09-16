@@ -48,11 +48,11 @@ func (c *Client) Send(entry model.NotifEntry) error {
 
 	user, err := utl.GetSecret(c.cfg.User, c.cfg.UserFile)
 	if err != nil {
-		return errors.New("Cannot retrieve username secret for Matrix notifier")
+		return errors.Wrap(err, "cannot retrieve username secret for Matrix notifier")
 	}
 	password, err := utl.GetSecret(c.cfg.Password, c.cfg.PasswordFile)
 	if err != nil {
-		return errors.New("Cannot retrieve password secret for Matrix notifier")
+		return errors.Wrap(err, "cannot retrieve password secret for Matrix notifier")
 	}
 
 	r, err := m.Login(&gomatrix.ReqLogin{

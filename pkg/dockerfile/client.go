@@ -27,17 +27,17 @@ type Options struct {
 func New(opts Options) (*Client, error) {
 	b, err := os.ReadFile(opts.Filename)
 	if err != nil {
-		return nil, errors.Wrapf(err, "Cannot read Dockerfile %s", opts.Filename)
+		return nil, errors.Wrapf(err, "cannot read Dockerfile %s", opts.Filename)
 	}
 
 	parsed, err := parser.Parse(bytes.NewReader(b))
 	if err != nil {
-		return nil, errors.Wrapf(err, "Cannot parse Dockerfile %s", opts.Filename)
+		return nil, errors.Wrapf(err, "cannot parse Dockerfile %s", opts.Filename)
 	}
 
 	stages, metaArgs, err := instructions.Parse(parsed.AST)
 	if err != nil {
-		return nil, errors.Wrapf(err, "Cannot parse stages for Dockerfile %s", opts.Filename)
+		return nil, errors.Wrapf(err, "cannot parse stages for Dockerfile %s", opts.Filename)
 	}
 
 	var kvpoArgs []instructions.KeyValuePairOptional

@@ -3,7 +3,6 @@ package rocketchat
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"net/url"
 	"path"
@@ -44,7 +43,7 @@ func (c *Client) Name() string {
 func (c *Client) Send(entry model.NotifEntry) error {
 	token, err := utl.GetSecret(c.cfg.Token, c.cfg.TokenFile)
 	if err != nil {
-		return errors.New("Cannot retrieve token secret for RocketChat notifier")
+		return errors.Wrap(err, "cannot retrieve token secret for RocketChat notifier")
 	}
 
 	hc := http.Client{
@@ -152,7 +151,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("HTTP error %d: %s", resp.StatusCode, respBody.ErrorType)
+		return errors.Errorf("unexpected HTTP error %d: %s", resp.StatusCode, respBody.ErrorType)
 	}
 
 	return nil

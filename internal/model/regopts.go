@@ -1,12 +1,12 @@
 package model
 
 import (
-	"fmt"
 	"strings"
 	"time"
 
 	"github.com/crazy-max/diun/v4/pkg/registry"
 	"github.com/crazy-max/diun/v4/pkg/utl"
+	"github.com/pkg/errors"
 )
 
 // RegOpts holds slice of registry options
@@ -60,5 +60,5 @@ func (s *RegOpts) Select(name string, image registry.Image) (*RegOpt, error) {
 	if len(name) == 0 {
 		return nil, nil
 	}
-	return nil, fmt.Errorf("%s not found", name)
+	return nil, errors.Errorf("%s not found", name)
 }

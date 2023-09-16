@@ -3,7 +3,6 @@ package gotify
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"net/url"
 	"path"
@@ -42,7 +41,7 @@ func (c *Client) Name() string {
 func (c *Client) Send(entry model.NotifEntry) error {
 	token, err := utl.GetSecret(c.cfg.Token, c.cfg.TokenFile)
 	if err != nil {
-		return errors.New("Cannot retrieve token secret for Gotify notifier")
+		return errors.Wrap(err, "cannot retrieve token secret for Gotify notifier")
 	}
 
 	hc := http.Client{
@@ -117,7 +116,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		if err != nil {
 			return err
 		}
-		return fmt.Errorf("%d %s: %s", errBody.ErrorCode, errBody.Error, errBody.ErrorDescription)
+		return errors.Errorf("%d %s: %s", errBody.ErrorCode, errBody.Error, errBody.ErrorDescription)
 	}
 
 	return nil

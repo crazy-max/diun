@@ -41,7 +41,7 @@ func (c *Client) RenderMarkdown() (title []byte, body []byte, _ error) {
 	var titleBuf bytes.Buffer
 	titleTpl, err := template.New("title").Funcs(c.opts.TemplateFuncs).Parse(strings.TrimSuffix(strings.TrimSpace(c.opts.TemplateTitle), "\n"))
 	if err != nil {
-		return title, body, errors.Wrap(err, "Cannot parse title template")
+		return title, body, errors.Wrap(err, "cannot parse title template")
 	}
 	if err = titleTpl.Execute(&titleBuf, struct {
 		Meta  model.Meta
@@ -50,14 +50,14 @@ func (c *Client) RenderMarkdown() (title []byte, body []byte, _ error) {
 		Meta:  c.opts.Meta,
 		Entry: c.opts.Entry,
 	}); err != nil {
-		return title, body, errors.Wrap(err, "Cannot render notif title")
+		return title, body, errors.Wrap(err, "cannot render notif title")
 	}
 	title = titleBuf.Bytes()
 
 	var bodyBuf bytes.Buffer
 	bodyTpl, err := template.New("body").Funcs(c.opts.TemplateFuncs).Parse(strings.TrimSuffix(strings.TrimSpace(c.opts.TemplateBody), "\n"))
 	if err != nil {
-		return title, body, errors.Wrap(err, "Cannot parse body template")
+		return title, body, errors.Wrap(err, "cannot parse body template")
 	}
 	if err = bodyTpl.Execute(&bodyBuf, struct {
 		Meta  model.Meta
@@ -66,7 +66,7 @@ func (c *Client) RenderMarkdown() (title []byte, body []byte, _ error) {
 		Meta:  c.opts.Meta,
 		Entry: c.opts.Entry,
 	}); err != nil {
-		return title, body, errors.Wrap(err, "Cannot render notif body")
+		return title, body, errors.Wrap(err, "cannot render notif body")
 	}
 	body = bodyBuf.Bytes()
 

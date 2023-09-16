@@ -18,7 +18,7 @@ func TestValidateImage(t *testing.T) {
 		watchByDef    bool
 		imageDefaults model.Image
 		expectedImage model.Image
-		expectedErr   error
+		expectedErr   interface{}
 	}{
 		// Test strip sha
 		{
@@ -69,7 +69,7 @@ func TestValidateImage(t *testing.T) {
 			expectedErr:   nil,
 		},
 		{
-			name:       "Invlaid diun.enable",
+			name:       "Invalid diun.enable",
 			image:      "myimg",
 			watchByDef: false,
 			labels: map[string]string{
@@ -78,7 +78,7 @@ func TestValidateImage(t *testing.T) {
 			expectedImage: model.Image{
 				Name: "myimg",
 			},
-			expectedErr: errInvalidLabel,
+			expectedErr: &invalidLabelError{},
 		},
 		// Test diun.regopt
 		{
@@ -164,7 +164,7 @@ func TestValidateImage(t *testing.T) {
 			expectedImage: model.Image{
 				Name: "myimg",
 			},
-			expectedErr: errInvalidLabel,
+			expectedErr: &invalidLabelError{},
 		},
 		{
 			name:       "Override default image values with labels (true > false)",
@@ -225,7 +225,7 @@ func TestValidateImage(t *testing.T) {
 				Name:     "myimg",
 				NotifyOn: []model.NotifyOn{},
 			},
-			expectedErr: errInvalidLabel,
+			expectedErr: &invalidLabelError{},
 		},
 		{
 			name:       "Set empty notify_on",
@@ -296,7 +296,7 @@ func TestValidateImage(t *testing.T) {
 			expectedImage: model.Image{
 				Name: "myimg",
 			},
-			expectedErr: errInvalidLabel,
+			expectedErr: &invalidLabelError{},
 		},
 		{
 			name:  "Set empty sort_tags",
@@ -367,7 +367,7 @@ func TestValidateImage(t *testing.T) {
 			expectedImage: model.Image{
 				Name: "myimg",
 			},
-			expectedErr: errInvalidLabel,
+			expectedErr: &invalidLabelError{},
 		},
 		{
 			name:  "Set empty max_tags",
@@ -380,7 +380,7 @@ func TestValidateImage(t *testing.T) {
 			expectedImage: model.Image{
 				Name: "myimg",
 			},
-			expectedErr: errInvalidLabel,
+			expectedErr: &invalidLabelError{},
 		},
 		{
 			name:       "Default max_tags",
@@ -678,7 +678,7 @@ func TestValidateImage(t *testing.T) {
 			expectedImage: model.Image{
 				Name: "myimg",
 			},
-			expectedErr: errInvalidLabel,
+			expectedErr: &invalidLabelError{},
 		},
 		{
 			name:  "Set empty platform",
@@ -692,7 +692,7 @@ func TestValidateImage(t *testing.T) {
 				Name:     "myimg",
 				Platform: model.ImagePlatform{},
 			},
-			expectedErr: errInvalidLabel,
+			expectedErr: &invalidLabelError{},
 		},
 		{
 			name:       "Default platform",
@@ -768,7 +768,7 @@ func TestValidateImage(t *testing.T) {
 			expectedImage: model.Image{
 				Name: "myimg",
 			},
-			expectedErr: errInvalidLabel,
+			expectedErr: &invalidLabelError{},
 		},
 		{
 			name:  "Set empty metadata key",
@@ -855,25 +855,26 @@ func TestValidateImage(t *testing.T) {
 		},
 	}
 
-	for _, c := range cases {
-		c := c
-		t.Run(c.name, func(t *testing.T) {
+	for _, tt := range cases {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			actualImg, actualErr := ValidateImage(
-				c.image,
-				c.metadata,
-				c.labels,
-				c.watchByDef,
-				c.imageDefaults,
+			img, err := ValidateImage(
+				tt.image,
+				tt.metadata,
+				tt.labels,
+				tt.watchByDef,
+				tt.imageDefaults,
 			)
-
-			assert.Equal(t, c.expectedImage, actualImg)
-
-			if c.expectedErr == nil {
-				assert.NoError(t, actualErr)
+			if tt.expectedErr == nil {
+				assert.NoError(t, err)
+				assert.Equal(t, tt.expectedImage, img)
 			} else {
-				if assert.Error(t, c.expectedErr) {
-					assert.ErrorIs(t, actualErr, c.expectedErr)
+				switch err.(type) {
+				case *invalidLabelError:
+					assert.Error(t, err)
+				default:
+					assert.Error(t, err)
 				}
 			}
 		})

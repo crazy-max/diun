@@ -90,12 +90,12 @@ func newExternalClusterClient(opts Options) (*kubernetes.Clientset, error) {
 	var err error
 
 	if opts.Endpoint == "" {
-		return nil, errors.New("Endpoint missing for external cluster client")
+		return nil, errors.New("endpoint missing for external cluster client")
 	}
 
 	opts.Token, err = utl.GetSecret(opts.Token, opts.TokenFile)
 	if err != nil {
-		return nil, errors.Wrap(err, "Cannot retrieve bearer token")
+		return nil, errors.Wrap(err, "cannot retrieve bearer token")
 	}
 
 	config := &rest.Config{
@@ -106,7 +106,7 @@ func newExternalClusterClient(opts Options) (*kubernetes.Clientset, error) {
 	if opts.CertAuthFilePath != "" {
 		caData, err := os.ReadFile(opts.CertAuthFilePath)
 		if err != nil {
-			return nil, errors.Wrap(err, "Failed to read CA file")
+			return nil, errors.Wrap(err, "failed to read CA file")
 		}
 		config.TLSClientConfig = rest.TLSClientConfig{
 			CAData: caData,

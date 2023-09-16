@@ -36,7 +36,7 @@ func (c *Client) Tags(opts TagsOptions) (*Tags, error) {
 
 	imgRef, err := ParseReference(opts.Image.String())
 	if err != nil {
-		return nil, errors.Wrap(err, "Cannot parse reference")
+		return nil, errors.Wrap(err, "cannot parse reference")
 	}
 
 	tags, err := docker.GetRepositoryTags(ctx, c.sysCtx, imgRef)
