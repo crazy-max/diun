@@ -47,6 +47,8 @@ jobs:
             loglevel: info
           - folder: dockerfile1
             loglevel: debug
+          - folder: dockerfile2
+            loglevel: debug
     steps:
       -
         name: Checkout

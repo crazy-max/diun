@@ -34,7 +34,7 @@ func (c *Client) Tags(opts TagsOptions) (*Tags, error) {
 	ctx, cancel := c.timeoutContext()
 	defer cancel()
 
-	imgRef, err := ParseReference(opts.Image.String())
+	imgRef, err := ImageReference(opts.Image.String())
 	if err != nil {
 		return nil, errors.Wrap(err, "cannot parse reference")
 	}

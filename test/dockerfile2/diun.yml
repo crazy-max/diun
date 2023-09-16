@@ -1,0 +1,15 @@
+watch:
+  workers: 20
+  schedule: "0 */6 * * *"
+  firstCheckNotif: true
+
+notif:
+  script:
+    cmd: "sh"
+    args:
+      - "/mount/notif.sh"
+
+providers:
+  dockerfile:
+    patterns:
+      - /mount/Dockerfile
