@@ -27,6 +27,27 @@ func TestTags(t *testing.T) {
 	assert.True(t, len(tags.List) > 0)
 }
 
+func TestTagsWithDigest(t *testing.T) {
+	assert.NotNil(t, rc)
+
+	image, err := ParseImage(ParseImageOptions{
+		Name: "crazymax/diun:latest@sha256:3fca3dd86c2710586208b0f92d1ec4ce25382f4cad4ae76a2275db8e8bb24031",
+	})
+	if err != nil {
+		t.Error(err)
+	}
+
+	tags, err := rc.Tags(TagsOptions{
+		Image: image,
+	})
+	if err != nil {
+		t.Error(err)
+	}
+
+	assert.True(t, tags.Total > 0)
+	assert.True(t, len(tags.List) > 0)
+}
+
 func TestTagsSort(t *testing.T) {
 	testCases := []struct {
 		name     string

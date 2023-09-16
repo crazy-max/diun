@@ -20,9 +20,8 @@ func TestValidateImage(t *testing.T) {
 		expectedImage model.Image
 		expectedErr   interface{}
 	}{
-		// Test strip sha
 		{
-			name:       "Test strip sha",
+			name:       "Test strip digest",
 			image:      "myimg@sha256:1234567890abcdef",
 			watchByDef: true,
 			expectedImage: model.Image{
@@ -30,7 +29,6 @@ func TestValidateImage(t *testing.T) {
 			},
 			expectedErr: nil,
 		},
-		// Test enable and watch by default
 		{
 			name:          "All excluded by default",
 			image:         "myimg",

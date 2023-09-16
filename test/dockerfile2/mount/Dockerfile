@@ -1,20 +1,13 @@
-# syntax=docker/dockerfile:1.3
-ARG ALPINE_VERSION=3.14
+# syntax=docker/dockerfile:1
 
 # diun.platform=linux/amd64
-FROM alpine:${ALPINE_VERSION}
+FROM alpine:latest
 
-# diun.watch_repo=true
-# diun.max_tags=10
 # diun.platform=linux/amd64
-COPY --from=crazymax/yasu / /
-
-# diun.watch_repo=true
-# diun.include_tags=^\d+\.\d+\.\d+$
-# diun.platform=linux/amd64
+# diun.metadata.foo=bar
 RUN --mount=type=bind,target=.,rw \
-  --mount=type=bind,from=crazymax/docker:20.10.6,source=/usr/local/bin/docker,target=/usr/bin/docker \
-  yasu --version
+  --mount=type=bind,from=crazymax/undock:0.5.0@sha256:736fdfde1268b93c2f733c53a7c45ece24e275318628fbb790bee7f89459961f,source=/usr/local/bin/undock,target=/usr/local/bin/undock \
+  undock --version
 
 # diun.platform=linux/amd64
 # diun.metadata.foo=bar

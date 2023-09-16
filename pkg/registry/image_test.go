@@ -68,6 +68,18 @@ func TestParseImage(t *testing.T) {
 			},
 		},
 		{
+			desc: "gcr busybox tag/digest",
+			parseOpts: ParseImageOptions{
+				Name: "gcr.io/google-containers/busybox:latest" + sha256digest,
+			},
+			expected: Image{
+				Domain: "gcr.io",
+				Path:   "google-containers/busybox",
+				Tag:    "latest",
+				Digest: sha256digest,
+			},
+		},
+		{
 			desc: "github ddns-route53",
 			parseOpts: ParseImageOptions{
 				Name: "docker.pkg.github.com/crazy-max/ddns-route53/ddns-route53:latest",

@@ -30,15 +30,20 @@ func (c *Client) Manifest(image Image, dbManifest Manifest) (Manifest, bool, err
 	ctx, cancel := c.timeoutContext()
 	defer cancel()
 
-	rmRef, err := ParseReference(image.String())
+	rmRef, err := ImageReference(image.String())
 	if err != nil {
 		return Manifest{}, false, errors.Wrap(err, "cannot parse reference")
 	}
 
-	// Retrieve remote digest through HEAD request
-	rmDigest, err := docker.GetDigest(ctx, c.sysCtx, rmRef)
-	if err != nil {
-		return Manifest{}, false, errors.Wrap(err, "cannot get image digest from HEAD request")
+	// Retrieve remote digest through HEAD request or get one from image reference
+	var rmDigest digest.Digest
+	if len(image.Digest) > 0 {
+		rmDigest = image.Digest
+	} else {
+		rmDigest, err = docker.GetDigest(ctx, c.sysCtx, rmRef)
+		if err != nil {
+			return Manifest{}, false, errors.Wrap(err, "cannot get image digest from HEAD request")
+		}
 	}
 
 	// Digest match, returns db manifest
