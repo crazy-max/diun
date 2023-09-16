@@ -11,6 +11,7 @@ import (
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/internal/msg"
 	"github.com/crazy-max/diun/v4/internal/notif/notifier"
+	"github.com/pkg/errors"
 )
 
 // Client represents an active discord notification object
@@ -138,7 +139,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	}
 
 	if resp.StatusCode != http.StatusNoContent {
-		return fmt.Errorf("unexpected HTTP status %d: %s", resp.StatusCode, resp.Body)
+		return errors.Errorf("unexpected HTTP status %d: %s", resp.StatusCode, resp.Body)
 	}
 
 	return nil

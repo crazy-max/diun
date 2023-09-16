@@ -36,7 +36,7 @@ func Load(config string) (*Config, error) {
 		},
 	})
 	if found, err := fileLoader.Load(&cfg); err != nil {
-		return nil, errors.Wrap(err, "Failed to decode configuration from file")
+		return nil, errors.Wrap(err, "failed to decode configuration from file")
 	} else if !found {
 		log.Debug().Msg("No configuration file found")
 	} else {
@@ -47,7 +47,7 @@ func Load(config string) (*Config, error) {
 		Prefix: "DIUN_",
 	})
 	if found, err := envLoader.Load(&cfg); err != nil {
-		return nil, errors.Wrap(err, "Failed to decode configuration from environment variables")
+		return nil, errors.Wrap(err, "failed to decode configuration from environment variables")
 	} else if !found {
 		log.Debug().Msg("No DIUN_* environment variables defined")
 	} else {
@@ -64,16 +64,16 @@ func Load(config string) (*Config, error) {
 func (cfg *Config) validate() error {
 	if len(cfg.Db.Path) > 0 {
 		if err := os.MkdirAll(path.Dir(cfg.Db.Path), os.ModePerm); err != nil {
-			return errors.Wrap(err, "Cannot create database destination folder")
+			return errors.Wrap(err, "cannot create database destination folder")
 		}
 	}
 
 	if cfg.Watch.Healthchecks != nil && len(cfg.Watch.Healthchecks.UUID) == 0 {
-		return errors.New("Healthchecks UUID is required")
+		return errors.New("healthchecks UUID is required")
 	}
 
 	if cfg.Providers == nil {
-		return errors.New("At least one provider is required")
+		return errors.New("at least one provider is required")
 	}
 
 	return validator.New().Struct(cfg)

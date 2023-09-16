@@ -1,10 +1,9 @@
-package file_test
+package file
 
 import (
 	"testing"
 
 	"github.com/crazy-max/diun/v4/internal/model"
-	"github.com/crazy-max/diun/v4/internal/provider/file"
 	"github.com/crazy-max/diun/v4/pkg/registry"
 	"github.com/crazy-max/diun/v4/pkg/utl"
 	"github.com/stretchr/testify/assert"
@@ -156,7 +155,7 @@ var (
 )
 
 func TestListJobFilename(t *testing.T) {
-	fc := file.New(&model.PrdFile{
+	fc := New(&model.PrdFile{
 		Filename: "./fixtures/dockerhub.yml",
 	}, &defaultImageDefaults)
 
@@ -164,7 +163,7 @@ func TestListJobFilename(t *testing.T) {
 }
 
 func TestListJobDirectory(t *testing.T) {
-	fc := file.New(&model.PrdFile{
+	fc := New(&model.PrdFile{
 		Directory: "./fixtures",
 	}, &defaultImageDefaults)
 
@@ -172,7 +171,7 @@ func TestListJobDirectory(t *testing.T) {
 }
 
 func TestDefaultImageOptions(t *testing.T) {
-	fc := file.New(&model.PrdFile{
+	fc := New(&model.PrdFile{
 		Filename: "./fixtures/dockerhub.yml",
 	}, &model.Image{WatchRepo: utl.NewTrue()})
 

@@ -35,7 +35,7 @@ func (c *Client) FromImages() (Images, error) {
 		case command.From:
 			ins, err := instructions.ParseInstruction(node)
 			if err != nil {
-				return nil, errors.Wrapf(err, "Cannot parse instruction")
+				return nil, errors.Wrapf(err, "cannot parse instruction")
 			}
 			if baseName := ins.(*instructions.Stage).BaseName; baseName != "scratch" {
 				name, err := c.shlex.ProcessWordWithMap(baseName, metaArgsToMap(c.metaArgs))
@@ -56,7 +56,7 @@ func (c *Client) FromImages() (Images, error) {
 		case command.Copy:
 			cmd, err := instructions.ParseCommand(node)
 			if err != nil {
-				return nil, errors.Wrapf(err, "Cannot parse command")
+				return nil, errors.Wrapf(err, "cannot parse command")
 			}
 			if copyFrom := cmd.(*instructions.CopyCommand).From; copyFrom != "null" {
 				name, err := c.shlex.ProcessWordWithMap(copyFrom, metaArgsToMap(c.metaArgs))
@@ -77,7 +77,7 @@ func (c *Client) FromImages() (Images, error) {
 		case command.Run:
 			cmd, err := instructions.ParseCommand(node)
 			if err != nil {
-				return nil, errors.Wrapf(err, "Cannot parse command")
+				return nil, errors.Wrapf(err, "cannot parse command")
 			}
 			if cmdRun, ok := cmd.(*instructions.RunCommand); ok {
 				mounts := instructions.GetMounts(cmdRun)

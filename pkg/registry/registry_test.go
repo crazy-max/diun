@@ -1,21 +1,20 @@
-package registry_test
+package registry
 
 import (
 	"os"
 	"testing"
 
-	"github.com/crazy-max/diun/v4/pkg/registry"
 	"github.com/stretchr/testify/assert"
 )
 
 var (
-	rc *registry.Client
+	rc *Client
 )
 
 func TestMain(m *testing.M) {
 	var err error
 
-	rc, err = registry.New(registry.Options{
+	rc, err = New(Options{
 		ImageOs:   "linux",
 		ImageArch: "amd64",
 	})

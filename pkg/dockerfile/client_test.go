@@ -1,23 +1,22 @@
-package dockerfile_test
+package dockerfile
 
 import (
 	"fmt"
 	"os"
 	"testing"
 
-	"github.com/crazy-max/diun/v4/pkg/dockerfile"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 var (
-	dc *dockerfile.Client
+	dc *Client
 )
 
 func TestMain(m *testing.M) {
 	var err error
 
-	dc, err = dockerfile.New(dockerfile.Options{
+	dc, err = New(Options{
 		Filename: "./fixtures/valid.Dockerfile",
 	})
 	if err != nil {
@@ -60,7 +59,7 @@ func TestLoadFile(t *testing.T) {
 	}
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
-			c, err := dockerfile.New(dockerfile.Options{
+			c, err := New(Options{
 				Filename: tt.dfile,
 			})
 			if tt.wantErr {

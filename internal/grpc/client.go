@@ -46,7 +46,7 @@ func (c *Client) Start() error {
 
 	lis, err := net.Listen("tcp", c.authority)
 	if err != nil {
-		return errors.Wrap(err, "Cannot create gRPC listener")
+		return errors.Wrap(err, "cannot create gRPC listener")
 	}
 
 	return c.server.Serve(lis)

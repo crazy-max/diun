@@ -2,7 +2,6 @@ package db
 
 import (
 	"encoding/json"
-	"fmt"
 	"time"
 
 	"github.com/opencontainers/go-digest"
@@ -24,12 +23,12 @@ func (c *Client) Migrate() error {
 	for version := c.metadata.Version + 1; version <= dbVersion; version++ {
 		migration, found := migrations[version]
 		if !found {
-			return fmt.Errorf("database migration v%d not found", version)
+			return errors.Errorf("database migration v%d not found", version)
 		}
 
 		log.Info().Msgf("Database migration v%d...", version)
 		if err := migration(c); err != nil {
-			return errors.Wrapf(err, "Database migration v%d failed", version)
+			return errors.Wrapf(err, "database migration v%d failed", version)
 		}
 	}
 

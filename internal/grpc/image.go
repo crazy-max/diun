@@ -7,6 +7,7 @@ import (
 
 	"github.com/containers/image/v5/docker/reference"
 	"github.com/crazy-max/diun/v4/pb"
+	"github.com/pkg/errors"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -55,7 +56,7 @@ func (c *Client) ImageInspect(ctx context.Context, request *pb.ImageInspectReque
 	}
 
 	if _, ok := images[ref.Name()]; !ok {
-		return nil, fmt.Errorf("%s not found in database", ref.Name())
+		return nil, errors.Errorf("%s not found in database", ref.Name())
 	}
 
 	iir := &pb.ImageInspectResponse_Image{

@@ -1,29 +1,28 @@
-package registry_test
+package registry
 
 import (
 	"testing"
 
-	"github.com/crazy-max/diun/v4/pkg/registry"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestCompareDigest(t *testing.T) {
 	t.Parallel()
-	rc, err := registry.New(registry.Options{
+	rc, err := New(Options{
 		CompareDigest: true,
 	})
 	if err != nil {
 		t.Error(err)
 	}
 
-	img, err := registry.ParseImage(registry.ParseImageOptions{
+	img, err := ParseImage(ParseImageOptions{
 		Name: "crazymax/diun:2.5.0",
 	})
 	if err != nil {
 		t.Error(err)
 	}
 
-	manifest, _, err := rc.Manifest(img, registry.Manifest{
+	manifest, _, err := rc.Manifest(img, Manifest{
 		Name:     "docker.io/crazymax/diun",
 		Tag:      "2.5.0",
 		MIMEType: "application/vnd.docker.distribution.manifest.list.v2+json",
@@ -40,7 +39,7 @@ func TestCompareDigest(t *testing.T) {
 
 func TestManifest(t *testing.T) {
 	t.Parallel()
-	rc, err := registry.New(registry.Options{
+	rc, err := New(Options{
 		CompareDigest: true,
 		ImageOs:       "linux",
 		ImageArch:     "amd64",
@@ -49,14 +48,14 @@ func TestManifest(t *testing.T) {
 		t.Error(err)
 	}
 
-	img, err := registry.ParseImage(registry.ParseImageOptions{
+	img, err := ParseImage(ParseImageOptions{
 		Name: "portainer/portainer-ce:linux-amd64-2.5.1",
 	})
 	if err != nil {
 		t.Error(err)
 	}
 
-	manifest, updated, err := rc.Manifest(img, registry.Manifest{
+	manifest, updated, err := rc.Manifest(img, Manifest{
 		Name:     "docker.io/portainer/portainer-ce",
 		Tag:      "linux-amd64-2.5.1",
 		MIMEType: "application/vnd.docker.distribution.manifest.v2+json",
@@ -101,7 +100,7 @@ func TestManifest(t *testing.T) {
 
 func TestManifestMultiUpdatedPlatform(t *testing.T) {
 	t.Parallel()
-	rc, err := registry.New(registry.Options{
+	rc, err := New(Options{
 		CompareDigest: true,
 		ImageOs:       "linux",
 		ImageArch:     "amd64",
@@ -110,14 +109,14 @@ func TestManifestMultiUpdatedPlatform(t *testing.T) {
 		t.Error(err)
 	}
 
-	img, err := registry.ParseImage(registry.ParseImageOptions{
+	img, err := ParseImage(ParseImageOptions{
 		Name: "mongo:3.6.21",
 	})
 	if err != nil {
 		t.Error(err)
 	}
 
-	manifest, updated, err := rc.Manifest(img, registry.Manifest{
+	manifest, updated, err := rc.Manifest(img, Manifest{
 		Name:     "docker.io/library/mongo",
 		Tag:      "3.6.21",
 		MIMEType: "application/vnd.docker.distribution.manifest.list.v2+json",
@@ -181,7 +180,7 @@ func TestManifestMultiUpdatedPlatform(t *testing.T) {
 
 func TestManifestMultiNotUpdatedPlatform(t *testing.T) {
 	t.Parallel()
-	rc, err := registry.New(registry.Options{
+	rc, err := New(Options{
 		CompareDigest: true,
 		ImageOs:       "linux",
 		ImageArch:     "amd64",
@@ -190,14 +189,14 @@ func TestManifestMultiNotUpdatedPlatform(t *testing.T) {
 		t.Error(err)
 	}
 
-	img, err := registry.ParseImage(registry.ParseImageOptions{
+	img, err := ParseImage(ParseImageOptions{
 		Name: "mongo:3.6.21",
 	})
 	if err != nil {
 		t.Error(err)
 	}
 
-	manifest, updated, err := rc.Manifest(img, registry.Manifest{
+	manifest, updated, err := rc.Manifest(img, Manifest{
 		Name:     "docker.io/library/mongo",
 		Tag:      "3.6.21",
 		MIMEType: "application/vnd.docker.distribution.manifest.list.v2+json",
@@ -261,7 +260,7 @@ func TestManifestMultiNotUpdatedPlatform(t *testing.T) {
 
 func TestManifestVariant(t *testing.T) {
 	t.Parallel()
-	rc, err := registry.New(registry.Options{
+	rc, err := New(Options{
 		ImageOs:      "linux",
 		ImageArch:    "arm",
 		ImageVariant: "v7",
@@ -270,14 +269,14 @@ func TestManifestVariant(t *testing.T) {
 		t.Error(err)
 	}
 
-	img, err := registry.ParseImage(registry.ParseImageOptions{
+	img, err := ParseImage(ParseImageOptions{
 		Name: "crazymax/diun:2.5.0",
 	})
 	if err != nil {
 		t.Error(err)
 	}
 
-	manifest, _, err := rc.Manifest(img, registry.Manifest{})
+	manifest, _, err := rc.Manifest(img, Manifest{})
 	assert.NoError(t, err)
 	assert.Equal(t, "docker.io/crazymax/diun", manifest.Name)
 	assert.Equal(t, "2.5.0", manifest.Tag)

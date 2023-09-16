@@ -37,12 +37,12 @@ func (c *Client) Name() string {
 func (c *Client) Send(entry model.NotifEntry) error {
 	token, err := utl.GetSecret(c.cfg.Token, c.cfg.TokenFile)
 	if err != nil {
-		return errors.New("Cannot retrieve token secret for Pushover notifier")
+		return errors.Wrap(err, "cannot retrieve token secret for Pushover notifier")
 	}
 
 	recipient, err := utl.GetSecret(c.cfg.Recipient, c.cfg.RecipientFile)
 	if err != nil {
-		return errors.New("Cannot retrieve recipient secret for Pushover notifier")
+		return errors.Wrap(err, "cannot retrieve recipient secret for Pushover notifier")
 	}
 
 	message, err := msg.New(msg.Options{

@@ -1,23 +1,22 @@
-package registry_test
+package registry
 
 import (
 	"testing"
 
-	"github.com/crazy-max/diun/v4/pkg/registry"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestTags(t *testing.T) {
 	assert.NotNil(t, rc)
 
-	image, err := registry.ParseImage(registry.ParseImageOptions{
+	image, err := ParseImage(ParseImageOptions{
 		Name: "crazymax/diun:3.0.0",
 	})
 	if err != nil {
 		t.Error(err)
 	}
 
-	tags, err := rc.Tags(registry.TagsOptions{
+	tags, err := rc.Tags(TagsOptions{
 		Image: image,
 	})
 	if err != nil {
@@ -31,12 +30,12 @@ func TestTags(t *testing.T) {
 func TestTagsSort(t *testing.T) {
 	testCases := []struct {
 		name     string
-		sortTag  registry.SortTag
+		sortTag  SortTag
 		expected []string
 	}{
 		{
 			name:    "sort default",
-			sortTag: registry.SortTagDefault,
+			sortTag: SortTagDefault,
 			expected: []string{
 				"0.1.0",
 				"0.4.0",
@@ -76,7 +75,7 @@ func TestTagsSort(t *testing.T) {
 		},
 		{
 			name:    "sort lexicographical",
-			sortTag: registry.SortTagLexicographical,
+			sortTag: SortTagLexicographical,
 			expected: []string{
 				"0.1.0",
 				"0.4.0",
@@ -116,7 +115,7 @@ func TestTagsSort(t *testing.T) {
 		},
 		{
 			name:    "sort reverse",
-			sortTag: registry.SortTagReverse,
+			sortTag: SortTagReverse,
 			expected: []string{
 				"latest",
 				"edge",
@@ -156,7 +155,7 @@ func TestTagsSort(t *testing.T) {
 		},
 		{
 			name:    "sort semver",
-			sortTag: registry.SortTagSemver,
+			sortTag: SortTagSemver,
 			expected: []string{
 				"alpine-5.0",
 				"ubuntu-5.0",
@@ -237,7 +236,7 @@ func TestTagsSort(t *testing.T) {
 
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			tags := registry.SortTags(repotags, tt.sortTag)
+			tags := SortTags(repotags, tt.sortTag)
 			assert.Equal(t, tt.expected, tags)
 		})
 	}

@@ -52,7 +52,7 @@ func New(cfg model.Db) (*Client, error) {
 		log.Debug().Msgf("%d entries found in manifest bucket", stats.KeyN)
 		return nil
 	}); err != nil {
-		return nil, errors.Wrap(err, "Cannot count entries in manifest bucket")
+		return nil, errors.Wrap(err, "cannot count entries in manifest bucket")
 	}
 
 	c := &Client{

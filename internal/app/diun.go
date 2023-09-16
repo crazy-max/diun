@@ -75,7 +75,7 @@ func New(meta model.Meta, cfg *config.Config, grpcAuthority string) (*Diun, erro
 		if len(cfg.Watch.Healthchecks.BaseURL) > 0 {
 			hcBaseURL, err = url.Parse(cfg.Watch.Healthchecks.BaseURL)
 			if err != nil {
-				return nil, errors.Wrap(err, "Cannot parse Healthchecks base URL")
+				return nil, errors.Wrap(err, "cannot parse Healthchecks base URL")
 			}
 		}
 		diun.hc = gohealthchecks.NewClient(&gohealthchecks.ClientOptions{

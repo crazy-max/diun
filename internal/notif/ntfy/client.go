@@ -11,6 +11,7 @@ import (
 	"github.com/crazy-max/diun/v4/internal/msg"
 	"github.com/crazy-max/diun/v4/internal/notif/notifier"
 	"github.com/crazy-max/diun/v4/pkg/utl"
+	"github.com/pkg/errors"
 )
 
 // Client represents an active ntfy notification object
@@ -107,7 +108,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		if err != nil {
 			return err
 		}
-		return fmt.Errorf("%d %s: %s", errBody.ErrorCode, errBody.Error, errBody.ErrorDescription)
+		return errors.Errorf("%d %s: %s", errBody.ErrorCode, errBody.Error, errBody.ErrorDescription)
 	}
 
 	return nil

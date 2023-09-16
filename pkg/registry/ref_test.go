@@ -1,9 +1,8 @@
-package registry_test
+package registry
 
 import (
 	"testing"
 
-	"github.com/crazy-max/diun/v4/pkg/registry"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -54,7 +53,7 @@ func TestParseReference(t *testing.T) {
 	for _, tt := range testCases {
 		tt := tt
 		t.Run(tt.input, func(t *testing.T) {
-			ref, err := registry.ParseReference(tt.input)
+			ref, err := ParseReference(tt.input)
 			if tt.wantErr {
 				require.Error(t, err)
 				return

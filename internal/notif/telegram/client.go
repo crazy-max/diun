@@ -39,17 +39,17 @@ func (c *Client) Name() string {
 func (c *Client) Send(entry model.NotifEntry) error {
 	token, err := utl.GetSecret(c.cfg.Token, c.cfg.TokenFile)
 	if err != nil {
-		return errors.New("Cannot retrieve token secret for Telegram notifier")
+		return errors.Wrap(err, "cannot retrieve token secret for Telegram notifier")
 	}
 
 	chatIDs := c.cfg.ChatIDs
 	chatIDsRaw, err := utl.GetSecret("", c.cfg.ChatIDsFile)
 	if err != nil {
-		return errors.New("Cannot retrieve chat IDs secret for Telegram notifier")
+		return errors.Wrap(err, "cannot retrieve chat IDs secret for Telegram notifier")
 	}
 	if len(chatIDsRaw) > 0 {
 		if err = json.Unmarshal([]byte(chatIDsRaw), &chatIDs); err != nil {
-			return errors.New("Cannot unmarshal chat IDs secret for Telegram notifier")
+			return errors.Wrap(err, "cannot unmarshal chat IDs secret for Telegram notifier")
 		}
 	}
 

@@ -32,13 +32,13 @@ func (c *Client) Manifest(image Image, dbManifest Manifest) (Manifest, bool, err
 
 	rmRef, err := ParseReference(image.String())
 	if err != nil {
-		return Manifest{}, false, errors.Wrap(err, "Cannot parse reference")
+		return Manifest{}, false, errors.Wrap(err, "cannot parse reference")
 	}
 
 	// Retrieve remote digest through HEAD request
 	rmDigest, err := docker.GetDigest(ctx, c.sysCtx, rmRef)
 	if err != nil {
-		return Manifest{}, false, errors.Wrap(err, "Cannot get image digest from HEAD request")
+		return Manifest{}, false, errors.Wrap(err, "cannot get image digest from HEAD request")
 	}
 
 	// Digest match, returns db manifest
@@ -48,13 +48,13 @@ func (c *Client) Manifest(image Image, dbManifest Manifest) (Manifest, bool, err
 
 	rmCloser, err := rmRef.NewImage(ctx, c.sysCtx)
 	if err != nil {
-		return Manifest{}, false, errors.Wrap(err, "Cannot create image closer")
+		return Manifest{}, false, errors.Wrap(err, "cannot create image closer")
 	}
 	defer rmCloser.Close()
 
 	rmRawManifest, rmManifestMimeType, err := rmCloser.Manifest(ctx)
 	if err != nil {
-		return Manifest{}, false, errors.Wrap(err, "Cannot get raw manifest")
+		return Manifest{}, false, errors.Wrap(err, "cannot get raw manifest")
 	}
 
 	// For manifests list compare also digest matching the platform
@@ -62,19 +62,19 @@ func (c *Client) Manifest(image Image, dbManifest Manifest) (Manifest, bool, err
 	if c.opts.CompareDigest && len(dbManifest.Raw) > 0 && dbManifest.isManifestList() && isManifestList(rmManifestMimeType) {
 		dbManifestList, err := manifest.ListFromBlob(dbManifest.Raw, dbManifest.MIMEType)
 		if err != nil {
-			return Manifest{}, false, errors.Wrap(err, "Cannot parse manifest list")
+			return Manifest{}, false, errors.Wrap(err, "cannot parse manifest list")
 		}
 		dbManifestPlatformDigest, err := dbManifestList.ChooseInstance(c.sysCtx)
 		if err != nil {
-			return Manifest{}, false, errors.Wrapf(err, "Error choosing image instance")
+			return Manifest{}, false, errors.Wrapf(err, "error choosing image instance")
 		}
 		rmManifestList, err := manifest.ListFromBlob(rmRawManifest, rmManifestMimeType)
 		if err != nil {
-			return Manifest{}, false, errors.Wrap(err, "Cannot parse manifest list")
+			return Manifest{}, false, errors.Wrap(err, "cannot parse manifest list")
 		}
 		rmManifestPlatformDigest, err := rmManifestList.ChooseInstance(c.sysCtx)
 		if err != nil {
-			return Manifest{}, false, errors.Wrapf(err, "Error choosing image instance")
+			return Manifest{}, false, errors.Wrapf(err, "error choosing image instance")
 		}
 		updated = dbManifestPlatformDigest != rmManifestPlatformDigest
 	}
@@ -82,7 +82,7 @@ func (c *Client) Manifest(image Image, dbManifest Manifest) (Manifest, bool, err
 	// Metadata describing the Docker image
 	rmInspect, err := rmCloser.Inspect(ctx)
 	if err != nil {
-		return Manifest{}, false, errors.Wrap(err, "Cannot inspect")
+		return Manifest{}, false, errors.Wrap(err, "cannot inspect")
 	}
 	rmTag := rmInspect.Tag
 	if len(rmTag) == 0 {
