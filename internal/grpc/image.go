@@ -3,7 +3,6 @@ package grpc
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 
 	"github.com/containers/image/v5/docker/reference"
 	"github.com/crazy-max/diun/v4/pb"
@@ -91,7 +90,7 @@ func (c *Client) ImageRemove(ctx context.Context, request *pb.ImageRemoveRequest
 	}
 
 	if _, ok := images[ref.Name()]; !ok {
-		return nil, fmt.Errorf("%s not found in database", ref.Name())
+		return nil, errors.Errorf("%s not found in database", ref.Name())
 	}
 
 	var tag string
