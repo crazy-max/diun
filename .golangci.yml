@@ -20,6 +20,7 @@ linters:
     - makezero
     - whitespace
     - unused
+    - forbidigo
   disable-all: true
 
 linters-settings:
