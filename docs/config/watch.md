@@ -143,7 +143,7 @@ events to [healthchecks.io](https://healthchecks.io/).
 
 ### `imageDefaults`
 
-ImageDefaults allows specifying default values for any configuration that is typically set at an Image level. For details More details on these examples can be seen in the [file provider documentation](docs/providers/file.md). Any value sset at the Image level will override or be merged with any deault values.
+ImageDefaults allows specifying default values for any configuration that is typically set at an Image level. For details More details on these examples can be seen in the [file provider documentation](../providers/file.md). Any value sset at the Image level will override or be merged with any deault values.
 
 !!! tip
     Not all values must be provided. You may chose which ones you'd like to set. A an example may be to specify defaults such that new SemVer tags will be trigger notifications.
