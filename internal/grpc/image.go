@@ -6,6 +6,7 @@ import (
 
 	"github.com/containers/image/v5/docker/reference"
 	"github.com/crazy-max/diun/v4/pb"
+	"github.com/crazy-max/diun/v4/pkg/registry"
 	"github.com/pkg/errors"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -17,16 +18,18 @@ func (c *Client) ImageList(ctx context.Context, request *pb.ImageListRequest) (*
 	}
 
 	var ilr []*pb.ImageListResponse_Image
-	for name, manifests := range images {
-		latest := &manifests[0]
-		for _, manifest := range manifests {
-			if manifest.Created.After(*latest.Created) {
-				latest = &manifest
+	for name, mfsts := range images {
+		mfsts := mfsts
+		var latest *registry.Manifest
+		for _, mfst := range mfsts {
+			mfst := mfst
+			if latest == nil || mfst.Created.After(*latest.Created) {
+				latest = &mfst
 			}
 		}
 		ilr = append(ilr, &pb.ImageListResponse_Image{
 			Name:           name,
-			ManifestsCount: int64(len(manifests)),
+			ManifestsCount: int64(len(mfsts)),
 			Latest: &pb.Manifest{
 				Tag:      latest.Tag,
 				MimeType: latest.MIMEType,
