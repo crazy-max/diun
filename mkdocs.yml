@@ -112,6 +112,7 @@ nav:
     - Overview: config/index.md
     - .db: config/db.md
     - .watch: config/watch.md
+    - .defaults: config/defaults.md
     - .notif: config/notif.md
     - .regopts: config/regopts.md
     - .providers: config/providers.md
