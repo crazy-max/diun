@@ -10,18 +10,18 @@ import (
 // Client represents an active kubernetes provider object
 type Client struct {
 	*provider.Client
-	config        *model.PrdKubernetes
-	logger        zerolog.Logger
-	imageDefaults *model.ImageDefaults
+	config   *model.PrdKubernetes
+	logger   zerolog.Logger
+	defaults *model.Defaults
 }
 
 // New creates new kubernetes provider instance
-func New(config *model.PrdKubernetes, imageDefaults *model.ImageDefaults) *provider.Client {
+func New(config *model.PrdKubernetes, defaults *model.Defaults) *provider.Client {
 	return &provider.Client{
 		Handler: &Client{
-			config:        config,
-			logger:        log.With().Str("provider", "kubernetes").Logger(),
-			imageDefaults: imageDefaults,
+			config:   config,
+			logger:   log.With().Str("provider", "kubernetes").Logger(),
+			defaults: defaults,
 		},
 	}
 }

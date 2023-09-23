@@ -91,7 +91,7 @@ func (c *Client) listContainerImage() []model.Image {
 			Str("ctn_image", imageName).
 			Interface("ctn_labels", ctn.Labels).
 			Msg("Validate image")
-		image, err := provider.ValidateImage(imageName, metadata(ctn), ctn.Labels, *c.config.WatchByDefault, c.imageDefaults)
+		image, err := provider.ValidateImage(imageName, metadata(ctn), ctn.Labels, *c.config.WatchByDefault, c.defaults)
 
 		if err != nil {
 			c.logger.Error().Err(err).

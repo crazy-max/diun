@@ -153,32 +153,32 @@ func (di *Diun) Run() {
 	defer di.pool.Release()
 
 	// Docker provider
-	for _, job := range dockerPrd.New(di.cfg.Providers.Docker, di.cfg.Watch.ImageDefaults).ListJob() {
+	for _, job := range dockerPrd.New(di.cfg.Providers.Docker, di.cfg.Defaults).ListJob() {
 		di.createJob(job)
 	}
 
 	// Swarm provider
-	for _, job := range swarmPrd.New(di.cfg.Providers.Swarm, di.cfg.Watch.ImageDefaults).ListJob() {
+	for _, job := range swarmPrd.New(di.cfg.Providers.Swarm, di.cfg.Defaults).ListJob() {
 		di.createJob(job)
 	}
 
 	// Kubernetes provider
-	for _, job := range kubernetesPrd.New(di.cfg.Providers.Kubernetes, di.cfg.Watch.ImageDefaults).ListJob() {
+	for _, job := range kubernetesPrd.New(di.cfg.Providers.Kubernetes, di.cfg.Defaults).ListJob() {
 		di.createJob(job)
 	}
 
 	// File provider
-	for _, job := range filePrd.New(di.cfg.Providers.File, di.cfg.Watch.ImageDefaults).ListJob() {
+	for _, job := range filePrd.New(di.cfg.Providers.File, di.cfg.Defaults).ListJob() {
 		di.createJob(job)
 	}
 
 	// Dockerfile provider
-	for _, job := range dockerfilePrd.New(di.cfg.Providers.Dockerfile, di.cfg.Watch.ImageDefaults).ListJob() {
+	for _, job := range dockerfilePrd.New(di.cfg.Providers.Dockerfile, di.cfg.Defaults).ListJob() {
 		di.createJob(job)
 	}
 
 	// Nomad provider
-	for _, job := range nomadPrd.New(di.cfg.Providers.Nomad, di.cfg.Watch.ImageDefaults).ListJob() {
+	for _, job := range nomadPrd.New(di.cfg.Providers.Nomad, di.cfg.Defaults).ListJob() {
 		di.createJob(job)
 	}
 

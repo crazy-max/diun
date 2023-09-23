@@ -15,7 +15,6 @@ type Watch struct {
 	RunOnStartup    *bool          `yaml:"runOnStartup,omitempty" json:"runOnStartup,omitempty" validate:"required"`
 	CompareDigest   *bool          `yaml:"compareDigest,omitempty" json:"compareDigest,omitempty" validate:"required"`
 	Healthchecks    *Healthchecks  `yaml:"healthchecks,omitempty" json:"healthchecks,omitempty"`
-	ImageDefaults   *ImageDefaults `yaml:"imageDefaults,omitempty" json:"imageDefaults,omitempty"`
 }
 
 // GetDefaults gets the default values

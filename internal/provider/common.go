@@ -18,19 +18,19 @@ var (
 )
 
 // ValidateImage returns a standard image through Docker labels
-func ValidateImage(image string, metadata, labels map[string]string, watchByDef bool, imageDefaults *model.ImageDefaults) (img model.Image, err error) {
+func ValidateImage(image string, metadata, labels map[string]string, watchByDef bool, defaults *model.Defaults) (img model.Image, err error) {
 	img = model.Image{
 		Name: image,
 	}
 
-	if imageDefaults != nil {
-		img.WatchRepo = imageDefaults.WatchRepo
-		img.NotifyOn = imageDefaults.NotifyOn
-		img.MaxTags = imageDefaults.MaxTags
-		img.SortTags = imageDefaults.SortTags
-		img.IncludeTags = imageDefaults.IncludeTags
-		img.ExcludeTags = imageDefaults.ExcludeTags
-		img.Metadata = imageDefaults.Metadata
+	if defaults != nil {
+		img.WatchRepo = defaults.WatchRepo
+		img.NotifyOn = defaults.NotifyOn
+		img.MaxTags = defaults.MaxTags
+		img.SortTags = defaults.SortTags
+		img.IncludeTags = defaults.IncludeTags
+		img.ExcludeTags = defaults.ExcludeTags
+		img.Metadata = defaults.Metadata
 	}
 
 	if enableStr, ok := labels["diun.enable"]; ok {

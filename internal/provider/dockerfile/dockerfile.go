@@ -10,18 +10,18 @@ import (
 // Client represents an active dockerfile provider object
 type Client struct {
 	*provider.Client
-	config        *model.PrdDockerfile
-	logger        zerolog.Logger
-	imageDefaults *model.ImageDefaults
+	config   *model.PrdDockerfile
+	logger   zerolog.Logger
+	defaults *model.Defaults
 }
 
 // New creates new dockerfile provider instance
-func New(config *model.PrdDockerfile, imageDefaults *model.ImageDefaults) *provider.Client {
+func New(config *model.PrdDockerfile, defaults *model.Defaults) *provider.Client {
 	return &provider.Client{
 		Handler: &Client{
-			config:        config,
-			logger:        log.With().Str("provider", "dockerfile").Logger(),
-			imageDefaults: imageDefaults,
+			config:   config,
+			logger:   log.With().Str("provider", "dockerfile").Logger(),
+			defaults: defaults,
 		},
 	}
 }

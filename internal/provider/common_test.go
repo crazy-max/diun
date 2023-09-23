@@ -17,7 +17,7 @@ func TestValidateImage(t *testing.T) {
 		metadata      map[string]string
 		labels        map[string]string
 		watchByDef    bool
-		imageDefaults *model.ImageDefaults
+		defaults      *model.Defaults
 		expectedImage model.Image
 		expectedErr   error
 	}{
@@ -85,8 +85,8 @@ func TestValidateImage(t *testing.T) {
 			labels: map[string]string{
 				"diun.regopt": "foo",
 			},
-			watchByDef:    true,
-			imageDefaults: &model.ImageDefaults{},
+			watchByDef: true,
+			defaults:   &model.Defaults{},
 			expectedImage: model.Image{
 				Name:   "myimg",
 				RegOpt: "foo",
@@ -110,7 +110,7 @@ func TestValidateImage(t *testing.T) {
 			name:       "Include using global settings",
 			image:      "myimg",
 			watchByDef: true,
-			imageDefaults: &model.ImageDefaults{
+			defaults: &model.Defaults{
 				WatchRepo: utl.NewTrue(),
 			},
 			expectedImage: model.Image{
@@ -126,7 +126,7 @@ func TestValidateImage(t *testing.T) {
 			labels: map[string]string{
 				"diun.watch_repo": "chickens",
 			},
-			imageDefaults: &model.ImageDefaults{},
+			defaults: &model.Defaults{},
 			expectedImage: model.Image{
 				Name: "myimg",
 			},
@@ -139,7 +139,7 @@ func TestValidateImage(t *testing.T) {
 			labels: map[string]string{
 				"diun.watch_repo": "false",
 			},
-			imageDefaults: &model.ImageDefaults{
+			defaults: &model.Defaults{
 				WatchRepo: utl.NewTrue(),
 			},
 			expectedImage: model.Image{
@@ -155,7 +155,7 @@ func TestValidateImage(t *testing.T) {
 			labels: map[string]string{
 				"diun.watch_repo": "true",
 			},
-			imageDefaults: &model.ImageDefaults{
+			defaults: &model.Defaults{
 				WatchRepo: utl.NewFalse(),
 			},
 			expectedImage: model.Image{
@@ -207,7 +207,7 @@ func TestValidateImage(t *testing.T) {
 			image:      "myimg",
 			watchByDef: true,
 			labels:     map[string]string{},
-			imageDefaults: &model.ImageDefaults{
+			defaults: &model.Defaults{
 				NotifyOn: []model.NotifyOn{model.NotifyOnNew},
 			},
 			expectedImage: model.Image{
@@ -223,7 +223,7 @@ func TestValidateImage(t *testing.T) {
 			labels: map[string]string{
 				"diun.notify_on": "update",
 			},
-			imageDefaults: &model.ImageDefaults{
+			defaults: &model.Defaults{
 				NotifyOn: []model.NotifyOn{model.NotifyOnNew},
 			},
 			expectedImage: model.Image{
@@ -274,7 +274,7 @@ func TestValidateImage(t *testing.T) {
 			image:      "myimg",
 			watchByDef: true,
 			labels:     map[string]string{},
-			imageDefaults: &model.ImageDefaults{
+			defaults: &model.Defaults{
 				SortTags: registry.SortTagSemver,
 			},
 			expectedImage: model.Image{
@@ -290,7 +290,7 @@ func TestValidateImage(t *testing.T) {
 			labels: map[string]string{
 				"diun.sort_tags": "reverse",
 			},
-			imageDefaults: &model.ImageDefaults{
+			defaults: &model.Defaults{
 				SortTags: registry.SortTagSemver,
 			},
 			expectedImage: model.Image{
@@ -341,7 +341,7 @@ func TestValidateImage(t *testing.T) {
 			image:      "myimg",
 			watchByDef: true,
 			labels:     map[string]string{},
-			imageDefaults: &model.ImageDefaults{
+			defaults: &model.Defaults{
 				MaxTags: 10,
 			},
 			expectedImage: model.Image{
@@ -357,7 +357,7 @@ func TestValidateImage(t *testing.T) {
 			labels: map[string]string{
 				"diun.max_tags": "11",
 			},
-			imageDefaults: &model.ImageDefaults{
+			defaults: &model.Defaults{
 				MaxTags: 10,
 			},
 			expectedImage: model.Image{
@@ -397,7 +397,7 @@ func TestValidateImage(t *testing.T) {
 			image:      "myimg",
 			watchByDef: true,
 			labels:     map[string]string{},
-			imageDefaults: &model.ImageDefaults{
+			defaults: &model.Defaults{
 				IncludeTags: []string{"alpine"},
 			},
 			expectedImage: model.Image{
@@ -413,7 +413,7 @@ func TestValidateImage(t *testing.T) {
 			labels: map[string]string{
 				"diun.include_tags": "ubuntu",
 			},
-			imageDefaults: &model.ImageDefaults{
+			defaults: &model.Defaults{
 				IncludeTags: []string{"alpine"},
 			},
 			expectedImage: model.Image{
@@ -453,7 +453,7 @@ func TestValidateImage(t *testing.T) {
 			image:      "myimg",
 			watchByDef: true,
 			labels:     map[string]string{},
-			imageDefaults: &model.ImageDefaults{
+			defaults: &model.Defaults{
 				ExcludeTags: []string{"alpine"},
 			},
 			expectedImage: model.Image{
@@ -469,7 +469,7 @@ func TestValidateImage(t *testing.T) {
 			labels: map[string]string{
 				"diun.exclude_tags": "ubuntu",
 			},
-			imageDefaults: &model.ImageDefaults{
+			defaults: &model.Defaults{
 				ExcludeTags: []string{"alpine"},
 			},
 			expectedImage: model.Image{
@@ -626,7 +626,7 @@ func TestValidateImage(t *testing.T) {
 			image:      "myimg",
 			watchByDef: true,
 			labels:     map[string]string{},
-			imageDefaults: &model.ImageDefaults{
+			defaults: &model.Defaults{
 				Metadata: map[string]string{
 					"foo123": "bar",
 				},
@@ -646,7 +646,7 @@ func TestValidateImage(t *testing.T) {
 			labels: map[string]string{
 				"diun.metadata.biz123": "baz",
 			},
-			imageDefaults: &model.ImageDefaults{
+			defaults: &model.Defaults{
 				Metadata: map[string]string{
 					"foo123": "bar",
 				},
@@ -667,7 +667,7 @@ func TestValidateImage(t *testing.T) {
 			labels: map[string]string{
 				"diun.metadata.foo123": "baz",
 			},
-			imageDefaults: &model.ImageDefaults{
+			defaults: &model.Defaults{
 				Metadata: map[string]string{
 					"foo123": "bar",
 				},
@@ -690,7 +690,7 @@ func TestValidateImage(t *testing.T) {
 				tt.metadata,
 				tt.labels,
 				tt.watchByDef,
-				tt.imageDefaults,
+				tt.defaults,
 			)
 			if tt.expectedErr == nil {
 				assert.NoError(t, err)

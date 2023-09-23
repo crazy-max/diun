@@ -10,18 +10,18 @@ import (
 // Client represents an active file provider object
 type Client struct {
 	*provider.Client
-	config        *model.PrdFile
-	logger        zerolog.Logger
-	imageDefaults *model.ImageDefaults
+	config   *model.PrdFile
+	logger   zerolog.Logger
+	defaults *model.Defaults
 }
 
 // New creates new file provider instance
-func New(config *model.PrdFile, imageDefaults *model.ImageDefaults) *provider.Client {
+func New(config *model.PrdFile, defaults *model.Defaults) *provider.Client {
 	return &provider.Client{
 		Handler: &Client{
-			config:        config,
-			logger:        log.With().Str("provider", "file").Logger(),
-			imageDefaults: imageDefaults,
+			config:   config,
+			logger:   log.With().Str("provider", "file").Logger(),
+			defaults: defaults,
 		},
 	}
 }
