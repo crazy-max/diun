@@ -2,7 +2,8 @@
 
 ## Overview
 
-Registry options is used to authenticate against a registry during the analysis of an image:
+Registry options are used to authenticate against a registry during the
+analysis of an image:
 
 ```yaml
 regopts:
