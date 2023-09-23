@@ -18,19 +18,25 @@ var (
 )
 
 // ValidateImage returns a standard image through Docker labels
-func ValidateImage(image string, metadata, labels map[string]string, watchByDef bool, imageDefaults model.Image) (img model.Image, err error) {
+func ValidateImage(image string, metadata, labels map[string]string, watchByDef bool, defaults *model.Defaults) (img model.Image, err error) {
 	img = model.Image{
 		Name: image,
 	}
 
-	if err := mergo.Merge(&img, imageDefaults); err != nil {
-		return img, &invalidLabelError{errors.Wrapf(err, "failed to merge image defaults for image %s", image)}
+	if defaults != nil {
+		img.WatchRepo = defaults.WatchRepo
+		img.NotifyOn = defaults.NotifyOn
+		img.MaxTags = defaults.MaxTags
+		img.SortTags = defaults.SortTags
+		img.IncludeTags = defaults.IncludeTags
+		img.ExcludeTags = defaults.ExcludeTags
+		img.Metadata = defaults.Metadata
 	}
 
 	if enableStr, ok := labels["diun.enable"]; ok {
 		enable, err := strconv.ParseBool(enableStr)
 		if err != nil {
-			return img, &invalidLabelError{errors.Wrapf(err, "cannot parse %q value of label diun.enable", enableStr)}
+			return img, errors.Wrapf(err, "cannot parse %q value of label diun.enable", enableStr)
 		}
 		if !enable {
 			return model.Image{}, nil
@@ -47,7 +53,7 @@ func ValidateImage(image string, metadata, labels map[string]string, watchByDef 
 			if watchRepo, err := strconv.ParseBool(value); err == nil {
 				img.WatchRepo = &watchRepo
 			} else {
-				return img, &invalidLabelError{errors.Wrapf(err, "cannot parse %q value of label %s", value, key)}
+				return img, errors.Wrapf(err, "cannot parse %q value of label %s", value, key)
 			}
 		case key == "diun.notify_on":
 			if len(value) == 0 {
@@ -57,7 +63,7 @@ func ValidateImage(image string, metadata, labels map[string]string, watchByDef 
 			for _, no := range strings.Split(value, ";") {
 				notifyOn := model.NotifyOn(no)
 				if !notifyOn.Valid() {
-					return img, &invalidLabelError{errors.Errorf("unknown notify status %q", value)}
+					return img, errors.Errorf("unknown notify status %q", value)
 				}
 				img.NotifyOn = append(img.NotifyOn, notifyOn)
 			}
@@ -67,12 +73,12 @@ func ValidateImage(image string, metadata, labels map[string]string, watchByDef 
 			}
 			sortTags := registry.SortTag(value)
 			if !sortTags.Valid() {
-				return img, &invalidLabelError{errors.Errorf("unknown sort tags type %q", value)}
+				return img, errors.Errorf("unknown sort tags type %q", value)
 			}
 			img.SortTags = sortTags
 		case key == "diun.max_tags":
 			if img.MaxTags, err = strconv.Atoi(value); err != nil {
-				return img, &invalidLabelError{errors.Wrapf(err, "cannot parse %q value of label %s", value, key)}
+				return img, errors.Wrapf(err, "cannot parse %q value of label %s", value, key)
 			}
 		case key == "diun.include_tags":
 			img.IncludeTags = strings.Split(value, ";")
@@ -85,7 +91,7 @@ func ValidateImage(image string, metadata, labels map[string]string, watchByDef 
 		case key == "diun.platform":
 			platform, err := platforms.Parse(value)
 			if err != nil {
-				return img, &invalidLabelError{errors.Wrapf(err, "cannot parse %q platform of label %s", value, key)}
+				return img, errors.Wrapf(err, "cannot parse %q platform of label %s", value, key)
 			}
 			img.Platform = model.ImagePlatform{
 				OS:      platform.OS,
@@ -98,7 +104,7 @@ func ValidateImage(image string, metadata, labels map[string]string, watchByDef 
 				break
 			}
 			if err := validateMetadataKey(mkey); err != nil {
-				return img, &invalidLabelError{errors.Wrapf(err, "invalid metadata key %q", mkey)}
+				return img, errors.Wrapf(err, "invalid metadata key %q", mkey)
 			}
 			if img.Metadata == nil {
 				img.Metadata = map[string]string{}
@@ -120,16 +126,4 @@ func validateMetadataKey(key string) error {
 		return errors.Errorf("only %q are allowed", metadataKeyChars)
 	}
 	return nil
-}
-
-type invalidLabelError struct {
-	error
-}
-
-func (e *invalidLabelError) Error() string {
-	return e.Error()
-}
-
-func (e *invalidLabelError) Unwrap() error {
-	return e
 }

@@ -12,6 +12,11 @@ watch:
     baseURL: https://hc-ping.com/
     uuid: 5bf66975-d4c7-4bf5-bcc8-b8d8a82ea278
 
+defaults:
+  notifyOn:
+    - new
+  maxTags: 5
+
 notif:
   amqp:
     host: localhost

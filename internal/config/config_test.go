@@ -58,10 +58,12 @@ func TestLoadFile(t *testing.T) {
 						BaseURL: "https://hc-ping.com/",
 						UUID:    "5bf66975-d4c7-4bf5-bcc8-b8d8a82ea278",
 					},
-					ImageDefaults: &model.Image{
-						NotifyOn: model.NotifyOnDefaults,
-						SortTags: registry.SortTagReverse,
-					},
+				},
+				Defaults: &model.Defaults{
+					WatchRepo: utl.NewFalse(),
+					NotifyOn:  []model.NotifyOn{model.NotifyOnNew},
+					MaxTags:   5,
+					SortTags:  registry.SortTagReverse,
 				},
 				Notif: &model.Notif{
 					Amqp: &model.NotifAmqp{
@@ -269,10 +271,11 @@ func TestLoadEnv(t *testing.T) {
 				"DIUN_PROVIDERS_DOCKER=true",
 			},
 			expected: &Config{
-				Db:      (&model.Db{}).GetDefaults(),
-				Watch:   (&model.Watch{}).GetDefaults(),
-				Notif:   nil,
-				RegOpts: nil,
+				Db:       (&model.Db{}).GetDefaults(),
+				Watch:    (&model.Watch{}).GetDefaults(),
+				Defaults: (&model.Defaults{}).GetDefaults(),
+				Notif:    nil,
+				RegOpts:  nil,
 				Providers: &model.Providers{
 					Docker: &model.PrdDocker{
 						TLSVerify:      utl.NewTrue(),
@@ -294,8 +297,9 @@ func TestLoadEnv(t *testing.T) {
 				"DIUN_PROVIDERS_DOCKER=true",
 			},
 			expected: &Config{
-				Db:    (&model.Db{}).GetDefaults(),
-				Watch: (&model.Watch{}).GetDefaults(),
+				Db:       (&model.Db{}).GetDefaults(),
+				Watch:    (&model.Watch{}).GetDefaults(),
+				Defaults: (&model.Defaults{}).GetDefaults(),
 				RegOpts: model.RegOpts{
 					{
 						Name:         "docker.io",
@@ -324,8 +328,9 @@ func TestLoadEnv(t *testing.T) {
 				"DIUN_PROVIDERS_SWARM=true",
 			},
 			expected: &Config{
-				Db:    (&model.Db{}).GetDefaults(),
-				Watch: (&model.Watch{}).GetDefaults(),
+				Db:       (&model.Db{}).GetDefaults(),
+				Watch:    (&model.Watch{}).GetDefaults(),
+				Defaults: (&model.Defaults{}).GetDefaults(),
 				Notif: &model.Notif{
 					Telegram: &model.NotifTelegram{
 						Token:        "abcdef123456",
@@ -350,8 +355,9 @@ func TestLoadEnv(t *testing.T) {
 				"DIUN_PROVIDERS_FILE_DIRECTORY=./fixtures",
 			},
 			expected: &Config{
-				Db:    (&model.Db{}).GetDefaults(),
-				Watch: (&model.Watch{}).GetDefaults(),
+				Db:       (&model.Db{}).GetDefaults(),
+				Watch:    (&model.Watch{}).GetDefaults(),
+				Defaults: (&model.Defaults{}).GetDefaults(),
 				Notif: &model.Notif{
 					Script: &model.NotifScript{
 						Cmd: "uname",
@@ -422,8 +428,9 @@ func TestLoadMixed(t *testing.T) {
 				"DIUN_NOTIF_MAIL_LOCALNAME=foo.com",
 			},
 			expected: &Config{
-				Db:    (&model.Db{}).GetDefaults(),
-				Watch: (&model.Watch{}).GetDefaults(),
+				Db:       (&model.Db{}).GetDefaults(),
+				Watch:    (&model.Watch{}).GetDefaults(),
+				Defaults: (&model.Defaults{}).GetDefaults(),
 				Notif: &model.Notif{
 					Mail: &model.NotifMail{
 						Host:               "127.0.0.1",
@@ -467,8 +474,9 @@ for <code>{{ .Entry.Manifest.Platform }}</code> platform.
 				"DIUN_NOTIF_WEBHOOK_TIMEOUT=1m",
 			},
 			expected: &Config{
-				Db:    (&model.Db{}).GetDefaults(),
-				Watch: (&model.Watch{}).GetDefaults(),
+				Db:       (&model.Db{}).GetDefaults(),
+				Watch:    (&model.Watch{}).GetDefaults(),
+				Defaults: (&model.Defaults{}).GetDefaults(),
 				Notif: &model.Notif{
 					Webhook: &model.NotifWebhook{
 						Endpoint: "http://webhook.foo.com/sd54qad89azd5a",

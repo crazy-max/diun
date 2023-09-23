@@ -37,7 +37,7 @@ func (c *Client) listServiceImage() []model.Image {
 			Str("ctn_image", svc.Spec.TaskTemplate.ContainerSpec.Image).
 			Msg("Validate image")
 
-		image, err := provider.ValidateImage(svc.Spec.TaskTemplate.ContainerSpec.Image, metadata(svc), svc.Spec.Labels, *c.config.WatchByDefault, *c.imageDefaults)
+		image, err := provider.ValidateImage(svc.Spec.TaskTemplate.ContainerSpec.Image, metadata(svc), svc.Spec.Labels, *c.config.WatchByDefault, c.defaults)
 		if err != nil {
 			c.logger.Error().Err(err).
 				Str("svc_name", svc.Spec.Name).

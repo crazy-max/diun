@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	defaultImageDefaults = model.Image{
+	defaults = model.Defaults{
 		NotifyOn: model.NotifyOnDefaults,
 		SortTags: registry.SortTagReverse,
 	}
@@ -157,7 +157,7 @@ var (
 func TestListJobFilename(t *testing.T) {
 	fc := New(&model.PrdFile{
 		Filename: "./fixtures/dockerhub.yml",
-	}, &defaultImageDefaults)
+	}, &defaults)
 
 	assert.Equal(t, dockerhubFile, fc.ListJob())
 }
@@ -165,7 +165,7 @@ func TestListJobFilename(t *testing.T) {
 func TestListJobDirectory(t *testing.T) {
 	fc := New(&model.PrdFile{
 		Directory: "./fixtures",
-	}, &defaultImageDefaults)
+	}, &defaults)
 
 	assert.Equal(t, append(append(bintrayFile, dockerhubFile...), append(lscrFile, quayFile...)...), fc.ListJob())
 }
@@ -173,7 +173,9 @@ func TestListJobDirectory(t *testing.T) {
 func TestDefaultImageOptions(t *testing.T) {
 	fc := New(&model.PrdFile{
 		Filename: "./fixtures/dockerhub.yml",
-	}, &model.Image{WatchRepo: utl.NewTrue()})
+	}, &model.Defaults{
+		WatchRepo: utl.NewTrue(),
+	})
 
 	for _, job := range fc.ListJob() {
 		assert.True(t, *job.Image.WatchRepo)

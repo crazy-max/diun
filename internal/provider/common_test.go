@@ -6,6 +6,7 @@ import (
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/pkg/registry"
 	"github.com/crazy-max/diun/v4/pkg/utl"
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -16,9 +17,9 @@ func TestValidateImage(t *testing.T) {
 		metadata      map[string]string
 		labels        map[string]string
 		watchByDef    bool
-		imageDefaults model.Image
+		defaults      *model.Defaults
 		expectedImage model.Image
-		expectedErr   interface{}
+		expectedErr   error
 	}{
 		{
 			name:       "Test with digest",
@@ -76,17 +77,16 @@ func TestValidateImage(t *testing.T) {
 			expectedImage: model.Image{
 				Name: "myimg",
 			},
-			expectedErr: &invalidLabelError{},
+			expectedErr: errors.Errorf(`cannot parse "chickens" value of label diun.enable`),
 		},
-		// Test diun.regopt
 		{
 			name:  "Set regopt",
 			image: "myimg",
 			labels: map[string]string{
 				"diun.regopt": "foo",
 			},
-			watchByDef:    true,
-			imageDefaults: model.Image{},
+			watchByDef: true,
+			defaults:   &model.Defaults{},
 			expectedImage: model.Image{
 				Name:   "myimg",
 				RegOpt: "foo",
@@ -99,8 +99,7 @@ func TestValidateImage(t *testing.T) {
 			labels: map[string]string{
 				"diun.regopt": "",
 			},
-			watchByDef:    true,
-			imageDefaults: model.Image{},
+			watchByDef: true,
 			expectedImage: model.Image{
 				Name:   "myimg",
 				RegOpt: "",
@@ -108,41 +107,10 @@ func TestValidateImage(t *testing.T) {
 			expectedErr: nil,
 		},
 		{
-			name:       "Default regopt",
-			image:      "myimg",
-			watchByDef: true,
-			labels:     map[string]string{},
-			imageDefaults: model.Image{
-				RegOpt: "foo",
-			},
-			expectedImage: model.Image{
-				Name:   "myimg",
-				RegOpt: "foo",
-			},
-			expectedErr: nil,
-		},
-		{
-			name:       "Override default regopt",
-			image:      "myimg",
-			watchByDef: true,
-			labels: map[string]string{
-				"diun.regopt": "bar",
-			},
-			imageDefaults: model.Image{
-				RegOpt: "foo",
-			},
-			expectedImage: model.Image{
-				Name:   "myimg",
-				RegOpt: "bar",
-			},
-			expectedErr: nil,
-		},
-		// Test watch_repo
-		{
 			name:       "Include using global settings",
 			image:      "myimg",
 			watchByDef: true,
-			imageDefaults: model.Image{
+			defaults: &model.Defaults{
 				WatchRepo: utl.NewTrue(),
 			},
 			expectedImage: model.Image{
@@ -158,11 +126,11 @@ func TestValidateImage(t *testing.T) {
 			labels: map[string]string{
 				"diun.watch_repo": "chickens",
 			},
-			imageDefaults: model.Image{},
+			defaults: &model.Defaults{},
 			expectedImage: model.Image{
 				Name: "myimg",
 			},
-			expectedErr: &invalidLabelError{},
+			expectedErr: errors.New(`cannot parse "chickens" value of label diun.watch_repo`),
 		},
 		{
 			name:       "Override default image values with labels (true > false)",
@@ -171,7 +139,7 @@ func TestValidateImage(t *testing.T) {
 			labels: map[string]string{
 				"diun.watch_repo": "false",
 			},
-			imageDefaults: model.Image{
+			defaults: &model.Defaults{
 				WatchRepo: utl.NewTrue(),
 			},
 			expectedImage: model.Image{
@@ -187,7 +155,7 @@ func TestValidateImage(t *testing.T) {
 			labels: map[string]string{
 				"diun.watch_repo": "true",
 			},
-			imageDefaults: model.Image{
+			defaults: &model.Defaults{
 				WatchRepo: utl.NewFalse(),
 			},
 			expectedImage: model.Image{
@@ -196,15 +164,13 @@ func TestValidateImage(t *testing.T) {
 			},
 			expectedErr: nil,
 		},
-		// Test diun.notify_on
 		{
 			name:  "Set valid notify_on",
 			image: "myimg",
 			labels: map[string]string{
 				"diun.notify_on": "new",
 			},
-			watchByDef:    true,
-			imageDefaults: model.Image{},
+			watchByDef: true,
 			expectedImage: model.Image{
 				Name:     "myimg",
 				NotifyOn: []model.NotifyOn{model.NotifyOnNew},
@@ -218,12 +184,11 @@ func TestValidateImage(t *testing.T) {
 			labels: map[string]string{
 				"diun.notify_on": "chickens",
 			},
-			imageDefaults: model.Image{},
 			expectedImage: model.Image{
 				Name:     "myimg",
 				NotifyOn: []model.NotifyOn{},
 			},
-			expectedErr: &invalidLabelError{},
+			expectedErr: errors.New(`unknown notify status "chickens"`),
 		},
 		{
 			name:       "Set empty notify_on",
@@ -232,7 +197,6 @@ func TestValidateImage(t *testing.T) {
 			labels: map[string]string{
 				"diun.notify_on": "",
 			},
-			imageDefaults: model.Image{},
 			expectedImage: model.Image{
 				Name: "myimg",
 			},
@@ -243,7 +207,7 @@ func TestValidateImage(t *testing.T) {
 			image:      "myimg",
 			watchByDef: true,
 			labels:     map[string]string{},
-			imageDefaults: model.Image{
+			defaults: &model.Defaults{
 				NotifyOn: []model.NotifyOn{model.NotifyOnNew},
 			},
 			expectedImage: model.Image{
@@ -259,7 +223,7 @@ func TestValidateImage(t *testing.T) {
 			labels: map[string]string{
 				"diun.notify_on": "update",
 			},
-			imageDefaults: model.Image{
+			defaults: &model.Defaults{
 				NotifyOn: []model.NotifyOn{model.NotifyOnNew},
 			},
 			expectedImage: model.Image{
@@ -268,15 +232,13 @@ func TestValidateImage(t *testing.T) {
 			},
 			expectedErr: nil,
 		},
-		// Test diun.sort_tags
 		{
 			name:  "Set valid sort_tags",
 			image: "myimg",
 			labels: map[string]string{
 				"diun.sort_tags": "semver",
 			},
-			watchByDef:    true,
-			imageDefaults: model.Image{},
+			watchByDef: true,
 			expectedImage: model.Image{
 				Name:     "myimg",
 				SortTags: registry.SortTagSemver,
@@ -289,12 +251,11 @@ func TestValidateImage(t *testing.T) {
 			labels: map[string]string{
 				"diun.sort_tags": "chickens",
 			},
-			watchByDef:    true,
-			imageDefaults: model.Image{},
+			watchByDef: true,
 			expectedImage: model.Image{
 				Name: "myimg",
 			},
-			expectedErr: &invalidLabelError{},
+			expectedErr: errors.New(`unknown sort tags type "chickens"`),
 		},
 		{
 			name:  "Set empty sort_tags",
@@ -302,8 +263,7 @@ func TestValidateImage(t *testing.T) {
 			labels: map[string]string{
 				"diun.sort_tags": "",
 			},
-			watchByDef:    true,
-			imageDefaults: model.Image{},
+			watchByDef: true,
 			expectedImage: model.Image{
 				Name: "myimg",
 			},
@@ -314,7 +274,7 @@ func TestValidateImage(t *testing.T) {
 			image:      "myimg",
 			watchByDef: true,
 			labels:     map[string]string{},
-			imageDefaults: model.Image{
+			defaults: &model.Defaults{
 				SortTags: registry.SortTagSemver,
 			},
 			expectedImage: model.Image{
@@ -330,7 +290,7 @@ func TestValidateImage(t *testing.T) {
 			labels: map[string]string{
 				"diun.sort_tags": "reverse",
 			},
-			imageDefaults: model.Image{
+			defaults: &model.Defaults{
 				SortTags: registry.SortTagSemver,
 			},
 			expectedImage: model.Image{
@@ -339,15 +299,13 @@ func TestValidateImage(t *testing.T) {
 			},
 			expectedErr: nil,
 		},
-		// Test diun.max_tags
 		{
 			name:  "Set valid max_tags",
 			image: "myimg",
 			labels: map[string]string{
 				"diun.max_tags": "10",
 			},
-			watchByDef:    true,
-			imageDefaults: model.Image{},
+			watchByDef: true,
 			expectedImage: model.Image{
 				Name:    "myimg",
 				MaxTags: 10,
@@ -360,12 +318,11 @@ func TestValidateImage(t *testing.T) {
 			labels: map[string]string{
 				"diun.max_tags": "chickens",
 			},
-			watchByDef:    true,
-			imageDefaults: model.Image{},
+			watchByDef: true,
 			expectedImage: model.Image{
 				Name: "myimg",
 			},
-			expectedErr: &invalidLabelError{},
+			expectedErr: errors.New(`cannot parse "chickens" value of label diun.max_tags`),
 		},
 		{
 			name:  "Set empty max_tags",
@@ -373,19 +330,18 @@ func TestValidateImage(t *testing.T) {
 			labels: map[string]string{
 				"diun.max_tags": "",
 			},
-			watchByDef:    true,
-			imageDefaults: model.Image{},
+			watchByDef: true,
 			expectedImage: model.Image{
 				Name: "myimg",
 			},
-			expectedErr: &invalidLabelError{},
+			expectedErr: errors.New(`cannot parse "" value of label diun.max_tags`),
 		},
 		{
 			name:       "Default max_tags",
 			image:      "myimg",
 			watchByDef: true,
 			labels:     map[string]string{},
-			imageDefaults: model.Image{
+			defaults: &model.Defaults{
 				MaxTags: 10,
 			},
 			expectedImage: model.Image{
@@ -401,7 +357,7 @@ func TestValidateImage(t *testing.T) {
 			labels: map[string]string{
 				"diun.max_tags": "11",
 			},
-			imageDefaults: model.Image{
+			defaults: &model.Defaults{
 				MaxTags: 10,
 			},
 			expectedImage: model.Image{
@@ -410,15 +366,13 @@ func TestValidateImage(t *testing.T) {
 			},
 			expectedErr: nil,
 		},
-		// Test diun.include_tags
 		{
 			name:  "Set include_tags",
 			image: "myimg",
 			labels: map[string]string{
 				"diun.include_tags": "alpine;ubuntu",
 			},
-			watchByDef:    true,
-			imageDefaults: model.Image{},
+			watchByDef: true,
 			expectedImage: model.Image{
 				Name:        "myimg",
 				IncludeTags: []string{"alpine", "ubuntu"},
@@ -431,8 +385,7 @@ func TestValidateImage(t *testing.T) {
 			labels: map[string]string{
 				"diun.include_tags": "",
 			},
-			watchByDef:    true,
-			imageDefaults: model.Image{},
+			watchByDef: true,
 			expectedImage: model.Image{
 				Name:        "myimg",
 				IncludeTags: []string{""},
@@ -444,7 +397,7 @@ func TestValidateImage(t *testing.T) {
 			image:      "myimg",
 			watchByDef: true,
 			labels:     map[string]string{},
-			imageDefaults: model.Image{
+			defaults: &model.Defaults{
 				IncludeTags: []string{"alpine"},
 			},
 			expectedImage: model.Image{
@@ -460,7 +413,7 @@ func TestValidateImage(t *testing.T) {
 			labels: map[string]string{
 				"diun.include_tags": "ubuntu",
 			},
-			imageDefaults: model.Image{
+			defaults: &model.Defaults{
 				IncludeTags: []string{"alpine"},
 			},
 			expectedImage: model.Image{
@@ -469,15 +422,13 @@ func TestValidateImage(t *testing.T) {
 			},
 			expectedErr: nil,
 		},
-		// Test diun.exclude_tags
 		{
 			name:  "Set exclude_tags",
 			image: "myimg",
 			labels: map[string]string{
 				"diun.exclude_tags": "alpine;ubuntu",
 			},
-			watchByDef:    true,
-			imageDefaults: model.Image{},
+			watchByDef: true,
 			expectedImage: model.Image{
 				Name:        "myimg",
 				ExcludeTags: []string{"alpine", "ubuntu"},
@@ -490,8 +441,7 @@ func TestValidateImage(t *testing.T) {
 			labels: map[string]string{
 				"diun.exclude_tags": "",
 			},
-			watchByDef:    true,
-			imageDefaults: model.Image{},
+			watchByDef: true,
 			expectedImage: model.Image{
 				Name:        "myimg",
 				ExcludeTags: []string{""},
@@ -503,7 +453,7 @@ func TestValidateImage(t *testing.T) {
 			image:      "myimg",
 			watchByDef: true,
 			labels:     map[string]string{},
-			imageDefaults: model.Image{
+			defaults: &model.Defaults{
 				ExcludeTags: []string{"alpine"},
 			},
 			expectedImage: model.Image{
@@ -519,7 +469,7 @@ func TestValidateImage(t *testing.T) {
 			labels: map[string]string{
 				"diun.exclude_tags": "ubuntu",
 			},
-			imageDefaults: model.Image{
+			defaults: &model.Defaults{
 				ExcludeTags: []string{"alpine"},
 			},
 			expectedImage: model.Image{
@@ -528,15 +478,13 @@ func TestValidateImage(t *testing.T) {
 			},
 			expectedErr: nil,
 		},
-		// Test diun.hub_tpl
 		{
 			name:  "Set hub_tpl",
 			image: "myimg",
 			labels: map[string]string{
 				"diun.hub_tpl": "foo",
 			},
-			watchByDef:    true,
-			imageDefaults: model.Image{},
+			watchByDef: true,
 			expectedImage: model.Image{
 				Name:   "myimg",
 				HubTpl: "foo",
@@ -549,8 +497,7 @@ func TestValidateImage(t *testing.T) {
 			labels: map[string]string{
 				"diun.hub_tpl": "",
 			},
-			watchByDef:    true,
-			imageDefaults: model.Image{},
+			watchByDef: true,
 			expectedImage: model.Image{
 				Name:   "myimg",
 				HubTpl: "",
@@ -558,44 +505,12 @@ func TestValidateImage(t *testing.T) {
 			expectedErr: nil,
 		},
 		{
-			name:       "Default hub_tpl",
-			image:      "myimg",
-			watchByDef: true,
-			labels:     map[string]string{},
-			imageDefaults: model.Image{
-				HubTpl: "foo",
-			},
-			expectedImage: model.Image{
-				Name:   "myimg",
-				HubTpl: "foo",
-			},
-			expectedErr: nil,
-		},
-		{
-			name:       "Override default hub_tpl",
-			image:      "myimg",
-			watchByDef: true,
-			labels: map[string]string{
-				"diun.hub_tpl": "bar",
-			},
-			imageDefaults: model.Image{
-				HubTpl: "foo",
-			},
-			expectedImage: model.Image{
-				Name:   "myimg",
-				HubTpl: "bar",
-			},
-			expectedErr: nil,
-		},
-		// Test diun.hub_link
-		{
 			name:  "Set hub_link",
 			image: "myimg",
 			labels: map[string]string{
 				"diun.hub_link": "foo",
 			},
-			watchByDef:    true,
-			imageDefaults: model.Image{},
+			watchByDef: true,
 			expectedImage: model.Image{
 				Name:    "myimg",
 				HubLink: "foo",
@@ -608,8 +523,7 @@ func TestValidateImage(t *testing.T) {
 			labels: map[string]string{
 				"diun.hub_link": "",
 			},
-			watchByDef:    true,
-			imageDefaults: model.Image{},
+			watchByDef: true,
 			expectedImage: model.Image{
 				Name:    "myimg",
 				HubLink: "",
@@ -617,44 +531,12 @@ func TestValidateImage(t *testing.T) {
 			expectedErr: nil,
 		},
 		{
-			name:       "Default hub_link",
-			image:      "myimg",
-			watchByDef: true,
-			labels:     map[string]string{},
-			imageDefaults: model.Image{
-				HubLink: "foo",
-			},
-			expectedImage: model.Image{
-				Name:    "myimg",
-				HubLink: "foo",
-			},
-			expectedErr: nil,
-		},
-		{
-			name:       "Override default hub_link",
-			image:      "myimg",
-			watchByDef: true,
-			labels: map[string]string{
-				"diun.hub_link": "bar",
-			},
-			imageDefaults: model.Image{
-				HubLink: "foo",
-			},
-			expectedImage: model.Image{
-				Name:    "myimg",
-				HubLink: "bar",
-			},
-			expectedErr: nil,
-		},
-		// Test diun.platform
-		{
 			name:  "Set valid platform",
 			image: "myimg",
 			labels: map[string]string{
 				"diun.platform": "linux/arm/v7",
 			},
-			watchByDef:    true,
-			imageDefaults: model.Image{},
+			watchByDef: true,
 			expectedImage: model.Image{
 				Name: "myimg",
 				Platform: model.ImagePlatform{
@@ -671,12 +553,11 @@ func TestValidateImage(t *testing.T) {
 			labels: map[string]string{
 				"diun.platform": "chickens",
 			},
-			watchByDef:    true,
-			imageDefaults: model.Image{},
+			watchByDef: true,
 			expectedImage: model.Image{
 				Name: "myimg",
 			},
-			expectedErr: &invalidLabelError{},
+			expectedErr: errors.New(`cannot parse "chickens" platform of label diun.platform`),
 		},
 		{
 			name:  "Set empty platform",
@@ -684,69 +565,20 @@ func TestValidateImage(t *testing.T) {
 			labels: map[string]string{
 				"diun.platform": "",
 			},
-			watchByDef:    true,
-			imageDefaults: model.Image{},
+			watchByDef: true,
 			expectedImage: model.Image{
 				Name:     "myimg",
 				Platform: model.ImagePlatform{},
 			},
-			expectedErr: &invalidLabelError{},
+			expectedErr: errors.New(`cannot parse "" platform of label diun.platform`),
 		},
-		{
-			name:       "Default platform",
-			image:      "myimg",
-			watchByDef: true,
-			labels:     map[string]string{},
-			imageDefaults: model.Image{
-				Platform: model.ImagePlatform{
-					OS:      "linux",
-					Arch:    "arm",
-					Variant: "v7",
-				},
-			},
-			expectedImage: model.Image{
-				Name: "myimg",
-				Platform: model.ImagePlatform{
-					OS:      "linux",
-					Arch:    "arm",
-					Variant: "v7",
-				},
-			},
-			expectedErr: nil,
-		},
-		{
-			name:       "Override default platform",
-			image:      "myimg",
-			watchByDef: true,
-			labels: map[string]string{
-				"diun.platform": "linux/arm/v6",
-			},
-			imageDefaults: model.Image{
-				Platform: model.ImagePlatform{
-					OS:      "linux",
-					Arch:    "arm",
-					Variant: "v7",
-				},
-			},
-			expectedImage: model.Image{
-				Name: "myimg",
-				Platform: model.ImagePlatform{
-					OS:      "linux",
-					Arch:    "arm",
-					Variant: "v6",
-				},
-			},
-			expectedErr: nil,
-		},
-		// Test diun.metadata
 		{
 			name:  "Set valid metadata",
 			image: "myimg",
 			labels: map[string]string{
 				"diun.metadata.foo123": "bar",
 			},
-			watchByDef:    true,
-			imageDefaults: model.Image{},
+			watchByDef: true,
 			expectedImage: model.Image{
 				Name: "myimg",
 				Metadata: map[string]string{
@@ -761,12 +593,11 @@ func TestValidateImage(t *testing.T) {
 			labels: map[string]string{
 				"diun.metadata.lots of chickens": "bar",
 			},
-			watchByDef:    true,
-			imageDefaults: model.Image{},
+			watchByDef: true,
 			expectedImage: model.Image{
 				Name: "myimg",
 			},
-			expectedErr: &invalidLabelError{},
+			expectedErr: errors.New(`invalid metadata key "lots of chickens"`),
 		},
 		{
 			name:  "Set empty metadata key",
@@ -774,8 +605,7 @@ func TestValidateImage(t *testing.T) {
 			labels: map[string]string{
 				"diun.metadata.": "bar",
 			},
-			watchByDef:    true,
-			imageDefaults: model.Image{},
+			watchByDef: true,
 			expectedImage: model.Image{
 				Name: "myimg",
 			},
@@ -786,8 +616,7 @@ func TestValidateImage(t *testing.T) {
 			labels: map[string]string{
 				"diun.metadata.foo123": "",
 			},
-			watchByDef:    true,
-			imageDefaults: model.Image{},
+			watchByDef: true,
 			expectedImage: model.Image{
 				Name: "myimg",
 			},
@@ -797,7 +626,7 @@ func TestValidateImage(t *testing.T) {
 			image:      "myimg",
 			watchByDef: true,
 			labels:     map[string]string{},
-			imageDefaults: model.Image{
+			defaults: &model.Defaults{
 				Metadata: map[string]string{
 					"foo123": "bar",
 				},
@@ -817,7 +646,7 @@ func TestValidateImage(t *testing.T) {
 			labels: map[string]string{
 				"diun.metadata.biz123": "baz",
 			},
-			imageDefaults: model.Image{
+			defaults: &model.Defaults{
 				Metadata: map[string]string{
 					"foo123": "bar",
 				},
@@ -838,7 +667,7 @@ func TestValidateImage(t *testing.T) {
 			labels: map[string]string{
 				"diun.metadata.foo123": "baz",
 			},
-			imageDefaults: model.Image{
+			defaults: &model.Defaults{
 				Metadata: map[string]string{
 					"foo123": "bar",
 				},
@@ -856,24 +685,18 @@ func TestValidateImage(t *testing.T) {
 	for _, tt := range cases {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
 			img, err := ValidateImage(
 				tt.image,
 				tt.metadata,
 				tt.labels,
 				tt.watchByDef,
-				tt.imageDefaults,
+				tt.defaults,
 			)
 			if tt.expectedErr == nil {
 				assert.NoError(t, err)
 				assert.Equal(t, tt.expectedImage, img)
 			} else {
-				switch err.(type) {
-				case *invalidLabelError:
-					assert.Error(t, err)
-				default:
-					assert.Error(t, err)
-				}
+				assert.ErrorContains(t, err, tt.expectedErr.Error())
 			}
 		})
 	}

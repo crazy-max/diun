@@ -34,11 +34,11 @@ func (c *Client) listFileImage() []model.Image {
 		for _, item := range items {
 			// Set default WatchRepo
 			if item.WatchRepo == nil {
-				item.WatchRepo = c.imageDefaults.WatchRepo
+				item.WatchRepo = c.defaults.WatchRepo
 			}
 			// Check NotifyOn
 			if len(item.NotifyOn) == 0 {
-				item.NotifyOn = c.imageDefaults.NotifyOn
+				item.NotifyOn = c.defaults.NotifyOn
 			} else {
 				for _, no := range item.NotifyOn {
 					if !no.Valid() {
@@ -52,7 +52,7 @@ func (c *Client) listFileImage() []model.Image {
 
 			// Check SortType
 			if item.SortTags == "" {
-				item.SortTags = c.imageDefaults.SortTags
+				item.SortTags = c.defaults.SortTags
 			}
 			if !item.SortTags.Valid() {
 				c.logger.Error().

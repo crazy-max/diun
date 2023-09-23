@@ -101,7 +101,7 @@ func (c *Client) listTaskImages() []model.Image {
 						c.logger.Error().Err(err).Msg("Cannot merge task metadata")
 					}
 
-					image, err := provider.ValidateImage(imageName, metadata(job, taskGroup, task), labels, *c.config.WatchByDefault, *c.imageDefaults)
+					image, err := provider.ValidateImage(imageName, metadata(job, taskGroup, task), labels, *c.config.WatchByDefault, c.defaults)
 					if err != nil {
 						c.logger.Error().
 							Err(err).

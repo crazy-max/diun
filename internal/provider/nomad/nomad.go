@@ -10,18 +10,18 @@ import (
 // Client represents an active nomad provider object
 type Client struct {
 	*provider.Client
-	config        *model.PrdNomad
-	logger        zerolog.Logger
-	imageDefaults *model.Image
+	config   *model.PrdNomad
+	logger   zerolog.Logger
+	defaults *model.Defaults
 }
 
 // New creates new nomad provider instance
-func New(config *model.PrdNomad, imageDefaults *model.Image) *provider.Client {
+func New(config *model.PrdNomad, defaults *model.Defaults) *provider.Client {
 	return &provider.Client{
 		Handler: &Client{
-			config:        config,
-			logger:        log.With().Str("provider", "nomad").Logger(),
-			imageDefaults: imageDefaults,
+			config:   config,
+			logger:   log.With().Str("provider", "nomad").Logger(),
+			defaults: defaults,
 		},
 	}
 }
