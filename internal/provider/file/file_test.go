@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	defaultImageDefaults = model.Image{
+	defaultImageDefaults = model.ImageDefaults{
 		NotifyOn: model.NotifyOnDefaults,
 		SortTags: registry.SortTagReverse,
 	}
@@ -173,7 +173,9 @@ func TestListJobDirectory(t *testing.T) {
 func TestDefaultImageOptions(t *testing.T) {
 	fc := New(&model.PrdFile{
 		Filename: "./fixtures/dockerhub.yml",
-	}, &model.Image{WatchRepo: utl.NewTrue()})
+	}, &model.ImageDefaults{
+		WatchRepo: utl.NewTrue(),
+	})
 
 	for _, job := range fc.ListJob() {
 		assert.True(t, *job.Image.WatchRepo)

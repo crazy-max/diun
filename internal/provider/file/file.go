@@ -12,11 +12,11 @@ type Client struct {
 	*provider.Client
 	config        *model.PrdFile
 	logger        zerolog.Logger
-	imageDefaults *model.Image
+	imageDefaults *model.ImageDefaults
 }
 
 // New creates new file provider instance
-func New(config *model.PrdFile, imageDefaults *model.Image) *provider.Client {
+func New(config *model.PrdFile, imageDefaults *model.ImageDefaults) *provider.Client {
 	return &provider.Client{
 		Handler: &Client{
 			config:        config,

@@ -58,9 +58,11 @@ func TestLoadFile(t *testing.T) {
 						BaseURL: "https://hc-ping.com/",
 						UUID:    "5bf66975-d4c7-4bf5-bcc8-b8d8a82ea278",
 					},
-					ImageDefaults: &model.Image{
-						NotifyOn: model.NotifyOnDefaults,
-						SortTags: registry.SortTagReverse,
+					ImageDefaults: &model.ImageDefaults{
+						WatchRepo: utl.NewFalse(),
+						NotifyOn:  []model.NotifyOn{model.NotifyOnNew},
+						MaxTags:   5,
+						SortTags:  registry.SortTagReverse,
 					},
 				},
 				Notif: &model.Notif{

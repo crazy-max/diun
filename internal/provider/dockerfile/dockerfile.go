@@ -12,11 +12,11 @@ type Client struct {
 	*provider.Client
 	config        *model.PrdDockerfile
 	logger        zerolog.Logger
-	imageDefaults *model.Image
+	imageDefaults *model.ImageDefaults
 }
 
 // New creates new dockerfile provider instance
-func New(config *model.PrdDockerfile, imageDefaults *model.Image) *provider.Client {
+func New(config *model.PrdDockerfile, imageDefaults *model.ImageDefaults) *provider.Client {
 	return &provider.Client{
 		Handler: &Client{
 			config:        config,

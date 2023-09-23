@@ -1,0 +1,11 @@
+watch:
+  workers: 20
+  schedule: "0 */6 * * *"
+  imageDefaults:
+    watchRepo: true
+    notifyOn:
+      - new
+    maxTags: 5
+
+providers:
+  docker: {}

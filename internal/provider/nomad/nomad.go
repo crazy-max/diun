@@ -12,11 +12,11 @@ type Client struct {
 	*provider.Client
 	config        *model.PrdNomad
 	logger        zerolog.Logger
-	imageDefaults *model.Image
+	imageDefaults *model.ImageDefaults
 }
 
 // New creates new nomad provider instance
-func New(config *model.PrdNomad, imageDefaults *model.Image) *provider.Client {
+func New(config *model.PrdNomad, imageDefaults *model.ImageDefaults) *provider.Client {
 	return &provider.Client{
 		Handler: &Client{
 			config:        config,

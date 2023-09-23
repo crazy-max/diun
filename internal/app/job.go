@@ -118,7 +118,7 @@ func (di *Diun) createJob(job model.Job) {
 		sublog.Error().Err(err).Msgf("Invoking job")
 	}
 
-	if job.Image.WatchRepo == nil || !*job.Image.WatchRepo || len(job.RegImage.Domain) == 0 {
+	if !*job.Image.WatchRepo || len(job.RegImage.Domain) == 0 {
 		return
 	}
 

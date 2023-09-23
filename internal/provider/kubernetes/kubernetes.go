@@ -12,11 +12,11 @@ type Client struct {
 	*provider.Client
 	config        *model.PrdKubernetes
 	logger        zerolog.Logger
-	imageDefaults *model.Image
+	imageDefaults *model.ImageDefaults
 }
 
 // New creates new kubernetes provider instance
-func New(config *model.PrdKubernetes, imageDefaults *model.Image) *provider.Client {
+func New(config *model.PrdKubernetes, imageDefaults *model.ImageDefaults) *provider.Client {
 	return &provider.Client{
 		Handler: &Client{
 			config:        config,
