@@ -1,6 +1,6 @@
 # Script notifications
 
-You can call a script when a notification occured. Following environment variables will be passed:
+You can call a script when a notification occurred. Following environment variables will be passed:
 
 ```
 DIUN_VERSION=4.24.0
