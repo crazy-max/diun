@@ -318,7 +318,7 @@ func TestManifestTaggedDigest(t *testing.T) {
 	}
 
 	img, err := ParseImage(ParseImageOptions{
-		Name: "crazymax/diun:latest@sha256:3fca3dd86c2710586208b0f92d1ec4ce25382f4cad4ae76a2275db8e8bb24031",
+		Name: "crazymax/diun:4.25.0@sha256:3fca3dd86c2710586208b0f92d1ec4ce25382f4cad4ae76a2275db8e8bb24031",
 	})
 	if err != nil {
 		t.Error(err)
@@ -333,7 +333,7 @@ func TestManifestTaggedDigest(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, false, updated)
 	assert.Equal(t, "docker.io/crazymax/diun", manifest.Name)
-	assert.Equal(t, "latest", manifest.Tag)
+	assert.Equal(t, "4.25.0", manifest.Tag)
 	assert.Equal(t, "application/vnd.oci.image.index.v1+json", manifest.MIMEType)
 	assert.Equal(t, "sha256:3fca3dd86c2710586208b0f92d1ec4ce25382f4cad4ae76a2275db8e8bb24031", manifest.Digest.String())
 	assert.Equal(t, "linux/amd64", manifest.Platform)
@@ -362,7 +362,7 @@ func TestManifestTaggedDigestUnknownTag(t *testing.T) {
 
 var manifestCrazymaxDiun4250 = Manifest{
 	Name:     "docker.io/crazymax/diun",
-	Tag:      "latest",
+	Tag:      "4.25.0",
 	MIMEType: "application/vnd.oci.image.index.v1+json",
 	Digest:   "sha256:3fca3dd86c2710586208b0f92d1ec4ce25382f4cad4ae76a2275db8e8bb24031",
 	Platform: "linux/amd64",
