@@ -64,6 +64,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		Title:     string(title),
 		Message:   string(body),
 		Priority:  c.cfg.Priority,
+		Sound:     c.cfg.Sound,
 		URL:       c.meta.URL,
 		URLTitle:  c.meta.Name,
 		Timestamp: time.Now().Unix(),
