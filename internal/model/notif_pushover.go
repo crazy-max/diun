@@ -7,6 +7,7 @@ type NotifPushover struct {
 	Recipient     string `yaml:"recipient,omitempty" json:"recipient,omitempty" validate:"omitempty"`
 	RecipientFile string `yaml:"recipientFile,omitempty" json:"recipientFile,omitempty" validate:"omitempty,file"`
 	Priority      int    `yaml:"priority,omitempty" json:"priority,omitempty" validate:"omitempty,min=-2,max=2"`
+	Sound         string `yaml:"sound,omitempty" json:"sound,omitempty" validate:"omitempty"`
 	TemplateTitle string `yaml:"templateTitle,omitempty" json:"templateTitle,omitempty" validate:"required"`
 	TemplateBody  string `yaml:"templateBody,omitempty" json:"templateBody,omitempty" validate:"required"`
 }
