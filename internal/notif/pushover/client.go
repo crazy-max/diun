@@ -60,13 +60,28 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		return err
 	}
 
+	messageUrl, err := msg.New(msg.Options{
+		Meta:          c.meta,
+		Entry:         entry,
+		TemplateTitle: c.cfg.TemplateURLTitle,
+		TemplateBody:  c.cfg.TemplateURL,
+	})
+	if err != nil {
+		return err
+	}
+
+	urlTitle, url, err := messageUrl.RenderMarkdown()
+	if err != nil {
+		return err
+	}
+
 	_, err = pushover.New(token).SendMessage(&pushover.Message{
 		Title:     string(title),
 		Message:   string(body),
 		Priority:  c.cfg.Priority,
 		Sound:     c.cfg.Sound,
-		URL:       c.meta.URL,
-		URLTitle:  c.meta.Name,
+		URLTitle:  string(urlTitle),
+		URL:       string(url),
 		Timestamp: time.Now().Unix(),
 		HTML:      true,
 	}, pushover.NewRecipient(recipient))
