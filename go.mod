@@ -6,7 +6,7 @@ require (
 	github.com/AlecAivazis/survey/v2 v2.3.7
 	github.com/alecthomas/kong v0.8.0
 	github.com/bmatcuk/doublestar/v3 v3.0.0
-	github.com/containerd/containerd v1.7.6
+	github.com/containerd/containerd v1.7.7
 	github.com/containers/image/v5 v5.26.1
 	github.com/crazy-max/cron/v3 v3.1.1
 	github.com/crazy-max/gohealthchecks v0.4.1
@@ -58,12 +58,13 @@ require (
 	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/Masterminds/sprig v2.16.0+incompatible // indirect
 	github.com/Microsoft/go-winio v0.6.1 // indirect
-	github.com/Microsoft/hcsshim v0.11.0 // indirect
+	github.com/Microsoft/hcsshim v0.11.1 // indirect
 	github.com/PuerkitoBio/goquery v1.5.0 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/andybalholm/cascadia v1.0.0 // indirect
 	github.com/aokoli/goutils v1.0.1 // indirect
 	github.com/aymerick/douceur v0.2.0 // indirect
+	github.com/containerd/log v0.1.0 // indirect
 	github.com/containerd/typeurl/v2 v2.1.1 // indirect
 	github.com/containers/libtrust v0.0.0-20230121012942-c1716e8a8d01 // indirect
 	github.com/containers/ocicrypt v1.1.7 // indirect
