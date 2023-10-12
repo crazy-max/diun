@@ -308,6 +308,7 @@ func TestManifestVariant(t *testing.T) {
 }
 
 func TestManifestTaggedDigest(t *testing.T) {
+	t.Parallel()
 	rc, err := New(Options{
 		CompareDigest: true,
 		ImageOs:       "linux",
@@ -340,6 +341,7 @@ func TestManifestTaggedDigest(t *testing.T) {
 }
 
 func TestManifestTaggedDigestUnknownTag(t *testing.T) {
+	t.Parallel()
 	rc, err := New(Options{
 		CompareDigest: true,
 		ImageOs:       "linux",

@@ -28,6 +28,8 @@ func TestTags(t *testing.T) {
 }
 
 func TestTagsWithDigest(t *testing.T) {
+	t.Parallel()
+
 	assert.NotNil(t, rc)
 
 	image, err := ParseImage(ParseImageOptions{
