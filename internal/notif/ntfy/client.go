@@ -64,12 +64,14 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		Title    string   `json:"title"`
 		Priority int      `json:"priority"`
 		Tags     []string `json:"tags"`
+		Markdown bool     `json:"markdown"`
 	}{
 		Topic:    c.cfg.Topic,
 		Message:  string(body),
 		Title:    string(title),
 		Priority: c.cfg.Priority,
 		Tags:     c.cfg.Tags,
+		Markdown: true,
 	}); err != nil {
 		return err
 	}
