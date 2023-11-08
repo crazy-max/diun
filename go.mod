@@ -1,6 +1,6 @@
 module github.com/crazy-max/diun/v4
 
-go 1.18
+go 1.21
 
 require (
 	github.com/AlecAivazis/survey/v2 v2.3.7
