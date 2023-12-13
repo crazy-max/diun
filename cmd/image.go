@@ -31,7 +31,7 @@ type ImageListCmd struct {
 	Raw bool `kong:"name='raw',default='false',help='JSON output.'"`
 }
 
-func (s *ImageListCmd) Run(ctx *Context) error {
+func (s *ImageListCmd) Run(_ *Context) error {
 	defer s.conn.Close()
 
 	il, err := s.imageSvc.ImageList(context.Background(), &pb.ImageListRequest{})
@@ -73,7 +73,7 @@ type ImageInspectCmd struct {
 	Raw   bool   `kong:"name='raw',default='false',help='JSON output.'"`
 }
 
-func (s *ImageInspectCmd) Run(ctx *Context) error {
+func (s *ImageInspectCmd) Run(_ *Context) error {
 	defer s.conn.Close()
 
 	ii, err := s.imageSvc.ImageInspect(context.Background(), &pb.ImageInspectRequest{
@@ -111,7 +111,7 @@ type ImageRemoveCmd struct {
 	Image string `kong:"name='image',required,help='Image to remove.'"`
 }
 
-func (s *ImageRemoveCmd) Run(ctx *Context) error {
+func (s *ImageRemoveCmd) Run(_ *Context) error {
 	defer s.conn.Close()
 
 	removed, err := s.imageSvc.ImageRemove(context.Background(), &pb.ImageRemoveRequest{
@@ -147,7 +147,7 @@ const (
 	pruneAllWarning = `This will remove all manifests from the database. Are you sure you want to continue?`
 )
 
-func (s *ImagePruneCmd) Run(ctx *Context) error {
+func (s *ImagePruneCmd) Run(_ *Context) error {
 	defer s.conn.Close()
 
 	if !s.Force {

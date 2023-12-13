@@ -11,7 +11,7 @@ import (
 	"github.com/crazy-max/diun/v4/pkg/registry"
 )
 
-func (c *Client) NotifTest(ctx context.Context, request *pb.NotifTestRequest) (*pb.NotifTestResponse, error) {
+func (c *Client) NotifTest(_ context.Context, _ *pb.NotifTestRequest) (*pb.NotifTestResponse, error) {
 	createdAt, _ := time.Parse("2006-01-02T15:04:05Z", "2020-03-26T12:23:56Z")
 	image, _ := registry.ParseImage(registry.ParseImageOptions{
 		Name: "diun/testnotif:latest",

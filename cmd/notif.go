@@ -17,7 +17,7 @@ type NotifTestCmd struct {
 	CliGlobals
 }
 
-func (s *NotifTestCmd) Run(ctx *Context) error {
+func (s *NotifTestCmd) Run(_ *Context) error {
 	defer s.conn.Close()
 
 	nt, err := s.notifSvc.NotifTest(context.Background(), &pb.NotifTestRequest{})

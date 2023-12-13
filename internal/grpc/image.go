@@ -11,7 +11,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func (c *Client) ImageList(ctx context.Context, request *pb.ImageListRequest) (*pb.ImageListResponse, error) {
+func (c *Client) ImageList(_ context.Context, _ *pb.ImageListRequest) (*pb.ImageListResponse, error) {
 	images, err := c.db.ListImage()
 	if err != nil {
 		return nil, err
@@ -46,7 +46,7 @@ func (c *Client) ImageList(ctx context.Context, request *pb.ImageListRequest) (*
 	}, nil
 }
 
-func (c *Client) ImageInspect(ctx context.Context, request *pb.ImageInspectRequest) (*pb.ImageInspectResponse, error) {
+func (c *Client) ImageInspect(_ context.Context, request *pb.ImageInspectRequest) (*pb.ImageInspectResponse, error) {
 	ref, err := reference.ParseNormalizedNamed(request.Name)
 	if err != nil {
 		return nil, err
@@ -81,7 +81,7 @@ func (c *Client) ImageInspect(ctx context.Context, request *pb.ImageInspectReque
 	}, nil
 }
 
-func (c *Client) ImageRemove(ctx context.Context, request *pb.ImageRemoveRequest) (*pb.ImageRemoveResponse, error) {
+func (c *Client) ImageRemove(_ context.Context, request *pb.ImageRemoveRequest) (*pb.ImageRemoveResponse, error) {
 	ref, err := reference.ParseNormalizedNamed(request.Name)
 	if err != nil {
 		return nil, err
@@ -125,7 +125,7 @@ func (c *Client) ImageRemove(ctx context.Context, request *pb.ImageRemoveRequest
 	}, nil
 }
 
-func (c *Client) ImagePrune(ctx context.Context, request *pb.ImagePruneRequest) (*pb.ImagePruneResponse, error) {
+func (c *Client) ImagePrune(_ context.Context, _ *pb.ImagePruneRequest) (*pb.ImagePruneResponse, error) {
 	images, err := c.db.ListImage()
 	if err != nil {
 		return nil, err
