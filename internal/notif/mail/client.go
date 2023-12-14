@@ -12,7 +12,7 @@ import (
 	"github.com/crazy-max/diun/v4/internal/notif/notifier"
 	"github.com/crazy-max/diun/v4/pkg/utl"
 	"github.com/go-gomail/gomail"
-	"github.com/matcornic/hermes/v2"
+	hermes "github.com/matcornic/hermes/v2"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 )
