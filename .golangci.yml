@@ -27,10 +27,11 @@ linters-settings:
   depguard:
     rules:
       main:
-        list-mode: lax
         deny:
-          - pkg: io/ioutil
-            desc: The io/ioutil package has been deprecated. https://go.dev/doc/go1.16#ioutil
+          # The io/ioutil package has been deprecated.
+          # https://go.dev/doc/go1.16#ioutil
+          - pkg: "io/ioutil"
+            desc: The io/ioutil package has been deprecated.
   forbidigo:
     forbid:
       - '^fmt\.Errorf(# use errors\.Errorf instead)?$'
@@ -42,3 +43,7 @@ issues:
     - linters:
         - revive
       text: "stutters"
+
+# show all
+max-issues-per-linter: 0
+max-same-issues: 0
