@@ -31,7 +31,7 @@ jobs:
         name: Validate targets matrix
         id: validate-targets
         run: |
-          echo "matrix=$(docker buildx bake validate --print | jq -cr '.group.validate.targets')" >> $GITHUB_OUTPUT
+          echo "matrix=$(docker buildx bake validate --print | jq -cr '.target | keys')" >> $GITHUB_OUTPUT
       -
         name: Artifact platforms matrix
         id: artifact-platforms
