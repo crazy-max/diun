@@ -14,6 +14,8 @@
 - name: traefik
   watch_repo: true
   sort_tags: default
+  exclude_tags:
+    - latest
 - name: alpine
   platform:
     os: linux
