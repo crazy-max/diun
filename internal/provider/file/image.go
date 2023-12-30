@@ -80,6 +80,21 @@ func (c *Client) listFileImage() []model.Image {
 				}
 			}
 
+			// Set default MaxTags
+			if item.MaxTags == 0 {
+				item.MaxTags = c.defaults.MaxTags
+			}
+
+			// Set default IncludeTags
+			if len(item.IncludeTags) == 0 {
+				item.IncludeTags = c.defaults.IncludeTags
+			}
+
+			// Set default ExcludeTags
+			if len(item.ExcludeTags) == 0 {
+				item.ExcludeTags = c.defaults.ExcludeTags
+			}
+
 			images = append(images, item)
 		}
 	}

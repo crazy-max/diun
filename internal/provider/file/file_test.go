@@ -13,6 +13,13 @@ var (
 	defaults = model.Defaults{
 		NotifyOn: model.NotifyOnDefaults,
 		SortTags: registry.SortTagReverse,
+		MaxTags:  25,
+		IncludeTags: []string{
+			`^(0|[1-9]\d*)\..*`,
+		},
+		ExcludeTags: []string{
+			`^0\.0\..*`,
+		},
 	}
 	bintrayFile = []model.Job{
 		{
@@ -22,6 +29,13 @@ var (
 				RegOpt:   "bintrayoptions",
 				NotifyOn: model.NotifyOnDefaults,
 				SortTags: registry.SortTagReverse,
+				MaxTags:  25,
+				IncludeTags: []string{
+					`^(0|[1-9]\d*)\..*`,
+				},
+				ExcludeTags: []string{
+					`^0\.0\..*`,
+				},
 			},
 		},
 		{
@@ -34,6 +48,12 @@ var (
 				},
 				SortTags: registry.SortTagLexicographical,
 				MaxTags:  50,
+				IncludeTags: []string{
+					`^(0|[1-9]\d*)\..*`,
+				},
+				ExcludeTags: []string{
+					`^0\.0\..*`,
+				},
 			},
 		},
 	}
@@ -45,6 +65,13 @@ var (
 				RegOpt:   "myregistry",
 				NotifyOn: model.NotifyOnDefaults,
 				SortTags: registry.SortTagReverse,
+				MaxTags:  25,
+				IncludeTags: []string{
+					`^(0|[1-9]\d*)\..*`,
+				},
+				ExcludeTags: []string{
+					`^0\.0\..*`,
+				},
 			},
 		},
 		{
@@ -54,8 +81,12 @@ var (
 				WatchRepo: utl.NewTrue(),
 				NotifyOn:  model.NotifyOnDefaults,
 				SortTags:  registry.SortTagSemver,
+				MaxTags:   25,
 				IncludeTags: []string{
 					`^1\.2\..*`,
+				},
+				ExcludeTags: []string{
+					`^0\.0\..*`,
 				},
 			},
 		},
@@ -70,6 +101,9 @@ var (
 				IncludeTags: []string{
 					`^(0|[1-9]\d*)\..*`,
 				},
+				ExcludeTags: []string{
+					`^0\.0\..*`,
+				},
 			},
 		},
 		{
@@ -79,6 +113,13 @@ var (
 				WatchRepo: utl.NewTrue(),
 				NotifyOn:  model.NotifyOnDefaults,
 				SortTags:  registry.SortTagDefault,
+				MaxTags:   25,
+				IncludeTags: []string{
+					`^(0|[1-9]\d*)\..*`,
+				},
+				ExcludeTags: []string{
+					`latest`,
+				},
 			},
 		},
 		{
@@ -92,6 +133,13 @@ var (
 					Arch:    "arm64",
 					Variant: "v8",
 				},
+				MaxTags: 25,
+				IncludeTags: []string{
+					`^(0|[1-9]\d*)\..*`,
+				},
+				ExcludeTags: []string{
+					`^0\.0\..*`,
+				},
 			},
 		},
 		{
@@ -100,6 +148,13 @@ var (
 				Name:     "docker.io/graylog/graylog:3.2.0",
 				NotifyOn: model.NotifyOnDefaults,
 				SortTags: registry.SortTagReverse,
+				MaxTags:  25,
+				IncludeTags: []string{
+					`^(0|[1-9]\d*)\..*`,
+				},
+				ExcludeTags: []string{
+					`^0\.0\..*`,
+				},
 			},
 		},
 		{
@@ -108,6 +163,13 @@ var (
 				Name:     "jacobalberty/unifi:5.9",
 				NotifyOn: model.NotifyOnDefaults,
 				SortTags: registry.SortTagReverse,
+				MaxTags:  25,
+				IncludeTags: []string{
+					`^(0|[1-9]\d*)\..*`,
+				},
+				ExcludeTags: []string{
+					`^0\.0\..*`,
+				},
 			},
 		},
 		{
@@ -117,8 +179,12 @@ var (
 				WatchRepo: utl.NewTrue(),
 				NotifyOn:  model.NotifyOnDefaults,
 				SortTags:  registry.SortTagReverse,
+				MaxTags:   25,
 				IncludeTags: []string{
 					`^1\..*`,
+				},
+				ExcludeTags: []string{
+					`^0\.0\..*`,
 				},
 			},
 		},
@@ -130,6 +196,13 @@ var (
 				Name:     "quay.io/coreos/hyperkube",
 				NotifyOn: model.NotifyOnDefaults,
 				SortTags: registry.SortTagReverse,
+				MaxTags:  25,
+				IncludeTags: []string{
+					`^(0|[1-9]\d*)\..*`,
+				},
+				ExcludeTags: []string{
+					`^0\.0\..*`,
+				},
 			},
 		},
 		{
@@ -138,6 +211,13 @@ var (
 				Name:     "quay.io/coreos/hyperkube:v1.1.7-coreos.1",
 				NotifyOn: model.NotifyOnDefaults,
 				SortTags: registry.SortTagReverse,
+				MaxTags:  25,
+				IncludeTags: []string{
+					`^(0|[1-9]\d*)\..*`,
+				},
+				ExcludeTags: []string{
+					`^0\.0\..*`,
+				},
 			},
 		},
 	}
@@ -149,6 +229,13 @@ var (
 				NotifyOn: model.NotifyOnDefaults,
 				SortTags: registry.SortTagReverse,
 				HubLink:  "https://fleet.linuxserver.io/image?name=linuxserver/heimdall",
+				MaxTags:  25,
+				IncludeTags: []string{
+					`^(0|[1-9]\d*)\..*`,
+				},
+				ExcludeTags: []string{
+					`^0\.0\..*`,
+				},
 			},
 		},
 	}
