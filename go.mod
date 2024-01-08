@@ -13,7 +13,7 @@ require (
 	github.com/crazy-max/gonfig v0.7.1
 	github.com/docker/distribution v2.8.3+incompatible
 	github.com/docker/docker v24.0.7+incompatible
-	github.com/docker/go-connections v0.4.0
+	github.com/docker/go-connections v0.5.0
 	github.com/docker/go-units v0.5.0
 	github.com/eclipse/paho.mqtt.golang v1.4.3
 	github.com/go-gomail/gomail v0.0.0-20160411212932-81ebce5c23df
