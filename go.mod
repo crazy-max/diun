@@ -6,8 +6,8 @@ require (
 	github.com/AlecAivazis/survey/v2 v2.3.7
 	github.com/alecthomas/kong v0.8.1
 	github.com/bmatcuk/doublestar/v3 v3.0.0
-	github.com/containerd/containerd v1.7.11
-	github.com/containers/image/v5 v5.29.0
+	github.com/containerd/containerd v1.6.19
+	github.com/containers/image/v5 v5.22.1
 	github.com/crazy-max/cron/v3 v3.1.1
 	github.com/crazy-max/gohealthchecks v0.4.1
 	github.com/crazy-max/gonfig v0.7.1
@@ -27,10 +27,10 @@ require (
 	github.com/matcornic/hermes/v2 v2.1.0
 	github.com/matrix-org/gomatrix v0.0.0-20210324163249-be2af5ef2e16
 	github.com/microcosm-cc/bluemonday v1.0.26
-	github.com/moby/buildkit v0.12.4
+	github.com/moby/buildkit v0.11.5
 	github.com/nlopes/slack v0.6.0
 	github.com/opencontainers/go-digest v1.0.0
-	github.com/opencontainers/image-spec v1.1.0-rc5
+	github.com/opencontainers/image-spec v1.1.0-rc.6
 	github.com/panjf2000/ants/v2 v2.9.0
 	github.com/pkg/errors v0.9.1
 	github.com/pkg/profile v1.7.0
@@ -57,23 +57,26 @@ require (
 	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/Masterminds/sprig v2.16.0+incompatible // indirect
 	github.com/Microsoft/go-winio v0.6.1 // indirect
-	github.com/Microsoft/hcsshim v0.12.0-rc.1 // indirect
 	github.com/PuerkitoBio/goquery v1.8.1 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/andybalholm/cascadia v1.3.2 // indirect
 	github.com/aokoli/goutils v1.0.1 // indirect
 	github.com/aymerick/douceur v0.2.0 // indirect
-	github.com/containerd/log v0.1.0 // indirect
-	github.com/containerd/typeurl/v2 v2.1.1 // indirect
+	github.com/beorn7/perks v1.0.1 // indirect
+	github.com/cespare/xxhash/v2 v2.2.0 // indirect
+	github.com/containerd/typeurl v1.0.2 // indirect
 	github.com/containers/libtrust v0.0.0-20230121012942-c1716e8a8d01 // indirect
 	github.com/containers/ocicrypt v1.1.9 // indirect
-	github.com/containers/storage v1.51.0 // indirect
+	github.com/containers/storage v1.48.1 // indirect
+	github.com/creack/pty v1.1.18 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/distribution/reference v0.5.0 // indirect
 	github.com/docker/docker-credential-helpers v0.8.0 // indirect
+	github.com/docker/go-metrics v0.0.1 // indirect
 	github.com/emicklei/go-restful/v3 v3.11.0 // indirect
 	github.com/felixge/fgprof v0.9.3 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.2 // indirect
+	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/go-logr/logr v1.3.0 // indirect
 	github.com/go-openapi/jsonpointer v0.19.6 // indirect
 	github.com/go-openapi/jsonreference v0.20.2 // indirect
@@ -106,10 +109,12 @@ require (
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.19 // indirect
 	github.com/mattn/go-runewidth v0.0.15 // indirect
+	github.com/matttproud/golang_protobuf_extensions v1.0.4 // indirect
 	github.com/mgutz/ansi v0.0.0-20170206155736-9520e82c474b // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/moby/sys/mountinfo v0.7.1 // indirect
+	github.com/moby/term v0.5.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
@@ -117,6 +122,10 @@ require (
 	github.com/opencontainers/runc v1.1.10 // indirect
 	github.com/opencontainers/runtime-spec v1.1.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/prometheus/client_golang v1.14.0 // indirect
+	github.com/prometheus/client_model v0.3.0 // indirect
+	github.com/prometheus/common v0.37.0 // indirect
+	github.com/prometheus/procfs v0.8.0 // indirect
 	github.com/rivo/uniseg v0.4.4 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
