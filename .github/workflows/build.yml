@@ -78,9 +78,10 @@ jobs:
           pull: true
       -
         name: Upload coverage
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
           directory: ${{ env.DESTDIR }}/coverage
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   artifact:
     runs-on: ubuntu-latest
