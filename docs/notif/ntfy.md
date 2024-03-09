@@ -38,7 +38,7 @@ Notifications can be sent using a [ntfy](https://ntfy.sh/) instance.
     * `DIUN_NOTIF_NTFY_TOPIC`
     * `DIUN_NOTIF_NTFY_PRIORITY`
     * `DIUN_NOTIF_NTFY_TAGS`
-    * `DIUN_NOTIF_NTFY_TIMEOUT`
+    * `DIUN_NOTIF_NTFY_TIMEOUT`[^2]
     * `DIUN_NOTIF_NTFY_TEMPLATETITLE`
     * `DIUN_NOTIF_NTFY_TEMPLATEBODY`
 
@@ -55,3 +55,4 @@ Notifications can be sent using a [ntfy](https://ntfy.sh/) instance.
 ```
 
 [^1]: Value required
+[^2]: The Value for the variable must be followed by the time unit for seconds (s) in lowercase. For example: "60s" 
