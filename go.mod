@@ -40,7 +40,7 @@ require (
 	github.com/streadway/amqp v1.1.0
 	github.com/stretchr/testify v1.8.4
 	github.com/tidwall/pretty v1.2.1
-	go.etcd.io/bbolt v1.3.8
+	go.etcd.io/bbolt v1.3.9
 	golang.org/x/mod v0.14.0
 	golang.org/x/sys v0.17.0
 	google.golang.org/grpc v1.60.1
