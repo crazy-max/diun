@@ -27,6 +27,8 @@ Multiple chat IDs can be provided in order to deliver notifications to multiple 
 | `tokenFile`        |                                    | Use content of secret file as Telegram bot token if `token` not defined   |
 | `chatIDs`          |                                    | List of chat IDs to send notifications to                                 |
 | `chatIDsFile`      |                                    | Use content of secret file as chat IDs if `chatIDs` not defined           |
+| `chatTopics`       |                                    | Nested List of chat topic IDs to send notifications to.                   |
+| `chatTopicsFile`   |                                    | Use content of secret file as chat topic IDs if `chatTopics` not defined  |
 | `templateBody`[^1] | See [below](#default-templatebody) | [Notification template](../faq.md#notification-template) for message body |
 
 !!! abstract "Environment variables"
@@ -38,6 +40,9 @@ Multiple chat IDs can be provided in order to deliver notifications to multiple 
 
 !!! example "chat IDs secret file"
     Chat IDs secret file must be a valid JSON array like: `[123456789,987654321]`
+
+!!! example "chat topic IDS secret file"
+    Chat topics is a nested array, so you can specify multiple topics per chat ID: `[[10,15][10,20]]`
 
 ### Default `templateBody`
 
