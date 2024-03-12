@@ -54,6 +54,17 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		}
 	}
 
+	chatTopics := c.cfg.ChatTopics
+	chatTopicsRaw, err := utl.GetSecret("", c.cfg.ChatTopicsFile)
+	if err != nil {
+		return errors.Wrap(err, "cannot retrieve chat topics secret for Telegram notifier")
+	}
+	if len(chatTopicsRaw) > 0 {
+		if err = json.Unmarshal([]byte(chatTopicsRaw), &chatTopics); err != nil {
+			return errors.Wrap(err, "cannot unmarshal chat topics secret for Telegram notifier")
+		}
+	}
+
 	bot, err := gotgbot.NewBot(token, &gotgbot.BotOpts{
 		BotClient: &gotgbot.BaseBotClient{
 			Client: http.Client{},
@@ -90,15 +101,30 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		return err
 	}
 
-	for _, chatID := range chatIDs {
-		_, err := bot.SendMessage(chatID, string(body), &gotgbot.SendMessageOpts{
-			ParseMode:          gotgbot.ParseModeMarkdown,
-			LinkPreviewOptions: &gotgbot.LinkPreviewOptions{IsDisabled: true},
-		})
-		if err != nil {
-			return err
+	for i, chatID := range chatIDs {
+		if len(chatTopics) > i && len(chatTopics[i]) > 0 {
+			for _, topic := range chatTopics[i] {
+				err = sendTelegramMessage(bot, chatID, topic, string(body))
+				if err != nil {
+					return err
+				}
+			}
+		} else {
+			err = sendTelegramMessage(bot, chatID, 0, string(body))
+			if err != nil {
+				return err
+			}
 		}
 	}
 
 	return nil
+}
+
+func sendTelegramMessage(bot *gotgbot.Bot, chatID int64, threadID int64, message string) error {
+	_, err := bot.SendMessage(chatID, message, &gotgbot.SendMessageOpts{
+		MessageThreadId:    threadID,
+		ParseMode:          gotgbot.ParseModeMarkdown,
+		LinkPreviewOptions: &gotgbot.LinkPreviewOptions{IsDisabled: true},
+	})
+	return err
 }
