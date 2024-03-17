@@ -102,18 +102,13 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	}
 
 	for i, chatID := range chatIDs {
-		if len(chatTopics) > i && len(chatTopics[i]) > 0 {
-			for _, topic := range chatTopics[i] {
-				err = sendTelegramMessage(bot, chatID, topic, string(body))
-				if err != nil {
-					return err
-				}
-			}
-		} else {
-			err = sendTelegramMessage(bot, chatID, 0, string(body))
-			if err != nil {
-				return err
-			}
+		var chatTopic int64
+		if len(chatTopics) > i {
+			chatTopic = chatTopics[i]
+		}
+		err = sendTelegramMessage(bot, chatID, chatTopic, string(body))
+		if err != nil {
+			return err
 		}
 	}
 
