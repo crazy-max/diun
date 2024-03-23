@@ -1,0 +1,1929 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Receive notifications when a Docker image is updated on a Docker registry">
+      
+      
+        <meta name="author" content="CrazyMax">
+      
+      
+        <link rel="canonical" href="https://crazymax.dev/diun/faq/">
+      
+      <link rel="icon" href="../assets/favicon.ico">
+      <meta name="generator" content="mkdocs-1.3.0, mkdocs-material-8.3.9">
+    
+    
+      
+        <title>FAQ - Diun</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.1d29e8d0.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.cbb835fc.min.css">
+        
+      
+      
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+<link rel="preconnect" href="https://plausible.re4per.com">
+<script defer data-domain="crazymax.dev/diun" src="https://plausible.re4per.com/js/plausible.outbound-links.js" ></script>
+<script>window.plausible = window.plausible || function() { (window.plausible.q = window.plausible.q || []).push(arguments) }</script>
+
+<meta name="application-name" content="Diun">
+<meta name="msapplication-TileColor" content="#FFFFFF">
+<meta name="msapplication-TileImage" content="https://crazymax.dev/diun/assets/meta/mstile-144x144.png">
+<meta name="msapplication-square70x70logo" content="https://crazymax.dev/diun/assets/meta/mstile-70x70.png">
+<meta name="msapplication-square150x150logo" content="https://crazymax.dev/diun/assets/meta/mstile-150x150.png">
+<meta name="msapplication-wide310x150logo" content="https://crazymax.dev/diun/assets/meta/mstile-310x150.png">
+<meta name="msapplication-square310x310logo" content="https://crazymax.dev/diun/assets/meta/mstile-310x310.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Diun - FAQ">
+<meta property="og:description" content="Receive notifications when a Docker image is updated on a Docker registry">
+<meta property="og:url" content="https://crazymax.dev/diun/faq/">
+<meta property="og:image" content="https://crazymax.dev/diun/assets/meta/card.png">
+<meta property="og:image:alt" content="Diun">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@crazyws">
+<meta name="twitter:creator" content="@crazyws">
+<meta name="twitter:title" content="Diun - FAQ">
+<meta name="twitter:description" content="Receive notifications when a Docker image is updated on a Docker registry">
+<meta name="twitter:image" content="https://crazymax.dev/diun/assets/meta/card.png">
+<meta name="google-site-verification" content="Kscpetr5E2zNDM0pqz-0xhtPZ77oY2oAS6Lid6yEUUM">
+<meta name="msvalidate.01" content="D188E0BEC1AB6E7C1E0194BFC35D0033">
+
+<link rel="apple-touch-icon-precomposed" sizes="57x57" href="https://crazymax.dev/diun/assets/meta/apple-touch-icon-57x57.png">
+<link rel="apple-touch-icon-precomposed" sizes="114x114" href="https://crazymax.dev/diun/assets/meta/apple-touch-icon-114x114.png">
+<link rel="apple-touch-icon-precomposed" sizes="72x72" href="https://crazymax.dev/diun/assets/meta/apple-touch-icon-72x72.png">
+<link rel="apple-touch-icon-precomposed" sizes="144x144" href="https://crazymax.dev/diun/assets/meta/apple-touch-icon-144x144.png">
+<link rel="apple-touch-icon-precomposed" sizes="60x60" href="https://crazymax.dev/diun/assets/meta/apple-touch-icon-60x60.png">
+<link rel="apple-touch-icon-precomposed" sizes="120x120" href="https://crazymax.dev/diun/assets/meta/apple-touch-icon-120x120.png">
+<link rel="apple-touch-icon-precomposed" sizes="76x76" href="https://crazymax.dev/diun/assets/meta/apple-touch-icon-76x76.png">
+<link rel="apple-touch-icon-precomposed" sizes="152x152" href="https://crazymax.dev/diun/assets/meta/apple-touch-icon-152x152.png">
+<link rel="icon" type="image/png" href="https://crazymax.dev/diun/assets/meta/favicon-196x196.png" sizes="196x196">
+<link rel="icon" type="image/png" href="https://crazymax.dev/diun/assets/meta/favicon-96x96.png" sizes="96x96">
+<link rel="icon" type="image/png" href="https://crazymax.dev/diun/assets/meta/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="https://crazymax.dev/diun/assets/meta/favicon-16x16.png" sizes="16x16">
+<link rel="icon" type="image/png" href="https://crazymax.dev/diun/assets/meta/favicon-128.png" sizes="128x128">
+
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="light-blue" data-md-color-accent="light-blue">
+  
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#faq" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+        <aside class="md-banner">
+          <div class="md-banner__inner md-grid md-typeset">
+            
+<style>
+
+  /* Add background color transition */
+  .md-announce {
+    transition: background-color 125ms;
+  }
+
+  /* Change background color on link focus */
+  .md-announce:focus-within {
+    background-color: var(--md-accent-fg-color);
+  }
+
+  /* Preserve link color */
+  .md-announce a,
+  .md-announce a:focus,
+  .md-announce a:hover {
+    color: currentColor;
+  }
+
+  /* Don't wrap name of blog article */
+  .md-announce strong {
+    white-space: nowrap;
+  }
+</style>
+<a target="_blank" href="https://github.com/sponsors/crazy-max">
+  If you like this project and use it, consider sponsoring it via
+  <strong>GitHub <img alt="❤" class="twemoji md-footer-custom-text" src="https://twemoji.maxcdn.com/v/latest/svg/2764.svg" title="love"> Sponsors</strong>
+</a>
+
+          </div>
+        </aside>
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Diun" class="md-header__button md-logo" aria-label="Diun" data-md-component="logo">
+      
+  <img src="../assets/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Diun
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              FAQ
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      <form class="md-header__option" data-md-component="palette">
+        
+          
+          
+          <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="light-blue" data-md-color-accent="light-blue"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+          
+            <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3 3.19.09m3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95 2.06.05m-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31Z"/></svg>
+            </label>
+          
+        
+          
+          
+          <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="light-blue" data-md-color-accent="light-blue"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_2">
+          
+            <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5c-.84 0-1.65.15-2.39.42L12 2M3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29L3.34 7m.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14L3.36 17M20.65 7l-1.77 3.79a7.023 7.023 0 0 0-2.38-4.15l4.15.36m-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29L20.64 17M12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44L12 22Z"/></svg>
+            </label>
+          
+        
+      </form>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7 0-.24-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91 1.61 0 2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08Z"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/crazy-max/diun" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    crazy-max/diun
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Diun" class="md-nav__button md-logo" aria-label="Diun" data-md-component="logo">
+      
+  <img src="../assets/logo.png" alt="logo">
+
+    </a>
+    Diun
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/crazy-max/diun" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    crazy-max/diun
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        Home
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2" type="checkbox" id="__nav_2" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_2">
+          Installation
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Installation" data-md-level="1">
+        <label class="md-nav__title" for="__nav_2">
+          <span class="md-nav__icon md-icon"></span>
+          Installation
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../install/docker/" class="md-nav__link">
+        From Docker image
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../install/binary/" class="md-nav__link">
+        From binary
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../install/linux-service/" class="md-nav__link">
+        Linux service
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3">
+          Usage
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Usage" data-md-level="1">
+        <label class="md-nav__title" for="__nav_3">
+          <span class="md-nav__icon md-icon"></span>
+          Usage
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../usage/command-line/" class="md-nav__link">
+        Command line
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../usage/basic-example/" class="md-nav__link">
+        Basic example
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" type="checkbox" id="__nav_4" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_4">
+          Configuration
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Configuration" data-md-level="1">
+        <label class="md-nav__title" for="__nav_4">
+          <span class="md-nav__icon md-icon"></span>
+          Configuration
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../config/" class="md-nav__link">
+        Overview
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../config/db/" class="md-nav__link">
+        .db
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../config/watch/" class="md-nav__link">
+        .watch
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../config/defaults/" class="md-nav__link">
+        .defaults
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../config/notif/" class="md-nav__link">
+        .notif
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../config/regopts/" class="md-nav__link">
+        .regopts
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../config/providers/" class="md-nav__link">
+        .providers
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5" type="checkbox" id="__nav_5" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_5">
+          Notifications
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Notifications" data-md-level="1">
+        <label class="md-nav__title" for="__nav_5">
+          <span class="md-nav__icon md-icon"></span>
+          Notifications
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../notif/amqp/" class="md-nav__link">
+        Amqp
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../notif/discord/" class="md-nav__link">
+        Discord
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../notif/gotify/" class="md-nav__link">
+        Gotify
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../notif/mail/" class="md-nav__link">
+        Mail
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../notif/matrix/" class="md-nav__link">
+        Matrix
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../notif/mqtt/" class="md-nav__link">
+        MQTT
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../notif/ntfy/" class="md-nav__link">
+        Ntfy
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../notif/pushover/" class="md-nav__link">
+        Pushover
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../notif/rocketchat/" class="md-nav__link">
+        Rocket.Chat
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../notif/script/" class="md-nav__link">
+        Script
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../notif/signalrest/" class="md-nav__link">
+        Signal (REST API)
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../notif/slack/" class="md-nav__link">
+        Slack
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../notif/teams/" class="md-nav__link">
+        Teams
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../notif/telegram/" class="md-nav__link">
+        Telegram
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../notif/webhook/" class="md-nav__link">
+        Webhook
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_6" type="checkbox" id="__nav_6" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_6">
+          Providers
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Providers" data-md-level="1">
+        <label class="md-nav__title" for="__nav_6">
+          <span class="md-nav__icon md-icon"></span>
+          Providers
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../providers/docker/" class="md-nav__link">
+        Docker
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../providers/kubernetes/" class="md-nav__link">
+        Kubernetes
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../providers/swarm/" class="md-nav__link">
+        Swarm
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../providers/nomad/" class="md-nav__link">
+        Nomad
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../providers/dockerfile/" class="md-nav__link">
+        Dockerfile
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../providers/file/" class="md-nav__link">
+        File
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_7" type="checkbox" id="__nav_7" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_7">
+          User guides
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="User guides" data-md-level="1">
+        <label class="md-nav__title" for="__nav_7">
+          <span class="md-nav__icon md-icon"></span>
+          User guides
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-guides/blog-posts/" class="md-nav__link">
+        Blog posts
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-guides/docker-file-providers/" class="md-nav__link">
+        Docker + File providers
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          FAQ
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        FAQ
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#timezone" class="md-nav__link">
+    Timezone
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#test-notifications" class="md-nav__link">
+    Test notifications
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#customize-the-hostname" class="md-nav__link">
+    Customize the hostname
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#notification-template" class="md-nav__link">
+    Notification template
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#authentication-against-the-registry" class="md-nav__link">
+    Authentication against the registry
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#field-dockerswarm-uses-unsupported-type-invalid" class="md-nav__link">
+    field docker|swarm uses unsupported type: invalid
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#no-image-found-in-manifest-list-for-architecture-variant-os" class="md-nav__link">
+    No image found in manifest list for architecture, variant, OS
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#too-many-requests-to-registry" class="md-nav__link">
+    Too many requests to registry
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#docker-hub-rate-limits" class="md-nav__link">
+    Docker Hub rate limits
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tags-sorting-when-using-watch_repo" class="md-nav__link">
+    Tags sorting when using watch_repo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#profiling" class="md-nav__link">
+    Profiling
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#image-with-digest-and-imagetagdigest-format" class="md-nav__link">
+    Image with digest and image:tag@digest format
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../changelog/" class="md-nav__link">
+        Changelog
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_10" type="checkbox" id="__nav_10" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_10">
+          Migration
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Migration" data-md-level="1">
+        <label class="md-nav__title" for="__nav_10">
+          <span class="md-nav__icon md-icon"></span>
+          Migration
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../migration/v4.0-to-v4.17/" class="md-nav__link">
+        Diun v4.0 to v4.17
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../migration/v3-to-v4/" class="md-nav__link">
+        Diun v3 to v4
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../migration/v2-to-v3/" class="md-nav__link">
+        Diun v2 to v3
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../migration/v1-to-v2/" class="md-nav__link">
+        Diun v1 to v2
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../migration/v0-to-v1/" class="md-nav__link">
+        Diun v0 to v1
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reporting-issue/" class="md-nav__link">
+        Reporting an issue
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contributing/" class="md-nav__link">
+        Contributing
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../donate/" class="md-nav__link">
+        Donate
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#timezone" class="md-nav__link">
+    Timezone
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#test-notifications" class="md-nav__link">
+    Test notifications
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#customize-the-hostname" class="md-nav__link">
+    Customize the hostname
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#notification-template" class="md-nav__link">
+    Notification template
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#authentication-against-the-registry" class="md-nav__link">
+    Authentication against the registry
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#field-dockerswarm-uses-unsupported-type-invalid" class="md-nav__link">
+    field docker|swarm uses unsupported type: invalid
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#no-image-found-in-manifest-list-for-architecture-variant-os" class="md-nav__link">
+    No image found in manifest list for architecture, variant, OS
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#too-many-requests-to-registry" class="md-nav__link">
+    Too many requests to registry
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#docker-hub-rate-limits" class="md-nav__link">
+    Docker Hub rate limits
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tags-sorting-when-using-watch_repo" class="md-nav__link">
+    Tags sorting when using watch_repo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#profiling" class="md-nav__link">
+    Profiling
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#image-with-digest-and-imagetagdigest-format" class="md-nav__link">
+    Image with digest and image:tag@digest format
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+  <a href="https://github.com/crazy-max/diun/edit/master/docs/faq.md" title="Edit this page" class="md-content__button md-icon">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"/></svg>
+  </a>
+
+
+
+<h1 id="faq">FAQ<a class="headerlink" href="#faq" title="Permanent link">&para;</a></h1>
+<h2 id="timezone">Timezone<a class="headerlink" href="#timezone" title="Permanent link">&para;</a></h2>
+<p>By default, all interpretation and scheduling is done with your local timezone (<code>TZ</code> environment variable).</p>
+<p>Cron schedule may also override the timezone to be interpreted in by providing an additional space-separated field
+at the beginning of the cron spec, of the form <code>CRON_TZ=&lt;timezone&gt;</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">watch</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="nt">schedule</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;CRON_TZ=Asia/Tokyo</span><span class="nv"> </span><span class="s">0</span><span class="nv"> </span><span class="s">*/6</span><span class="nv"> </span><span class="s">*</span><span class="nv"> </span><span class="s">*</span><span class="nv"> </span><span class="s">*&quot;</span><span class="w"></span>
+</code></pre></div>
+<h2 id="test-notifications">Test notifications<a class="headerlink" href="#test-notifications" title="Permanent link">&para;</a></h2>
+<p>Through the <a href="../usage/command-line/#notif-test">command line</a> with:</p>
+<div class="highlight"><pre><span></span><code>diun notif <span class="nb">test</span>
+</code></pre></div>
+<p>Or within a container:</p>
+<div class="highlight"><pre><span></span><code>docker-compose <span class="nb">exec</span> diun diun notif <span class="nb">test</span>
+</code></pre></div>
+<h2 id="customize-the-hostname">Customize the hostname<a class="headerlink" href="#customize-the-hostname" title="Permanent link">&para;</a></h2>
+<p>The hostname that appears in your notifications is the one associated with the
+container if you use the Diun image with <code>docker run</code> or <code>docker-compose up -d</code>.
+By default, it's a random string like <code>d2219b854598</code>. To change it:</p>
+<div class="highlight"><pre><span></span><code><span class="gp">$ </span>docker run --hostname <span class="s2">&quot;diun&quot;</span> ...
+</code></pre></div>
+<p>Or if you use docker-compose:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">services</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="nt">diun</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">crazymax/diun:latest</span><span class="w"></span>
+<span class="w">    </span><span class="nt">hostname</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">diun</span><span class="w"></span>
+<span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">...</span><span class="w"></span>
+</code></pre></div>
+<h2 id="notification-template">Notification template<a class="headerlink" href="#notification-template" title="Permanent link">&para;</a></h2>
+<p>The title and body of a notification message can be customized for each notifier through <code>templateTitle</code> and
+<code>templateBody</code> fields except for those rendering <em>JSON</em> or <em>Env</em> like <a href="../notif/amqp/">Amqp</a>,
+<a href="../notif/mqtt/">MQTT</a>, <a href="../notif/script/">Script</a> and <a href="../notif/webhook/">Webhook</a>.</p>
+<p>Templating is supported with the following fields:</p>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>.Meta.ID</code></td>
+<td>App ID: <code>diun</code></td>
+</tr>
+<tr>
+<td><code>.Meta.Name</code></td>
+<td>App Name: <code>Diun</code></td>
+</tr>
+<tr>
+<td><code>.Meta.Desc</code></td>
+<td>App description: <code>Docker image update notifier</code></td>
+</tr>
+<tr>
+<td><code>.Meta.URL</code></td>
+<td>App repo URL: <code>https://github.com/crazy-max/diun</code></td>
+</tr>
+<tr>
+<td><code>.Meta.Logo</code></td>
+<td>App logo URL: <code>https://raw.githubusercontent.com/crazy-max/diun/master/.res/diun.png</code></td>
+</tr>
+<tr>
+<td><code>.Meta.Author</code></td>
+<td>App author: <code>CrazyMax</code></td>
+</tr>
+<tr>
+<td><code>.Meta.Version</code></td>
+<td>App version: <code>v4.19.0</code></td>
+</tr>
+<tr>
+<td><code>.Meta.UserAgent</code></td>
+<td>App user-agent used to talk with registries: <code>diun/4.19.0 go/1.16 Linux</code></td>
+</tr>
+<tr>
+<td><code>.Meta.Hostname</code></td>
+<td>Hostname</td>
+</tr>
+<tr>
+<td><code>.Entry.Status</code></td>
+<td>Entry status. Can be <code>new</code>, <code>update</code>, <code>unchange</code>, <code>skip</code> or <code>error</code></td>
+</tr>
+<tr>
+<td><code>.Entry.Provider</code></td>
+<td><a href="../config/providers/">Provider</a> used</td>
+</tr>
+<tr>
+<td><code>.Entry.Image</code></td>
+<td>Docker image name. e.g. <code>docker.io/crazymax/diun:latest</code></td>
+</tr>
+<tr>
+<td><code>.Entry.Image.Domain</code></td>
+<td>Docker image domain. e.g. <code>docker.io</code></td>
+</tr>
+<tr>
+<td><code>.Entry.Image.Path</code></td>
+<td>Docker image path. e.g. <code>crazymax/diun</code></td>
+</tr>
+<tr>
+<td><code>.Entry.Image.Tag</code></td>
+<td>Docker image tag. e.g. <code>latest</code></td>
+</tr>
+<tr>
+<td><code>.Entry.Image.Digest</code></td>
+<td>Docker image digest</td>
+</tr>
+<tr>
+<td><code>.Entry.Image.HubLink</code></td>
+<td>Docker image hub link (if available). e.g. <code>https://hub.docker.com/r/crazymax/diun</code></td>
+</tr>
+<tr>
+<td><code>.Entry.Manifest.Name</code></td>
+<td>Manifest name. e.g. <code>docker.io/crazymax/diun</code></td>
+</tr>
+<tr>
+<td><code>.Entry.Manifest.Tag</code></td>
+<td>Manifest tag. e.g. <code>latest</code></td>
+</tr>
+<tr>
+<td><code>.Entry.Manifest.MIMEType</code></td>
+<td>Manifest MIME type. e.g. <code>application/vnd.docker.distribution.manifest.list.v2+json</code></td>
+</tr>
+<tr>
+<td><code>.Entry.Manifest.Digest</code></td>
+<td>Manifest digest</td>
+</tr>
+<tr>
+<td><code>.Entry.Manifest.Created</code></td>
+<td>Manifest created date. e.g. <code>2021-06-20T12:23:56Z</code></td>
+</tr>
+<tr>
+<td><code>.Entry.Manifest.DockerVersion</code></td>
+<td>Version of Docker that was used to build the image. e.g. <code>20.10.7</code></td>
+</tr>
+<tr>
+<td><code>.Entry.Manifest.Labels</code></td>
+<td>Image labels</td>
+</tr>
+<tr>
+<td><code>.Entry.Manifest.Layers</code></td>
+<td>Image layers</td>
+</tr>
+<tr>
+<td><code>.Entry.Manifest.Platform</code></td>
+<td>Platform that the image is runs on. e.g. <code>linux/amd64</code></td>
+</tr>
+<tr>
+<td><code>.Entry.Metadata</code></td>
+<td>Key-value pair of image metadata specific to each provider</td>
+</tr>
+</tbody>
+</table>
+<h2 id="authentication-against-the-registry">Authentication against the registry<a class="headerlink" href="#authentication-against-the-registry" title="Permanent link">&para;</a></h2>
+<p>You can authenticate against the registry through the <a href="../config/regopts/"><code>regopts</code> settings</a> or you can mount
+your docker config file <code>$HOME/.docker/config.json</code> if you are already connected to the registry with <code>docker login</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;3.5&quot;</span><span class="w"></span>
+
+<span class="nt">services</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="nt">diun</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">crazymax/diun:latest</span><span class="w"></span>
+<span class="w">    </span><span class="nt">container_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">diun</span><span class="w"></span>
+<span class="w">    </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">serve</span><span class="w"></span>
+<span class="w">    </span><span class="nt">volumes</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;./data:/data&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;/root/.docker/config.json:/root/.docker/config.json:ro&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;/var/run/docker.sock:/var/run/docker.sock&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">environment</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;TZ=Europe/Paris&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;DIUN_WATCH_SCHEDULE=0</span><span class="nv"> </span><span class="s">*/6</span><span class="nv"> </span><span class="s">*</span><span class="nv"> </span><span class="s">*</span><span class="nv"> </span><span class="s">*&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;DIUN_PROVIDERS_DOCKER=true&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;DIUN_PROVIDERS_DOCKER_WATCHBYDEFAULT=true&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">restart</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">always</span><span class="w"></span>
+</code></pre></div>
+<h2 id="field-dockerswarm-uses-unsupported-type-invalid">field docker|swarm uses unsupported type: invalid<a class="headerlink" href="#field-dockerswarm-uses-unsupported-type-invalid" title="Permanent link">&para;</a></h2>
+<p>If you have the error <code>failed to decode configuration from file: field docker uses unsupported type: invalid</code> that's
+because your <code>docker</code>, <code>swarm</code> or <code>kubernetes</code> provider is not initialized in your configuration:</p>
+<div class="admonition failure">
+<p class="admonition-title">Failure</p>
+<div class="highlight"><pre><span></span><code><span class="nt">providers</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="nt">docker</span><span class="p">:</span><span class="w"></span>
+</code></pre></div>
+</div>
+<p>should be:</p>
+<div class="admonition success">
+<p class="admonition-title">Success</p>
+<div class="highlight"><pre><span></span><code><span class="nt">providers</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="nt">docker</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{}</span><span class="w"></span>
+</code></pre></div>
+</div>
+<h2 id="no-image-found-in-manifest-list-for-architecture-variant-os">No image found in manifest list for architecture, variant, OS<a class="headerlink" href="#no-image-found-in-manifest-list-for-architecture-variant-os" title="Permanent link">&para;</a></h2>
+<p>If you encounter this kind of warning, you are probably using the <a href="../providers/file/">file provider</a> for an
+image with an erroneous or empty platform. If the platform is not filled in, it will be deduced automatically from the
+information of your operating system on which Diun is running.</p>
+<p>In the example below, Diun is running (<code>diun_x.x.x_windows_i386.zip</code>) on Windows 10 and tries to analyze the
+<code>crazymax/cloudflared</code> image with the detected platform (<code>windows/386)</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">crazymax/cloudflared:2020.2.1</span><span class="w"></span>
+</code></pre></div>
+<p>But this platform is not supported by this image as you can see <a href="https://hub.docker.com/layers/crazymax/cloudflared/2020.2.1/images/sha256-137eea4e84ec4c6cb5ceb2017b9788dcd7b04f135d756e1f37e3e6673c0dd9d2?context=explore">on DockerHub</a>:</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><code>Fri, 27 Mar 2020 01:20:03 UTC WRN Cannot get remote manifest error="Cannot create image closer: Error choosing image instance: no image found in manifest list for architecture 386, variant \"\", OS windows" image=docker.io/image=crazymax/cloudflared:2020.2.1 provider=file</code></p>
+</div>
+<p>You have to force the platform for this image if you are not on a supported platform:</p>
+<div class="highlight"><pre><span></span><code><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">crazymax/cloudflared:2020.2.1</span><span class="w"></span>
+<span class="w">  </span><span class="nt">platform</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">os</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">linux</span><span class="w"></span>
+<span class="w">    </span><span class="nt">arch</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">amd64</span><span class="w"></span>
+</code></pre></div>
+<div class="admonition success">
+<p class="admonition-title">Success</p>
+<p><code>Fri, 27 Mar 2020 01:24:33 UTC INF New image found image=docker.io/crazymax/cloudflared:2020.2.1 provider=file</code></p>
+</div>
+<h2 id="too-many-requests-to-registry">Too many requests to registry<a class="headerlink" href="#too-many-requests-to-registry" title="Permanent link">&para;</a></h2>
+<p>The error <code>Cannot create image closer: too many requests to registry</code> is returned when the HTTP status code returned
+by the registry is 429.</p>
+<p>This can happen on the DockerHub registry because of the <a href="https://docs.docker.com/docker-hub/download-rate-limit/">rate-limited anonymous pulls</a>.</p>
+<p>To solve this you must first be authenticated against the registry through the <a href="../config/regopts/"><code>regopts</code> settings</a>: </p>
+<div class="highlight"><pre><span></span><code><span class="nt">regopts</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;docker.io&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">selector</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">image</span><span class="w"></span>
+<span class="w">    </span><span class="nt">username</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">foo</span><span class="w"></span>
+<span class="w">    </span><span class="nt">password</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bar</span><span class="w"></span>
+</code></pre></div>
+<p>If this is not enough, tweak the <a href="../config/watch/#schedule"><code>schedule</code> setting</a> with something
+like <code>0 */6 * * *</code> (every 6 hours).</p>
+<h2 id="docker-hub-rate-limits">Docker Hub rate limits<a class="headerlink" href="#docker-hub-rate-limits" title="Permanent link">&para;</a></h2>
+<p>Docker is now <a href="https://www.docker.com/increase-rate-limits">enforcing Docker Hub pull rate limits</a>. This means you can
+make 100 pull image requests per six hours for anonymous usage, and 200 pull image requests per six hours
+for free Docker accounts. But this rate limit is not necessarily an indicator on the number of times an image has
+actually been downloaded. In fact, their <em>pulls</em> counter/metric is actually a representation of the number of times a
+manifest for a particular image has been retrieved.</p>
+<p>As you probably know, Diun downloads the manifest of an image from its registry through a <code>GET</code> request to be able to
+retrieve its inside metadata. Fortunately Diun doesn't perform a <code>GET</code> request at each scan but only when an image
+has been updated or added on the registry. This allows us not to exceed this rate limit in our situation, but
+it also <strong>strongly depends on the number of images you scan</strong>. To increase your pull rate limits you can upgrade
+your account to a <a href="https://www.docker.com/pricing">Docker Pro or Team subscription</a> and authenticate against the
+registry through the <a href="../config/regopts/"><code>regopts</code> settings</a>: </p>
+<div class="highlight"><pre><span></span><code><span class="nt">regopts</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;docker.io&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">selector</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">image</span><span class="w"></span>
+<span class="w">    </span><span class="nt">username</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">foo</span><span class="w"></span>
+<span class="w">    </span><span class="nt">password</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bar</span><span class="w"></span>
+</code></pre></div>
+<p>Or you can tweak the <a href="../config/watch/#schedule"><code>schedule</code> setting</a> with something like <code>0 */6 * * *</code> (every 6 hours).</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Also be careful with the <code>watch_repo</code> setting as it will fetch manifest for <strong>ALL</strong> tags available for the image.</p>
+</div>
+<h2 id="tags-sorting-when-using-watch_repo">Tags sorting when using <code>watch_repo</code><a class="headerlink" href="#tags-sorting-when-using-watch_repo" title="Permanent link">&para;</a></h2>
+<p>When you use the <code>watch_repo</code> setting, Diun will fetch all tags available for
+the image. Depending on the registry, order of the tags list can change.</p>
+<p>You can use the <code>sort_tags</code> setting available for each provider to use a
+specific sorting method for the tags list.</p>
+<ul>
+<li><code>default</code>: do not sort and use the expected tags list from the registry</li>
+<li><code>reverse</code>: reverse order for the tags list from the registry</li>
+<li><code>lexicographical</code>: sort the tags list lexicographically</li>
+<li><code>semver</code>: sort the tags list using semantic versioning</li>
+</ul>
+<p>Given the following list of tags received from the registry:</p>
+<div class="highlight"><pre><span></span><code><span class="p">[</span><span class="w"></span>
+<span class="w">  </span><span class="s2">&quot;0.1.0&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s2">&quot;0.4.0&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s2">&quot;3.0.0-beta.1&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s2">&quot;3.0.0-beta.4&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s2">&quot;4&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s2">&quot;4.0.0&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s2">&quot;4.0.0-beta.1&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s2">&quot;4.1.0&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s2">&quot;4.1.1&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s2">&quot;4.10.0&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s2">&quot;4.11.0&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s2">&quot;4.20&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s2">&quot;4.20.0&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s2">&quot;4.20.1&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s2">&quot;4.3.0&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s2">&quot;4.3.1&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s2">&quot;4.9.0&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s2">&quot;edge&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s2">&quot;latest&quot;</span><span class="w"></span>
+<span class="p">]</span><span class="w"></span>
+</code></pre></div>
+<p>Here is the result for <code>reverse</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="p">[</span><span class="w"></span>
+<span class="w">  </span><span class="s2">&quot;latest&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s2">&quot;edge&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s2">&quot;4.9.0&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s2">&quot;4.3.1&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s2">&quot;4.3.0&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s2">&quot;4.20.1&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s2">&quot;4.20.0&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s2">&quot;4.20&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s2">&quot;4.11.0&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s2">&quot;4.10.0&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s2">&quot;4.1.1&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s2">&quot;4.1.0&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s2">&quot;4.0.0-beta.1&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s2">&quot;4.0.0&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s2">&quot;4&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s2">&quot;3.0.0-beta.4&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s2">&quot;3.0.0-beta.1&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s2">&quot;0.4.0&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s2">&quot;0.1.0&quot;</span><span class="w"></span>
+<span class="p">]</span><span class="w"></span>
+</code></pre></div>
+<p>And for <code>semver</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="p">[</span><span class="w"></span>
+<span class="w">  </span><span class="s2">&quot;4.20.1&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s2">&quot;4.20.0&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s2">&quot;4.20&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s2">&quot;4.11.0&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s2">&quot;4.10.0&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s2">&quot;4.9.0&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s2">&quot;4.3.1&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s2">&quot;4.3.0&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s2">&quot;4.1.1&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s2">&quot;4.1.0&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s2">&quot;4.0.0&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s2">&quot;4&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s2">&quot;4.0.0-beta.1&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s2">&quot;3.0.0-beta.4&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s2">&quot;3.0.0-beta.1&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s2">&quot;0.4.0&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s2">&quot;0.1.0&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s2">&quot;edge&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s2">&quot;latest&quot;</span><span class="w"></span>
+<span class="p">]</span><span class="w"></span>
+</code></pre></div>
+<h2 id="profiling">Profiling<a class="headerlink" href="#profiling" title="Permanent link">&para;</a></h2>
+<p>Diun provides a simple way to manage runtime/pprof profiling through the
+<a href="../usage/command-line/#serve"><code>--profiler-path</code> and <code>--profiler</code> flags with <code>serve</code> command</a>:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;3.5&quot;</span><span class="w"></span>
+
+<span class="nt">services</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="nt">diun</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">crazymax/diun:latest</span><span class="w"></span>
+<span class="w">    </span><span class="nt">container_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">diun</span><span class="w"></span>
+<span class="w">    </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">serve</span><span class="w"></span>
+<span class="w">    </span><span class="nt">volumes</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;./data:/data&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;./profiler:/profiler&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;/var/run/docker.sock:/var/run/docker.sock&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">environment</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;TZ=Europe/Paris&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;LOG_LEVEL=info&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;PROFILER_PATH=/profiler&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;PROFILER=mem&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;DIUN_PROVIDERS_DOCKER=true&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">restart</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">always</span><span class="w"></span>
+</code></pre></div>
+<p>Following profilers are available:</p>
+<ul>
+<li><code>cpu</code> enables cpu profiling</li>
+<li><code>mem</code> enables memory profiling</li>
+<li><code>alloc</code> enables memory profiling and changes which type of memory to profile allocations</li>
+<li><code>heap</code> enables memory profiling and changes which type of memory profiling to profile the heap</li>
+<li><code>routines</code> enables goroutine profiling</li>
+<li><code>mutex</code> enables mutex profiling</li>
+<li><code>threads</code> enables thread creation profiling</li>
+<li><code>block</code> enables block (contention) profiling</li>
+</ul>
+<h2 id="image-with-digest-and-imagetagdigest-format">Image with digest and <code>image:tag@digest</code> format<a class="headerlink" href="#image-with-digest-and-imagetagdigest-format" title="Permanent link">&para;</a></h2>
+<p>Analysis of an image with a digest but without tag will be done using <code>latest</code>
+as a tag which could lead to false positives.</p>
+<p>For example <code>crazymax/diun@sha256:fa80af32a7c61128ffda667344547805b3c5e7721ecbbafd70e35bb7bb7c989f</code>
+is referring to <code>crazymax/diun:4.24.0</code> tag, so it's not correct to assume that
+we want to analyze <code>crazymax/diun:latest</code>.</p>
+<p>You can still pin an image to a specific digest and analyze the image if the
+tag is specified using the <code>image:tag@digest</code> format. Taking the previous
+example if we specify <code>crazymax/diun:4.24.0@sha256:fa80af32a7c61128ffda667344547805b3c5e7721ecbbafd70e35bb7bb7c989f</code>,
+then <code>crazymax/diun:4.24.0</code> will be analyzed.</p>
+
+  <hr>
+<div class="md-source-file">
+  <small>
+    
+      Last update:
+      <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_datetime">2023-09-16 16:40:53</span>
+      
+        <br>
+        Created:
+        <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_datetime">2020-03-31 21:27:10</span>
+      
+    
+  </small>
+</div>
+
+              
+            </article>
+            
+          </div>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+    <nav class="md-footer__inner md-grid" aria-label="Footer" >
+      
+        
+        <a href="../user-guides/docker-file-providers/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Docker + File providers" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              Docker + File providers
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="../changelog/" class="md-footer__link md-footer__link--next" aria-label="Next: Changelog" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              Changelog
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+      
+      
+    
+    <a href="https://github.com/crazy-max/diun" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 512"><!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M186.1 328.7c0 20.9-10.9 55.1-36.7 55.1s-36.7-34.2-36.7-55.1 10.9-55.1 36.7-55.1 36.7 34.2 36.7 55.1zM480 278.2c0 31.9-3.2 65.7-17.5 95-37.9 76.6-142.1 74.8-216.7 74.8-75.8 0-186.2 2.7-225.6-74.8-14.6-29-20.2-63.1-20.2-95 0-41.9 13.9-81.5 41.5-113.6-5.2-15.8-7.7-32.4-7.7-48.8 0-21.5 4.9-32.3 14.6-51.8 45.3 0 74.3 9 108.8 36 29-6.9 58.8-10 88.7-10 27 0 54.2 2.9 80.4 9.2 34-26.7 63-35.2 107.8-35.2 9.8 19.5 14.6 30.3 14.6 51.8 0 16.4-2.6 32.7-7.7 48.2 27.5 32.4 39 72.3 39 114.2zm-64.3 50.5c0-43.9-26.7-82.6-73.5-82.6-18.9 0-37 3.4-56 6-14.9 2.3-29.8 3.2-45.1 3.2-15.2 0-30.1-.9-45.1-3.2-18.7-2.6-37-6-56-6-46.8 0-73.5 38.7-73.5 82.6 0 87.8 80.4 101.3 150.4 101.3h48.2c70.3 0 150.6-13.4 150.6-101.3zm-82.6-55.1c-25.8 0-36.7 34.2-36.7 55.1s10.9 55.1 36.7 55.1 36.7-34.2 36.7-55.1-10.9-55.1-36.7-55.1z"/></svg>
+    </a>
+  
+    
+    
+      
+      
+    
+    <a href="https://twitter.com/crazyws" target="_blank" rel="noopener" title="twitter.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M459.37 151.716c.325 4.548.325 9.097.325 13.645 0 138.72-105.583 298.558-298.558 298.558-59.452 0-114.68-17.219-161.137-47.106 8.447.974 16.568 1.299 25.34 1.299 49.055 0 94.213-16.568 130.274-44.832-46.132-.975-84.792-31.188-98.112-72.772 6.498.974 12.995 1.624 19.818 1.624 9.421 0 18.843-1.3 27.614-3.573-48.081-9.747-84.143-51.98-84.143-102.985v-1.299c13.969 7.797 30.214 12.67 47.431 13.319-28.264-18.843-46.781-51.005-46.781-87.391 0-19.492 5.197-37.36 14.294-52.954 51.655 63.675 129.3 105.258 216.365 109.807-1.624-7.797-2.599-15.918-2.599-24.04 0-57.828 46.782-104.934 104.934-104.934 30.213 0 57.502 12.67 76.67 33.137 23.715-4.548 46.456-13.32 66.599-25.34-7.798 24.366-24.366 44.833-46.132 57.827 21.117-2.273 41.584-8.122 60.426-16.243-14.292 20.791-32.161 39.308-52.628 54.253z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    <script id="__config" type="application/json">{"base": "..", "features": ["search.highlight", "search.share", "search.suggest"], "search": "../assets/javascripts/workers/search.b97dbffb.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.6c7ad80a.min.js"></script>
+      
+    
+  </body>
+</html>
