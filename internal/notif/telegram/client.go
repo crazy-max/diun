@@ -2,14 +2,15 @@ package telegram
 
 import (
 	"encoding/json"
+	"net/http"
 	"strings"
 	"text/template"
 
+	"github.com/PaulSonOfLars/gotgbot/v2"
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/internal/msg"
 	"github.com/crazy-max/diun/v4/internal/notif/notifier"
 	"github.com/crazy-max/diun/v4/pkg/utl"
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/pkg/errors"
 )
 
@@ -53,9 +54,17 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		}
 	}
 
-	bot, err := tgbotapi.NewBotAPI(token)
+	bot, err := gotgbot.NewBot(token, &gotgbot.BotOpts{
+		BotClient: &gotgbot.BaseBotClient{
+			Client: http.Client{},
+			DefaultRequestOpts: &gotgbot.RequestOpts{
+				Timeout: gotgbot.DefaultTimeout,
+				APIURL:  gotgbot.DefaultAPIURL,
+			},
+		},
+	})
 	if err != nil {
-		return err
+		return errors.Wrap(err, "failed to create telegram bot client")
 	}
 
 	message, err := msg.New(msg.Options{
@@ -82,13 +91,9 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	}
 
 	for _, chatID := range chatIDs {
-		_, err := bot.Send(tgbotapi.MessageConfig{
-			BaseChat: tgbotapi.BaseChat{
-				ChatID: chatID,
-			},
-			Text:                  string(body),
-			ParseMode:             "markdown",
-			DisableWebPagePreview: true,
+		_, err := bot.SendMessage(chatID, string(body), &gotgbot.SendMessageOpts{
+			ParseMode:          gotgbot.ParseModeMarkdown,
+			LinkPreviewOptions: &gotgbot.LinkPreviewOptions{IsDisabled: true},
 		})
 		if err != nil {
 			return err
