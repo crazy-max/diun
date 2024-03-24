@@ -2,6 +2,7 @@ package telegram
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strings"
 	"text/template"
@@ -101,14 +102,19 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		return err
 	}
 
-	for i, chatID := range chatIDs {
-		var chatTopic int64
-		if len(chatTopics) > i {
-			chatTopic = chatTopics[i]
-		}
-		err = sendTelegramMessage(bot, chatID, chatTopic, string(body))
-		if err != nil {
-			return err
+	for _, chatID := range chatIDs {
+		if topics, ok := chatTopics[fmt.Sprintf("%d", chatID)]; ok {
+			for _, topic := range topics {
+				err = sendTelegramMessage(bot, chatID, topic, string(body))
+				if err != nil {
+					return err
+				}
+			}
+		} else {
+			err = sendTelegramMessage(bot, chatID, 0, string(body))
+			if err != nil {
+				return err
+			}
 		}
 	}
 
