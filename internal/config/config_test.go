@@ -142,10 +142,12 @@ for <code>{{ .Entry.Manifest.Platform }}</code> platform.
 						TemplateBody:  model.NotifDefaultTemplateBody,
 					},
 					Pushover: &model.NotifPushover{
-						Token:         "uQiRzpo4DXghDmr9QzzfQu27cmVRsG",
-						Recipient:     "gznej3rKEVAvPUxu9vvNnqpmZpokzF",
-						TemplateTitle: model.NotifDefaultTemplateTitle,
-						TemplateBody:  model.NotifDefaultTemplateBody,
+						Token:            "uQiRzpo4DXghDmr9QzzfQu27cmVRsG",
+						Recipient:        "gznej3rKEVAvPUxu9vvNnqpmZpokzF",
+						TemplateTitle:    model.NotifDefaultTemplateTitle,
+						TemplateBody:     model.NotifDefaultTemplateBody,
+						TemplateURLTitle: model.NotifDefaultTemplateURLTitle,
+						TemplateURL:      model.NotifDefaultTemplateURL,
 					},
 					RocketChat: &model.NotifRocketChat{
 						Endpoint:         "http://rocket.foo.com:3000",
