@@ -170,6 +170,7 @@ jobs:
         uses: docker/bake-action@v4
         with:
           targets: release
+          provenance: false
       -
         name: GitHub Release
         uses: softprops/action-gh-release@v2
