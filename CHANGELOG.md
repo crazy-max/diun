@@ -1,5 +1,15 @@
 # Changelog
 
+## 4.28.0 (2024/04/06)
+
+* Add `tzdata` package to Docker image (#1144)
+* Alpine Linux 3.19 (#1140)
+* Bump github.com/jedib0t/go-pretty/v6 to 6.5.6 (#1137)
+* Bump github.com/panjf2000/ants/v2 to 2.9.1 (#1139)
+* Bump golang.org/x/mod to 0.17.0 (#1143)
+* Bump golang.org/x/sys to 0.19.0 (#1142)
+* Bump google.golang.org/grpc to 1.63.0 (#1141)
+
 ## 4.27.0 (2024/03/23)
 
 * Sound option support for pushover (#996)
