@@ -103,7 +103,7 @@ FROM scratch AS release
 COPY --link --from=releaser /out /
 
 FROM alpine:${ALPINE_VERSION}
-RUN apk --update --no-cache add ca-certificates openssl
+RUN apk --update --no-cache add ca-certificates openssl tzdata
 COPY --from=build /usr/bin/diun /usr/local/bin/diun
 ENV PROFILER_PATH="/profiler" \
   DIUN_DB_PATH="/data/diun.db"
