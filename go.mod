@@ -7,7 +7,7 @@ require (
 	github.com/PaulSonOfLars/gotgbot/v2 v2.0.0-rc.25
 	github.com/alecthomas/kong v0.9.0
 	github.com/bmatcuk/doublestar/v3 v3.0.0
-	github.com/containerd/containerd v1.7.14
+	github.com/containerd/containerd v1.7.15
 	github.com/containers/image/v5 v5.30.0
 	github.com/crazy-max/cron/v3 v3.1.1
 	github.com/crazy-max/gohealthchecks v0.4.1
