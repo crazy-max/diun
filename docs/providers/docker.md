@@ -55,7 +55,7 @@ services:
 
 As an example we use [crazymax/cloudflared:latest](https://github.com/crazy-max/docker-cloudflared) Docker image.
 A few [labels](#docker-labels) are added to configure the image analysis of this container for Diun. Now start this
-composition with `docker-composes up -d` and take a look at the logs:
+composition with `docker-compose up -d` and take a look at the logs:
 
 ```
 $ docker-compose logs -f
