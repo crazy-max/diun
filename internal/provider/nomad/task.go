@@ -34,7 +34,9 @@ func (c *Client) listTaskImages() []model.Image {
 	}
 
 	if *c.config.TLSInsecure {
-		config.TLSConfig.Insecure = true
+		config.TLSConfig = &nomad.TLSConfig{
+			Insecure: true,
+		}
 	}
 
 	client, err := nomad.NewClient(config)
