@@ -4,12 +4,13 @@ import (
 	"sort"
 
 	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
 )
 
 // ContainerList returns Docker containers
 func (c *Client) ContainerList(filterArgs filters.Args) ([]types.Container, error) {
-	containers, err := c.API.ContainerList(c.ctx, types.ContainerListOptions{
+	containers, err := c.API.ContainerList(c.ctx, container.ListOptions{
 		Filters: filterArgs,
 	})
 	if err != nil {
