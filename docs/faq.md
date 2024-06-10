@@ -23,27 +23,26 @@ diun notif test
 Or within a container:
 
 ```shell
-docker-compose exec diun diun notif test
+docker compose exec diun diun notif test
 ```
 
 ## Customize the hostname
 
 The hostname that appears in your notifications is the one associated with the
-container if you use the Diun image with `docker run` or `docker-compose up -d`.
+container if you use the Diun image with `docker run` or `docker compose up -d`.
 By default, it's a random string like `d2219b854598`. To change it:
 
 ```console
 $ docker run --hostname "diun" ...
 ```
 
-Or if you use docker-compose:
+Or if you use Docker Compose:
 
 ```yaml
 services:
   diun:
     image: crazymax/diun:latest
     hostname: diun
-    ...
 ```
 
 ## Notification template
@@ -90,7 +89,7 @@ You can authenticate against the registry through the [`regopts` settings](confi
 your docker config file `$HOME/.docker/config.json` if you are already connected to the registry with `docker login`:
 
 ```yaml
-version: "3.5"
+name: diun
 
 services:
   diun:
@@ -303,7 +302,7 @@ Diun provides a simple way to manage runtime/pprof profiling through the
 [`--profiler-path` and `--profiler` flags with `serve` command](usage/command-line.md#serve):
 
 ```yaml
-version: "3.5"
+name: diun
 
 services:
   diun:
@@ -323,7 +322,7 @@ services:
     restart: always
 ```
 
-Following profilers are available:
+The following profilers are available:
 
 * `cpu` enables cpu profiling
 * `mem` enables memory profiling

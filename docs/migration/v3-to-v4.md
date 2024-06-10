@@ -241,7 +241,7 @@ configuration file:
     [default places](../config/index.md#configuration-file)
 
 ```yaml
-version: "3.5"
+name: diun
 
 services:
   diun:

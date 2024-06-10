@@ -2,20 +2,23 @@
 
 ## About
 
-The Docker provider allows you to analyze the containers of your Docker instance to extract images found and check
-for updates on the registry.
+The Docker provider allows you to analyze the containers of your Docker instance
+to extract images found and check for updates on the registry.
 
 ## Quick start
 
-In this section we quickly go over a basic docker-compose file using your local docker provider.
+In this section we quickly go over a basic Docker Compose file using your local
+docker provider.
 
-Here we use a single Docker provider with a minimum configuration to analyze labeled containers
-(watch by default disabled), even stopped ones, of your local Docker instance.
+Here we use a single Docker provider with a minimum configuration to analyze
+labeled containers (watch by default disabled), even stopped ones, of your
+local Docker instance.
 
-Now let's create a simple docker-compose file with Diun and some simple services:
+Now let's create a simple `docker-compose.yml` file with Diun and some simple
+services:
 
 ```yaml
-version: "3.5"
+name: cloudflared
 
 services:
   diun:
@@ -53,12 +56,13 @@ services:
     restart: always
 ```
 
-As an example we use [crazymax/cloudflared:latest](https://github.com/crazy-max/docker-cloudflared) Docker image.
-A few [labels](#docker-labels) are added to configure the image analysis of this container for Diun. Now start this
-composition with `docker-composes up -d` and take a look at the logs:
+As an example we use [crazymax/cloudflared:latest](https://github.com/crazy-max/docker-cloudflared)
+Docker image. A few [labels](#docker-labels) are added to configure the image
+analysis of this container for Diun. Now start this composition with
+`docker compose up -d` and take a look at the logs:
 
 ```
-$ docker-compose logs -f
+$ docker compose logs -f
 Attaching to bin_diun_1, cloudflared
 cloudflared    | time="2019-12-14T15:30:07+01:00" level=info msg="Adding DNS upstream" url="https://1.1.1.1/dns-query"
 cloudflared    | time="2019-12-14T15:30:07+01:00" level=info msg="Adding DNS upstream" url="https://1.0.0.1/dns-query"

@@ -35,16 +35,16 @@ Image: crazymax/diun:latest
 ## Usage
 
 !!! note
-    This reference setup guides users through the setup based on `docker-compose` and the
-    [Docker provider](../providers/docker.md), but the installation of `docker-compose` is out of scope of this
-    documentation. To install `docker-compose` itself, follow the official
-    [install instructions](https://docs.docker.com/compose/install/).
+    This reference setup guides users through the setup based on Docker Compose
+    and the [Docker provider](../providers/docker.md), but the installation of
+    Docker Compose is out of scope of this documentation. To install Docker
+    Compose itself, follow the official [install instructions](https://docs.docker.com/compose/install/).
     
     You can also use the [Swarm](../providers/swarm.md) or [Kubernetes](../providers/kubernetes.md) providers
-    if you don't want to use `docker-compose`.
+    if you don't want to use Docker Compose.
 
 ```yaml
-version: "3.5"
+name: diun
 
 services:
   diun:
@@ -67,8 +67,8 @@ services:
 Edit this example with your preferences and run the following commands to bring up Diun:
 
 ```shell
-docker-compose up -d
-docker-compose logs -f
+docker compose up -d
+docker compose logs -f
 ```
 
 Or use the following command:
@@ -89,14 +89,14 @@ docker run -d --name diun \
 To upgrade your installation to the latest release:
 
 ```shell
-docker-compose pull
-docker-compose up -d
+docker compose pull
+docker compose up -d
 ```
 
 If you prefer to rely on the configuration file instead of environment variables:
 
 ```yaml
-version: "3.5"
+name: diun
 
 services:
   diun:

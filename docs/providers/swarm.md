@@ -15,7 +15,7 @@ disabled).
 Now let's create a simple stack for Diun:
 
 ```yaml
-version: "3.5"
+name: diun
 
 services:
   diun:
@@ -43,7 +43,7 @@ services:
 And another one with a simple service:
 
 ```yaml
-version: "3.5"
+name: diun
 
 services:
   nginx:
@@ -59,10 +59,11 @@ services:
         - "diun.enable=true"
 ```
 
-As an example we use [nginx](https://hub.docker.com/_/nginx/) Docker image. A few [labels](#docker-labels) are added
-to configure the image analysis of this service for Diun. We can now start these 2 stacks:
+As an example we use [nginx](https://hub.docker.com/_/nginx/) Docker image. A
+few [labels](#docker-labels) are added to configure the image analysis of this
+service for Diun. We can now start these 2 stacks:
 
-```
+```shell
 docker stack deploy -c diun.yml diun
 docker stack deploy -c nginx.yml nginx
 ```

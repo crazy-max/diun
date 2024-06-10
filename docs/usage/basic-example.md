@@ -1,13 +1,14 @@
 # Basic example
 
-In this section we quickly go over a basic docker-compose file to run Diun using the docker provider.
+In this section we quickly go over a basic Docker Compose file to run Diun
+using the docker provider.
 
 ## Setup
 
 Create a `docker-compose.yml` file that uses the official Diun image:
 
 ```yaml
-version: "3.5"
+name: diun
 
 services:
   diun:
@@ -29,19 +30,19 @@ services:
     restart: always
 ```
 
-Here we use a minimal configuration to analyze **all running containers** (watch by default enabled) of
-your **local Docker** instance **every 6 hours**.
+Here we use a minimal configuration to analyze **all running containers**
+(watch by default enabled) of your **local Docker** instance **every 6 hours**.
 
 That's it. Now you can launch Diun with the following command:
 
 ```shell
-docker-compose up -d
+docker compose up -d
 ```
 
 If you prefer to rely on the configuration file instead of environment variables:
 
 ```yaml
-version: "3.5"
+name: diun
 
 services:
   diun:
