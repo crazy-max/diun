@@ -13,7 +13,7 @@ require (
 	github.com/crazy-max/gohealthchecks v0.4.1
 	github.com/crazy-max/gonfig v0.7.1
 	github.com/distribution/reference v0.6.0
-	github.com/docker/docker v26.1.4+incompatible
+	github.com/docker/docker v27.0.2+incompatible
 	github.com/docker/go-connections v0.5.0
 	github.com/docker/go-units v0.5.0
 	github.com/eclipse/paho.mqtt.golang v1.4.3
