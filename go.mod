@@ -7,7 +7,7 @@ require (
 	github.com/PaulSonOfLars/gotgbot/v2 v2.0.0-rc.27
 	github.com/alecthomas/kong v0.9.0
 	github.com/bmatcuk/doublestar/v3 v3.0.0
-	github.com/containerd/containerd v1.7.18
+	github.com/containerd/containerd v1.7.19
 	github.com/containers/image/v5 v5.30.0
 	github.com/crazy-max/cron/v3 v3.1.1
 	github.com/crazy-max/gohealthchecks v0.4.1
@@ -64,8 +64,8 @@ require (
 	github.com/andybalholm/cascadia v1.3.2 // indirect
 	github.com/aokoli/goutils v1.0.1 // indirect
 	github.com/aymerick/douceur v0.2.0 // indirect
-	github.com/containerd/errdefs v0.1.0 // indirect
 	github.com/containerd/log v0.1.0 // indirect
+	github.com/containerd/platforms v0.2.1 // indirect
 	github.com/containerd/typeurl/v2 v2.1.1 // indirect
 	github.com/containers/libtrust v0.0.0-20230121012942-c1716e8a8d01 // indirect
 	github.com/containers/ocicrypt v1.1.10 // indirect
