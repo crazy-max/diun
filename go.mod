@@ -4,7 +4,7 @@ go 1.21
 
 require (
 	github.com/AlecAivazis/survey/v2 v2.3.7
-	github.com/PaulSonOfLars/gotgbot/v2 v2.0.0-rc.27
+	github.com/PaulSonOfLars/gotgbot/v2 v2.0.0-rc.29
 	github.com/alecthomas/kong v0.9.0
 	github.com/bmatcuk/doublestar/v3 v3.0.0
 	github.com/containerd/containerd v1.7.18
