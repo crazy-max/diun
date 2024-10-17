@@ -13,8 +13,8 @@ on:
   pull_request:
 
 env:
-  DOCKERHUB_SLUG: crazymax/diun
-  GHCR_SLUG: ghcr.io/crazy-max/diun
+  DOCKERHUB_SLUG: thibaudmerlin/diun
+  GHCR_SLUG: ghcr.io/thibaudmerlin/diun
   DESTDIR: ./bin
 
 jobs:
@@ -76,12 +76,6 @@ jobs:
         with:
           targets: test
           pull: true
-      -
-        name: Upload coverage
-        uses: codecov/codecov-action@v4
-        with:
-          directory: ${{ env.DESTDIR }}/coverage
-          token: ${{ secrets.CODECOV_TOKEN }}
 
   artifact:
     runs-on: ubuntu-latest
