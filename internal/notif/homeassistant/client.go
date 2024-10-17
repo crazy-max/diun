@@ -57,8 +57,10 @@ func (c *Client) Send(entry model.NotifEntry) error {
         }
     }
 
+    // Extract the image string
+    imageStr := entry.Image.String()
 	// Extract the repository name (without version) and sanitize it
-	repoName := strings.Split(entry.Image, ":")[0]
+	repoName := strings.Split(imageStr, ":")[0]
     sanitizedImage := strings.ReplaceAll(repoName, "/", "_")
 
     // Define the discovery topic
