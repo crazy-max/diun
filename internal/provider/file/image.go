@@ -12,7 +12,7 @@ import (
 )
 
 func (c *Client) listFileImage() []model.Image {
-	var images []model.Image
+	var images model.ImageList
 
 	files := c.getFiles()
 	if len(files) == 0 {
@@ -99,7 +99,7 @@ func (c *Client) listFileImage() []model.Image {
 		}
 	}
 
-	return images
+	return images.Dedupe()
 }
 
 func (c *Client) getFiles() []string {
