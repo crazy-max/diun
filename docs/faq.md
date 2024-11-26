@@ -25,8 +25,8 @@ Or within a container:
 ```shell
 docker compose exec diun diun notif test
 ```
-!!! warning
-    `While the test notification might work, it's important to note that, by defaul, Diun will only notify when the cronjob triggers and not on the first run. Check [.watch](config/watch.md) for firstCheckNotif`
+
+While the test notification might work, it's important to note that, by default, Diun will only notify when the cronjob triggers and not on the first run. Check [.watch](config/watch.md) for ´firstCheckNotif´
 
 
 ## Customize the hostname
