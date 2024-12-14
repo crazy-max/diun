@@ -189,7 +189,7 @@ for <code>{{ .Entry.Manifest.Platform }}</code> platform.
 					},
 				},
 				RegOpts: model.RegOpts{
-					{
+					model.RegOpt{
 						Name:        "myregistry",
 						Selector:    model.RegOptSelectorName,
 						Username:    "fii",
@@ -197,7 +197,7 @@ for <code>{{ .Entry.Manifest.Platform }}</code> platform.
 						InsecureTLS: utl.NewFalse(),
 						Timeout:     utl.NewDuration(5 * time.Second),
 					},
-					{
+					model.RegOpt{
 						Name:        "docker.io",
 						Selector:    model.RegOptSelectorImage,
 						Username:    "foo",
@@ -205,7 +205,7 @@ for <code>{{ .Entry.Manifest.Platform }}</code> platform.
 						InsecureTLS: utl.NewFalse(),
 						Timeout:     utl.NewDuration(0),
 					},
-					{
+					model.RegOpt{
 						Name:         "docker.io/crazymax",
 						Selector:     model.RegOptSelectorImage,
 						UsernameFile: "./fixtures/run_secrets_username",
@@ -301,7 +301,7 @@ func TestLoadEnv(t *testing.T) {
 				Watch:    (&model.Watch{}).GetDefaults(),
 				Defaults: (&model.Defaults{}).GetDefaults(),
 				RegOpts: model.RegOpts{
-					{
+					model.RegOpt{
 						Name:         "docker.io",
 						Selector:     model.RegOptSelectorImage,
 						UsernameFile: "./fixtures/run_secrets_username",

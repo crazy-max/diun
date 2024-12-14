@@ -9,9 +9,9 @@ import (
 	"time"
 	"unicode"
 
-	"github.com/AlecAivazis/survey/v2"
+	survey "github.com/AlecAivazis/survey/v2"
 	"github.com/crazy-max/diun/v4/pb"
-	"github.com/docker/go-units"
+	units "github.com/docker/go-units"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/tidwall/pretty"
 	"google.golang.org/protobuf/encoding/protojson"
@@ -138,8 +138,8 @@ func (s *ImageRemoveCmd) Run(_ *Context) error {
 // ImagePruneCmd holds image prune command
 type ImagePruneCmd struct {
 	CliGlobals
-	//All    bool   `kong:"name='all',default='false',help='Remove all manifests from the database.'"`
-	//Filter string `kong:"name='filter',help='Provide filter values (e.g., until=24h).'"`
+	// All    bool   `kong:"name='all',default='false',help='Remove all manifests from the database.'"`
+	// Filter string `kong:"name='filter',help='Provide filter values (e.g., until=24h).'"`
 	Force bool `kong:"name='force',default='false',help='Do not prompt for confirmation.'"`
 }
 

@@ -85,13 +85,6 @@ func (i Image) Reference() string {
 	return i.Tag
 }
 
-// WithDigest sets the digest for an image.
-func (i Image) WithDigest(digest digest.Digest) (err error) {
-	i.Digest = digest
-	i.named, err = reference.WithDigest(i.named, digest)
-	return err
-}
-
 func (i Image) hubLink() (string, error) {
 	if i.opts.HubTpl != "" {
 		var out bytes.Buffer

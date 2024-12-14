@@ -2,6 +2,7 @@ package gotify
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"net/http"
 	"net/url"
@@ -42,10 +43,6 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	token, err := utl.GetSecret(c.cfg.Token, c.cfg.TokenFile)
 	if err != nil {
 		return errors.Wrap(err, "cannot retrieve token secret for Gotify notifier")
-	}
-
-	hc := http.Client{
-		Timeout: *c.cfg.Timeout,
 	}
 
 	message, err := msg.New(msg.Options{
@@ -92,7 +89,11 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	q.Set("token", token)
 	u.RawQuery = q.Encode()
 
-	req, err := http.NewRequest("POST", u.String(), bytes.NewBuffer(jsonBody))
+	hc := http.Client{}
+	ctx, cancel := context.WithTimeout(context.Background(), *c.cfg.Timeout)
+	defer cancel()
+
+	req, err := http.NewRequestWithContext(ctx, "POST", u.String(), bytes.NewBuffer(jsonBody))
 	if err != nil {
 		return err
 	}
@@ -105,6 +106,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	if err != nil {
 		return err
 	}
+	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
 		var errBody struct {

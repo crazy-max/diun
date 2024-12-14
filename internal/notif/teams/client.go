@@ -2,6 +2,7 @@ package teams
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -49,10 +50,6 @@ type Fact struct {
 
 // Send creates and sends a webhook notification with an entry
 func (c *Client) Send(entry model.NotifEntry) error {
-	hc := http.Client{
-		Timeout: time.Duration(10) * time.Second,
-	}
-
 	message, err := msg.New(msg.Options{
 		Meta:         c.meta,
 		Entry:        entry,
@@ -106,7 +103,11 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		return err
 	}
 
-	req, err := http.NewRequest("POST", c.cfg.WebhookURL, bytes.NewBuffer(jsonBody))
+	hc := http.Client{}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(10)*time.Second)
+	defer cancel()
+
+	req, err := http.NewRequestWithContext(ctx, "POST", c.cfg.WebhookURL, bytes.NewBuffer(jsonBody))
 	if err != nil {
 		return err
 	}
@@ -114,6 +115,11 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Set("User-Agent", c.meta.UserAgent)
 
-	_, err = hc.Do(req)
-	return err
+	resp, err := hc.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	return nil
 }

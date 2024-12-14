@@ -2,6 +2,7 @@ package webhook
 
 import (
 	"bytes"
+	"context"
 	"net/http"
 
 	"github.com/crazy-max/diun/v4/internal/model"
@@ -33,10 +34,6 @@ func (c *Client) Name() string {
 
 // Send creates and sends a webhook notification with an entry
 func (c *Client) Send(entry model.NotifEntry) error {
-	hc := http.Client{
-		Timeout: *c.cfg.Timeout,
-	}
-
 	message, err := msg.New(msg.Options{
 		Meta:  c.meta,
 		Entry: entry,
@@ -50,7 +47,11 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		return err
 	}
 
-	req, err := http.NewRequest(c.cfg.Method, c.cfg.Endpoint, bytes.NewBuffer(body))
+	hc := http.Client{}
+	ctx, cancel := context.WithTimeout(context.Background(), *c.cfg.Timeout)
+	defer cancel()
+
+	req, err := http.NewRequestWithContext(ctx, "POST", c.cfg.Endpoint, bytes.NewBuffer(body))
 	if err != nil {
 		return err
 	}
@@ -63,6 +64,11 @@ func (c *Client) Send(entry model.NotifEntry) error {
 
 	req.Header.Set("User-Agent", c.meta.UserAgent)
 
-	_, err = hc.Do(req)
-	return err
+	resp, err := hc.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	return nil
 }

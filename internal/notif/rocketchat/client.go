@@ -2,6 +2,7 @@ package rocketchat
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"net/http"
 	"net/url"
@@ -44,10 +45,6 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	token, err := utl.GetSecret(c.cfg.Token, c.cfg.TokenFile)
 	if err != nil {
 		return errors.Wrap(err, "cannot retrieve token secret for RocketChat notifier")
-	}
-
-	hc := http.Client{
-		Timeout: *c.cfg.Timeout,
 	}
 
 	message, err := msg.New(msg.Options{
@@ -125,7 +122,11 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	}
 	u.Path = path.Join(u.Path, "api/v1/chat.postMessage")
 
-	req, err := http.NewRequest("POST", u.String(), dataBuf)
+	hc := http.Client{}
+	ctx, cancel := context.WithTimeout(context.Background(), *c.cfg.Timeout)
+	defer cancel()
+
+	req, err := http.NewRequestWithContext(ctx, "POST", u.String(), dataBuf)
 	if err != nil {
 		return err
 	}
@@ -139,6 +140,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	if err != nil {
 		return err
 	}
+	defer resp.Body.Close()
 
 	var respBody struct {
 		Success   bool   `json:"success"`

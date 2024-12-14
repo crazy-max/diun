@@ -7,7 +7,7 @@ import (
 	"github.com/crazy-max/diun/v4/pkg/registry"
 	"github.com/crazy-max/diun/v4/pkg/utl"
 	"github.com/pkg/errors"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestValidateImage(t *testing.T) {
@@ -693,10 +693,10 @@ func TestValidateImage(t *testing.T) {
 				tt.defaults,
 			)
 			if tt.expectedErr == nil {
-				assert.NoError(t, err)
-				assert.Equal(t, tt.expectedImage, img)
+				require.NoError(t, err)
+				require.Equal(t, tt.expectedImage, img)
 			} else {
-				assert.ErrorContains(t, err, tt.expectedErr.Error())
+				require.ErrorContains(t, err, tt.expectedErr.Error())
 			}
 		})
 	}
