@@ -401,6 +401,9 @@ github.com/pkg/profile
 # github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2
 ## explicit
 github.com/pmezard/go-difflib/difflib
+# github.com/rabbitmq/amqp091-go v1.10.0
+## explicit; go 1.20
+github.com/rabbitmq/amqp091-go
 # github.com/rivo/uniseg v0.4.7
 ## explicit; go 1.18
 github.com/rivo/uniseg
@@ -422,9 +425,6 @@ github.com/spf13/pflag
 # github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf
 ## explicit
 github.com/ssor/bom
-# github.com/streadway/amqp v1.1.0
-## explicit; go 1.10
-github.com/streadway/amqp
 # github.com/stretchr/testify v1.9.0
 ## explicit; go 1.17
 github.com/stretchr/testify/assert
