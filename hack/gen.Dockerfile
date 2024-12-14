@@ -1,10 +1,11 @@
 # syntax=docker/dockerfile:1
 
-ARG GO_VERSION="1.20"
+ARG GO_VERSION="1.21"
 ARG PROTOC_VERSION="3.17.3"
 
 # protoc is dynamically linked to glibc so can't use alpine base
 FROM golang:${GO_VERSION}-bullseye AS base
+ENV GOFLAGS="-mod=vendor"
 RUN apt-get update && apt-get --no-install-recommends install -y git unzip
 ARG PROTOC_VERSION
 ARG TARGETOS
@@ -17,36 +18,34 @@ RUN <<EOT
 EOT
 WORKDIR /src
 
-FROM base AS vendored
-COPY go.mod go.sum ./
-RUN --mount=type=cache,target=/go/pkg/mod \
-  go mod download
-
-FROM vendored AS tools
-RUN --mount=type=bind,target=. \
-    --mount=type=cache,target=/go/pkg/mod \
-  go install \
-    google.golang.org/grpc/cmd/protoc-gen-go-grpc \
-    google.golang.org/protobuf/cmd/protoc-gen-go
-
-FROM tools AS generate
+FROM base AS tools
 RUN --mount=type=bind,target=.,rw \
-    --mount=type=cache,target=/go/pkg/mod <<EOT
-  set -e
+    --mount=type=cache,target=/root/.cache \
+    --mount=type=cache,target=/go/pkg/mod \
+    go install \
+      google.golang.org/grpc/cmd/protoc-gen-go-grpc \
+      google.golang.org/protobuf/cmd/protoc-gen-go
+
+FROM tools AS generated
+RUN --mount=type=bind,target=.,rw <<EOT
+  set -ex
   go generate -v ./...
   mkdir /out
-  cp -Rf pb /out
+  git ls-files -m --others -- ':!vendor' '**/*.pb.go' | tar -cf - --files-from - | tar -C /out -xf -
 EOT
 
 FROM scratch AS update
-COPY --from=generate /out /
+COPY --from=generated /out /
 
-FROM generate AS validate
-RUN --mount=type=bind,target=.,rw <<EOT
+FROM base AS validate
+RUN --mount=type=bind,target=.,rw \
+    --mount=type=bind,from=generated,source=/out,target=/generated-files <<EOT
   set -e
   git add -A
-  cp -rf /out/* .
-  diff=$(git status --porcelain -- pb)
+  if [ "$(ls -A /generated-files)" ]; then
+    cp -rf /generated-files/* .
+  fi
+  diff=$(git status --porcelain -- ':!vendor' '**/*.pb.go')
   if [ -n "$diff" ]; then
     echo >&2 'ERROR: Vendor result differs. Please vendor your package with "docker buildx bake gen"'
     echo "$diff"
