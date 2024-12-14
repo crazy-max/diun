@@ -1,0 +1,13 @@
+linters-settings:
+  lll:
+    line-length: 150
+
+linters:
+  enable-all: true
+
+issues:
+  max-same: 0 # Disable maximum count of issues with the same text.
+  exclude:
+  - G104 # Duplicate of errcheck
+
+  exclude-use-default: false

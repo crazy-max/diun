@@ -5,38 +5,43 @@ ARG ALPINE_VERSION="3.18"
 ARG GOMOD_OUTDATED_VERSION="v0.8.0"
 
 FROM golang:${GO_VERSION}-alpine${ALPINE_VERSION} AS base
-RUN apk add --no-cache git linux-headers musl-dev
+ENV GOFLAGS="-mod=vendor"
+RUN apk add --no-cache git linux-headers musl-dev rsync
 WORKDIR /src
 
 FROM base AS vendored
-RUN --mount=type=bind,target=.,rw \
-    --mount=type=cache,target=/go/pkg/mod <<EOT
+RUN --mount=target=/context \
+    --mount=target=.,type=tmpfs  \
+    --mount=target=/go/pkg/mod,type=cache <<EOT
   set -e
+  rsync -a /context/. .
   go mod tidy
-  go mod download
+  go mod vendor
   mkdir /out
-  cp go.mod go.sum /out
+  cp -r go.mod go.sum vendor /out
 EOT
 
 FROM scratch AS update
 COPY --from=vendored /out /
 
 FROM vendored AS validate
-RUN --mount=type=bind,target=.,rw <<EOT
+RUN --mount=target=/context \
+    --mount=target=.,type=tmpfs <<EOT
   set -e
+  rsync -a /context/. .
   git add -A
+  rm -rf vendor
   cp -rf /out/* .
-  diff=$(git status --porcelain -- go.mod go.sum)
-  if [ -n "$diff" ]; then
-    echo >&2 'ERROR: Vendor result differs. Please vendor your package with "docker buildx bake vendor"'
-    echo "$diff"
+  if [ -n "$(git status --porcelain -- go.mod go.sum vendor)" ]; then
+    echo >&2 'ERROR: Vendor result differs. Please vendor your package with "make vendor"'
+    git status --porcelain -- go.mod go.sum vendor
     exit 1
   fi
 EOT
 
 FROM psampaz/go-mod-outdated:${GOMOD_OUTDATED_VERSION} AS go-mod-outdated
 FROM base AS outdated
-RUN --mount=type=bind,target=. \
+RUN --mount=type=bind,target=.,rw \
     --mount=type=cache,target=/go/pkg/mod \
     --mount=from=go-mod-outdated,source=/home/go-mod-outdated,target=/usr/bin/go-mod-outdated \
-    go list -mod=readonly -u -m -json all | go-mod-outdated -update -direct
+    go list -mod=mod -u -m -json all | go-mod-outdated -update -direct

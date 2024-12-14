@@ -1,0 +1,132 @@
+run:
+  # timeout for analysis, e.g. 30s, 5m, default is 1m
+  timeout: 1m
+
+  # exit code when at least one issue was found, default is 1
+  issues-exit-code: 1
+
+  # include test files or not, default is true
+  tests: true
+
+# output configuration options
+output:
+  # colored-line-number|line-number|json|tab|checkstyle|code-climate|junit-xml|github-actions
+  # default is "colored-line-number"
+  formats:
+    - format: colored-line-number
+
+  # print lines of code with issue, default is true
+  print-issued-lines: true
+
+  # print linter name in the end of issue text, default is true
+  print-linter-name: true
+
+  # make issues output unique by line, default is true
+  uniq-by-line: true
+
+  # sorts results by: filepath, line and column
+  sort-results: true
+
+linters:
+  disable-all: true
+  enable:
+    - errcheck
+    - gosimple
+    - govet
+    - ineffassign
+    - staticcheck
+    - typecheck
+    - unused
+    - asciicheck
+    - bodyclose
+    - bodyclose
+    - dupl
+    - durationcheck
+    - errorlint
+    - exhaustive
+    - exportloopref
+    - forbidigo
+    - forcetypeassert
+    - godot
+    - err113
+    - gofmt
+    - goimports
+    - gomoddirectives
+    - goprintffuncname
+    - gosec
+    #    - ifshort
+    - importas
+    #    - lll
+    - makezero
+    - misspell
+    - nakedret
+    #    - nilassign
+    - nilerr
+    - noctx
+    #    - nolintlint
+    #    - paralleltest
+    - prealloc
+    - promlinter
+    - tagliatelle
+    - unconvert
+    - unparam
+    - wastedassign
+issues:
+  # Excluding configuration per-path, per-linter, per-text and per-source
+  exclude-rules:
+    - path: samples/
+      linters:
+        - gomoddirectives # We allow replace directives in the samples/ directory as we want to keep up to date
+        - gosec # We don't use rand for security reasons here
+    # Don't run error or allocation optimisations on scripts, since they're not necessary to generate code
+    - path: scripts/generate/
+      linters:
+        - prealloc
+        - err113
+    # Exclude some `staticcheck` messages.
+    - linters:
+        - staticcheck
+      text: "SA1019:" # warning about "strings.Title" being deprecated for unicode issue; we dont need unicode here.
+    - linters:
+        - gosec
+      text: "G404:" # warning about insecure math/rand. We dont care about this in tests!
+      path: "\\w*_test.go"
+    - linters:
+        - gosimple
+      text: "S1023:" # allow redundant return statements. They can be nice for readability.
+
+  # Enable default excludes, for common sense values.
+  exclude-use-default: true
+
+  # Maximum count of issues with the same text. Set to 0 to disable. Default is 3.
+  max-same-issues: 0
+
+severity:
+  # Default value is empty string.
+  # Set the default severity for issues. If severity rules are defined and the issues
+  # do not match or no severity is provided to the rule this will be the default
+  # severity applied. Severities should match the supported severity names of the
+  # selected out format.
+  # - Code climate: https://docs.codeclimate.com/docs/issues#issue-severity
+  # -   Checkstyle: https://checkstyle.sourceforge.io/property_types.html#severity
+  # -       Github: https://help.github.com/en/actions/reference/workflow-commands-for-github-actions#setting-an-error-message
+  default-severity: error
+
+  # The default value is false.
+  # If set to true severity-rules regular expressions become case sensitive.
+  case-sensitive: false
+
+linters-settings:
+  tagliatelle:
+    # check the struck tag name case
+    case:
+      # use the struct field name to check the name of the struct tag
+      use-field-name: true
+      rules:
+        # JSON must use snake case
+        json: snake
+  errcheck:
+    check-type-assertions: true
+    exclude-functions:
+      - (github.com/PaulSonOfLars/gotgbot/v2.Message).Reply
+      - (net/http.ResponseWriter).Write
