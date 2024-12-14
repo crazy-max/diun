@@ -24,7 +24,7 @@ type CliGlobals struct {
 
 // BeforeApply is a hook that run cli cmd are executed.
 func (s *CliGlobals) BeforeApply() (err error) {
-	s.conn, err = grpc.Dial(s.GRPCAuthority, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	s.conn, err = grpc.NewClient(s.GRPCAuthority, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return err
 	}

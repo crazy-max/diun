@@ -2,6 +2,7 @@ package discord
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -40,10 +41,6 @@ func (c *Client) Name() string {
 // https://discord.com/developers/docs/resources/webhook#execute-webhook
 func (c *Client) Send(entry model.NotifEntry) error {
 	var content bytes.Buffer
-
-	hc := http.Client{
-		Timeout: *c.cfg.Timeout,
-	}
 
 	message, err := msg.New(msg.Options{
 		Meta:         c.meta,
@@ -125,7 +122,11 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		return err
 	}
 
-	req, err := http.NewRequest("POST", u.String(), dataBuf)
+	hc := http.Client{}
+	ctx, cancel := context.WithTimeout(context.Background(), *c.cfg.Timeout)
+	defer cancel()
+
+	req, err := http.NewRequestWithContext(ctx, "POST", u.String(), dataBuf)
 	if err != nil {
 		return err
 	}
@@ -137,6 +138,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	if err != nil {
 		return err
 	}
+	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusNoContent {
 		return errors.Errorf("unexpected HTTP status %d: %s", resp.StatusCode, resp.Body)

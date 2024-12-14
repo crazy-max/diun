@@ -99,7 +99,7 @@ func (c *Client) Send(entry model.NotifEntry) {
 	for _, n := range c.notifiers {
 		log.Debug().Str("image", entry.Image.String()).Msgf("Sending %s notification...", n.Name())
 		if err := n.Send(entry); err != nil {
-			log.Error().Err(err).Str("image", entry.Image.String()).Msgf("%s notification failed", strings.Title(n.Name()))
+			log.Error().Err(err).Str("image", entry.Image.String()).Msgf("%s notification failed", strings.Title(n.Name())) //nolint:staticcheck // ignoring "SA1019: strings.Title is deprecated", as for our use we don't need full unicode support
 		}
 	}
 }

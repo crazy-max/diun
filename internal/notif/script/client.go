@@ -66,6 +66,6 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		return errors.Wrap(err, strings.TrimSpace(stderr.String()))
 	}
 
-	log.Debug().Msgf(strings.TrimSpace(stdout.String()))
+	log.Debug().Msg(strings.TrimSpace(stdout.String()))
 	return nil
 }

@@ -2,6 +2,7 @@ package ntfy
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -38,10 +39,6 @@ func (c *Client) Name() string {
 
 // Send creates and sends a ntfy notification with an entry
 func (c *Client) Send(entry model.NotifEntry) error {
-	hc := http.Client{
-		Timeout: *c.cfg.Timeout,
-	}
-
 	message, err := msg.New(msg.Options{
 		Meta:          c.meta,
 		Entry:         entry,
@@ -84,7 +81,11 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	q := u.Query()
 	u.RawQuery = q.Encode()
 
-	req, err := http.NewRequest("POST", u.String(), dataBuf)
+	hc := http.Client{}
+	ctx, cancel := context.WithTimeout(context.Background(), *c.cfg.Timeout)
+	defer cancel()
+
+	req, err := http.NewRequestWithContext(ctx, "POST", u.String(), dataBuf)
 	if err != nil {
 		return err
 	}
@@ -99,6 +100,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	if err != nil {
 		return err
 	}
+	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
 		var errBody struct {

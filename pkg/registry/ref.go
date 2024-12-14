@@ -28,9 +28,7 @@ func namedReference(name string) (reference.Named, error) {
 	ref, err := reference.ParseNormalizedNamed(name)
 	if err != nil {
 		return nil, errors.Wrapf(err, "parsing normalized named %q", name)
-	}
-
-	if _, ok := ref.(reference.Named); !ok {
+	} else if ref == nil {
 		return nil, errors.Errorf("%q is not a named reference", name)
 	}
 

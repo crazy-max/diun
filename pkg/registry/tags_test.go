@@ -23,8 +23,8 @@ func TestTags(t *testing.T) {
 		t.Error(err)
 	}
 
-	assert.True(t, tags.Total > 0)
-	assert.True(t, len(tags.List) > 0)
+	assert.Greater(t, tags.Total, 0)
+	assert.Greater(t, len(tags.List), 0)
 }
 
 func TestTagsWithDigest(t *testing.T) {
@@ -46,8 +46,8 @@ func TestTagsWithDigest(t *testing.T) {
 		t.Error(err)
 	}
 
-	assert.True(t, tags.Total > 0)
-	assert.True(t, len(tags.List) > 0)
+	assert.Greater(t, tags.Total, 0)
+	assert.Greater(t, len(tags.List), 0)
 }
 
 func TestTagsSort(t *testing.T) {

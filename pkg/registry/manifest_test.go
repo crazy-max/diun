@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestCompareDigest(t *testing.T) {
@@ -26,7 +27,7 @@ func TestCompareDigest(t *testing.T) {
 
 	// download manifest
 	_, _, err = rc.Manifest(img, Manifest{})
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	// check manifest
 	manifest, _, err := rc.Manifest(img, Manifest{
@@ -36,7 +37,7 @@ func TestCompareDigest(t *testing.T) {
 		Digest:   "sha256:db618981ef3d07699ff6cd8b9d2a81f51a021747bc08c85c1b0e8d11130c2be5",
 		Platform: "linux/amd64",
 	})
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, "docker.io/crazymax/diun", manifest.Name)
 	assert.Equal(t, "2.5.0", manifest.Tag)
 	assert.Equal(t, "application/vnd.docker.distribution.manifest.list.v2+json", manifest.MIMEType)
@@ -64,7 +65,7 @@ func TestManifest(t *testing.T) {
 
 	// download manifest
 	_, _, err = rc.Manifest(img, Manifest{})
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	// check manifest
 	manifest, updated, err := rc.Manifest(img, Manifest{
@@ -101,7 +102,7 @@ func TestManifest(t *testing.T) {
 }`),
 	})
 
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, false, updated)
 	assert.Equal(t, "docker.io/portainer/portainer-ce", manifest.Name)
 	assert.Equal(t, "linux-amd64-2.5.1", manifest.Tag)
@@ -130,7 +131,7 @@ func TestManifestMultiUpdatedPlatform(t *testing.T) {
 
 	// download manifest
 	_, _, err = rc.Manifest(img, Manifest{})
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	// check manifest
 	manifest, updated, err := rc.Manifest(img, Manifest{
@@ -186,7 +187,7 @@ func TestManifestMultiUpdatedPlatform(t *testing.T) {
 }`),
 	})
 
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, true, updated)
 	assert.Equal(t, "docker.io/library/mongo", manifest.Name)
 	assert.Equal(t, "3.6.21", manifest.Tag)
@@ -215,7 +216,7 @@ func TestManifestMultiNotUpdatedPlatform(t *testing.T) {
 
 	// download manifest
 	_, _, err = rc.Manifest(img, Manifest{})
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	// check manifest
 	manifest, updated, err := rc.Manifest(img, Manifest{
@@ -271,7 +272,7 @@ func TestManifestMultiNotUpdatedPlatform(t *testing.T) {
 }`),
 	})
 
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, false, updated)
 	assert.Equal(t, "docker.io/library/mongo", manifest.Name)
 	assert.Equal(t, "3.6.21", manifest.Tag)
@@ -299,7 +300,7 @@ func TestManifestVariant(t *testing.T) {
 	}
 
 	manifest, _, err := rc.Manifest(img, Manifest{})
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, "docker.io/crazymax/diun", manifest.Name)
 	assert.Equal(t, "2.5.0", manifest.Tag)
 	assert.Equal(t, "application/vnd.docker.distribution.manifest.list.v2+json", manifest.MIMEType)
@@ -327,11 +328,11 @@ func TestManifestTaggedDigest(t *testing.T) {
 
 	// download manifest
 	_, _, err = rc.Manifest(img, Manifest{})
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	// check manifest
 	manifest, updated, err := rc.Manifest(img, manifestCrazymaxDiun4250)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, false, updated)
 	assert.Equal(t, "docker.io/crazymax/diun", manifest.Name)
 	assert.Equal(t, "4.25.0", manifest.Tag)
@@ -359,7 +360,7 @@ func TestManifestTaggedDigestUnknownTag(t *testing.T) {
 	}
 
 	_, _, err = rc.Manifest(img, Manifest{})
-	assert.Error(t, err)
+	require.Error(t, err)
 }
 
 var manifestCrazymaxDiun4250 = Manifest{
