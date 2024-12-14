@@ -1,15 +1,19 @@
-// Copyright (c) 2012, Sean Treadway, SoundCloud Ltd.
+// Copyright (c) 2021 VMware, Inc. or its affiliates. All Rights Reserved.
+// Copyright (c) 2012-2021, Sean Treadway, SoundCloud Ltd.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
-// Source code and contact info at http://github.com/streadway/amqp
 
-package amqp
+package amqp091
 
 import (
 	"fmt"
 	"io"
 	"time"
 )
+
+// DefaultExchange is the default direct exchange that binds every queue by its
+// name. Applications can route to a queue using the queue name as routing key.
+const DefaultExchange = ""
 
 // Constants for standard AMQP 0-9-1 exchange types.
 const (
@@ -29,7 +33,7 @@ var (
 	ErrChannelMax = &Error{Code: ChannelError, Reason: "channel id space exhausted"}
 
 	// ErrSASL is returned from Dial when the authentication mechanism could not
-	// be negoated.
+	// be negotiated.
 	ErrSASL = &Error{Code: AccessRefused, Reason: "SASL could not negotiate a shared mechanism"}
 
 	// ErrCredentials is returned when the authenticated client is not authorized
@@ -59,6 +63,11 @@ var (
 
 	// ErrFieldType is returned when writing a message containing a Go type unsupported by AMQP.
 	ErrFieldType = &Error{Code: SyntaxError, Reason: "unsupported table field type"}
+)
+
+// internal errors used inside the library
+var (
+	errInvalidTypeAssertion = &Error{Code: InternalError, Reason: "type assertion unsuccessful", Server: false, Recover: true}
 )
 
 // Error captures the code and reason a channel or connection has been closed
@@ -135,6 +144,19 @@ const (
 	flagReserved1       = 0x0004
 )
 
+// Expiration. These constants can be used to set a messages expiration TTL.
+// They should be viewed as a clarification of the expiration functionality in
+// messages and their usage is not enforced by this pkg.
+//
+// The server requires a string value that is interpreted by the server as
+// milliseconds. If no value is set, which translates to the nil value of
+// string, the message will never expire by itself. This does not influence queue
+// configured TTL configurations.
+const (
+	NeverExpire       string = ""  // empty value means never expire
+	ImmediatelyExpire string = "0" // 0 means immediately expire
+)
+
 // Queue captures the current server state of the queue on the server returned
 // from Channel.QueueDeclare or Channel.QueueInspect.
 type Queue struct {
@@ -153,18 +175,25 @@ type Publishing struct {
 	Headers Table
 
 	// Properties
-	ContentType     string    // MIME content type
-	ContentEncoding string    // MIME content encoding
-	DeliveryMode    uint8     // Transient (0 or 1) or Persistent (2)
-	Priority        uint8     // 0 to 9
-	CorrelationId   string    // correlation identifier
-	ReplyTo         string    // address to to reply to (ex: RPC)
-	Expiration      string    // message expiration spec
-	MessageId       string    // message identifier
-	Timestamp       time.Time // message timestamp
-	Type            string    // message type name
-	UserId          string    // creating user id - ex: "guest"
-	AppId           string    // creating application id
+	ContentType     string // MIME content type
+	ContentEncoding string // MIME content encoding
+	DeliveryMode    uint8  // Transient (0 or 1) or Persistent (2)
+	Priority        uint8  // 0 to 9
+	CorrelationId   string // correlation identifier
+	ReplyTo         string // address to to reply to (ex: RPC)
+	// Expiration represents the message TTL in milliseconds. A value of "0"
+	// indicates that the message will immediately expire if the message arrives
+	// at its destination and the message is not directly handled by a consumer
+	// that currently has the capacatity to do so. If you wish the message to
+	// not expire on its own, set this value to any ttl value, empty string or
+	// use the corresponding constants NeverExpire and ImmediatelyExpire. This
+	// does not influence queue configured TTL values.
+	Expiration string
+	MessageId  string    // message identifier
+	Timestamp  time.Time // message timestamp
+	Type       string    // message type name
+	UserId     string    // creating user id - ex: "guest"
+	AppId      string    // creating application id
 
 	// The application specific payload of the message
 	Body []byte
@@ -177,6 +206,16 @@ type Publishing struct {
 type Blocking struct {
 	Active bool   // TCP pushback active/inactive on server
 	Reason string // Server reason for activation
+}
+
+// DeferredConfirmation represents a future publisher confirm for a message. It
+// allows users to directly correlate a publishing to a confirmation. These are
+// returned from PublishWithDeferredConfirm on Channels.
+type DeferredConfirmation struct {
+	DeliveryTag uint64
+
+	done chan struct{}
+	ack  bool
 }
 
 // Confirmation notifies the acknowledgment or negative acknowledgement of a
@@ -194,23 +233,106 @@ type Decimal struct {
 	Value int32
 }
 
+// Most common queue argument keys in queue declaration. For a comprehensive list
+// of queue arguments, visit [RabbitMQ Queue docs].
+//
+// [QueueTypeArg] queue argument is used to declare quorum and stream queues.
+// Accepted values are [QueueTypeClassic] (default), [QueueTypeQuorum] and
+// [QueueTypeStream]. [Quorum Queues] accept (almost) all queue arguments as their
+// Classic Queues counterparts. Check [feature comparison] docs for more
+// information.
+//
+// Queues can define their [max length] using [QueueMaxLenArg] and
+// [QueueMaxLenBytesArg] queue arguments. Overflow behaviour is set using
+// [QueueOverflowArg]. Accepted values are [QueueOverflowDropHead] (default),
+// [QueueOverflowRejectPublish] and [QueueOverflowRejectPublishDLX].
+//
+// [Queue TTL] can be defined using [QueueTTLArg]. That is, the time-to-live for an
+// unused queue. [Queue Message TTL] can be defined using [QueueMessageTTLArg].
+// This will set a time-to-live for messages in the queue.
+//
+// [Stream retention] can be configured using [StreamMaxLenBytesArg], to set the
+// maximum size of the stream. Please note that stream queues always keep, at
+// least, one segment. [Stream retention] can also be set using [StreamMaxAgeArg],
+// to set time-based retention. Values are string with unit suffix. Valid
+// suffixes are Y, M, D, h, m, s. E.g. "7D" for one week. The maximum segment
+// size can be set using [StreamMaxSegmentSizeBytesArg]. The default value is
+// 500_000_000 bytes ~= 500 megabytes
+//
+// Starting with RabbitMQ 3.12, consumer timeout can be configured as a queue
+// argument. This is the timeout for a consumer to acknowledge a message. The
+// value is the time in milliseconds. The timeout is evaluated periodically,
+// at one minute intervals. Values lower than one minute are not supported.
+// See the [consumer timeout] guide for more information.
+//
+// [Single Active Consumer] on quorum and classic queues can be configured
+// using [SingleActiveConsumerArg]. This argument expects a boolean value. It is
+// false by default.
+//
+// [RabbitMQ Queue docs]: https://rabbitmq.com/queues.html
+// [Stream retention]: https://rabbitmq.com/streams.html#retention
+// [max length]: https://rabbitmq.com/maxlength.html
+// [Queue TTL]: https://rabbitmq.com/ttl.html#queue-ttl
+// [Queue Message TTL]: https://rabbitmq.com/ttl.html#per-queue-message-ttl
+// [Quorum Queues]: https://rabbitmq.com/quorum-queues.html
+// [feature comparison]: https://rabbitmq.com/quorum-queues.html#feature-comparison
+// [consumer timeout]: https://rabbitmq.com/consumers.html#acknowledgement-timeout
+// [Single Active Consumer]: https://rabbitmq.com/consumers.html#single-active-consumer
+const (
+	QueueTypeArg                 = "x-queue-type"
+	QueueMaxLenArg               = "x-max-length"
+	QueueMaxLenBytesArg          = "x-max-length-bytes"
+	StreamMaxLenBytesArg         = "x-max-length-bytes"
+	QueueOverflowArg             = "x-overflow"
+	QueueMessageTTLArg           = "x-message-ttl"
+	QueueTTLArg                  = "x-expires"
+	StreamMaxAgeArg              = "x-max-age"
+	StreamMaxSegmentSizeBytesArg = "x-stream-max-segment-size-bytes"
+	// QueueVersionArg declares the Classic Queue version to use. Expects an integer, either 1 or 2.
+	QueueVersionArg = "x-queue-version"
+	// ConsumerTimeoutArg is available in RabbitMQ 3.12+ as a queue argument.
+	ConsumerTimeoutArg      = "x-consumer-timeout"
+	SingleActiveConsumerArg = "x-single-active-consumer"
+)
+
+// Values for queue arguments. Use as values for queue arguments during queue declaration.
+// The following argument table will create a classic queue, with max length set to 100 messages,
+// and a queue TTL of 30 minutes.
+//
+//	args := amqp.Table{
+//		amqp.QueueTypeArg: QueueTypeClassic,
+//		amqp.QueueMaxLenArg: 100,
+//		amqp.QueueTTLArg: 1800000,
+//	}
+//
+// Refer to [Channel.QueueDeclare] for more examples.
+const (
+	QueueTypeClassic              = "classic"
+	QueueTypeQuorum               = "quorum"
+	QueueTypeStream               = "stream"
+	QueueOverflowDropHead         = "drop-head"
+	QueueOverflowRejectPublish    = "reject-publish"
+	QueueOverflowRejectPublishDLX = "reject-publish-dlx"
+)
+
 // Table stores user supplied fields of the following types:
 //
-//   bool
-//   byte
-//   float32
-//   float64
-//   int
-//   int16
-//   int32
-//   int64
-//   nil
-//   string
-//   time.Time
-//   amqp.Decimal
-//   amqp.Table
-//   []byte
-//   []interface{} - containing above types
+//	bool
+//	byte
+//	int8
+//	float32
+//	float64
+//	int
+//	int16
+//	int32
+//	int64
+//	nil
+//	string
+//	time.Time
+//	amqp.Decimal
+//	amqp.Table
+//	[]byte
+//	[]interface{} - containing above types
 //
 // Functions taking a table will immediately fail when the table contains a
 // value of an unsupported type.
@@ -221,12 +343,11 @@ type Decimal struct {
 // Use a type assertion when reading values from a table for type conversion.
 //
 // RabbitMQ expects int32 for integer values.
-//
 type Table map[string]interface{}
 
 func validateField(f interface{}) error {
 	switch fv := f.(type) {
-	case nil, bool, byte, int, int16, int32, int64, float32, float64, string, []byte, Decimal, time.Time:
+	case nil, bool, byte, int8, int, int16, int32, int64, float32, float64, string, []byte, Decimal, time.Time:
 		return nil
 
 	case []interface{}:
@@ -254,17 +375,12 @@ func (t Table) Validate() error {
 	return validateField(t)
 }
 
-// Heap interface for maintaining delivery tags
-type tagSet []uint64
-
-func (set tagSet) Len() int              { return len(set) }
-func (set tagSet) Less(i, j int) bool    { return (set)[i] < (set)[j] }
-func (set tagSet) Swap(i, j int)         { (set)[i], (set)[j] = (set)[j], (set)[i] }
-func (set *tagSet) Push(tag interface{}) { *set = append(*set, tag.(uint64)) }
-func (set *tagSet) Pop() interface{} {
-	val := (*set)[len(*set)-1]
-	*set = (*set)[:len(*set)-1]
-	return val
+// Sets the connection name property. This property can be used in
+// amqp.Config to set a custom connection name during amqp.DialConfig(). This
+// can be helpful to identify specific connections in RabbitMQ, for debugging or
+// tracing purposes.
+func (t Table) SetClientConnectionName(connName string) {
+	t["connection_name"] = connName
 }
 
 type message interface {
@@ -288,11 +404,11 @@ The base interface implemented as:
 All frames consist of a header (7 octets), a payload of arbitrary size, and a 'frame-end' octet that detects
 malformed frames:
 
-  0      1         3             7                  size+7 size+8
-  +------+---------+-------------+  +------------+  +-----------+
-  | type | channel |     size    |  |  payload   |  | frame-end |
-  +------+---------+-------------+  +------------+  +-----------+
-   octet   short         long         size octets       octet
+	0      1         3             7                  size+7 size+8
+	+------+---------+-------------+  +------------+  +-----------+
+	| type | channel |     size    |  |  payload   |  | frame-end |
+	+------+---------+-------------+  +------------+  +-----------+
+	 octet   short         long         size octets       octet
 
 To read a frame, we:
 
@@ -303,11 +419,22 @@ To read a frame, we:
 In realistic implementations where performance is a concern, we would use
 “read-ahead buffering” or “gathering reads” to avoid doing three separate
 system calls to read a frame.
-
 */
 type frame interface {
 	write(io.Writer) error
 	channel() uint16
+}
+
+/*
+Perform any updates on the channel immediately after the frame is decoded while the
+connection mutex is held.
+*/
+func updateChannel(f frame, channel *Channel) {
+	if mf, isMethodFrame := f.(*methodFrame); isMethodFrame {
+		if _, isChannelClose := mf.Method.(*channelClose); isChannelClose {
+			channel.setClosed()
+		}
+	}
 }
 
 type reader struct {
@@ -334,17 +461,17 @@ func (protocolHeader) channel() uint16 {
 Method frames carry the high-level protocol commands (which we call "methods").
 One method frame carries one command.  The method frame payload has this format:
 
-  0          2           4
-  +----------+-----------+-------------- - -
-  | class-id | method-id | arguments...
-  +----------+-----------+-------------- - -
-     short      short    ...
+	0          2           4
+	+----------+-----------+-------------- - -
+	| class-id | method-id | arguments...
+	+----------+-----------+-------------- - -
+	   short      short    ...
 
 To process a method frame, we:
  1. Read the method frame payload.
  2. Unpack it into a structure.  A given method always has the same structure,
- so we can unpack the method rapidly.  3. Check that the method is allowed in
- the current context.
+    so we can unpack the method rapidly.  3. Check that the method is allowed in
+    the current context.
  4. Check that the method arguments are valid.
  5. Execute the method.
 
@@ -383,11 +510,11 @@ follows it with a content header and zero or more content body frames.
 
 A content header frame has this format:
 
-    0          2        4           12               14
-    +----------+--------+-----------+----------------+------------- - -
-    | class-id | weight | body size | property flags | property list...
-    +----------+--------+-----------+----------------+------------- - -
-      short     short    long long       short        remainder...
+	0          2        4           12               14
+	+----------+--------+-----------+----------------+------------- - -
+	| class-id | weight | body size | property flags | property list...
+	+----------+--------+-----------+----------------+------------- - -
+	  short     short    long long       short        remainder...
 
 We place content body in distinct frames (rather than including it in the
 method) so that AMQP may support "zero copy" techniques in which content is
@@ -415,10 +542,10 @@ into several (or many) chunks, each forming a "content body frame".
 Looking at the frames for a specific channel, as they pass on the wire, we
 might see something like this:
 
-		[method]
-		[method] [header] [body] [body]
-		[method]
-		...
+	[method]
+	[method] [header] [body] [body]
+	[method]
+	...
 */
 type bodyFrame struct {
 	ChannelId uint16
@@ -426,3 +553,16 @@ type bodyFrame struct {
 }
 
 func (f *bodyFrame) channel() uint16 { return f.ChannelId }
+
+type heartbeatDuration struct {
+	value    time.Duration
+	hasValue bool
+}
+
+func newHeartbeatDurationFromSeconds(s int) heartbeatDuration {
+	v := time.Duration(s) * time.Second
+	return heartbeatDuration{
+		value:    v,
+		hasValue: true,
+	}
+}

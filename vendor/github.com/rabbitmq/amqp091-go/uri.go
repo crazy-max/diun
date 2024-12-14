@@ -1,12 +1,13 @@
-// Copyright (c) 2012, Sean Treadway, SoundCloud Ltd.
+// Copyright (c) 2021 VMware, Inc. or its affiliates. All Rights Reserved.
+// Copyright (c) 2012-2021, Sean Treadway, SoundCloud Ltd.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
-// Source code and contact info at http://github.com/streadway/amqp
 
-package amqp
+package amqp091
 
 import (
 	"errors"
+	"fmt"
 	"net"
 	"net/url"
 	"strconv"
@@ -32,12 +33,20 @@ var defaultURI = URI{
 
 // URI represents a parsed AMQP URI string.
 type URI struct {
-	Scheme   string
-	Host     string
-	Port     int
-	Username string
-	Password string
-	Vhost    string
+	Scheme            string
+	Host              string
+	Port              int
+	Username          string
+	Password          string
+	Vhost             string
+	CertFile          string // client TLS auth - path to certificate (PEM)
+	CACertFile        string // client TLS auth - path to CA certificate (PEM)
+	KeyFile           string // client TLS auth - path to private key (PEM)
+	ServerName        string // client TLS auth - server name
+	AuthMechanism     []string
+	Heartbeat         heartbeatDuration
+	ConnectionTimeout int
+	ChannelMax        uint16
 }
 
 // ParseURI attempts to parse the given AMQP URI according to the spec.
@@ -45,17 +54,32 @@ type URI struct {
 //
 // Default values for the fields are:
 //
-//   Scheme: amqp
-//   Host: localhost
-//   Port: 5672
-//   Username: guest
-//   Password: guest
-//   Vhost: /
+//	Scheme: amqp
+//	Host: localhost
+//	Port: 5672
+//	Username: guest
+//	Password: guest
+//	Vhost: /
 //
+// Supports TLS query parameters. See https://www.rabbitmq.com/uri-query-parameters.html
+//
+//	certfile: <path/to/client_cert.pem>
+//	keyfile: <path/to/client_key.pem>
+//	cacertfile: <path/to/ca.pem>
+//	server_name_indication: <server name>
+//	auth_mechanism: <one or more: plain, amqplain, external>
+//	heartbeat: <seconds (integer)>
+//	connection_timeout: <milliseconds (integer)>
+//	channel_max: <max number of channels (integer)>
+//
+// If cacertfile is not provided, system CA certificates will be used.
+// Mutual TLS (client auth) will be enabled only in case keyfile AND certfile provided.
+//
+// If Config.TLSClientConfig is set, TLS parameters from URI will be ignored.
 func ParseURI(uri string) (URI, error) {
 	builder := defaultURI
 
-	if strings.Contains(uri, " ") == true {
+	if strings.Contains(uri, " ") {
 		return builder, errURIWhitespace
 	}
 
@@ -113,6 +137,38 @@ func ParseURI(uri string) (URI, error) {
 		}
 	}
 
+	// see https://www.rabbitmq.com/uri-query-parameters.html
+	params := u.Query()
+	builder.CertFile = params.Get("certfile")
+	builder.KeyFile = params.Get("keyfile")
+	builder.CACertFile = params.Get("cacertfile")
+	builder.ServerName = params.Get("server_name_indication")
+	builder.AuthMechanism = params["auth_mechanism"]
+
+	if params.Has("heartbeat") {
+		value, err := strconv.Atoi(params.Get("heartbeat"))
+		if err != nil {
+			return builder, fmt.Errorf("heartbeat is not an integer: %v", err)
+		}
+		builder.Heartbeat = newHeartbeatDurationFromSeconds(value)
+	}
+
+	if params.Has("connection_timeout") {
+		value, err := strconv.Atoi(params.Get("connection_timeout"))
+		if err != nil {
+			return builder, fmt.Errorf("connection_timeout is not an integer: %v", err)
+		}
+		builder.ConnectionTimeout = value
+	}
+
+	if params.Has("channel_max") {
+		value, err := strconv.ParseUint(params.Get("channel_max"), 10, 16)
+		if err != nil {
+			return builder, fmt.Errorf("connection_timeout is not an integer: %v", err)
+		}
+		builder.ChannelMax = uint16(value)
+	}
+
 	return builder, nil
 }
 
@@ -150,8 +206,6 @@ func (uri URI) String() string {
 		}
 	}
 
-	authority.Host = net.JoinHostPort(uri.Host, strconv.Itoa(uri.Port))
-
 	if defaultPort, found := schemePorts[uri.Scheme]; !found || defaultPort != uri.Port {
 		authority.Host = net.JoinHostPort(uri.Host, strconv.Itoa(uri.Port))
 	} else {
@@ -170,6 +224,30 @@ func (uri URI) String() string {
 		authority.RawPath = url.QueryEscape(uri.Vhost)
 	} else {
 		authority.Path = "/"
+	}
+
+	if uri.CertFile != "" || uri.KeyFile != "" || uri.CACertFile != "" || uri.ServerName != "" {
+		rawQuery := strings.Builder{}
+		if uri.CertFile != "" {
+			rawQuery.WriteString("certfile=")
+			rawQuery.WriteString(uri.CertFile)
+			rawQuery.WriteRune('&')
+		}
+		if uri.KeyFile != "" {
+			rawQuery.WriteString("keyfile=")
+			rawQuery.WriteString(uri.KeyFile)
+			rawQuery.WriteRune('&')
+		}
+		if uri.CACertFile != "" {
+			rawQuery.WriteString("cacertfile=")
+			rawQuery.WriteString(uri.CACertFile)
+			rawQuery.WriteRune('&')
+		}
+		if uri.ServerName != "" {
+			rawQuery.WriteString("server_name_indication=")
+			rawQuery.WriteString(uri.ServerName)
+		}
+		authority.RawQuery = rawQuery.String()
 	}
 
 	return authority.String()

@@ -7,7 +7,7 @@ import (
 	"github.com/crazy-max/diun/v4/internal/msg"
 	"github.com/crazy-max/diun/v4/internal/notif/notifier"
 	"github.com/crazy-max/diun/v4/pkg/utl"
-	"github.com/streadway/amqp"
+	amqp "github.com/rabbitmq/amqp091-go"
 )
 
 // Client represents an active amqp notification object
