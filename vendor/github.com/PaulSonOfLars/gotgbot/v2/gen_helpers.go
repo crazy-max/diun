@@ -33,6 +33,11 @@ func (c Chat) CreateInviteLink(b *Bot, opts *CreateChatInviteLinkOpts) (*ChatInv
 	return b.CreateChatInviteLink(c.Id, opts)
 }
 
+// CreateSubscriptionInviteLink Helper method for Bot.CreateChatSubscriptionInviteLink.
+func (c Chat) CreateSubscriptionInviteLink(b *Bot, subscriptionPeriod int64, subscriptionPrice int64, opts *CreateChatSubscriptionInviteLinkOpts) (*ChatInviteLink, error) {
+	return b.CreateChatSubscriptionInviteLink(c.Id, subscriptionPeriod, subscriptionPrice, opts)
+}
+
 // DeclineJoinRequest Helper method for Bot.DeclineChatJoinRequest.
 func (c Chat) DeclineJoinRequest(b *Bot, userId int64, opts *DeclineChatJoinRequestOpts) (bool, error) {
 	return b.DeclineChatJoinRequest(c.Id, userId, opts)
@@ -51,6 +56,11 @@ func (c Chat) DeleteStickerSet(b *Bot, opts *DeleteChatStickerSetOpts) (bool, er
 // EditInviteLink Helper method for Bot.EditChatInviteLink.
 func (c Chat) EditInviteLink(b *Bot, inviteLink string, opts *EditChatInviteLinkOpts) (*ChatInviteLink, error) {
 	return b.EditChatInviteLink(c.Id, inviteLink, opts)
+}
+
+// EditSubscriptionInviteLink Helper method for Bot.EditChatSubscriptionInviteLink.
+func (c Chat) EditSubscriptionInviteLink(b *Bot, inviteLink string, opts *EditChatSubscriptionInviteLinkOpts) (*ChatInviteLink, error) {
+	return b.EditChatSubscriptionInviteLink(c.Id, inviteLink, opts)
 }
 
 // ExportInviteLink Helper method for Bot.ExportChatInviteLink.

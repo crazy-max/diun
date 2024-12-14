@@ -21,9 +21,7 @@ const (
 
 type BotClient interface {
 	// RequestWithContext submits a POST HTTP request a bot API instance.
-	RequestWithContext(ctx context.Context, token string, method string, params map[string]string, data map[string]NamedReader, opts *RequestOpts) (json.RawMessage, error)
-	// TimeoutContext calculates the required timeout contect required given the passed RequestOpts, and any default opts defined by the BotClient.
-	TimeoutContext(opts *RequestOpts) (context.Context, context.CancelFunc)
+	RequestWithContext(ctx context.Context, token string, method string, params map[string]string, data map[string]FileReader, opts *RequestOpts) (json.RawMessage, error)
 	// GetAPIURL gets the URL of the API either in use by the bot or defined in the request opts.
 	GetAPIURL(opts *RequestOpts) string
 	// FileURL gets the URL of a file at the API address that the bot is interacting with.
@@ -74,24 +72,6 @@ func (t *TelegramError) Error() string {
 	return fmt.Sprintf("unable to %s: %s", t.Method, t.Description)
 }
 
-type NamedReader interface {
-	Name() string
-	io.Reader
-}
-
-type NamedFile struct {
-	File     io.Reader
-	FileName string
-}
-
-func (nf NamedFile) Read(p []byte) (n int, err error) {
-	return nf.File.Read(p)
-}
-
-func (nf NamedFile) Name() string {
-	return nf.FileName
-}
-
 // RequestOpts defines any request-specific options used to interact with the telegram API.
 type RequestOpts struct {
 	// Timeout for the HTTP request to the telegram API.
@@ -100,38 +80,45 @@ type RequestOpts struct {
 	APIURL string
 }
 
-// TimeoutContext returns the appropriate context for the current settings.
-func (bot *BaseBotClient) TimeoutContext(opts *RequestOpts) (context.Context, context.CancelFunc) {
+// getTimeoutContext returns the appropriate context for the current settings.
+func (bot *BaseBotClient) getTimeoutContext(parentCtx context.Context, opts *RequestOpts) (context.Context, context.CancelFunc) {
+	if parentCtx == nil {
+		parentCtx = context.Background()
+	}
+
 	if opts != nil {
-		ctx, cancelFunc := timeoutFromOpts(opts)
+		ctx, cancelFunc := timeoutFromOpts(parentCtx, opts)
 		if ctx != nil {
 			return ctx, cancelFunc
 		}
 	}
 
 	if bot.DefaultRequestOpts != nil {
-		ctx, cancelFunc := timeoutFromOpts(bot.DefaultRequestOpts)
+		ctx, cancelFunc := timeoutFromOpts(parentCtx, bot.DefaultRequestOpts)
 		if ctx != nil {
 			return ctx, cancelFunc
 		}
 	}
 
-	return context.WithTimeout(context.Background(), DefaultTimeout)
+	return context.WithTimeout(parentCtx, DefaultTimeout)
 }
 
-func timeoutFromOpts(opts *RequestOpts) (context.Context, context.CancelFunc) {
+func timeoutFromOpts(parentCtx context.Context, opts *RequestOpts) (context.Context, context.CancelFunc) {
 	// nothing? no timeout.
 	if opts == nil {
 		return nil, nil
 	}
 
+	if parentCtx == nil {
+		parentCtx = context.Background()
+	}
+
 	if opts.Timeout > 0 {
-		// > 0 timeout defined.
-		return context.WithTimeout(context.Background(), opts.Timeout)
+		return context.WithTimeout(parentCtx, opts.Timeout)
 
 	} else if opts.Timeout < 0 {
 		// < 0  no timeout; infinite.
-		return context.Background(), func() {}
+		return parentCtx, func() {}
 	}
 	// 0 == nothing defined, use defaults.
 	return nil, nil
@@ -142,28 +129,40 @@ func timeoutFromOpts(opts *RequestOpts) (context.Context, context.CancelFunc) {
 //   - method: the telegram API method to call.
 //   - params: map of parameters to be sending to the telegram API. eg: chat_id, user_id, etc.
 //   - data: map of any files to be sending to the telegram API.
-//   - opts: request opts to use. Note: Timeout opts are ignored when used in RequestWithContext. Timeout handling is the
-//     responsibility of the caller/context owner.
-func (bot *BaseBotClient) RequestWithContext(ctx context.Context, token string, method string, params map[string]string, data map[string]NamedReader, opts *RequestOpts) (json.RawMessage, error) {
-	b := &bytes.Buffer{}
+//   - opts: request opts to use.
+func (bot *BaseBotClient) RequestWithContext(parentCtx context.Context, token string, method string, params map[string]string, data map[string]FileReader, opts *RequestOpts) (json.RawMessage, error) {
+	ctx, cancel := bot.getTimeoutContext(parentCtx, opts)
+	defer cancel()
+
+	var requestBody io.Reader
 
 	var contentType string
 	// Check if there are any files to upload. If yes, use multipart; else, use JSON.
 	if len(data) > 0 {
-		var err error
-		contentType, err = fillBuffer(b, params, data)
-		if err != nil {
-			return nil, fmt.Errorf("failed to fill buffer with parameters and file data: %w", err)
-		}
+		pr, pw := io.Pipe()
+		defer pr.Close() // avoid writer goroutine leak
+		mw := multipart.NewWriter(pw)
+		contentType = mw.FormDataContentType()
+		requestBody = pr
+		// Write the request data asynchronously from another goroutine
+		// to the multipart.Writer which will be piped into the pipe reader
+		// which is tied to the request to be sent
+		go func() {
+			writerError := fillBuffer(mw, params, data)
+			// Close the writer with error of multipart writer.
+			// If the error is nil, this will act just like pw.Close()
+			_ = pw.CloseWithError(writerError)
+		}()
 	} else {
 		contentType = "application/json"
-		err := json.NewEncoder(b).Encode(params)
+		bodyBytes, err := json.Marshal(params)
 		if err != nil {
 			return nil, fmt.Errorf("failed to encode parameters as JSON: %w", err)
 		}
+		requestBody = bytes.NewReader(bodyBytes)
 	}
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, bot.methodEndpoint(token, method, opts), b)
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, bot.methodEndpoint(token, method, opts), requestBody)
 	if err != nil {
 		return nil, fmt.Errorf("failed to build POST request to %s: %w", method, err)
 	}
@@ -194,38 +193,37 @@ func (bot *BaseBotClient) RequestWithContext(ctx context.Context, token string, 
 	return r.Result, nil
 }
 
-func fillBuffer(b *bytes.Buffer, params map[string]string, data map[string]NamedReader) (string, error) {
-	w := multipart.NewWriter(b)
-
+// Fill the buffer of multipart.Writer with data which is going to be sent.
+func fillBuffer(w *multipart.Writer, params map[string]string, data map[string]FileReader) error {
 	for k, v := range params {
 		err := w.WriteField(k, v)
 		if err != nil {
-			return "", fmt.Errorf("failed to write multipart field %s with value %s: %w", k, v, err)
+			return fmt.Errorf("failed to write multipart field %s with value %s: %w", k, v, err)
 		}
 	}
 
 	for field, file := range data {
-		fileName := file.Name()
+		fileName := file.Name
 		if fileName == "" {
 			fileName = field
 		}
 
 		part, err := w.CreateFormFile(field, fileName)
 		if err != nil {
-			return "", fmt.Errorf("failed to create form file for field %s and fileName %s: %w", field, fileName, err)
+			return fmt.Errorf("failed to create form file for field %s and fileName %s: %w", field, fileName, err)
 		}
 
-		_, err = io.Copy(part, file)
+		_, err = io.Copy(part, file.Data)
 		if err != nil {
-			return "", fmt.Errorf("failed to copy file contents of field %s to form: %w", field, err)
+			return fmt.Errorf("failed to copy file contents of field %s to form: %w", field, err)
 		}
 	}
 
 	if err := w.Close(); err != nil {
-		return "", fmt.Errorf("failed to close multipart form writer: %w", err)
+		return fmt.Errorf("failed to close multipart form writer: %w", err)
 	}
 
-	return w.FormDataContentType(), nil
+	return nil
 }
 
 // GetAPIURL returns the currently used API endpoint.

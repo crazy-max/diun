@@ -4,14 +4,13 @@
 package gotgbot
 
 import (
-	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 	"strconv"
 )
 
-// AddStickerToSetOpts is the set of optional fields for Bot.AddStickerToSet.
+// AddStickerToSetOpts is the set of optional fields for Bot.AddStickerToSet and Bot.AddStickerToSetWithContext.
 type AddStickerToSetOpts struct {
 	// RequestOpts are an additional optional field to configure timeouts for individual requests
 	RequestOpts *RequestOpts
@@ -25,8 +24,13 @@ type AddStickerToSetOpts struct {
 //   - sticker (type InputSticker): A JSON-serialized object with information about the added sticker. If exactly the same sticker had already been added to the set, then the set isn't changed.
 //   - opts (type AddStickerToSetOpts): All optional parameters.
 func (bot *Bot) AddStickerToSet(userId int64, name string, sticker InputSticker, opts *AddStickerToSetOpts) (bool, error) {
+	return bot.AddStickerToSetWithContext(context.Background(), userId, name, sticker, opts)
+}
+
+// AddStickerToSetWithContext is the same as Bot.AddStickerToSet, but with a context.Context parameter
+func (bot *Bot) AddStickerToSetWithContext(ctx context.Context, userId int64, name string, sticker InputSticker, opts *AddStickerToSetOpts) (bool, error) {
 	v := map[string]string{}
-	data := map[string]NamedReader{}
+	data := map[string]FileReader{}
 	v["user_id"] = strconv.FormatInt(userId, 10)
 	v["name"] = name
 	inputBs, err := sticker.InputParams("sticker", data)
@@ -40,7 +44,7 @@ func (bot *Bot) AddStickerToSet(userId int64, name string, sticker InputSticker,
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("addStickerToSet", v, data, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "addStickerToSet", v, data, reqOpts)
 	if err != nil {
 		return false, err
 	}
@@ -49,7 +53,7 @@ func (bot *Bot) AddStickerToSet(userId int64, name string, sticker InputSticker,
 	return b, json.Unmarshal(r, &b)
 }
 
-// AnswerCallbackQueryOpts is the set of optional fields for Bot.AnswerCallbackQuery.
+// AnswerCallbackQueryOpts is the set of optional fields for Bot.AnswerCallbackQuery and Bot.AnswerCallbackQueryWithContext.
 type AnswerCallbackQueryOpts struct {
 	// Text of the notification. If not specified, nothing will be shown to the user, 0-200 characters
 	Text string
@@ -69,6 +73,11 @@ type AnswerCallbackQueryOpts struct {
 //   - callbackQueryId (type string): Unique identifier for the query to be answered
 //   - opts (type AnswerCallbackQueryOpts): All optional parameters.
 func (bot *Bot) AnswerCallbackQuery(callbackQueryId string, opts *AnswerCallbackQueryOpts) (bool, error) {
+	return bot.AnswerCallbackQueryWithContext(context.Background(), callbackQueryId, opts)
+}
+
+// AnswerCallbackQueryWithContext is the same as Bot.AnswerCallbackQuery, but with a context.Context parameter
+func (bot *Bot) AnswerCallbackQueryWithContext(ctx context.Context, callbackQueryId string, opts *AnswerCallbackQueryOpts) (bool, error) {
 	v := map[string]string{}
 	v["callback_query_id"] = callbackQueryId
 	if opts != nil {
@@ -85,7 +94,7 @@ func (bot *Bot) AnswerCallbackQuery(callbackQueryId string, opts *AnswerCallback
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("answerCallbackQuery", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "answerCallbackQuery", v, nil, reqOpts)
 	if err != nil {
 		return false, err
 	}
@@ -94,7 +103,7 @@ func (bot *Bot) AnswerCallbackQuery(callbackQueryId string, opts *AnswerCallback
 	return b, json.Unmarshal(r, &b)
 }
 
-// AnswerInlineQueryOpts is the set of optional fields for Bot.AnswerInlineQuery.
+// AnswerInlineQueryOpts is the set of optional fields for Bot.AnswerInlineQuery and Bot.AnswerInlineQueryWithContext.
 type AnswerInlineQueryOpts struct {
 	// The maximum amount of time in seconds that the result of the inline query may be cached on the server. Defaults to 300.
 	CacheTime int64
@@ -116,6 +125,11 @@ type AnswerInlineQueryOpts struct {
 //   - results (type []InlineQueryResult): A JSON-serialized array of results for the inline query
 //   - opts (type AnswerInlineQueryOpts): All optional parameters.
 func (bot *Bot) AnswerInlineQuery(inlineQueryId string, results []InlineQueryResult, opts *AnswerInlineQueryOpts) (bool, error) {
+	return bot.AnswerInlineQueryWithContext(context.Background(), inlineQueryId, results, opts)
+}
+
+// AnswerInlineQueryWithContext is the same as Bot.AnswerInlineQuery, but with a context.Context parameter
+func (bot *Bot) AnswerInlineQueryWithContext(ctx context.Context, inlineQueryId string, results []InlineQueryResult, opts *AnswerInlineQueryOpts) (bool, error) {
 	v := map[string]string{}
 	v["inline_query_id"] = inlineQueryId
 	if results != nil {
@@ -145,7 +159,7 @@ func (bot *Bot) AnswerInlineQuery(inlineQueryId string, results []InlineQueryRes
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("answerInlineQuery", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "answerInlineQuery", v, nil, reqOpts)
 	if err != nil {
 		return false, err
 	}
@@ -154,7 +168,7 @@ func (bot *Bot) AnswerInlineQuery(inlineQueryId string, results []InlineQueryRes
 	return b, json.Unmarshal(r, &b)
 }
 
-// AnswerPreCheckoutQueryOpts is the set of optional fields for Bot.AnswerPreCheckoutQuery.
+// AnswerPreCheckoutQueryOpts is the set of optional fields for Bot.AnswerPreCheckoutQuery and Bot.AnswerPreCheckoutQueryWithContext.
 type AnswerPreCheckoutQueryOpts struct {
 	// Required if ok is False. Error message in human readable form that explains the reason for failure to proceed with the checkout (e.g. "Sorry, somebody just bought the last of our amazing black T-shirts while you were busy filling out your payment details. Please choose a different color or garment!"). Telegram will display this message to the user.
 	ErrorMessage string
@@ -169,6 +183,11 @@ type AnswerPreCheckoutQueryOpts struct {
 //   - ok (type bool): Specify True if everything is alright (goods are available, etc.) and the bot is ready to proceed with the order. Use False if there are any problems.
 //   - opts (type AnswerPreCheckoutQueryOpts): All optional parameters.
 func (bot *Bot) AnswerPreCheckoutQuery(preCheckoutQueryId string, ok bool, opts *AnswerPreCheckoutQueryOpts) (bool, error) {
+	return bot.AnswerPreCheckoutQueryWithContext(context.Background(), preCheckoutQueryId, ok, opts)
+}
+
+// AnswerPreCheckoutQueryWithContext is the same as Bot.AnswerPreCheckoutQuery, but with a context.Context parameter
+func (bot *Bot) AnswerPreCheckoutQueryWithContext(ctx context.Context, preCheckoutQueryId string, ok bool, opts *AnswerPreCheckoutQueryOpts) (bool, error) {
 	v := map[string]string{}
 	v["pre_checkout_query_id"] = preCheckoutQueryId
 	v["ok"] = strconv.FormatBool(ok)
@@ -181,7 +200,7 @@ func (bot *Bot) AnswerPreCheckoutQuery(preCheckoutQueryId string, ok bool, opts 
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("answerPreCheckoutQuery", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "answerPreCheckoutQuery", v, nil, reqOpts)
 	if err != nil {
 		return false, err
 	}
@@ -190,7 +209,7 @@ func (bot *Bot) AnswerPreCheckoutQuery(preCheckoutQueryId string, ok bool, opts 
 	return b, json.Unmarshal(r, &b)
 }
 
-// AnswerShippingQueryOpts is the set of optional fields for Bot.AnswerShippingQuery.
+// AnswerShippingQueryOpts is the set of optional fields for Bot.AnswerShippingQuery and Bot.AnswerShippingQueryWithContext.
 type AnswerShippingQueryOpts struct {
 	// Required if ok is True. A JSON-serialized array of available shipping options.
 	ShippingOptions []ShippingOption
@@ -207,6 +226,11 @@ type AnswerShippingQueryOpts struct {
 //   - ok (type bool): Pass True if delivery to the specified address is possible and False if there are any problems (for example, if delivery to the specified address is not possible)
 //   - opts (type AnswerShippingQueryOpts): All optional parameters.
 func (bot *Bot) AnswerShippingQuery(shippingQueryId string, ok bool, opts *AnswerShippingQueryOpts) (bool, error) {
+	return bot.AnswerShippingQueryWithContext(context.Background(), shippingQueryId, ok, opts)
+}
+
+// AnswerShippingQueryWithContext is the same as Bot.AnswerShippingQuery, but with a context.Context parameter
+func (bot *Bot) AnswerShippingQueryWithContext(ctx context.Context, shippingQueryId string, ok bool, opts *AnswerShippingQueryOpts) (bool, error) {
 	v := map[string]string{}
 	v["shipping_query_id"] = shippingQueryId
 	v["ok"] = strconv.FormatBool(ok)
@@ -226,7 +250,7 @@ func (bot *Bot) AnswerShippingQuery(shippingQueryId string, ok bool, opts *Answe
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("answerShippingQuery", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "answerShippingQuery", v, nil, reqOpts)
 	if err != nil {
 		return false, err
 	}
@@ -235,7 +259,7 @@ func (bot *Bot) AnswerShippingQuery(shippingQueryId string, ok bool, opts *Answe
 	return b, json.Unmarshal(r, &b)
 }
 
-// AnswerWebAppQueryOpts is the set of optional fields for Bot.AnswerWebAppQuery.
+// AnswerWebAppQueryOpts is the set of optional fields for Bot.AnswerWebAppQuery and Bot.AnswerWebAppQueryWithContext.
 type AnswerWebAppQueryOpts struct {
 	// RequestOpts are an additional optional field to configure timeouts for individual requests
 	RequestOpts *RequestOpts
@@ -248,6 +272,11 @@ type AnswerWebAppQueryOpts struct {
 //   - result (type InlineQueryResult): A JSON-serialized object describing the message to be sent
 //   - opts (type AnswerWebAppQueryOpts): All optional parameters.
 func (bot *Bot) AnswerWebAppQuery(webAppQueryId string, result InlineQueryResult, opts *AnswerWebAppQueryOpts) (*SentWebAppMessage, error) {
+	return bot.AnswerWebAppQueryWithContext(context.Background(), webAppQueryId, result, opts)
+}
+
+// AnswerWebAppQueryWithContext is the same as Bot.AnswerWebAppQuery, but with a context.Context parameter
+func (bot *Bot) AnswerWebAppQueryWithContext(ctx context.Context, webAppQueryId string, result InlineQueryResult, opts *AnswerWebAppQueryOpts) (*SentWebAppMessage, error) {
 	v := map[string]string{}
 	v["web_app_query_id"] = webAppQueryId
 	bs, err := json.Marshal(result)
@@ -261,7 +290,7 @@ func (bot *Bot) AnswerWebAppQuery(webAppQueryId string, result InlineQueryResult
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("answerWebAppQuery", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "answerWebAppQuery", v, nil, reqOpts)
 	if err != nil {
 		return nil, err
 	}
@@ -270,7 +299,7 @@ func (bot *Bot) AnswerWebAppQuery(webAppQueryId string, result InlineQueryResult
 	return &s, json.Unmarshal(r, &s)
 }
 
-// ApproveChatJoinRequestOpts is the set of optional fields for Bot.ApproveChatJoinRequest.
+// ApproveChatJoinRequestOpts is the set of optional fields for Bot.ApproveChatJoinRequest and Bot.ApproveChatJoinRequestWithContext.
 type ApproveChatJoinRequestOpts struct {
 	// RequestOpts are an additional optional field to configure timeouts for individual requests
 	RequestOpts *RequestOpts
@@ -283,6 +312,11 @@ type ApproveChatJoinRequestOpts struct {
 //   - userId (type int64): Unique identifier of the target user
 //   - opts (type ApproveChatJoinRequestOpts): All optional parameters.
 func (bot *Bot) ApproveChatJoinRequest(chatId int64, userId int64, opts *ApproveChatJoinRequestOpts) (bool, error) {
+	return bot.ApproveChatJoinRequestWithContext(context.Background(), chatId, userId, opts)
+}
+
+// ApproveChatJoinRequestWithContext is the same as Bot.ApproveChatJoinRequest, but with a context.Context parameter
+func (bot *Bot) ApproveChatJoinRequestWithContext(ctx context.Context, chatId int64, userId int64, opts *ApproveChatJoinRequestOpts) (bool, error) {
 	v := map[string]string{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 	v["user_id"] = strconv.FormatInt(userId, 10)
@@ -292,7 +326,7 @@ func (bot *Bot) ApproveChatJoinRequest(chatId int64, userId int64, opts *Approve
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("approveChatJoinRequest", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "approveChatJoinRequest", v, nil, reqOpts)
 	if err != nil {
 		return false, err
 	}
@@ -301,7 +335,7 @@ func (bot *Bot) ApproveChatJoinRequest(chatId int64, userId int64, opts *Approve
 	return b, json.Unmarshal(r, &b)
 }
 
-// BanChatMemberOpts is the set of optional fields for Bot.BanChatMember.
+// BanChatMemberOpts is the set of optional fields for Bot.BanChatMember and Bot.BanChatMemberWithContext.
 type BanChatMemberOpts struct {
 	// Date when the user will be unbanned; Unix time. If user is banned for more than 366 days or less than 30 seconds from the current time they are considered to be banned forever. Applied for supergroups and channels only.
 	UntilDate int64
@@ -318,6 +352,11 @@ type BanChatMemberOpts struct {
 //   - userId (type int64): Unique identifier of the target user
 //   - opts (type BanChatMemberOpts): All optional parameters.
 func (bot *Bot) BanChatMember(chatId int64, userId int64, opts *BanChatMemberOpts) (bool, error) {
+	return bot.BanChatMemberWithContext(context.Background(), chatId, userId, opts)
+}
+
+// BanChatMemberWithContext is the same as Bot.BanChatMember, but with a context.Context parameter
+func (bot *Bot) BanChatMemberWithContext(ctx context.Context, chatId int64, userId int64, opts *BanChatMemberOpts) (bool, error) {
 	v := map[string]string{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 	v["user_id"] = strconv.FormatInt(userId, 10)
@@ -333,7 +372,7 @@ func (bot *Bot) BanChatMember(chatId int64, userId int64, opts *BanChatMemberOpt
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("banChatMember", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "banChatMember", v, nil, reqOpts)
 	if err != nil {
 		return false, err
 	}
@@ -342,7 +381,7 @@ func (bot *Bot) BanChatMember(chatId int64, userId int64, opts *BanChatMemberOpt
 	return b, json.Unmarshal(r, &b)
 }
 
-// BanChatSenderChatOpts is the set of optional fields for Bot.BanChatSenderChat.
+// BanChatSenderChatOpts is the set of optional fields for Bot.BanChatSenderChat and Bot.BanChatSenderChatWithContext.
 type BanChatSenderChatOpts struct {
 	// RequestOpts are an additional optional field to configure timeouts for individual requests
 	RequestOpts *RequestOpts
@@ -355,6 +394,11 @@ type BanChatSenderChatOpts struct {
 //   - senderChatId (type int64): Unique identifier of the target sender chat
 //   - opts (type BanChatSenderChatOpts): All optional parameters.
 func (bot *Bot) BanChatSenderChat(chatId int64, senderChatId int64, opts *BanChatSenderChatOpts) (bool, error) {
+	return bot.BanChatSenderChatWithContext(context.Background(), chatId, senderChatId, opts)
+}
+
+// BanChatSenderChatWithContext is the same as Bot.BanChatSenderChat, but with a context.Context parameter
+func (bot *Bot) BanChatSenderChatWithContext(ctx context.Context, chatId int64, senderChatId int64, opts *BanChatSenderChatOpts) (bool, error) {
 	v := map[string]string{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 	v["sender_chat_id"] = strconv.FormatInt(senderChatId, 10)
@@ -364,7 +408,7 @@ func (bot *Bot) BanChatSenderChat(chatId int64, senderChatId int64, opts *BanCha
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("banChatSenderChat", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "banChatSenderChat", v, nil, reqOpts)
 	if err != nil {
 		return false, err
 	}
@@ -373,7 +417,7 @@ func (bot *Bot) BanChatSenderChat(chatId int64, senderChatId int64, opts *BanCha
 	return b, json.Unmarshal(r, &b)
 }
 
-// CloseOpts is the set of optional fields for Bot.Close.
+// CloseOpts is the set of optional fields for Bot.Close and Bot.CloseWithContext.
 type CloseOpts struct {
 	// RequestOpts are an additional optional field to configure timeouts for individual requests
 	RequestOpts *RequestOpts
@@ -384,6 +428,11 @@ type CloseOpts struct {
 // Use this method to close the bot instance before moving it from one local server to another. You need to delete the webhook before calling this method to ensure that the bot isn't launched again after server restart. The method will return error 429 in the first 10 minutes after the bot is launched. Returns True on success. Requires no parameters.
 //   - opts (type CloseOpts): All optional parameters.
 func (bot *Bot) Close(opts *CloseOpts) (bool, error) {
+	return bot.CloseWithContext(context.Background(), opts)
+}
+
+// CloseWithContext is the same as Bot.Close, but with a context.Context parameter
+func (bot *Bot) CloseWithContext(ctx context.Context, opts *CloseOpts) (bool, error) {
 	v := map[string]string{}
 
 	var reqOpts *RequestOpts
@@ -391,7 +440,7 @@ func (bot *Bot) Close(opts *CloseOpts) (bool, error) {
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("close", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "close", v, nil, reqOpts)
 	if err != nil {
 		return false, err
 	}
@@ -400,7 +449,7 @@ func (bot *Bot) Close(opts *CloseOpts) (bool, error) {
 	return b, json.Unmarshal(r, &b)
 }
 
-// CloseForumTopicOpts is the set of optional fields for Bot.CloseForumTopic.
+// CloseForumTopicOpts is the set of optional fields for Bot.CloseForumTopic and Bot.CloseForumTopicWithContext.
 type CloseForumTopicOpts struct {
 	// RequestOpts are an additional optional field to configure timeouts for individual requests
 	RequestOpts *RequestOpts
@@ -413,6 +462,11 @@ type CloseForumTopicOpts struct {
 //   - messageThreadId (type int64): Unique identifier for the target message thread of the forum topic
 //   - opts (type CloseForumTopicOpts): All optional parameters.
 func (bot *Bot) CloseForumTopic(chatId int64, messageThreadId int64, opts *CloseForumTopicOpts) (bool, error) {
+	return bot.CloseForumTopicWithContext(context.Background(), chatId, messageThreadId, opts)
+}
+
+// CloseForumTopicWithContext is the same as Bot.CloseForumTopic, but with a context.Context parameter
+func (bot *Bot) CloseForumTopicWithContext(ctx context.Context, chatId int64, messageThreadId int64, opts *CloseForumTopicOpts) (bool, error) {
 	v := map[string]string{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 	v["message_thread_id"] = strconv.FormatInt(messageThreadId, 10)
@@ -422,7 +476,7 @@ func (bot *Bot) CloseForumTopic(chatId int64, messageThreadId int64, opts *Close
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("closeForumTopic", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "closeForumTopic", v, nil, reqOpts)
 	if err != nil {
 		return false, err
 	}
@@ -431,7 +485,7 @@ func (bot *Bot) CloseForumTopic(chatId int64, messageThreadId int64, opts *Close
 	return b, json.Unmarshal(r, &b)
 }
 
-// CloseGeneralForumTopicOpts is the set of optional fields for Bot.CloseGeneralForumTopic.
+// CloseGeneralForumTopicOpts is the set of optional fields for Bot.CloseGeneralForumTopic and Bot.CloseGeneralForumTopicWithContext.
 type CloseGeneralForumTopicOpts struct {
 	// RequestOpts are an additional optional field to configure timeouts for individual requests
 	RequestOpts *RequestOpts
@@ -443,6 +497,11 @@ type CloseGeneralForumTopicOpts struct {
 //   - chatId (type int64): Unique identifier for the target chat
 //   - opts (type CloseGeneralForumTopicOpts): All optional parameters.
 func (bot *Bot) CloseGeneralForumTopic(chatId int64, opts *CloseGeneralForumTopicOpts) (bool, error) {
+	return bot.CloseGeneralForumTopicWithContext(context.Background(), chatId, opts)
+}
+
+// CloseGeneralForumTopicWithContext is the same as Bot.CloseGeneralForumTopic, but with a context.Context parameter
+func (bot *Bot) CloseGeneralForumTopicWithContext(ctx context.Context, chatId int64, opts *CloseGeneralForumTopicOpts) (bool, error) {
 	v := map[string]string{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 
@@ -451,7 +510,7 @@ func (bot *Bot) CloseGeneralForumTopic(chatId int64, opts *CloseGeneralForumTopi
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("closeGeneralForumTopic", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "closeGeneralForumTopic", v, nil, reqOpts)
 	if err != nil {
 		return false, err
 	}
@@ -460,7 +519,7 @@ func (bot *Bot) CloseGeneralForumTopic(chatId int64, opts *CloseGeneralForumTopi
 	return b, json.Unmarshal(r, &b)
 }
 
-// CopyMessageOpts is the set of optional fields for Bot.CopyMessage.
+// CopyMessageOpts is the set of optional fields for Bot.CopyMessage and Bot.CopyMessageWithContext.
 type CopyMessageOpts struct {
 	// Unique identifier for the target message thread (topic) of the forum; for forum supergroups only
 	MessageThreadId int64
@@ -470,10 +529,14 @@ type CopyMessageOpts struct {
 	ParseMode string
 	// A JSON-serialized list of special entities that appear in the new caption, which can be specified instead of parse_mode
 	CaptionEntities []MessageEntity
+	// Pass True, if the caption must be shown above the message media. Ignored if a new caption isn't specified.
+	ShowCaptionAboveMedia bool
 	// Sends the message silently. Users will receive a notification with no sound.
 	DisableNotification bool
 	// Protects the contents of the sent message from forwarding and saving
 	ProtectContent bool
+	// Pass True to allow up to 1000 messages per second, ignoring broadcasting limits for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot's balance
+	AllowPaidBroadcast bool
 	// Description of the message to reply to
 	ReplyParameters *ReplyParameters
 	// Additional interface options. A JSON-serialized object for an inline keyboard, custom reply keyboard, instructions to remove a reply keyboard or to force a reply from the user
@@ -484,12 +547,17 @@ type CopyMessageOpts struct {
 
 // CopyMessage (https://core.telegram.org/bots/api#copymessage)
 //
-// Use this method to copy messages of any kind. Service messages, giveaway messages, giveaway winners messages, and invoice messages can't be copied. A quiz poll can be copied only if the value of the field correct_option_id is known to the bot. The method is analogous to the method forwardMessage, but the copied message doesn't have a link to the original message. Returns the MessageId of the sent message on success.
+// Use this method to copy messages of any kind. Service messages, paid media messages, giveaway messages, giveaway winners messages, and invoice messages can't be copied. A quiz poll can be copied only if the value of the field correct_option_id is known to the bot. The method is analogous to the method forwardMessage, but the copied message doesn't have a link to the original message. Returns the MessageId of the sent message on success.
 //   - chatId (type int64): Unique identifier for the target chat
 //   - fromChatId (type int64): Unique identifier for the chat where the original message was sent
 //   - messageId (type int64): Message identifier in the chat specified in from_chat_id
 //   - opts (type CopyMessageOpts): All optional parameters.
 func (bot *Bot) CopyMessage(chatId int64, fromChatId int64, messageId int64, opts *CopyMessageOpts) (*MessageId, error) {
+	return bot.CopyMessageWithContext(context.Background(), chatId, fromChatId, messageId, opts)
+}
+
+// CopyMessageWithContext is the same as Bot.CopyMessage, but with a context.Context parameter
+func (bot *Bot) CopyMessageWithContext(ctx context.Context, chatId int64, fromChatId int64, messageId int64, opts *CopyMessageOpts) (*MessageId, error) {
 	v := map[string]string{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 	v["from_chat_id"] = strconv.FormatInt(fromChatId, 10)
@@ -509,8 +577,10 @@ func (bot *Bot) CopyMessage(chatId int64, fromChatId int64, messageId int64, opt
 			}
 			v["caption_entities"] = string(bs)
 		}
+		v["show_caption_above_media"] = strconv.FormatBool(opts.ShowCaptionAboveMedia)
 		v["disable_notification"] = strconv.FormatBool(opts.DisableNotification)
 		v["protect_content"] = strconv.FormatBool(opts.ProtectContent)
+		v["allow_paid_broadcast"] = strconv.FormatBool(opts.AllowPaidBroadcast)
 		if opts.ReplyParameters != nil {
 			bs, err := json.Marshal(opts.ReplyParameters)
 			if err != nil {
@@ -532,7 +602,7 @@ func (bot *Bot) CopyMessage(chatId int64, fromChatId int64, messageId int64, opt
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("copyMessage", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "copyMessage", v, nil, reqOpts)
 	if err != nil {
 		return nil, err
 	}
@@ -541,7 +611,7 @@ func (bot *Bot) CopyMessage(chatId int64, fromChatId int64, messageId int64, opt
 	return &m, json.Unmarshal(r, &m)
 }
 
-// CopyMessagesOpts is the set of optional fields for Bot.CopyMessages.
+// CopyMessagesOpts is the set of optional fields for Bot.CopyMessages and Bot.CopyMessagesWithContext.
 type CopyMessagesOpts struct {
 	// Unique identifier for the target message thread (topic) of the forum; for forum supergroups only
 	MessageThreadId int64
@@ -557,12 +627,17 @@ type CopyMessagesOpts struct {
 
 // CopyMessages (https://core.telegram.org/bots/api#copymessages)
 //
-// Use this method to copy messages of any kind. If some of the specified messages can't be found or copied, they are skipped. Service messages, giveaway messages, giveaway winners messages, and invoice messages can't be copied. A quiz poll can be copied only if the value of the field correct_option_id is known to the bot. The method is analogous to the method forwardMessages, but the copied messages don't have a link to the original message. Album grouping is kept for copied messages. On success, an array of MessageId of the sent messages is returned.
+// Use this method to copy messages of any kind. If some of the specified messages can't be found or copied, they are skipped. Service messages, paid media messages, giveaway messages, giveaway winners messages, and invoice messages can't be copied. A quiz poll can be copied only if the value of the field correct_option_id is known to the bot. The method is analogous to the method forwardMessages, but the copied messages don't have a link to the original message. Album grouping is kept for copied messages. On success, an array of MessageId of the sent messages is returned.
 //   - chatId (type int64): Unique identifier for the target chat
 //   - fromChatId (type int64): Unique identifier for the chat where the original messages were sent
 //   - messageIds (type []int64): A JSON-serialized list of 1-100 identifiers of messages in the chat from_chat_id to copy. The identifiers must be specified in a strictly increasing order.
 //   - opts (type CopyMessagesOpts): All optional parameters.
 func (bot *Bot) CopyMessages(chatId int64, fromChatId int64, messageIds []int64, opts *CopyMessagesOpts) ([]MessageId, error) {
+	return bot.CopyMessagesWithContext(context.Background(), chatId, fromChatId, messageIds, opts)
+}
+
+// CopyMessagesWithContext is the same as Bot.CopyMessages, but with a context.Context parameter
+func (bot *Bot) CopyMessagesWithContext(ctx context.Context, chatId int64, fromChatId int64, messageIds []int64, opts *CopyMessagesOpts) ([]MessageId, error) {
 	v := map[string]string{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 	v["from_chat_id"] = strconv.FormatInt(fromChatId, 10)
@@ -587,7 +662,7 @@ func (bot *Bot) CopyMessages(chatId int64, fromChatId int64, messageIds []int64,
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("copyMessages", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "copyMessages", v, nil, reqOpts)
 	if err != nil {
 		return nil, err
 	}
@@ -596,7 +671,7 @@ func (bot *Bot) CopyMessages(chatId int64, fromChatId int64, messageIds []int64,
 	return m, json.Unmarshal(r, &m)
 }
 
-// CreateChatInviteLinkOpts is the set of optional fields for Bot.CreateChatInviteLink.
+// CreateChatInviteLinkOpts is the set of optional fields for Bot.CreateChatInviteLink and Bot.CreateChatInviteLinkWithContext.
 type CreateChatInviteLinkOpts struct {
 	// Invite link name; 0-32 characters
 	Name string
@@ -616,6 +691,11 @@ type CreateChatInviteLinkOpts struct {
 //   - chatId (type int64): Unique identifier for the target chat
 //   - opts (type CreateChatInviteLinkOpts): All optional parameters.
 func (bot *Bot) CreateChatInviteLink(chatId int64, opts *CreateChatInviteLinkOpts) (*ChatInviteLink, error) {
+	return bot.CreateChatInviteLinkWithContext(context.Background(), chatId, opts)
+}
+
+// CreateChatInviteLinkWithContext is the same as Bot.CreateChatInviteLink, but with a context.Context parameter
+func (bot *Bot) CreateChatInviteLinkWithContext(ctx context.Context, chatId int64, opts *CreateChatInviteLinkOpts) (*ChatInviteLink, error) {
 	v := map[string]string{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 	if opts != nil {
@@ -634,7 +714,7 @@ func (bot *Bot) CreateChatInviteLink(chatId int64, opts *CreateChatInviteLinkOpt
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("createChatInviteLink", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "createChatInviteLink", v, nil, reqOpts)
 	if err != nil {
 		return nil, err
 	}
@@ -643,7 +723,50 @@ func (bot *Bot) CreateChatInviteLink(chatId int64, opts *CreateChatInviteLinkOpt
 	return &c, json.Unmarshal(r, &c)
 }
 
-// CreateForumTopicOpts is the set of optional fields for Bot.CreateForumTopic.
+// CreateChatSubscriptionInviteLinkOpts is the set of optional fields for Bot.CreateChatSubscriptionInviteLink and Bot.CreateChatSubscriptionInviteLinkWithContext.
+type CreateChatSubscriptionInviteLinkOpts struct {
+	// Invite link name; 0-32 characters
+	Name string
+	// RequestOpts are an additional optional field to configure timeouts for individual requests
+	RequestOpts *RequestOpts
+}
+
+// CreateChatSubscriptionInviteLink (https://core.telegram.org/bots/api#createchatsubscriptioninvitelink)
+//
+// Use this method to create a subscription invite link for a channel chat. The bot must have the can_invite_users administrator rights. The link can be edited using the method editChatSubscriptionInviteLink or revoked using the method revokeChatInviteLink. Returns the new invite link as a ChatInviteLink object.
+//   - chatId (type int64): Unique identifier for the target channel chat
+//   - subscriptionPeriod (type int64): The number of seconds the subscription will be active for before the next payment. Currently, it must always be 2592000 (30 days).
+//   - subscriptionPrice (type int64): The amount of Telegram Stars a user must pay initially and after each subsequent subscription period to be a member of the chat; 1-2500
+//   - opts (type CreateChatSubscriptionInviteLinkOpts): All optional parameters.
+func (bot *Bot) CreateChatSubscriptionInviteLink(chatId int64, subscriptionPeriod int64, subscriptionPrice int64, opts *CreateChatSubscriptionInviteLinkOpts) (*ChatInviteLink, error) {
+	return bot.CreateChatSubscriptionInviteLinkWithContext(context.Background(), chatId, subscriptionPeriod, subscriptionPrice, opts)
+}
+
+// CreateChatSubscriptionInviteLinkWithContext is the same as Bot.CreateChatSubscriptionInviteLink, but with a context.Context parameter
+func (bot *Bot) CreateChatSubscriptionInviteLinkWithContext(ctx context.Context, chatId int64, subscriptionPeriod int64, subscriptionPrice int64, opts *CreateChatSubscriptionInviteLinkOpts) (*ChatInviteLink, error) {
+	v := map[string]string{}
+	v["chat_id"] = strconv.FormatInt(chatId, 10)
+	v["subscription_period"] = strconv.FormatInt(subscriptionPeriod, 10)
+	v["subscription_price"] = strconv.FormatInt(subscriptionPrice, 10)
+	if opts != nil {
+		v["name"] = opts.Name
+	}
+
+	var reqOpts *RequestOpts
+	if opts != nil {
+		reqOpts = opts.RequestOpts
+	}
+
+	r, err := bot.RequestWithContext(ctx, "createChatSubscriptionInviteLink", v, nil, reqOpts)
+	if err != nil {
+		return nil, err
+	}
+
+	var c ChatInviteLink
+	return &c, json.Unmarshal(r, &c)
+}
+
+// CreateForumTopicOpts is the set of optional fields for Bot.CreateForumTopic and Bot.CreateForumTopicWithContext.
 type CreateForumTopicOpts struct {
 	// Color of the topic icon in RGB format. Currently, must be one of 7322096 (0x6FB9F0), 16766590 (0xFFD67E), 13338331 (0xCB86DB), 9367192 (0x8EEE98), 16749490 (0xFF93B2), or 16478047 (0xFB6F5F)
 	IconColor int64
@@ -660,6 +783,11 @@ type CreateForumTopicOpts struct {
 //   - name (type string): Topic name, 1-128 characters
 //   - opts (type CreateForumTopicOpts): All optional parameters.
 func (bot *Bot) CreateForumTopic(chatId int64, name string, opts *CreateForumTopicOpts) (*ForumTopic, error) {
+	return bot.CreateForumTopicWithContext(context.Background(), chatId, name, opts)
+}
+
+// CreateForumTopicWithContext is the same as Bot.CreateForumTopic, but with a context.Context parameter
+func (bot *Bot) CreateForumTopicWithContext(ctx context.Context, chatId int64, name string, opts *CreateForumTopicOpts) (*ForumTopic, error) {
 	v := map[string]string{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 	v["name"] = name
@@ -675,7 +803,7 @@ func (bot *Bot) CreateForumTopic(chatId int64, name string, opts *CreateForumTop
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("createForumTopic", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "createForumTopic", v, nil, reqOpts)
 	if err != nil {
 		return nil, err
 	}
@@ -684,9 +812,11 @@ func (bot *Bot) CreateForumTopic(chatId int64, name string, opts *CreateForumTop
 	return &f, json.Unmarshal(r, &f)
 }
 
-// CreateInvoiceLinkOpts is the set of optional fields for Bot.CreateInvoiceLink.
+// CreateInvoiceLinkOpts is the set of optional fields for Bot.CreateInvoiceLink and Bot.CreateInvoiceLinkWithContext.
 type CreateInvoiceLinkOpts struct {
-	// The maximum accepted amount for tips in the smallest units of the currency (integer, not float/double). For example, for a maximum tip of US$ 1.45 pass max_tip_amount = 145. See the exp parameter in currencies.json, it shows the number of digits past the decimal point for each currency (2 for the majority of currencies). Defaults to 0
+	// Payment provider token, obtained via @BotFather. Pass an empty string for payments in Telegram Stars.
+	ProviderToken string
+	// The maximum accepted amount for tips in the smallest units of the currency (integer, not float/double). For example, for a maximum tip of US$ 1.45 pass max_tip_amount = 145. See the exp parameter in currencies.json, it shows the number of digits past the decimal point for each currency (2 for the majority of currencies). Defaults to 0. Not supported for payments in Telegram Stars.
 	MaxTipAmount int64
 	// A JSON-serialized array of suggested amounts of tips in the smallest units of the currency (integer, not float/double). At most 4 suggested tip amounts can be specified. The suggested tip amounts must be positive, passed in a strictly increased order and must not exceed max_tip_amount.
 	SuggestedTipAmounts []int64
@@ -700,19 +830,19 @@ type CreateInvoiceLinkOpts struct {
 	PhotoWidth int64
 	// Photo height
 	PhotoHeight int64
-	// Pass True if you require the user's full name to complete the order
+	// Pass True if you require the user's full name to complete the order. Ignored for payments in Telegram Stars.
 	NeedName bool
-	// Pass True if you require the user's phone number to complete the order
+	// Pass True if you require the user's phone number to complete the order. Ignored for payments in Telegram Stars.
 	NeedPhoneNumber bool
-	// Pass True if you require the user's email address to complete the order
+	// Pass True if you require the user's email address to complete the order. Ignored for payments in Telegram Stars.
 	NeedEmail bool
-	// Pass True if you require the user's shipping address to complete the order
+	// Pass True if you require the user's shipping address to complete the order. Ignored for payments in Telegram Stars.
 	NeedShippingAddress bool
-	// Pass True if the user's phone number should be sent to the provider
+	// Pass True if the user's phone number should be sent to the provider. Ignored for payments in Telegram Stars.
 	SendPhoneNumberToProvider bool
-	// Pass True if the user's email address should be sent to the provider
+	// Pass True if the user's email address should be sent to the provider. Ignored for payments in Telegram Stars.
 	SendEmailToProvider bool
-	// Pass True if the final price depends on the shipping method
+	// Pass True if the final price depends on the shipping method. Ignored for payments in Telegram Stars.
 	IsFlexible bool
 	// RequestOpts are an additional optional field to configure timeouts for individual requests
 	RequestOpts *RequestOpts
@@ -723,17 +853,20 @@ type CreateInvoiceLinkOpts struct {
 // Use this method to create a link for an invoice. Returns the created invoice link as String on success.
 //   - title (type string): Product name, 1-32 characters
 //   - description (type string): Product description, 1-255 characters
-//   - payload (type string): Bot-defined invoice payload, 1-128 bytes. This will not be displayed to the user, use for your internal processes.
-//   - providerToken (type string): Payment provider token, obtained via BotFather
-//   - currency (type string): Three-letter ISO 4217 currency code, see more on currencies
-//   - prices (type []LabeledPrice): Price breakdown, a JSON-serialized list of components (e.g. product price, tax, discount, delivery cost, delivery tax, bonus, etc.)
+//   - payload (type string): Bot-defined invoice payload, 1-128 bytes. This will not be displayed to the user, use it for your internal processes.
+//   - currency (type string): Three-letter ISO 4217 currency code, see more on currencies. Pass "XTR" for payments in Telegram Stars.
+//   - prices (type []LabeledPrice): Price breakdown, a JSON-serialized list of components (e.g. product price, tax, discount, delivery cost, delivery tax, bonus, etc.). Must contain exactly one item for payments in Telegram Stars.
 //   - opts (type CreateInvoiceLinkOpts): All optional parameters.
-func (bot *Bot) CreateInvoiceLink(title string, description string, payload string, providerToken string, currency string, prices []LabeledPrice, opts *CreateInvoiceLinkOpts) (string, error) {
+func (bot *Bot) CreateInvoiceLink(title string, description string, payload string, currency string, prices []LabeledPrice, opts *CreateInvoiceLinkOpts) (string, error) {
+	return bot.CreateInvoiceLinkWithContext(context.Background(), title, description, payload, currency, prices, opts)
+}
+
+// CreateInvoiceLinkWithContext is the same as Bot.CreateInvoiceLink, but with a context.Context parameter
+func (bot *Bot) CreateInvoiceLinkWithContext(ctx context.Context, title string, description string, payload string, currency string, prices []LabeledPrice, opts *CreateInvoiceLinkOpts) (string, error) {
 	v := map[string]string{}
 	v["title"] = title
 	v["description"] = description
 	v["payload"] = payload
-	v["provider_token"] = providerToken
 	v["currency"] = currency
 	if prices != nil {
 		bs, err := json.Marshal(prices)
@@ -743,6 +876,7 @@ func (bot *Bot) CreateInvoiceLink(title string, description string, payload stri
 		v["prices"] = string(bs)
 	}
 	if opts != nil {
+		v["provider_token"] = opts.ProviderToken
 		if opts.MaxTipAmount != 0 {
 			v["max_tip_amount"] = strconv.FormatInt(opts.MaxTipAmount, 10)
 		}
@@ -778,7 +912,7 @@ func (bot *Bot) CreateInvoiceLink(title string, description string, payload stri
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("createInvoiceLink", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "createInvoiceLink", v, nil, reqOpts)
 	if err != nil {
 		return "", err
 	}
@@ -787,7 +921,7 @@ func (bot *Bot) CreateInvoiceLink(title string, description string, payload stri
 	return s, json.Unmarshal(r, &s)
 }
 
-// CreateNewStickerSetOpts is the set of optional fields for Bot.CreateNewStickerSet.
+// CreateNewStickerSetOpts is the set of optional fields for Bot.CreateNewStickerSet and Bot.CreateNewStickerSetWithContext.
 type CreateNewStickerSetOpts struct {
 	// Type of stickers in the set, pass "regular", "mask", or "custom_emoji". By default, a regular sticker set is created.
 	StickerType string
@@ -806,8 +940,13 @@ type CreateNewStickerSetOpts struct {
 //   - stickers (type []InputSticker): A JSON-serialized list of 1-50 initial stickers to be added to the sticker set
 //   - opts (type CreateNewStickerSetOpts): All optional parameters.
 func (bot *Bot) CreateNewStickerSet(userId int64, name string, title string, stickers []InputSticker, opts *CreateNewStickerSetOpts) (bool, error) {
+	return bot.CreateNewStickerSetWithContext(context.Background(), userId, name, title, stickers, opts)
+}
+
+// CreateNewStickerSetWithContext is the same as Bot.CreateNewStickerSet, but with a context.Context parameter
+func (bot *Bot) CreateNewStickerSetWithContext(ctx context.Context, userId int64, name string, title string, stickers []InputSticker, opts *CreateNewStickerSetOpts) (bool, error) {
 	v := map[string]string{}
-	data := map[string]NamedReader{}
+	data := map[string]FileReader{}
 	v["user_id"] = strconv.FormatInt(userId, 10)
 	v["name"] = name
 	v["title"] = title
@@ -836,7 +975,7 @@ func (bot *Bot) CreateNewStickerSet(userId int64, name string, title string, sti
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("createNewStickerSet", v, data, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "createNewStickerSet", v, data, reqOpts)
 	if err != nil {
 		return false, err
 	}
@@ -845,7 +984,7 @@ func (bot *Bot) CreateNewStickerSet(userId int64, name string, title string, sti
 	return b, json.Unmarshal(r, &b)
 }
 
-// DeclineChatJoinRequestOpts is the set of optional fields for Bot.DeclineChatJoinRequest.
+// DeclineChatJoinRequestOpts is the set of optional fields for Bot.DeclineChatJoinRequest and Bot.DeclineChatJoinRequestWithContext.
 type DeclineChatJoinRequestOpts struct {
 	// RequestOpts are an additional optional field to configure timeouts for individual requests
 	RequestOpts *RequestOpts
@@ -858,6 +997,11 @@ type DeclineChatJoinRequestOpts struct {
 //   - userId (type int64): Unique identifier of the target user
 //   - opts (type DeclineChatJoinRequestOpts): All optional parameters.
 func (bot *Bot) DeclineChatJoinRequest(chatId int64, userId int64, opts *DeclineChatJoinRequestOpts) (bool, error) {
+	return bot.DeclineChatJoinRequestWithContext(context.Background(), chatId, userId, opts)
+}
+
+// DeclineChatJoinRequestWithContext is the same as Bot.DeclineChatJoinRequest, but with a context.Context parameter
+func (bot *Bot) DeclineChatJoinRequestWithContext(ctx context.Context, chatId int64, userId int64, opts *DeclineChatJoinRequestOpts) (bool, error) {
 	v := map[string]string{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 	v["user_id"] = strconv.FormatInt(userId, 10)
@@ -867,7 +1011,7 @@ func (bot *Bot) DeclineChatJoinRequest(chatId int64, userId int64, opts *Decline
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("declineChatJoinRequest", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "declineChatJoinRequest", v, nil, reqOpts)
 	if err != nil {
 		return false, err
 	}
@@ -876,7 +1020,7 @@ func (bot *Bot) DeclineChatJoinRequest(chatId int64, userId int64, opts *Decline
 	return b, json.Unmarshal(r, &b)
 }
 
-// DeleteChatPhotoOpts is the set of optional fields for Bot.DeleteChatPhoto.
+// DeleteChatPhotoOpts is the set of optional fields for Bot.DeleteChatPhoto and Bot.DeleteChatPhotoWithContext.
 type DeleteChatPhotoOpts struct {
 	// RequestOpts are an additional optional field to configure timeouts for individual requests
 	RequestOpts *RequestOpts
@@ -888,6 +1032,11 @@ type DeleteChatPhotoOpts struct {
 //   - chatId (type int64): Unique identifier for the target chat
 //   - opts (type DeleteChatPhotoOpts): All optional parameters.
 func (bot *Bot) DeleteChatPhoto(chatId int64, opts *DeleteChatPhotoOpts) (bool, error) {
+	return bot.DeleteChatPhotoWithContext(context.Background(), chatId, opts)
+}
+
+// DeleteChatPhotoWithContext is the same as Bot.DeleteChatPhoto, but with a context.Context parameter
+func (bot *Bot) DeleteChatPhotoWithContext(ctx context.Context, chatId int64, opts *DeleteChatPhotoOpts) (bool, error) {
 	v := map[string]string{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 
@@ -896,7 +1045,7 @@ func (bot *Bot) DeleteChatPhoto(chatId int64, opts *DeleteChatPhotoOpts) (bool, 
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("deleteChatPhoto", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "deleteChatPhoto", v, nil, reqOpts)
 	if err != nil {
 		return false, err
 	}
@@ -905,7 +1054,7 @@ func (bot *Bot) DeleteChatPhoto(chatId int64, opts *DeleteChatPhotoOpts) (bool, 
 	return b, json.Unmarshal(r, &b)
 }
 
-// DeleteChatStickerSetOpts is the set of optional fields for Bot.DeleteChatStickerSet.
+// DeleteChatStickerSetOpts is the set of optional fields for Bot.DeleteChatStickerSet and Bot.DeleteChatStickerSetWithContext.
 type DeleteChatStickerSetOpts struct {
 	// RequestOpts are an additional optional field to configure timeouts for individual requests
 	RequestOpts *RequestOpts
@@ -917,6 +1066,11 @@ type DeleteChatStickerSetOpts struct {
 //   - chatId (type int64): Unique identifier for the target chat
 //   - opts (type DeleteChatStickerSetOpts): All optional parameters.
 func (bot *Bot) DeleteChatStickerSet(chatId int64, opts *DeleteChatStickerSetOpts) (bool, error) {
+	return bot.DeleteChatStickerSetWithContext(context.Background(), chatId, opts)
+}
+
+// DeleteChatStickerSetWithContext is the same as Bot.DeleteChatStickerSet, but with a context.Context parameter
+func (bot *Bot) DeleteChatStickerSetWithContext(ctx context.Context, chatId int64, opts *DeleteChatStickerSetOpts) (bool, error) {
 	v := map[string]string{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 
@@ -925,7 +1079,7 @@ func (bot *Bot) DeleteChatStickerSet(chatId int64, opts *DeleteChatStickerSetOpt
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("deleteChatStickerSet", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "deleteChatStickerSet", v, nil, reqOpts)
 	if err != nil {
 		return false, err
 	}
@@ -934,7 +1088,7 @@ func (bot *Bot) DeleteChatStickerSet(chatId int64, opts *DeleteChatStickerSetOpt
 	return b, json.Unmarshal(r, &b)
 }
 
-// DeleteForumTopicOpts is the set of optional fields for Bot.DeleteForumTopic.
+// DeleteForumTopicOpts is the set of optional fields for Bot.DeleteForumTopic and Bot.DeleteForumTopicWithContext.
 type DeleteForumTopicOpts struct {
 	// RequestOpts are an additional optional field to configure timeouts for individual requests
 	RequestOpts *RequestOpts
@@ -947,6 +1101,11 @@ type DeleteForumTopicOpts struct {
 //   - messageThreadId (type int64): Unique identifier for the target message thread of the forum topic
 //   - opts (type DeleteForumTopicOpts): All optional parameters.
 func (bot *Bot) DeleteForumTopic(chatId int64, messageThreadId int64, opts *DeleteForumTopicOpts) (bool, error) {
+	return bot.DeleteForumTopicWithContext(context.Background(), chatId, messageThreadId, opts)
+}
+
+// DeleteForumTopicWithContext is the same as Bot.DeleteForumTopic, but with a context.Context parameter
+func (bot *Bot) DeleteForumTopicWithContext(ctx context.Context, chatId int64, messageThreadId int64, opts *DeleteForumTopicOpts) (bool, error) {
 	v := map[string]string{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 	v["message_thread_id"] = strconv.FormatInt(messageThreadId, 10)
@@ -956,7 +1115,7 @@ func (bot *Bot) DeleteForumTopic(chatId int64, messageThreadId int64, opts *Dele
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("deleteForumTopic", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "deleteForumTopic", v, nil, reqOpts)
 	if err != nil {
 		return false, err
 	}
@@ -965,7 +1124,7 @@ func (bot *Bot) DeleteForumTopic(chatId int64, messageThreadId int64, opts *Dele
 	return b, json.Unmarshal(r, &b)
 }
 
-// DeleteMessageOpts is the set of optional fields for Bot.DeleteMessage.
+// DeleteMessageOpts is the set of optional fields for Bot.DeleteMessage and Bot.DeleteMessageWithContext.
 type DeleteMessageOpts struct {
 	// RequestOpts are an additional optional field to configure timeouts for individual requests
 	RequestOpts *RequestOpts
@@ -988,6 +1147,11 @@ type DeleteMessageOpts struct {
 //   - messageId (type int64): Identifier of the message to delete
 //   - opts (type DeleteMessageOpts): All optional parameters.
 func (bot *Bot) DeleteMessage(chatId int64, messageId int64, opts *DeleteMessageOpts) (bool, error) {
+	return bot.DeleteMessageWithContext(context.Background(), chatId, messageId, opts)
+}
+
+// DeleteMessageWithContext is the same as Bot.DeleteMessage, but with a context.Context parameter
+func (bot *Bot) DeleteMessageWithContext(ctx context.Context, chatId int64, messageId int64, opts *DeleteMessageOpts) (bool, error) {
 	v := map[string]string{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 	v["message_id"] = strconv.FormatInt(messageId, 10)
@@ -997,7 +1161,7 @@ func (bot *Bot) DeleteMessage(chatId int64, messageId int64, opts *DeleteMessage
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("deleteMessage", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "deleteMessage", v, nil, reqOpts)
 	if err != nil {
 		return false, err
 	}
@@ -1006,7 +1170,7 @@ func (bot *Bot) DeleteMessage(chatId int64, messageId int64, opts *DeleteMessage
 	return b, json.Unmarshal(r, &b)
 }
 
-// DeleteMessagesOpts is the set of optional fields for Bot.DeleteMessages.
+// DeleteMessagesOpts is the set of optional fields for Bot.DeleteMessages and Bot.DeleteMessagesWithContext.
 type DeleteMessagesOpts struct {
 	// RequestOpts are an additional optional field to configure timeouts for individual requests
 	RequestOpts *RequestOpts
@@ -1019,6 +1183,11 @@ type DeleteMessagesOpts struct {
 //   - messageIds (type []int64): A JSON-serialized list of 1-100 identifiers of messages to delete. See deleteMessage for limitations on which messages can be deleted
 //   - opts (type DeleteMessagesOpts): All optional parameters.
 func (bot *Bot) DeleteMessages(chatId int64, messageIds []int64, opts *DeleteMessagesOpts) (bool, error) {
+	return bot.DeleteMessagesWithContext(context.Background(), chatId, messageIds, opts)
+}
+
+// DeleteMessagesWithContext is the same as Bot.DeleteMessages, but with a context.Context parameter
+func (bot *Bot) DeleteMessagesWithContext(ctx context.Context, chatId int64, messageIds []int64, opts *DeleteMessagesOpts) (bool, error) {
 	v := map[string]string{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 	if messageIds != nil {
@@ -1034,7 +1203,7 @@ func (bot *Bot) DeleteMessages(chatId int64, messageIds []int64, opts *DeleteMes
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("deleteMessages", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "deleteMessages", v, nil, reqOpts)
 	if err != nil {
 		return false, err
 	}
@@ -1043,7 +1212,7 @@ func (bot *Bot) DeleteMessages(chatId int64, messageIds []int64, opts *DeleteMes
 	return b, json.Unmarshal(r, &b)
 }
 
-// DeleteMyCommandsOpts is the set of optional fields for Bot.DeleteMyCommands.
+// DeleteMyCommandsOpts is the set of optional fields for Bot.DeleteMyCommands and Bot.DeleteMyCommandsWithContext.
 type DeleteMyCommandsOpts struct {
 	// A JSON-serialized object, describing scope of users for which the commands are relevant. Defaults to BotCommandScopeDefault.
 	Scope BotCommandScope
@@ -1058,6 +1227,11 @@ type DeleteMyCommandsOpts struct {
 // Use this method to delete the list of the bot's commands for the given scope and user language. After deletion, higher level commands will be shown to affected users. Returns True on success.
 //   - opts (type DeleteMyCommandsOpts): All optional parameters.
 func (bot *Bot) DeleteMyCommands(opts *DeleteMyCommandsOpts) (bool, error) {
+	return bot.DeleteMyCommandsWithContext(context.Background(), opts)
+}
+
+// DeleteMyCommandsWithContext is the same as Bot.DeleteMyCommands, but with a context.Context parameter
+func (bot *Bot) DeleteMyCommandsWithContext(ctx context.Context, opts *DeleteMyCommandsOpts) (bool, error) {
 	v := map[string]string{}
 	if opts != nil {
 		bs, err := json.Marshal(opts.Scope)
@@ -1073,7 +1247,7 @@ func (bot *Bot) DeleteMyCommands(opts *DeleteMyCommandsOpts) (bool, error) {
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("deleteMyCommands", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "deleteMyCommands", v, nil, reqOpts)
 	if err != nil {
 		return false, err
 	}
@@ -1082,7 +1256,7 @@ func (bot *Bot) DeleteMyCommands(opts *DeleteMyCommandsOpts) (bool, error) {
 	return b, json.Unmarshal(r, &b)
 }
 
-// DeleteStickerFromSetOpts is the set of optional fields for Bot.DeleteStickerFromSet.
+// DeleteStickerFromSetOpts is the set of optional fields for Bot.DeleteStickerFromSet and Bot.DeleteStickerFromSetWithContext.
 type DeleteStickerFromSetOpts struct {
 	// RequestOpts are an additional optional field to configure timeouts for individual requests
 	RequestOpts *RequestOpts
@@ -1094,6 +1268,11 @@ type DeleteStickerFromSetOpts struct {
 //   - sticker (type string): File identifier of the sticker
 //   - opts (type DeleteStickerFromSetOpts): All optional parameters.
 func (bot *Bot) DeleteStickerFromSet(sticker string, opts *DeleteStickerFromSetOpts) (bool, error) {
+	return bot.DeleteStickerFromSetWithContext(context.Background(), sticker, opts)
+}
+
+// DeleteStickerFromSetWithContext is the same as Bot.DeleteStickerFromSet, but with a context.Context parameter
+func (bot *Bot) DeleteStickerFromSetWithContext(ctx context.Context, sticker string, opts *DeleteStickerFromSetOpts) (bool, error) {
 	v := map[string]string{}
 	v["sticker"] = sticker
 
@@ -1102,7 +1281,7 @@ func (bot *Bot) DeleteStickerFromSet(sticker string, opts *DeleteStickerFromSetO
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("deleteStickerFromSet", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "deleteStickerFromSet", v, nil, reqOpts)
 	if err != nil {
 		return false, err
 	}
@@ -1111,7 +1290,7 @@ func (bot *Bot) DeleteStickerFromSet(sticker string, opts *DeleteStickerFromSetO
 	return b, json.Unmarshal(r, &b)
 }
 
-// DeleteStickerSetOpts is the set of optional fields for Bot.DeleteStickerSet.
+// DeleteStickerSetOpts is the set of optional fields for Bot.DeleteStickerSet and Bot.DeleteStickerSetWithContext.
 type DeleteStickerSetOpts struct {
 	// RequestOpts are an additional optional field to configure timeouts for individual requests
 	RequestOpts *RequestOpts
@@ -1123,6 +1302,11 @@ type DeleteStickerSetOpts struct {
 //   - name (type string): Sticker set name
 //   - opts (type DeleteStickerSetOpts): All optional parameters.
 func (bot *Bot) DeleteStickerSet(name string, opts *DeleteStickerSetOpts) (bool, error) {
+	return bot.DeleteStickerSetWithContext(context.Background(), name, opts)
+}
+
+// DeleteStickerSetWithContext is the same as Bot.DeleteStickerSet, but with a context.Context parameter
+func (bot *Bot) DeleteStickerSetWithContext(ctx context.Context, name string, opts *DeleteStickerSetOpts) (bool, error) {
 	v := map[string]string{}
 	v["name"] = name
 
@@ -1131,7 +1315,7 @@ func (bot *Bot) DeleteStickerSet(name string, opts *DeleteStickerSetOpts) (bool,
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("deleteStickerSet", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "deleteStickerSet", v, nil, reqOpts)
 	if err != nil {
 		return false, err
 	}
@@ -1140,7 +1324,7 @@ func (bot *Bot) DeleteStickerSet(name string, opts *DeleteStickerSetOpts) (bool,
 	return b, json.Unmarshal(r, &b)
 }
 
-// DeleteWebhookOpts is the set of optional fields for Bot.DeleteWebhook.
+// DeleteWebhookOpts is the set of optional fields for Bot.DeleteWebhook and Bot.DeleteWebhookWithContext.
 type DeleteWebhookOpts struct {
 	// Pass True to drop all pending updates
 	DropPendingUpdates bool
@@ -1153,6 +1337,11 @@ type DeleteWebhookOpts struct {
 // Use this method to remove webhook integration if you decide to switch back to getUpdates. Returns True on success.
 //   - opts (type DeleteWebhookOpts): All optional parameters.
 func (bot *Bot) DeleteWebhook(opts *DeleteWebhookOpts) (bool, error) {
+	return bot.DeleteWebhookWithContext(context.Background(), opts)
+}
+
+// DeleteWebhookWithContext is the same as Bot.DeleteWebhook, but with a context.Context parameter
+func (bot *Bot) DeleteWebhookWithContext(ctx context.Context, opts *DeleteWebhookOpts) (bool, error) {
 	v := map[string]string{}
 	if opts != nil {
 		v["drop_pending_updates"] = strconv.FormatBool(opts.DropPendingUpdates)
@@ -1163,7 +1352,7 @@ func (bot *Bot) DeleteWebhook(opts *DeleteWebhookOpts) (bool, error) {
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("deleteWebhook", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "deleteWebhook", v, nil, reqOpts)
 	if err != nil {
 		return false, err
 	}
@@ -1172,7 +1361,7 @@ func (bot *Bot) DeleteWebhook(opts *DeleteWebhookOpts) (bool, error) {
 	return b, json.Unmarshal(r, &b)
 }
 
-// EditChatInviteLinkOpts is the set of optional fields for Bot.EditChatInviteLink.
+// EditChatInviteLinkOpts is the set of optional fields for Bot.EditChatInviteLink and Bot.EditChatInviteLinkWithContext.
 type EditChatInviteLinkOpts struct {
 	// Invite link name; 0-32 characters
 	Name string
@@ -1193,6 +1382,11 @@ type EditChatInviteLinkOpts struct {
 //   - inviteLink (type string): The invite link to edit
 //   - opts (type EditChatInviteLinkOpts): All optional parameters.
 func (bot *Bot) EditChatInviteLink(chatId int64, inviteLink string, opts *EditChatInviteLinkOpts) (*ChatInviteLink, error) {
+	return bot.EditChatInviteLinkWithContext(context.Background(), chatId, inviteLink, opts)
+}
+
+// EditChatInviteLinkWithContext is the same as Bot.EditChatInviteLink, but with a context.Context parameter
+func (bot *Bot) EditChatInviteLinkWithContext(ctx context.Context, chatId int64, inviteLink string, opts *EditChatInviteLinkOpts) (*ChatInviteLink, error) {
 	v := map[string]string{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 	v["invite_link"] = inviteLink
@@ -1212,7 +1406,7 @@ func (bot *Bot) EditChatInviteLink(chatId int64, inviteLink string, opts *EditCh
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("editChatInviteLink", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "editChatInviteLink", v, nil, reqOpts)
 	if err != nil {
 		return nil, err
 	}
@@ -1221,7 +1415,48 @@ func (bot *Bot) EditChatInviteLink(chatId int64, inviteLink string, opts *EditCh
 	return &c, json.Unmarshal(r, &c)
 }
 
-// EditForumTopicOpts is the set of optional fields for Bot.EditForumTopic.
+// EditChatSubscriptionInviteLinkOpts is the set of optional fields for Bot.EditChatSubscriptionInviteLink and Bot.EditChatSubscriptionInviteLinkWithContext.
+type EditChatSubscriptionInviteLinkOpts struct {
+	// Invite link name; 0-32 characters
+	Name string
+	// RequestOpts are an additional optional field to configure timeouts for individual requests
+	RequestOpts *RequestOpts
+}
+
+// EditChatSubscriptionInviteLink (https://core.telegram.org/bots/api#editchatsubscriptioninvitelink)
+//
+// Use this method to edit a subscription invite link created by the bot. The bot must have the can_invite_users administrator rights. Returns the edited invite link as a ChatInviteLink object.
+//   - chatId (type int64): Unique identifier for the target chat
+//   - inviteLink (type string): The invite link to edit
+//   - opts (type EditChatSubscriptionInviteLinkOpts): All optional parameters.
+func (bot *Bot) EditChatSubscriptionInviteLink(chatId int64, inviteLink string, opts *EditChatSubscriptionInviteLinkOpts) (*ChatInviteLink, error) {
+	return bot.EditChatSubscriptionInviteLinkWithContext(context.Background(), chatId, inviteLink, opts)
+}
+
+// EditChatSubscriptionInviteLinkWithContext is the same as Bot.EditChatSubscriptionInviteLink, but with a context.Context parameter
+func (bot *Bot) EditChatSubscriptionInviteLinkWithContext(ctx context.Context, chatId int64, inviteLink string, opts *EditChatSubscriptionInviteLinkOpts) (*ChatInviteLink, error) {
+	v := map[string]string{}
+	v["chat_id"] = strconv.FormatInt(chatId, 10)
+	v["invite_link"] = inviteLink
+	if opts != nil {
+		v["name"] = opts.Name
+	}
+
+	var reqOpts *RequestOpts
+	if opts != nil {
+		reqOpts = opts.RequestOpts
+	}
+
+	r, err := bot.RequestWithContext(ctx, "editChatSubscriptionInviteLink", v, nil, reqOpts)
+	if err != nil {
+		return nil, err
+	}
+
+	var c ChatInviteLink
+	return &c, json.Unmarshal(r, &c)
+}
+
+// EditForumTopicOpts is the set of optional fields for Bot.EditForumTopic and Bot.EditForumTopicWithContext.
 type EditForumTopicOpts struct {
 	// New topic name, 0-128 characters. If not specified or empty, the current name of the topic will be kept
 	Name string
@@ -1233,11 +1468,16 @@ type EditForumTopicOpts struct {
 
 // EditForumTopic (https://core.telegram.org/bots/api#editforumtopic)
 //
-// Use this method to edit name and icon of a topic in a forum supergroup chat. The bot must be an administrator in the chat for this to work and must have can_manage_topics administrator rights, unless it is the creator of the topic. Returns True on success.
+// Use this method to edit name and icon of a topic in a forum supergroup chat. The bot must be an administrator in the chat for this to work and must have the can_manage_topics administrator rights, unless it is the creator of the topic. Returns True on success.
 //   - chatId (type int64): Unique identifier for the target chat
 //   - messageThreadId (type int64): Unique identifier for the target message thread of the forum topic
 //   - opts (type EditForumTopicOpts): All optional parameters.
 func (bot *Bot) EditForumTopic(chatId int64, messageThreadId int64, opts *EditForumTopicOpts) (bool, error) {
+	return bot.EditForumTopicWithContext(context.Background(), chatId, messageThreadId, opts)
+}
+
+// EditForumTopicWithContext is the same as Bot.EditForumTopic, but with a context.Context parameter
+func (bot *Bot) EditForumTopicWithContext(ctx context.Context, chatId int64, messageThreadId int64, opts *EditForumTopicOpts) (bool, error) {
 	v := map[string]string{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 	v["message_thread_id"] = strconv.FormatInt(messageThreadId, 10)
@@ -1253,7 +1493,7 @@ func (bot *Bot) EditForumTopic(chatId int64, messageThreadId int64, opts *EditFo
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("editForumTopic", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "editForumTopic", v, nil, reqOpts)
 	if err != nil {
 		return false, err
 	}
@@ -1262,7 +1502,7 @@ func (bot *Bot) EditForumTopic(chatId int64, messageThreadId int64, opts *EditFo
 	return b, json.Unmarshal(r, &b)
 }
 
-// EditGeneralForumTopicOpts is the set of optional fields for Bot.EditGeneralForumTopic.
+// EditGeneralForumTopicOpts is the set of optional fields for Bot.EditGeneralForumTopic and Bot.EditGeneralForumTopicWithContext.
 type EditGeneralForumTopicOpts struct {
 	// RequestOpts are an additional optional field to configure timeouts for individual requests
 	RequestOpts *RequestOpts
@@ -1270,11 +1510,16 @@ type EditGeneralForumTopicOpts struct {
 
 // EditGeneralForumTopic (https://core.telegram.org/bots/api#editgeneralforumtopic)
 //
-// Use this method to edit the name of the 'General' topic in a forum supergroup chat. The bot must be an administrator in the chat for this to work and must have can_manage_topics administrator rights. Returns True on success.
+// Use this method to edit the name of the 'General' topic in a forum supergroup chat. The bot must be an administrator in the chat for this to work and must have the can_manage_topics administrator rights. Returns True on success.
 //   - chatId (type int64): Unique identifier for the target chat
 //   - name (type string): New topic name, 1-128 characters
 //   - opts (type EditGeneralForumTopicOpts): All optional parameters.
 func (bot *Bot) EditGeneralForumTopic(chatId int64, name string, opts *EditGeneralForumTopicOpts) (bool, error) {
+	return bot.EditGeneralForumTopicWithContext(context.Background(), chatId, name, opts)
+}
+
+// EditGeneralForumTopicWithContext is the same as Bot.EditGeneralForumTopic, but with a context.Context parameter
+func (bot *Bot) EditGeneralForumTopicWithContext(ctx context.Context, chatId int64, name string, opts *EditGeneralForumTopicOpts) (bool, error) {
 	v := map[string]string{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 	v["name"] = name
@@ -1284,7 +1529,7 @@ func (bot *Bot) EditGeneralForumTopic(chatId int64, name string, opts *EditGener
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("editGeneralForumTopic", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "editGeneralForumTopic", v, nil, reqOpts)
 	if err != nil {
 		return false, err
 	}
@@ -1293,8 +1538,10 @@ func (bot *Bot) EditGeneralForumTopic(chatId int64, name string, opts *EditGener
 	return b, json.Unmarshal(r, &b)
 }
 
-// EditMessageCaptionOpts is the set of optional fields for Bot.EditMessageCaption.
+// EditMessageCaptionOpts is the set of optional fields for Bot.EditMessageCaption and Bot.EditMessageCaptionWithContext.
 type EditMessageCaptionOpts struct {
+	// Unique identifier of the business connection on behalf of which the message to be edited was sent
+	BusinessConnectionId string
 	// Required if inline_message_id is not specified. Unique identifier for the target chat
 	ChatId int64
 	// Required if inline_message_id is not specified. Identifier of the message to edit
@@ -1307,6 +1554,8 @@ type EditMessageCaptionOpts struct {
 	ParseMode string
 	// A JSON-serialized list of special entities that appear in the caption, which can be specified instead of parse_mode
 	CaptionEntities []MessageEntity
+	// Pass True, if the caption must be shown above the message media. Supported only for animation, photo and video messages.
+	ShowCaptionAboveMedia bool
 	// A JSON-serialized object for an inline keyboard.
 	ReplyMarkup InlineKeyboardMarkup
 	// RequestOpts are an additional optional field to configure timeouts for individual requests
@@ -1315,11 +1564,17 @@ type EditMessageCaptionOpts struct {
 
 // EditMessageCaption (https://core.telegram.org/bots/api#editmessagecaption)
 //
-// Use this method to edit captions of messages. On success, if the edited message is not an inline message, the edited Message is returned, otherwise True is returned.
+// Use this method to edit captions of messages. On success, if the edited message is not an inline message, the edited Message is returned, otherwise True is returned. Note that business messages that were not sent by the bot and do not contain an inline keyboard can only be edited within 48 hours from the time they were sent.
 //   - opts (type EditMessageCaptionOpts): All optional parameters.
 func (bot *Bot) EditMessageCaption(opts *EditMessageCaptionOpts) (*Message, bool, error) {
+	return bot.EditMessageCaptionWithContext(context.Background(), opts)
+}
+
+// EditMessageCaptionWithContext is the same as Bot.EditMessageCaption, but with a context.Context parameter
+func (bot *Bot) EditMessageCaptionWithContext(ctx context.Context, opts *EditMessageCaptionOpts) (*Message, bool, error) {
 	v := map[string]string{}
 	if opts != nil {
+		v["business_connection_id"] = opts.BusinessConnectionId
 		if opts.ChatId != 0 {
 			v["chat_id"] = strconv.FormatInt(opts.ChatId, 10)
 		}
@@ -1336,6 +1591,7 @@ func (bot *Bot) EditMessageCaption(opts *EditMessageCaptionOpts) (*Message, bool
 			}
 			v["caption_entities"] = string(bs)
 		}
+		v["show_caption_above_media"] = strconv.FormatBool(opts.ShowCaptionAboveMedia)
 		bs, err := json.Marshal(opts.ReplyMarkup)
 		if err != nil {
 			return nil, false, fmt.Errorf("failed to marshal field reply_markup: %w", err)
@@ -1348,7 +1604,7 @@ func (bot *Bot) EditMessageCaption(opts *EditMessageCaptionOpts) (*Message, bool
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("editMessageCaption", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "editMessageCaption", v, nil, reqOpts)
 	if err != nil {
 		return nil, false, err
 	}
@@ -1365,8 +1621,10 @@ func (bot *Bot) EditMessageCaption(opts *EditMessageCaptionOpts) (*Message, bool
 
 }
 
-// EditMessageLiveLocationOpts is the set of optional fields for Bot.EditMessageLiveLocation.
+// EditMessageLiveLocationOpts is the set of optional fields for Bot.EditMessageLiveLocation and Bot.EditMessageLiveLocationWithContext.
 type EditMessageLiveLocationOpts struct {
+	// Unique identifier of the business connection on behalf of which the message to be edited was sent
+	BusinessConnectionId string
 	// Required if inline_message_id is not specified. Unique identifier for the target chat
 	ChatId int64
 	// Required if inline_message_id is not specified. Identifier of the message to edit
@@ -1394,10 +1652,16 @@ type EditMessageLiveLocationOpts struct {
 //   - longitude (type float64): Longitude of new location
 //   - opts (type EditMessageLiveLocationOpts): All optional parameters.
 func (bot *Bot) EditMessageLiveLocation(latitude float64, longitude float64, opts *EditMessageLiveLocationOpts) (*Message, bool, error) {
+	return bot.EditMessageLiveLocationWithContext(context.Background(), latitude, longitude, opts)
+}
+
+// EditMessageLiveLocationWithContext is the same as Bot.EditMessageLiveLocation, but with a context.Context parameter
+func (bot *Bot) EditMessageLiveLocationWithContext(ctx context.Context, latitude float64, longitude float64, opts *EditMessageLiveLocationOpts) (*Message, bool, error) {
 	v := map[string]string{}
 	v["latitude"] = strconv.FormatFloat(latitude, 'f', -1, 64)
 	v["longitude"] = strconv.FormatFloat(longitude, 'f', -1, 64)
 	if opts != nil {
+		v["business_connection_id"] = opts.BusinessConnectionId
 		if opts.ChatId != 0 {
 			v["chat_id"] = strconv.FormatInt(opts.ChatId, 10)
 		}
@@ -1429,7 +1693,7 @@ func (bot *Bot) EditMessageLiveLocation(latitude float64, longitude float64, opt
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("editMessageLiveLocation", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "editMessageLiveLocation", v, nil, reqOpts)
 	if err != nil {
 		return nil, false, err
 	}
@@ -1446,8 +1710,10 @@ func (bot *Bot) EditMessageLiveLocation(latitude float64, longitude float64, opt
 
 }
 
-// EditMessageMediaOpts is the set of optional fields for Bot.EditMessageMedia.
+// EditMessageMediaOpts is the set of optional fields for Bot.EditMessageMedia and Bot.EditMessageMediaWithContext.
 type EditMessageMediaOpts struct {
+	// Unique identifier of the business connection on behalf of which the message to be edited was sent
+	BusinessConnectionId string
 	// Required if inline_message_id is not specified. Unique identifier for the target chat
 	ChatId int64
 	// Required if inline_message_id is not specified. Identifier of the message to edit
@@ -1462,18 +1728,24 @@ type EditMessageMediaOpts struct {
 
 // EditMessageMedia (https://core.telegram.org/bots/api#editmessagemedia)
 //
-// Use this method to edit animation, audio, document, photo, or video messages. If a message is part of a message album, then it can be edited only to an audio for audio albums, only to a document for document albums and to a photo or a video otherwise. When an inline message is edited, a new file can't be uploaded; use a previously uploaded file via its file_id or specify a URL. On success, if the edited message is not an inline message, the edited Message is returned, otherwise True is returned.
+// Use this method to edit animation, audio, document, photo, or video messages, or to add media to text messages. If a message is part of a message album, then it can be edited only to an audio for audio albums, only to a document for document albums and to a photo or a video otherwise. When an inline message is edited, a new file can't be uploaded; use a previously uploaded file via its file_id or specify a URL. On success, if the edited message is not an inline message, the edited Message is returned, otherwise True is returned. Note that business messages that were not sent by the bot and do not contain an inline keyboard can only be edited within 48 hours from the time they were sent.
 //   - media (type InputMedia): A JSON-serialized object for a new media content of the message
 //   - opts (type EditMessageMediaOpts): All optional parameters.
 func (bot *Bot) EditMessageMedia(media InputMedia, opts *EditMessageMediaOpts) (*Message, bool, error) {
+	return bot.EditMessageMediaWithContext(context.Background(), media, opts)
+}
+
+// EditMessageMediaWithContext is the same as Bot.EditMessageMedia, but with a context.Context parameter
+func (bot *Bot) EditMessageMediaWithContext(ctx context.Context, media InputMedia, opts *EditMessageMediaOpts) (*Message, bool, error) {
 	v := map[string]string{}
-	data := map[string]NamedReader{}
+	data := map[string]FileReader{}
 	inputBs, err := media.InputParams("media", data)
 	if err != nil {
 		return nil, false, fmt.Errorf("failed to marshal field media: %w", err)
 	}
 	v["media"] = string(inputBs)
 	if opts != nil {
+		v["business_connection_id"] = opts.BusinessConnectionId
 		if opts.ChatId != 0 {
 			v["chat_id"] = strconv.FormatInt(opts.ChatId, 10)
 		}
@@ -1493,7 +1765,7 @@ func (bot *Bot) EditMessageMedia(media InputMedia, opts *EditMessageMediaOpts) (
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("editMessageMedia", v, data, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "editMessageMedia", v, data, reqOpts)
 	if err != nil {
 		return nil, false, err
 	}
@@ -1510,8 +1782,10 @@ func (bot *Bot) EditMessageMedia(media InputMedia, opts *EditMessageMediaOpts) (
 
 }
 
-// EditMessageReplyMarkupOpts is the set of optional fields for Bot.EditMessageReplyMarkup.
+// EditMessageReplyMarkupOpts is the set of optional fields for Bot.EditMessageReplyMarkup and Bot.EditMessageReplyMarkupWithContext.
 type EditMessageReplyMarkupOpts struct {
+	// Unique identifier of the business connection on behalf of which the message to be edited was sent
+	BusinessConnectionId string
 	// Required if inline_message_id is not specified. Unique identifier for the target chat
 	ChatId int64
 	// Required if inline_message_id is not specified. Identifier of the message to edit
@@ -1526,11 +1800,17 @@ type EditMessageReplyMarkupOpts struct {
 
 // EditMessageReplyMarkup (https://core.telegram.org/bots/api#editmessagereplymarkup)
 //
-// Use this method to edit only the reply markup of messages. On success, if the edited message is not an inline message, the edited Message is returned, otherwise True is returned.
+// Use this method to edit only the reply markup of messages. On success, if the edited message is not an inline message, the edited Message is returned, otherwise True is returned. Note that business messages that were not sent by the bot and do not contain an inline keyboard can only be edited within 48 hours from the time they were sent.
 //   - opts (type EditMessageReplyMarkupOpts): All optional parameters.
 func (bot *Bot) EditMessageReplyMarkup(opts *EditMessageReplyMarkupOpts) (*Message, bool, error) {
+	return bot.EditMessageReplyMarkupWithContext(context.Background(), opts)
+}
+
+// EditMessageReplyMarkupWithContext is the same as Bot.EditMessageReplyMarkup, but with a context.Context parameter
+func (bot *Bot) EditMessageReplyMarkupWithContext(ctx context.Context, opts *EditMessageReplyMarkupOpts) (*Message, bool, error) {
 	v := map[string]string{}
 	if opts != nil {
+		v["business_connection_id"] = opts.BusinessConnectionId
 		if opts.ChatId != 0 {
 			v["chat_id"] = strconv.FormatInt(opts.ChatId, 10)
 		}
@@ -1550,7 +1830,7 @@ func (bot *Bot) EditMessageReplyMarkup(opts *EditMessageReplyMarkupOpts) (*Messa
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("editMessageReplyMarkup", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "editMessageReplyMarkup", v, nil, reqOpts)
 	if err != nil {
 		return nil, false, err
 	}
@@ -1567,8 +1847,10 @@ func (bot *Bot) EditMessageReplyMarkup(opts *EditMessageReplyMarkupOpts) (*Messa
 
 }
 
-// EditMessageTextOpts is the set of optional fields for Bot.EditMessageText.
+// EditMessageTextOpts is the set of optional fields for Bot.EditMessageText and Bot.EditMessageTextWithContext.
 type EditMessageTextOpts struct {
+	// Unique identifier of the business connection on behalf of which the message to be edited was sent
+	BusinessConnectionId string
 	// Required if inline_message_id is not specified. Unique identifier for the target chat
 	ChatId int64
 	// Required if inline_message_id is not specified. Identifier of the message to edit
@@ -1589,13 +1871,19 @@ type EditMessageTextOpts struct {
 
 // EditMessageText (https://core.telegram.org/bots/api#editmessagetext)
 //
-// Use this method to edit text and game messages. On success, if the edited message is not an inline message, the edited Message is returned, otherwise True is returned.
+// Use this method to edit text and game messages. On success, if the edited message is not an inline message, the edited Message is returned, otherwise True is returned. Note that business messages that were not sent by the bot and do not contain an inline keyboard can only be edited within 48 hours from the time they were sent.
 //   - text (type string): New text of the message, 1-4096 characters after entities parsing
 //   - opts (type EditMessageTextOpts): All optional parameters.
 func (bot *Bot) EditMessageText(text string, opts *EditMessageTextOpts) (*Message, bool, error) {
+	return bot.EditMessageTextWithContext(context.Background(), text, opts)
+}
+
+// EditMessageTextWithContext is the same as Bot.EditMessageText, but with a context.Context parameter
+func (bot *Bot) EditMessageTextWithContext(ctx context.Context, text string, opts *EditMessageTextOpts) (*Message, bool, error) {
 	v := map[string]string{}
 	v["text"] = text
 	if opts != nil {
+		v["business_connection_id"] = opts.BusinessConnectionId
 		if opts.ChatId != 0 {
 			v["chat_id"] = strconv.FormatInt(opts.ChatId, 10)
 		}
@@ -1630,7 +1918,7 @@ func (bot *Bot) EditMessageText(text string, opts *EditMessageTextOpts) (*Messag
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("editMessageText", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "editMessageText", v, nil, reqOpts)
 	if err != nil {
 		return nil, false, err
 	}
@@ -1647,7 +1935,7 @@ func (bot *Bot) EditMessageText(text string, opts *EditMessageTextOpts) (*Messag
 
 }
 
-// ExportChatInviteLinkOpts is the set of optional fields for Bot.ExportChatInviteLink.
+// ExportChatInviteLinkOpts is the set of optional fields for Bot.ExportChatInviteLink and Bot.ExportChatInviteLinkWithContext.
 type ExportChatInviteLinkOpts struct {
 	// RequestOpts are an additional optional field to configure timeouts for individual requests
 	RequestOpts *RequestOpts
@@ -1659,6 +1947,11 @@ type ExportChatInviteLinkOpts struct {
 //   - chatId (type int64): Unique identifier for the target chat
 //   - opts (type ExportChatInviteLinkOpts): All optional parameters.
 func (bot *Bot) ExportChatInviteLink(chatId int64, opts *ExportChatInviteLinkOpts) (string, error) {
+	return bot.ExportChatInviteLinkWithContext(context.Background(), chatId, opts)
+}
+
+// ExportChatInviteLinkWithContext is the same as Bot.ExportChatInviteLink, but with a context.Context parameter
+func (bot *Bot) ExportChatInviteLinkWithContext(ctx context.Context, chatId int64, opts *ExportChatInviteLinkOpts) (string, error) {
 	v := map[string]string{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 
@@ -1667,7 +1960,7 @@ func (bot *Bot) ExportChatInviteLink(chatId int64, opts *ExportChatInviteLinkOpt
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("exportChatInviteLink", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "exportChatInviteLink", v, nil, reqOpts)
 	if err != nil {
 		return "", err
 	}
@@ -1676,7 +1969,7 @@ func (bot *Bot) ExportChatInviteLink(chatId int64, opts *ExportChatInviteLinkOpt
 	return s, json.Unmarshal(r, &s)
 }
 
-// ForwardMessageOpts is the set of optional fields for Bot.ForwardMessage.
+// ForwardMessageOpts is the set of optional fields for Bot.ForwardMessage and Bot.ForwardMessageWithContext.
 type ForwardMessageOpts struct {
 	// Unique identifier for the target message thread (topic) of the forum; for forum supergroups only
 	MessageThreadId int64
@@ -1696,6 +1989,11 @@ type ForwardMessageOpts struct {
 //   - messageId (type int64): Message identifier in the chat specified in from_chat_id
 //   - opts (type ForwardMessageOpts): All optional parameters.
 func (bot *Bot) ForwardMessage(chatId int64, fromChatId int64, messageId int64, opts *ForwardMessageOpts) (*Message, error) {
+	return bot.ForwardMessageWithContext(context.Background(), chatId, fromChatId, messageId, opts)
+}
+
+// ForwardMessageWithContext is the same as Bot.ForwardMessage, but with a context.Context parameter
+func (bot *Bot) ForwardMessageWithContext(ctx context.Context, chatId int64, fromChatId int64, messageId int64, opts *ForwardMessageOpts) (*Message, error) {
 	v := map[string]string{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 	v["from_chat_id"] = strconv.FormatInt(fromChatId, 10)
@@ -1713,7 +2011,7 @@ func (bot *Bot) ForwardMessage(chatId int64, fromChatId int64, messageId int64, 
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("forwardMessage", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "forwardMessage", v, nil, reqOpts)
 	if err != nil {
 		return nil, err
 	}
@@ -1722,7 +2020,7 @@ func (bot *Bot) ForwardMessage(chatId int64, fromChatId int64, messageId int64, 
 	return &m, json.Unmarshal(r, &m)
 }
 
-// ForwardMessagesOpts is the set of optional fields for Bot.ForwardMessages.
+// ForwardMessagesOpts is the set of optional fields for Bot.ForwardMessages and Bot.ForwardMessagesWithContext.
 type ForwardMessagesOpts struct {
 	// Unique identifier for the target message thread (topic) of the forum; for forum supergroups only
 	MessageThreadId int64
@@ -1742,6 +2040,11 @@ type ForwardMessagesOpts struct {
 //   - messageIds (type []int64): A JSON-serialized list of 1-100 identifiers of messages in the chat from_chat_id to forward. The identifiers must be specified in a strictly increasing order.
 //   - opts (type ForwardMessagesOpts): All optional parameters.
 func (bot *Bot) ForwardMessages(chatId int64, fromChatId int64, messageIds []int64, opts *ForwardMessagesOpts) ([]MessageId, error) {
+	return bot.ForwardMessagesWithContext(context.Background(), chatId, fromChatId, messageIds, opts)
+}
+
+// ForwardMessagesWithContext is the same as Bot.ForwardMessages, but with a context.Context parameter
+func (bot *Bot) ForwardMessagesWithContext(ctx context.Context, chatId int64, fromChatId int64, messageIds []int64, opts *ForwardMessagesOpts) ([]MessageId, error) {
 	v := map[string]string{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 	v["from_chat_id"] = strconv.FormatInt(fromChatId, 10)
@@ -1765,7 +2068,7 @@ func (bot *Bot) ForwardMessages(chatId int64, fromChatId int64, messageIds []int
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("forwardMessages", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "forwardMessages", v, nil, reqOpts)
 	if err != nil {
 		return nil, err
 	}
@@ -1774,7 +2077,7 @@ func (bot *Bot) ForwardMessages(chatId int64, fromChatId int64, messageIds []int
 	return m, json.Unmarshal(r, &m)
 }
 
-// GetBusinessConnectionOpts is the set of optional fields for Bot.GetBusinessConnection.
+// GetBusinessConnectionOpts is the set of optional fields for Bot.GetBusinessConnection and Bot.GetBusinessConnectionWithContext.
 type GetBusinessConnectionOpts struct {
 	// RequestOpts are an additional optional field to configure timeouts for individual requests
 	RequestOpts *RequestOpts
@@ -1786,6 +2089,11 @@ type GetBusinessConnectionOpts struct {
 //   - businessConnectionId (type string): Unique identifier of the business connection
 //   - opts (type GetBusinessConnectionOpts): All optional parameters.
 func (bot *Bot) GetBusinessConnection(businessConnectionId string, opts *GetBusinessConnectionOpts) (*BusinessConnection, error) {
+	return bot.GetBusinessConnectionWithContext(context.Background(), businessConnectionId, opts)
+}
+
+// GetBusinessConnectionWithContext is the same as Bot.GetBusinessConnection, but with a context.Context parameter
+func (bot *Bot) GetBusinessConnectionWithContext(ctx context.Context, businessConnectionId string, opts *GetBusinessConnectionOpts) (*BusinessConnection, error) {
 	v := map[string]string{}
 	v["business_connection_id"] = businessConnectionId
 
@@ -1794,7 +2102,7 @@ func (bot *Bot) GetBusinessConnection(businessConnectionId string, opts *GetBusi
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("getBusinessConnection", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "getBusinessConnection", v, nil, reqOpts)
 	if err != nil {
 		return nil, err
 	}
@@ -1803,7 +2111,7 @@ func (bot *Bot) GetBusinessConnection(businessConnectionId string, opts *GetBusi
 	return &b, json.Unmarshal(r, &b)
 }
 
-// GetChatOpts is the set of optional fields for Bot.GetChat.
+// GetChatOpts is the set of optional fields for Bot.GetChat and Bot.GetChatWithContext.
 type GetChatOpts struct {
 	// RequestOpts are an additional optional field to configure timeouts for individual requests
 	RequestOpts *RequestOpts
@@ -1815,6 +2123,11 @@ type GetChatOpts struct {
 //   - chatId (type int64): Unique identifier for the target chat
 //   - opts (type GetChatOpts): All optional parameters.
 func (bot *Bot) GetChat(chatId int64, opts *GetChatOpts) (*ChatFullInfo, error) {
+	return bot.GetChatWithContext(context.Background(), chatId, opts)
+}
+
+// GetChatWithContext is the same as Bot.GetChat, but with a context.Context parameter
+func (bot *Bot) GetChatWithContext(ctx context.Context, chatId int64, opts *GetChatOpts) (*ChatFullInfo, error) {
 	v := map[string]string{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 
@@ -1823,7 +2136,7 @@ func (bot *Bot) GetChat(chatId int64, opts *GetChatOpts) (*ChatFullInfo, error) 
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("getChat", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "getChat", v, nil, reqOpts)
 	if err != nil {
 		return nil, err
 	}
@@ -1832,7 +2145,7 @@ func (bot *Bot) GetChat(chatId int64, opts *GetChatOpts) (*ChatFullInfo, error) 
 	return &c, json.Unmarshal(r, &c)
 }
 
-// GetChatAdministratorsOpts is the set of optional fields for Bot.GetChatAdministrators.
+// GetChatAdministratorsOpts is the set of optional fields for Bot.GetChatAdministrators and Bot.GetChatAdministratorsWithContext.
 type GetChatAdministratorsOpts struct {
 	// RequestOpts are an additional optional field to configure timeouts for individual requests
 	RequestOpts *RequestOpts
@@ -1844,6 +2157,11 @@ type GetChatAdministratorsOpts struct {
 //   - chatId (type int64): Unique identifier for the target chat
 //   - opts (type GetChatAdministratorsOpts): All optional parameters.
 func (bot *Bot) GetChatAdministrators(chatId int64, opts *GetChatAdministratorsOpts) ([]ChatMember, error) {
+	return bot.GetChatAdministratorsWithContext(context.Background(), chatId, opts)
+}
+
+// GetChatAdministratorsWithContext is the same as Bot.GetChatAdministrators, but with a context.Context parameter
+func (bot *Bot) GetChatAdministratorsWithContext(ctx context.Context, chatId int64, opts *GetChatAdministratorsOpts) ([]ChatMember, error) {
 	v := map[string]string{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 
@@ -1852,7 +2170,7 @@ func (bot *Bot) GetChatAdministrators(chatId int64, opts *GetChatAdministratorsO
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("getChatAdministrators", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "getChatAdministrators", v, nil, reqOpts)
 	if err != nil {
 		return nil, err
 	}
@@ -1860,7 +2178,7 @@ func (bot *Bot) GetChatAdministrators(chatId int64, opts *GetChatAdministratorsO
 	return unmarshalChatMemberArray(r)
 }
 
-// GetChatMemberOpts is the set of optional fields for Bot.GetChatMember.
+// GetChatMemberOpts is the set of optional fields for Bot.GetChatMember and Bot.GetChatMemberWithContext.
 type GetChatMemberOpts struct {
 	// RequestOpts are an additional optional field to configure timeouts for individual requests
 	RequestOpts *RequestOpts
@@ -1873,6 +2191,11 @@ type GetChatMemberOpts struct {
 //   - userId (type int64): Unique identifier of the target user
 //   - opts (type GetChatMemberOpts): All optional parameters.
 func (bot *Bot) GetChatMember(chatId int64, userId int64, opts *GetChatMemberOpts) (ChatMember, error) {
+	return bot.GetChatMemberWithContext(context.Background(), chatId, userId, opts)
+}
+
+// GetChatMemberWithContext is the same as Bot.GetChatMember, but with a context.Context parameter
+func (bot *Bot) GetChatMemberWithContext(ctx context.Context, chatId int64, userId int64, opts *GetChatMemberOpts) (ChatMember, error) {
 	v := map[string]string{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 	v["user_id"] = strconv.FormatInt(userId, 10)
@@ -1882,7 +2205,7 @@ func (bot *Bot) GetChatMember(chatId int64, userId int64, opts *GetChatMemberOpt
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("getChatMember", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "getChatMember", v, nil, reqOpts)
 	if err != nil {
 		return nil, err
 	}
@@ -1890,7 +2213,7 @@ func (bot *Bot) GetChatMember(chatId int64, userId int64, opts *GetChatMemberOpt
 	return unmarshalChatMember(r)
 }
 
-// GetChatMemberCountOpts is the set of optional fields for Bot.GetChatMemberCount.
+// GetChatMemberCountOpts is the set of optional fields for Bot.GetChatMemberCount and Bot.GetChatMemberCountWithContext.
 type GetChatMemberCountOpts struct {
 	// RequestOpts are an additional optional field to configure timeouts for individual requests
 	RequestOpts *RequestOpts
@@ -1902,6 +2225,11 @@ type GetChatMemberCountOpts struct {
 //   - chatId (type int64): Unique identifier for the target chat
 //   - opts (type GetChatMemberCountOpts): All optional parameters.
 func (bot *Bot) GetChatMemberCount(chatId int64, opts *GetChatMemberCountOpts) (int64, error) {
+	return bot.GetChatMemberCountWithContext(context.Background(), chatId, opts)
+}
+
+// GetChatMemberCountWithContext is the same as Bot.GetChatMemberCount, but with a context.Context parameter
+func (bot *Bot) GetChatMemberCountWithContext(ctx context.Context, chatId int64, opts *GetChatMemberCountOpts) (int64, error) {
 	v := map[string]string{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 
@@ -1910,7 +2238,7 @@ func (bot *Bot) GetChatMemberCount(chatId int64, opts *GetChatMemberCountOpts) (
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("getChatMemberCount", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "getChatMemberCount", v, nil, reqOpts)
 	if err != nil {
 		return 0, err
 	}
@@ -1919,7 +2247,7 @@ func (bot *Bot) GetChatMemberCount(chatId int64, opts *GetChatMemberCountOpts) (
 	return i, json.Unmarshal(r, &i)
 }
 
-// GetChatMenuButtonOpts is the set of optional fields for Bot.GetChatMenuButton.
+// GetChatMenuButtonOpts is the set of optional fields for Bot.GetChatMenuButton and Bot.GetChatMenuButtonWithContext.
 type GetChatMenuButtonOpts struct {
 	// Unique identifier for the target private chat. If not specified, default bot's menu button will be returned
 	ChatId *int64
@@ -1932,6 +2260,11 @@ type GetChatMenuButtonOpts struct {
 // Use this method to get the current value of the bot's menu button in a private chat, or the default menu button. Returns MenuButton on success.
 //   - opts (type GetChatMenuButtonOpts): All optional parameters.
 func (bot *Bot) GetChatMenuButton(opts *GetChatMenuButtonOpts) (MenuButton, error) {
+	return bot.GetChatMenuButtonWithContext(context.Background(), opts)
+}
+
+// GetChatMenuButtonWithContext is the same as Bot.GetChatMenuButton, but with a context.Context parameter
+func (bot *Bot) GetChatMenuButtonWithContext(ctx context.Context, opts *GetChatMenuButtonOpts) (MenuButton, error) {
 	v := map[string]string{}
 	if opts != nil {
 		if opts.ChatId != nil {
@@ -1944,7 +2277,7 @@ func (bot *Bot) GetChatMenuButton(opts *GetChatMenuButtonOpts) (MenuButton, erro
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("getChatMenuButton", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "getChatMenuButton", v, nil, reqOpts)
 	if err != nil {
 		return nil, err
 	}
@@ -1952,7 +2285,7 @@ func (bot *Bot) GetChatMenuButton(opts *GetChatMenuButtonOpts) (MenuButton, erro
 	return unmarshalMenuButton(r)
 }
 
-// GetCustomEmojiStickersOpts is the set of optional fields for Bot.GetCustomEmojiStickers.
+// GetCustomEmojiStickersOpts is the set of optional fields for Bot.GetCustomEmojiStickers and Bot.GetCustomEmojiStickersWithContext.
 type GetCustomEmojiStickersOpts struct {
 	// RequestOpts are an additional optional field to configure timeouts for individual requests
 	RequestOpts *RequestOpts
@@ -1964,6 +2297,11 @@ type GetCustomEmojiStickersOpts struct {
 //   - customEmojiIds (type []string): A JSON-serialized list of custom emoji identifiers. At most 200 custom emoji identifiers can be specified.
 //   - opts (type GetCustomEmojiStickersOpts): All optional parameters.
 func (bot *Bot) GetCustomEmojiStickers(customEmojiIds []string, opts *GetCustomEmojiStickersOpts) ([]Sticker, error) {
+	return bot.GetCustomEmojiStickersWithContext(context.Background(), customEmojiIds, opts)
+}
+
+// GetCustomEmojiStickersWithContext is the same as Bot.GetCustomEmojiStickers, but with a context.Context parameter
+func (bot *Bot) GetCustomEmojiStickersWithContext(ctx context.Context, customEmojiIds []string, opts *GetCustomEmojiStickersOpts) ([]Sticker, error) {
 	v := map[string]string{}
 	if customEmojiIds != nil {
 		bs, err := json.Marshal(customEmojiIds)
@@ -1978,7 +2316,7 @@ func (bot *Bot) GetCustomEmojiStickers(customEmojiIds []string, opts *GetCustomE
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("getCustomEmojiStickers", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "getCustomEmojiStickers", v, nil, reqOpts)
 	if err != nil {
 		return nil, err
 	}
@@ -1987,7 +2325,7 @@ func (bot *Bot) GetCustomEmojiStickers(customEmojiIds []string, opts *GetCustomE
 	return s, json.Unmarshal(r, &s)
 }
 
-// GetFileOpts is the set of optional fields for Bot.GetFile.
+// GetFileOpts is the set of optional fields for Bot.GetFile and Bot.GetFileWithContext.
 type GetFileOpts struct {
 	// RequestOpts are an additional optional field to configure timeouts for individual requests
 	RequestOpts *RequestOpts
@@ -2000,6 +2338,11 @@ type GetFileOpts struct {
 //   - fileId (type string): File identifier to get information about
 //   - opts (type GetFileOpts): All optional parameters.
 func (bot *Bot) GetFile(fileId string, opts *GetFileOpts) (*File, error) {
+	return bot.GetFileWithContext(context.Background(), fileId, opts)
+}
+
+// GetFileWithContext is the same as Bot.GetFile, but with a context.Context parameter
+func (bot *Bot) GetFileWithContext(ctx context.Context, fileId string, opts *GetFileOpts) (*File, error) {
 	v := map[string]string{}
 	v["file_id"] = fileId
 
@@ -2008,7 +2351,7 @@ func (bot *Bot) GetFile(fileId string, opts *GetFileOpts) (*File, error) {
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("getFile", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "getFile", v, nil, reqOpts)
 	if err != nil {
 		return nil, err
 	}
@@ -2017,7 +2360,7 @@ func (bot *Bot) GetFile(fileId string, opts *GetFileOpts) (*File, error) {
 	return &f, json.Unmarshal(r, &f)
 }
 
-// GetForumTopicIconStickersOpts is the set of optional fields for Bot.GetForumTopicIconStickers.
+// GetForumTopicIconStickersOpts is the set of optional fields for Bot.GetForumTopicIconStickers and Bot.GetForumTopicIconStickersWithContext.
 type GetForumTopicIconStickersOpts struct {
 	// RequestOpts are an additional optional field to configure timeouts for individual requests
 	RequestOpts *RequestOpts
@@ -2028,6 +2371,11 @@ type GetForumTopicIconStickersOpts struct {
 // Use this method to get custom emoji stickers, which can be used as a forum topic icon by any user. Requires no parameters. Returns an Array of Sticker objects.
 //   - opts (type GetForumTopicIconStickersOpts): All optional parameters.
 func (bot *Bot) GetForumTopicIconStickers(opts *GetForumTopicIconStickersOpts) ([]Sticker, error) {
+	return bot.GetForumTopicIconStickersWithContext(context.Background(), opts)
+}
+
+// GetForumTopicIconStickersWithContext is the same as Bot.GetForumTopicIconStickers, but with a context.Context parameter
+func (bot *Bot) GetForumTopicIconStickersWithContext(ctx context.Context, opts *GetForumTopicIconStickersOpts) ([]Sticker, error) {
 	v := map[string]string{}
 
 	var reqOpts *RequestOpts
@@ -2035,7 +2383,7 @@ func (bot *Bot) GetForumTopicIconStickers(opts *GetForumTopicIconStickersOpts) (
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("getForumTopicIconStickers", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "getForumTopicIconStickers", v, nil, reqOpts)
 	if err != nil {
 		return nil, err
 	}
@@ -2044,7 +2392,7 @@ func (bot *Bot) GetForumTopicIconStickers(opts *GetForumTopicIconStickersOpts) (
 	return s, json.Unmarshal(r, &s)
 }
 
-// GetGameHighScoresOpts is the set of optional fields for Bot.GetGameHighScores.
+// GetGameHighScoresOpts is the set of optional fields for Bot.GetGameHighScores and Bot.GetGameHighScoresWithContext.
 type GetGameHighScoresOpts struct {
 	// Required if inline_message_id is not specified. Unique identifier for the target chat
 	ChatId int64
@@ -2062,6 +2410,11 @@ type GetGameHighScoresOpts struct {
 //   - userId (type int64): Target user id
 //   - opts (type GetGameHighScoresOpts): All optional parameters.
 func (bot *Bot) GetGameHighScores(userId int64, opts *GetGameHighScoresOpts) ([]GameHighScore, error) {
+	return bot.GetGameHighScoresWithContext(context.Background(), userId, opts)
+}
+
+// GetGameHighScoresWithContext is the same as Bot.GetGameHighScores, but with a context.Context parameter
+func (bot *Bot) GetGameHighScoresWithContext(ctx context.Context, userId int64, opts *GetGameHighScoresOpts) ([]GameHighScore, error) {
 	v := map[string]string{}
 	v["user_id"] = strconv.FormatInt(userId, 10)
 	if opts != nil {
@@ -2079,7 +2432,7 @@ func (bot *Bot) GetGameHighScores(userId int64, opts *GetGameHighScoresOpts) ([]
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("getGameHighScores", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "getGameHighScores", v, nil, reqOpts)
 	if err != nil {
 		return nil, err
 	}
@@ -2088,7 +2441,7 @@ func (bot *Bot) GetGameHighScores(userId int64, opts *GetGameHighScoresOpts) ([]
 	return g, json.Unmarshal(r, &g)
 }
 
-// GetMeOpts is the set of optional fields for Bot.GetMe.
+// GetMeOpts is the set of optional fields for Bot.GetMe and Bot.GetMeWithContext.
 type GetMeOpts struct {
 	// RequestOpts are an additional optional field to configure timeouts for individual requests
 	RequestOpts *RequestOpts
@@ -2099,6 +2452,11 @@ type GetMeOpts struct {
 // A simple method for testing your bot's authentication token. Requires no parameters. Returns basic information about the bot in form of a User object.
 //   - opts (type GetMeOpts): All optional parameters.
 func (bot *Bot) GetMe(opts *GetMeOpts) (*User, error) {
+	return bot.GetMeWithContext(context.Background(), opts)
+}
+
+// GetMeWithContext is the same as Bot.GetMe, but with a context.Context parameter
+func (bot *Bot) GetMeWithContext(ctx context.Context, opts *GetMeOpts) (*User, error) {
 	v := map[string]string{}
 
 	var reqOpts *RequestOpts
@@ -2106,7 +2464,7 @@ func (bot *Bot) GetMe(opts *GetMeOpts) (*User, error) {
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("getMe", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "getMe", v, nil, reqOpts)
 	if err != nil {
 		return nil, err
 	}
@@ -2115,7 +2473,7 @@ func (bot *Bot) GetMe(opts *GetMeOpts) (*User, error) {
 	return &u, json.Unmarshal(r, &u)
 }
 
-// GetMyCommandsOpts is the set of optional fields for Bot.GetMyCommands.
+// GetMyCommandsOpts is the set of optional fields for Bot.GetMyCommands and Bot.GetMyCommandsWithContext.
 type GetMyCommandsOpts struct {
 	// A JSON-serialized object, describing scope of users. Defaults to BotCommandScopeDefault.
 	Scope BotCommandScope
@@ -2130,6 +2488,11 @@ type GetMyCommandsOpts struct {
 // Use this method to get the current list of the bot's commands for the given scope and user language. Returns an Array of BotCommand objects. If commands aren't set, an empty list is returned.
 //   - opts (type GetMyCommandsOpts): All optional parameters.
 func (bot *Bot) GetMyCommands(opts *GetMyCommandsOpts) ([]BotCommand, error) {
+	return bot.GetMyCommandsWithContext(context.Background(), opts)
+}
+
+// GetMyCommandsWithContext is the same as Bot.GetMyCommands, but with a context.Context parameter
+func (bot *Bot) GetMyCommandsWithContext(ctx context.Context, opts *GetMyCommandsOpts) ([]BotCommand, error) {
 	v := map[string]string{}
 	if opts != nil {
 		bs, err := json.Marshal(opts.Scope)
@@ -2145,7 +2508,7 @@ func (bot *Bot) GetMyCommands(opts *GetMyCommandsOpts) ([]BotCommand, error) {
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("getMyCommands", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "getMyCommands", v, nil, reqOpts)
 	if err != nil {
 		return nil, err
 	}
@@ -2154,7 +2517,7 @@ func (bot *Bot) GetMyCommands(opts *GetMyCommandsOpts) ([]BotCommand, error) {
 	return b, json.Unmarshal(r, &b)
 }
 
-// GetMyDefaultAdministratorRightsOpts is the set of optional fields for Bot.GetMyDefaultAdministratorRights.
+// GetMyDefaultAdministratorRightsOpts is the set of optional fields for Bot.GetMyDefaultAdministratorRights and Bot.GetMyDefaultAdministratorRightsWithContext.
 type GetMyDefaultAdministratorRightsOpts struct {
 	// Pass True to get default administrator rights of the bot in channels. Otherwise, default administrator rights of the bot for groups and supergroups will be returned.
 	ForChannels bool
@@ -2167,6 +2530,11 @@ type GetMyDefaultAdministratorRightsOpts struct {
 // Use this method to get the current default administrator rights of the bot. Returns ChatAdministratorRights on success.
 //   - opts (type GetMyDefaultAdministratorRightsOpts): All optional parameters.
 func (bot *Bot) GetMyDefaultAdministratorRights(opts *GetMyDefaultAdministratorRightsOpts) (*ChatAdministratorRights, error) {
+	return bot.GetMyDefaultAdministratorRightsWithContext(context.Background(), opts)
+}
+
+// GetMyDefaultAdministratorRightsWithContext is the same as Bot.GetMyDefaultAdministratorRights, but with a context.Context parameter
+func (bot *Bot) GetMyDefaultAdministratorRightsWithContext(ctx context.Context, opts *GetMyDefaultAdministratorRightsOpts) (*ChatAdministratorRights, error) {
 	v := map[string]string{}
 	if opts != nil {
 		v["for_channels"] = strconv.FormatBool(opts.ForChannels)
@@ -2177,7 +2545,7 @@ func (bot *Bot) GetMyDefaultAdministratorRights(opts *GetMyDefaultAdministratorR
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("getMyDefaultAdministratorRights", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "getMyDefaultAdministratorRights", v, nil, reqOpts)
 	if err != nil {
 		return nil, err
 	}
@@ -2186,7 +2554,7 @@ func (bot *Bot) GetMyDefaultAdministratorRights(opts *GetMyDefaultAdministratorR
 	return &c, json.Unmarshal(r, &c)
 }
 
-// GetMyDescriptionOpts is the set of optional fields for Bot.GetMyDescription.
+// GetMyDescriptionOpts is the set of optional fields for Bot.GetMyDescription and Bot.GetMyDescriptionWithContext.
 type GetMyDescriptionOpts struct {
 	// A two-letter ISO 639-1 language code or an empty string
 	LanguageCode string
@@ -2199,6 +2567,11 @@ type GetMyDescriptionOpts struct {
 // Use this method to get the current bot description for the given user language. Returns BotDescription on success.
 //   - opts (type GetMyDescriptionOpts): All optional parameters.
 func (bot *Bot) GetMyDescription(opts *GetMyDescriptionOpts) (*BotDescription, error) {
+	return bot.GetMyDescriptionWithContext(context.Background(), opts)
+}
+
+// GetMyDescriptionWithContext is the same as Bot.GetMyDescription, but with a context.Context parameter
+func (bot *Bot) GetMyDescriptionWithContext(ctx context.Context, opts *GetMyDescriptionOpts) (*BotDescription, error) {
 	v := map[string]string{}
 	if opts != nil {
 		v["language_code"] = opts.LanguageCode
@@ -2209,7 +2582,7 @@ func (bot *Bot) GetMyDescription(opts *GetMyDescriptionOpts) (*BotDescription, e
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("getMyDescription", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "getMyDescription", v, nil, reqOpts)
 	if err != nil {
 		return nil, err
 	}
@@ -2218,7 +2591,7 @@ func (bot *Bot) GetMyDescription(opts *GetMyDescriptionOpts) (*BotDescription, e
 	return &b, json.Unmarshal(r, &b)
 }
 
-// GetMyNameOpts is the set of optional fields for Bot.GetMyName.
+// GetMyNameOpts is the set of optional fields for Bot.GetMyName and Bot.GetMyNameWithContext.
 type GetMyNameOpts struct {
 	// A two-letter ISO 639-1 language code or an empty string
 	LanguageCode string
@@ -2231,6 +2604,11 @@ type GetMyNameOpts struct {
 // Use this method to get the current bot name for the given user language. Returns BotName on success.
 //   - opts (type GetMyNameOpts): All optional parameters.
 func (bot *Bot) GetMyName(opts *GetMyNameOpts) (*BotName, error) {
+	return bot.GetMyNameWithContext(context.Background(), opts)
+}
+
+// GetMyNameWithContext is the same as Bot.GetMyName, but with a context.Context parameter
+func (bot *Bot) GetMyNameWithContext(ctx context.Context, opts *GetMyNameOpts) (*BotName, error) {
 	v := map[string]string{}
 	if opts != nil {
 		v["language_code"] = opts.LanguageCode
@@ -2241,7 +2619,7 @@ func (bot *Bot) GetMyName(opts *GetMyNameOpts) (*BotName, error) {
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("getMyName", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "getMyName", v, nil, reqOpts)
 	if err != nil {
 		return nil, err
 	}
@@ -2250,7 +2628,7 @@ func (bot *Bot) GetMyName(opts *GetMyNameOpts) (*BotName, error) {
 	return &b, json.Unmarshal(r, &b)
 }
 
-// GetMyShortDescriptionOpts is the set of optional fields for Bot.GetMyShortDescription.
+// GetMyShortDescriptionOpts is the set of optional fields for Bot.GetMyShortDescription and Bot.GetMyShortDescriptionWithContext.
 type GetMyShortDescriptionOpts struct {
 	// A two-letter ISO 639-1 language code or an empty string
 	LanguageCode string
@@ -2263,6 +2641,11 @@ type GetMyShortDescriptionOpts struct {
 // Use this method to get the current bot short description for the given user language. Returns BotShortDescription on success.
 //   - opts (type GetMyShortDescriptionOpts): All optional parameters.
 func (bot *Bot) GetMyShortDescription(opts *GetMyShortDescriptionOpts) (*BotShortDescription, error) {
+	return bot.GetMyShortDescriptionWithContext(context.Background(), opts)
+}
+
+// GetMyShortDescriptionWithContext is the same as Bot.GetMyShortDescription, but with a context.Context parameter
+func (bot *Bot) GetMyShortDescriptionWithContext(ctx context.Context, opts *GetMyShortDescriptionOpts) (*BotShortDescription, error) {
 	v := map[string]string{}
 	if opts != nil {
 		v["language_code"] = opts.LanguageCode
@@ -2273,7 +2656,7 @@ func (bot *Bot) GetMyShortDescription(opts *GetMyShortDescriptionOpts) (*BotShor
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("getMyShortDescription", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "getMyShortDescription", v, nil, reqOpts)
 	if err != nil {
 		return nil, err
 	}
@@ -2282,7 +2665,51 @@ func (bot *Bot) GetMyShortDescription(opts *GetMyShortDescriptionOpts) (*BotShor
 	return &b, json.Unmarshal(r, &b)
 }
 
-// GetStickerSetOpts is the set of optional fields for Bot.GetStickerSet.
+// GetStarTransactionsOpts is the set of optional fields for Bot.GetStarTransactions and Bot.GetStarTransactionsWithContext.
+type GetStarTransactionsOpts struct {
+	// Number of transactions to skip in the response
+	Offset int64
+	// The maximum number of transactions to be retrieved. Values between 1-100 are accepted. Defaults to 100.
+	Limit int64
+	// RequestOpts are an additional optional field to configure timeouts for individual requests
+	RequestOpts *RequestOpts
+}
+
+// GetStarTransactions (https://core.telegram.org/bots/api#getstartransactions)
+//
+// Returns the bot's Telegram Star transactions in chronological order. On success, returns a StarTransactions object.
+//   - opts (type GetStarTransactionsOpts): All optional parameters.
+func (bot *Bot) GetStarTransactions(opts *GetStarTransactionsOpts) (*StarTransactions, error) {
+	return bot.GetStarTransactionsWithContext(context.Background(), opts)
+}
+
+// GetStarTransactionsWithContext is the same as Bot.GetStarTransactions, but with a context.Context parameter
+func (bot *Bot) GetStarTransactionsWithContext(ctx context.Context, opts *GetStarTransactionsOpts) (*StarTransactions, error) {
+	v := map[string]string{}
+	if opts != nil {
+		if opts.Offset != 0 {
+			v["offset"] = strconv.FormatInt(opts.Offset, 10)
+		}
+		if opts.Limit != 0 {
+			v["limit"] = strconv.FormatInt(opts.Limit, 10)
+		}
+	}
+
+	var reqOpts *RequestOpts
+	if opts != nil {
+		reqOpts = opts.RequestOpts
+	}
+
+	r, err := bot.RequestWithContext(ctx, "getStarTransactions", v, nil, reqOpts)
+	if err != nil {
+		return nil, err
+	}
+
+	var s StarTransactions
+	return &s, json.Unmarshal(r, &s)
+}
+
+// GetStickerSetOpts is the set of optional fields for Bot.GetStickerSet and Bot.GetStickerSetWithContext.
 type GetStickerSetOpts struct {
 	// RequestOpts are an additional optional field to configure timeouts for individual requests
 	RequestOpts *RequestOpts
@@ -2294,6 +2721,11 @@ type GetStickerSetOpts struct {
 //   - name (type string): Name of the sticker set
 //   - opts (type GetStickerSetOpts): All optional parameters.
 func (bot *Bot) GetStickerSet(name string, opts *GetStickerSetOpts) (*StickerSet, error) {
+	return bot.GetStickerSetWithContext(context.Background(), name, opts)
+}
+
+// GetStickerSetWithContext is the same as Bot.GetStickerSet, but with a context.Context parameter
+func (bot *Bot) GetStickerSetWithContext(ctx context.Context, name string, opts *GetStickerSetOpts) (*StickerSet, error) {
 	v := map[string]string{}
 	v["name"] = name
 
@@ -2302,7 +2734,7 @@ func (bot *Bot) GetStickerSet(name string, opts *GetStickerSetOpts) (*StickerSet
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("getStickerSet", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "getStickerSet", v, nil, reqOpts)
 	if err != nil {
 		return nil, err
 	}
@@ -2311,7 +2743,7 @@ func (bot *Bot) GetStickerSet(name string, opts *GetStickerSetOpts) (*StickerSet
 	return &s, json.Unmarshal(r, &s)
 }
 
-// GetUpdatesOpts is the set of optional fields for Bot.GetUpdates.
+// GetUpdatesOpts is the set of optional fields for Bot.GetUpdates and Bot.GetUpdatesWithContext.
 type GetUpdatesOpts struct {
 	// Identifier of the first update to be returned. Must be greater by one than the highest among the identifiers of previously received updates. By default, updates starting with the earliest unconfirmed update are returned. An update is considered confirmed as soon as getUpdates is called with an offset higher than its update_id. The negative offset can be specified to retrieve updates starting from -offset update from the end of the updates queue. All previous updates will be forgotten.
 	Offset int64
@@ -2330,6 +2762,11 @@ type GetUpdatesOpts struct {
 // Use this method to receive incoming updates using long polling (wiki). Returns an Array of Update objects.
 //   - opts (type GetUpdatesOpts): All optional parameters.
 func (bot *Bot) GetUpdates(opts *GetUpdatesOpts) ([]Update, error) {
+	return bot.GetUpdatesWithContext(context.Background(), opts)
+}
+
+// GetUpdatesWithContext is the same as Bot.GetUpdates, but with a context.Context parameter
+func (bot *Bot) GetUpdatesWithContext(ctx context.Context, opts *GetUpdatesOpts) ([]Update, error) {
 	v := map[string]string{}
 	if opts != nil {
 		if opts.Offset != 0 {
@@ -2355,7 +2792,7 @@ func (bot *Bot) GetUpdates(opts *GetUpdatesOpts) ([]Update, error) {
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("getUpdates", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "getUpdates", v, nil, reqOpts)
 	if err != nil {
 		return nil, err
 	}
@@ -2364,7 +2801,7 @@ func (bot *Bot) GetUpdates(opts *GetUpdatesOpts) ([]Update, error) {
 	return u, json.Unmarshal(r, &u)
 }
 
-// GetUserChatBoostsOpts is the set of optional fields for Bot.GetUserChatBoosts.
+// GetUserChatBoostsOpts is the set of optional fields for Bot.GetUserChatBoosts and Bot.GetUserChatBoostsWithContext.
 type GetUserChatBoostsOpts struct {
 	// RequestOpts are an additional optional field to configure timeouts for individual requests
 	RequestOpts *RequestOpts
@@ -2377,6 +2814,11 @@ type GetUserChatBoostsOpts struct {
 //   - userId (type int64): Unique identifier of the target user
 //   - opts (type GetUserChatBoostsOpts): All optional parameters.
 func (bot *Bot) GetUserChatBoosts(chatId int64, userId int64, opts *GetUserChatBoostsOpts) (*UserChatBoosts, error) {
+	return bot.GetUserChatBoostsWithContext(context.Background(), chatId, userId, opts)
+}
+
+// GetUserChatBoostsWithContext is the same as Bot.GetUserChatBoosts, but with a context.Context parameter
+func (bot *Bot) GetUserChatBoostsWithContext(ctx context.Context, chatId int64, userId int64, opts *GetUserChatBoostsOpts) (*UserChatBoosts, error) {
 	v := map[string]string{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 	v["user_id"] = strconv.FormatInt(userId, 10)
@@ -2386,7 +2828,7 @@ func (bot *Bot) GetUserChatBoosts(chatId int64, userId int64, opts *GetUserChatB
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("getUserChatBoosts", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "getUserChatBoosts", v, nil, reqOpts)
 	if err != nil {
 		return nil, err
 	}
@@ -2395,7 +2837,7 @@ func (bot *Bot) GetUserChatBoosts(chatId int64, userId int64, opts *GetUserChatB
 	return &u, json.Unmarshal(r, &u)
 }
 
-// GetUserProfilePhotosOpts is the set of optional fields for Bot.GetUserProfilePhotos.
+// GetUserProfilePhotosOpts is the set of optional fields for Bot.GetUserProfilePhotos and Bot.GetUserProfilePhotosWithContext.
 type GetUserProfilePhotosOpts struct {
 	// Sequential number of the first photo to be returned. By default, all photos are returned.
 	Offset int64
@@ -2411,6 +2853,11 @@ type GetUserProfilePhotosOpts struct {
 //   - userId (type int64): Unique identifier of the target user
 //   - opts (type GetUserProfilePhotosOpts): All optional parameters.
 func (bot *Bot) GetUserProfilePhotos(userId int64, opts *GetUserProfilePhotosOpts) (*UserProfilePhotos, error) {
+	return bot.GetUserProfilePhotosWithContext(context.Background(), userId, opts)
+}
+
+// GetUserProfilePhotosWithContext is the same as Bot.GetUserProfilePhotos, but with a context.Context parameter
+func (bot *Bot) GetUserProfilePhotosWithContext(ctx context.Context, userId int64, opts *GetUserProfilePhotosOpts) (*UserProfilePhotos, error) {
 	v := map[string]string{}
 	v["user_id"] = strconv.FormatInt(userId, 10)
 	if opts != nil {
@@ -2427,7 +2874,7 @@ func (bot *Bot) GetUserProfilePhotos(userId int64, opts *GetUserProfilePhotosOpt
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("getUserProfilePhotos", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "getUserProfilePhotos", v, nil, reqOpts)
 	if err != nil {
 		return nil, err
 	}
@@ -2436,7 +2883,7 @@ func (bot *Bot) GetUserProfilePhotos(userId int64, opts *GetUserProfilePhotosOpt
 	return &u, json.Unmarshal(r, &u)
 }
 
-// GetWebhookInfoOpts is the set of optional fields for Bot.GetWebhookInfo.
+// GetWebhookInfoOpts is the set of optional fields for Bot.GetWebhookInfo and Bot.GetWebhookInfoWithContext.
 type GetWebhookInfoOpts struct {
 	// RequestOpts are an additional optional field to configure timeouts for individual requests
 	RequestOpts *RequestOpts
@@ -2447,6 +2894,11 @@ type GetWebhookInfoOpts struct {
 // Use this method to get current webhook status. Requires no parameters. On success, returns a WebhookInfo object. If the bot is using getUpdates, will return an object with the url field empty.
 //   - opts (type GetWebhookInfoOpts): All optional parameters.
 func (bot *Bot) GetWebhookInfo(opts *GetWebhookInfoOpts) (*WebhookInfo, error) {
+	return bot.GetWebhookInfoWithContext(context.Background(), opts)
+}
+
+// GetWebhookInfoWithContext is the same as Bot.GetWebhookInfo, but with a context.Context parameter
+func (bot *Bot) GetWebhookInfoWithContext(ctx context.Context, opts *GetWebhookInfoOpts) (*WebhookInfo, error) {
 	v := map[string]string{}
 
 	var reqOpts *RequestOpts
@@ -2454,7 +2906,7 @@ func (bot *Bot) GetWebhookInfo(opts *GetWebhookInfoOpts) (*WebhookInfo, error) {
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("getWebhookInfo", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "getWebhookInfo", v, nil, reqOpts)
 	if err != nil {
 		return nil, err
 	}
@@ -2463,7 +2915,7 @@ func (bot *Bot) GetWebhookInfo(opts *GetWebhookInfoOpts) (*WebhookInfo, error) {
 	return &w, json.Unmarshal(r, &w)
 }
 
-// HideGeneralForumTopicOpts is the set of optional fields for Bot.HideGeneralForumTopic.
+// HideGeneralForumTopicOpts is the set of optional fields for Bot.HideGeneralForumTopic and Bot.HideGeneralForumTopicWithContext.
 type HideGeneralForumTopicOpts struct {
 	// RequestOpts are an additional optional field to configure timeouts for individual requests
 	RequestOpts *RequestOpts
@@ -2475,6 +2927,11 @@ type HideGeneralForumTopicOpts struct {
 //   - chatId (type int64): Unique identifier for the target chat
 //   - opts (type HideGeneralForumTopicOpts): All optional parameters.
 func (bot *Bot) HideGeneralForumTopic(chatId int64, opts *HideGeneralForumTopicOpts) (bool, error) {
+	return bot.HideGeneralForumTopicWithContext(context.Background(), chatId, opts)
+}
+
+// HideGeneralForumTopicWithContext is the same as Bot.HideGeneralForumTopic, but with a context.Context parameter
+func (bot *Bot) HideGeneralForumTopicWithContext(ctx context.Context, chatId int64, opts *HideGeneralForumTopicOpts) (bool, error) {
 	v := map[string]string{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 
@@ -2483,7 +2940,7 @@ func (bot *Bot) HideGeneralForumTopic(chatId int64, opts *HideGeneralForumTopicO
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("hideGeneralForumTopic", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "hideGeneralForumTopic", v, nil, reqOpts)
 	if err != nil {
 		return false, err
 	}
@@ -2492,7 +2949,7 @@ func (bot *Bot) HideGeneralForumTopic(chatId int64, opts *HideGeneralForumTopicO
 	return b, json.Unmarshal(r, &b)
 }
 
-// LeaveChatOpts is the set of optional fields for Bot.LeaveChat.
+// LeaveChatOpts is the set of optional fields for Bot.LeaveChat and Bot.LeaveChatWithContext.
 type LeaveChatOpts struct {
 	// RequestOpts are an additional optional field to configure timeouts for individual requests
 	RequestOpts *RequestOpts
@@ -2504,6 +2961,11 @@ type LeaveChatOpts struct {
 //   - chatId (type int64): Unique identifier for the target chat
 //   - opts (type LeaveChatOpts): All optional parameters.
 func (bot *Bot) LeaveChat(chatId int64, opts *LeaveChatOpts) (bool, error) {
+	return bot.LeaveChatWithContext(context.Background(), chatId, opts)
+}
+
+// LeaveChatWithContext is the same as Bot.LeaveChat, but with a context.Context parameter
+func (bot *Bot) LeaveChatWithContext(ctx context.Context, chatId int64, opts *LeaveChatOpts) (bool, error) {
 	v := map[string]string{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 
@@ -2512,7 +2974,7 @@ func (bot *Bot) LeaveChat(chatId int64, opts *LeaveChatOpts) (bool, error) {
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("leaveChat", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "leaveChat", v, nil, reqOpts)
 	if err != nil {
 		return false, err
 	}
@@ -2521,7 +2983,7 @@ func (bot *Bot) LeaveChat(chatId int64, opts *LeaveChatOpts) (bool, error) {
 	return b, json.Unmarshal(r, &b)
 }
 
-// LogOutOpts is the set of optional fields for Bot.LogOut.
+// LogOutOpts is the set of optional fields for Bot.LogOut and Bot.LogOutWithContext.
 type LogOutOpts struct {
 	// RequestOpts are an additional optional field to configure timeouts for individual requests
 	RequestOpts *RequestOpts
@@ -2532,6 +2994,11 @@ type LogOutOpts struct {
 // Use this method to log out from the cloud Bot API server before launching the bot locally. You must log out the bot before running it locally, otherwise there is no guarantee that the bot will receive updates. After a successful call, you can immediately log in on a local server, but will not be able to log in back to the cloud Bot API server for 10 minutes. Returns True on success. Requires no parameters.
 //   - opts (type LogOutOpts): All optional parameters.
 func (bot *Bot) LogOut(opts *LogOutOpts) (bool, error) {
+	return bot.LogOutWithContext(context.Background(), opts)
+}
+
+// LogOutWithContext is the same as Bot.LogOut, but with a context.Context parameter
+func (bot *Bot) LogOutWithContext(ctx context.Context, opts *LogOutOpts) (bool, error) {
 	v := map[string]string{}
 
 	var reqOpts *RequestOpts
@@ -2539,7 +3006,7 @@ func (bot *Bot) LogOut(opts *LogOutOpts) (bool, error) {
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("logOut", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "logOut", v, nil, reqOpts)
 	if err != nil {
 		return false, err
 	}
@@ -2548,8 +3015,10 @@ func (bot *Bot) LogOut(opts *LogOutOpts) (bool, error) {
 	return b, json.Unmarshal(r, &b)
 }
 
-// PinChatMessageOpts is the set of optional fields for Bot.PinChatMessage.
+// PinChatMessageOpts is the set of optional fields for Bot.PinChatMessage and Bot.PinChatMessageWithContext.
 type PinChatMessageOpts struct {
+	// Unique identifier of the business connection on behalf of which the message will be pinned
+	BusinessConnectionId string
 	// Pass True if it is not necessary to send a notification to all chat members about the new pinned message. Notifications are always disabled in channels and private chats.
 	DisableNotification bool
 	// RequestOpts are an additional optional field to configure timeouts for individual requests
@@ -2563,10 +3032,16 @@ type PinChatMessageOpts struct {
 //   - messageId (type int64): Identifier of a message to pin
 //   - opts (type PinChatMessageOpts): All optional parameters.
 func (bot *Bot) PinChatMessage(chatId int64, messageId int64, opts *PinChatMessageOpts) (bool, error) {
+	return bot.PinChatMessageWithContext(context.Background(), chatId, messageId, opts)
+}
+
+// PinChatMessageWithContext is the same as Bot.PinChatMessage, but with a context.Context parameter
+func (bot *Bot) PinChatMessageWithContext(ctx context.Context, chatId int64, messageId int64, opts *PinChatMessageOpts) (bool, error) {
 	v := map[string]string{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 	v["message_id"] = strconv.FormatInt(messageId, 10)
 	if opts != nil {
+		v["business_connection_id"] = opts.BusinessConnectionId
 		v["disable_notification"] = strconv.FormatBool(opts.DisableNotification)
 	}
 
@@ -2575,7 +3050,7 @@ func (bot *Bot) PinChatMessage(chatId int64, messageId int64, opts *PinChatMessa
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("pinChatMessage", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "pinChatMessage", v, nil, reqOpts)
 	if err != nil {
 		return false, err
 	}
@@ -2584,7 +3059,7 @@ func (bot *Bot) PinChatMessage(chatId int64, messageId int64, opts *PinChatMessa
 	return b, json.Unmarshal(r, &b)
 }
 
-// PromoteChatMemberOpts is the set of optional fields for Bot.PromoteChatMember.
+// PromoteChatMemberOpts is the set of optional fields for Bot.PromoteChatMember and Bot.PromoteChatMemberWithContext.
 type PromoteChatMemberOpts struct {
 	// Pass True if the administrator's presence in the chat is hidden
 	IsAnonymous bool
@@ -2627,6 +3102,11 @@ type PromoteChatMemberOpts struct {
 //   - userId (type int64): Unique identifier of the target user
 //   - opts (type PromoteChatMemberOpts): All optional parameters.
 func (bot *Bot) PromoteChatMember(chatId int64, userId int64, opts *PromoteChatMemberOpts) (bool, error) {
+	return bot.PromoteChatMemberWithContext(context.Background(), chatId, userId, opts)
+}
+
+// PromoteChatMemberWithContext is the same as Bot.PromoteChatMember, but with a context.Context parameter
+func (bot *Bot) PromoteChatMemberWithContext(ctx context.Context, chatId int64, userId int64, opts *PromoteChatMemberOpts) (bool, error) {
 	v := map[string]string{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 	v["user_id"] = strconv.FormatInt(userId, 10)
@@ -2653,7 +3133,7 @@ func (bot *Bot) PromoteChatMember(chatId int64, userId int64, opts *PromoteChatM
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("promoteChatMember", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "promoteChatMember", v, nil, reqOpts)
 	if err != nil {
 		return false, err
 	}
@@ -2662,7 +3142,43 @@ func (bot *Bot) PromoteChatMember(chatId int64, userId int64, opts *PromoteChatM
 	return b, json.Unmarshal(r, &b)
 }
 
-// ReopenForumTopicOpts is the set of optional fields for Bot.ReopenForumTopic.
+// RefundStarPaymentOpts is the set of optional fields for Bot.RefundStarPayment and Bot.RefundStarPaymentWithContext.
+type RefundStarPaymentOpts struct {
+	// RequestOpts are an additional optional field to configure timeouts for individual requests
+	RequestOpts *RequestOpts
+}
+
+// RefundStarPayment (https://core.telegram.org/bots/api#refundstarpayment)
+//
+// Refunds a successful payment in Telegram Stars. Returns True on success.
+//   - userId (type int64): Identifier of the user whose payment will be refunded
+//   - telegramPaymentChargeId (type string): Telegram payment identifier
+//   - opts (type RefundStarPaymentOpts): All optional parameters.
+func (bot *Bot) RefundStarPayment(userId int64, telegramPaymentChargeId string, opts *RefundStarPaymentOpts) (bool, error) {
+	return bot.RefundStarPaymentWithContext(context.Background(), userId, telegramPaymentChargeId, opts)
+}
+
+// RefundStarPaymentWithContext is the same as Bot.RefundStarPayment, but with a context.Context parameter
+func (bot *Bot) RefundStarPaymentWithContext(ctx context.Context, userId int64, telegramPaymentChargeId string, opts *RefundStarPaymentOpts) (bool, error) {
+	v := map[string]string{}
+	v["user_id"] = strconv.FormatInt(userId, 10)
+	v["telegram_payment_charge_id"] = telegramPaymentChargeId
+
+	var reqOpts *RequestOpts
+	if opts != nil {
+		reqOpts = opts.RequestOpts
+	}
+
+	r, err := bot.RequestWithContext(ctx, "refundStarPayment", v, nil, reqOpts)
+	if err != nil {
+		return false, err
+	}
+
+	var b bool
+	return b, json.Unmarshal(r, &b)
+}
+
+// ReopenForumTopicOpts is the set of optional fields for Bot.ReopenForumTopic and Bot.ReopenForumTopicWithContext.
 type ReopenForumTopicOpts struct {
 	// RequestOpts are an additional optional field to configure timeouts for individual requests
 	RequestOpts *RequestOpts
@@ -2675,6 +3191,11 @@ type ReopenForumTopicOpts struct {
 //   - messageThreadId (type int64): Unique identifier for the target message thread of the forum topic
 //   - opts (type ReopenForumTopicOpts): All optional parameters.
 func (bot *Bot) ReopenForumTopic(chatId int64, messageThreadId int64, opts *ReopenForumTopicOpts) (bool, error) {
+	return bot.ReopenForumTopicWithContext(context.Background(), chatId, messageThreadId, opts)
+}
+
+// ReopenForumTopicWithContext is the same as Bot.ReopenForumTopic, but with a context.Context parameter
+func (bot *Bot) ReopenForumTopicWithContext(ctx context.Context, chatId int64, messageThreadId int64, opts *ReopenForumTopicOpts) (bool, error) {
 	v := map[string]string{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 	v["message_thread_id"] = strconv.FormatInt(messageThreadId, 10)
@@ -2684,7 +3205,7 @@ func (bot *Bot) ReopenForumTopic(chatId int64, messageThreadId int64, opts *Reop
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("reopenForumTopic", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "reopenForumTopic", v, nil, reqOpts)
 	if err != nil {
 		return false, err
 	}
@@ -2693,7 +3214,7 @@ func (bot *Bot) ReopenForumTopic(chatId int64, messageThreadId int64, opts *Reop
 	return b, json.Unmarshal(r, &b)
 }
 
-// ReopenGeneralForumTopicOpts is the set of optional fields for Bot.ReopenGeneralForumTopic.
+// ReopenGeneralForumTopicOpts is the set of optional fields for Bot.ReopenGeneralForumTopic and Bot.ReopenGeneralForumTopicWithContext.
 type ReopenGeneralForumTopicOpts struct {
 	// RequestOpts are an additional optional field to configure timeouts for individual requests
 	RequestOpts *RequestOpts
@@ -2705,6 +3226,11 @@ type ReopenGeneralForumTopicOpts struct {
 //   - chatId (type int64): Unique identifier for the target chat
 //   - opts (type ReopenGeneralForumTopicOpts): All optional parameters.
 func (bot *Bot) ReopenGeneralForumTopic(chatId int64, opts *ReopenGeneralForumTopicOpts) (bool, error) {
+	return bot.ReopenGeneralForumTopicWithContext(context.Background(), chatId, opts)
+}
+
+// ReopenGeneralForumTopicWithContext is the same as Bot.ReopenGeneralForumTopic, but with a context.Context parameter
+func (bot *Bot) ReopenGeneralForumTopicWithContext(ctx context.Context, chatId int64, opts *ReopenGeneralForumTopicOpts) (bool, error) {
 	v := map[string]string{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 
@@ -2713,7 +3239,7 @@ func (bot *Bot) ReopenGeneralForumTopic(chatId int64, opts *ReopenGeneralForumTo
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("reopenGeneralForumTopic", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "reopenGeneralForumTopic", v, nil, reqOpts)
 	if err != nil {
 		return false, err
 	}
@@ -2722,7 +3248,7 @@ func (bot *Bot) ReopenGeneralForumTopic(chatId int64, opts *ReopenGeneralForumTo
 	return b, json.Unmarshal(r, &b)
 }
 
-// ReplaceStickerInSetOpts is the set of optional fields for Bot.ReplaceStickerInSet.
+// ReplaceStickerInSetOpts is the set of optional fields for Bot.ReplaceStickerInSet and Bot.ReplaceStickerInSetWithContext.
 type ReplaceStickerInSetOpts struct {
 	// RequestOpts are an additional optional field to configure timeouts for individual requests
 	RequestOpts *RequestOpts
@@ -2737,8 +3263,13 @@ type ReplaceStickerInSetOpts struct {
 //   - sticker (type InputSticker): A JSON-serialized object with information about the added sticker. If exactly the same sticker had already been added to the set, then the set remains unchanged.
 //   - opts (type ReplaceStickerInSetOpts): All optional parameters.
 func (bot *Bot) ReplaceStickerInSet(userId int64, name string, oldSticker string, sticker InputSticker, opts *ReplaceStickerInSetOpts) (bool, error) {
+	return bot.ReplaceStickerInSetWithContext(context.Background(), userId, name, oldSticker, sticker, opts)
+}
+
+// ReplaceStickerInSetWithContext is the same as Bot.ReplaceStickerInSet, but with a context.Context parameter
+func (bot *Bot) ReplaceStickerInSetWithContext(ctx context.Context, userId int64, name string, oldSticker string, sticker InputSticker, opts *ReplaceStickerInSetOpts) (bool, error) {
 	v := map[string]string{}
-	data := map[string]NamedReader{}
+	data := map[string]FileReader{}
 	v["user_id"] = strconv.FormatInt(userId, 10)
 	v["name"] = name
 	v["old_sticker"] = oldSticker
@@ -2753,7 +3284,7 @@ func (bot *Bot) ReplaceStickerInSet(userId int64, name string, oldSticker string
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("replaceStickerInSet", v, data, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "replaceStickerInSet", v, data, reqOpts)
 	if err != nil {
 		return false, err
 	}
@@ -2762,7 +3293,7 @@ func (bot *Bot) ReplaceStickerInSet(userId int64, name string, oldSticker string
 	return b, json.Unmarshal(r, &b)
 }
 
-// RestrictChatMemberOpts is the set of optional fields for Bot.RestrictChatMember.
+// RestrictChatMemberOpts is the set of optional fields for Bot.RestrictChatMember and Bot.RestrictChatMemberWithContext.
 type RestrictChatMemberOpts struct {
 	// Pass True if chat permissions are set independently. Otherwise, the can_send_other_messages and can_add_web_page_previews permissions will imply the can_send_messages, can_send_audios, can_send_documents, can_send_photos, can_send_videos, can_send_video_notes, and can_send_voice_notes permissions; the can_send_polls permission will imply the can_send_messages permission.
 	UseIndependentChatPermissions bool
@@ -2780,6 +3311,11 @@ type RestrictChatMemberOpts struct {
 //   - permissions (type ChatPermissions): A JSON-serialized object for new user permissions
 //   - opts (type RestrictChatMemberOpts): All optional parameters.
 func (bot *Bot) RestrictChatMember(chatId int64, userId int64, permissions ChatPermissions, opts *RestrictChatMemberOpts) (bool, error) {
+	return bot.RestrictChatMemberWithContext(context.Background(), chatId, userId, permissions, opts)
+}
+
+// RestrictChatMemberWithContext is the same as Bot.RestrictChatMember, but with a context.Context parameter
+func (bot *Bot) RestrictChatMemberWithContext(ctx context.Context, chatId int64, userId int64, permissions ChatPermissions, opts *RestrictChatMemberOpts) (bool, error) {
 	v := map[string]string{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 	v["user_id"] = strconv.FormatInt(userId, 10)
@@ -2800,7 +3336,7 @@ func (bot *Bot) RestrictChatMember(chatId int64, userId int64, permissions ChatP
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("restrictChatMember", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "restrictChatMember", v, nil, reqOpts)
 	if err != nil {
 		return false, err
 	}
@@ -2809,7 +3345,7 @@ func (bot *Bot) RestrictChatMember(chatId int64, userId int64, permissions ChatP
 	return b, json.Unmarshal(r, &b)
 }
 
-// RevokeChatInviteLinkOpts is the set of optional fields for Bot.RevokeChatInviteLink.
+// RevokeChatInviteLinkOpts is the set of optional fields for Bot.RevokeChatInviteLink and Bot.RevokeChatInviteLinkWithContext.
 type RevokeChatInviteLinkOpts struct {
 	// RequestOpts are an additional optional field to configure timeouts for individual requests
 	RequestOpts *RequestOpts
@@ -2822,6 +3358,11 @@ type RevokeChatInviteLinkOpts struct {
 //   - inviteLink (type string): The invite link to revoke
 //   - opts (type RevokeChatInviteLinkOpts): All optional parameters.
 func (bot *Bot) RevokeChatInviteLink(chatId int64, inviteLink string, opts *RevokeChatInviteLinkOpts) (*ChatInviteLink, error) {
+	return bot.RevokeChatInviteLinkWithContext(context.Background(), chatId, inviteLink, opts)
+}
+
+// RevokeChatInviteLinkWithContext is the same as Bot.RevokeChatInviteLink, but with a context.Context parameter
+func (bot *Bot) RevokeChatInviteLinkWithContext(ctx context.Context, chatId int64, inviteLink string, opts *RevokeChatInviteLinkOpts) (*ChatInviteLink, error) {
 	v := map[string]string{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 	v["invite_link"] = inviteLink
@@ -2831,7 +3372,7 @@ func (bot *Bot) RevokeChatInviteLink(chatId int64, inviteLink string, opts *Revo
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("revokeChatInviteLink", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "revokeChatInviteLink", v, nil, reqOpts)
 	if err != nil {
 		return nil, err
 	}
@@ -2840,7 +3381,7 @@ func (bot *Bot) RevokeChatInviteLink(chatId int64, inviteLink string, opts *Revo
 	return &c, json.Unmarshal(r, &c)
 }
 
-// SendAnimationOpts is the set of optional fields for Bot.SendAnimation.
+// SendAnimationOpts is the set of optional fields for Bot.SendAnimation and Bot.SendAnimationWithContext.
 type SendAnimationOpts struct {
 	// Unique identifier of the business connection on behalf of which the message will be sent
 	BusinessConnectionId string
@@ -2860,12 +3401,18 @@ type SendAnimationOpts struct {
 	ParseMode string
 	// A JSON-serialized list of special entities that appear in the caption, which can be specified instead of parse_mode
 	CaptionEntities []MessageEntity
+	// Pass True, if the caption must be shown above the message media
+	ShowCaptionAboveMedia bool
 	// Pass True if the animation needs to be covered with a spoiler animation
 	HasSpoiler bool
 	// Sends the message silently. Users will receive a notification with no sound.
 	DisableNotification bool
 	// Protects the contents of the sent message from forwarding and saving
 	ProtectContent bool
+	// Pass True to allow up to 1000 messages per second, ignoring broadcasting limits for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot's balance
+	AllowPaidBroadcast bool
+	// Unique identifier of the message effect to be added to the message; for private chats only
+	MessageEffectId string
 	// Description of the message to reply to
 	ReplyParameters *ReplyParameters
 	// Additional interface options. A JSON-serialized object for an inline keyboard, custom reply keyboard, instructions to remove a reply keyboard or to force a reply from the user
@@ -2878,32 +3425,23 @@ type SendAnimationOpts struct {
 //
 // Use this method to send animation files (GIF or H.264/MPEG-4 AVC video without sound). On success, the sent Message is returned. Bots can currently send animation files of up to 50 MB in size, this limit may be changed in the future.
 //   - chatId (type int64): Unique identifier for the target chat
-//   - animation (type InputFile): Animation to send. Pass a file_id as String to send an animation that exists on the Telegram servers (recommended), pass an HTTP URL as a String for Telegram to get an animation from the Internet, or upload a new animation using multipart/form-data. More information on Sending Files: https://core.telegram.org/bots/api#sending-files
+//   - animation (type InputFileOrString): Animation to send. Pass a file_id as String to send an animation that exists on the Telegram servers (recommended), pass an HTTP URL as a String for Telegram to get an animation from the Internet, or upload a new animation using multipart/form-data. More information on Sending Files: https://core.telegram.org/bots/api#sending-files
 //   - opts (type SendAnimationOpts): All optional parameters.
-func (bot *Bot) SendAnimation(chatId int64, animation InputFile, opts *SendAnimationOpts) (*Message, error) {
+func (bot *Bot) SendAnimation(chatId int64, animation InputFileOrString, opts *SendAnimationOpts) (*Message, error) {
+	return bot.SendAnimationWithContext(context.Background(), chatId, animation, opts)
+}
+
+// SendAnimationWithContext is the same as Bot.SendAnimation, but with a context.Context parameter
+func (bot *Bot) SendAnimationWithContext(ctx context.Context, chatId int64, animation InputFileOrString, opts *SendAnimationOpts) (*Message, error) {
 	v := map[string]string{}
-	data := map[string]NamedReader{}
+	data := map[string]FileReader{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 	if animation != nil {
-		switch m := animation.(type) {
-		case string:
-			v["animation"] = m
-
-		case NamedReader:
-			v["animation"] = "attach://animation"
-			data["animation"] = m
-
-		case io.Reader:
-			v["animation"] = "attach://animation"
-			data["animation"] = NamedFile{File: m}
-
-		case []byte:
-			v["animation"] = "attach://animation"
-			data["animation"] = NamedFile{File: bytes.NewReader(m)}
-
-		default:
-			return nil, fmt.Errorf("unknown type for InputFile: %T", animation)
+		err := animation.Attach("animation", data)
+		if err != nil {
+			return nil, fmt.Errorf("failed to attach 'animation' input file: %w", err)
 		}
+		v["animation"] = animation.getValue()
 	}
 	if opts != nil {
 		v["business_connection_id"] = opts.BusinessConnectionId
@@ -2920,25 +3458,11 @@ func (bot *Bot) SendAnimation(chatId int64, animation InputFile, opts *SendAnima
 			v["height"] = strconv.FormatInt(opts.Height, 10)
 		}
 		if opts.Thumbnail != nil {
-			switch m := opts.Thumbnail.(type) {
-			case string:
-				v["thumbnail"] = m
-
-			case NamedReader:
-				v["thumbnail"] = "attach://thumbnail"
-				data["thumbnail"] = m
-
-			case io.Reader:
-				v["thumbnail"] = "attach://thumbnail"
-				data["thumbnail"] = NamedFile{File: m}
-
-			case []byte:
-				v["thumbnail"] = "attach://thumbnail"
-				data["thumbnail"] = NamedFile{File: bytes.NewReader(m)}
-
-			default:
-				return nil, fmt.Errorf("unknown type for InputFile: %T", opts.Thumbnail)
+			err := opts.Thumbnail.Attach("thumbnail", data)
+			if err != nil {
+				return nil, fmt.Errorf("failed to attach 'thumbnail' input file: %w", err)
 			}
+			v["thumbnail"] = opts.Thumbnail.getValue()
 		}
 		v["caption"] = opts.Caption
 		v["parse_mode"] = opts.ParseMode
@@ -2949,9 +3473,12 @@ func (bot *Bot) SendAnimation(chatId int64, animation InputFile, opts *SendAnima
 			}
 			v["caption_entities"] = string(bs)
 		}
+		v["show_caption_above_media"] = strconv.FormatBool(opts.ShowCaptionAboveMedia)
 		v["has_spoiler"] = strconv.FormatBool(opts.HasSpoiler)
 		v["disable_notification"] = strconv.FormatBool(opts.DisableNotification)
 		v["protect_content"] = strconv.FormatBool(opts.ProtectContent)
+		v["allow_paid_broadcast"] = strconv.FormatBool(opts.AllowPaidBroadcast)
+		v["message_effect_id"] = opts.MessageEffectId
 		if opts.ReplyParameters != nil {
 			bs, err := json.Marshal(opts.ReplyParameters)
 			if err != nil {
@@ -2973,7 +3500,7 @@ func (bot *Bot) SendAnimation(chatId int64, animation InputFile, opts *SendAnima
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("sendAnimation", v, data, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "sendAnimation", v, data, reqOpts)
 	if err != nil {
 		return nil, err
 	}
@@ -2982,7 +3509,7 @@ func (bot *Bot) SendAnimation(chatId int64, animation InputFile, opts *SendAnima
 	return &m, json.Unmarshal(r, &m)
 }
 
-// SendAudioOpts is the set of optional fields for Bot.SendAudio.
+// SendAudioOpts is the set of optional fields for Bot.SendAudio and Bot.SendAudioWithContext.
 type SendAudioOpts struct {
 	// Unique identifier of the business connection on behalf of which the message will be sent
 	BusinessConnectionId string
@@ -3006,6 +3533,10 @@ type SendAudioOpts struct {
 	DisableNotification bool
 	// Protects the contents of the sent message from forwarding and saving
 	ProtectContent bool
+	// Pass True to allow up to 1000 messages per second, ignoring broadcasting limits for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot's balance
+	AllowPaidBroadcast bool
+	// Unique identifier of the message effect to be added to the message; for private chats only
+	MessageEffectId string
 	// Description of the message to reply to
 	ReplyParameters *ReplyParameters
 	// Additional interface options. A JSON-serialized object for an inline keyboard, custom reply keyboard, instructions to remove a reply keyboard or to force a reply from the user
@@ -3019,32 +3550,23 @@ type SendAudioOpts struct {
 // Use this method to send audio files, if you want Telegram clients to display them in the music player. Your audio must be in the .MP3 or .M4A format. On success, the sent Message is returned. Bots can currently send audio files of up to 50 MB in size, this limit may be changed in the future.
 // For sending voice messages, use the sendVoice method instead.
 //   - chatId (type int64): Unique identifier for the target chat
-//   - audio (type InputFile): Audio file to send. Pass a file_id as String to send an audio file that exists on the Telegram servers (recommended), pass an HTTP URL as a String for Telegram to get an audio file from the Internet, or upload a new one using multipart/form-data. More information on Sending Files: https://core.telegram.org/bots/api#sending-files
+//   - audio (type InputFileOrString): Audio file to send. Pass a file_id as String to send an audio file that exists on the Telegram servers (recommended), pass an HTTP URL as a String for Telegram to get an audio file from the Internet, or upload a new one using multipart/form-data. More information on Sending Files: https://core.telegram.org/bots/api#sending-files
 //   - opts (type SendAudioOpts): All optional parameters.
-func (bot *Bot) SendAudio(chatId int64, audio InputFile, opts *SendAudioOpts) (*Message, error) {
+func (bot *Bot) SendAudio(chatId int64, audio InputFileOrString, opts *SendAudioOpts) (*Message, error) {
+	return bot.SendAudioWithContext(context.Background(), chatId, audio, opts)
+}
+
+// SendAudioWithContext is the same as Bot.SendAudio, but with a context.Context parameter
+func (bot *Bot) SendAudioWithContext(ctx context.Context, chatId int64, audio InputFileOrString, opts *SendAudioOpts) (*Message, error) {
 	v := map[string]string{}
-	data := map[string]NamedReader{}
+	data := map[string]FileReader{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 	if audio != nil {
-		switch m := audio.(type) {
-		case string:
-			v["audio"] = m
-
-		case NamedReader:
-			v["audio"] = "attach://audio"
-			data["audio"] = m
-
-		case io.Reader:
-			v["audio"] = "attach://audio"
-			data["audio"] = NamedFile{File: m}
-
-		case []byte:
-			v["audio"] = "attach://audio"
-			data["audio"] = NamedFile{File: bytes.NewReader(m)}
-
-		default:
-			return nil, fmt.Errorf("unknown type for InputFile: %T", audio)
+		err := audio.Attach("audio", data)
+		if err != nil {
+			return nil, fmt.Errorf("failed to attach 'audio' input file: %w", err)
 		}
+		v["audio"] = audio.getValue()
 	}
 	if opts != nil {
 		v["business_connection_id"] = opts.BusinessConnectionId
@@ -3066,28 +3588,16 @@ func (bot *Bot) SendAudio(chatId int64, audio InputFile, opts *SendAudioOpts) (*
 		v["performer"] = opts.Performer
 		v["title"] = opts.Title
 		if opts.Thumbnail != nil {
-			switch m := opts.Thumbnail.(type) {
-			case string:
-				v["thumbnail"] = m
-
-			case NamedReader:
-				v["thumbnail"] = "attach://thumbnail"
-				data["thumbnail"] = m
-
-			case io.Reader:
-				v["thumbnail"] = "attach://thumbnail"
-				data["thumbnail"] = NamedFile{File: m}
-
-			case []byte:
-				v["thumbnail"] = "attach://thumbnail"
-				data["thumbnail"] = NamedFile{File: bytes.NewReader(m)}
-
-			default:
-				return nil, fmt.Errorf("unknown type for InputFile: %T", opts.Thumbnail)
+			err := opts.Thumbnail.Attach("thumbnail", data)
+			if err != nil {
+				return nil, fmt.Errorf("failed to attach 'thumbnail' input file: %w", err)
 			}
+			v["thumbnail"] = opts.Thumbnail.getValue()
 		}
 		v["disable_notification"] = strconv.FormatBool(opts.DisableNotification)
 		v["protect_content"] = strconv.FormatBool(opts.ProtectContent)
+		v["allow_paid_broadcast"] = strconv.FormatBool(opts.AllowPaidBroadcast)
+		v["message_effect_id"] = opts.MessageEffectId
 		if opts.ReplyParameters != nil {
 			bs, err := json.Marshal(opts.ReplyParameters)
 			if err != nil {
@@ -3109,7 +3619,7 @@ func (bot *Bot) SendAudio(chatId int64, audio InputFile, opts *SendAudioOpts) (*
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("sendAudio", v, data, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "sendAudio", v, data, reqOpts)
 	if err != nil {
 		return nil, err
 	}
@@ -3118,7 +3628,7 @@ func (bot *Bot) SendAudio(chatId int64, audio InputFile, opts *SendAudioOpts) (*
 	return &m, json.Unmarshal(r, &m)
 }
 
-// SendChatActionOpts is the set of optional fields for Bot.SendChatAction.
+// SendChatActionOpts is the set of optional fields for Bot.SendChatAction and Bot.SendChatActionWithContext.
 type SendChatActionOpts struct {
 	// Unique identifier of the business connection on behalf of which the action will be sent
 	BusinessConnectionId string
@@ -3136,6 +3646,11 @@ type SendChatActionOpts struct {
 //   - action (type string): Type of action to broadcast. Choose one, depending on what the user is about to receive: typing for text messages, upload_photo for photos, record_video or upload_video for videos, record_voice or upload_voice for voice notes, upload_document for general files, choose_sticker for stickers, find_location for location data, record_video_note or upload_video_note for video notes.
 //   - opts (type SendChatActionOpts): All optional parameters.
 func (bot *Bot) SendChatAction(chatId int64, action string, opts *SendChatActionOpts) (bool, error) {
+	return bot.SendChatActionWithContext(context.Background(), chatId, action, opts)
+}
+
+// SendChatActionWithContext is the same as Bot.SendChatAction, but with a context.Context parameter
+func (bot *Bot) SendChatActionWithContext(ctx context.Context, chatId int64, action string, opts *SendChatActionOpts) (bool, error) {
 	v := map[string]string{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 	v["action"] = action
@@ -3151,7 +3666,7 @@ func (bot *Bot) SendChatAction(chatId int64, action string, opts *SendChatAction
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("sendChatAction", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "sendChatAction", v, nil, reqOpts)
 	if err != nil {
 		return false, err
 	}
@@ -3160,7 +3675,7 @@ func (bot *Bot) SendChatAction(chatId int64, action string, opts *SendChatAction
 	return b, json.Unmarshal(r, &b)
 }
 
-// SendContactOpts is the set of optional fields for Bot.SendContact.
+// SendContactOpts is the set of optional fields for Bot.SendContact and Bot.SendContactWithContext.
 type SendContactOpts struct {
 	// Unique identifier of the business connection on behalf of which the message will be sent
 	BusinessConnectionId string
@@ -3174,6 +3689,10 @@ type SendContactOpts struct {
 	DisableNotification bool
 	// Protects the contents of the sent message from forwarding and saving
 	ProtectContent bool
+	// Pass True to allow up to 1000 messages per second, ignoring broadcasting limits for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot's balance
+	AllowPaidBroadcast bool
+	// Unique identifier of the message effect to be added to the message; for private chats only
+	MessageEffectId string
 	// Description of the message to reply to
 	ReplyParameters *ReplyParameters
 	// Additional interface options. A JSON-serialized object for an inline keyboard, custom reply keyboard, instructions to remove a reply keyboard or to force a reply from the user
@@ -3190,6 +3709,11 @@ type SendContactOpts struct {
 //   - firstName (type string): Contact's first name
 //   - opts (type SendContactOpts): All optional parameters.
 func (bot *Bot) SendContact(chatId int64, phoneNumber string, firstName string, opts *SendContactOpts) (*Message, error) {
+	return bot.SendContactWithContext(context.Background(), chatId, phoneNumber, firstName, opts)
+}
+
+// SendContactWithContext is the same as Bot.SendContact, but with a context.Context parameter
+func (bot *Bot) SendContactWithContext(ctx context.Context, chatId int64, phoneNumber string, firstName string, opts *SendContactOpts) (*Message, error) {
 	v := map[string]string{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 	v["phone_number"] = phoneNumber
@@ -3203,6 +3727,8 @@ func (bot *Bot) SendContact(chatId int64, phoneNumber string, firstName string, 
 		v["vcard"] = opts.Vcard
 		v["disable_notification"] = strconv.FormatBool(opts.DisableNotification)
 		v["protect_content"] = strconv.FormatBool(opts.ProtectContent)
+		v["allow_paid_broadcast"] = strconv.FormatBool(opts.AllowPaidBroadcast)
+		v["message_effect_id"] = opts.MessageEffectId
 		if opts.ReplyParameters != nil {
 			bs, err := json.Marshal(opts.ReplyParameters)
 			if err != nil {
@@ -3224,7 +3750,7 @@ func (bot *Bot) SendContact(chatId int64, phoneNumber string, firstName string, 
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("sendContact", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "sendContact", v, nil, reqOpts)
 	if err != nil {
 		return nil, err
 	}
@@ -3233,7 +3759,7 @@ func (bot *Bot) SendContact(chatId int64, phoneNumber string, firstName string, 
 	return &m, json.Unmarshal(r, &m)
 }
 
-// SendDiceOpts is the set of optional fields for Bot.SendDice.
+// SendDiceOpts is the set of optional fields for Bot.SendDice and Bot.SendDiceWithContext.
 type SendDiceOpts struct {
 	// Unique identifier of the business connection on behalf of which the message will be sent
 	BusinessConnectionId string
@@ -3245,6 +3771,10 @@ type SendDiceOpts struct {
 	DisableNotification bool
 	// Protects the contents of the sent message from forwarding
 	ProtectContent bool
+	// Pass True to allow up to 1000 messages per second, ignoring broadcasting limits for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot's balance
+	AllowPaidBroadcast bool
+	// Unique identifier of the message effect to be added to the message; for private chats only
+	MessageEffectId string
 	// Description of the message to reply to
 	ReplyParameters *ReplyParameters
 	// Additional interface options. A JSON-serialized object for an inline keyboard, custom reply keyboard, instructions to remove a reply keyboard or to force a reply from the user
@@ -3259,6 +3789,11 @@ type SendDiceOpts struct {
 //   - chatId (type int64): Unique identifier for the target chat
 //   - opts (type SendDiceOpts): All optional parameters.
 func (bot *Bot) SendDice(chatId int64, opts *SendDiceOpts) (*Message, error) {
+	return bot.SendDiceWithContext(context.Background(), chatId, opts)
+}
+
+// SendDiceWithContext is the same as Bot.SendDice, but with a context.Context parameter
+func (bot *Bot) SendDiceWithContext(ctx context.Context, chatId int64, opts *SendDiceOpts) (*Message, error) {
 	v := map[string]string{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 	if opts != nil {
@@ -3269,6 +3804,8 @@ func (bot *Bot) SendDice(chatId int64, opts *SendDiceOpts) (*Message, error) {
 		v["emoji"] = opts.Emoji
 		v["disable_notification"] = strconv.FormatBool(opts.DisableNotification)
 		v["protect_content"] = strconv.FormatBool(opts.ProtectContent)
+		v["allow_paid_broadcast"] = strconv.FormatBool(opts.AllowPaidBroadcast)
+		v["message_effect_id"] = opts.MessageEffectId
 		if opts.ReplyParameters != nil {
 			bs, err := json.Marshal(opts.ReplyParameters)
 			if err != nil {
@@ -3290,7 +3827,7 @@ func (bot *Bot) SendDice(chatId int64, opts *SendDiceOpts) (*Message, error) {
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("sendDice", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "sendDice", v, nil, reqOpts)
 	if err != nil {
 		return nil, err
 	}
@@ -3299,7 +3836,7 @@ func (bot *Bot) SendDice(chatId int64, opts *SendDiceOpts) (*Message, error) {
 	return &m, json.Unmarshal(r, &m)
 }
 
-// SendDocumentOpts is the set of optional fields for Bot.SendDocument.
+// SendDocumentOpts is the set of optional fields for Bot.SendDocument and Bot.SendDocumentWithContext.
 type SendDocumentOpts struct {
 	// Unique identifier of the business connection on behalf of which the message will be sent
 	BusinessConnectionId string
@@ -3319,6 +3856,10 @@ type SendDocumentOpts struct {
 	DisableNotification bool
 	// Protects the contents of the sent message from forwarding and saving
 	ProtectContent bool
+	// Pass True to allow up to 1000 messages per second, ignoring broadcasting limits for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot's balance
+	AllowPaidBroadcast bool
+	// Unique identifier of the message effect to be added to the message; for private chats only
+	MessageEffectId string
 	// Description of the message to reply to
 	ReplyParameters *ReplyParameters
 	// Additional interface options. A JSON-serialized object for an inline keyboard, custom reply keyboard, instructions to remove a reply keyboard or to force a reply from the user
@@ -3331,32 +3872,23 @@ type SendDocumentOpts struct {
 //
 // Use this method to send general files. On success, the sent Message is returned. Bots can currently send files of any type of up to 50 MB in size, this limit may be changed in the future.
 //   - chatId (type int64): Unique identifier for the target chat
-//   - document (type InputFile): File to send. Pass a file_id as String to send a file that exists on the Telegram servers (recommended), pass an HTTP URL as a String for Telegram to get a file from the Internet, or upload a new one using multipart/form-data. More information on Sending Files: https://core.telegram.org/bots/api#sending-files
+//   - document (type InputFileOrString): File to send. Pass a file_id as String to send a file that exists on the Telegram servers (recommended), pass an HTTP URL as a String for Telegram to get a file from the Internet, or upload a new one using multipart/form-data. More information on Sending Files: https://core.telegram.org/bots/api#sending-files
 //   - opts (type SendDocumentOpts): All optional parameters.
-func (bot *Bot) SendDocument(chatId int64, document InputFile, opts *SendDocumentOpts) (*Message, error) {
+func (bot *Bot) SendDocument(chatId int64, document InputFileOrString, opts *SendDocumentOpts) (*Message, error) {
+	return bot.SendDocumentWithContext(context.Background(), chatId, document, opts)
+}
+
+// SendDocumentWithContext is the same as Bot.SendDocument, but with a context.Context parameter
+func (bot *Bot) SendDocumentWithContext(ctx context.Context, chatId int64, document InputFileOrString, opts *SendDocumentOpts) (*Message, error) {
 	v := map[string]string{}
-	data := map[string]NamedReader{}
+	data := map[string]FileReader{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 	if document != nil {
-		switch m := document.(type) {
-		case string:
-			v["document"] = m
-
-		case NamedReader:
-			v["document"] = "attach://document"
-			data["document"] = m
-
-		case io.Reader:
-			v["document"] = "attach://document"
-			data["document"] = NamedFile{File: m}
-
-		case []byte:
-			v["document"] = "attach://document"
-			data["document"] = NamedFile{File: bytes.NewReader(m)}
-
-		default:
-			return nil, fmt.Errorf("unknown type for InputFile: %T", document)
+		err := document.Attach("document", data)
+		if err != nil {
+			return nil, fmt.Errorf("failed to attach 'document' input file: %w", err)
 		}
+		v["document"] = document.getValue()
 	}
 	if opts != nil {
 		v["business_connection_id"] = opts.BusinessConnectionId
@@ -3364,25 +3896,11 @@ func (bot *Bot) SendDocument(chatId int64, document InputFile, opts *SendDocumen
 			v["message_thread_id"] = strconv.FormatInt(opts.MessageThreadId, 10)
 		}
 		if opts.Thumbnail != nil {
-			switch m := opts.Thumbnail.(type) {
-			case string:
-				v["thumbnail"] = m
-
-			case NamedReader:
-				v["thumbnail"] = "attach://thumbnail"
-				data["thumbnail"] = m
-
-			case io.Reader:
-				v["thumbnail"] = "attach://thumbnail"
-				data["thumbnail"] = NamedFile{File: m}
-
-			case []byte:
-				v["thumbnail"] = "attach://thumbnail"
-				data["thumbnail"] = NamedFile{File: bytes.NewReader(m)}
-
-			default:
-				return nil, fmt.Errorf("unknown type for InputFile: %T", opts.Thumbnail)
+			err := opts.Thumbnail.Attach("thumbnail", data)
+			if err != nil {
+				return nil, fmt.Errorf("failed to attach 'thumbnail' input file: %w", err)
 			}
+			v["thumbnail"] = opts.Thumbnail.getValue()
 		}
 		v["caption"] = opts.Caption
 		v["parse_mode"] = opts.ParseMode
@@ -3396,6 +3914,8 @@ func (bot *Bot) SendDocument(chatId int64, document InputFile, opts *SendDocumen
 		v["disable_content_type_detection"] = strconv.FormatBool(opts.DisableContentTypeDetection)
 		v["disable_notification"] = strconv.FormatBool(opts.DisableNotification)
 		v["protect_content"] = strconv.FormatBool(opts.ProtectContent)
+		v["allow_paid_broadcast"] = strconv.FormatBool(opts.AllowPaidBroadcast)
+		v["message_effect_id"] = opts.MessageEffectId
 		if opts.ReplyParameters != nil {
 			bs, err := json.Marshal(opts.ReplyParameters)
 			if err != nil {
@@ -3417,7 +3937,7 @@ func (bot *Bot) SendDocument(chatId int64, document InputFile, opts *SendDocumen
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("sendDocument", v, data, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "sendDocument", v, data, reqOpts)
 	if err != nil {
 		return nil, err
 	}
@@ -3426,7 +3946,7 @@ func (bot *Bot) SendDocument(chatId int64, document InputFile, opts *SendDocumen
 	return &m, json.Unmarshal(r, &m)
 }
 
-// SendGameOpts is the set of optional fields for Bot.SendGame.
+// SendGameOpts is the set of optional fields for Bot.SendGame and Bot.SendGameWithContext.
 type SendGameOpts struct {
 	// Unique identifier of the business connection on behalf of which the message will be sent
 	BusinessConnectionId string
@@ -3436,6 +3956,10 @@ type SendGameOpts struct {
 	DisableNotification bool
 	// Protects the contents of the sent message from forwarding and saving
 	ProtectContent bool
+	// Pass True to allow up to 1000 messages per second, ignoring broadcasting limits for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot's balance
+	AllowPaidBroadcast bool
+	// Unique identifier of the message effect to be added to the message; for private chats only
+	MessageEffectId string
 	// Description of the message to reply to
 	ReplyParameters *ReplyParameters
 	// A JSON-serialized object for an inline keyboard. If empty, one 'Play game_title' button will be shown. If not empty, the first button must launch the game.
@@ -3451,6 +3975,11 @@ type SendGameOpts struct {
 //   - gameShortName (type string): Short name of the game, serves as the unique identifier for the game. Set up your games via @BotFather.
 //   - opts (type SendGameOpts): All optional parameters.
 func (bot *Bot) SendGame(chatId int64, gameShortName string, opts *SendGameOpts) (*Message, error) {
+	return bot.SendGameWithContext(context.Background(), chatId, gameShortName, opts)
+}
+
+// SendGameWithContext is the same as Bot.SendGame, but with a context.Context parameter
+func (bot *Bot) SendGameWithContext(ctx context.Context, chatId int64, gameShortName string, opts *SendGameOpts) (*Message, error) {
 	v := map[string]string{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 	v["game_short_name"] = gameShortName
@@ -3461,6 +3990,8 @@ func (bot *Bot) SendGame(chatId int64, gameShortName string, opts *SendGameOpts)
 		}
 		v["disable_notification"] = strconv.FormatBool(opts.DisableNotification)
 		v["protect_content"] = strconv.FormatBool(opts.ProtectContent)
+		v["allow_paid_broadcast"] = strconv.FormatBool(opts.AllowPaidBroadcast)
+		v["message_effect_id"] = opts.MessageEffectId
 		if opts.ReplyParameters != nil {
 			bs, err := json.Marshal(opts.ReplyParameters)
 			if err != nil {
@@ -3480,7 +4011,7 @@ func (bot *Bot) SendGame(chatId int64, gameShortName string, opts *SendGameOpts)
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("sendGame", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "sendGame", v, nil, reqOpts)
 	if err != nil {
 		return nil, err
 	}
@@ -3489,11 +4020,13 @@ func (bot *Bot) SendGame(chatId int64, gameShortName string, opts *SendGameOpts)
 	return &m, json.Unmarshal(r, &m)
 }
 
-// SendInvoiceOpts is the set of optional fields for Bot.SendInvoice.
+// SendInvoiceOpts is the set of optional fields for Bot.SendInvoice and Bot.SendInvoiceWithContext.
 type SendInvoiceOpts struct {
 	// Unique identifier for the target message thread (topic) of the forum; for forum supergroups only
 	MessageThreadId int64
-	// The maximum accepted amount for tips in the smallest units of the currency (integer, not float/double). For example, for a maximum tip of US$ 1.45 pass max_tip_amount = 145. See the exp parameter in currencies.json, it shows the number of digits past the decimal point for each currency (2 for the majority of currencies). Defaults to 0
+	// Payment provider token, obtained via @BotFather. Pass an empty string for payments in Telegram Stars.
+	ProviderToken string
+	// The maximum accepted amount for tips in the smallest units of the currency (integer, not float/double). For example, for a maximum tip of US$ 1.45 pass max_tip_amount = 145. See the exp parameter in currencies.json, it shows the number of digits past the decimal point for each currency (2 for the majority of currencies). Defaults to 0. Not supported for payments in Telegram Stars.
 	MaxTipAmount int64
 	// A JSON-serialized array of suggested amounts of tips in the smallest units of the currency (integer, not float/double). At most 4 suggested tip amounts can be specified. The suggested tip amounts must be positive, passed in a strictly increased order and must not exceed max_tip_amount.
 	SuggestedTipAmounts []int64
@@ -3509,24 +4042,28 @@ type SendInvoiceOpts struct {
 	PhotoWidth int64
 	// Photo height
 	PhotoHeight int64
-	// Pass True if you require the user's full name to complete the order
+	// Pass True if you require the user's full name to complete the order. Ignored for payments in Telegram Stars.
 	NeedName bool
-	// Pass True if you require the user's phone number to complete the order
+	// Pass True if you require the user's phone number to complete the order. Ignored for payments in Telegram Stars.
 	NeedPhoneNumber bool
-	// Pass True if you require the user's email address to complete the order
+	// Pass True if you require the user's email address to complete the order. Ignored for payments in Telegram Stars.
 	NeedEmail bool
-	// Pass True if you require the user's shipping address to complete the order
+	// Pass True if you require the user's shipping address to complete the order. Ignored for payments in Telegram Stars.
 	NeedShippingAddress bool
-	// Pass True if the user's phone number should be sent to provider
+	// Pass True if the user's phone number should be sent to the provider. Ignored for payments in Telegram Stars.
 	SendPhoneNumberToProvider bool
-	// Pass True if the user's email address should be sent to provider
+	// Pass True if the user's email address should be sent to the provider. Ignored for payments in Telegram Stars.
 	SendEmailToProvider bool
-	// Pass True if the final price depends on the shipping method
+	// Pass True if the final price depends on the shipping method. Ignored for payments in Telegram Stars.
 	IsFlexible bool
 	// Sends the message silently. Users will receive a notification with no sound.
 	DisableNotification bool
 	// Protects the contents of the sent message from forwarding and saving
 	ProtectContent bool
+	// Pass True to allow up to 1000 messages per second, ignoring broadcasting limits for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot's balance
+	AllowPaidBroadcast bool
+	// Unique identifier of the message effect to be added to the message; for private chats only
+	MessageEffectId string
 	// Description of the message to reply to
 	ReplyParameters *ReplyParameters
 	// A JSON-serialized object for an inline keyboard. If empty, one 'Pay total price' button will be shown. If not empty, the first button must be a Pay button.
@@ -3541,18 +4078,21 @@ type SendInvoiceOpts struct {
 //   - chatId (type int64): Unique identifier for the target chat
 //   - title (type string): Product name, 1-32 characters
 //   - description (type string): Product description, 1-255 characters
-//   - payload (type string): Bot-defined invoice payload, 1-128 bytes. This will not be displayed to the user, use for your internal processes.
-//   - providerToken (type string): Payment provider token, obtained via @BotFather
-//   - currency (type string): Three-letter ISO 4217 currency code, see more on currencies
-//   - prices (type []LabeledPrice): Price breakdown, a JSON-serialized list of components (e.g. product price, tax, discount, delivery cost, delivery tax, bonus, etc.)
+//   - payload (type string): Bot-defined invoice payload, 1-128 bytes. This will not be displayed to the user, use it for your internal processes.
+//   - currency (type string): Three-letter ISO 4217 currency code, see more on currencies. Pass "XTR" for payments in Telegram Stars.
+//   - prices (type []LabeledPrice): Price breakdown, a JSON-serialized list of components (e.g. product price, tax, discount, delivery cost, delivery tax, bonus, etc.). Must contain exactly one item for payments in Telegram Stars.
 //   - opts (type SendInvoiceOpts): All optional parameters.
-func (bot *Bot) SendInvoice(chatId int64, title string, description string, payload string, providerToken string, currency string, prices []LabeledPrice, opts *SendInvoiceOpts) (*Message, error) {
+func (bot *Bot) SendInvoice(chatId int64, title string, description string, payload string, currency string, prices []LabeledPrice, opts *SendInvoiceOpts) (*Message, error) {
+	return bot.SendInvoiceWithContext(context.Background(), chatId, title, description, payload, currency, prices, opts)
+}
+
+// SendInvoiceWithContext is the same as Bot.SendInvoice, but with a context.Context parameter
+func (bot *Bot) SendInvoiceWithContext(ctx context.Context, chatId int64, title string, description string, payload string, currency string, prices []LabeledPrice, opts *SendInvoiceOpts) (*Message, error) {
 	v := map[string]string{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 	v["title"] = title
 	v["description"] = description
 	v["payload"] = payload
-	v["provider_token"] = providerToken
 	v["currency"] = currency
 	if prices != nil {
 		bs, err := json.Marshal(prices)
@@ -3565,6 +4105,7 @@ func (bot *Bot) SendInvoice(chatId int64, title string, description string, payl
 		if opts.MessageThreadId != 0 {
 			v["message_thread_id"] = strconv.FormatInt(opts.MessageThreadId, 10)
 		}
+		v["provider_token"] = opts.ProviderToken
 		if opts.MaxTipAmount != 0 {
 			v["max_tip_amount"] = strconv.FormatInt(opts.MaxTipAmount, 10)
 		}
@@ -3596,6 +4137,8 @@ func (bot *Bot) SendInvoice(chatId int64, title string, description string, payl
 		v["is_flexible"] = strconv.FormatBool(opts.IsFlexible)
 		v["disable_notification"] = strconv.FormatBool(opts.DisableNotification)
 		v["protect_content"] = strconv.FormatBool(opts.ProtectContent)
+		v["allow_paid_broadcast"] = strconv.FormatBool(opts.AllowPaidBroadcast)
+		v["message_effect_id"] = opts.MessageEffectId
 		if opts.ReplyParameters != nil {
 			bs, err := json.Marshal(opts.ReplyParameters)
 			if err != nil {
@@ -3615,7 +4158,7 @@ func (bot *Bot) SendInvoice(chatId int64, title string, description string, payl
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("sendInvoice", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "sendInvoice", v, nil, reqOpts)
 	if err != nil {
 		return nil, err
 	}
@@ -3624,7 +4167,7 @@ func (bot *Bot) SendInvoice(chatId int64, title string, description string, payl
 	return &m, json.Unmarshal(r, &m)
 }
 
-// SendLocationOpts is the set of optional fields for Bot.SendLocation.
+// SendLocationOpts is the set of optional fields for Bot.SendLocation and Bot.SendLocationWithContext.
 type SendLocationOpts struct {
 	// Unique identifier of the business connection on behalf of which the message will be sent
 	BusinessConnectionId string
@@ -3642,6 +4185,10 @@ type SendLocationOpts struct {
 	DisableNotification bool
 	// Protects the contents of the sent message from forwarding and saving
 	ProtectContent bool
+	// Pass True to allow up to 1000 messages per second, ignoring broadcasting limits for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot's balance
+	AllowPaidBroadcast bool
+	// Unique identifier of the message effect to be added to the message; for private chats only
+	MessageEffectId string
 	// Description of the message to reply to
 	ReplyParameters *ReplyParameters
 	// Additional interface options. A JSON-serialized object for an inline keyboard, custom reply keyboard, instructions to remove a reply keyboard or to force a reply from the user
@@ -3658,6 +4205,11 @@ type SendLocationOpts struct {
 //   - longitude (type float64): Longitude of the location
 //   - opts (type SendLocationOpts): All optional parameters.
 func (bot *Bot) SendLocation(chatId int64, latitude float64, longitude float64, opts *SendLocationOpts) (*Message, error) {
+	return bot.SendLocationWithContext(context.Background(), chatId, latitude, longitude, opts)
+}
+
+// SendLocationWithContext is the same as Bot.SendLocation, but with a context.Context parameter
+func (bot *Bot) SendLocationWithContext(ctx context.Context, chatId int64, latitude float64, longitude float64, opts *SendLocationOpts) (*Message, error) {
 	v := map[string]string{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 	v["latitude"] = strconv.FormatFloat(latitude, 'f', -1, 64)
@@ -3681,6 +4233,8 @@ func (bot *Bot) SendLocation(chatId int64, latitude float64, longitude float64, 
 		}
 		v["disable_notification"] = strconv.FormatBool(opts.DisableNotification)
 		v["protect_content"] = strconv.FormatBool(opts.ProtectContent)
+		v["allow_paid_broadcast"] = strconv.FormatBool(opts.AllowPaidBroadcast)
+		v["message_effect_id"] = opts.MessageEffectId
 		if opts.ReplyParameters != nil {
 			bs, err := json.Marshal(opts.ReplyParameters)
 			if err != nil {
@@ -3702,7 +4256,7 @@ func (bot *Bot) SendLocation(chatId int64, latitude float64, longitude float64, 
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("sendLocation", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "sendLocation", v, nil, reqOpts)
 	if err != nil {
 		return nil, err
 	}
@@ -3711,7 +4265,7 @@ func (bot *Bot) SendLocation(chatId int64, latitude float64, longitude float64, 
 	return &m, json.Unmarshal(r, &m)
 }
 
-// SendMediaGroupOpts is the set of optional fields for Bot.SendMediaGroup.
+// SendMediaGroupOpts is the set of optional fields for Bot.SendMediaGroup and Bot.SendMediaGroupWithContext.
 type SendMediaGroupOpts struct {
 	// Unique identifier of the business connection on behalf of which the message will be sent
 	BusinessConnectionId string
@@ -3721,6 +4275,10 @@ type SendMediaGroupOpts struct {
 	DisableNotification bool
 	// Protects the contents of the sent messages from forwarding and saving
 	ProtectContent bool
+	// Pass True to allow up to 1000 messages per second, ignoring broadcasting limits for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot's balance
+	AllowPaidBroadcast bool
+	// Unique identifier of the message effect to be added to the message; for private chats only
+	MessageEffectId string
 	// Description of the message to reply to
 	ReplyParameters *ReplyParameters
 	// RequestOpts are an additional optional field to configure timeouts for individual requests
@@ -3734,8 +4292,13 @@ type SendMediaGroupOpts struct {
 //   - media (type []InputMedia): A JSON-serialized array describing messages to be sent, must include 2-10 items
 //   - opts (type SendMediaGroupOpts): All optional parameters.
 func (bot *Bot) SendMediaGroup(chatId int64, media []InputMedia, opts *SendMediaGroupOpts) ([]Message, error) {
+	return bot.SendMediaGroupWithContext(context.Background(), chatId, media, opts)
+}
+
+// SendMediaGroupWithContext is the same as Bot.SendMediaGroup, but with a context.Context parameter
+func (bot *Bot) SendMediaGroupWithContext(ctx context.Context, chatId int64, media []InputMedia, opts *SendMediaGroupOpts) ([]Message, error) {
 	v := map[string]string{}
-	data := map[string]NamedReader{}
+	data := map[string]FileReader{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 	if media != nil {
 		var rawList []json.RawMessage
@@ -3759,6 +4322,8 @@ func (bot *Bot) SendMediaGroup(chatId int64, media []InputMedia, opts *SendMedia
 		}
 		v["disable_notification"] = strconv.FormatBool(opts.DisableNotification)
 		v["protect_content"] = strconv.FormatBool(opts.ProtectContent)
+		v["allow_paid_broadcast"] = strconv.FormatBool(opts.AllowPaidBroadcast)
+		v["message_effect_id"] = opts.MessageEffectId
 		if opts.ReplyParameters != nil {
 			bs, err := json.Marshal(opts.ReplyParameters)
 			if err != nil {
@@ -3773,7 +4338,7 @@ func (bot *Bot) SendMediaGroup(chatId int64, media []InputMedia, opts *SendMedia
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("sendMediaGroup", v, data, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "sendMediaGroup", v, data, reqOpts)
 	if err != nil {
 		return nil, err
 	}
@@ -3782,7 +4347,7 @@ func (bot *Bot) SendMediaGroup(chatId int64, media []InputMedia, opts *SendMedia
 	return m, json.Unmarshal(r, &m)
 }
 
-// SendMessageOpts is the set of optional fields for Bot.SendMessage.
+// SendMessageOpts is the set of optional fields for Bot.SendMessage and Bot.SendMessageWithContext.
 type SendMessageOpts struct {
 	// Unique identifier of the business connection on behalf of which the message will be sent
 	BusinessConnectionId string
@@ -3798,6 +4363,10 @@ type SendMessageOpts struct {
 	DisableNotification bool
 	// Protects the contents of the sent message from forwarding and saving
 	ProtectContent bool
+	// Pass True to allow up to 1000 messages per second, ignoring broadcasting limits for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot's balance
+	AllowPaidBroadcast bool
+	// Unique identifier of the message effect to be added to the message; for private chats only
+	MessageEffectId string
 	// Description of the message to reply to
 	ReplyParameters *ReplyParameters
 	// Additional interface options. A JSON-serialized object for an inline keyboard, custom reply keyboard, instructions to remove a reply keyboard or to force a reply from the user
@@ -3813,6 +4382,11 @@ type SendMessageOpts struct {
 //   - text (type string): Text of the message to be sent, 1-4096 characters after entities parsing
 //   - opts (type SendMessageOpts): All optional parameters.
 func (bot *Bot) SendMessage(chatId int64, text string, opts *SendMessageOpts) (*Message, error) {
+	return bot.SendMessageWithContext(context.Background(), chatId, text, opts)
+}
+
+// SendMessageWithContext is the same as Bot.SendMessage, but with a context.Context parameter
+func (bot *Bot) SendMessageWithContext(ctx context.Context, chatId int64, text string, opts *SendMessageOpts) (*Message, error) {
 	v := map[string]string{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 	v["text"] = text
@@ -3838,6 +4412,8 @@ func (bot *Bot) SendMessage(chatId int64, text string, opts *SendMessageOpts) (*
 		}
 		v["disable_notification"] = strconv.FormatBool(opts.DisableNotification)
 		v["protect_content"] = strconv.FormatBool(opts.ProtectContent)
+		v["allow_paid_broadcast"] = strconv.FormatBool(opts.AllowPaidBroadcast)
+		v["message_effect_id"] = opts.MessageEffectId
 		if opts.ReplyParameters != nil {
 			bs, err := json.Marshal(opts.ReplyParameters)
 			if err != nil {
@@ -3859,7 +4435,7 @@ func (bot *Bot) SendMessage(chatId int64, text string, opts *SendMessageOpts) (*
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("sendMessage", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "sendMessage", v, nil, reqOpts)
 	if err != nil {
 		return nil, err
 	}
@@ -3868,7 +4444,113 @@ func (bot *Bot) SendMessage(chatId int64, text string, opts *SendMessageOpts) (*
 	return &m, json.Unmarshal(r, &m)
 }
 
-// SendPhotoOpts is the set of optional fields for Bot.SendPhoto.
+// SendPaidMediaOpts is the set of optional fields for Bot.SendPaidMedia and Bot.SendPaidMediaWithContext.
+type SendPaidMediaOpts struct {
+	// Unique identifier of the business connection on behalf of which the message will be sent
+	BusinessConnectionId string
+	// Bot-defined paid media payload, 0-128 bytes. This will not be displayed to the user, use it for your internal processes.
+	Payload string
+	// Media caption, 0-1024 characters after entities parsing
+	Caption string
+	// Mode for parsing entities in the media caption. See formatting options for more details.
+	ParseMode string
+	// A JSON-serialized list of special entities that appear in the caption, which can be specified instead of parse_mode
+	CaptionEntities []MessageEntity
+	// Pass True, if the caption must be shown above the message media
+	ShowCaptionAboveMedia bool
+	// Sends the message silently. Users will receive a notification with no sound.
+	DisableNotification bool
+	// Protects the contents of the sent message from forwarding and saving
+	ProtectContent bool
+	// Pass True to allow up to 1000 messages per second, ignoring broadcasting limits for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot's balance
+	AllowPaidBroadcast bool
+	// Description of the message to reply to
+	ReplyParameters *ReplyParameters
+	// Additional interface options. A JSON-serialized object for an inline keyboard, custom reply keyboard, instructions to remove a reply keyboard or to force a reply from the user
+	ReplyMarkup ReplyMarkup
+	// RequestOpts are an additional optional field to configure timeouts for individual requests
+	RequestOpts *RequestOpts
+}
+
+// SendPaidMedia (https://core.telegram.org/bots/api#sendpaidmedia)
+//
+// Use this method to send paid media. On success, the sent Message is returned.
+//   - chatId (type int64): Unique identifier for the target chat. If the chat is a channel, all Telegram Star proceeds from this media will be credited to the chat's balance. Otherwise, they will be credited to the bot's balance.
+//   - starCount (type int64): The number of Telegram Stars that must be paid to buy access to the media; 1-2500
+//   - media (type []InputPaidMedia): A JSON-serialized array describing the media to be sent; up to 10 items
+//   - opts (type SendPaidMediaOpts): All optional parameters.
+func (bot *Bot) SendPaidMedia(chatId int64, starCount int64, media []InputPaidMedia, opts *SendPaidMediaOpts) (*Message, error) {
+	return bot.SendPaidMediaWithContext(context.Background(), chatId, starCount, media, opts)
+}
+
+// SendPaidMediaWithContext is the same as Bot.SendPaidMedia, but with a context.Context parameter
+func (bot *Bot) SendPaidMediaWithContext(ctx context.Context, chatId int64, starCount int64, media []InputPaidMedia, opts *SendPaidMediaOpts) (*Message, error) {
+	v := map[string]string{}
+	data := map[string]FileReader{}
+	v["chat_id"] = strconv.FormatInt(chatId, 10)
+	v["star_count"] = strconv.FormatInt(starCount, 10)
+	if media != nil {
+		var rawList []json.RawMessage
+		for idx, im := range media {
+			inputBs, err := im.InputParams("media"+strconv.Itoa(idx), data)
+			if err != nil {
+				return nil, fmt.Errorf("failed to marshal list item %d for field media: %w", idx, err)
+			}
+			rawList = append(rawList, inputBs)
+		}
+		bs, err := json.Marshal(rawList)
+		if err != nil {
+			return nil, fmt.Errorf("failed to marshal raw json list for field: media %w", err)
+		}
+		v["media"] = string(bs)
+	}
+	if opts != nil {
+		v["business_connection_id"] = opts.BusinessConnectionId
+		v["payload"] = opts.Payload
+		v["caption"] = opts.Caption
+		v["parse_mode"] = opts.ParseMode
+		if opts.CaptionEntities != nil {
+			bs, err := json.Marshal(opts.CaptionEntities)
+			if err != nil {
+				return nil, fmt.Errorf("failed to marshal field caption_entities: %w", err)
+			}
+			v["caption_entities"] = string(bs)
+		}
+		v["show_caption_above_media"] = strconv.FormatBool(opts.ShowCaptionAboveMedia)
+		v["disable_notification"] = strconv.FormatBool(opts.DisableNotification)
+		v["protect_content"] = strconv.FormatBool(opts.ProtectContent)
+		v["allow_paid_broadcast"] = strconv.FormatBool(opts.AllowPaidBroadcast)
+		if opts.ReplyParameters != nil {
+			bs, err := json.Marshal(opts.ReplyParameters)
+			if err != nil {
+				return nil, fmt.Errorf("failed to marshal field reply_parameters: %w", err)
+			}
+			v["reply_parameters"] = string(bs)
+		}
+		if opts.ReplyMarkup != nil {
+			bs, err := json.Marshal(opts.ReplyMarkup)
+			if err != nil {
+				return nil, fmt.Errorf("failed to marshal field reply_markup: %w", err)
+			}
+			v["reply_markup"] = string(bs)
+		}
+	}
+
+	var reqOpts *RequestOpts
+	if opts != nil {
+		reqOpts = opts.RequestOpts
+	}
+
+	r, err := bot.RequestWithContext(ctx, "sendPaidMedia", v, data, reqOpts)
+	if err != nil {
+		return nil, err
+	}
+
+	var m Message
+	return &m, json.Unmarshal(r, &m)
+}
+
+// SendPhotoOpts is the set of optional fields for Bot.SendPhoto and Bot.SendPhotoWithContext.
 type SendPhotoOpts struct {
 	// Unique identifier of the business connection on behalf of which the message will be sent
 	BusinessConnectionId string
@@ -3880,12 +4562,18 @@ type SendPhotoOpts struct {
 	ParseMode string
 	// A JSON-serialized list of special entities that appear in the caption, which can be specified instead of parse_mode
 	CaptionEntities []MessageEntity
+	// Pass True, if the caption must be shown above the message media
+	ShowCaptionAboveMedia bool
 	// Pass True if the photo needs to be covered with a spoiler animation
 	HasSpoiler bool
 	// Sends the message silently. Users will receive a notification with no sound.
 	DisableNotification bool
 	// Protects the contents of the sent message from forwarding and saving
 	ProtectContent bool
+	// Pass True to allow up to 1000 messages per second, ignoring broadcasting limits for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot's balance
+	AllowPaidBroadcast bool
+	// Unique identifier of the message effect to be added to the message; for private chats only
+	MessageEffectId string
 	// Description of the message to reply to
 	ReplyParameters *ReplyParameters
 	// Additional interface options. A JSON-serialized object for an inline keyboard, custom reply keyboard, instructions to remove a reply keyboard or to force a reply from the user
@@ -3898,32 +4586,23 @@ type SendPhotoOpts struct {
 //
 // Use this method to send photos. On success, the sent Message is returned.
 //   - chatId (type int64): Unique identifier for the target chat
-//   - photo (type InputFile): Photo to send. Pass a file_id as String to send a photo that exists on the Telegram servers (recommended), pass an HTTP URL as a String for Telegram to get a photo from the Internet, or upload a new photo using multipart/form-data. The photo must be at most 10 MB in size. The photo's width and height must not exceed 10000 in total. Width and height ratio must be at most 20. More information on Sending Files: https://core.telegram.org/bots/api#sending-files
+//   - photo (type InputFileOrString): Photo to send. Pass a file_id as String to send a photo that exists on the Telegram servers (recommended), pass an HTTP URL as a String for Telegram to get a photo from the Internet, or upload a new photo using multipart/form-data. The photo must be at most 10 MB in size. The photo's width and height must not exceed 10000 in total. Width and height ratio must be at most 20. More information on Sending Files: https://core.telegram.org/bots/api#sending-files
 //   - opts (type SendPhotoOpts): All optional parameters.
-func (bot *Bot) SendPhoto(chatId int64, photo InputFile, opts *SendPhotoOpts) (*Message, error) {
+func (bot *Bot) SendPhoto(chatId int64, photo InputFileOrString, opts *SendPhotoOpts) (*Message, error) {
+	return bot.SendPhotoWithContext(context.Background(), chatId, photo, opts)
+}
+
+// SendPhotoWithContext is the same as Bot.SendPhoto, but with a context.Context parameter
+func (bot *Bot) SendPhotoWithContext(ctx context.Context, chatId int64, photo InputFileOrString, opts *SendPhotoOpts) (*Message, error) {
 	v := map[string]string{}
-	data := map[string]NamedReader{}
+	data := map[string]FileReader{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 	if photo != nil {
-		switch m := photo.(type) {
-		case string:
-			v["photo"] = m
-
-		case NamedReader:
-			v["photo"] = "attach://photo"
-			data["photo"] = m
-
-		case io.Reader:
-			v["photo"] = "attach://photo"
-			data["photo"] = NamedFile{File: m}
-
-		case []byte:
-			v["photo"] = "attach://photo"
-			data["photo"] = NamedFile{File: bytes.NewReader(m)}
-
-		default:
-			return nil, fmt.Errorf("unknown type for InputFile: %T", photo)
+		err := photo.Attach("photo", data)
+		if err != nil {
+			return nil, fmt.Errorf("failed to attach 'photo' input file: %w", err)
 		}
+		v["photo"] = photo.getValue()
 	}
 	if opts != nil {
 		v["business_connection_id"] = opts.BusinessConnectionId
@@ -3939,9 +4618,12 @@ func (bot *Bot) SendPhoto(chatId int64, photo InputFile, opts *SendPhotoOpts) (*
 			}
 			v["caption_entities"] = string(bs)
 		}
+		v["show_caption_above_media"] = strconv.FormatBool(opts.ShowCaptionAboveMedia)
 		v["has_spoiler"] = strconv.FormatBool(opts.HasSpoiler)
 		v["disable_notification"] = strconv.FormatBool(opts.DisableNotification)
 		v["protect_content"] = strconv.FormatBool(opts.ProtectContent)
+		v["allow_paid_broadcast"] = strconv.FormatBool(opts.AllowPaidBroadcast)
+		v["message_effect_id"] = opts.MessageEffectId
 		if opts.ReplyParameters != nil {
 			bs, err := json.Marshal(opts.ReplyParameters)
 			if err != nil {
@@ -3963,7 +4645,7 @@ func (bot *Bot) SendPhoto(chatId int64, photo InputFile, opts *SendPhotoOpts) (*
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("sendPhoto", v, data, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "sendPhoto", v, data, reqOpts)
 	if err != nil {
 		return nil, err
 	}
@@ -3972,7 +4654,7 @@ func (bot *Bot) SendPhoto(chatId int64, photo InputFile, opts *SendPhotoOpts) (*
 	return &m, json.Unmarshal(r, &m)
 }
 
-// SendPollOpts is the set of optional fields for Bot.SendPoll.
+// SendPollOpts is the set of optional fields for Bot.SendPoll and Bot.SendPollWithContext.
 type SendPollOpts struct {
 	// Unique identifier of the business connection on behalf of which the message will be sent
 	BusinessConnectionId string
@@ -4006,6 +4688,10 @@ type SendPollOpts struct {
 	DisableNotification bool
 	// Protects the contents of the sent message from forwarding and saving
 	ProtectContent bool
+	// Pass True to allow up to 1000 messages per second, ignoring broadcasting limits for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot's balance
+	AllowPaidBroadcast bool
+	// Unique identifier of the message effect to be added to the message; for private chats only
+	MessageEffectId string
 	// Description of the message to reply to
 	ReplyParameters *ReplyParameters
 	// Additional interface options. A JSON-serialized object for an inline keyboard, custom reply keyboard, instructions to remove a reply keyboard or to force a reply from the user
@@ -4022,6 +4708,11 @@ type SendPollOpts struct {
 //   - options (type []InputPollOption): A JSON-serialized list of 2-10 answer options
 //   - opts (type SendPollOpts): All optional parameters.
 func (bot *Bot) SendPoll(chatId int64, question string, options []InputPollOption, opts *SendPollOpts) (*Message, error) {
+	return bot.SendPollWithContext(context.Background(), chatId, question, options, opts)
+}
+
+// SendPollWithContext is the same as Bot.SendPoll, but with a context.Context parameter
+func (bot *Bot) SendPollWithContext(ctx context.Context, chatId int64, question string, options []InputPollOption, opts *SendPollOpts) (*Message, error) {
 	v := map[string]string{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 	v["question"] = question
@@ -4070,6 +4761,8 @@ func (bot *Bot) SendPoll(chatId int64, question string, options []InputPollOptio
 		v["is_closed"] = strconv.FormatBool(opts.IsClosed)
 		v["disable_notification"] = strconv.FormatBool(opts.DisableNotification)
 		v["protect_content"] = strconv.FormatBool(opts.ProtectContent)
+		v["allow_paid_broadcast"] = strconv.FormatBool(opts.AllowPaidBroadcast)
+		v["message_effect_id"] = opts.MessageEffectId
 		if opts.ReplyParameters != nil {
 			bs, err := json.Marshal(opts.ReplyParameters)
 			if err != nil {
@@ -4091,7 +4784,7 @@ func (bot *Bot) SendPoll(chatId int64, question string, options []InputPollOptio
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("sendPoll", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "sendPoll", v, nil, reqOpts)
 	if err != nil {
 		return nil, err
 	}
@@ -4100,7 +4793,7 @@ func (bot *Bot) SendPoll(chatId int64, question string, options []InputPollOptio
 	return &m, json.Unmarshal(r, &m)
 }
 
-// SendStickerOpts is the set of optional fields for Bot.SendSticker.
+// SendStickerOpts is the set of optional fields for Bot.SendSticker and Bot.SendStickerWithContext.
 type SendStickerOpts struct {
 	// Unique identifier of the business connection on behalf of which the message will be sent
 	BusinessConnectionId string
@@ -4112,6 +4805,10 @@ type SendStickerOpts struct {
 	DisableNotification bool
 	// Protects the contents of the sent message from forwarding and saving
 	ProtectContent bool
+	// Pass True to allow up to 1000 messages per second, ignoring broadcasting limits for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot's balance
+	AllowPaidBroadcast bool
+	// Unique identifier of the message effect to be added to the message; for private chats only
+	MessageEffectId string
 	// Description of the message to reply to
 	ReplyParameters *ReplyParameters
 	// Additional interface options. A JSON-serialized object for an inline keyboard, custom reply keyboard, instructions to remove a reply keyboard or to force a reply from the user
@@ -4124,32 +4821,23 @@ type SendStickerOpts struct {
 //
 // Use this method to send static .WEBP, animated .TGS, or video .WEBM stickers. On success, the sent Message is returned.
 //   - chatId (type int64): Unique identifier for the target chat
-//   - sticker (type InputFile): Sticker to send. Pass a file_id as String to send a file that exists on the Telegram servers (recommended), pass an HTTP URL as a String for Telegram to get a .WEBP sticker from the Internet, or upload a new .WEBP, .TGS, or .WEBM sticker using multipart/form-data. More information on Sending Files: https://core.telegram.org/bots/api#sending-files. Video and animated stickers can't be sent via an HTTP URL.
+//   - sticker (type InputFileOrString): Sticker to send. Pass a file_id as String to send a file that exists on the Telegram servers (recommended), pass an HTTP URL as a String for Telegram to get a .WEBP sticker from the Internet, or upload a new .WEBP, .TGS, or .WEBM sticker using multipart/form-data. More information on Sending Files: https://core.telegram.org/bots/api#sending-files. Video and animated stickers can't be sent via an HTTP URL.
 //   - opts (type SendStickerOpts): All optional parameters.
-func (bot *Bot) SendSticker(chatId int64, sticker InputFile, opts *SendStickerOpts) (*Message, error) {
+func (bot *Bot) SendSticker(chatId int64, sticker InputFileOrString, opts *SendStickerOpts) (*Message, error) {
+	return bot.SendStickerWithContext(context.Background(), chatId, sticker, opts)
+}
+
+// SendStickerWithContext is the same as Bot.SendSticker, but with a context.Context parameter
+func (bot *Bot) SendStickerWithContext(ctx context.Context, chatId int64, sticker InputFileOrString, opts *SendStickerOpts) (*Message, error) {
 	v := map[string]string{}
-	data := map[string]NamedReader{}
+	data := map[string]FileReader{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 	if sticker != nil {
-		switch m := sticker.(type) {
-		case string:
-			v["sticker"] = m
-
-		case NamedReader:
-			v["sticker"] = "attach://sticker"
-			data["sticker"] = m
-
-		case io.Reader:
-			v["sticker"] = "attach://sticker"
-			data["sticker"] = NamedFile{File: m}
-
-		case []byte:
-			v["sticker"] = "attach://sticker"
-			data["sticker"] = NamedFile{File: bytes.NewReader(m)}
-
-		default:
-			return nil, fmt.Errorf("unknown type for InputFile: %T", sticker)
+		err := sticker.Attach("sticker", data)
+		if err != nil {
+			return nil, fmt.Errorf("failed to attach 'sticker' input file: %w", err)
 		}
+		v["sticker"] = sticker.getValue()
 	}
 	if opts != nil {
 		v["business_connection_id"] = opts.BusinessConnectionId
@@ -4159,6 +4847,8 @@ func (bot *Bot) SendSticker(chatId int64, sticker InputFile, opts *SendStickerOp
 		v["emoji"] = opts.Emoji
 		v["disable_notification"] = strconv.FormatBool(opts.DisableNotification)
 		v["protect_content"] = strconv.FormatBool(opts.ProtectContent)
+		v["allow_paid_broadcast"] = strconv.FormatBool(opts.AllowPaidBroadcast)
+		v["message_effect_id"] = opts.MessageEffectId
 		if opts.ReplyParameters != nil {
 			bs, err := json.Marshal(opts.ReplyParameters)
 			if err != nil {
@@ -4180,7 +4870,7 @@ func (bot *Bot) SendSticker(chatId int64, sticker InputFile, opts *SendStickerOp
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("sendSticker", v, data, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "sendSticker", v, data, reqOpts)
 	if err != nil {
 		return nil, err
 	}
@@ -4189,7 +4879,7 @@ func (bot *Bot) SendSticker(chatId int64, sticker InputFile, opts *SendStickerOp
 	return &m, json.Unmarshal(r, &m)
 }
 
-// SendVenueOpts is the set of optional fields for Bot.SendVenue.
+// SendVenueOpts is the set of optional fields for Bot.SendVenue and Bot.SendVenueWithContext.
 type SendVenueOpts struct {
 	// Unique identifier of the business connection on behalf of which the message will be sent
 	BusinessConnectionId string
@@ -4207,6 +4897,10 @@ type SendVenueOpts struct {
 	DisableNotification bool
 	// Protects the contents of the sent message from forwarding and saving
 	ProtectContent bool
+	// Pass True to allow up to 1000 messages per second, ignoring broadcasting limits for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot's balance
+	AllowPaidBroadcast bool
+	// Unique identifier of the message effect to be added to the message; for private chats only
+	MessageEffectId string
 	// Description of the message to reply to
 	ReplyParameters *ReplyParameters
 	// Additional interface options. A JSON-serialized object for an inline keyboard, custom reply keyboard, instructions to remove a reply keyboard or to force a reply from the user
@@ -4225,6 +4919,11 @@ type SendVenueOpts struct {
 //   - address (type string): Address of the venue
 //   - opts (type SendVenueOpts): All optional parameters.
 func (bot *Bot) SendVenue(chatId int64, latitude float64, longitude float64, title string, address string, opts *SendVenueOpts) (*Message, error) {
+	return bot.SendVenueWithContext(context.Background(), chatId, latitude, longitude, title, address, opts)
+}
+
+// SendVenueWithContext is the same as Bot.SendVenue, but with a context.Context parameter
+func (bot *Bot) SendVenueWithContext(ctx context.Context, chatId int64, latitude float64, longitude float64, title string, address string, opts *SendVenueOpts) (*Message, error) {
 	v := map[string]string{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 	v["latitude"] = strconv.FormatFloat(latitude, 'f', -1, 64)
@@ -4242,6 +4941,8 @@ func (bot *Bot) SendVenue(chatId int64, latitude float64, longitude float64, tit
 		v["google_place_type"] = opts.GooglePlaceType
 		v["disable_notification"] = strconv.FormatBool(opts.DisableNotification)
 		v["protect_content"] = strconv.FormatBool(opts.ProtectContent)
+		v["allow_paid_broadcast"] = strconv.FormatBool(opts.AllowPaidBroadcast)
+		v["message_effect_id"] = opts.MessageEffectId
 		if opts.ReplyParameters != nil {
 			bs, err := json.Marshal(opts.ReplyParameters)
 			if err != nil {
@@ -4263,7 +4964,7 @@ func (bot *Bot) SendVenue(chatId int64, latitude float64, longitude float64, tit
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("sendVenue", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "sendVenue", v, nil, reqOpts)
 	if err != nil {
 		return nil, err
 	}
@@ -4272,7 +4973,7 @@ func (bot *Bot) SendVenue(chatId int64, latitude float64, longitude float64, tit
 	return &m, json.Unmarshal(r, &m)
 }
 
-// SendVideoOpts is the set of optional fields for Bot.SendVideo.
+// SendVideoOpts is the set of optional fields for Bot.SendVideo and Bot.SendVideoWithContext.
 type SendVideoOpts struct {
 	// Unique identifier of the business connection on behalf of which the message will be sent
 	BusinessConnectionId string
@@ -4292,6 +4993,8 @@ type SendVideoOpts struct {
 	ParseMode string
 	// A JSON-serialized list of special entities that appear in the caption, which can be specified instead of parse_mode
 	CaptionEntities []MessageEntity
+	// Pass True, if the caption must be shown above the message media
+	ShowCaptionAboveMedia bool
 	// Pass True if the video needs to be covered with a spoiler animation
 	HasSpoiler bool
 	// Pass True if the uploaded video is suitable for streaming
@@ -4300,6 +5003,10 @@ type SendVideoOpts struct {
 	DisableNotification bool
 	// Protects the contents of the sent message from forwarding and saving
 	ProtectContent bool
+	// Pass True to allow up to 1000 messages per second, ignoring broadcasting limits for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot's balance
+	AllowPaidBroadcast bool
+	// Unique identifier of the message effect to be added to the message; for private chats only
+	MessageEffectId string
 	// Description of the message to reply to
 	ReplyParameters *ReplyParameters
 	// Additional interface options. A JSON-serialized object for an inline keyboard, custom reply keyboard, instructions to remove a reply keyboard or to force a reply from the user
@@ -4312,32 +5019,23 @@ type SendVideoOpts struct {
 //
 // Use this method to send video files, Telegram clients support MPEG4 videos (other formats may be sent as Document). On success, the sent Message is returned. Bots can currently send video files of up to 50 MB in size, this limit may be changed in the future.
 //   - chatId (type int64): Unique identifier for the target chat
-//   - video (type InputFile): Video to send. Pass a file_id as String to send a video that exists on the Telegram servers (recommended), pass an HTTP URL as a String for Telegram to get a video from the Internet, or upload a new video using multipart/form-data. More information on Sending Files: https://core.telegram.org/bots/api#sending-files
+//   - video (type InputFileOrString): Video to send. Pass a file_id as String to send a video that exists on the Telegram servers (recommended), pass an HTTP URL as a String for Telegram to get a video from the Internet, or upload a new video using multipart/form-data. More information on Sending Files: https://core.telegram.org/bots/api#sending-files
 //   - opts (type SendVideoOpts): All optional parameters.
-func (bot *Bot) SendVideo(chatId int64, video InputFile, opts *SendVideoOpts) (*Message, error) {
+func (bot *Bot) SendVideo(chatId int64, video InputFileOrString, opts *SendVideoOpts) (*Message, error) {
+	return bot.SendVideoWithContext(context.Background(), chatId, video, opts)
+}
+
+// SendVideoWithContext is the same as Bot.SendVideo, but with a context.Context parameter
+func (bot *Bot) SendVideoWithContext(ctx context.Context, chatId int64, video InputFileOrString, opts *SendVideoOpts) (*Message, error) {
 	v := map[string]string{}
-	data := map[string]NamedReader{}
+	data := map[string]FileReader{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 	if video != nil {
-		switch m := video.(type) {
-		case string:
-			v["video"] = m
-
-		case NamedReader:
-			v["video"] = "attach://video"
-			data["video"] = m
-
-		case io.Reader:
-			v["video"] = "attach://video"
-			data["video"] = NamedFile{File: m}
-
-		case []byte:
-			v["video"] = "attach://video"
-			data["video"] = NamedFile{File: bytes.NewReader(m)}
-
-		default:
-			return nil, fmt.Errorf("unknown type for InputFile: %T", video)
+		err := video.Attach("video", data)
+		if err != nil {
+			return nil, fmt.Errorf("failed to attach 'video' input file: %w", err)
 		}
+		v["video"] = video.getValue()
 	}
 	if opts != nil {
 		v["business_connection_id"] = opts.BusinessConnectionId
@@ -4354,25 +5052,11 @@ func (bot *Bot) SendVideo(chatId int64, video InputFile, opts *SendVideoOpts) (*
 			v["height"] = strconv.FormatInt(opts.Height, 10)
 		}
 		if opts.Thumbnail != nil {
-			switch m := opts.Thumbnail.(type) {
-			case string:
-				v["thumbnail"] = m
-
-			case NamedReader:
-				v["thumbnail"] = "attach://thumbnail"
-				data["thumbnail"] = m
-
-			case io.Reader:
-				v["thumbnail"] = "attach://thumbnail"
-				data["thumbnail"] = NamedFile{File: m}
-
-			case []byte:
-				v["thumbnail"] = "attach://thumbnail"
-				data["thumbnail"] = NamedFile{File: bytes.NewReader(m)}
-
-			default:
-				return nil, fmt.Errorf("unknown type for InputFile: %T", opts.Thumbnail)
+			err := opts.Thumbnail.Attach("thumbnail", data)
+			if err != nil {
+				return nil, fmt.Errorf("failed to attach 'thumbnail' input file: %w", err)
 			}
+			v["thumbnail"] = opts.Thumbnail.getValue()
 		}
 		v["caption"] = opts.Caption
 		v["parse_mode"] = opts.ParseMode
@@ -4383,10 +5067,13 @@ func (bot *Bot) SendVideo(chatId int64, video InputFile, opts *SendVideoOpts) (*
 			}
 			v["caption_entities"] = string(bs)
 		}
+		v["show_caption_above_media"] = strconv.FormatBool(opts.ShowCaptionAboveMedia)
 		v["has_spoiler"] = strconv.FormatBool(opts.HasSpoiler)
 		v["supports_streaming"] = strconv.FormatBool(opts.SupportsStreaming)
 		v["disable_notification"] = strconv.FormatBool(opts.DisableNotification)
 		v["protect_content"] = strconv.FormatBool(opts.ProtectContent)
+		v["allow_paid_broadcast"] = strconv.FormatBool(opts.AllowPaidBroadcast)
+		v["message_effect_id"] = opts.MessageEffectId
 		if opts.ReplyParameters != nil {
 			bs, err := json.Marshal(opts.ReplyParameters)
 			if err != nil {
@@ -4408,7 +5095,7 @@ func (bot *Bot) SendVideo(chatId int64, video InputFile, opts *SendVideoOpts) (*
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("sendVideo", v, data, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "sendVideo", v, data, reqOpts)
 	if err != nil {
 		return nil, err
 	}
@@ -4417,7 +5104,7 @@ func (bot *Bot) SendVideo(chatId int64, video InputFile, opts *SendVideoOpts) (*
 	return &m, json.Unmarshal(r, &m)
 }
 
-// SendVideoNoteOpts is the set of optional fields for Bot.SendVideoNote.
+// SendVideoNoteOpts is the set of optional fields for Bot.SendVideoNote and Bot.SendVideoNoteWithContext.
 type SendVideoNoteOpts struct {
 	// Unique identifier of the business connection on behalf of which the message will be sent
 	BusinessConnectionId string
@@ -4433,6 +5120,10 @@ type SendVideoNoteOpts struct {
 	DisableNotification bool
 	// Protects the contents of the sent message from forwarding and saving
 	ProtectContent bool
+	// Pass True to allow up to 1000 messages per second, ignoring broadcasting limits for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot's balance
+	AllowPaidBroadcast bool
+	// Unique identifier of the message effect to be added to the message; for private chats only
+	MessageEffectId string
 	// Description of the message to reply to
 	ReplyParameters *ReplyParameters
 	// Additional interface options. A JSON-serialized object for an inline keyboard, custom reply keyboard, instructions to remove a reply keyboard or to force a reply from the user
@@ -4445,32 +5136,23 @@ type SendVideoNoteOpts struct {
 //
 // As of v.4.0, Telegram clients support rounded square MPEG4 videos of up to 1 minute long. Use this method to send video messages. On success, the sent Message is returned.
 //   - chatId (type int64): Unique identifier for the target chat
-//   - videoNote (type InputFile): Video note to send. Pass a file_id as String to send a video note that exists on the Telegram servers (recommended) or upload a new video using multipart/form-data. More information on Sending Files: https://core.telegram.org/bots/api#sending-files. Sending video notes by a URL is currently unsupported
+//   - videoNote (type InputFileOrString): Video note to send. Pass a file_id as String to send a video note that exists on the Telegram servers (recommended) or upload a new video using multipart/form-data. More information on Sending Files: https://core.telegram.org/bots/api#sending-files. Sending video notes by a URL is currently unsupported
 //   - opts (type SendVideoNoteOpts): All optional parameters.
-func (bot *Bot) SendVideoNote(chatId int64, videoNote InputFile, opts *SendVideoNoteOpts) (*Message, error) {
+func (bot *Bot) SendVideoNote(chatId int64, videoNote InputFileOrString, opts *SendVideoNoteOpts) (*Message, error) {
+	return bot.SendVideoNoteWithContext(context.Background(), chatId, videoNote, opts)
+}
+
+// SendVideoNoteWithContext is the same as Bot.SendVideoNote, but with a context.Context parameter
+func (bot *Bot) SendVideoNoteWithContext(ctx context.Context, chatId int64, videoNote InputFileOrString, opts *SendVideoNoteOpts) (*Message, error) {
 	v := map[string]string{}
-	data := map[string]NamedReader{}
+	data := map[string]FileReader{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 	if videoNote != nil {
-		switch m := videoNote.(type) {
-		case string:
-			v["video_note"] = m
-
-		case NamedReader:
-			v["video_note"] = "attach://video_note"
-			data["video_note"] = m
-
-		case io.Reader:
-			v["video_note"] = "attach://video_note"
-			data["video_note"] = NamedFile{File: m}
-
-		case []byte:
-			v["video_note"] = "attach://video_note"
-			data["video_note"] = NamedFile{File: bytes.NewReader(m)}
-
-		default:
-			return nil, fmt.Errorf("unknown type for InputFile: %T", videoNote)
+		err := videoNote.Attach("video_note", data)
+		if err != nil {
+			return nil, fmt.Errorf("failed to attach 'video_note' input file: %w", err)
 		}
+		v["video_note"] = videoNote.getValue()
 	}
 	if opts != nil {
 		v["business_connection_id"] = opts.BusinessConnectionId
@@ -4484,28 +5166,16 @@ func (bot *Bot) SendVideoNote(chatId int64, videoNote InputFile, opts *SendVideo
 			v["length"] = strconv.FormatInt(opts.Length, 10)
 		}
 		if opts.Thumbnail != nil {
-			switch m := opts.Thumbnail.(type) {
-			case string:
-				v["thumbnail"] = m
-
-			case NamedReader:
-				v["thumbnail"] = "attach://thumbnail"
-				data["thumbnail"] = m
-
-			case io.Reader:
-				v["thumbnail"] = "attach://thumbnail"
-				data["thumbnail"] = NamedFile{File: m}
-
-			case []byte:
-				v["thumbnail"] = "attach://thumbnail"
-				data["thumbnail"] = NamedFile{File: bytes.NewReader(m)}
-
-			default:
-				return nil, fmt.Errorf("unknown type for InputFile: %T", opts.Thumbnail)
+			err := opts.Thumbnail.Attach("thumbnail", data)
+			if err != nil {
+				return nil, fmt.Errorf("failed to attach 'thumbnail' input file: %w", err)
 			}
+			v["thumbnail"] = opts.Thumbnail.getValue()
 		}
 		v["disable_notification"] = strconv.FormatBool(opts.DisableNotification)
 		v["protect_content"] = strconv.FormatBool(opts.ProtectContent)
+		v["allow_paid_broadcast"] = strconv.FormatBool(opts.AllowPaidBroadcast)
+		v["message_effect_id"] = opts.MessageEffectId
 		if opts.ReplyParameters != nil {
 			bs, err := json.Marshal(opts.ReplyParameters)
 			if err != nil {
@@ -4527,7 +5197,7 @@ func (bot *Bot) SendVideoNote(chatId int64, videoNote InputFile, opts *SendVideo
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("sendVideoNote", v, data, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "sendVideoNote", v, data, reqOpts)
 	if err != nil {
 		return nil, err
 	}
@@ -4536,7 +5206,7 @@ func (bot *Bot) SendVideoNote(chatId int64, videoNote InputFile, opts *SendVideo
 	return &m, json.Unmarshal(r, &m)
 }
 
-// SendVoiceOpts is the set of optional fields for Bot.SendVoice.
+// SendVoiceOpts is the set of optional fields for Bot.SendVoice and Bot.SendVoiceWithContext.
 type SendVoiceOpts struct {
 	// Unique identifier of the business connection on behalf of which the message will be sent
 	BusinessConnectionId string
@@ -4554,6 +5224,10 @@ type SendVoiceOpts struct {
 	DisableNotification bool
 	// Protects the contents of the sent message from forwarding and saving
 	ProtectContent bool
+	// Pass True to allow up to 1000 messages per second, ignoring broadcasting limits for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot's balance
+	AllowPaidBroadcast bool
+	// Unique identifier of the message effect to be added to the message; for private chats only
+	MessageEffectId string
 	// Description of the message to reply to
 	ReplyParameters *ReplyParameters
 	// Additional interface options. A JSON-serialized object for an inline keyboard, custom reply keyboard, instructions to remove a reply keyboard or to force a reply from the user
@@ -4566,32 +5240,23 @@ type SendVoiceOpts struct {
 //
 // Use this method to send audio files, if you want Telegram clients to display the file as a playable voice message. For this to work, your audio must be in an .OGG file encoded with OPUS, or in .MP3 format, or in .M4A format (other formats may be sent as Audio or Document). On success, the sent Message is returned. Bots can currently send voice messages of up to 50 MB in size, this limit may be changed in the future.
 //   - chatId (type int64): Unique identifier for the target chat
-//   - voice (type InputFile): Audio file to send. Pass a file_id as String to send a file that exists on the Telegram servers (recommended), pass an HTTP URL as a String for Telegram to get a file from the Internet, or upload a new one using multipart/form-data. More information on Sending Files: https://core.telegram.org/bots/api#sending-files
+//   - voice (type InputFileOrString): Audio file to send. Pass a file_id as String to send a file that exists on the Telegram servers (recommended), pass an HTTP URL as a String for Telegram to get a file from the Internet, or upload a new one using multipart/form-data. More information on Sending Files: https://core.telegram.org/bots/api#sending-files
 //   - opts (type SendVoiceOpts): All optional parameters.
-func (bot *Bot) SendVoice(chatId int64, voice InputFile, opts *SendVoiceOpts) (*Message, error) {
+func (bot *Bot) SendVoice(chatId int64, voice InputFileOrString, opts *SendVoiceOpts) (*Message, error) {
+	return bot.SendVoiceWithContext(context.Background(), chatId, voice, opts)
+}
+
+// SendVoiceWithContext is the same as Bot.SendVoice, but with a context.Context parameter
+func (bot *Bot) SendVoiceWithContext(ctx context.Context, chatId int64, voice InputFileOrString, opts *SendVoiceOpts) (*Message, error) {
 	v := map[string]string{}
-	data := map[string]NamedReader{}
+	data := map[string]FileReader{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 	if voice != nil {
-		switch m := voice.(type) {
-		case string:
-			v["voice"] = m
-
-		case NamedReader:
-			v["voice"] = "attach://voice"
-			data["voice"] = m
-
-		case io.Reader:
-			v["voice"] = "attach://voice"
-			data["voice"] = NamedFile{File: m}
-
-		case []byte:
-			v["voice"] = "attach://voice"
-			data["voice"] = NamedFile{File: bytes.NewReader(m)}
-
-		default:
-			return nil, fmt.Errorf("unknown type for InputFile: %T", voice)
+		err := voice.Attach("voice", data)
+		if err != nil {
+			return nil, fmt.Errorf("failed to attach 'voice' input file: %w", err)
 		}
+		v["voice"] = voice.getValue()
 	}
 	if opts != nil {
 		v["business_connection_id"] = opts.BusinessConnectionId
@@ -4612,6 +5277,8 @@ func (bot *Bot) SendVoice(chatId int64, voice InputFile, opts *SendVoiceOpts) (*
 		}
 		v["disable_notification"] = strconv.FormatBool(opts.DisableNotification)
 		v["protect_content"] = strconv.FormatBool(opts.ProtectContent)
+		v["allow_paid_broadcast"] = strconv.FormatBool(opts.AllowPaidBroadcast)
+		v["message_effect_id"] = opts.MessageEffectId
 		if opts.ReplyParameters != nil {
 			bs, err := json.Marshal(opts.ReplyParameters)
 			if err != nil {
@@ -4633,7 +5300,7 @@ func (bot *Bot) SendVoice(chatId int64, voice InputFile, opts *SendVoiceOpts) (*
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("sendVoice", v, data, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "sendVoice", v, data, reqOpts)
 	if err != nil {
 		return nil, err
 	}
@@ -4642,7 +5309,7 @@ func (bot *Bot) SendVoice(chatId int64, voice InputFile, opts *SendVoiceOpts) (*
 	return &m, json.Unmarshal(r, &m)
 }
 
-// SetChatAdministratorCustomTitleOpts is the set of optional fields for Bot.SetChatAdministratorCustomTitle.
+// SetChatAdministratorCustomTitleOpts is the set of optional fields for Bot.SetChatAdministratorCustomTitle and Bot.SetChatAdministratorCustomTitleWithContext.
 type SetChatAdministratorCustomTitleOpts struct {
 	// RequestOpts are an additional optional field to configure timeouts for individual requests
 	RequestOpts *RequestOpts
@@ -4656,6 +5323,11 @@ type SetChatAdministratorCustomTitleOpts struct {
 //   - customTitle (type string): New custom title for the administrator; 0-16 characters, emoji are not allowed
 //   - opts (type SetChatAdministratorCustomTitleOpts): All optional parameters.
 func (bot *Bot) SetChatAdministratorCustomTitle(chatId int64, userId int64, customTitle string, opts *SetChatAdministratorCustomTitleOpts) (bool, error) {
+	return bot.SetChatAdministratorCustomTitleWithContext(context.Background(), chatId, userId, customTitle, opts)
+}
+
+// SetChatAdministratorCustomTitleWithContext is the same as Bot.SetChatAdministratorCustomTitle, but with a context.Context parameter
+func (bot *Bot) SetChatAdministratorCustomTitleWithContext(ctx context.Context, chatId int64, userId int64, customTitle string, opts *SetChatAdministratorCustomTitleOpts) (bool, error) {
 	v := map[string]string{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 	v["user_id"] = strconv.FormatInt(userId, 10)
@@ -4666,7 +5338,7 @@ func (bot *Bot) SetChatAdministratorCustomTitle(chatId int64, userId int64, cust
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("setChatAdministratorCustomTitle", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "setChatAdministratorCustomTitle", v, nil, reqOpts)
 	if err != nil {
 		return false, err
 	}
@@ -4675,7 +5347,7 @@ func (bot *Bot) SetChatAdministratorCustomTitle(chatId int64, userId int64, cust
 	return b, json.Unmarshal(r, &b)
 }
 
-// SetChatDescriptionOpts is the set of optional fields for Bot.SetChatDescription.
+// SetChatDescriptionOpts is the set of optional fields for Bot.SetChatDescription and Bot.SetChatDescriptionWithContext.
 type SetChatDescriptionOpts struct {
 	// New chat description, 0-255 characters
 	Description string
@@ -4689,6 +5361,11 @@ type SetChatDescriptionOpts struct {
 //   - chatId (type int64): Unique identifier for the target chat
 //   - opts (type SetChatDescriptionOpts): All optional parameters.
 func (bot *Bot) SetChatDescription(chatId int64, opts *SetChatDescriptionOpts) (bool, error) {
+	return bot.SetChatDescriptionWithContext(context.Background(), chatId, opts)
+}
+
+// SetChatDescriptionWithContext is the same as Bot.SetChatDescription, but with a context.Context parameter
+func (bot *Bot) SetChatDescriptionWithContext(ctx context.Context, chatId int64, opts *SetChatDescriptionOpts) (bool, error) {
 	v := map[string]string{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 	if opts != nil {
@@ -4700,7 +5377,7 @@ func (bot *Bot) SetChatDescription(chatId int64, opts *SetChatDescriptionOpts) (
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("setChatDescription", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "setChatDescription", v, nil, reqOpts)
 	if err != nil {
 		return false, err
 	}
@@ -4709,7 +5386,7 @@ func (bot *Bot) SetChatDescription(chatId int64, opts *SetChatDescriptionOpts) (
 	return b, json.Unmarshal(r, &b)
 }
 
-// SetChatMenuButtonOpts is the set of optional fields for Bot.SetChatMenuButton.
+// SetChatMenuButtonOpts is the set of optional fields for Bot.SetChatMenuButton and Bot.SetChatMenuButtonWithContext.
 type SetChatMenuButtonOpts struct {
 	// Unique identifier for the target private chat. If not specified, default bot's menu button will be changed
 	ChatId *int64
@@ -4724,6 +5401,11 @@ type SetChatMenuButtonOpts struct {
 // Use this method to change the bot's menu button in a private chat, or the default menu button. Returns True on success.
 //   - opts (type SetChatMenuButtonOpts): All optional parameters.
 func (bot *Bot) SetChatMenuButton(opts *SetChatMenuButtonOpts) (bool, error) {
+	return bot.SetChatMenuButtonWithContext(context.Background(), opts)
+}
+
+// SetChatMenuButtonWithContext is the same as Bot.SetChatMenuButton, but with a context.Context parameter
+func (bot *Bot) SetChatMenuButtonWithContext(ctx context.Context, opts *SetChatMenuButtonOpts) (bool, error) {
 	v := map[string]string{}
 	if opts != nil {
 		if opts.ChatId != nil {
@@ -4741,7 +5423,7 @@ func (bot *Bot) SetChatMenuButton(opts *SetChatMenuButtonOpts) (bool, error) {
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("setChatMenuButton", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "setChatMenuButton", v, nil, reqOpts)
 	if err != nil {
 		return false, err
 	}
@@ -4750,7 +5432,7 @@ func (bot *Bot) SetChatMenuButton(opts *SetChatMenuButtonOpts) (bool, error) {
 	return b, json.Unmarshal(r, &b)
 }
 
-// SetChatPermissionsOpts is the set of optional fields for Bot.SetChatPermissions.
+// SetChatPermissionsOpts is the set of optional fields for Bot.SetChatPermissions and Bot.SetChatPermissionsWithContext.
 type SetChatPermissionsOpts struct {
 	// Pass True if chat permissions are set independently. Otherwise, the can_send_other_messages and can_add_web_page_previews permissions will imply the can_send_messages, can_send_audios, can_send_documents, can_send_photos, can_send_videos, can_send_video_notes, and can_send_voice_notes permissions; the can_send_polls permission will imply the can_send_messages permission.
 	UseIndependentChatPermissions bool
@@ -4765,6 +5447,11 @@ type SetChatPermissionsOpts struct {
 //   - permissions (type ChatPermissions): A JSON-serialized object for new default chat permissions
 //   - opts (type SetChatPermissionsOpts): All optional parameters.
 func (bot *Bot) SetChatPermissions(chatId int64, permissions ChatPermissions, opts *SetChatPermissionsOpts) (bool, error) {
+	return bot.SetChatPermissionsWithContext(context.Background(), chatId, permissions, opts)
+}
+
+// SetChatPermissionsWithContext is the same as Bot.SetChatPermissions, but with a context.Context parameter
+func (bot *Bot) SetChatPermissionsWithContext(ctx context.Context, chatId int64, permissions ChatPermissions, opts *SetChatPermissionsOpts) (bool, error) {
 	v := map[string]string{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 	bs, err := json.Marshal(permissions)
@@ -4781,7 +5468,7 @@ func (bot *Bot) SetChatPermissions(chatId int64, permissions ChatPermissions, op
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("setChatPermissions", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "setChatPermissions", v, nil, reqOpts)
 	if err != nil {
 		return false, err
 	}
@@ -4790,7 +5477,7 @@ func (bot *Bot) SetChatPermissions(chatId int64, permissions ChatPermissions, op
 	return b, json.Unmarshal(r, &b)
 }
 
-// SetChatPhotoOpts is the set of optional fields for Bot.SetChatPhoto.
+// SetChatPhotoOpts is the set of optional fields for Bot.SetChatPhoto and Bot.SetChatPhotoWithContext.
 type SetChatPhotoOpts struct {
 	// RequestOpts are an additional optional field to configure timeouts for individual requests
 	RequestOpts *RequestOpts
@@ -4803,26 +5490,20 @@ type SetChatPhotoOpts struct {
 //   - photo (type InputFile): New chat photo, uploaded using multipart/form-data
 //   - opts (type SetChatPhotoOpts): All optional parameters.
 func (bot *Bot) SetChatPhoto(chatId int64, photo InputFile, opts *SetChatPhotoOpts) (bool, error) {
+	return bot.SetChatPhotoWithContext(context.Background(), chatId, photo, opts)
+}
+
+// SetChatPhotoWithContext is the same as Bot.SetChatPhoto, but with a context.Context parameter
+func (bot *Bot) SetChatPhotoWithContext(ctx context.Context, chatId int64, photo InputFile, opts *SetChatPhotoOpts) (bool, error) {
 	v := map[string]string{}
-	data := map[string]NamedReader{}
+	data := map[string]FileReader{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 	if photo != nil {
-		switch m := photo.(type) {
-		case NamedReader:
-			v["photo"] = "attach://photo"
-			data["photo"] = m
-
-		case io.Reader:
-			v["photo"] = "attach://photo"
-			data["photo"] = NamedFile{File: m}
-
-		case []byte:
-			v["photo"] = "attach://photo"
-			data["photo"] = NamedFile{File: bytes.NewReader(m)}
-
-		default:
-			return false, fmt.Errorf("unknown type for InputFile: %T", photo)
+		err := photo.Attach("photo", data)
+		if err != nil {
+			return false, fmt.Errorf("failed to attach 'photo' input file: %w", err)
 		}
+		v["photo"] = photo.getValue()
 	}
 
 	var reqOpts *RequestOpts
@@ -4830,7 +5511,7 @@ func (bot *Bot) SetChatPhoto(chatId int64, photo InputFile, opts *SetChatPhotoOp
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("setChatPhoto", v, data, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "setChatPhoto", v, data, reqOpts)
 	if err != nil {
 		return false, err
 	}
@@ -4839,7 +5520,7 @@ func (bot *Bot) SetChatPhoto(chatId int64, photo InputFile, opts *SetChatPhotoOp
 	return b, json.Unmarshal(r, &b)
 }
 
-// SetChatStickerSetOpts is the set of optional fields for Bot.SetChatStickerSet.
+// SetChatStickerSetOpts is the set of optional fields for Bot.SetChatStickerSet and Bot.SetChatStickerSetWithContext.
 type SetChatStickerSetOpts struct {
 	// RequestOpts are an additional optional field to configure timeouts for individual requests
 	RequestOpts *RequestOpts
@@ -4852,6 +5533,11 @@ type SetChatStickerSetOpts struct {
 //   - stickerSetName (type string): Name of the sticker set to be set as the group sticker set
 //   - opts (type SetChatStickerSetOpts): All optional parameters.
 func (bot *Bot) SetChatStickerSet(chatId int64, stickerSetName string, opts *SetChatStickerSetOpts) (bool, error) {
+	return bot.SetChatStickerSetWithContext(context.Background(), chatId, stickerSetName, opts)
+}
+
+// SetChatStickerSetWithContext is the same as Bot.SetChatStickerSet, but with a context.Context parameter
+func (bot *Bot) SetChatStickerSetWithContext(ctx context.Context, chatId int64, stickerSetName string, opts *SetChatStickerSetOpts) (bool, error) {
 	v := map[string]string{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 	v["sticker_set_name"] = stickerSetName
@@ -4861,7 +5547,7 @@ func (bot *Bot) SetChatStickerSet(chatId int64, stickerSetName string, opts *Set
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("setChatStickerSet", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "setChatStickerSet", v, nil, reqOpts)
 	if err != nil {
 		return false, err
 	}
@@ -4870,7 +5556,7 @@ func (bot *Bot) SetChatStickerSet(chatId int64, stickerSetName string, opts *Set
 	return b, json.Unmarshal(r, &b)
 }
 
-// SetChatTitleOpts is the set of optional fields for Bot.SetChatTitle.
+// SetChatTitleOpts is the set of optional fields for Bot.SetChatTitle and Bot.SetChatTitleWithContext.
 type SetChatTitleOpts struct {
 	// RequestOpts are an additional optional field to configure timeouts for individual requests
 	RequestOpts *RequestOpts
@@ -4883,6 +5569,11 @@ type SetChatTitleOpts struct {
 //   - title (type string): New chat title, 1-128 characters
 //   - opts (type SetChatTitleOpts): All optional parameters.
 func (bot *Bot) SetChatTitle(chatId int64, title string, opts *SetChatTitleOpts) (bool, error) {
+	return bot.SetChatTitleWithContext(context.Background(), chatId, title, opts)
+}
+
+// SetChatTitleWithContext is the same as Bot.SetChatTitle, but with a context.Context parameter
+func (bot *Bot) SetChatTitleWithContext(ctx context.Context, chatId int64, title string, opts *SetChatTitleOpts) (bool, error) {
 	v := map[string]string{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 	v["title"] = title
@@ -4892,7 +5583,7 @@ func (bot *Bot) SetChatTitle(chatId int64, title string, opts *SetChatTitleOpts)
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("setChatTitle", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "setChatTitle", v, nil, reqOpts)
 	if err != nil {
 		return false, err
 	}
@@ -4901,7 +5592,7 @@ func (bot *Bot) SetChatTitle(chatId int64, title string, opts *SetChatTitleOpts)
 	return b, json.Unmarshal(r, &b)
 }
 
-// SetCustomEmojiStickerSetThumbnailOpts is the set of optional fields for Bot.SetCustomEmojiStickerSetThumbnail.
+// SetCustomEmojiStickerSetThumbnailOpts is the set of optional fields for Bot.SetCustomEmojiStickerSetThumbnail and Bot.SetCustomEmojiStickerSetThumbnailWithContext.
 type SetCustomEmojiStickerSetThumbnailOpts struct {
 	// Custom emoji identifier of a sticker from the sticker set; pass an empty string to drop the thumbnail and use the first sticker as the thumbnail.
 	CustomEmojiId string
@@ -4915,6 +5606,11 @@ type SetCustomEmojiStickerSetThumbnailOpts struct {
 //   - name (type string): Sticker set name
 //   - opts (type SetCustomEmojiStickerSetThumbnailOpts): All optional parameters.
 func (bot *Bot) SetCustomEmojiStickerSetThumbnail(name string, opts *SetCustomEmojiStickerSetThumbnailOpts) (bool, error) {
+	return bot.SetCustomEmojiStickerSetThumbnailWithContext(context.Background(), name, opts)
+}
+
+// SetCustomEmojiStickerSetThumbnailWithContext is the same as Bot.SetCustomEmojiStickerSetThumbnail, but with a context.Context parameter
+func (bot *Bot) SetCustomEmojiStickerSetThumbnailWithContext(ctx context.Context, name string, opts *SetCustomEmojiStickerSetThumbnailOpts) (bool, error) {
 	v := map[string]string{}
 	v["name"] = name
 	if opts != nil {
@@ -4926,7 +5622,7 @@ func (bot *Bot) SetCustomEmojiStickerSetThumbnail(name string, opts *SetCustomEm
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("setCustomEmojiStickerSetThumbnail", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "setCustomEmojiStickerSetThumbnail", v, nil, reqOpts)
 	if err != nil {
 		return false, err
 	}
@@ -4935,7 +5631,7 @@ func (bot *Bot) SetCustomEmojiStickerSetThumbnail(name string, opts *SetCustomEm
 	return b, json.Unmarshal(r, &b)
 }
 
-// SetGameScoreOpts is the set of optional fields for Bot.SetGameScore.
+// SetGameScoreOpts is the set of optional fields for Bot.SetGameScore and Bot.SetGameScoreWithContext.
 type SetGameScoreOpts struct {
 	// Pass True if the high score is allowed to decrease. This can be useful when fixing mistakes or banning cheaters
 	Force bool
@@ -4958,6 +5654,11 @@ type SetGameScoreOpts struct {
 //   - score (type int64): New score, must be non-negative
 //   - opts (type SetGameScoreOpts): All optional parameters.
 func (bot *Bot) SetGameScore(userId int64, score int64, opts *SetGameScoreOpts) (*Message, bool, error) {
+	return bot.SetGameScoreWithContext(context.Background(), userId, score, opts)
+}
+
+// SetGameScoreWithContext is the same as Bot.SetGameScore, but with a context.Context parameter
+func (bot *Bot) SetGameScoreWithContext(ctx context.Context, userId int64, score int64, opts *SetGameScoreOpts) (*Message, bool, error) {
 	v := map[string]string{}
 	v["user_id"] = strconv.FormatInt(userId, 10)
 	v["score"] = strconv.FormatInt(score, 10)
@@ -4978,7 +5679,7 @@ func (bot *Bot) SetGameScore(userId int64, score int64, opts *SetGameScoreOpts) 
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("setGameScore", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "setGameScore", v, nil, reqOpts)
 	if err != nil {
 		return nil, false, err
 	}
@@ -4995,9 +5696,9 @@ func (bot *Bot) SetGameScore(userId int64, score int64, opts *SetGameScoreOpts) 
 
 }
 
-// SetMessageReactionOpts is the set of optional fields for Bot.SetMessageReaction.
+// SetMessageReactionOpts is the set of optional fields for Bot.SetMessageReaction and Bot.SetMessageReactionWithContext.
 type SetMessageReactionOpts struct {
-	// A JSON-serialized list of reaction types to set on the message. Currently, as non-premium users, bots can set up to one reaction per message. A custom emoji reaction can be used if it is either already present on the message or explicitly allowed by chat administrators.
+	// A JSON-serialized list of reaction types to set on the message. Currently, as non-premium users, bots can set up to one reaction per message. A custom emoji reaction can be used if it is either already present on the message or explicitly allowed by chat administrators. Paid reactions can't be used by bots.
 	Reaction []ReactionType
 	// Pass True to set the reaction with a big animation
 	IsBig bool
@@ -5007,11 +5708,16 @@ type SetMessageReactionOpts struct {
 
 // SetMessageReaction (https://core.telegram.org/bots/api#setmessagereaction)
 //
-// Use this method to change the chosen reactions on a message. Service messages can't be reacted to. Automatically forwarded messages from a channel to its discussion group have the same available reactions as messages in the channel. Returns True on success.
+// Use this method to change the chosen reactions on a message. Service messages can't be reacted to. Automatically forwarded messages from a channel to its discussion group have the same available reactions as messages in the channel. Bots can't use paid reactions. Returns True on success.
 //   - chatId (type int64): Unique identifier for the target chat
 //   - messageId (type int64): Identifier of the target message. If the message belongs to a media group, the reaction is set to the first non-deleted message in the group instead.
 //   - opts (type SetMessageReactionOpts): All optional parameters.
 func (bot *Bot) SetMessageReaction(chatId int64, messageId int64, opts *SetMessageReactionOpts) (bool, error) {
+	return bot.SetMessageReactionWithContext(context.Background(), chatId, messageId, opts)
+}
+
+// SetMessageReactionWithContext is the same as Bot.SetMessageReaction, but with a context.Context parameter
+func (bot *Bot) SetMessageReactionWithContext(ctx context.Context, chatId int64, messageId int64, opts *SetMessageReactionOpts) (bool, error) {
 	v := map[string]string{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 	v["message_id"] = strconv.FormatInt(messageId, 10)
@@ -5031,7 +5737,7 @@ func (bot *Bot) SetMessageReaction(chatId int64, messageId int64, opts *SetMessa
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("setMessageReaction", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "setMessageReaction", v, nil, reqOpts)
 	if err != nil {
 		return false, err
 	}
@@ -5040,7 +5746,7 @@ func (bot *Bot) SetMessageReaction(chatId int64, messageId int64, opts *SetMessa
 	return b, json.Unmarshal(r, &b)
 }
 
-// SetMyCommandsOpts is the set of optional fields for Bot.SetMyCommands.
+// SetMyCommandsOpts is the set of optional fields for Bot.SetMyCommands and Bot.SetMyCommandsWithContext.
 type SetMyCommandsOpts struct {
 	// A JSON-serialized object, describing scope of users for which the commands are relevant. Defaults to BotCommandScopeDefault.
 	Scope BotCommandScope
@@ -5056,6 +5762,11 @@ type SetMyCommandsOpts struct {
 //   - commands (type []BotCommand): A JSON-serialized list of bot commands to be set as the list of the bot's commands. At most 100 commands can be specified.
 //   - opts (type SetMyCommandsOpts): All optional parameters.
 func (bot *Bot) SetMyCommands(commands []BotCommand, opts *SetMyCommandsOpts) (bool, error) {
+	return bot.SetMyCommandsWithContext(context.Background(), commands, opts)
+}
+
+// SetMyCommandsWithContext is the same as Bot.SetMyCommands, but with a context.Context parameter
+func (bot *Bot) SetMyCommandsWithContext(ctx context.Context, commands []BotCommand, opts *SetMyCommandsOpts) (bool, error) {
 	v := map[string]string{}
 	if commands != nil {
 		bs, err := json.Marshal(commands)
@@ -5078,7 +5789,7 @@ func (bot *Bot) SetMyCommands(commands []BotCommand, opts *SetMyCommandsOpts) (b
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("setMyCommands", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "setMyCommands", v, nil, reqOpts)
 	if err != nil {
 		return false, err
 	}
@@ -5087,7 +5798,7 @@ func (bot *Bot) SetMyCommands(commands []BotCommand, opts *SetMyCommandsOpts) (b
 	return b, json.Unmarshal(r, &b)
 }
 
-// SetMyDefaultAdministratorRightsOpts is the set of optional fields for Bot.SetMyDefaultAdministratorRights.
+// SetMyDefaultAdministratorRightsOpts is the set of optional fields for Bot.SetMyDefaultAdministratorRights and Bot.SetMyDefaultAdministratorRightsWithContext.
 type SetMyDefaultAdministratorRightsOpts struct {
 	// A JSON-serialized object describing new default administrator rights. If not specified, the default administrator rights will be cleared.
 	Rights *ChatAdministratorRights
@@ -5102,6 +5813,11 @@ type SetMyDefaultAdministratorRightsOpts struct {
 // Use this method to change the default administrator rights requested by the bot when it's added as an administrator to groups or channels. These rights will be suggested to users, but they are free to modify the list before adding the bot. Returns True on success.
 //   - opts (type SetMyDefaultAdministratorRightsOpts): All optional parameters.
 func (bot *Bot) SetMyDefaultAdministratorRights(opts *SetMyDefaultAdministratorRightsOpts) (bool, error) {
+	return bot.SetMyDefaultAdministratorRightsWithContext(context.Background(), opts)
+}
+
+// SetMyDefaultAdministratorRightsWithContext is the same as Bot.SetMyDefaultAdministratorRights, but with a context.Context parameter
+func (bot *Bot) SetMyDefaultAdministratorRightsWithContext(ctx context.Context, opts *SetMyDefaultAdministratorRightsOpts) (bool, error) {
 	v := map[string]string{}
 	if opts != nil {
 		if opts.Rights != nil {
@@ -5119,7 +5835,7 @@ func (bot *Bot) SetMyDefaultAdministratorRights(opts *SetMyDefaultAdministratorR
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("setMyDefaultAdministratorRights", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "setMyDefaultAdministratorRights", v, nil, reqOpts)
 	if err != nil {
 		return false, err
 	}
@@ -5128,7 +5844,7 @@ func (bot *Bot) SetMyDefaultAdministratorRights(opts *SetMyDefaultAdministratorR
 	return b, json.Unmarshal(r, &b)
 }
 
-// SetMyDescriptionOpts is the set of optional fields for Bot.SetMyDescription.
+// SetMyDescriptionOpts is the set of optional fields for Bot.SetMyDescription and Bot.SetMyDescriptionWithContext.
 type SetMyDescriptionOpts struct {
 	// New bot description; 0-512 characters. Pass an empty string to remove the dedicated description for the given language.
 	Description string
@@ -5143,6 +5859,11 @@ type SetMyDescriptionOpts struct {
 // Use this method to change the bot's description, which is shown in the chat with the bot if the chat is empty. Returns True on success.
 //   - opts (type SetMyDescriptionOpts): All optional parameters.
 func (bot *Bot) SetMyDescription(opts *SetMyDescriptionOpts) (bool, error) {
+	return bot.SetMyDescriptionWithContext(context.Background(), opts)
+}
+
+// SetMyDescriptionWithContext is the same as Bot.SetMyDescription, but with a context.Context parameter
+func (bot *Bot) SetMyDescriptionWithContext(ctx context.Context, opts *SetMyDescriptionOpts) (bool, error) {
 	v := map[string]string{}
 	if opts != nil {
 		v["description"] = opts.Description
@@ -5154,7 +5875,7 @@ func (bot *Bot) SetMyDescription(opts *SetMyDescriptionOpts) (bool, error) {
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("setMyDescription", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "setMyDescription", v, nil, reqOpts)
 	if err != nil {
 		return false, err
 	}
@@ -5163,7 +5884,7 @@ func (bot *Bot) SetMyDescription(opts *SetMyDescriptionOpts) (bool, error) {
 	return b, json.Unmarshal(r, &b)
 }
 
-// SetMyNameOpts is the set of optional fields for Bot.SetMyName.
+// SetMyNameOpts is the set of optional fields for Bot.SetMyName and Bot.SetMyNameWithContext.
 type SetMyNameOpts struct {
 	// New bot name; 0-64 characters. Pass an empty string to remove the dedicated name for the given language.
 	Name string
@@ -5178,6 +5899,11 @@ type SetMyNameOpts struct {
 // Use this method to change the bot's name. Returns True on success.
 //   - opts (type SetMyNameOpts): All optional parameters.
 func (bot *Bot) SetMyName(opts *SetMyNameOpts) (bool, error) {
+	return bot.SetMyNameWithContext(context.Background(), opts)
+}
+
+// SetMyNameWithContext is the same as Bot.SetMyName, but with a context.Context parameter
+func (bot *Bot) SetMyNameWithContext(ctx context.Context, opts *SetMyNameOpts) (bool, error) {
 	v := map[string]string{}
 	if opts != nil {
 		v["name"] = opts.Name
@@ -5189,7 +5915,7 @@ func (bot *Bot) SetMyName(opts *SetMyNameOpts) (bool, error) {
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("setMyName", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "setMyName", v, nil, reqOpts)
 	if err != nil {
 		return false, err
 	}
@@ -5198,7 +5924,7 @@ func (bot *Bot) SetMyName(opts *SetMyNameOpts) (bool, error) {
 	return b, json.Unmarshal(r, &b)
 }
 
-// SetMyShortDescriptionOpts is the set of optional fields for Bot.SetMyShortDescription.
+// SetMyShortDescriptionOpts is the set of optional fields for Bot.SetMyShortDescription and Bot.SetMyShortDescriptionWithContext.
 type SetMyShortDescriptionOpts struct {
 	// New short description for the bot; 0-120 characters. Pass an empty string to remove the dedicated short description for the given language.
 	ShortDescription string
@@ -5213,6 +5939,11 @@ type SetMyShortDescriptionOpts struct {
 // Use this method to change the bot's short description, which is shown on the bot's profile page and is sent together with the link when users share the bot. Returns True on success.
 //   - opts (type SetMyShortDescriptionOpts): All optional parameters.
 func (bot *Bot) SetMyShortDescription(opts *SetMyShortDescriptionOpts) (bool, error) {
+	return bot.SetMyShortDescriptionWithContext(context.Background(), opts)
+}
+
+// SetMyShortDescriptionWithContext is the same as Bot.SetMyShortDescription, but with a context.Context parameter
+func (bot *Bot) SetMyShortDescriptionWithContext(ctx context.Context, opts *SetMyShortDescriptionOpts) (bool, error) {
 	v := map[string]string{}
 	if opts != nil {
 		v["short_description"] = opts.ShortDescription
@@ -5224,7 +5955,7 @@ func (bot *Bot) SetMyShortDescription(opts *SetMyShortDescriptionOpts) (bool, er
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("setMyShortDescription", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "setMyShortDescription", v, nil, reqOpts)
 	if err != nil {
 		return false, err
 	}
@@ -5233,7 +5964,7 @@ func (bot *Bot) SetMyShortDescription(opts *SetMyShortDescriptionOpts) (bool, er
 	return b, json.Unmarshal(r, &b)
 }
 
-// SetPassportDataErrorsOpts is the set of optional fields for Bot.SetPassportDataErrors.
+// SetPassportDataErrorsOpts is the set of optional fields for Bot.SetPassportDataErrors and Bot.SetPassportDataErrorsWithContext.
 type SetPassportDataErrorsOpts struct {
 	// RequestOpts are an additional optional field to configure timeouts for individual requests
 	RequestOpts *RequestOpts
@@ -5247,6 +5978,11 @@ type SetPassportDataErrorsOpts struct {
 //   - errors (type []PassportElementError): A JSON-serialized array describing the errors
 //   - opts (type SetPassportDataErrorsOpts): All optional parameters.
 func (bot *Bot) SetPassportDataErrors(userId int64, errors []PassportElementError, opts *SetPassportDataErrorsOpts) (bool, error) {
+	return bot.SetPassportDataErrorsWithContext(context.Background(), userId, errors, opts)
+}
+
+// SetPassportDataErrorsWithContext is the same as Bot.SetPassportDataErrors, but with a context.Context parameter
+func (bot *Bot) SetPassportDataErrorsWithContext(ctx context.Context, userId int64, errors []PassportElementError, opts *SetPassportDataErrorsOpts) (bool, error) {
 	v := map[string]string{}
 	v["user_id"] = strconv.FormatInt(userId, 10)
 	if errors != nil {
@@ -5262,7 +5998,7 @@ func (bot *Bot) SetPassportDataErrors(userId int64, errors []PassportElementErro
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("setPassportDataErrors", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "setPassportDataErrors", v, nil, reqOpts)
 	if err != nil {
 		return false, err
 	}
@@ -5271,7 +6007,7 @@ func (bot *Bot) SetPassportDataErrors(userId int64, errors []PassportElementErro
 	return b, json.Unmarshal(r, &b)
 }
 
-// SetStickerEmojiListOpts is the set of optional fields for Bot.SetStickerEmojiList.
+// SetStickerEmojiListOpts is the set of optional fields for Bot.SetStickerEmojiList and Bot.SetStickerEmojiListWithContext.
 type SetStickerEmojiListOpts struct {
 	// RequestOpts are an additional optional field to configure timeouts for individual requests
 	RequestOpts *RequestOpts
@@ -5284,6 +6020,11 @@ type SetStickerEmojiListOpts struct {
 //   - emojiList (type []string): A JSON-serialized list of 1-20 emoji associated with the sticker
 //   - opts (type SetStickerEmojiListOpts): All optional parameters.
 func (bot *Bot) SetStickerEmojiList(sticker string, emojiList []string, opts *SetStickerEmojiListOpts) (bool, error) {
+	return bot.SetStickerEmojiListWithContext(context.Background(), sticker, emojiList, opts)
+}
+
+// SetStickerEmojiListWithContext is the same as Bot.SetStickerEmojiList, but with a context.Context parameter
+func (bot *Bot) SetStickerEmojiListWithContext(ctx context.Context, sticker string, emojiList []string, opts *SetStickerEmojiListOpts) (bool, error) {
 	v := map[string]string{}
 	v["sticker"] = sticker
 	if emojiList != nil {
@@ -5299,7 +6040,7 @@ func (bot *Bot) SetStickerEmojiList(sticker string, emojiList []string, opts *Se
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("setStickerEmojiList", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "setStickerEmojiList", v, nil, reqOpts)
 	if err != nil {
 		return false, err
 	}
@@ -5308,7 +6049,7 @@ func (bot *Bot) SetStickerEmojiList(sticker string, emojiList []string, opts *Se
 	return b, json.Unmarshal(r, &b)
 }
 
-// SetStickerKeywordsOpts is the set of optional fields for Bot.SetStickerKeywords.
+// SetStickerKeywordsOpts is the set of optional fields for Bot.SetStickerKeywords and Bot.SetStickerKeywordsWithContext.
 type SetStickerKeywordsOpts struct {
 	// A JSON-serialized list of 0-20 search keywords for the sticker with total length of up to 64 characters
 	Keywords []string
@@ -5322,6 +6063,11 @@ type SetStickerKeywordsOpts struct {
 //   - sticker (type string): File identifier of the sticker
 //   - opts (type SetStickerKeywordsOpts): All optional parameters.
 func (bot *Bot) SetStickerKeywords(sticker string, opts *SetStickerKeywordsOpts) (bool, error) {
+	return bot.SetStickerKeywordsWithContext(context.Background(), sticker, opts)
+}
+
+// SetStickerKeywordsWithContext is the same as Bot.SetStickerKeywords, but with a context.Context parameter
+func (bot *Bot) SetStickerKeywordsWithContext(ctx context.Context, sticker string, opts *SetStickerKeywordsOpts) (bool, error) {
 	v := map[string]string{}
 	v["sticker"] = sticker
 	if opts != nil {
@@ -5339,7 +6085,7 @@ func (bot *Bot) SetStickerKeywords(sticker string, opts *SetStickerKeywordsOpts)
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("setStickerKeywords", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "setStickerKeywords", v, nil, reqOpts)
 	if err != nil {
 		return false, err
 	}
@@ -5348,7 +6094,7 @@ func (bot *Bot) SetStickerKeywords(sticker string, opts *SetStickerKeywordsOpts)
 	return b, json.Unmarshal(r, &b)
 }
 
-// SetStickerMaskPositionOpts is the set of optional fields for Bot.SetStickerMaskPosition.
+// SetStickerMaskPositionOpts is the set of optional fields for Bot.SetStickerMaskPosition and Bot.SetStickerMaskPositionWithContext.
 type SetStickerMaskPositionOpts struct {
 	// A JSON-serialized object with the position where the mask should be placed on faces. Omit the parameter to remove the mask position.
 	MaskPosition *MaskPosition
@@ -5362,6 +6108,11 @@ type SetStickerMaskPositionOpts struct {
 //   - sticker (type string): File identifier of the sticker
 //   - opts (type SetStickerMaskPositionOpts): All optional parameters.
 func (bot *Bot) SetStickerMaskPosition(sticker string, opts *SetStickerMaskPositionOpts) (bool, error) {
+	return bot.SetStickerMaskPositionWithContext(context.Background(), sticker, opts)
+}
+
+// SetStickerMaskPositionWithContext is the same as Bot.SetStickerMaskPosition, but with a context.Context parameter
+func (bot *Bot) SetStickerMaskPositionWithContext(ctx context.Context, sticker string, opts *SetStickerMaskPositionOpts) (bool, error) {
 	v := map[string]string{}
 	v["sticker"] = sticker
 	if opts != nil {
@@ -5379,7 +6130,7 @@ func (bot *Bot) SetStickerMaskPosition(sticker string, opts *SetStickerMaskPosit
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("setStickerMaskPosition", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "setStickerMaskPosition", v, nil, reqOpts)
 	if err != nil {
 		return false, err
 	}
@@ -5388,7 +6139,7 @@ func (bot *Bot) SetStickerMaskPosition(sticker string, opts *SetStickerMaskPosit
 	return b, json.Unmarshal(r, &b)
 }
 
-// SetStickerPositionInSetOpts is the set of optional fields for Bot.SetStickerPositionInSet.
+// SetStickerPositionInSetOpts is the set of optional fields for Bot.SetStickerPositionInSet and Bot.SetStickerPositionInSetWithContext.
 type SetStickerPositionInSetOpts struct {
 	// RequestOpts are an additional optional field to configure timeouts for individual requests
 	RequestOpts *RequestOpts
@@ -5401,6 +6152,11 @@ type SetStickerPositionInSetOpts struct {
 //   - position (type int64): New sticker position in the set, zero-based
 //   - opts (type SetStickerPositionInSetOpts): All optional parameters.
 func (bot *Bot) SetStickerPositionInSet(sticker string, position int64, opts *SetStickerPositionInSetOpts) (bool, error) {
+	return bot.SetStickerPositionInSetWithContext(context.Background(), sticker, position, opts)
+}
+
+// SetStickerPositionInSetWithContext is the same as Bot.SetStickerPositionInSet, but with a context.Context parameter
+func (bot *Bot) SetStickerPositionInSetWithContext(ctx context.Context, sticker string, position int64, opts *SetStickerPositionInSetOpts) (bool, error) {
 	v := map[string]string{}
 	v["sticker"] = sticker
 	v["position"] = strconv.FormatInt(position, 10)
@@ -5410,7 +6166,7 @@ func (bot *Bot) SetStickerPositionInSet(sticker string, position int64, opts *Se
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("setStickerPositionInSet", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "setStickerPositionInSet", v, nil, reqOpts)
 	if err != nil {
 		return false, err
 	}
@@ -5419,9 +6175,9 @@ func (bot *Bot) SetStickerPositionInSet(sticker string, position int64, opts *Se
 	return b, json.Unmarshal(r, &b)
 }
 
-// SetStickerSetThumbnailOpts is the set of optional fields for Bot.SetStickerSetThumbnail.
+// SetStickerSetThumbnailOpts is the set of optional fields for Bot.SetStickerSetThumbnail and Bot.SetStickerSetThumbnailWithContext.
 type SetStickerSetThumbnailOpts struct {
-	// A .WEBP or .PNG image with the thumbnail, must be up to 128 kilobytes in size and have a width and height of exactly 100px, or a .TGS animation with a thumbnail up to 32 kilobytes in size (see https://core.telegram.org/stickers#animated-sticker-requirements for animated sticker technical requirements), or a WEBM video with the thumbnail up to 32 kilobytes in size; see https://core.telegram.org/stickers#video-sticker-requirements for video sticker technical requirements. Pass a file_id as a String to send a file that already exists on the Telegram servers, pass an HTTP URL as a String for Telegram to get a file from the Internet, or upload a new one using multipart/form-data. More information on Sending Files: https://core.telegram.org/bots/api#sending-files. Animated and video sticker set thumbnails can't be uploaded via HTTP URL. If omitted, then the thumbnail is dropped and the first sticker is used as the thumbnail.
+	// A .WEBP or .PNG image with the thumbnail, must be up to 128 kilobytes in size and have a width and height of exactly 100px, or a .TGS animation with a thumbnail up to 32 kilobytes in size (see https://core.telegram.org/stickers#animation-requirements for animated sticker technical requirements), or a WEBM video with the thumbnail up to 32 kilobytes in size; see https://core.telegram.org/stickers#video-requirements for video sticker technical requirements. Pass a file_id as a String to send a file that already exists on the Telegram servers, pass an HTTP URL as a String for Telegram to get a file from the Internet, or upload a new one using multipart/form-data. More information on Sending Files: https://core.telegram.org/bots/api#sending-files. Animated and video sticker set thumbnails can't be uploaded via HTTP URL. If omitted, then the thumbnail is dropped and the first sticker is used as the thumbnail.
 	Thumbnail InputFile
 	// RequestOpts are an additional optional field to configure timeouts for individual requests
 	RequestOpts *RequestOpts
@@ -5435,32 +6191,23 @@ type SetStickerSetThumbnailOpts struct {
 //   - format (type string): Format of the thumbnail, must be one of "static" for a .WEBP or .PNG image, "animated" for a .TGS animation, or "video" for a WEBM video
 //   - opts (type SetStickerSetThumbnailOpts): All optional parameters.
 func (bot *Bot) SetStickerSetThumbnail(name string, userId int64, format string, opts *SetStickerSetThumbnailOpts) (bool, error) {
+	return bot.SetStickerSetThumbnailWithContext(context.Background(), name, userId, format, opts)
+}
+
+// SetStickerSetThumbnailWithContext is the same as Bot.SetStickerSetThumbnail, but with a context.Context parameter
+func (bot *Bot) SetStickerSetThumbnailWithContext(ctx context.Context, name string, userId int64, format string, opts *SetStickerSetThumbnailOpts) (bool, error) {
 	v := map[string]string{}
-	data := map[string]NamedReader{}
+	data := map[string]FileReader{}
 	v["name"] = name
 	v["user_id"] = strconv.FormatInt(userId, 10)
 	v["format"] = format
 	if opts != nil {
 		if opts.Thumbnail != nil {
-			switch m := opts.Thumbnail.(type) {
-			case string:
-				v["thumbnail"] = m
-
-			case NamedReader:
-				v["thumbnail"] = "attach://thumbnail"
-				data["thumbnail"] = m
-
-			case io.Reader:
-				v["thumbnail"] = "attach://thumbnail"
-				data["thumbnail"] = NamedFile{File: m}
-
-			case []byte:
-				v["thumbnail"] = "attach://thumbnail"
-				data["thumbnail"] = NamedFile{File: bytes.NewReader(m)}
-
-			default:
-				return false, fmt.Errorf("unknown type for InputFile: %T", opts.Thumbnail)
+			err := opts.Thumbnail.Attach("thumbnail", data)
+			if err != nil {
+				return false, fmt.Errorf("failed to attach 'thumbnail' input file: %w", err)
 			}
+			v["thumbnail"] = opts.Thumbnail.getValue()
 		}
 	}
 
@@ -5469,7 +6216,7 @@ func (bot *Bot) SetStickerSetThumbnail(name string, userId int64, format string,
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("setStickerSetThumbnail", v, data, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "setStickerSetThumbnail", v, data, reqOpts)
 	if err != nil {
 		return false, err
 	}
@@ -5478,7 +6225,7 @@ func (bot *Bot) SetStickerSetThumbnail(name string, userId int64, format string,
 	return b, json.Unmarshal(r, &b)
 }
 
-// SetStickerSetTitleOpts is the set of optional fields for Bot.SetStickerSetTitle.
+// SetStickerSetTitleOpts is the set of optional fields for Bot.SetStickerSetTitle and Bot.SetStickerSetTitleWithContext.
 type SetStickerSetTitleOpts struct {
 	// RequestOpts are an additional optional field to configure timeouts for individual requests
 	RequestOpts *RequestOpts
@@ -5491,6 +6238,11 @@ type SetStickerSetTitleOpts struct {
 //   - title (type string): Sticker set title, 1-64 characters
 //   - opts (type SetStickerSetTitleOpts): All optional parameters.
 func (bot *Bot) SetStickerSetTitle(name string, title string, opts *SetStickerSetTitleOpts) (bool, error) {
+	return bot.SetStickerSetTitleWithContext(context.Background(), name, title, opts)
+}
+
+// SetStickerSetTitleWithContext is the same as Bot.SetStickerSetTitle, but with a context.Context parameter
+func (bot *Bot) SetStickerSetTitleWithContext(ctx context.Context, name string, title string, opts *SetStickerSetTitleOpts) (bool, error) {
 	v := map[string]string{}
 	v["name"] = name
 	v["title"] = title
@@ -5500,7 +6252,7 @@ func (bot *Bot) SetStickerSetTitle(name string, title string, opts *SetStickerSe
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("setStickerSetTitle", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "setStickerSetTitle", v, nil, reqOpts)
 	if err != nil {
 		return false, err
 	}
@@ -5509,7 +6261,7 @@ func (bot *Bot) SetStickerSetTitle(name string, title string, opts *SetStickerSe
 	return b, json.Unmarshal(r, &b)
 }
 
-// SetWebhookOpts is the set of optional fields for Bot.SetWebhook.
+// SetWebhookOpts is the set of optional fields for Bot.SetWebhook and Bot.SetWebhookWithContext.
 type SetWebhookOpts struct {
 	// Upload your public key certificate so that the root certificate in use can be checked. See our self-signed guide for details.
 	Certificate InputFile
@@ -5534,27 +6286,21 @@ type SetWebhookOpts struct {
 //   - url (type string): HTTPS URL to send updates to. Use an empty string to remove webhook integration
 //   - opts (type SetWebhookOpts): All optional parameters.
 func (bot *Bot) SetWebhook(url string, opts *SetWebhookOpts) (bool, error) {
+	return bot.SetWebhookWithContext(context.Background(), url, opts)
+}
+
+// SetWebhookWithContext is the same as Bot.SetWebhook, but with a context.Context parameter
+func (bot *Bot) SetWebhookWithContext(ctx context.Context, url string, opts *SetWebhookOpts) (bool, error) {
 	v := map[string]string{}
-	data := map[string]NamedReader{}
+	data := map[string]FileReader{}
 	v["url"] = url
 	if opts != nil {
 		if opts.Certificate != nil {
-			switch m := opts.Certificate.(type) {
-			case NamedReader:
-				v["certificate"] = "attach://certificate"
-				data["certificate"] = m
-
-			case io.Reader:
-				v["certificate"] = "attach://certificate"
-				data["certificate"] = NamedFile{File: m}
-
-			case []byte:
-				v["certificate"] = "attach://certificate"
-				data["certificate"] = NamedFile{File: bytes.NewReader(m)}
-
-			default:
-				return false, fmt.Errorf("unknown type for InputFile: %T", opts.Certificate)
+			err := opts.Certificate.Attach("certificate", data)
+			if err != nil {
+				return false, fmt.Errorf("failed to attach 'certificate' input file: %w", err)
 			}
+			v["certificate"] = opts.Certificate.getValue()
 		}
 		v["ip_address"] = opts.IpAddress
 		if opts.MaxConnections != 0 {
@@ -5576,7 +6322,7 @@ func (bot *Bot) SetWebhook(url string, opts *SetWebhookOpts) (bool, error) {
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("setWebhook", v, data, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "setWebhook", v, data, reqOpts)
 	if err != nil {
 		return false, err
 	}
@@ -5585,8 +6331,10 @@ func (bot *Bot) SetWebhook(url string, opts *SetWebhookOpts) (bool, error) {
 	return b, json.Unmarshal(r, &b)
 }
 
-// StopMessageLiveLocationOpts is the set of optional fields for Bot.StopMessageLiveLocation.
+// StopMessageLiveLocationOpts is the set of optional fields for Bot.StopMessageLiveLocation and Bot.StopMessageLiveLocationWithContext.
 type StopMessageLiveLocationOpts struct {
+	// Unique identifier of the business connection on behalf of which the message to be edited was sent
+	BusinessConnectionId string
 	// Required if inline_message_id is not specified. Unique identifier for the target chat
 	ChatId int64
 	// Required if inline_message_id is not specified. Identifier of the message with live location to stop
@@ -5604,8 +6352,14 @@ type StopMessageLiveLocationOpts struct {
 // Use this method to stop updating a live location message before live_period expires. On success, if the message is not an inline message, the edited Message is returned, otherwise True is returned.
 //   - opts (type StopMessageLiveLocationOpts): All optional parameters.
 func (bot *Bot) StopMessageLiveLocation(opts *StopMessageLiveLocationOpts) (*Message, bool, error) {
+	return bot.StopMessageLiveLocationWithContext(context.Background(), opts)
+}
+
+// StopMessageLiveLocationWithContext is the same as Bot.StopMessageLiveLocation, but with a context.Context parameter
+func (bot *Bot) StopMessageLiveLocationWithContext(ctx context.Context, opts *StopMessageLiveLocationOpts) (*Message, bool, error) {
 	v := map[string]string{}
 	if opts != nil {
+		v["business_connection_id"] = opts.BusinessConnectionId
 		if opts.ChatId != 0 {
 			v["chat_id"] = strconv.FormatInt(opts.ChatId, 10)
 		}
@@ -5625,7 +6379,7 @@ func (bot *Bot) StopMessageLiveLocation(opts *StopMessageLiveLocationOpts) (*Mes
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("stopMessageLiveLocation", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "stopMessageLiveLocation", v, nil, reqOpts)
 	if err != nil {
 		return nil, false, err
 	}
@@ -5642,8 +6396,10 @@ func (bot *Bot) StopMessageLiveLocation(opts *StopMessageLiveLocationOpts) (*Mes
 
 }
 
-// StopPollOpts is the set of optional fields for Bot.StopPoll.
+// StopPollOpts is the set of optional fields for Bot.StopPoll and Bot.StopPollWithContext.
 type StopPollOpts struct {
+	// Unique identifier of the business connection on behalf of which the message to be edited was sent
+	BusinessConnectionId string
 	// A JSON-serialized object for a new message inline keyboard.
 	ReplyMarkup InlineKeyboardMarkup
 	// RequestOpts are an additional optional field to configure timeouts for individual requests
@@ -5657,10 +6413,16 @@ type StopPollOpts struct {
 //   - messageId (type int64): Identifier of the original message with the poll
 //   - opts (type StopPollOpts): All optional parameters.
 func (bot *Bot) StopPoll(chatId int64, messageId int64, opts *StopPollOpts) (*Poll, error) {
+	return bot.StopPollWithContext(context.Background(), chatId, messageId, opts)
+}
+
+// StopPollWithContext is the same as Bot.StopPoll, but with a context.Context parameter
+func (bot *Bot) StopPollWithContext(ctx context.Context, chatId int64, messageId int64, opts *StopPollOpts) (*Poll, error) {
 	v := map[string]string{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 	v["message_id"] = strconv.FormatInt(messageId, 10)
 	if opts != nil {
+		v["business_connection_id"] = opts.BusinessConnectionId
 		bs, err := json.Marshal(opts.ReplyMarkup)
 		if err != nil {
 			return nil, fmt.Errorf("failed to marshal field reply_markup: %w", err)
@@ -5673,7 +6435,7 @@ func (bot *Bot) StopPoll(chatId int64, messageId int64, opts *StopPollOpts) (*Po
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("stopPoll", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "stopPoll", v, nil, reqOpts)
 	if err != nil {
 		return nil, err
 	}
@@ -5682,7 +6444,7 @@ func (bot *Bot) StopPoll(chatId int64, messageId int64, opts *StopPollOpts) (*Po
 	return &p, json.Unmarshal(r, &p)
 }
 
-// UnbanChatMemberOpts is the set of optional fields for Bot.UnbanChatMember.
+// UnbanChatMemberOpts is the set of optional fields for Bot.UnbanChatMember and Bot.UnbanChatMemberWithContext.
 type UnbanChatMemberOpts struct {
 	// Do nothing if the user is not banned
 	OnlyIfBanned bool
@@ -5697,6 +6459,11 @@ type UnbanChatMemberOpts struct {
 //   - userId (type int64): Unique identifier of the target user
 //   - opts (type UnbanChatMemberOpts): All optional parameters.
 func (bot *Bot) UnbanChatMember(chatId int64, userId int64, opts *UnbanChatMemberOpts) (bool, error) {
+	return bot.UnbanChatMemberWithContext(context.Background(), chatId, userId, opts)
+}
+
+// UnbanChatMemberWithContext is the same as Bot.UnbanChatMember, but with a context.Context parameter
+func (bot *Bot) UnbanChatMemberWithContext(ctx context.Context, chatId int64, userId int64, opts *UnbanChatMemberOpts) (bool, error) {
 	v := map[string]string{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 	v["user_id"] = strconv.FormatInt(userId, 10)
@@ -5709,7 +6476,7 @@ func (bot *Bot) UnbanChatMember(chatId int64, userId int64, opts *UnbanChatMembe
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("unbanChatMember", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "unbanChatMember", v, nil, reqOpts)
 	if err != nil {
 		return false, err
 	}
@@ -5718,7 +6485,7 @@ func (bot *Bot) UnbanChatMember(chatId int64, userId int64, opts *UnbanChatMembe
 	return b, json.Unmarshal(r, &b)
 }
 
-// UnbanChatSenderChatOpts is the set of optional fields for Bot.UnbanChatSenderChat.
+// UnbanChatSenderChatOpts is the set of optional fields for Bot.UnbanChatSenderChat and Bot.UnbanChatSenderChatWithContext.
 type UnbanChatSenderChatOpts struct {
 	// RequestOpts are an additional optional field to configure timeouts for individual requests
 	RequestOpts *RequestOpts
@@ -5731,6 +6498,11 @@ type UnbanChatSenderChatOpts struct {
 //   - senderChatId (type int64): Unique identifier of the target sender chat
 //   - opts (type UnbanChatSenderChatOpts): All optional parameters.
 func (bot *Bot) UnbanChatSenderChat(chatId int64, senderChatId int64, opts *UnbanChatSenderChatOpts) (bool, error) {
+	return bot.UnbanChatSenderChatWithContext(context.Background(), chatId, senderChatId, opts)
+}
+
+// UnbanChatSenderChatWithContext is the same as Bot.UnbanChatSenderChat, but with a context.Context parameter
+func (bot *Bot) UnbanChatSenderChatWithContext(ctx context.Context, chatId int64, senderChatId int64, opts *UnbanChatSenderChatOpts) (bool, error) {
 	v := map[string]string{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 	v["sender_chat_id"] = strconv.FormatInt(senderChatId, 10)
@@ -5740,7 +6512,7 @@ func (bot *Bot) UnbanChatSenderChat(chatId int64, senderChatId int64, opts *Unba
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("unbanChatSenderChat", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "unbanChatSenderChat", v, nil, reqOpts)
 	if err != nil {
 		return false, err
 	}
@@ -5749,7 +6521,7 @@ func (bot *Bot) UnbanChatSenderChat(chatId int64, senderChatId int64, opts *Unba
 	return b, json.Unmarshal(r, &b)
 }
 
-// UnhideGeneralForumTopicOpts is the set of optional fields for Bot.UnhideGeneralForumTopic.
+// UnhideGeneralForumTopicOpts is the set of optional fields for Bot.UnhideGeneralForumTopic and Bot.UnhideGeneralForumTopicWithContext.
 type UnhideGeneralForumTopicOpts struct {
 	// RequestOpts are an additional optional field to configure timeouts for individual requests
 	RequestOpts *RequestOpts
@@ -5761,6 +6533,11 @@ type UnhideGeneralForumTopicOpts struct {
 //   - chatId (type int64): Unique identifier for the target chat
 //   - opts (type UnhideGeneralForumTopicOpts): All optional parameters.
 func (bot *Bot) UnhideGeneralForumTopic(chatId int64, opts *UnhideGeneralForumTopicOpts) (bool, error) {
+	return bot.UnhideGeneralForumTopicWithContext(context.Background(), chatId, opts)
+}
+
+// UnhideGeneralForumTopicWithContext is the same as Bot.UnhideGeneralForumTopic, but with a context.Context parameter
+func (bot *Bot) UnhideGeneralForumTopicWithContext(ctx context.Context, chatId int64, opts *UnhideGeneralForumTopicOpts) (bool, error) {
 	v := map[string]string{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 
@@ -5769,7 +6546,7 @@ func (bot *Bot) UnhideGeneralForumTopic(chatId int64, opts *UnhideGeneralForumTo
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("unhideGeneralForumTopic", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "unhideGeneralForumTopic", v, nil, reqOpts)
 	if err != nil {
 		return false, err
 	}
@@ -5778,7 +6555,7 @@ func (bot *Bot) UnhideGeneralForumTopic(chatId int64, opts *UnhideGeneralForumTo
 	return b, json.Unmarshal(r, &b)
 }
 
-// UnpinAllChatMessagesOpts is the set of optional fields for Bot.UnpinAllChatMessages.
+// UnpinAllChatMessagesOpts is the set of optional fields for Bot.UnpinAllChatMessages and Bot.UnpinAllChatMessagesWithContext.
 type UnpinAllChatMessagesOpts struct {
 	// RequestOpts are an additional optional field to configure timeouts for individual requests
 	RequestOpts *RequestOpts
@@ -5790,6 +6567,11 @@ type UnpinAllChatMessagesOpts struct {
 //   - chatId (type int64): Unique identifier for the target chat
 //   - opts (type UnpinAllChatMessagesOpts): All optional parameters.
 func (bot *Bot) UnpinAllChatMessages(chatId int64, opts *UnpinAllChatMessagesOpts) (bool, error) {
+	return bot.UnpinAllChatMessagesWithContext(context.Background(), chatId, opts)
+}
+
+// UnpinAllChatMessagesWithContext is the same as Bot.UnpinAllChatMessages, but with a context.Context parameter
+func (bot *Bot) UnpinAllChatMessagesWithContext(ctx context.Context, chatId int64, opts *UnpinAllChatMessagesOpts) (bool, error) {
 	v := map[string]string{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 
@@ -5798,7 +6580,7 @@ func (bot *Bot) UnpinAllChatMessages(chatId int64, opts *UnpinAllChatMessagesOpt
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("unpinAllChatMessages", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "unpinAllChatMessages", v, nil, reqOpts)
 	if err != nil {
 		return false, err
 	}
@@ -5807,7 +6589,7 @@ func (bot *Bot) UnpinAllChatMessages(chatId int64, opts *UnpinAllChatMessagesOpt
 	return b, json.Unmarshal(r, &b)
 }
 
-// UnpinAllForumTopicMessagesOpts is the set of optional fields for Bot.UnpinAllForumTopicMessages.
+// UnpinAllForumTopicMessagesOpts is the set of optional fields for Bot.UnpinAllForumTopicMessages and Bot.UnpinAllForumTopicMessagesWithContext.
 type UnpinAllForumTopicMessagesOpts struct {
 	// RequestOpts are an additional optional field to configure timeouts for individual requests
 	RequestOpts *RequestOpts
@@ -5820,6 +6602,11 @@ type UnpinAllForumTopicMessagesOpts struct {
 //   - messageThreadId (type int64): Unique identifier for the target message thread of the forum topic
 //   - opts (type UnpinAllForumTopicMessagesOpts): All optional parameters.
 func (bot *Bot) UnpinAllForumTopicMessages(chatId int64, messageThreadId int64, opts *UnpinAllForumTopicMessagesOpts) (bool, error) {
+	return bot.UnpinAllForumTopicMessagesWithContext(context.Background(), chatId, messageThreadId, opts)
+}
+
+// UnpinAllForumTopicMessagesWithContext is the same as Bot.UnpinAllForumTopicMessages, but with a context.Context parameter
+func (bot *Bot) UnpinAllForumTopicMessagesWithContext(ctx context.Context, chatId int64, messageThreadId int64, opts *UnpinAllForumTopicMessagesOpts) (bool, error) {
 	v := map[string]string{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 	v["message_thread_id"] = strconv.FormatInt(messageThreadId, 10)
@@ -5829,7 +6616,7 @@ func (bot *Bot) UnpinAllForumTopicMessages(chatId int64, messageThreadId int64, 
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("unpinAllForumTopicMessages", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "unpinAllForumTopicMessages", v, nil, reqOpts)
 	if err != nil {
 		return false, err
 	}
@@ -5838,7 +6625,7 @@ func (bot *Bot) UnpinAllForumTopicMessages(chatId int64, messageThreadId int64, 
 	return b, json.Unmarshal(r, &b)
 }
 
-// UnpinAllGeneralForumTopicMessagesOpts is the set of optional fields for Bot.UnpinAllGeneralForumTopicMessages.
+// UnpinAllGeneralForumTopicMessagesOpts is the set of optional fields for Bot.UnpinAllGeneralForumTopicMessages and Bot.UnpinAllGeneralForumTopicMessagesWithContext.
 type UnpinAllGeneralForumTopicMessagesOpts struct {
 	// RequestOpts are an additional optional field to configure timeouts for individual requests
 	RequestOpts *RequestOpts
@@ -5850,6 +6637,11 @@ type UnpinAllGeneralForumTopicMessagesOpts struct {
 //   - chatId (type int64): Unique identifier for the target chat
 //   - opts (type UnpinAllGeneralForumTopicMessagesOpts): All optional parameters.
 func (bot *Bot) UnpinAllGeneralForumTopicMessages(chatId int64, opts *UnpinAllGeneralForumTopicMessagesOpts) (bool, error) {
+	return bot.UnpinAllGeneralForumTopicMessagesWithContext(context.Background(), chatId, opts)
+}
+
+// UnpinAllGeneralForumTopicMessagesWithContext is the same as Bot.UnpinAllGeneralForumTopicMessages, but with a context.Context parameter
+func (bot *Bot) UnpinAllGeneralForumTopicMessagesWithContext(ctx context.Context, chatId int64, opts *UnpinAllGeneralForumTopicMessagesOpts) (bool, error) {
 	v := map[string]string{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 
@@ -5858,7 +6650,7 @@ func (bot *Bot) UnpinAllGeneralForumTopicMessages(chatId int64, opts *UnpinAllGe
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("unpinAllGeneralForumTopicMessages", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "unpinAllGeneralForumTopicMessages", v, nil, reqOpts)
 	if err != nil {
 		return false, err
 	}
@@ -5867,9 +6659,11 @@ func (bot *Bot) UnpinAllGeneralForumTopicMessages(chatId int64, opts *UnpinAllGe
 	return b, json.Unmarshal(r, &b)
 }
 
-// UnpinChatMessageOpts is the set of optional fields for Bot.UnpinChatMessage.
+// UnpinChatMessageOpts is the set of optional fields for Bot.UnpinChatMessage and Bot.UnpinChatMessageWithContext.
 type UnpinChatMessageOpts struct {
-	// Identifier of a message to unpin. If not specified, the most recent pinned message (by sending date) will be unpinned.
+	// Unique identifier of the business connection on behalf of which the message will be unpinned
+	BusinessConnectionId string
+	// Identifier of the message to unpin. Required if business_connection_id is specified. If not specified, the most recent pinned message (by sending date) will be unpinned.
 	MessageId *int64
 	// RequestOpts are an additional optional field to configure timeouts for individual requests
 	RequestOpts *RequestOpts
@@ -5881,9 +6675,15 @@ type UnpinChatMessageOpts struct {
 //   - chatId (type int64): Unique identifier for the target chat
 //   - opts (type UnpinChatMessageOpts): All optional parameters.
 func (bot *Bot) UnpinChatMessage(chatId int64, opts *UnpinChatMessageOpts) (bool, error) {
+	return bot.UnpinChatMessageWithContext(context.Background(), chatId, opts)
+}
+
+// UnpinChatMessageWithContext is the same as Bot.UnpinChatMessage, but with a context.Context parameter
+func (bot *Bot) UnpinChatMessageWithContext(ctx context.Context, chatId int64, opts *UnpinChatMessageOpts) (bool, error) {
 	v := map[string]string{}
 	v["chat_id"] = strconv.FormatInt(chatId, 10)
 	if opts != nil {
+		v["business_connection_id"] = opts.BusinessConnectionId
 		if opts.MessageId != nil {
 			v["message_id"] = strconv.FormatInt(*opts.MessageId, 10)
 		}
@@ -5894,7 +6694,7 @@ func (bot *Bot) UnpinChatMessage(chatId int64, opts *UnpinChatMessageOpts) (bool
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("unpinChatMessage", v, nil, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "unpinChatMessage", v, nil, reqOpts)
 	if err != nil {
 		return false, err
 	}
@@ -5903,7 +6703,7 @@ func (bot *Bot) UnpinChatMessage(chatId int64, opts *UnpinChatMessageOpts) (bool
 	return b, json.Unmarshal(r, &b)
 }
 
-// UploadStickerFileOpts is the set of optional fields for Bot.UploadStickerFile.
+// UploadStickerFileOpts is the set of optional fields for Bot.UploadStickerFile and Bot.UploadStickerFileWithContext.
 type UploadStickerFileOpts struct {
 	// RequestOpts are an additional optional field to configure timeouts for individual requests
 	RequestOpts *RequestOpts
@@ -5917,26 +6717,20 @@ type UploadStickerFileOpts struct {
 //   - stickerFormat (type string): Format of the sticker, must be one of "static", "animated", "video"
 //   - opts (type UploadStickerFileOpts): All optional parameters.
 func (bot *Bot) UploadStickerFile(userId int64, sticker InputFile, stickerFormat string, opts *UploadStickerFileOpts) (*File, error) {
+	return bot.UploadStickerFileWithContext(context.Background(), userId, sticker, stickerFormat, opts)
+}
+
+// UploadStickerFileWithContext is the same as Bot.UploadStickerFile, but with a context.Context parameter
+func (bot *Bot) UploadStickerFileWithContext(ctx context.Context, userId int64, sticker InputFile, stickerFormat string, opts *UploadStickerFileOpts) (*File, error) {
 	v := map[string]string{}
-	data := map[string]NamedReader{}
+	data := map[string]FileReader{}
 	v["user_id"] = strconv.FormatInt(userId, 10)
 	if sticker != nil {
-		switch m := sticker.(type) {
-		case NamedReader:
-			v["sticker"] = "attach://sticker"
-			data["sticker"] = m
-
-		case io.Reader:
-			v["sticker"] = "attach://sticker"
-			data["sticker"] = NamedFile{File: m}
-
-		case []byte:
-			v["sticker"] = "attach://sticker"
-			data["sticker"] = NamedFile{File: bytes.NewReader(m)}
-
-		default:
-			return nil, fmt.Errorf("unknown type for InputFile: %T", sticker)
+		err := sticker.Attach("sticker", data)
+		if err != nil {
+			return nil, fmt.Errorf("failed to attach 'sticker' input file: %w", err)
 		}
+		v["sticker"] = sticker.getValue()
 	}
 	v["sticker_format"] = stickerFormat
 
@@ -5945,7 +6739,7 @@ func (bot *Bot) UploadStickerFile(userId int64, sticker InputFile, stickerFormat
 		reqOpts = opts.RequestOpts
 	}
 
-	r, err := bot.Request("uploadStickerFile", v, data, reqOpts)
+	r, err := bot.RequestWithContext(ctx, "uploadStickerFile", v, data, reqOpts)
 	if err != nil {
 		return nil, err
 	}

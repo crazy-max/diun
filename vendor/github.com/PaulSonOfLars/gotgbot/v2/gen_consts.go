@@ -20,6 +20,7 @@ const (
 	UpdateTypeCallbackQuery           = "callback_query"
 	UpdateTypeShippingQuery           = "shipping_query"
 	UpdateTypePreCheckoutQuery        = "pre_checkout_query"
+	UpdateTypePurchasedPaidMedia      = "purchased_paid_media"
 	UpdateTypePoll                    = "poll"
 	UpdateTypePollAnswer              = "poll_answer"
 	UpdateTypeMyChatMember            = "my_chat_member"
@@ -77,6 +78,9 @@ func (u Update) GetType() string {
 	case u.PreCheckoutQuery != nil:
 		return UpdateTypePreCheckoutQuery
 
+	case u.PurchasedPaidMedia != nil:
+		return UpdateTypePurchasedPaidMedia
+
 	case u.Poll != nil:
 		return UpdateTypePoll
 
@@ -109,6 +113,21 @@ const (
 	ParseModeMarkdownV2 = "MarkdownV2"
 	ParseModeMarkdown   = "Markdown"
 	ParseModeNone       = ""
+)
+
+// The consts listed below represent all the chat action options that can be sent to telegram.
+const (
+	ChatActionTyping          = "typing"
+	ChatActionUploadPhoto     = "upload_photo"
+	ChatActionRecordVideo     = "record_video"
+	ChatActionUploadVideo     = "upload_video"
+	ChatActionRecordVoice     = "record_voice"
+	ChatActionUploadVoice     = "upload_voice"
+	ChatActionUploadDocument  = "upload_document"
+	ChatActionChooseSticker   = "choose_sticker"
+	ChatActionFindLocation    = "find_location"
+	ChatActionRecordVideoNote = "record_video_note"
+	ChatActionUploadVideoNote = "upload_video_note"
 )
 
 // The consts listed below represent all the sticker types that can be obtained from telegram.
