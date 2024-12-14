@@ -5,10 +5,10 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/containerd/containerd/platforms"
+	"github.com/containerd/platforms"
 	"github.com/crazy-max/diun/v4/internal/model"
 	ocispecs "github.com/opencontainers/image-spec/specs-go/v1"
-	"gopkg.in/yaml.v2"
+	yaml "gopkg.in/yaml.v2"
 )
 
 func (c *Client) listFileImage() []model.Image {
