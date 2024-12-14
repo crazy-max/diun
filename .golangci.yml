@@ -4,46 +4,100 @@ run:
     - containers_image_openpgp
     - exclude_graphdriver_btrfs
     - exclude_graphdriver_devicemapper
+  # default uses Go version from the go.mod file, fallback on the env var
+  # `GOVERSION`, fallback on 1.17: https://golangci-lint.run/usage/configuration/#run-configuration
+  go: "1.23"
 
 linters:
   enable:
+    - bodyclose
     - depguard
+    - forbidigo
+    - gocritic
     - gofmt
     - goimports
-    - revive
+    - gosec
+    - gosimple
     - govet
-    - importas
     - ineffassign
-    - misspell
-    - typecheck
-    - errname
     - makezero
-    - whitespace
+    - misspell
+    - noctx
+    - nolintlint
+    - revive
+    - staticcheck
+    - testifylint
+    - typecheck
     - unused
-    - forbidigo
+    - whitespace
   disable-all: true
 
 linters-settings:
+  gocritic:
+    disabled-checks:
+      - "ifElseChain"
+      - "assignOp"
+      - "appendAssign"
+      - "singleCaseSwitch"
+      - "exitAfterDefer" # FIXME
+  importas:
+    alias:
+      - pkg: "github.com/opencontainers/image-spec/specs-go/v1"
+        alias: "ocispecs"
+      - pkg: "github.com/opencontainers/go-digest"
+        alias: "digest"
+  govet:
+    enable:
+      - nilness
+      - unusedwrite
   depguard:
     rules:
       main:
         deny:
-          # The io/ioutil package has been deprecated.
-          # https://go.dev/doc/go1.16#ioutil
           - pkg: "io/ioutil"
             desc: The io/ioutil package has been deprecated.
   forbidigo:
     forbid:
       - '^fmt\.Errorf(# use errors\.Errorf instead)?$'
-  importas:
-    no-unaliased: true
+      - '^platforms\.DefaultString(# use platforms\.Format(platforms\.DefaultSpec()) instead\.)?$'
+  gosec:
+    excludes:
+      - G204  # Audit use of command execution
+      - G402  # TLS MinVersion too low
+      - G115  # integer overflow conversion
+    config:
+      G306: "0644"
+  testifylint:
+    disable:
+      # disable rules that reduce the test condition
+      - "empty"
+      - "bool-compare"
+      - "len"
+      - "negative-positive"
 
 issues:
+  exclude-files:
+    - ".*\\.pb\\.go$"
   exclude-rules:
     - linters:
         - revive
       text: "stutters"
+    - linters:
+        - revive
+      text: "empty-block"
+    - linters:
+        - revive
+      text: "superfluous-else"
+    - linters:
+        - revive
+      text: "unused-parameter"
+    - linters:
+        - revive
+      text: "redefines-builtin-id"
+    - linters:
+        - revive
+      text: "if-return"
 
-# show all
-max-issues-per-linter: 0
-max-same-issues: 0
+  # show all
+  max-issues-per-linter: 0
+  max-same-issues: 0
