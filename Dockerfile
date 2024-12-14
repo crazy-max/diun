@@ -9,6 +9,7 @@ FROM --platform=$BUILDPLATFORM tonistiigi/xx:${XX_VERSION} AS xx
 FROM --platform=$BUILDPLATFORM golang:${GO_VERSION}-alpine${ALPINE_VERSION} AS base
 COPY --from=xx / /
 ENV CGO_ENABLED=0
+ENV GOFLAGS="-mod=vendor"
 RUN apk add --no-cache file git
 WORKDIR /src
 
