@@ -134,8 +134,13 @@ type ReusedBlob struct {
 	Size   int64         // Must be provided
 	// The following compression fields should be set when the reuse substitutes
 	// a differently-compressed blob.
+	// They may be set also to change from a base variant to a specific variant of an algorithm.
 	CompressionOperation types.LayerCompression // Compress/Decompress, matching the reused blob; PreserveOriginal if N/A
 	CompressionAlgorithm *compression.Algorithm // Algorithm if compressed, nil if decompressed or N/A
+
+	// Annotations that should be added, for CompressionAlgorithm. Note that they might need to be
+	// added even if the digest doesn’t change (if we found the annotations in a cache).
+	CompressionAnnotations map[string]string
 
 	MatchedByTOCDigest bool // Whether the layer was reused/matched by TOC digest. Used only for UI purposes.
 }
@@ -143,7 +148,11 @@ type ReusedBlob struct {
 // ImageSourceChunk is a portion of a blob.
 // This API is experimental and can be changed without bumping the major version number.
 type ImageSourceChunk struct {
+	// Offset specifies the starting position of the chunk within the source blob.
 	Offset uint64
+
+	// Length specifies the size of the chunk.  If it is set to math.MaxUint64,
+	// then it refers to all the data from Offset to the end of the blob.
 	Length uint64
 }
 
@@ -154,6 +163,8 @@ type BlobChunkAccessor interface {
 	// The specified chunks must be not overlapping and sorted by their offset.
 	// The readers must be fully consumed, in the order they are returned, before blocking
 	// to read the next chunk.
+	// If the Length for the last chunk is set to math.MaxUint64, then it
+	// fully fetches the remaining data from the offset to the end of the blob.
 	GetBlobAt(ctx context.Context, info types.BlobInfo, chunks []ImageSourceChunk) (chan io.ReadCloser, chan error, error)
 }
 
