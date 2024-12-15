@@ -18,7 +18,7 @@ require (
 	github.com/docker/go-units v0.5.0
 	github.com/eclipse/paho.mqtt.golang v1.4.3
 	github.com/go-gomail/gomail v0.0.0-20160411212932-81ebce5c23df
-	github.com/go-playground/validator/v10 v10.22.0
+	github.com/go-playground/validator/v10 v10.23.0
 	github.com/gregdel/pushover v1.3.1
 	github.com/hako/durafmt v0.0.0-20210608085754-5c1018a4e16b
 	github.com/hashicorp/nomad/api v0.0.0-20231213195942-64e3dca9274b // v1.7.2
