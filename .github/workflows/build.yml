@@ -40,6 +40,8 @@ jobs:
 
   validate:
     runs-on: ubuntu-latest
+    env:
+      GOLANGCI_LINT_MULTIPLATFORM: 1
     needs:
       - prepare
     strategy:
