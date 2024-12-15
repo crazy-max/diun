@@ -3,6 +3,7 @@ module github.com/crazy-max/diun/v4
 go 1.23.0
 
 require (
+	dario.cat/mergo v1.0.1
 	github.com/AlecAivazis/survey/v2 v2.3.7
 	github.com/PaulSonOfLars/gotgbot/v2 v2.0.0-rc.30
 	github.com/alecthomas/kong v1.6.0
@@ -22,7 +23,6 @@ require (
 	github.com/gregdel/pushover v1.3.1
 	github.com/hako/durafmt v0.0.0-20210608085754-5c1018a4e16b
 	github.com/hashicorp/nomad/api v0.0.0-20231213195942-64e3dca9274b // v1.7.2
-	github.com/imdario/mergo v0.3.16
 	github.com/jedib0t/go-pretty/v6 v6.6.5
 	github.com/matcornic/hermes/v2 v2.1.0
 	github.com/matrix-org/gomatrix v0.0.0-20210324163249-be2af5ef2e16
@@ -97,6 +97,7 @@ require (
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/hashicorp/go-rootcerts v1.0.2 // indirect
 	github.com/huandu/xstrings v1.2.0 // indirect
+	github.com/imdario/mergo v0.3.6 // indirect
 	github.com/jaytaylor/html2text v0.0.0-20180606194806-57d518f124b0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect

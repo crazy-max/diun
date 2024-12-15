@@ -4,10 +4,10 @@ import (
 	"reflect"
 	"strings"
 
+	"dario.cat/mergo"
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/internal/provider"
 	nomad "github.com/hashicorp/nomad/api"
-	"github.com/imdario/mergo"
 )
 
 func parseServiceTags(tags []string) map[string]string {
