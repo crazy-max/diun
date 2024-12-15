@@ -38,7 +38,7 @@ require (
 	github.com/rs/zerolog v1.33.0
 	github.com/russross/blackfriday/v2 v2.1.0
 	github.com/sirupsen/logrus v1.9.3
-	github.com/stretchr/testify v1.9.0
+	github.com/stretchr/testify v1.10.0
 	github.com/tidwall/pretty v1.2.1
 	go.etcd.io/bbolt v1.3.11
 	golang.org/x/mod v0.21.0

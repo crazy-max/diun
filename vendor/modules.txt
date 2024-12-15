@@ -428,9 +428,10 @@ github.com/spf13/pflag
 # github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf
 ## explicit
 github.com/ssor/bom
-# github.com/stretchr/testify v1.9.0
+# github.com/stretchr/testify v1.10.0
 ## explicit; go 1.17
 github.com/stretchr/testify/assert
+github.com/stretchr/testify/assert/yaml
 github.com/stretchr/testify/require
 # github.com/tidwall/pretty v1.2.1
 ## explicit; go 1.16
