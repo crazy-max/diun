@@ -30,6 +30,21 @@ type ClientOptionsReader struct {
 	options *ClientOptions
 }
 
+// NewOptionsReader creates a ClientOptionsReader, this should only be used for mocking purposes.
+//
+// An example implementation:
+//
+//	func (c *mqttClientMock) OptionsReader() mqtt.ClientOptionsReader {
+//		opts := mqtt.NewClientOptions()
+//		opts.UserName = "TestUserName"
+//		return mqtt.NewOptionsReader(opts)
+//	}
+func NewOptionsReader(o *ClientOptions) ClientOptionsReader {
+	return ClientOptionsReader{
+		options: o,
+	}
+}
+
 // Servers returns a slice of the servers defined in the clientoptions
 func (r *ClientOptionsReader) Servers() []*url.URL {
 	s := make([]*url.URL, len(r.options.Servers))

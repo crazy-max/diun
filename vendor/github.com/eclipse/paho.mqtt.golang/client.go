@@ -142,7 +142,7 @@ type client struct {
 	workers      sync.WaitGroup // used to wait for workers to complete (ping, keepalive, errwatch, resume)
 	commsStopped chan struct{}  // closed when the comms routines have stopped (kept running until after workers have closed to avoid deadlocks)
 
-	backoff      *backoffController
+	backoff *backoffController
 }
 
 // NewClient will create an MQTT v3.1.1 client with all of the options specified
@@ -306,12 +306,12 @@ func (c *client) reconnect(connectionUp connCompletedFn) {
 	DEBUG.Println(CLI, "enter reconnect")
 	var (
 		initSleep = 1 * time.Second
-		conn  net.Conn
+		conn      net.Conn
 	)
 
 	// If the reason of connection lost is same as the before one, sleep timer is set before attempting connection is started.
 	// Sleep time is exponentially increased as the same situation continues
-	if slp, isContinual := c.backoff.sleepWithBackoff("connectionLost", initSleep, c.options.MaxReconnectInterval, 3 * time.Second, true); isContinual {
+	if slp, isContinual := c.backoff.sleepWithBackoff("connectionLost", initSleep, c.options.MaxReconnectInterval, 3*time.Second, true); isContinual {
 		DEBUG.Println(CLI, "Detect continual connection lost after reconnect, slept for", int(slp.Seconds()), "seconds")
 	}
 
@@ -427,7 +427,7 @@ func (c *client) attemptConnection() (net.Conn, byte, bool, error) {
 		if rc != packets.ErrNetworkError { // mqtt error
 			err = packets.ConnErrors[rc]
 		} else { // network error (if this occurred in ConnectMQTT then err will be nil)
-			err = fmt.Errorf("%s : %s", packets.ConnErrors[rc], err)
+			err = fmt.Errorf("%w : %w", packets.ConnErrors[rc], err)
 		}
 	}
 	return conn, rc, sessionPresent, err
@@ -601,17 +601,14 @@ func (c *client) startCommsWorkers(conn net.Conn, connectionUp connCompletedFn, 
 	c.workers.Add(1) // Done will be called when ackOut is closed
 	ackOut := c.msgRouter.matchAndDispatch(incomingPubChan, c.options.Order, c)
 
-	// The connection is now ready for use (we spin up a few go routines below). It is possible that
-	// Disconnect has been called in the interim...
+	// The connection is now ready for use (we spin up a few go routines below).
+	// It is possible that Disconnect has been called in the interim...
+	// issue 675：we will allow the connection to complete before the Disconnect is allowed to proceed
+	//   as if a Disconnect event occurred immediately after connectionUp(true) completed.
 	if err := connectionUp(true); err != nil {
-		DEBUG.Println(CLI, err)
-		close(c.stop) // Tidy up anything we have already started
-		close(incomingPubChan)
-		c.workers.Wait()
-		c.conn.Close()
-		c.conn = nil
-		return false
+		ERROR.Println(CLI, err)
 	}
+
 	DEBUG.Println(CLI, "client is connected/reconnected")
 	if c.options.OnConnect != nil {
 		go c.options.OnConnect(c)
@@ -799,9 +796,13 @@ func (c *client) Publish(topic string, qos byte, retained bool, payload interfac
 		if publishWaitTimeout == 0 {
 			publishWaitTimeout = time.Second * 30
 		}
+
+		t := time.NewTimer(publishWaitTimeout)
+		defer t.Stop()
+
 		select {
 		case c.obound <- &PacketAndToken{p: pub, t: token}:
-		case <-time.After(publishWaitTimeout):
+		case <-t.C:
 			token.setError(errors.New("publish was broken by timeout"))
 		}
 	}

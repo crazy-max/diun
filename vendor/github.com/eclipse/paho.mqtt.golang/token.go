@@ -17,6 +17,7 @@
 package mqtt
 
 import (
+	"errors"
 	"sync"
 	"time"
 
@@ -201,4 +202,21 @@ type UnsubscribeToken struct {
 // required to provide information about calls to Disconnect()
 type DisconnectToken struct {
 	baseToken
+}
+
+// TimedOut is the error returned by WaitTimeout when the timeout expires
+var TimedOut = errors.New("context canceled")
+
+// WaitTokenTimeout is a utility function used to simplify the use of token.WaitTimeout
+// token.WaitTimeout may return `false` due to time out but t.Error() still results
+// in nil.
+// `if t := client.X(); t.WaitTimeout(time.Second) && t.Error() != nil {` may evaluate
+// to false even if the operation fails.
+// It is important to note that if TimedOut is returned, then the operation may still be running
+// and could eventually complete successfully.
+func WaitTokenTimeout(t Token, d time.Duration) error {
+	if !t.WaitTimeout(d) {
+		return TimedOut
+	}
+	return t.Error()
 }
