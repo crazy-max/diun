@@ -5,10 +5,10 @@ import (
 	"strconv"
 	"strings"
 
+	"dario.cat/mergo"
 	"github.com/containerd/platforms"
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/pkg/registry"
-	"github.com/imdario/mergo"
 	"github.com/pkg/errors"
 )
 

@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"regexp"
 
+	"dario.cat/mergo"
 	"github.com/containers/image/v5/pkg/docker/config"
 	"github.com/containers/image/v5/types"
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/pkg/registry"
 	"github.com/crazy-max/diun/v4/pkg/utl"
-	"github.com/imdario/mergo"
 	"github.com/rs/zerolog/log"
 )
 
