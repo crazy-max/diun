@@ -15,25 +15,27 @@ var mdMap = map[string]string{
 }
 
 var mdV2Map = map[string]string{
-	"bold":          "*",
-	"italic":        "_",
-	"code":          "`",
-	"pre":           "```",
-	"underline":     "__",
-	"strikethrough": "~",
-	"spoiler":       "||",
-	"blockquote":    ">",
+	"bold":                  "*",
+	"italic":                "_",
+	"code":                  "`",
+	"pre":                   "```",
+	"underline":             "__",
+	"strikethrough":         "~",
+	"spoiler":               "||",
+	"blockquote":            ">",
+	"expandable_blockquote": "**>",
 }
 
 var htmlMap = map[string]string{
-	"bold":          "b",
-	"italic":        "i",
-	"code":          "code",
-	"pre":           "pre",
-	"underline":     "u",
-	"strikethrough": "s",
-	"spoiler":       "span class=\"tg-spoiler\"",
-	"blockquote":    "blockquote",
+	"bold":                  "b",
+	"italic":                "i",
+	"code":                  "code",
+	"pre":                   "pre",
+	"underline":             "u",
+	"strikethrough":         "s",
+	"spoiler":               "span class=\"tg-spoiler\"",
+	"blockquote":            "blockquote",
+	"expandable_blockquote": "blockquote expandable",
 }
 
 // OriginalMD gets the original markdown formatting of a message text.
@@ -209,6 +211,8 @@ func writeFinalHTML(data []uint16, ent MessageEntity, start int64, cntnt string)
 		return prevText + `<a href="` + ent.Url + `">` + cntnt + "</a>"
 	case "blockquote":
 		return prevText + `<blockquote>` + cntnt + "</blockquote>"
+	case "expandable_blockquote":
+		return prevText + `<blockquote expandable>` + cntnt + "</blockquote>"
 	default:
 		return prevText + cntnt
 	}
@@ -243,6 +247,8 @@ func writeFinalMarkdownV2(data []uint16, ent MessageEntity, start int64, cntnt s
 		return prevText + pre + "[" + cleanCntnt + "](" + ent.Url + ")" + post
 	case "blockquote":
 		return prevText + pre + ">" + strings.Join(strings.Split(cleanCntnt, "\n"), "\n>") + post
+	case "expandable_blockquote":
+		return prevText + pre + "**>" + strings.Join(strings.Split(cleanCntnt, "\n"), "\n>") + "||" + post
 	default:
 		return prevText + cntnt
 	}

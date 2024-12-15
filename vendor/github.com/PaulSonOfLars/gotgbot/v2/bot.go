@@ -1,14 +1,22 @@
 package gotgbot
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
+	"strings"
 	"time"
 )
 
 //go:generate go run ./scripts/generate
+
+var (
+	ErrNilBotClient       = errors.New("nil BotClient")
+	ErrInvalidTokenFormat = errors.New("invalid token format")
+)
 
 // Bot is the default Bot struct used to send and receive messages to the telegram API.
 type Bot struct {
@@ -75,6 +83,24 @@ func NewBot(token string, opts *BotOpts) (*Bot, error) {
 			return nil, fmt.Errorf("failed to check bot token: %w", err)
 		}
 		b.User = *botUser
+	} else {
+		// If token checks are disabled, we populate the bot's ID from the token.
+		split := strings.Split(token, ":")
+		if len(split) != 2 {
+			return nil, fmt.Errorf("%w: expected '123:abcd', got %s", ErrInvalidTokenFormat, token)
+		}
+
+		id, err := strconv.ParseInt(split[0], 10, 64)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse bot ID from token: %w", err)
+		}
+		b.User = User{
+			Id:    id,
+			IsBot: true,
+			// We mark these fields as missing so we can know why they're not available
+			FirstName: "<missing>",
+			Username:  "<missing>",
+		}
 	}
 
 	return &b, nil
@@ -88,15 +114,14 @@ func (bot *Bot) UseMiddleware(mw func(client BotClient) BotClient) *Bot {
 	return bot
 }
 
-var ErrNilBotClient = errors.New("nil BotClient")
+func (bot *Bot) Request(method string, params map[string]string, data map[string]FileReader, opts *RequestOpts) (json.RawMessage, error) {
+	return bot.RequestWithContext(context.Background(), method, params, data, opts)
+}
 
-func (bot *Bot) Request(method string, params map[string]string, data map[string]NamedReader, opts *RequestOpts) (json.RawMessage, error) {
+func (bot *Bot) RequestWithContext(ctx context.Context, method string, params map[string]string, data map[string]FileReader, opts *RequestOpts) (json.RawMessage, error) {
 	if bot.BotClient == nil {
 		return nil, ErrNilBotClient
 	}
-
-	ctx, cancel := bot.BotClient.TimeoutContext(opts)
-	defer cancel()
 
 	return bot.BotClient.RequestWithContext(ctx, bot.Token, method, params, data, opts)
 }
