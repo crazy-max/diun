@@ -293,7 +293,7 @@ github.com/imdario/mergo
 # github.com/jaytaylor/html2text v0.0.0-20180606194806-57d518f124b0
 ## explicit
 github.com/jaytaylor/html2text
-# github.com/jedib0t/go-pretty/v6 v6.5.9
+# github.com/jedib0t/go-pretty/v6 v6.6.5
 ## explicit; go 1.17
 github.com/jedib0t/go-pretty/v6/table
 github.com/jedib0t/go-pretty/v6/text

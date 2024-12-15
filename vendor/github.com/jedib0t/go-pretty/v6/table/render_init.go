@@ -3,6 +3,7 @@ package table
 import (
 	"fmt"
 	"strings"
+	"unicode"
 
 	"github.com/jedib0t/go-pretty/v6/text"
 )
@@ -77,7 +78,7 @@ func (t *Table) extractMaxColumnLengthsFromRow(row rowStr, mci mergedColumnIndic
 
 func (t *Table) extractMaxColumnLengthsFromRowForMergedColumns(colIdx int, mergedColumnLength int, mci mergedColumnIndices) {
 	numMergedColumns := mci.len(colIdx)
-	mergedColumnLength -= (numMergedColumns - 1) * text.RuneWidthWithoutEscSequences(t.style.Box.MiddleSeparator)
+	mergedColumnLength -= (numMergedColumns - 1) * text.StringWidthWithoutEscSequences(t.style.Box.MiddleSeparator)
 	maxLengthSplitAcrossColumns := mergedColumnLength / numMergedColumns
 	if maxLengthSplitAcrossColumns > t.maxColumnLengths[colIdx] {
 		t.maxColumnLengths[colIdx] = maxLengthSplitAcrossColumns
@@ -104,6 +105,8 @@ func (t *Table) initForRender() {
 
 	// find the longest continuous line in each column
 	t.initForRenderColumnLengths()
+	t.initForRenderMaxRowLength()
+	t.initForRenderPaddedColumns()
 
 	// generate a separator row and calculate maximum row length
 	t.initForRenderRowSeparator()
@@ -171,20 +174,64 @@ func (t *Table) initForRenderHideColumns() {
 	t.columnConfigMap = columnConfigMap
 }
 
+func (t *Table) initForRenderMaxRowLength() {
+	t.maxRowLength = 0
+	if t.autoIndex {
+		t.maxRowLength += text.StringWidthWithoutEscSequences(t.style.Box.PaddingLeft)
+		t.maxRowLength += len(fmt.Sprint(len(t.rows)))
+		t.maxRowLength += text.StringWidthWithoutEscSequences(t.style.Box.PaddingRight)
+		if t.style.Options.SeparateColumns {
+			t.maxRowLength += text.StringWidthWithoutEscSequences(t.style.Box.MiddleSeparator)
+		}
+	}
+	if t.style.Options.SeparateColumns {
+		t.maxRowLength += text.StringWidthWithoutEscSequences(t.style.Box.MiddleSeparator) * (t.numColumns - 1)
+	}
+	for _, maxColumnLength := range t.maxColumnLengths {
+		maxColumnLength += text.StringWidthWithoutEscSequences(t.style.Box.PaddingLeft + t.style.Box.PaddingRight)
+		t.maxRowLength += maxColumnLength
+	}
+	if t.style.Options.DrawBorder {
+		t.maxRowLength += text.StringWidthWithoutEscSequences(t.style.Box.Left + t.style.Box.Right)
+	}
+}
+
+func (t *Table) initForRenderPaddedColumns() {
+	paddingSize := t.style.Size.WidthMin - t.maxRowLength
+	for paddingSize > 0 {
+		// distribute padding equally among all columns
+		numColumnsPadded := 0
+		for colIdx := 0; paddingSize > 0 && colIdx < t.numColumns; colIdx++ {
+			colWidthMax := t.getColumnWidthMax(colIdx)
+			if colWidthMax == 0 || t.maxColumnLengths[colIdx] < colWidthMax {
+				t.maxColumnLengths[colIdx]++
+				numColumnsPadded++
+				paddingSize--
+			}
+		}
+
+		// avoid endless looping because all columns are at max size and cannot
+		// be expanded any further
+		if numColumnsPadded == 0 {
+			break
+		}
+	}
+}
+
 func (t *Table) initForRenderRows() {
 	// auto-index: calc the index column's max length
 	t.autoIndexVIndexMaxLength = len(fmt.Sprint(len(t.rowsRaw)))
 
 	// stringify all the rows to make it easy to render
-	if t.rowPainter != nil {
-		t.rowsColors = make([]text.Colors, len(t.rowsRaw))
-	}
 	t.rows = t.initForRenderRowsStringify(t.rowsRaw, renderHint{})
 	t.rowsFooter = t.initForRenderRowsStringify(t.rowsFooterRaw, renderHint{isFooterRow: true})
 	t.rowsHeader = t.initForRenderRowsStringify(t.rowsHeaderRaw, renderHint{isHeaderRow: true})
 
 	// sort the rows as requested
 	t.initForRenderSortRows()
+
+	// find the row colors (if any)
+	t.initForRenderRowPainterColors()
 
 	// suppress columns without any content
 	t.initForRenderSuppressColumns()
@@ -196,35 +243,47 @@ func (t *Table) initForRenderRows() {
 func (t *Table) initForRenderRowsStringify(rows []Row, hint renderHint) []rowStr {
 	rowsStr := make([]rowStr, len(rows))
 	for idx, row := range rows {
-		if t.rowPainter != nil && hint.isRegularRow() {
-			t.rowsColors[idx] = t.rowPainter(row)
-		}
+		hint.rowNumber = idx + 1
 		rowsStr[idx] = t.analyzeAndStringify(row, hint)
 	}
 	return rowsStr
 }
 
-func (t *Table) initForRenderRowSeparator() {
-	t.maxRowLength = 0
-	if t.autoIndex {
-		t.maxRowLength += text.RuneWidthWithoutEscSequences(t.style.Box.PaddingLeft)
-		t.maxRowLength += len(fmt.Sprint(len(t.rows)))
-		t.maxRowLength += text.RuneWidthWithoutEscSequences(t.style.Box.PaddingRight)
-		if t.style.Options.SeparateColumns {
-			t.maxRowLength += text.RuneWidthWithoutEscSequences(t.style.Box.MiddleSeparator)
+func (t *Table) initForRenderRowPainterColors() {
+	if !t.hasRowPainter() {
+		return
+	}
+
+	// generate the colors
+	t.rowsColors = make([]text.Colors, len(t.rowsRaw))
+	for idx, row := range t.rowsRaw {
+		idxColors := idx
+		if len(t.sortedRowIndices) > 0 {
+			// override with the sorted row index
+			for j := 0; j < len(t.sortedRowIndices); j++ {
+				if t.sortedRowIndices[j] == idx {
+					idxColors = j
+					break
+				}
+			}
+		}
+
+		if t.rowPainter != nil {
+			t.rowsColors[idxColors] = t.rowPainter(row)
+		} else if t.rowPainterWithAttributes != nil {
+			t.rowsColors[idxColors] = t.rowPainterWithAttributes(row, RowAttributes{
+				Number:       idx + 1,
+				NumberSorted: idxColors + 1,
+			})
 		}
 	}
-	if t.style.Options.SeparateColumns {
-		t.maxRowLength += text.RuneWidthWithoutEscSequences(t.style.Box.MiddleSeparator) * (t.numColumns - 1)
-	}
+}
+
+func (t *Table) initForRenderRowSeparator() {
 	t.rowSeparator = make(rowStr, t.numColumns)
 	for colIdx, maxColumnLength := range t.maxColumnLengths {
-		maxColumnLength += text.RuneWidthWithoutEscSequences(t.style.Box.PaddingLeft + t.style.Box.PaddingRight)
-		t.maxRowLength += maxColumnLength
+		maxColumnLength += text.StringWidthWithoutEscSequences(t.style.Box.PaddingLeft + t.style.Box.PaddingRight)
 		t.rowSeparator[colIdx] = text.RepeatAndTrim(t.style.Box.MiddleHorizontal, maxColumnLength)
-	}
-	if t.style.Options.DrawBorder {
-		t.maxRowLength += text.RuneWidthWithoutEscSequences(t.style.Box.Left + t.style.Box.Right)
 	}
 }
 
@@ -234,28 +293,27 @@ func (t *Table) initForRenderSortRows() {
 	}
 
 	// sort the rows
-	sortedRowIndices := t.getSortedRowIndices()
+	t.sortedRowIndices = t.getSortedRowIndices()
 	sortedRows := make([]rowStr, len(t.rows))
 	for idx := range t.rows {
-		sortedRows[idx] = t.rows[sortedRowIndices[idx]]
+		sortedRows[idx] = t.rows[t.sortedRowIndices[idx]]
 	}
 	t.rows = sortedRows
-
-	// sort the rowsColors
-	if len(t.rowsColors) > 0 {
-		sortedRowsColors := make([]text.Colors, len(t.rows))
-		for idx := range t.rows {
-			sortedRowsColors[idx] = t.rowsColors[sortedRowIndices[idx]]
-		}
-		t.rowsColors = sortedRowsColors
-	}
 }
 
 func (t *Table) initForRenderSuppressColumns() {
 	shouldSuppressColumn := func(colIdx int) bool {
 		for _, row := range t.rows {
 			if colIdx < len(row) && row[colIdx] != "" {
-				return false
+				// Columns may contain non-printable characters. For example
+				// the text.Direction modifiers. These should not be considered
+				// when deciding to suppress a column.
+				for _, r := range row[colIdx] {
+					if unicode.IsPrint(r) {
+						return false
+					}
+				}
+				return true
 			}
 		}
 		return true
