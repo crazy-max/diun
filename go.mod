@@ -5,7 +5,7 @@ go 1.23.0
 require (
 	github.com/AlecAivazis/survey/v2 v2.3.7
 	github.com/PaulSonOfLars/gotgbot/v2 v2.0.0-rc.30
-	github.com/alecthomas/kong v0.9.0
+	github.com/alecthomas/kong v1.6.0
 	github.com/bmatcuk/doublestar/v3 v3.0.0
 	github.com/containerd/platforms v0.2.1
 	github.com/containers/image/v5 v5.33.0

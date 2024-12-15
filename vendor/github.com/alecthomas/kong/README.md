@@ -5,42 +5,46 @@
 
 [![](https://godoc.org/github.com/alecthomas/kong?status.svg)](http://godoc.org/github.com/alecthomas/kong) [![CircleCI](https://img.shields.io/circleci/project/github/alecthomas/kong.svg)](https://circleci.com/gh/alecthomas/kong) [![Go Report Card](https://goreportcard.com/badge/github.com/alecthomas/kong)](https://goreportcard.com/report/github.com/alecthomas/kong) [![Slack chat](https://img.shields.io/static/v1?logo=slack&style=flat&label=slack&color=green&message=gophers)](https://gophers.slack.com/messages/CN9DS8YF3)
 
-<!-- TOC depthfrom:2 depthto:3 -->
+- [Kong is a command-line parser for Go](#kong-is-a-command-line-parser-for-go)
+  - [Version 1.0.0 Release](#version-100-release)
+  - [Introduction](#introduction)
+  - [Help](#help)
+    - [Help as a user of a Kong application](#help-as-a-user-of-a-kong-application)
+    - [Defining help in Kong](#defining-help-in-kong)
+  - [Command handling](#command-handling)
+    - [Switch on the command string](#switch-on-the-command-string)
+    - [Attach a `Run(...) error` method to each command](#attach-a-run-error-method-to-each-command)
+  - [Hooks: BeforeReset(), BeforeResolve(), BeforeApply(), AfterApply() and the Bind() option](#hooks-beforereset-beforeresolve-beforeapply-afterapply-and-the-bind-option)
+  - [Flags](#flags)
+  - [Commands and sub-commands](#commands-and-sub-commands)
+  - [Branching positional arguments](#branching-positional-arguments)
+  - [Positional arguments](#positional-arguments)
+  - [Slices](#slices)
+  - [Maps](#maps)
+  - [Pointers](#pointers)
+  - [Nested data structure](#nested-data-structure)
+  - [Custom named decoders](#custom-named-decoders)
+  - [Supported field types](#supported-field-types)
+  - [Custom decoders (mappers)](#custom-decoders-mappers)
+  - [Supported tags](#supported-tags)
+  - [Plugins](#plugins)
+  - [Dynamic Commands](#dynamic-commands)
+  - [Variable interpolation](#variable-interpolation)
+  - [Validation](#validation)
+  - [Modifying Kong's behaviour](#modifying-kongs-behaviour)
+    - [`Name(help)` and `Description(help)` - set the application name description](#namehelp-and-descriptionhelp---set-the-application-name-description)
+    - [`Configuration(loader, paths...)` - load defaults from configuration files](#configurationloader-paths---load-defaults-from-configuration-files)
+    - [`Resolver(...)` - support for default values from external sources](#resolver---support-for-default-values-from-external-sources)
+    - [`*Mapper(...)` - customising how the command-line is mapped to Go values](#mapper---customising-how-the-command-line-is-mapped-to-go-values)
+    - [`ConfigureHelp(HelpOptions)` and `Help(HelpFunc)` - customising help](#configurehelphelpoptions-and-helphelpfunc---customising-help)
+    - [`Bind(...)` - bind values for callback hooks and Run() methods](#bind---bind-values-for-callback-hooks-and-run-methods)
+    - [Other options](#other-options)
 
-- [Introduction](#introduction)
-- [Help](#help)
-  - [Help as a user of a Kong application](#help-as-a-user-of-a-kong-application)
-  - [Defining help in Kong](#defining-help-in-kong)
-- [Command handling](#command-handling)
-  - [Switch on the command string](#switch-on-the-command-string)
-  - [Attach a Run... error method to each command](#attach-a-run-error-method-to-each-command)
-- [Hooks: BeforeReset, BeforeResolve, BeforeApply, AfterApply and the Bind option](#hooks-beforereset-beforeresolve-beforeapply-afterapply-and-the-bind-option)
-- [Flags](#flags)
-- [Commands and sub-commands](#commands-and-sub-commands)
-- [Branching positional arguments](#branching-positional-arguments)
-- [Positional arguments](#positional-arguments)
-- [Slices](#slices)
-- [Maps](#maps)
-- [Pointers](#pointers)
-- [Nested data structure](#nested-data-structure)
-- [Custom named decoders](#custom-named-decoders)
-- [Supported field types](#supported-field-types)
-- [Custom decoders mappers](#custom-decoders-mappers)
-- [Supported tags](#supported-tags)
-- [Plugins](#plugins)
-- [Dynamic Commands](#dynamic-commands)
-- [Variable interpolation](#variable-interpolation)
-- [Validation](#validation)
-- [Modifying Kong's behaviour](#modifying-kongs-behaviour)
-  - [Namehelp and Descriptionhelp - set the application name description](#namehelp-and-descriptionhelp---set-the-application-name-description)
-  - [Configurationloader, paths... - load defaults from configuration files](#configurationloader-paths---load-defaults-from-configuration-files)
-  - [Resolver... - support for default values from external sources](#resolver---support-for-default-values-from-external-sources)
-  - [\*Mapper... - customising how the command-line is mapped to Go values](#mapper---customising-how-the-command-line-is-mapped-to-go-values)
-  - [ConfigureHelpHelpOptions and HelpHelpFunc - customising help](#configurehelphelpoptions-and-helphelpfunc---customising-help)
-  - [Bind... - bind values for callback hooks and Run methods](#bind---bind-values-for-callback-hooks-and-run-methods)
-  - [Other options](#other-options)
+## Version 1.0.0 Release
 
-<!-- /TOC -->
+Kong has been stable for a long time, so it seemed appropriate to cut a 1.0 release.
+
+There is one breaking change, [#436](https://github.com/alecthomas/kong/pull/436), which should effect relatively few users.
 
 ## Introduction
 
@@ -561,28 +565,34 @@ Both can coexist with standard Tag parsing.
 | `name:"X"`           | Long name, for overriding field name.                                                                                                                                                                                                                                                                                          |
 | `help:"X"`           | Help text.                                                                                                                                                                                                                                                                                                                     |
 | `type:"X"`           | Specify [named types](#custom-named-decoders) to use.                                                                                                                                                                                                                                                                          |
-| `placeholder:"X"`    | Placeholder text.                                                                                                                                                                                                                                                                                                              |
+| `placeholder:"X"`    | Placeholder input, if flag. e.g. `` `placeholder:"<the-placeholder>"` `` will show `--flag-name=<the-placeholder>` when displaying help.                                                                                                                                                                                       |
 | `default:"X"`        | Default value.                                                                                                                                                                                                                                                                                                                 |
 | `default:"1"`        | On a command, make it the default.                                                                                                                                                                                                                                                                                             |
 | `default:"withargs"` | On a command, make it the default and allow args/flags from that command                                                                                                                                                                                                                                                       |
 | `short:"X"`          | Short name, if flag.                                                                                                                                                                                                                                                                                                           |
-| `aliases:"X,Y"`      | One or more aliases (for cmd or flag).                                                                                                                                                                                                                                                                                                 |
+| `aliases:"X,Y"`      | One or more aliases (for cmd or flag).                                                                                                                                                                                                                                                                                         |
 | `required:""`        | If present, flag/arg is required.                                                                                                                                                                                                                                                                                              |
 | `optional:""`        | If present, flag/arg is optional.                                                                                                                                                                                                                                                                                              |
 | `hidden:""`          | If present, command or flag is hidden.                                                                                                                                                                                                                                                                                         |
 | `negatable:""`       | If present on a `bool` field, supports prefixing a flag with `--no-` to invert the default value                                                                                                                                                                                                                               |
+| `negatable:"X"`      | If present on a `bool` field, supports `--X` to invert the default value                                                                                                                                                                                                                                                       |
 | `format:"X"`         | Format for parsing input, if supported.                                                                                                                                                                                                                                                                                        |
 | `sep:"X"`            | Separator for sequences (defaults to ","). May be `none` to disable splitting.                                                                                                                                                                                                                                                 |
 | `mapsep:"X"`         | Separator for maps (defaults to ";"). May be `none` to disable splitting.                                                                                                                                                                                                                                                      |
 | `enum:"X,Y,..."`     | Set of valid values allowed for this flag. An enum field must be `required` or have a valid `default`.                                                                                                                                                                                                                         |
 | `group:"X"`          | Logical group for a flag or command.                                                                                                                                                                                                                                                                                           |
 | `xor:"X,Y,..."`      | Exclusive OR groups for flags. Only one flag in the group can be used which is restricted within the same command. When combined with `required`, at least one of the `xor` group will be required.                                                                                                                            |
+| `and:"X,Y,..."`      | AND groups for flags. All flags in the group must be used in the same command. When combined with `required`, all flags in the group will be required.                                                                                                                                                                         |
 | `prefix:"X"`         | Prefix for all sub-flags.                                                                                                                                                                                                                                                                                                      |
 | `envprefix:"X"`      | Envar prefix for all sub-flags.                                                                                                                                                                                                                                                                                                |
 | `set:"K=V"`          | Set a variable for expansion by child elements. Multiples can occur.                                                                                                                                                                                                                                                           |
 | `embed:""`           | If present, this field's children will be embedded in the parent. Useful for composition.                                                                                                                                                                                                                                      |
-| `passthrough:""`     | If present on a positional argument, it stops flag parsing when encountered, as if `--` was processed before. Useful for external command wrappers, like `exec`. On a command it requires that the command contains only one argument of type `[]string` which is then filled with everything following the command, unparsed. |
+| `passthrough:"<mode>"`[^1] | If present on a positional argument, it stops flag parsing when encountered, as if `--` was processed before. Useful for external command wrappers, like `exec`. On a command it requires that the command contains only one argument of type `[]string` which is then filled with everything following the command, unparsed. |
 | `-`                  | Ignore the field. Useful for adding non-CLI fields to a configuration struct. e.g `` `kong:"-"` ``                                                                                                                                                                                                                             |
+
+[^1]: `<mode>` can be `partial` or `all` (the default). `all` will pass through all arguments including flags, including
+flags. `partial` will validate flags until the first positional argument is encountered, then pass through all remaining
+positional arguments.
 
 ## Plugins
 
@@ -654,12 +664,17 @@ func main() {
 ## Validation
 
 Kong does validation on the structure of a command-line, but also supports
-extensible validation. Any node in the tree may implement the following
-interface:
+extensible validation. Any node in the tree may implement either of the following interfaces:
 
 ```go
 type Validatable interface {
     Validate() error
+ }
+```
+
+```go
+type Validatable interface {
+    Validate(kctx *kong.Context) error
  }
 ```
 
@@ -733,13 +748,18 @@ All builtin Go types (as well as a bunch of useful stdlib types like `time.Time`
 The default help output is usually sufficient, but if not there are two solutions.
 
 1. Use `ConfigureHelp(HelpOptions)` to configure how help is formatted (see [HelpOptions](https://godoc.org/github.com/alecthomas/kong#HelpOptions) for details).
-2. Custom help can be wired into Kong via the `Help(HelpFunc)` option. The `HelpFunc` is passed a `Context`, which contains the parsed context for the current command-line. See the implementation of `PrintHelp` for an example.
+2. Custom help can be wired into Kong via the `Help(HelpFunc)` option. The `HelpFunc` is passed a `Context`, which contains the parsed context for the current command-line. See the implementation of `DefaultHelpPrinter` for an example.
 3. Use `ValueFormatter(HelpValueFormatter)` if you want to just customize the help text that is accompanied by flags and arguments.
 4. Use `Groups([]Group)` if you want to customize group titles or add a header.
 
-### `Bind(...)` - bind values for callback hooks and Run() methods
+### Injecting values into `Run()` methods
 
-See the [section on hooks](#hooks-beforeresolve-beforeapply-afterapply-and-the-bind-option) for details.
+There are several ways to inject values into `Run()` methods:
+
+1. Use `Bind()` to bind values directly.
+2. Use `BindTo()` to bind values to an interface type.
+3. Use `BindToProvider()` to bind values to a function that provides the value.
+4. Implement `Provide<Type>() error` methods on the command structure.
 
 ### Other options
 

@@ -31,8 +31,8 @@ github.com/PuerkitoBio/goquery
 # github.com/agext/levenshtein v1.2.3
 ## explicit
 github.com/agext/levenshtein
-# github.com/alecthomas/kong v0.9.0
-## explicit; go 1.18
+# github.com/alecthomas/kong v1.6.0
+## explicit; go 1.20
 github.com/alecthomas/kong
 # github.com/andybalholm/cascadia v1.3.2
 ## explicit; go 1.16
