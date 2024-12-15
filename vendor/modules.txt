@@ -441,8 +441,8 @@ github.com/vanng822/css
 # github.com/vanng822/go-premailer v0.0.0-20191214114701-be27abe028fe
 ## explicit
 github.com/vanng822/go-premailer/premailer
-# go.etcd.io/bbolt v1.3.10
-## explicit; go 1.21
+# go.etcd.io/bbolt v1.3.11
+## explicit; go 1.22
 go.etcd.io/bbolt
 # go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.49.0
 ## explicit; go 1.20
