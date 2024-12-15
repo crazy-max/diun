@@ -117,7 +117,7 @@ func New(grammar interface{}, options ...Option) (*Kong, error) {
 
 	// Embed any embedded structs.
 	for _, embed := range k.embedded {
-		tag, err := parseTagString(strings.Join(embed.tags, " ")) //nolint:govet
+		tag, err := parseTagString(strings.Join(embed.tags, " "))
 		if err != nil {
 			return nil, err
 		}
@@ -167,7 +167,40 @@ func New(grammar interface{}, options ...Option) (*Kong, error) {
 
 	k.bindings.add(k.vars)
 
+	if err = checkOverlappingXorAnd(k); err != nil {
+		return nil, err
+	}
+
 	return k, nil
+}
+
+func checkOverlappingXorAnd(k *Kong) error {
+	xorGroups := map[string][]string{}
+	andGroups := map[string][]string{}
+	for _, flag := range k.Model.Node.Flags {
+		for _, xor := range flag.Xor {
+			xorGroups[xor] = append(xorGroups[xor], flag.Name)
+		}
+		for _, and := range flag.And {
+			andGroups[and] = append(andGroups[and], flag.Name)
+		}
+	}
+	for xor, xorSet := range xorGroups {
+		for and, andSet := range andGroups {
+			overlappingEntries := []string{}
+			for _, xorTag := range xorSet {
+				for _, andTag := range andSet {
+					if xorTag == andTag {
+						overlappingEntries = append(overlappingEntries, xorTag)
+					}
+				}
+			}
+			if len(overlappingEntries) > 1 {
+				return fmt.Errorf("invalid xor and combination, %s and %s overlap with more than one: %s", xor, and, overlappingEntries)
+			}
+		}
+	}
+	return nil
 }
 
 type varStack []Vars
@@ -216,19 +249,19 @@ func (k *Kong) interpolateValue(value *Value, vars Vars) (err error) {
 		return fmt.Errorf("enum for %s: %s", value.Summary(), err)
 	}
 
-	updatedVars := map[string]string{
-		"default": value.Default,
-		"enum":    value.Enum,
-	}
 	if value.Default, err = interpolate(value.Default, vars, nil); err != nil {
 		return fmt.Errorf("default value for %s: %s", value.Summary(), err)
 	}
 	if value.Enum, err = interpolate(value.Enum, vars, nil); err != nil {
 		return fmt.Errorf("enum value for %s: %s", value.Summary(), err)
 	}
+	updatedVars := map[string]string{
+		"default": value.Default,
+		"enum":    value.Enum,
+	}
 	if value.Flag != nil {
 		for i, env := range value.Flag.Envs {
-			if value.Flag.Envs[i], err = interpolate(env, vars, nil); err != nil {
+			if value.Flag.Envs[i], err = interpolate(env, vars, updatedVars); err != nil {
 				return fmt.Errorf("env value for %s: %s", value.Summary(), err)
 			}
 		}
@@ -373,7 +406,7 @@ func (k *Kong) applyHookToDefaultFlags(ctx *Context, node *Node, name string) er
 }
 
 func formatMultilineMessage(w io.Writer, leaders []string, format string, args ...interface{}) {
-	lines := strings.Split(fmt.Sprintf(format, args...), "\n")
+	lines := strings.Split(strings.TrimRight(fmt.Sprintf(format, args...), "\n"), "\n")
 	leader := ""
 	for _, l := range leaders {
 		if l == "" {
