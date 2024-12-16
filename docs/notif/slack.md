@@ -19,12 +19,14 @@ You can send notifications to your Slack channel using an [incoming webhook URL]
 
 | Name               | Default                            | Description                                                                               |
 |--------------------|------------------------------------|-------------------------------------------------------------------------------------------|
-| `webhookURL`[^1]   |                                    | Slack [incoming webhook URL](https://api.slack.com/messaging/webhooks)                    |
+| `webhookURL`       |                                    | Slack [incoming webhook URL](https://api.slack.com/messaging/webhooks)                    |
+| `webhookURLFile`   |                                    | Use content of secret file as webhook URL if `webhookURL` is not defined                  |
 | `renderFields`     | `true`                             | Render [field objects](https://api.slack.com/messaging/composing/layouts#stack_of_blocks) |
 | `templateBody`[^1] | See [below](#default-templatebody) | [Notification template](../faq.md#notification-template) for message body                 |
 
 !!! abstract "Environment variables"
     * `DIUN_NOTIF_SLACK_WEBHOOKURL`
+    * `DIUN_NOTIF_SLACK_WEBHOOKURLFILE`
     * `DIUN_NOTIF_SLACK_RENDERFIELDS`
     * `DIUN_NOTIF_SLACK_TEMPLATEBODY`
 

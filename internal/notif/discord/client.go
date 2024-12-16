@@ -12,6 +12,7 @@ import (
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/internal/msg"
 	"github.com/crazy-max/diun/v4/internal/notif/notifier"
+	"github.com/crazy-max/diun/v4/pkg/utl"
 	"github.com/pkg/errors"
 )
 
@@ -41,6 +42,11 @@ func (c *Client) Name() string {
 // https://discord.com/developers/docs/resources/webhook#execute-webhook
 func (c *Client) Send(entry model.NotifEntry) error {
 	var content bytes.Buffer
+
+	webhookURL, err := utl.GetSecret(c.cfg.WebhookURL, c.cfg.WebhookURLFile)
+	if err != nil {
+		return errors.Wrap(err, "cannot retrieve webhook URL for Discord notifier")
+	}
 
 	message, err := msg.New(msg.Options{
 		Meta:         c.meta,
@@ -117,7 +123,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		return err
 	}
 
-	u, err := url.Parse(c.cfg.WebhookURL)
+	u, err := url.Parse(webhookURL)
 	if err != nil {
 		return err
 	}

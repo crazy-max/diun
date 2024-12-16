@@ -16,12 +16,14 @@ You can send notifications to your Teams team-channel using an [incoming webhook
 
 | Name               | Default                            | Description                                                                                                                                     |
 |--------------------|------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
-| `webhookURL`[^1]   |                                    | Teams [incoming webhook URL](https://docs.microsoft.com/en-us/microsoftteams/platform/webhooks-and-connectors/what-are-webhooks-and-connectors) |
+| `webhookURL`       |                                    | Teams [incoming webhook URL](https://docs.microsoft.com/en-us/microsoftteams/platform/webhooks-and-connectors/what-are-webhooks-and-connectors) |
+| `webhookURLFile`   |                                    | Use content of secret file as webhook URL if `webhookURL` is not defined                                                                        |
 | `renderFacts`      | `true`                             | Render fact objects                                                                                                                             |
 | `templateBody`[^1] | See [below](#default-templatebody) | [Notification template](../faq.md#notification-template) for message body                                                                       |
 
 !!! abstract "Environment variables"
     * `DIUN_NOTIF_TEAMS_WEBHOOKURL`
+    * `DIUN_NOTIF_TEAMS_WEBHOOKURLFILE`
     * `DIUN_NOTIF_TEAMS_RENDERFACTS`
     * `DIUN_NOTIF_TEAMS_TEMPLATEBODY`
 
