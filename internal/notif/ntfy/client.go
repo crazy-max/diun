@@ -108,9 +108,8 @@ func (c *Client) Send(entry model.NotifEntry) error {
 			ErrorCode        int    `json:"errorCode"`
 			ErrorDescription string `json:"errorDescription"`
 		}
-		err := json.NewDecoder(resp.Body).Decode(&errBody)
-		if err != nil {
-			return err
+		if err := json.NewDecoder(resp.Body).Decode(&errBody); err != nil {
+			return errors.Wrapf(err, "cannot decode JSON error response for HTTP %d %s status", resp.StatusCode, http.StatusText(resp.StatusCode))
 		}
 		return errors.Errorf("%d %s: %s", errBody.ErrorCode, errBody.Error, errBody.ErrorDescription)
 	}

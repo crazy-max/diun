@@ -147,14 +147,11 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		Error     string `json:"error,omitempty"`
 		ErrorType string `json:"errorType,omitempty"`
 	}
-	err = json.NewDecoder(resp.Body).Decode(&respBody)
-	if err == nil {
-		return err
+	if err = json.NewDecoder(resp.Body).Decode(&respBody); err != nil {
+		return errors.Wrapf(err, "cannot decode JSON body response for HTTP %d %s status", resp.StatusCode, http.StatusText(resp.StatusCode))
 	}
-
 	if resp.StatusCode != http.StatusOK {
 		return errors.Errorf("unexpected HTTP error %d: %s", resp.StatusCode, respBody.ErrorType)
 	}
-
 	return nil
 }
