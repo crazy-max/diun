@@ -99,8 +99,10 @@ notif:
   telegram:
     token: abcdef123456
     chatIDs:
-      - 8547439
-      - 1234567
+      - "8547439"
+      - "1234567"
+      - "567891234:25"
+      - "891256734:25;12"
   webhook:
     endpoint: http://webhook.foo.com/sd54qad89azd5a
     method: GET

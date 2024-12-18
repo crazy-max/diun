@@ -174,8 +174,13 @@ for <code>{{ .Entry.Manifest.Platform }}</code> platform.
 						TemplateBody: model.NotifTeamsDefaultTemplateBody,
 					},
 					Telegram: &model.NotifTelegram{
-						Token:        "abcdef123456",
-						ChatIDs:      []int64{8547439, 1234567},
+						Token: "abcdef123456",
+						ChatIDs: []string{
+							"8547439",
+							"1234567",
+							"567891234:25",
+							"891256734:25;12",
+						},
 						TemplateBody: model.NotifTelegramDefaultTemplateBody,
 					},
 					Webhook: &model.NotifWebhook{
@@ -333,8 +338,11 @@ func TestLoadEnv(t *testing.T) {
 				Defaults: (&model.Defaults{}).GetDefaults(),
 				Notif: &model.Notif{
 					Telegram: &model.NotifTelegram{
-						Token:        "abcdef123456",
-						ChatIDs:      []int64{8547439, 1234567},
+						Token: "abcdef123456",
+						ChatIDs: []string{
+							"8547439",
+							"1234567",
+						},
 						TemplateBody: model.NotifTelegramDefaultTemplateBody,
 					},
 				},

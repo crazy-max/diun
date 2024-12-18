@@ -3,6 +3,7 @@ package telegram
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 	"strings"
 	"text/template"
 
@@ -19,6 +20,11 @@ type Client struct {
 	*notifier.Notifier
 	cfg  *model.NotifTelegram
 	meta model.Meta
+}
+
+type chatID struct {
+	id     int64
+	topics []int64
 }
 
 // New creates a new Telegram notification instance
@@ -43,15 +49,26 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		return errors.Wrap(err, "cannot retrieve token secret for Telegram notifier")
 	}
 
-	chatIDs := c.cfg.ChatIDs
-	chatIDsRaw, err := utl.GetSecret("", c.cfg.ChatIDsFile)
+	var cids []interface{}
+	for _, cid := range c.cfg.ChatIDs {
+		cids = append(cids, cid)
+	}
+	cidsRaw, err := utl.GetSecret("", c.cfg.ChatIDsFile)
 	if err != nil {
 		return errors.Wrap(err, "cannot retrieve chat IDs secret for Telegram notifier")
 	}
-	if len(chatIDsRaw) > 0 {
-		if err = json.Unmarshal([]byte(chatIDsRaw), &chatIDs); err != nil {
+	if len(cidsRaw) > 0 {
+		if err = json.Unmarshal([]byte(cidsRaw), &cids); err != nil {
 			return errors.Wrap(err, "cannot unmarshal chat IDs secret for Telegram notifier")
 		}
+	}
+	if len(cids) == 0 {
+		return errors.New("no chat IDs provided for Telegram notifier")
+	}
+
+	parsedChatIDs, err := parseChatIDs(cids)
+	if err != nil {
+		return errors.Wrap(err, "cannot parse chat IDs for Telegram notifier")
 	}
 
 	bot, err := gotgbot.NewBot(token, &gotgbot.BotOpts{
@@ -90,15 +107,67 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		return err
 	}
 
-	for _, chatID := range chatIDs {
-		_, err := bot.SendMessage(chatID, string(body), &gotgbot.SendMessageOpts{
-			ParseMode:          gotgbot.ParseModeMarkdown,
-			LinkPreviewOptions: &gotgbot.LinkPreviewOptions{IsDisabled: true},
-		})
-		if err != nil {
-			return err
+	for _, cid := range parsedChatIDs {
+		if len(cid.topics) > 0 {
+			for _, topic := range cid.topics {
+				if err = sendTelegramMessage(bot, cid.id, topic, string(body)); err != nil {
+					return err
+				}
+			}
+		} else {
+			if err = sendTelegramMessage(bot, cid.id, 0, string(body)); err != nil {
+				return err
+			}
 		}
 	}
 
 	return nil
+}
+
+func parseChatIDs(entries []interface{}) ([]chatID, error) {
+	var chatIDs []chatID
+	for _, entry := range entries {
+		switch v := entry.(type) {
+		case int:
+			chatIDs = append(chatIDs, chatID{id: int64(v)})
+		case int64:
+			chatIDs = append(chatIDs, chatID{id: v})
+		case string:
+			parts := strings.Split(v, ":")
+			if len(parts) < 1 || len(parts) > 2 {
+				return nil, errors.Errorf("invalid chat ID %q", v)
+			}
+			id, err := strconv.ParseInt(parts[0], 10, 64)
+			if err != nil {
+				return nil, errors.Wrap(err, "invalid chat ID")
+			}
+			var topics []int64
+			if len(parts) == 2 {
+				topicParts := strings.Split(parts[1], ";")
+				for _, topicPart := range topicParts {
+					topic, err := strconv.ParseInt(topicPart, 10, 64)
+					if err != nil {
+						return nil, errors.Wrapf(err, "invalid topic %q for chat ID %d", topicPart, id)
+					}
+					topics = append(topics, topic)
+				}
+			}
+			chatIDs = append(chatIDs, chatID{
+				id:     id,
+				topics: topics,
+			})
+		default:
+			return nil, errors.Errorf("invalid chat ID %v (type=%T)", entry, entry)
+		}
+	}
+	return chatIDs, nil
+}
+
+func sendTelegramMessage(bot *gotgbot.Bot, chatID int64, threadID int64, message string) error {
+	_, err := bot.SendMessage(chatID, message, &gotgbot.SendMessageOpts{
+		MessageThreadId:    threadID,
+		ParseMode:          gotgbot.ParseModeMarkdown,
+		LinkPreviewOptions: &gotgbot.LinkPreviewOptions{IsDisabled: true},
+	})
+	return err
 }
