@@ -20,6 +20,98 @@
   color: "03a9f4"
   description: ""
 -
+  name: "area/notif"
+  color: "ce6cf8"
+  description: ""
+-
+  name: "area/notif/amqp"
+  color: "ce6cf8"
+  description: ""
+-
+  name: "area/notif/discord"
+  color: "ce6cf8"
+  description: ""
+-
+  name: "area/notif/gotify"
+  color: "ce6cf8"
+  description: ""
+-
+  name: "area/notif/mail"
+  color: "ce6cf8"
+  description: ""
+-
+  name: "area/notif/matrix"
+  color: "ce6cf8"
+  description: ""
+-
+  name: "area/notif/mqtt"
+  color: "ce6cf8"
+  description: ""
+-
+  name: "area/notif/ntfy"
+  color: "ce6cf8"
+  description: ""
+-
+  name: "area/notif/pushover"
+  color: "ce6cf8"
+  description: ""
+-
+  name: "area/notif/rocketchat"
+  color: "ce6cf8"
+  description: ""
+-
+  name: "area/notif/script"
+  color: "ce6cf8"
+  description: ""
+-
+  name: "area/notif/signal-rest"
+  color: "ce6cf8"
+  description: ""
+-
+  name: "area/notif/slack"
+  color: "ce6cf8"
+  description: ""
+-
+  name: "area/notif/teams"
+  color: "ce6cf8"
+  description: ""
+-
+  name: "area/notif/telegram"
+  color: "ce6cf8"
+  description: ""
+-
+  name: "area/notif/webhook"
+  color: "ce6cf8"
+  description: ""
+-
+  name: "area/provider"
+  color: "eeb914"
+  description: ""
+-
+  name: "area/provider/docker"
+  color: "eeb914"
+  description: ""
+-
+  name: "area/provider/dockerfile"
+  color: "eeb914"
+  description: ""
+-
+  name: "area/provider/file"
+  color: "eeb914"
+  description: ""
+-
+  name: "area/provider/kubernetes"
+  color: "eeb914"
+  description: ""
+-
+  name: "area/provider/nomad"
+  color: "eeb914"
+  description: ""
+-
+  name: "area/provider/swarm"
+  color: "eeb914"
+  description: ""
+-
   name: "kind/bug"
   color: "b60205"
   description: ""
