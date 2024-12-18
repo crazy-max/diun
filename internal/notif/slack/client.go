@@ -9,7 +9,9 @@ import (
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/internal/msg"
 	"github.com/crazy-max/diun/v4/internal/notif/notifier"
+	"github.com/crazy-max/diun/v4/pkg/utl"
 	"github.com/nlopes/slack"
+	"github.com/pkg/errors"
 )
 
 // Client represents an active slack notification object
@@ -36,6 +38,11 @@ func (c *Client) Name() string {
 
 // Send creates and sends a slack notification with an entry
 func (c *Client) Send(entry model.NotifEntry) error {
+	webhookURL, err := utl.GetSecret(c.cfg.WebhookURL, c.cfg.WebhookURLFile)
+	if err != nil {
+		return errors.Wrap(err, "cannot retrieve webhook URL for Slack notifier")
+	}
+
 	message, err := msg.New(msg.Options{
 		Meta:         c.meta,
 		Entry:        entry,
@@ -93,7 +100,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		color = "#0054ca"
 	}
 
-	return slack.PostWebhook(c.cfg.WebhookURL, &slack.WebhookMessage{
+	return slack.PostWebhook(webhookURL, &slack.WebhookMessage{
 		Attachments: []slack.Attachment{
 			{
 				Color:         color,

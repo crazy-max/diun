@@ -7,9 +7,10 @@ const NotifSlackDefaultTemplateBody = "<!channel> Docker tag {{ if .Entry.Image.
 
 // NotifSlack holds slack notification configuration details
 type NotifSlack struct {
-	WebhookURL   string `yaml:"webhookURL,omitempty" json:"webhookURL,omitempty" validate:"required"`
-	RenderFields *bool  `yaml:"renderFields,omitempty" json:"renderFields,omitempty" validate:"required"`
-	TemplateBody string `yaml:"templateBody,omitempty" json:"templateBody,omitempty" validate:"required"`
+	WebhookURL     string `yaml:"webhookURL,omitempty" json:"webhookURL,omitempty" validate:"omitempty"`
+	WebhookURLFile string `yaml:"webhookURLFile,omitempty" json:"webhookURLFile,omitempty" validate:"omitempty,file"`
+	RenderFields   *bool  `yaml:"renderFields,omitempty" json:"renderFields,omitempty" validate:"required"`
+	TemplateBody   string `yaml:"templateBody,omitempty" json:"templateBody,omitempty" validate:"required"`
 }
 
 // GetDefaults gets the default values

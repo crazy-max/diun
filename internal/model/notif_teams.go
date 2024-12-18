@@ -7,9 +7,10 @@ const NotifTeamsDefaultTemplateBody = "Docker tag {{ if .Entry.Image.HubLink }}[
 
 // NotifTeams holds Teams notification configuration details
 type NotifTeams struct {
-	WebhookURL   string `yaml:"webhookURL,omitempty" json:"webhookURL,omitempty" validate:"required"`
-	RenderFacts  *bool  `yaml:"renderFacts,omitempty" json:"renderFacts,omitempty" validate:"required"`
-	TemplateBody string `yaml:"templateBody,omitempty" json:"templateBody,omitempty" validate:"required"`
+	WebhookURL     string `yaml:"webhookURL,omitempty" json:"webhookURL,omitempty" validate:"omitempty"`
+	WebhookURLFile string `yaml:"webhookURLFile,omitempty" json:"webhookURLFile,omitempty" validate:"omitempty,file"`
+	RenderFacts    *bool  `yaml:"renderFacts,omitempty" json:"renderFacts,omitempty" validate:"required"`
+	TemplateBody   string `yaml:"templateBody,omitempty" json:"templateBody,omitempty" validate:"required"`
 }
 
 // GetDefaults gets the default values

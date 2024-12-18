@@ -11,6 +11,8 @@ import (
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/internal/msg"
 	"github.com/crazy-max/diun/v4/internal/notif/notifier"
+	"github.com/crazy-max/diun/v4/pkg/utl"
+	"github.com/pkg/errors"
 )
 
 // Client represents an active webhook notification object
@@ -50,6 +52,11 @@ type Fact struct {
 
 // Send creates and sends a webhook notification with an entry
 func (c *Client) Send(entry model.NotifEntry) error {
+	webhookURL, err := utl.GetSecret(c.cfg.WebhookURL, c.cfg.WebhookURLFile)
+	if err != nil {
+		return errors.Wrap(err, "cannot retrieve webhook URL for Teams notifier")
+	}
+
 	message, err := msg.New(msg.Options{
 		Meta:         c.meta,
 		Entry:        entry,
@@ -107,7 +114,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(10)*time.Second)
 	defer cancel()
 
-	req, err := http.NewRequestWithContext(ctx, "POST", c.cfg.WebhookURL, bytes.NewBuffer(jsonBody))
+	req, err := http.NewRequestWithContext(ctx, "POST", webhookURL, bytes.NewBuffer(jsonBody))
 	if err != nil {
 		return err
 	}
