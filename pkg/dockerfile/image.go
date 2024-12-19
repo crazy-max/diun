@@ -38,7 +38,7 @@ func (c *Client) FromImages() (Images, error) {
 				return nil, errors.Wrapf(err, "cannot parse instruction")
 			}
 			if baseName := ins.(*instructions.Stage).BaseName; baseName != "scratch" {
-				name, err := c.shlex.ProcessWordWithMap(baseName, metaArgsToMap(c.metaArgs))
+				name, _, err := c.shlex.ProcessWord(baseName, c.metaArgs)
 				if err != nil {
 					return nil, err
 				}
@@ -59,7 +59,7 @@ func (c *Client) FromImages() (Images, error) {
 				return nil, errors.Wrapf(err, "cannot parse command")
 			}
 			if copyFrom := cmd.(*instructions.CopyCommand).From; copyFrom != "null" {
-				name, err := c.shlex.ProcessWordWithMap(copyFrom, metaArgsToMap(c.metaArgs))
+				name, _, err := c.shlex.ProcessWord(copyFrom, c.metaArgs)
 				if err != nil {
 					return nil, err
 				}
@@ -85,7 +85,7 @@ func (c *Client) FromImages() (Images, error) {
 					if mount.Type != instructions.MountTypeBind || len(mount.From) == 0 {
 						continue
 					}
-					name, err := c.shlex.ProcessWordWithMap(mount.From, metaArgsToMap(c.metaArgs))
+					name, _, err := c.shlex.ProcessWord(mount.From, c.metaArgs)
 					if err != nil {
 						return nil, err
 					}

@@ -14,7 +14,7 @@ import (
 type Client struct {
 	ast      *parser.Node
 	stages   []instructions.Stage
-	metaArgs []instructions.KeyValuePairOptional
+	metaArgs shell.EnvGetter
 	shlex    *shell.Lex
 }
 
@@ -35,26 +35,28 @@ func New(opts Options) (*Client, error) {
 		return nil, errors.Wrapf(err, "cannot parse Dockerfile %s", opts.Filename)
 	}
 
-	stages, metaArgs, err := instructions.Parse(parsed.AST)
+	stages, metaArgs, err := instructions.Parse(parsed.AST, nil)
 	if err != nil {
 		return nil, errors.Wrapf(err, "cannot parse stages for Dockerfile %s", opts.Filename)
 	}
 
-	var kvpoArgs []instructions.KeyValuePairOptional
+	var kvpoArgs []string
 	shlex := shell.NewLex(parsed.EscapeToken)
 	for _, cmd := range metaArgs {
 		for _, metaArg := range cmd.Args {
 			if metaArg.Value != nil {
-				*metaArg.Value, _ = shlex.ProcessWordWithMap(*metaArg.Value, metaArgsToMap(kvpoArgs))
+				if name, _, err := shlex.ProcessWord(*metaArg.Value, shell.EnvsFromSlice(kvpoArgs)); err == nil {
+					metaArg.Value = &name
+				}
 			}
-			kvpoArgs = append(kvpoArgs, metaArg)
+			kvpoArgs = append(kvpoArgs, metaArg.String())
 		}
 	}
 
 	return &Client{
 		ast:      parsed.AST,
 		stages:   stages,
-		metaArgs: kvpoArgs,
+		metaArgs: shell.EnvsFromSlice(kvpoArgs),
 		shlex:    shlex,
 	}, nil
 }
@@ -66,12 +68,4 @@ func (c *Client) isStageName(name string) bool {
 		}
 	}
 	return false
-}
-
-func metaArgsToMap(metaArgs []instructions.KeyValuePairOptional) map[string]string {
-	m := map[string]string{}
-	for _, arg := range metaArgs {
-		m[arg.Key] = arg.ValueString()
-	}
-	return m
 }
