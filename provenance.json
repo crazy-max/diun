@@ -1,0 +1,1226 @@
+{
+  "_type": "https://in-toto.io/Statement/v0.1",
+  "predicateType": "https://slsa.dev/provenance/v0.2",
+  "subject": [
+    {
+      "name": "404.html",
+      "digest": {
+        "sha256": "3e3d705648f39d1361583d2b49d20d668ae31d7af077f28380372e28e8f8be90"
+      }
+    },
+    {
+      "name": "assets/favicon.ico",
+      "digest": {
+        "sha256": "a510e4f233baa526510ced5d3fab459e5df7500c05f7ccd14b221299a75ae51c"
+      }
+    },
+    {
+      "name": "assets/images/favicon.png",
+      "digest": {
+        "sha256": "023854c43fc4b25b795ee4951c8019e3de0593ffeb6f918b5d1f2a9b47a57cfe"
+      }
+    },
+    {
+      "name": "assets/javascripts/bundle.6c7ad80a.min.js",
+      "digest": {
+        "sha256": "7b5b47e8d2f1bfa7bc9ea7711b30a421c0bb4839eeec4b2ad5eaf759c826a734"
+      }
+    },
+    {
+      "name": "assets/javascripts/bundle.6c7ad80a.min.js.map",
+      "digest": {
+        "sha256": "2ba88dabee42d017cbb5b662e180f24dc1f74c0a4fb0a009d06fda568317e464"
+      }
+    },
+    {
+      "name": "assets/javascripts/lunr/min/lunr.ar.min.js",
+      "digest": {
+        "sha256": "3907ff77c011255d725b98a3f5fc21da72a98429c6dd3fdbd470b0a97ffaa324"
+      }
+    },
+    {
+      "name": "assets/javascripts/lunr/min/lunr.da.min.js",
+      "digest": {
+        "sha256": "2a12734048eae74e0a05e5c108fdf24c2b71dfcd8da712336ca9e3d27ab92956"
+      }
+    },
+    {
+      "name": "assets/javascripts/lunr/min/lunr.de.min.js",
+      "digest": {
+        "sha256": "bcaa7c5c19bc730c05bb91e22ae0e386e1ac4a0580c42b7d94f9b8757aadadab"
+      }
+    },
+    {
+      "name": "assets/javascripts/lunr/min/lunr.du.min.js",
+      "digest": {
+        "sha256": "452da04fe449b9c65c61384fec582dc63824bd4e559fae2c3926a7790b68e976"
+      }
+    },
+    {
+      "name": "assets/javascripts/lunr/min/lunr.es.min.js",
+      "digest": {
+        "sha256": "dec4ec90bd6f478ca3e65636a8e3fedf512b23d01a51a01d7e7822f67ebbaaf8"
+      }
+    },
+    {
+      "name": "assets/javascripts/lunr/min/lunr.fi.min.js",
+      "digest": {
+        "sha256": "681541fcf5b1987ad8b00766e9c06389ecf99c3d7ae817fa891f923f691b8668"
+      }
+    },
+    {
+      "name": "assets/javascripts/lunr/min/lunr.fr.min.js",
+      "digest": {
+        "sha256": "4dd56aa2551e770ad26ef4b85092cd31447671e0e84b39514278547f54177377"
+      }
+    },
+    {
+      "name": "assets/javascripts/lunr/min/lunr.hi.min.js",
+      "digest": {
+        "sha256": "631fff52e3623f2dfba35af076c6b8b5a450eeffe30a5cfac7458dab77cbe0a6"
+      }
+    },
+    {
+      "name": "assets/javascripts/lunr/min/lunr.hu.min.js",
+      "digest": {
+        "sha256": "876c969bbf4a2b84738f4e0a14922ee331cb7c2193a621f65db7f836fdd33a38"
+      }
+    },
+    {
+      "name": "assets/javascripts/lunr/min/lunr.it.min.js",
+      "digest": {
+        "sha256": "00a5073df2e922e5fded1c5a4d4011aec02472ab9d9182a7c6508d60b625c453"
+      }
+    },
+    {
+      "name": "assets/javascripts/lunr/min/lunr.ja.min.js",
+      "digest": {
+        "sha256": "c4fded308f633681a6ed53b6c10d8ca5916fdfd50f6b82ec914d725be0cb8bd6"
+      }
+    },
+    {
+      "name": "assets/javascripts/lunr/min/lunr.jp.min.js",
+      "digest": {
+        "sha256": "04114edc36dc114edce5afbb3c7f795f45c77d8673c1edcdca5675ddab5d5199"
+      }
+    },
+    {
+      "name": "assets/javascripts/lunr/min/lunr.multi.min.js",
+      "digest": {
+        "sha256": "9761f475ae79f36420ff714df9950efb264effcf9230efd55b511a0de899e979"
+      }
+    },
+    {
+      "name": "assets/javascripts/lunr/min/lunr.nl.min.js",
+      "digest": {
+        "sha256": "399ef26d61ed2d5806f58ea723dfaca09f4a7c9b51e315bdd17482c8e3013a3e"
+      }
+    },
+    {
+      "name": "assets/javascripts/lunr/min/lunr.no.min.js",
+      "digest": {
+        "sha256": "57f9db9290f9ed36080755f53ee342a04f55a5954e4add915d1c301a37464573"
+      }
+    },
+    {
+      "name": "assets/javascripts/lunr/min/lunr.pt.min.js",
+      "digest": {
+        "sha256": "3a25d2abaa23063cf13fc56c19ae4cc5050cb6215115e9d08f4a6f4b78780067"
+      }
+    },
+    {
+      "name": "assets/javascripts/lunr/min/lunr.ro.min.js",
+      "digest": {
+        "sha256": "cfa26a8ea4293d81e8547ba2321d703a0fe9881f0721fca5f33a3f80bf156ee9"
+      }
+    },
+    {
+      "name": "assets/javascripts/lunr/min/lunr.ru.min.js",
+      "digest": {
+        "sha256": "50ef3c0fab4a3f2d260e8973c63363aa0dcf02b559ea9d11d5f02b6197585c17"
+      }
+    },
+    {
+      "name": "assets/javascripts/lunr/min/lunr.stemmer.support.min.js",
+      "digest": {
+        "sha256": "2e7213605846a18014ec750910cb18a8a4c60bb23200103b3fad9ef27b10c705"
+      }
+    },
+    {
+      "name": "assets/javascripts/lunr/min/lunr.sv.min.js",
+      "digest": {
+        "sha256": "942b165bcc8218e3246fc4735af9b1c2f66514366d0000be051bf1bb896d413e"
+      }
+    },
+    {
+      "name": "assets/javascripts/lunr/min/lunr.th.min.js",
+      "digest": {
+        "sha256": "348461266843e316b26820004a96d3fd87a1579829d244ce510c17293eef0439"
+      }
+    },
+    {
+      "name": "assets/javascripts/lunr/min/lunr.tr.min.js",
+      "digest": {
+        "sha256": "e8bf57b1033b8bd92ea04a94c533015aa1a7f0a8d6830194b974e94e1e4aca3c"
+      }
+    },
+    {
+      "name": "assets/javascripts/lunr/min/lunr.vi.min.js",
+      "digest": {
+        "sha256": "2e39c3fd7305f6e66fc0424796a7696cb8e36dc0f5c3a83ea1bc44dfe3fecb56"
+      }
+    },
+    {
+      "name": "assets/javascripts/lunr/min/lunr.zh.min.js",
+      "digest": {
+        "sha256": "2273fa00429df17a458b481f411d2ecd6da7a950ac6e6cee2d1b2c5cffeefd6f"
+      }
+    },
+    {
+      "name": "assets/javascripts/lunr/tinyseg.js",
+      "digest": {
+        "sha256": "1b044c239610ef65fceff6039567442bb1692d413f5ee8686fee81b1a3067761"
+      }
+    },
+    {
+      "name": "assets/javascripts/lunr/wordcut.js",
+      "digest": {
+        "sha256": "4972aa0ace30e614c2f6fb1eed634d2feea40d9c029842c708f18705d7f1f04a"
+      }
+    },
+    {
+      "name": "assets/javascripts/workers/search.b97dbffb.min.js",
+      "digest": {
+        "sha256": "93f1b45c21c81d2e036064040437c3d248b6e5aa9be673aa7db3504376efacd6"
+      }
+    },
+    {
+      "name": "assets/javascripts/workers/search.b97dbffb.min.js.map",
+      "digest": {
+        "sha256": "5b35925cf3fb80f8b8a0484985ea82b039df9a3737cdb92d04dd118709f3aad7"
+      }
+    },
+    {
+      "name": "assets/logo.png",
+      "digest": {
+        "sha256": "e17504927ed951da5d88c9047f9c64b6624d3862f157ebfb4429e82eefa9f983"
+      }
+    },
+    {
+      "name": "assets/meta/apple-touch-icon-114x114.png",
+      "digest": {
+        "sha256": "1487e0dac7fcb68dc47020b41022b70b548820e3c74ead1794b78a0912efe737"
+      }
+    },
+    {
+      "name": "assets/meta/apple-touch-icon-120x120.png",
+      "digest": {
+        "sha256": "f3181c5922fec36f10199be78d8666d6cab4e111040461a21fb1a281b981b32d"
+      }
+    },
+    {
+      "name": "assets/meta/apple-touch-icon-144x144.png",
+      "digest": {
+        "sha256": "c1e1ab0ac8f43be2523a223b548fda6bcc01f95353eb3ca91b3003af1cf3d754"
+      }
+    },
+    {
+      "name": "assets/meta/apple-touch-icon-152x152.png",
+      "digest": {
+        "sha256": "c07b8a38723f3b36baab51c6fdd244da48fc8724fff5ef5a14daf12e3a3f3c34"
+      }
+    },
+    {
+      "name": "assets/meta/apple-touch-icon-57x57.png",
+      "digest": {
+        "sha256": "1366af3458f4bf7b9051efc8ee950588b0086db098056b9277c4f3966dd04a45"
+      }
+    },
+    {
+      "name": "assets/meta/apple-touch-icon-60x60.png",
+      "digest": {
+        "sha256": "0da7c4b77968cbc59075f06275101c2f2cf27a8151863cee5277f1a57b7f25c1"
+      }
+    },
+    {
+      "name": "assets/meta/apple-touch-icon-72x72.png",
+      "digest": {
+        "sha256": "a2b617f7e15199d97da11a5a3d325536d6cdadc3bbc20d417625278eed48ef4d"
+      }
+    },
+    {
+      "name": "assets/meta/apple-touch-icon-76x76.png",
+      "digest": {
+        "sha256": "dca7e5210dd857cceb43a3a50b227d16453ca33fba47a073abcf56bac7f38d87"
+      }
+    },
+    {
+      "name": "assets/meta/card.png",
+      "digest": {
+        "sha256": "09b958b883431524b8878251f46addfbeb0119f133315646fcd9673abdf36002"
+      }
+    },
+    {
+      "name": "assets/meta/favicon-128.png",
+      "digest": {
+        "sha256": "740583b6a3e6fc408e17700be3e461f44521e0aa32a4820aa5c38e1614d0088e"
+      }
+    },
+    {
+      "name": "assets/meta/favicon-16x16.png",
+      "digest": {
+        "sha256": "812a75507e386e686e14729e890012d75aaa0709881e907481e184d3b35d595d"
+      }
+    },
+    {
+      "name": "assets/meta/favicon-196x196.png",
+      "digest": {
+        "sha256": "b0fc1d0fb5d880baed4e2e41f6474446fb829389e657b8a16b2f0880b47ff008"
+      }
+    },
+    {
+      "name": "assets/meta/favicon-32x32.png",
+      "digest": {
+        "sha256": "7fdbad31dfe917f859b0be8ba31a7b29bfa74d5b78fc1c81717d0ec57b9ecf91"
+      }
+    },
+    {
+      "name": "assets/meta/favicon-96x96.png",
+      "digest": {
+        "sha256": "a143b39e0bbe2f8f1eff5c25b266776afcbd644191928d8b2a5e75a6c7044704"
+      }
+    },
+    {
+      "name": "assets/meta/mstile-144x144.png",
+      "digest": {
+        "sha256": "c1e1ab0ac8f43be2523a223b548fda6bcc01f95353eb3ca91b3003af1cf3d754"
+      }
+    },
+    {
+      "name": "assets/meta/mstile-150x150.png",
+      "digest": {
+        "sha256": "e671ac0484992bd7fdc483a97cba77b3019535b5732ae24da9b1c3ce98abc433"
+      }
+    },
+    {
+      "name": "assets/meta/mstile-310x150.png",
+      "digest": {
+        "sha256": "e1f03f997d93b1ca80d36ffa932aaf40e2d9483fd973c6c64dbea406011d80d7"
+      }
+    },
+    {
+      "name": "assets/meta/mstile-310x310.png",
+      "digest": {
+        "sha256": "71219903bc48269f570d4711ba22b141f53905bdf6c78937c3703baa4732139b"
+      }
+    },
+    {
+      "name": "assets/meta/mstile-70x70.png",
+      "digest": {
+        "sha256": "740583b6a3e6fc408e17700be3e461f44521e0aa32a4820aa5c38e1614d0088e"
+      }
+    },
+    {
+      "name": "assets/notif/discord-1.png",
+      "digest": {
+        "sha256": "41adfd5e58ba687b6a52d5d488b9fbc0c76d06a107e62b95f14f13de8362a12f"
+      }
+    },
+    {
+      "name": "assets/notif/discord-2.png",
+      "digest": {
+        "sha256": "78fd0d293184e01eebab5e85e18b3032fe581a1da55ea1924c26fd92abe8ebaf"
+      }
+    },
+    {
+      "name": "assets/notif/gotify.png",
+      "digest": {
+        "sha256": "85c4da54d1fa410a76d63092471804cfce510c8be3a72ce13acd5c593199de4f"
+      }
+    },
+    {
+      "name": "assets/notif/mail.png",
+      "digest": {
+        "sha256": "09862387d506324a0a671f4f9d010d1e6d6af891509ae86f4f57ac0c27e0af55"
+      }
+    },
+    {
+      "name": "assets/notif/matrix.png",
+      "digest": {
+        "sha256": "a8db1426b0924b4379f27ed40efb65473db4787c65ffd99465ae00436aaf0a1a"
+      }
+    },
+    {
+      "name": "assets/notif/pushover.png",
+      "digest": {
+        "sha256": "7861e61e3adb487479505d31c4c8aa153cd5c4946a65c249e46def7cd0ceb4ac"
+      }
+    },
+    {
+      "name": "assets/notif/rocketchat.png",
+      "digest": {
+        "sha256": "1b6a40fb5c0cae71133c036fe74e35cd6233812282d139a77402a086f56c3fe0"
+      }
+    },
+    {
+      "name": "assets/notif/slack.png",
+      "digest": {
+        "sha256": "2e293aea863bd49ca0516e6d00de631b697bb6235d46c7217d125238d1bf0daa"
+      }
+    },
+    {
+      "name": "assets/notif/teams.png",
+      "digest": {
+        "sha256": "1c068305a002929675eda44a38746765bdcb36f94908dd9c9644385c91b4efbf"
+      }
+    },
+    {
+      "name": "assets/notif/telegram.png",
+      "digest": {
+        "sha256": "38b9719f55f5ef0ff0a6af9093abc0d4ba5defe02a1a4604159915b769a85790"
+      }
+    },
+    {
+      "name": "assets/stylesheets/extra.css",
+      "digest": {
+        "sha256": "ff48902377715f22891315e3954dcf16adcbbfc3c513eaec6d5068d208568ed6"
+      }
+    },
+    {
+      "name": "assets/stylesheets/main.1d29e8d0.min.css",
+      "digest": {
+        "sha256": "1d29e8d0a6f01fd50cbcfa6960f1d3c431ea7c153d27b65a20c59ffb947e9ffc"
+      }
+    },
+    {
+      "name": "assets/stylesheets/main.1d29e8d0.min.css.map",
+      "digest": {
+        "sha256": "1bc5cff4936e22f385cfc819d94b6ab23b24a4c90fba7de02eda71f96cbb9e7e"
+      }
+    },
+    {
+      "name": "assets/stylesheets/palette.cbb835fc.min.css",
+      "digest": {
+        "sha256": "cbb835fc311266a2002524bfe4b2bb8a09d8d87fbdf6bab95089bd892dfd75ff"
+      }
+    },
+    {
+      "name": "assets/stylesheets/palette.cbb835fc.min.css.map",
+      "digest": {
+        "sha256": "3b3fe45236401bfbbe4c07bf26a1b5405a73b52de9e72c43a9d6a9e514aa5875"
+      }
+    },
+    {
+      "name": "assets/watch/healthchecks.png",
+      "digest": {
+        "sha256": "143ccb3cdd66448e27d0b4ab5366a17e8d914616bcf308dc5e8e65bd90eea4e4"
+      }
+    },
+    {
+      "name": "changelog/index.html",
+      "digest": {
+        "sha256": "81805184f71fc4105e58831df1e6cd794c81900832b29633667332a732901588"
+      }
+    },
+    {
+      "name": "config/db/index.html",
+      "digest": {
+        "sha256": "722d5873952dfc8dabb930783bd13c7f4914b368d019ca4d2f62bfe63fed0cc7"
+      }
+    },
+    {
+      "name": "config/defaults/index.html",
+      "digest": {
+        "sha256": "031b072ac233515aa3c828c5850d599417d93171b7dd81f880597a53d6df77e2"
+      }
+    },
+    {
+      "name": "config/index.html",
+      "digest": {
+        "sha256": "7d8fd380b449c021b8889a55a0ce08d4cdc3b4af5534c7e7e7e09863024d8609"
+      }
+    },
+    {
+      "name": "config/notif/index.html",
+      "digest": {
+        "sha256": "a3d28b660745ad932b815dcef7b7845503ea78faec6bba108bfca3d1425e070f"
+      }
+    },
+    {
+      "name": "config/providers/index.html",
+      "digest": {
+        "sha256": "47b61f96ebabd6bfc40045c2d5ec034a121b026c835f3a8482eb682f04289f87"
+      }
+    },
+    {
+      "name": "config/regopts/index.html",
+      "digest": {
+        "sha256": "3d783e27612ee04aba7e44da53a7e2144171b891593d69874c31178ebf493fd1"
+      }
+    },
+    {
+      "name": "config/watch/index.html",
+      "digest": {
+        "sha256": "3baf7bd5b6afebf55fa5515c8995b2bd876393c57210984edf733f6f9f3edeb0"
+      }
+    },
+    {
+      "name": "contributing/index.html",
+      "digest": {
+        "sha256": "c7178c8c745030a1964c123fc364cdf57e9791511b22561714791db19717ee9c"
+      }
+    },
+    {
+      "name": "donate/index.html",
+      "digest": {
+        "sha256": "7194e9c3dd4a18d68564965adb0a83ac3de40899f9ee320feca2ef933ec973d7"
+      }
+    },
+    {
+      "name": "faq/index.html",
+      "digest": {
+        "sha256": "da40d6095cba9e329b2d7c6971326b585e5a2fa82e3a771a322c1d47a378e36b"
+      }
+    },
+    {
+      "name": "index.html",
+      "digest": {
+        "sha256": "f23e1da91ee8b6fff7084e74795dce6d043bf30e947e40db4d24d277f1edcd43"
+      }
+    },
+    {
+      "name": "install/binary/index.html",
+      "digest": {
+        "sha256": "541a5c028f43c31c1ab52942260299a0ad79dcb4e14b658c21a76f6a3a3bdfec"
+      }
+    },
+    {
+      "name": "install/docker/index.html",
+      "digest": {
+        "sha256": "541eb2dc78df8951a5fce8be142957e22f1d9c51577362d2cfce5ab4f8ba8473"
+      }
+    },
+    {
+      "name": "install/linux-service/index.html",
+      "digest": {
+        "sha256": "a74ec057b457962feb3ee1da4cd1ea93173a5570f7244c78212874fd847597cf"
+      }
+    },
+    {
+      "name": "migration/v0-to-v1/index.html",
+      "digest": {
+        "sha256": "d1df6f472b8207bd4c2eea1119b3323e2ebf256ab10fd33d1e8882d1dec158c9"
+      }
+    },
+    {
+      "name": "migration/v1-to-v2/index.html",
+      "digest": {
+        "sha256": "8b23bc02e0c36ae29e4a2282922fd0a5c64cba4ebf188531b1a5756d61ef6e73"
+      }
+    },
+    {
+      "name": "migration/v2-to-v3/index.html",
+      "digest": {
+        "sha256": "ec5bd674872a9e6902bbd2382c7249430be5a11f47d883a8d4c3d7d070b1f93f"
+      }
+    },
+    {
+      "name": "migration/v3-to-v4/index.html",
+      "digest": {
+        "sha256": "3bf0c8eb55642a6a4b2c496e1e28fe480456eae0a067c8e413548ef880f52d0e"
+      }
+    },
+    {
+      "name": "migration/v4.0-to-v4.17/index.html",
+      "digest": {
+        "sha256": "307d8de868a795ee29290daa4f13f06328863071d75a71ae4324b3e630679225"
+      }
+    },
+    {
+      "name": "notif/amqp/index.html",
+      "digest": {
+        "sha256": "5d52bd7b1a0ad302bb4dbbf965140455ab3f66461a664fb2d4ebbda94dbbc454"
+      }
+    },
+    {
+      "name": "notif/discord/index.html",
+      "digest": {
+        "sha256": "780dcbbf680090642bbf19b29ca9da895119fe34d58ec848aaee78ea3faaba66"
+      }
+    },
+    {
+      "name": "notif/gotify/index.html",
+      "digest": {
+        "sha256": "c7420f77289087becb3a96ebbb75e3df738c939c707a60bc2004dc1cdcce5974"
+      }
+    },
+    {
+      "name": "notif/mail/index.html",
+      "digest": {
+        "sha256": "b9b32f0f0ebd8e503a818666daba041a7140d25f5576d45259ba4a8dc12705f5"
+      }
+    },
+    {
+      "name": "notif/matrix/index.html",
+      "digest": {
+        "sha256": "00bcfbdb6e754b04afa42de0c483164ebfcdfd856205b2443149cbd1a3c0ccbe"
+      }
+    },
+    {
+      "name": "notif/mqtt/index.html",
+      "digest": {
+        "sha256": "2d642ba0858e11d3b871b39f3a8a0dc90dd6788bfc2d551d1c7f3e3ffc368e8f"
+      }
+    },
+    {
+      "name": "notif/ntfy/index.html",
+      "digest": {
+        "sha256": "1e91635451219447f8b3e6f5d335c5867a9919d7126fb0974fdc41308de5b1e0"
+      }
+    },
+    {
+      "name": "notif/pushover/index.html",
+      "digest": {
+        "sha256": "518210b1023c8d56a82822066d27e4a8453649f9a9f3ec90d8ebf818bf5c7c90"
+      }
+    },
+    {
+      "name": "notif/rocketchat/index.html",
+      "digest": {
+        "sha256": "7e1a75914d3abb8b55984aed2424275fa5d585ffc32e0ff34932028781cf8227"
+      }
+    },
+    {
+      "name": "notif/script/index.html",
+      "digest": {
+        "sha256": "abb4440b8185f49b1639f291ea8442ab101357afa082374439807ee6bb0b5e49"
+      }
+    },
+    {
+      "name": "notif/signalrest/index.html",
+      "digest": {
+        "sha256": "b74dc4632f11331316778cb77aad5b1380120eeb45adbf074b77bfcc3e1ec607"
+      }
+    },
+    {
+      "name": "notif/slack/index.html",
+      "digest": {
+        "sha256": "7a95ab43fb16597091f378bc779dbdc0e840b5455816b89ae813b89df1a86297"
+      }
+    },
+    {
+      "name": "notif/teams/index.html",
+      "digest": {
+        "sha256": "8d04d8f004a20a472edf93c78187944b4ddecb4b00a23b2cd7ff9a2416f3b36a"
+      }
+    },
+    {
+      "name": "notif/telegram/index.html",
+      "digest": {
+        "sha256": "f37411362f6a79c258f6331b4594b6f6d64208aa8109fbefc1e5faa02f1f4f5c"
+      }
+    },
+    {
+      "name": "notif/webhook/index.html",
+      "digest": {
+        "sha256": "e630cf2f25e721af24b29bf88a8b93fa6d50ea1d977fc5fdb309720d9a1e1ae0"
+      }
+    },
+    {
+      "name": "providers/docker/index.html",
+      "digest": {
+        "sha256": "9a2f43c549451d38c4f2699fc1799dfc266dec74ae548459d731f66a22f2ce6d"
+      }
+    },
+    {
+      "name": "providers/dockerfile/index.html",
+      "digest": {
+        "sha256": "ede2b37c402b4e9f04ae7d21e13876fa6cad5fd5ff15962ed3ffa6c89ff5bb33"
+      }
+    },
+    {
+      "name": "providers/file/index.html",
+      "digest": {
+        "sha256": "1d760c00ad605a0b61ea44cfc4152d610294421e6db1230400b7b4c62caa2ea1"
+      }
+    },
+    {
+      "name": "providers/kubernetes/index.html",
+      "digest": {
+        "sha256": "aa31f8770534996e15f98c4227e450ec589d94e3dc5c03539d86eb42a6760b79"
+      }
+    },
+    {
+      "name": "providers/nomad/index.html",
+      "digest": {
+        "sha256": "24f2fd5cb26b069a6cab7e3736a66c7d415ff27cf6dbe0252a89970d5894a95c"
+      }
+    },
+    {
+      "name": "providers/swarm/index.html",
+      "digest": {
+        "sha256": "7d08ae3631c0817b5f4cb0f9688c516b512b643f4bf00dc7b03a79475d38eac3"
+      }
+    },
+    {
+      "name": "reporting-issue/index.html",
+      "digest": {
+        "sha256": "22113d816be8c8e0feea94a0adce584b75b50a30ec070a115130e19250e2e973"
+      }
+    },
+    {
+      "name": "search/search_index.json",
+      "digest": {
+        "sha256": "50d8ad2e9cd620ab39b9c4347f8e1b72a6196d672da08d6b263cf2fc5bb311fe"
+      }
+    },
+    {
+      "name": "sitemap.xml",
+      "digest": {
+        "sha256": "c2c7a3a05932f2db803a9ba06c0c40c42aece9e2ac40ac047d750ddd82feb132"
+      }
+    },
+    {
+      "name": "sitemap.xml.gz",
+      "digest": {
+        "sha256": "97f6f15c1b5358cdec3d93af86e15ed9944d3a49652849008b02dc7b51ba8725"
+      }
+    },
+    {
+      "name": "usage/basic-example/index.html",
+      "digest": {
+        "sha256": "65dcf2e071a3729b310cff4455546af99ac1e44a0edac3c9d61fe8f1dffbb5c9"
+      }
+    },
+    {
+      "name": "usage/command-line/index.html",
+      "digest": {
+        "sha256": "3179d41c1a3a5342dfb26b7bc7b4265d8b49a9310b6981b4c1a89bde13338b4e"
+      }
+    },
+    {
+      "name": "user-guides/blog-posts/index.html",
+      "digest": {
+        "sha256": "08dc85747370955e8b5da5a878a05d786e5526fb005cbf29b8e588930d666df0"
+      }
+    },
+    {
+      "name": "user-guides/docker-file-providers/index.html",
+      "digest": {
+        "sha256": "0ccc29b9018a8cea38693c3c7a5363cf6318dc5b91e2edb9a63b7430aa556815"
+      }
+    }
+  ],
+  "predicate": {
+    "builder": {
+      "id": "https://github.com/crazy-max/diun/actions/runs/12417537131/attempts/1"
+    },
+    "buildType": "https://mobyproject.org/buildkit@v1",
+    "materials": [
+      {
+        "uri": "pkg:docker/docker/dockerfile@1",
+        "digest": {
+          "sha256": "93bfd3b68c109427185cd78b4779fc82b484b0b7618e36d0f104d4d801e66d25"
+        }
+      },
+      {
+        "uri": "pkg:docker/squidfunk/mkdocs-material@8.3.9?platform=linux%2Famd64",
+        "digest": {
+          "sha256": "cf3ab925e641cef688f30bd8cfd547ddb72fcca542525a490849f2a50f57d817"
+        }
+      }
+    ],
+    "invocation": {
+      "configSource": {
+        "entryPoint": "docs.Dockerfile"
+      },
+      "parameters": {
+        "frontend": "gateway.v0",
+        "args": {
+          "cmdline": "docker/dockerfile:1",
+          "source": "docker/dockerfile:1",
+          "target": "release"
+        },
+        "locals": [
+          {
+            "name": "context"
+          },
+          {
+            "name": "dockerfile"
+          }
+        ]
+      },
+      "environment": {
+        "platform": "linux/amd64"
+      }
+    },
+    "buildConfig": {
+      "llbDefinition": [
+        {
+          "id": "step0",
+          "op": {
+            "Op": {
+              "source": {
+                "identifier": "docker-image://docker.io/squidfunk/mkdocs-material:8.3.9@sha256:cf3ab925e641cef688f30bd8cfd547ddb72fcca542525a490849f2a50f57d817",
+                "attrs": {
+                  "image.resolvemode": "pull"
+                }
+              }
+            },
+            "platform": {
+              "Architecture": "amd64",
+              "OS": "linux"
+            },
+            "constraints": {}
+          }
+        },
+        {
+          "id": "step1",
+          "op": {
+            "Op": {
+              "exec": {
+                "meta": {
+                  "args": [
+                    "/bin/sh",
+                    "-c",
+                    "apk add --no-cache git git-fast-import openssl   \u0026\u0026 apk add --no-cache --virtual .build gcc musl-dev   \u0026\u0026 pip install --no-cache-dir     'lunr'     'markdown-include'     'mkdocs-awesome-pages-plugin'     'mkdocs-exclude'     'mkdocs-git-revision-date-localized-plugin'     'mkdocs-macros-plugin'   \u0026\u0026 apk del .build gcc musl-dev   \u0026\u0026 rm -rf /tmp/*"
+                  ],
+                  "env": [
+                    "PATH=/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+                    "LANG=C.UTF-8",
+                    "GPG_KEY=E3FF2839C048B25C084DEBE9B26995E310250568",
+                    "PYTHON_VERSION=3.9.2",
+                    "PYTHON_PIP_VERSION=21.0.1",
+                    "PYTHON_GET_PIP_URL=https://github.com/pypa/get-pip/raw/b60e2320d9e8d02348525bd74e871e466afdf77c/get-pip.py",
+                    "PYTHON_GET_PIP_SHA256=c3b81e5d06371e135fb3156dc7d8fd6270735088428c4a9a5ec1f342e2024565",
+                    "PACKAGES=/usr/local/lib/python3.9/site-packages",
+                    "PYTHONDONTWRITEBYTECODE=1"
+                  ],
+                  "cwd": "/docs",
+                  "removeMountStubsRecursive": true
+                },
+                "mounts": [
+                  {
+                    "dest": "/"
+                  }
+                ]
+              }
+            },
+            "platform": {
+              "Architecture": "amd64",
+              "OS": "linux"
+            },
+            "constraints": {}
+          },
+          "inputs": [
+            "step0:0"
+          ]
+        },
+        {
+          "id": "step2",
+          "op": {
+            "Op": {
+              "source": {
+                "identifier": "local://context",
+                "attrs": {
+                  "local.excludepatterns": "[\"bin\"]",
+                  "local.sharedkeyhint": "context"
+                }
+              }
+            },
+            "constraints": {}
+          }
+        },
+        {
+          "id": "step3",
+          "op": {
+            "Op": {
+              "exec": {
+                "meta": {
+                  "args": [
+                    "/bin/sh",
+                    "-c",
+                    "mkdocs build --strict --site-dir /out"
+                  ],
+                  "env": [
+                    "PATH=/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+                    "LANG=C.UTF-8",
+                    "GPG_KEY=E3FF2839C048B25C084DEBE9B26995E310250568",
+                    "PYTHON_VERSION=3.9.2",
+                    "PYTHON_PIP_VERSION=21.0.1",
+                    "PYTHON_GET_PIP_URL=https://github.com/pypa/get-pip/raw/b60e2320d9e8d02348525bd74e871e466afdf77c/get-pip.py",
+                    "PYTHON_GET_PIP_SHA256=c3b81e5d06371e135fb3156dc7d8fd6270735088428c4a9a5ec1f342e2024565",
+                    "PACKAGES=/usr/local/lib/python3.9/site-packages",
+                    "PYTHONDONTWRITEBYTECODE=1"
+                  ],
+                  "cwd": "/docs",
+                  "removeMountStubsRecursive": true
+                },
+                "mounts": [
+                  {
+                    "dest": "/"
+                  },
+                  {
+                    "input": 1,
+                    "dest": "/docs",
+                    "output": -1,
+                    "readonly": true
+                  }
+                ]
+              }
+            },
+            "platform": {
+              "Architecture": "amd64",
+              "OS": "linux"
+            },
+            "constraints": {}
+          },
+          "inputs": [
+            "step1:0",
+            "step2:0"
+          ]
+        },
+        {
+          "id": "step4",
+          "op": {
+            "Op": {
+              "file": {
+                "actions": [
+                  {
+                    "input": -1,
+                    "secondaryInput": 0,
+                    "output": 0,
+                    "Action": {
+                      "copy": {
+                        "src": "/out",
+                        "dest": "/",
+                        "mode": -1,
+                        "followSymlink": true,
+                        "dirCopyContents": true,
+                        "createDestPath": true,
+                        "allowWildcard": true,
+                        "allowEmptyWildcard": true,
+                        "timestamp": -1
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            "constraints": {}
+          },
+          "inputs": [
+            "step3:0"
+          ]
+        },
+        {
+          "id": "step5",
+          "op": {
+            "Op": {}
+          },
+          "inputs": [
+            "step4:0"
+          ]
+        }
+      ],
+      "digestMapping": {
+        "sha256:5e92e1446ebb7be86f67cf2a610ae88a68e0d0f7049c711fcb86e531aa225642": "step4",
+        "sha256:756cdf63a0e7bb945da94d59d46cc8cf86a0f1a7d1408b3825d137ef9b1b090a": "step5",
+        "sha256:86373b9738005134a91ae4eb343b88f2ed66ebc0acf7fed4ef63f709c2f02eb9": "step0",
+        "sha256:bdbcf14d54e6379d986809bcf309ba077e2ece12330da3d4aea1cbf15d43d1f9": "step2",
+        "sha256:ce8116688d3c81a8a1c7189a6eaf014650da113dc12deaece6a90b2f0d1857ec": "step3",
+        "sha256:de7d5f9dc557980a11f145047c647104109fb872abb50f86c2c8a59991040378": "step1"
+      }
+    },
+    "metadata": {
+      "buildInvocationID": "vx4r533vrvfuejahn88gdhl93",
+      "buildStartedOn": "2024-12-19T17:16:12.98047294Z",
+      "buildFinishedOn": "2024-12-19T17:16:34.217456556Z",
+      "completeness": {
+        "parameters": true,
+        "environment": true,
+        "materials": false
+      },
+      "reproducible": false,
+      "https://mobyproject.org/buildkit@v1#metadata": {
+        "vcs": {
+          "localdir:context": ".",
+          "localdir:dockerfile": "hack",
+          "revision": "1ca5d37370a57965fa55979d9e9aa4e177ddf193",
+          "source": "https://github.com/crazy-max/diun"
+        },
+        "source": {
+          "locations": {
+            "step0": {
+              "locations": [
+                {
+                  "ranges": [
+                    {
+                      "start": {
+                        "line": 5
+                      },
+                      "end": {
+                        "line": 5
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            "step1": {
+              "locations": [
+                {
+                  "ranges": [
+                    {
+                      "start": {
+                        "line": 6
+                      },
+                      "end": {
+                        "line": 6
+                      }
+                    },
+                    {
+                      "start": {
+                        "line": 7
+                      },
+                      "end": {
+                        "line": 7
+                      }
+                    },
+                    {
+                      "start": {
+                        "line": 8
+                      },
+                      "end": {
+                        "line": 8
+                      }
+                    },
+                    {
+                      "start": {
+                        "line": 9
+                      },
+                      "end": {
+                        "line": 9
+                      }
+                    },
+                    {
+                      "start": {
+                        "line": 10
+                      },
+                      "end": {
+                        "line": 10
+                      }
+                    },
+                    {
+                      "start": {
+                        "line": 11
+                      },
+                      "end": {
+                        "line": 11
+                      }
+                    },
+                    {
+                      "start": {
+                        "line": 12
+                      },
+                      "end": {
+                        "line": 12
+                      }
+                    },
+                    {
+                      "start": {
+                        "line": 13
+                      },
+                      "end": {
+                        "line": 13
+                      }
+                    },
+                    {
+                      "start": {
+                        "line": 14
+                      },
+                      "end": {
+                        "line": 14
+                      }
+                    },
+                    {
+                      "start": {
+                        "line": 15
+                      },
+                      "end": {
+                        "line": 15
+                      }
+                    },
+                    {
+                      "start": {
+                        "line": 16
+                      },
+                      "end": {
+                        "line": 16
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            "step2": {},
+            "step3": {
+              "locations": [
+                {
+                  "ranges": [
+                    {
+                      "start": {
+                        "line": 19
+                      },
+                      "end": {
+                        "line": 19
+                      }
+                    },
+                    {
+                      "start": {
+                        "line": 20
+                      },
+                      "end": {
+                        "line": 20
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            "step4": {
+              "locations": [
+                {
+                  "ranges": [
+                    {
+                      "start": {
+                        "line": 23
+                      },
+                      "end": {
+                        "line": 23
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "infos": [
+            {
+              "filename": "docs.Dockerfile",
+              "language": "Dockerfile",
+              "data": "IyBzeW50YXg9ZG9ja2VyL2RvY2tlcmZpbGU6MQoKQVJHIE1LRE9DU19WRVJTSU9OPSI4LjMuOSIKCkZST00gc3F1aWRmdW5rL21rZG9jcy1tYXRlcmlhbDoke01LRE9DU19WRVJTSU9OfSBBUyBiYXNlClJVTiBhcGsgYWRkIC0tbm8tY2FjaGUgZ2l0IGdpdC1mYXN0LWltcG9ydCBvcGVuc3NsIFwKICAmJiBhcGsgYWRkIC0tbm8tY2FjaGUgLS12aXJ0dWFsIC5idWlsZCBnY2MgbXVzbC1kZXYgXAogICYmIHBpcCBpbnN0YWxsIC0tbm8tY2FjaGUtZGlyIFwKICAgICdsdW5yJyBcCiAgICAnbWFya2Rvd24taW5jbHVkZScgXAogICAgJ21rZG9jcy1hd2Vzb21lLXBhZ2VzLXBsdWdpbicgXAogICAgJ21rZG9jcy1leGNsdWRlJyBcCiAgICAnbWtkb2NzLWdpdC1yZXZpc2lvbi1kYXRlLWxvY2FsaXplZC1wbHVnaW4nIFwKICAgICdta2RvY3MtbWFjcm9zLXBsdWdpbicgXAogICYmIGFwayBkZWwgLmJ1aWxkIGdjYyBtdXNsLWRldiBcCiAgJiYgcm0gLXJmIC90bXAvKgoKRlJPTSBiYXNlIEFTIGdlbmVyYXRlClJVTiAtLW1vdW50PXR5cGU9YmluZCx0YXJnZXQ9LiBcCiAgbWtkb2NzIGJ1aWxkIC0tc3RyaWN0IC0tc2l0ZS1kaXIgL291dAoKRlJPTSBzY3JhdGNoIEFTIHJlbGVhc2UKQ09QWSAtLWZyb209Z2VuZXJhdGUgL291dCAvCg==",
+              "llbDefinition": [
+                {
+                  "id": "step0",
+                  "op": {
+                    "Op": {
+                      "source": {
+                        "identifier": "local://dockerfile",
+                        "attrs": {
+                          "local.differ": "none",
+                          "local.followpaths": "[\"docs.Dockerfile\",\"docs.Dockerfile.dockerignore\"]",
+                          "local.sharedkeyhint": "dockerfile"
+                        }
+                      }
+                    },
+                    "constraints": {}
+                  }
+                },
+                {
+                  "id": "step1",
+                  "op": {
+                    "Op": {}
+                  },
+                  "inputs": [
+                    "step0:0"
+                  ]
+                }
+              ],
+              "digestMapping": {
+                "sha256:9ffab50b0f62cf3dd6011fa4f8f95dde2f32595e47c259729c6862efe04f30e5": "step0",
+                "sha256:df98f1bbd1d7f633cce56d82c223055b2225cf284b0d9e0da065ee6e78f7455d": "step1"
+              }
+            }
+          ]
+        },
+        "layers": {
+          "step0:0": [
+            [
+              {
+                "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+                "digest": "sha256:ca3cd42a7c9525f6ce3d64c1a70982613a8235f0cc057ec9244052921853ef15",
+                "size": 2811947
+              },
+              {
+                "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+                "digest": "sha256:1d917aee477c10b5ea813a6463dd3f433b3f4dc7d85ca28c17912f4ab8f58e4d",
+                "size": 656231
+              },
+              {
+                "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+                "digest": "sha256:7bc50e7d1ae37a8a84d4107e5b458752e3825d63d629e97c2e9d5e30b92e928d",
+                "size": 11410400
+              },
+              {
+                "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+                "digest": "sha256:83ca130858d18454191089846378c03c93e566dcbd862b54c69aef5eade1c5da",
+                "size": 231
+              },
+              {
+                "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+                "digest": "sha256:3d2c0e52073b216758824f9d38f4ecf60b8d774bcbfe609b0d3e14f3891b4c55",
+                "size": 2164509
+              },
+              {
+                "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+                "digest": "sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1",
+                "size": 32
+              },
+              {
+                "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+                "digest": "sha256:0142aa88c946772330e89170317b7ecceaa8a7cfb53dd84a7f6e7cc119f91806",
+                "size": 2087246
+              },
+              {
+                "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+                "digest": "sha256:106c235eb6a2e90e7b0e9756d78b5397eeab1a7180933fe4deeed214c9e3bcb4",
+                "size": 308
+              },
+              {
+                "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+                "digest": "sha256:87773a68fc9a46749bc87db76c9e9332f97b2c749ba61762cc15d30e20aa0989",
+                "size": 1319
+              },
+              {
+                "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+                "digest": "sha256:4057fb5406499a08d39ddd46551c79815ecc946e847515a19a1531352c50a3e5",
+                "size": 3368
+              },
+              {
+                "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+                "digest": "sha256:561941bd8c81ea21c3b57c07a021fbdb8c997b8fced7f0f232dd17c857c79e1b",
+                "size": 920
+              },
+              {
+                "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+                "digest": "sha256:700e96758dccf375a01a6cf382bada70a00a8a3eda040f223bfc3465955d4d5b",
+                "size": 1549
+              },
+              {
+                "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+                "digest": "sha256:c3b0c2205e6baad053b1603e7f82992b424093f8de38d57ae39d53dc0993c101",
+                "size": 20968464
+              },
+              {
+                "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+                "digest": "sha256:352d9a9f2e061725ed866ae5aaeb2e771aacb51b1512598e7e4cb09582249131",
+                "size": 93
+              }
+            ]
+          ]
+        }
+      }
+    }
+  }
+}
