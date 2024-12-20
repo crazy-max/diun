@@ -10,13 +10,13 @@ import (
 func TestParseChatIDs(t *testing.T) {
 	tests := []struct {
 		name     string
-		entries  []interface{}
+		entries  []string
 		expected []chatID
 		err      error
 	}{
 		{
-			name:    "valid integers",
-			entries: []interface{}{8547439, 1234567},
+			name:    "valid chat IDS",
+			entries: []string{"8547439", "1234567"},
 			expected: []chatID{
 				{id: 8547439},
 				{id: 1234567},
@@ -25,7 +25,7 @@ func TestParseChatIDs(t *testing.T) {
 		},
 		{
 			name:    "valid strings with topics",
-			entries: []interface{}{"567891234:25", "891256734:25;12"},
+			entries: []string{"567891234:25", "891256734:25;12"},
 			expected: []chatID{
 				{id: 567891234, topics: []int64{25}},
 				{id: 891256734, topics: []int64{25, 12}},
@@ -34,37 +34,25 @@ func TestParseChatIDs(t *testing.T) {
 		},
 		{
 			name:     "invalid format",
-			entries:  []interface{}{"invalid_format"},
+			entries:  []string{"invalid_format"},
 			expected: nil,
 			err:      errors.New(`invalid chat ID: strconv.ParseInt: parsing "invalid_format": invalid syntax`),
 		},
 		{
-			name:     "invalid type",
-			entries:  []interface{}{true},
-			expected: nil,
-			err:      errors.New("invalid chat ID true (type=bool)"),
-		},
-		{
 			name:     "empty string",
-			entries:  []interface{}{""},
+			entries:  []string{""},
 			expected: nil,
 			err:      errors.New(`invalid chat ID: strconv.ParseInt: parsing "": invalid syntax`),
 		},
 		{
 			name:     "string with invalid topic",
-			entries:  []interface{}{"567891234:invalid"},
+			entries:  []string{"567891234:invalid"},
 			expected: nil,
 			err:      errors.New(`invalid topic "invalid" for chat ID 567891234: strconv.ParseInt: parsing "invalid": invalid syntax`),
 		},
 		{
-			name:     "mixed valid and invalid entries",
-			entries:  []interface{}{8547439, "567891234:25", "invalid_format", true},
-			expected: nil,
-			err:      errors.New(`invalid chat ID: strconv.ParseInt: parsing "invalid_format": invalid syntax`),
-		},
-		{
 			name:     "invalid format with too many parts",
-			entries:  []interface{}{"567891234:25:extra"},
+			entries:  []string{"567891234:25:extra"},
 			expected: nil,
 			err:      errors.New(`invalid chat ID "567891234:25:extra"`),
 		},
