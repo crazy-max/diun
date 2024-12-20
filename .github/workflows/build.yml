@@ -16,6 +16,7 @@ env:
   DOCKERHUB_SLUG: crazymax/diun
   GHCR_SLUG: ghcr.io/crazy-max/diun
   DESTDIR: ./bin
+  DOCKER_BUILD_SUMMARY: false
 
 jobs:
   prepare:
@@ -119,8 +120,6 @@ jobs:
           pull: true
           set: |
             *.platform=${{ matrix.platform }}
-            *.cache-from=type=gha,scope=artifact-${{ env.PLATFORM_PAIR }}
-            *.cache-to=type=gha,scope=artifact-${{ env.PLATFORM_PAIR }},mode=max
       -
         name: Rename provenance and sbom
         working-directory: ${{ env.DESTDIR }}/artifact
@@ -194,17 +193,6 @@ jobs:
         with:
           fetch-depth: 0
       -
-        name: Prepare
-        run: |
-          cfroms=
-          while read -r platform; do
-            if [ -n "$cfroms" ]; then cfroms="${cfroms}\n"; fi
-            cfroms="${cfroms}*.cache-from=type=gha,scope=artifact-${platform//\//-}"
-          done < <(docker buildx bake artifact-all --print | jq -r '.target."artifact-all".platforms[]')
-          echo "CACHE_FROMS<<EOF" >> $GITHUB_ENV
-          echo -e "$cfroms" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
-      -
         name: Docker meta
         id: meta
         uses: docker/metadata-action@v5
@@ -255,8 +243,6 @@ jobs:
           sbom: true
           pull: true
           push: ${{ github.event_name != 'pull_request' }}
-          set: |
-            ${{ env.CACHE_FROMS }}
       -
         name: Check manifest
         if: github.event_name != 'pull_request'
