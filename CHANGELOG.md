@@ -2,6 +2,8 @@
 
 ## 4.29.0 (2024/12/19)
 
+:warning: See **Migration notes** in the documentation before upgrading.
+
 * Topics support for Telegram notifications (#1308)
 * Webhook url as secret support for Discord, Slack and Teams notifications (#1302)
 * Enhance error message for JSON decode response issues for Gotify, ntfy and RocketChat (#1309)
