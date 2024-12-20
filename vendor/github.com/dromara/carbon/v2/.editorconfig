@@ -1,0 +1,14 @@
+# http://editorconfig.org
+root = true
+
+[*]
+indent_style = tab
+charset = utf-8
+trim_trailing_whitespace = true
+
+[*.md]
+indent_size = 4
+trim_trailing_whitespace = false
+
+[lang/*.json]
+indent_size = 4
