@@ -49,10 +49,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		return errors.Wrap(err, "cannot retrieve token secret for Telegram notifier")
 	}
 
-	var cids []interface{}
-	for _, cid := range c.cfg.ChatIDs {
-		cids = append(cids, cid)
-	}
+	cids := c.cfg.ChatIDs
 	cidsRaw, err := utl.GetSecret("", c.cfg.ChatIDsFile)
 	if err != nil {
 		return errors.Wrap(err, "cannot retrieve chat IDs secret for Telegram notifier")
@@ -124,41 +121,32 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	return nil
 }
 
-func parseChatIDs(entries []interface{}) ([]chatID, error) {
+func parseChatIDs(entries []string) ([]chatID, error) {
 	var chatIDs []chatID
 	for _, entry := range entries {
-		switch v := entry.(type) {
-		case int:
-			chatIDs = append(chatIDs, chatID{id: int64(v)})
-		case int64:
-			chatIDs = append(chatIDs, chatID{id: v})
-		case string:
-			parts := strings.Split(v, ":")
-			if len(parts) < 1 || len(parts) > 2 {
-				return nil, errors.Errorf("invalid chat ID %q", v)
-			}
-			id, err := strconv.ParseInt(parts[0], 10, 64)
-			if err != nil {
-				return nil, errors.Wrap(err, "invalid chat ID")
-			}
-			var topics []int64
-			if len(parts) == 2 {
-				topicParts := strings.Split(parts[1], ";")
-				for _, topicPart := range topicParts {
-					topic, err := strconv.ParseInt(topicPart, 10, 64)
-					if err != nil {
-						return nil, errors.Wrapf(err, "invalid topic %q for chat ID %d", topicPart, id)
-					}
-					topics = append(topics, topic)
-				}
-			}
-			chatIDs = append(chatIDs, chatID{
-				id:     id,
-				topics: topics,
-			})
-		default:
-			return nil, errors.Errorf("invalid chat ID %v (type=%T)", entry, entry)
+		parts := strings.Split(entry, ":")
+		if len(parts) < 1 || len(parts) > 2 {
+			return nil, errors.Errorf("invalid chat ID %q", entry)
 		}
+		id, err := strconv.ParseInt(parts[0], 10, 64)
+		if err != nil {
+			return nil, errors.Wrap(err, "invalid chat ID")
+		}
+		var topics []int64
+		if len(parts) == 2 {
+			topicParts := strings.Split(parts[1], ";")
+			for _, topicPart := range topicParts {
+				topic, err := strconv.ParseInt(topicPart, 10, 64)
+				if err != nil {
+					return nil, errors.Wrapf(err, "invalid topic %q for chat ID %d", topicPart, id)
+				}
+				topics = append(topics, topic)
+			}
+		}
+		chatIDs = append(chatIDs, chatID{
+			id:     id,
+			topics: topics,
+		})
 	}
 	return chatIDs, nil
 }
