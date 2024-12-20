@@ -21,6 +21,7 @@ on:
 env:
   BUILD_TAG: 'diun:local'
   CONTAINER_NAME: 'diun'
+  DOCKER_BUILD_SUMMARY: false
 
 jobs:
   e2e:
