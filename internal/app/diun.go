@@ -4,7 +4,6 @@ import (
 	"net/url"
 	"sync"
 	"sync/atomic"
-	"time"
 
 	"github.com/crazy-max/cron/v3"
 	"github.com/crazy-max/diun/v4/internal/config"
@@ -20,7 +19,7 @@ import (
 	nomadPrd "github.com/crazy-max/diun/v4/internal/provider/nomad"
 	swarmPrd "github.com/crazy-max/diun/v4/internal/provider/swarm"
 	"github.com/crazy-max/gohealthchecks"
-	"github.com/hako/durafmt"
+	"github.com/dromara/carbon/v2"
 	"github.com/panjf2000/ants/v2"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
@@ -120,7 +119,7 @@ func (di *Diun) Start() error {
 	// Start scheduler
 	di.cron.Start()
 	log.Info().Msgf("Next run in %s (%s)",
-		durafmt.Parse(time.Until(di.cron.Entry(di.jobID).Next)).LimitFirstN(2).String(),
+		carbon.CreateFromStdTime(di.cron.Entry(di.jobID).Next).DiffAbsInString(),
 		di.cron.Entry(di.jobID).Next)
 
 	select {}
@@ -135,7 +134,7 @@ func (di *Diun) Run() {
 	defer atomic.StoreUint32(&di.locker, 0)
 	if di.jobID > 0 {
 		defer log.Info().Msgf("Next run in %s (%s)",
-			durafmt.Parse(time.Until(di.cron.Entry(di.jobID).Next)).LimitFirstN(2).String(),
+			carbon.CreateFromStdTime(di.cron.Entry(di.jobID).Next).DiffAbsInString(),
 			di.cron.Entry(di.jobID).Next)
 	}
 
