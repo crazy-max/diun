@@ -39,7 +39,7 @@ Multiple chat IDs can be provided in order to deliver notifications to multiple 
     * `DIUN_NOTIF_TELEGRAM_TEMPLATEBODY`
 
 !!! example "chat IDs secret file"
-    Chat IDs secret file must be a valid JSON array like: `[123456789,987654321,"567891234:25","891256734:25;12"]`
+    Chat IDs secret file must be a valid JSON array like: `["123456789","987654321","567891234:25","891256734:25;12"]`
 
 ### `chatIDs` format
 

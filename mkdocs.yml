@@ -145,6 +145,7 @@ nav:
   - FAQ: faq.md
   - Changelog: changelog.md
   - Migration:
+    - Diun v4.1 to v4.29: migration/v4.1-to-v4.29.md
     - Diun v4.0 to v4.17: migration/v4.0-to-v4.17.md
     - Diun v3 to v4: migration/v3-to-v4.md
     - Diun v2 to v3: migration/v2-to-v3.md
