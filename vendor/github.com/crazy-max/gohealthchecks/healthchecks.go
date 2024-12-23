@@ -5,7 +5,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"runtime"
@@ -14,7 +13,7 @@ import (
 )
 
 const (
-	version        = "0.4.1"
+	version        = "0.5.0"
 	defaultBaseURL = "https://hc-ping.com/"
 )
 
@@ -82,6 +81,7 @@ func (c *Client) request(ctx context.Context, method, path string, body []byte) 
 	if err != nil {
 		return err
 	}
+	defer r.Body.Close()
 	defer drain(r.Body)
 
 	if r.StatusCode != 200 {
@@ -95,13 +95,12 @@ func (c *Client) request(ctx context.Context, method, path string, body []byte) 
 // asynchronously.
 func drain(r io.ReadCloser) {
 	go func() {
-		// Panicking here does not put data in
-		// an inconsistent state.
+		// panicking here does not put data in an inconsistent state.
 		defer func() {
 			_ = recover()
 		}()
 
-		_, _ = io.Copy(ioutil.Discard, r)
+		_, _ = io.Copy(io.Discard, r)
 		r.Close()
 	}()
 }
