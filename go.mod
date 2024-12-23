@@ -11,7 +11,7 @@ require (
 	github.com/containerd/platforms v0.2.1
 	github.com/containers/image/v5 v5.33.0
 	github.com/crazy-max/cron/v3 v3.1.1
-	github.com/crazy-max/gohealthchecks v0.4.1
+	github.com/crazy-max/gohealthchecks v0.5.0
 	github.com/crazy-max/gonfig v0.7.1
 	github.com/distribution/reference v0.6.0
 	github.com/docker/docker v27.3.1+incompatible
