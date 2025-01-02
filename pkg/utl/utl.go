@@ -3,6 +3,7 @@ package utl
 import (
 	"os"
 	"regexp"
+	"strings"
 	"time"
 )
 
@@ -62,7 +63,7 @@ func GetSecret(plaintext, filename string) (string, error) {
 		if err != nil {
 			return "", err
 		}
-		return string(b), nil
+		return strings.TrimRight(string(b), "\n"), nil
 	}
 	return "", nil
 }
