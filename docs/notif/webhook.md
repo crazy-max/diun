@@ -31,7 +31,7 @@ You can send webhook notifications with the following settings.
 
 ## Sample
 
-The JSON response will look like this:
+The JSON request will look like this:
 
 ```json
 {
