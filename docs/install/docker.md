@@ -135,6 +135,9 @@ version: "3.5"
 services:
   diun_app:
     image: docker.io/crazymax/diun:latest
+    # security_opt is neccessary if you use podman in rootless mode to apply the correct SELinux rules
+    security_opt:
+      - "label=type:container_runtime_t"
     volumes:
       - "./data:/data"
       # root mode
