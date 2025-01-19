@@ -408,10 +408,10 @@ github.com/opencontainers/image-spec/specs-go/v1
 # github.com/opencontainers/runtime-spec v1.2.0
 ## explicit
 github.com/opencontainers/runtime-spec/specs-go
-# github.com/panjf2000/ants/v2 v2.10.0
-## explicit; go 1.13
+# github.com/panjf2000/ants/v2 v2.11.0
+## explicit; go 1.18
 github.com/panjf2000/ants/v2
-github.com/panjf2000/ants/v2/internal/sync
+github.com/panjf2000/ants/v2/pkg/sync
 # github.com/pkg/errors v0.9.1
 ## explicit
 github.com/pkg/errors
