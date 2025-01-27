@@ -814,8 +814,12 @@ func (bot *Bot) CreateForumTopicWithContext(ctx context.Context, chatId int64, n
 
 // CreateInvoiceLinkOpts is the set of optional fields for Bot.CreateInvoiceLink and Bot.CreateInvoiceLinkWithContext.
 type CreateInvoiceLinkOpts struct {
+	// Unique identifier of the business connection on behalf of which the link will be created. For payments in Telegram Stars only.
+	BusinessConnectionId string
 	// Payment provider token, obtained via @BotFather. Pass an empty string for payments in Telegram Stars.
 	ProviderToken string
+	// The number of seconds the subscription will be active for before the next payment. The currency must be set to "XTR" (Telegram Stars) if the parameter is used. Currently, it must always be 2592000 (30 days) if specified. Any number of subscriptions can be active for a given bot at the same time, including multiple concurrent subscriptions from the same user. Subscription price must no exceed 2500 Telegram Stars.
+	SubscriptionPeriod int64
 	// The maximum accepted amount for tips in the smallest units of the currency (integer, not float/double). For example, for a maximum tip of US$ 1.45 pass max_tip_amount = 145. See the exp parameter in currencies.json, it shows the number of digits past the decimal point for each currency (2 for the majority of currencies). Defaults to 0. Not supported for payments in Telegram Stars.
 	MaxTipAmount int64
 	// A JSON-serialized array of suggested amounts of tips in the smallest units of the currency (integer, not float/double). At most 4 suggested tip amounts can be specified. The suggested tip amounts must be positive, passed in a strictly increased order and must not exceed max_tip_amount.
@@ -876,7 +880,11 @@ func (bot *Bot) CreateInvoiceLinkWithContext(ctx context.Context, title string, 
 		v["prices"] = string(bs)
 	}
 	if opts != nil {
+		v["business_connection_id"] = opts.BusinessConnectionId
 		v["provider_token"] = opts.ProviderToken
+		if opts.SubscriptionPeriod != 0 {
+			v["subscription_period"] = strconv.FormatInt(opts.SubscriptionPeriod, 10)
+		}
 		if opts.MaxTipAmount != 0 {
 			v["max_tip_amount"] = strconv.FormatInt(opts.MaxTipAmount, 10)
 		}
@@ -1935,6 +1943,44 @@ func (bot *Bot) EditMessageTextWithContext(ctx context.Context, text string, opt
 
 }
 
+// EditUserStarSubscriptionOpts is the set of optional fields for Bot.EditUserStarSubscription and Bot.EditUserStarSubscriptionWithContext.
+type EditUserStarSubscriptionOpts struct {
+	// RequestOpts are an additional optional field to configure timeouts for individual requests
+	RequestOpts *RequestOpts
+}
+
+// EditUserStarSubscription (https://core.telegram.org/bots/api#edituserstarsubscription)
+//
+// Allows the bot to cancel or re-enable extension of a subscription paid in Telegram Stars. Returns True on success.
+//   - userId (type int64): Identifier of the user whose subscription will be edited
+//   - telegramPaymentChargeId (type string): Telegram payment identifier for the subscription
+//   - isCanceled (type bool): Pass True to cancel extension of the user subscription; the subscription must be active up to the end of the current subscription period. Pass False to allow the user to re-enable a subscription that was previously canceled by the bot.
+//   - opts (type EditUserStarSubscriptionOpts): All optional parameters.
+func (bot *Bot) EditUserStarSubscription(userId int64, telegramPaymentChargeId string, isCanceled bool, opts *EditUserStarSubscriptionOpts) (bool, error) {
+	return bot.EditUserStarSubscriptionWithContext(context.Background(), userId, telegramPaymentChargeId, isCanceled, opts)
+}
+
+// EditUserStarSubscriptionWithContext is the same as Bot.EditUserStarSubscription, but with a context.Context parameter
+func (bot *Bot) EditUserStarSubscriptionWithContext(ctx context.Context, userId int64, telegramPaymentChargeId string, isCanceled bool, opts *EditUserStarSubscriptionOpts) (bool, error) {
+	v := map[string]string{}
+	v["user_id"] = strconv.FormatInt(userId, 10)
+	v["telegram_payment_charge_id"] = telegramPaymentChargeId
+	v["is_canceled"] = strconv.FormatBool(isCanceled)
+
+	var reqOpts *RequestOpts
+	if opts != nil {
+		reqOpts = opts.RequestOpts
+	}
+
+	r, err := bot.RequestWithContext(ctx, "editUserStarSubscription", v, nil, reqOpts)
+	if err != nil {
+		return false, err
+	}
+
+	var b bool
+	return b, json.Unmarshal(r, &b)
+}
+
 // ExportChatInviteLinkOpts is the set of optional fields for Bot.ExportChatInviteLink and Bot.ExportChatInviteLinkWithContext.
 type ExportChatInviteLinkOpts struct {
 	// RequestOpts are an additional optional field to configure timeouts for individual requests
@@ -2075,6 +2121,38 @@ func (bot *Bot) ForwardMessagesWithContext(ctx context.Context, chatId int64, fr
 
 	var m []MessageId
 	return m, json.Unmarshal(r, &m)
+}
+
+// GetAvailableGiftsOpts is the set of optional fields for Bot.GetAvailableGifts and Bot.GetAvailableGiftsWithContext.
+type GetAvailableGiftsOpts struct {
+	// RequestOpts are an additional optional field to configure timeouts for individual requests
+	RequestOpts *RequestOpts
+}
+
+// GetAvailableGifts (https://core.telegram.org/bots/api#getavailablegifts)
+//
+// Returns the list of gifts that can be sent by the bot to users. Requires no parameters. Returns a Gifts object.
+//   - opts (type GetAvailableGiftsOpts): All optional parameters.
+func (bot *Bot) GetAvailableGifts(opts *GetAvailableGiftsOpts) (*Gifts, error) {
+	return bot.GetAvailableGiftsWithContext(context.Background(), opts)
+}
+
+// GetAvailableGiftsWithContext is the same as Bot.GetAvailableGifts, but with a context.Context parameter
+func (bot *Bot) GetAvailableGiftsWithContext(ctx context.Context, opts *GetAvailableGiftsOpts) (*Gifts, error) {
+	v := map[string]string{}
+
+	var reqOpts *RequestOpts
+	if opts != nil {
+		reqOpts = opts.RequestOpts
+	}
+
+	r, err := bot.RequestWithContext(ctx, "getAvailableGifts", v, nil, reqOpts)
+	if err != nil {
+		return nil, err
+	}
+
+	var g Gifts
+	return &g, json.Unmarshal(r, &g)
 }
 
 // GetBusinessConnectionOpts is the set of optional fields for Bot.GetBusinessConnection and Bot.GetBusinessConnectionWithContext.
@@ -2751,7 +2829,7 @@ type GetUpdatesOpts struct {
 	Limit int64
 	// Timeout in seconds for long polling. Defaults to 0, i.e. usual short polling. Should be positive, short polling should be used for testing purposes only.
 	Timeout int64
-	// A JSON-serialized list of the update types you want your bot to receive. For example, specify ["message", "edited_channel_post", "callback_query"] to only receive updates of these types. See Update for a complete list of available update types. Specify an empty list to receive all update types except chat_member, message_reaction, and message_reaction_count (default). If not specified, the previous setting will be used. Please note that this parameter doesn't affect updates created before the call to the getUpdates, so unwanted updates may be received for a short period of time.
+	// A JSON-serialized list of the update types you want your bot to receive. For example, specify ["message", "edited_channel_post", "callback_query"] to only receive updates of these types. See Update for a complete list of available update types. Specify an empty list to receive all update types except chat_member, message_reaction, and message_reaction_count (default). If not specified, the previous setting will be used. Please note that this parameter doesn't affect updates created before the call to getUpdates, so unwanted updates may be received for a short period of time.
 	AllowedUpdates []string
 	// RequestOpts are an additional optional field to configure timeouts for individual requests
 	RequestOpts *RequestOpts
@@ -3178,6 +3256,74 @@ func (bot *Bot) RefundStarPaymentWithContext(ctx context.Context, userId int64, 
 	return b, json.Unmarshal(r, &b)
 }
 
+// RemoveChatVerificationOpts is the set of optional fields for Bot.RemoveChatVerification and Bot.RemoveChatVerificationWithContext.
+type RemoveChatVerificationOpts struct {
+	// RequestOpts are an additional optional field to configure timeouts for individual requests
+	RequestOpts *RequestOpts
+}
+
+// RemoveChatVerification (https://core.telegram.org/bots/api#removechatverification)
+//
+// Removes verification from a chat that is currently verified on behalf of the organization represented by the bot. Returns True on success.
+//   - chatId (type int64): Unique identifier for the target chat
+//   - opts (type RemoveChatVerificationOpts): All optional parameters.
+func (bot *Bot) RemoveChatVerification(chatId int64, opts *RemoveChatVerificationOpts) (bool, error) {
+	return bot.RemoveChatVerificationWithContext(context.Background(), chatId, opts)
+}
+
+// RemoveChatVerificationWithContext is the same as Bot.RemoveChatVerification, but with a context.Context parameter
+func (bot *Bot) RemoveChatVerificationWithContext(ctx context.Context, chatId int64, opts *RemoveChatVerificationOpts) (bool, error) {
+	v := map[string]string{}
+	v["chat_id"] = strconv.FormatInt(chatId, 10)
+
+	var reqOpts *RequestOpts
+	if opts != nil {
+		reqOpts = opts.RequestOpts
+	}
+
+	r, err := bot.RequestWithContext(ctx, "removeChatVerification", v, nil, reqOpts)
+	if err != nil {
+		return false, err
+	}
+
+	var b bool
+	return b, json.Unmarshal(r, &b)
+}
+
+// RemoveUserVerificationOpts is the set of optional fields for Bot.RemoveUserVerification and Bot.RemoveUserVerificationWithContext.
+type RemoveUserVerificationOpts struct {
+	// RequestOpts are an additional optional field to configure timeouts for individual requests
+	RequestOpts *RequestOpts
+}
+
+// RemoveUserVerification (https://core.telegram.org/bots/api#removeuserverification)
+//
+// Removes verification from a user who is currently verified on behalf of the organization represented by the bot. Returns True on success.
+//   - userId (type int64): Unique identifier of the target user
+//   - opts (type RemoveUserVerificationOpts): All optional parameters.
+func (bot *Bot) RemoveUserVerification(userId int64, opts *RemoveUserVerificationOpts) (bool, error) {
+	return bot.RemoveUserVerificationWithContext(context.Background(), userId, opts)
+}
+
+// RemoveUserVerificationWithContext is the same as Bot.RemoveUserVerification, but with a context.Context parameter
+func (bot *Bot) RemoveUserVerificationWithContext(ctx context.Context, userId int64, opts *RemoveUserVerificationOpts) (bool, error) {
+	v := map[string]string{}
+	v["user_id"] = strconv.FormatInt(userId, 10)
+
+	var reqOpts *RequestOpts
+	if opts != nil {
+		reqOpts = opts.RequestOpts
+	}
+
+	r, err := bot.RequestWithContext(ctx, "removeUserVerification", v, nil, reqOpts)
+	if err != nil {
+		return false, err
+	}
+
+	var b bool
+	return b, json.Unmarshal(r, &b)
+}
+
 // ReopenForumTopicOpts is the set of optional fields for Bot.ReopenForumTopic and Bot.ReopenForumTopicWithContext.
 type ReopenForumTopicOpts struct {
 	// RequestOpts are an additional optional field to configure timeouts for individual requests
@@ -3379,6 +3525,60 @@ func (bot *Bot) RevokeChatInviteLinkWithContext(ctx context.Context, chatId int6
 
 	var c ChatInviteLink
 	return &c, json.Unmarshal(r, &c)
+}
+
+// SavePreparedInlineMessageOpts is the set of optional fields for Bot.SavePreparedInlineMessage and Bot.SavePreparedInlineMessageWithContext.
+type SavePreparedInlineMessageOpts struct {
+	// Pass True if the message can be sent to private chats with users
+	AllowUserChats bool
+	// Pass True if the message can be sent to private chats with bots
+	AllowBotChats bool
+	// Pass True if the message can be sent to group and supergroup chats
+	AllowGroupChats bool
+	// Pass True if the message can be sent to channel chats
+	AllowChannelChats bool
+	// RequestOpts are an additional optional field to configure timeouts for individual requests
+	RequestOpts *RequestOpts
+}
+
+// SavePreparedInlineMessage (https://core.telegram.org/bots/api#savepreparedinlinemessage)
+//
+// Stores a message that can be sent by a user of a Mini App. Returns a PreparedInlineMessage object.
+//   - userId (type int64): Unique identifier of the target user that can use the prepared message
+//   - result (type InlineQueryResult): A JSON-serialized object describing the message to be sent
+//   - opts (type SavePreparedInlineMessageOpts): All optional parameters.
+func (bot *Bot) SavePreparedInlineMessage(userId int64, result InlineQueryResult, opts *SavePreparedInlineMessageOpts) (*PreparedInlineMessage, error) {
+	return bot.SavePreparedInlineMessageWithContext(context.Background(), userId, result, opts)
+}
+
+// SavePreparedInlineMessageWithContext is the same as Bot.SavePreparedInlineMessage, but with a context.Context parameter
+func (bot *Bot) SavePreparedInlineMessageWithContext(ctx context.Context, userId int64, result InlineQueryResult, opts *SavePreparedInlineMessageOpts) (*PreparedInlineMessage, error) {
+	v := map[string]string{}
+	v["user_id"] = strconv.FormatInt(userId, 10)
+	bs, err := json.Marshal(result)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal field result: %w", err)
+	}
+	v["result"] = string(bs)
+	if opts != nil {
+		v["allow_user_chats"] = strconv.FormatBool(opts.AllowUserChats)
+		v["allow_bot_chats"] = strconv.FormatBool(opts.AllowBotChats)
+		v["allow_group_chats"] = strconv.FormatBool(opts.AllowGroupChats)
+		v["allow_channel_chats"] = strconv.FormatBool(opts.AllowChannelChats)
+	}
+
+	var reqOpts *RequestOpts
+	if opts != nil {
+		reqOpts = opts.RequestOpts
+	}
+
+	r, err := bot.RequestWithContext(ctx, "savePreparedInlineMessage", v, nil, reqOpts)
+	if err != nil {
+		return nil, err
+	}
+
+	var p PreparedInlineMessage
+	return &p, json.Unmarshal(r, &p)
 }
 
 // SendAnimationOpts is the set of optional fields for Bot.SendAnimation and Bot.SendAnimationWithContext.
@@ -4018,6 +4218,62 @@ func (bot *Bot) SendGameWithContext(ctx context.Context, chatId int64, gameShort
 
 	var m Message
 	return &m, json.Unmarshal(r, &m)
+}
+
+// SendGiftOpts is the set of optional fields for Bot.SendGift and Bot.SendGiftWithContext.
+type SendGiftOpts struct {
+	// Pass True to pay for the gift upgrade from the bot's balance, thereby making the upgrade free for the receiver
+	PayForUpgrade bool
+	// Text that will be shown along with the gift; 0-255 characters
+	Text string
+	// Mode for parsing entities in the text. See formatting options for more details. Entities other than "bold", "italic", "underline", "strikethrough", "spoiler", and "custom_emoji" are ignored.
+	TextParseMode string
+	// A JSON-serialized list of special entities that appear in the gift text. It can be specified instead of text_parse_mode. Entities other than "bold", "italic", "underline", "strikethrough", "spoiler", and "custom_emoji" are ignored.
+	TextEntities []MessageEntity
+	// RequestOpts are an additional optional field to configure timeouts for individual requests
+	RequestOpts *RequestOpts
+}
+
+// SendGift (https://core.telegram.org/bots/api#sendgift)
+//
+// Sends a gift to the given user. The gift can't be converted to Telegram Stars by the user. Returns True on success.
+//   - userId (type int64): Unique identifier of the target user that will receive the gift
+//   - giftId (type string): Identifier of the gift
+//   - opts (type SendGiftOpts): All optional parameters.
+func (bot *Bot) SendGift(userId int64, giftId string, opts *SendGiftOpts) (bool, error) {
+	return bot.SendGiftWithContext(context.Background(), userId, giftId, opts)
+}
+
+// SendGiftWithContext is the same as Bot.SendGift, but with a context.Context parameter
+func (bot *Bot) SendGiftWithContext(ctx context.Context, userId int64, giftId string, opts *SendGiftOpts) (bool, error) {
+	v := map[string]string{}
+	v["user_id"] = strconv.FormatInt(userId, 10)
+	v["gift_id"] = giftId
+	if opts != nil {
+		v["pay_for_upgrade"] = strconv.FormatBool(opts.PayForUpgrade)
+		v["text"] = opts.Text
+		v["text_parse_mode"] = opts.TextParseMode
+		if opts.TextEntities != nil {
+			bs, err := json.Marshal(opts.TextEntities)
+			if err != nil {
+				return false, fmt.Errorf("failed to marshal field text_entities: %w", err)
+			}
+			v["text_entities"] = string(bs)
+		}
+	}
+
+	var reqOpts *RequestOpts
+	if opts != nil {
+		reqOpts = opts.RequestOpts
+	}
+
+	r, err := bot.RequestWithContext(ctx, "sendGift", v, nil, reqOpts)
+	if err != nil {
+		return false, err
+	}
+
+	var b bool
+	return b, json.Unmarshal(r, &b)
 }
 
 // SendInvoiceOpts is the set of optional fields for Bot.SendInvoice and Bot.SendInvoiceWithContext.
@@ -6177,7 +6433,7 @@ func (bot *Bot) SetStickerPositionInSetWithContext(ctx context.Context, sticker 
 
 // SetStickerSetThumbnailOpts is the set of optional fields for Bot.SetStickerSetThumbnail and Bot.SetStickerSetThumbnailWithContext.
 type SetStickerSetThumbnailOpts struct {
-	// A .WEBP or .PNG image with the thumbnail, must be up to 128 kilobytes in size and have a width and height of exactly 100px, or a .TGS animation with a thumbnail up to 32 kilobytes in size (see https://core.telegram.org/stickers#animation-requirements for animated sticker technical requirements), or a WEBM video with the thumbnail up to 32 kilobytes in size; see https://core.telegram.org/stickers#video-requirements for video sticker technical requirements. Pass a file_id as a String to send a file that already exists on the Telegram servers, pass an HTTP URL as a String for Telegram to get a file from the Internet, or upload a new one using multipart/form-data. More information on Sending Files: https://core.telegram.org/bots/api#sending-files. Animated and video sticker set thumbnails can't be uploaded via HTTP URL. If omitted, then the thumbnail is dropped and the first sticker is used as the thumbnail.
+	// A .WEBP or .PNG image with the thumbnail, must be up to 128 kilobytes in size and have a width and height of exactly 100px, or a .TGS animation with a thumbnail up to 32 kilobytes in size (see https://core.telegram.org/stickers#animation-requirements for animated sticker technical requirements), or a .WEBM video with the thumbnail up to 32 kilobytes in size; see https://core.telegram.org/stickers#video-requirements for video sticker technical requirements. Pass a file_id as a String to send a file that already exists on the Telegram servers, pass an HTTP URL as a String for Telegram to get a file from the Internet, or upload a new one using multipart/form-data. More information on Sending Files: https://core.telegram.org/bots/api#sending-files. Animated and video sticker set thumbnails can't be uploaded via HTTP URL. If omitted, then the thumbnail is dropped and the first sticker is used as the thumbnail.
 	Thumbnail InputFile
 	// RequestOpts are an additional optional field to configure timeouts for individual requests
 	RequestOpts *RequestOpts
@@ -6188,7 +6444,7 @@ type SetStickerSetThumbnailOpts struct {
 // Use this method to set the thumbnail of a regular or mask sticker set. The format of the thumbnail file must match the format of the stickers in the set. Returns True on success.
 //   - name (type string): Sticker set name
 //   - userId (type int64): User identifier of the sticker set owner
-//   - format (type string): Format of the thumbnail, must be one of "static" for a .WEBP or .PNG image, "animated" for a .TGS animation, or "video" for a WEBM video
+//   - format (type string): Format of the thumbnail, must be one of "static" for a .WEBP or .PNG image, "animated" for a .TGS animation, or "video" for a .WEBM video
 //   - opts (type SetStickerSetThumbnailOpts): All optional parameters.
 func (bot *Bot) SetStickerSetThumbnail(name string, userId int64, format string, opts *SetStickerSetThumbnailOpts) (bool, error) {
 	return bot.SetStickerSetThumbnailWithContext(context.Background(), name, userId, format, opts)
@@ -6261,6 +6517,50 @@ func (bot *Bot) SetStickerSetTitleWithContext(ctx context.Context, name string, 
 	return b, json.Unmarshal(r, &b)
 }
 
+// SetUserEmojiStatusOpts is the set of optional fields for Bot.SetUserEmojiStatus and Bot.SetUserEmojiStatusWithContext.
+type SetUserEmojiStatusOpts struct {
+	// Custom emoji identifier of the emoji status to set. Pass an empty string to remove the status.
+	EmojiStatusCustomEmojiId string
+	// Expiration date of the emoji status, if any
+	EmojiStatusExpirationDate int64
+	// RequestOpts are an additional optional field to configure timeouts for individual requests
+	RequestOpts *RequestOpts
+}
+
+// SetUserEmojiStatus (https://core.telegram.org/bots/api#setuseremojistatus)
+//
+// Changes the emoji status for a given user that previously allowed the bot to manage their emoji status via the Mini App method requestEmojiStatusAccess. Returns True on success.
+//   - userId (type int64): Unique identifier of the target user
+//   - opts (type SetUserEmojiStatusOpts): All optional parameters.
+func (bot *Bot) SetUserEmojiStatus(userId int64, opts *SetUserEmojiStatusOpts) (bool, error) {
+	return bot.SetUserEmojiStatusWithContext(context.Background(), userId, opts)
+}
+
+// SetUserEmojiStatusWithContext is the same as Bot.SetUserEmojiStatus, but with a context.Context parameter
+func (bot *Bot) SetUserEmojiStatusWithContext(ctx context.Context, userId int64, opts *SetUserEmojiStatusOpts) (bool, error) {
+	v := map[string]string{}
+	v["user_id"] = strconv.FormatInt(userId, 10)
+	if opts != nil {
+		v["emoji_status_custom_emoji_id"] = opts.EmojiStatusCustomEmojiId
+		if opts.EmojiStatusExpirationDate != 0 {
+			v["emoji_status_expiration_date"] = strconv.FormatInt(opts.EmojiStatusExpirationDate, 10)
+		}
+	}
+
+	var reqOpts *RequestOpts
+	if opts != nil {
+		reqOpts = opts.RequestOpts
+	}
+
+	r, err := bot.RequestWithContext(ctx, "setUserEmojiStatus", v, nil, reqOpts)
+	if err != nil {
+		return false, err
+	}
+
+	var b bool
+	return b, json.Unmarshal(r, &b)
+}
+
 // SetWebhookOpts is the set of optional fields for Bot.SetWebhook and Bot.SetWebhookWithContext.
 type SetWebhookOpts struct {
 	// Upload your public key certificate so that the root certificate in use can be checked. See our self-signed guide for details.
@@ -6281,7 +6581,7 @@ type SetWebhookOpts struct {
 
 // SetWebhook (https://core.telegram.org/bots/api#setwebhook)
 //
-// Use this method to specify a URL and receive incoming updates via an outgoing webhook. Whenever there is an update for the bot, we will send an HTTPS POST request to the specified URL, containing a JSON-serialized Update. In case of an unsuccessful request, we will give up after a reasonable amount of attempts. Returns True on success.
+// Use this method to specify a URL and receive incoming updates via an outgoing webhook. Whenever there is an update for the bot, we will send an HTTPS POST request to the specified URL, containing a JSON-serialized Update. In case of an unsuccessful request (a request with response HTTP status code different from 2XY), we will repeat the request and give up after a reasonable amount of attempts. Returns True on success.
 // If you'd like to make sure that the webhook was set by you, you can specify secret data in the parameter secret_token. If specified, the request will contain a header "X-Telegram-Bot-Api-Secret-Token" with the secret token as content.
 //   - url (type string): HTTPS URL to send updates to. Use an empty string to remove webhook integration
 //   - opts (type SetWebhookOpts): All optional parameters.
@@ -6746,4 +7046,82 @@ func (bot *Bot) UploadStickerFileWithContext(ctx context.Context, userId int64, 
 
 	var f File
 	return &f, json.Unmarshal(r, &f)
+}
+
+// VerifyChatOpts is the set of optional fields for Bot.VerifyChat and Bot.VerifyChatWithContext.
+type VerifyChatOpts struct {
+	// Custom description for the verification; 0-70 characters. Must be empty if the organization isn't allowed to provide a custom verification description.
+	CustomDescription string
+	// RequestOpts are an additional optional field to configure timeouts for individual requests
+	RequestOpts *RequestOpts
+}
+
+// VerifyChat (https://core.telegram.org/bots/api#verifychat)
+//
+// Verifies a chat on behalf of the organization which is represented by the bot. Returns True on success.
+//   - chatId (type int64): Unique identifier for the target chat
+//   - opts (type VerifyChatOpts): All optional parameters.
+func (bot *Bot) VerifyChat(chatId int64, opts *VerifyChatOpts) (bool, error) {
+	return bot.VerifyChatWithContext(context.Background(), chatId, opts)
+}
+
+// VerifyChatWithContext is the same as Bot.VerifyChat, but with a context.Context parameter
+func (bot *Bot) VerifyChatWithContext(ctx context.Context, chatId int64, opts *VerifyChatOpts) (bool, error) {
+	v := map[string]string{}
+	v["chat_id"] = strconv.FormatInt(chatId, 10)
+	if opts != nil {
+		v["custom_description"] = opts.CustomDescription
+	}
+
+	var reqOpts *RequestOpts
+	if opts != nil {
+		reqOpts = opts.RequestOpts
+	}
+
+	r, err := bot.RequestWithContext(ctx, "verifyChat", v, nil, reqOpts)
+	if err != nil {
+		return false, err
+	}
+
+	var b bool
+	return b, json.Unmarshal(r, &b)
+}
+
+// VerifyUserOpts is the set of optional fields for Bot.VerifyUser and Bot.VerifyUserWithContext.
+type VerifyUserOpts struct {
+	// Custom description for the verification; 0-70 characters. Must be empty if the organization isn't allowed to provide a custom verification description.
+	CustomDescription string
+	// RequestOpts are an additional optional field to configure timeouts for individual requests
+	RequestOpts *RequestOpts
+}
+
+// VerifyUser (https://core.telegram.org/bots/api#verifyuser)
+//
+// Verifies a user on behalf of the organization which is represented by the bot. Returns True on success.
+//   - userId (type int64): Unique identifier of the target user
+//   - opts (type VerifyUserOpts): All optional parameters.
+func (bot *Bot) VerifyUser(userId int64, opts *VerifyUserOpts) (bool, error) {
+	return bot.VerifyUserWithContext(context.Background(), userId, opts)
+}
+
+// VerifyUserWithContext is the same as Bot.VerifyUser, but with a context.Context parameter
+func (bot *Bot) VerifyUserWithContext(ctx context.Context, userId int64, opts *VerifyUserOpts) (bool, error) {
+	v := map[string]string{}
+	v["user_id"] = strconv.FormatInt(userId, 10)
+	if opts != nil {
+		v["custom_description"] = opts.CustomDescription
+	}
+
+	var reqOpts *RequestOpts
+	if opts != nil {
+		reqOpts = opts.RequestOpts
+	}
+
+	r, err := bot.RequestWithContext(ctx, "verifyUser", v, nil, reqOpts)
+	if err != nil {
+		return false, err
+	}
+
+	var b bool
+	return b, json.Unmarshal(r, &b)
 }

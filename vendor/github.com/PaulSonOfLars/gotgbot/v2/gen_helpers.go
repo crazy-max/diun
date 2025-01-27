@@ -121,6 +121,11 @@ func (c Chat) PromoteMember(b *Bot, userId int64, opts *PromoteChatMemberOpts) (
 	return b.PromoteChatMember(c.Id, userId, opts)
 }
 
+// RemoveVerification Helper method for Bot.RemoveChatVerification.
+func (c Chat) RemoveVerification(b *Bot, opts *RemoveChatVerificationOpts) (bool, error) {
+	return b.RemoveChatVerification(c.Id, opts)
+}
+
 // RestrictMember Helper method for Bot.RestrictChatMember.
 func (c Chat) RestrictMember(b *Bot, userId int64, permissions ChatPermissions, opts *RestrictChatMemberOpts) (bool, error) {
 	return b.RestrictChatMember(c.Id, userId, permissions, opts)
@@ -197,6 +202,16 @@ func (c Chat) UnpinAllMessages(b *Bot, opts *UnpinAllChatMessagesOpts) (bool, er
 // UnpinMessage Helper method for Bot.UnpinChatMessage.
 func (c Chat) UnpinMessage(b *Bot, opts *UnpinChatMessageOpts) (bool, error) {
 	return b.UnpinChatMessage(c.Id, opts)
+}
+
+// Verify Helper method for Bot.VerifyChat.
+func (c Chat) Verify(b *Bot, opts *VerifyChatOpts) (bool, error) {
+	return b.VerifyChat(c.Id, opts)
+}
+
+// Send Helper method for Bot.SendGift.
+func (g Gift) Send(b *Bot, userId int64, opts *SendGiftOpts) (bool, error) {
+	return b.SendGift(userId, g.Id, opts)
 }
 
 // Copy Helper method for Bot.CopyMessage.
@@ -482,6 +497,11 @@ func (sq ShippingQuery) Answer(b *Bot, ok bool, opts *AnswerShippingQueryOpts) (
 	return b.AnswerShippingQuery(sq.Id, ok, opts)
 }
 
+// EditStarSubscription Helper method for Bot.EditUserStarSubscription.
+func (u User) EditStarSubscription(b *Bot, telegramPaymentChargeId string, isCanceled bool, opts *EditUserStarSubscriptionOpts) (bool, error) {
+	return b.EditUserStarSubscription(u.Id, telegramPaymentChargeId, isCanceled, opts)
+}
+
 // GetChatBoosts Helper method for Bot.GetUserChatBoosts.
 func (u User) GetChatBoosts(b *Bot, chatId int64, opts *GetUserChatBoostsOpts) (*UserChatBoosts, error) {
 	return b.GetUserChatBoosts(chatId, u.Id, opts)
@@ -490,4 +510,19 @@ func (u User) GetChatBoosts(b *Bot, chatId int64, opts *GetUserChatBoostsOpts) (
 // GetProfilePhotos Helper method for Bot.GetUserProfilePhotos.
 func (u User) GetProfilePhotos(b *Bot, opts *GetUserProfilePhotosOpts) (*UserProfilePhotos, error) {
 	return b.GetUserProfilePhotos(u.Id, opts)
+}
+
+// RemoveVerification Helper method for Bot.RemoveUserVerification.
+func (u User) RemoveVerification(b *Bot, opts *RemoveUserVerificationOpts) (bool, error) {
+	return b.RemoveUserVerification(u.Id, opts)
+}
+
+// SetEmojiStatus Helper method for Bot.SetUserEmojiStatus.
+func (u User) SetEmojiStatus(b *Bot, opts *SetUserEmojiStatusOpts) (bool, error) {
+	return b.SetUserEmojiStatus(u.Id, opts)
+}
+
+// Verify Helper method for Bot.VerifyUser.
+func (u User) Verify(b *Bot, opts *VerifyUserOpts) (bool, error) {
+	return b.VerifyUser(u.Id, opts)
 }
