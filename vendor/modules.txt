@@ -25,7 +25,7 @@ github.com/Microsoft/go-winio/internal/fs
 github.com/Microsoft/go-winio/internal/socket
 github.com/Microsoft/go-winio/internal/stringbuffer
 github.com/Microsoft/go-winio/pkg/guid
-# github.com/PaulSonOfLars/gotgbot/v2 v2.0.0-rc.30
+# github.com/PaulSonOfLars/gotgbot/v2 v2.0.0-rc.31
 ## explicit; go 1.19
 github.com/PaulSonOfLars/gotgbot/v2
 # github.com/PuerkitoBio/goquery v1.8.1
