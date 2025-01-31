@@ -189,7 +189,8 @@ for <code>{{ .Entry.Manifest.Platform }}</code> platform.
 							"567891234:25",
 							"891256734:25;12",
 						},
-						TemplateBody: model.NotifTelegramDefaultTemplateBody,
+						TemplateBody:        model.NotifTelegramDefaultTemplateBody,
+						DisableNotification: utl.NewFalse(),
 					},
 					Webhook: &model.NotifWebhook{
 						Endpoint: "http://webhook.foo.com/sd54qad89azd5a",
@@ -351,7 +352,8 @@ func TestLoadEnv(t *testing.T) {
 							"8547439",
 							"1234567",
 						},
-						TemplateBody: model.NotifTelegramDefaultTemplateBody,
+						TemplateBody:        model.NotifTelegramDefaultTemplateBody,
+						DisableNotification: utl.NewFalse(),
 					},
 				},
 				Providers: &model.Providers{
