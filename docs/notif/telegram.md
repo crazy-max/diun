@@ -23,13 +23,14 @@ Multiple chat IDs can be provided in order to deliver notifications to multiple 
           Docker tag {{ .Entry.Image }} which you subscribed to through {{ .Entry.Provider }} provider has been released.
     ```
 
-| Name               | Default                            | Description                                                               |
-|--------------------|------------------------------------|---------------------------------------------------------------------------|
-| `token`            |                                    | Telegram bot token                                                        |
-| `tokenFile`        |                                    | Use content of secret file as Telegram bot token if `token` not defined   |
-| `chatIDs`          |                                    | List of [chat IDs](#chatids-format) to send notifications to              |
-| `chatIDsFile`      |                                    | Use content of secret file as chat IDs if `chatIDs` not defined           |
-| `templateBody`[^1] | See [below](#default-templatebody) | [Notification template](../faq.md#notification-template) for message body |
+| Name                  | Default                            | Description                                                               |
+|-----------------------|------------------------------------|---------------------------------------------------------------------------|
+| `token`               |                                    | Telegram bot token                                                        |
+| `tokenFile`           |                                    | Use content of secret file as Telegram bot token if `token` not defined   |
+| `chatIDs`             |                                    | List of [chat IDs](#chatids-format) to send notifications to              |
+| `chatIDsFile`         |                                    | Use content of secret file as chat IDs if `chatIDs` not defined           |
+| `templateBody`[^1]    | See [below](#default-templatebody) | [Notification template](../faq.md#notification-template) for message body |
+| `disableNotification` |                                    | Send silent message with no sound                                         |
 
 !!! abstract "Environment variables"
     * `DIUN_NOTIF_TELEGRAM_TOKEN`
@@ -37,6 +38,7 @@ Multiple chat IDs can be provided in order to deliver notifications to multiple 
     * `DIUN_NOTIF_TELEGRAM_CHATIDS` (comma separated)
     * `DIUN_NOTIF_TELEGRAM_CHATIDSFILE`
     * `DIUN_NOTIF_TELEGRAM_TEMPLATEBODY`
+    * `DIUN_NOTIF_TELEGRAM_DISABLENOTIFICATION`
 
 !!! example "chat IDs secret file"
     Chat IDs secret file must be a valid JSON array like: `["123456789","987654321","567891234:25","891256734:25;12"]`
