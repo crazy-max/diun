@@ -4,6 +4,10 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+# https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#permissions
+permissions:
+  contents: read
+
 on:
   push:
     branches:
@@ -146,6 +150,9 @@ jobs:
 
   release:
     runs-on: ubuntu-latest
+    permissions:
+      # required to create GitHub release
+      contents: write
     needs:
       - artifact
       - test
@@ -187,6 +194,11 @@ jobs:
 
   image:
     runs-on: ubuntu-latest
+    permissions:
+      # same as global permissions
+      contents: read
+      # required to push to GHCR
+      packages: write
     needs:
       - artifact
       - test

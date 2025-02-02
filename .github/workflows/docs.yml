@@ -4,6 +4,10 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+# https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#permissions
+permissions:
+  contents: read
+
 on:
   workflow_dispatch:
   push:
@@ -18,6 +22,9 @@ env:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    permissions:
+      # required to push to gh-pages
+      contents: write
     steps:
       -
         name: Checkout
