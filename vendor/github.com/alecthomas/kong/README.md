@@ -13,7 +13,8 @@
 - [Command handling](#command-handling)
   - [Switch on the command string](#switch-on-the-command-string)
   - [Attach a `Run(...) error` method to each command](#attach-a-run-error-method-to-each-command)
-- [Hooks: BeforeReset(), BeforeResolve(), BeforeApply(), AfterApply() and the Bind() option](#hooks-beforereset-beforeresolve-beforeapply-afterapply-and-the-bind-option)
+- [Hooks: BeforeReset(), BeforeResolve(), BeforeApply(), AfterApply()](#hooks-beforereset-beforeresolve-beforeapply-afterapply)
+- [The Bind() option](#the-bind-option)
 - [Flags](#flags)
 - [Commands and sub-commands](#commands-and-sub-commands)
 - [Branching positional arguments](#branching-positional-arguments)
@@ -305,16 +306,20 @@ func main() {
 
 ```
 
-## Hooks: BeforeReset(), BeforeResolve(), BeforeApply(), AfterApply() and the Bind() option
+## Hooks: BeforeReset(), BeforeResolve(), BeforeApply(), AfterApply()
 
-If a node in the CLI, or any of its embedded fields, has a `BeforeReset(...) error`, `BeforeResolve
-(...) error`, `BeforeApply(...) error` and/or `AfterApply(...) error` method, those
-methods will be called before values are reset, before validation/assignment,
-and after validation/assignment, respectively.
+If a node in the CLI, or any of its embedded fields, implements a `BeforeReset(...) error`, `BeforeResolve
+(...) error`, `BeforeApply(...) error` and/or `AfterApply(...) error` method, those will be called as Kong
+resets, resolves, validates, and assigns values to the node.
+
+| Hook            | Description                                                                                                 |
+| --------------- | ----------------------------------------------------------------------------------------------------------- |
+| `BeforeReset`   | Invoked before values are reset to their defaults (as defined by the grammar) or to zero values             |
+| `BeforeResolve` | Invoked before resolvers are applied to a node                                                              |
+| `BeforeApply`   | Invoked before the traced command line arguments are applied to the grammar                                 |
+| `AfterApply`    | Invoked after command line arguments are applied to the grammar **and validated**`                          |
 
 The `--help` flag is implemented with a `BeforeReset` hook.
-
-Arguments to hooks are provided via the `Run(...)` method or `Bind(...)` option. `*Kong`, `*Context` and `*Path` are also bound and finally, hooks can also contribute bindings via `kong.Context.Bind()` and `kong.Context.BindTo()`.
 
 eg.
 
@@ -339,6 +344,44 @@ func main() {
 
   // ...
 }
+```
+
+It's also possible to register these hooks with the functional options
+`kong.WithBeforeReset`, `kong.WithBeforeResolve`, `kong.WithBeforeApply`, and
+`kong.WithAfterApply`.
+
+##  The Bind() option
+
+Arguments to hooks are provided via the `Run(...)` method or `Bind(...)` option. `*Kong`, `*Context`, `*Path` and parent commands are also bound and finally, hooks can also contribute bindings via `kong.Context.Bind()` and `kong.Context.BindTo()`.
+
+eg:
+
+```go
+type CLI struct {
+  Debug bool `help:"Enable debug mode."`
+
+  Rm RmCmd `cmd:"" help:"Remove files."`
+  Ls LsCmd `cmd:"" help:"List paths."`
+}
+
+type AuthorName string
+
+// ...
+func (l *LsCmd) Run(cli *CLI) error {
+// use cli.Debug here !!
+  return nil
+}
+
+func (r *RmCmD) Run(author AuthorName) error{
+// use binded author here
+  return nil
+}
+
+func main() {
+  var cli CLI
+  
+  ctx := kong.Parse(&cli, Bind(AuthorName("penguin")))
+  err := ctx.Run()
 ```
 
 ## Flags
@@ -587,8 +630,8 @@ also supports dynamically adding commands via `kong.DynamicCommand()`.
 
 ## Variable interpolation
 
-Kong supports limited variable interpolation into help strings, enum lists and
-default values.
+Kong supports limited variable interpolation into help strings, placeholder strings,
+enum lists and default values.
 
 Variables are in the form:
 

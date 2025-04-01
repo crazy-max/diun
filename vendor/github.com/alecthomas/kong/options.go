@@ -123,6 +123,40 @@ func PostBuild(fn func(*Kong) error) Option {
 	})
 }
 
+// WithBeforeReset registers a hook to run before fields values are reset to their defaults
+// (as specified in the grammar) or to zero values.
+func WithBeforeReset(fn any) Option {
+	return withHook("BeforeReset", fn)
+}
+
+// WithBeforeResolve registers a hook to run before resolvers are applied.
+func WithBeforeResolve(fn any) Option {
+	return withHook("BeforeResolve", fn)
+}
+
+// WithBeforeApply registers a hook to run before command line arguments are applied to the grammar.
+func WithBeforeApply(fn any) Option {
+	return withHook("BeforeApply", fn)
+}
+
+// WithAfterApply registers a hook to run after values are applied to the grammar and validated.
+func WithAfterApply(fn any) Option {
+	return withHook("AfterApply", fn)
+}
+
+// withHook registers a named hook.
+func withHook(name string, fn any) Option {
+	value := reflect.ValueOf(fn)
+	if value.Kind() != reflect.Func {
+		panic(fmt.Errorf("expected function, got %s", value.Type()))
+	}
+
+	return OptionFunc(func(k *Kong) error {
+		k.hooks[name] = append(k.hooks[name], value)
+		return nil
+	})
+}
+
 // Name overrides the application name.
 func Name(name string) Option {
 	return PostBuild(func(k *Kong) error {
@@ -210,15 +244,33 @@ func BindTo(impl, iface any) Option {
 
 // BindToProvider binds an injected value to a provider function.
 //
-// The provider function must have the signature:
+// The provider function must have one of the following signatures:
 //
-//	func() (any, error)
+//	func(...) (T, error)
+//	func(...) T
+//
+// Where arguments to the function are injected by Kong.
 //
 // This is useful when the Run() function of different commands require different values that may
 // not all be initialisable from the main() function.
 func BindToProvider(provider any) Option {
 	return OptionFunc(func(k *Kong) error {
-		return k.bindings.addProvider(provider)
+		return k.bindings.addProvider(provider, false /* singleton */)
+	})
+}
+
+// BindSingletonProvider binds an injected value to a provider function.
+// The provider function must have the signature:
+//
+//	func(...) (T, error)
+//	func(...) T
+//
+// Unlike [BindToProvider], the provider function will only be called
+// at most once, and the result will be cached and reused
+// across multiple recipients of the injected value.
+func BindSingletonProvider(provider any) Option {
+	return OptionFunc(func(k *Kong) error {
+		return k.bindings.addProvider(provider, true /* singleton */)
 	})
 }
 
