@@ -3,6 +3,7 @@ package mail
 import (
 	"crypto/tls"
 	"fmt"
+	"os"
 	"strings"
 	"text/template"
 	"time"
@@ -11,10 +12,10 @@ import (
 	"github.com/crazy-max/diun/v4/internal/msg"
 	"github.com/crazy-max/diun/v4/internal/notif/notifier"
 	"github.com/crazy-max/diun/v4/pkg/utl"
-	"github.com/go-gomail/gomail"
 	hermes "github.com/matcornic/hermes/v2"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
+	"github.com/wneessen/go-mail"
 )
 
 // Client represents an active mail notification object
@@ -99,19 +100,16 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		return errors.Wrap(err, "cannot generate plaintext email")
 	}
 
-	mailMessage := gomail.NewMessage()
-	mailMessage.SetHeader("From", fmt.Sprintf("%s <%s>", c.meta.Name, c.cfg.From))
-	mailMessage.SetHeader("To", c.cfg.To...)
-	mailMessage.SetHeader("Subject", string(title))
-	mailMessage.SetBody("text/plain", textpart)
-	mailMessage.AddAlternative("text/html", htmlpart)
-
-	var tlsConfig *tls.Config
-	if *c.cfg.InsecureSkipVerify {
-		tlsConfig = &tls.Config{
-			InsecureSkipVerify: *c.cfg.InsecureSkipVerify,
-		}
+	mailMessage := mail.NewMsg()
+	if err = mailMessage.FromFormat(c.meta.Name, c.cfg.From); err != nil {
+		return errors.Wrap(err, "cannot set mail FROM address")
 	}
+	if err = mailMessage.To(c.cfg.To...); err != nil {
+		return errors.Wrap(err, "cannot set mail TO address(es)")
+	}
+	mailMessage.Subject(string(title))
+	mailMessage.SetBodyString(mail.TypeTextPlain, textpart)
+	mailMessage.AddAlternativeString(mail.TypeTextHTML, htmlpart)
 
 	username, err := utl.GetSecret(c.cfg.Username, c.cfg.UsernameFile)
 	if err != nil {
@@ -121,16 +119,32 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	if err != nil {
 		log.Warn().Err(err).Msg("Cannot retrieve password secret for mail notifier")
 	}
-
-	dialer := &gomail.Dialer{
-		Host:      c.cfg.Host,
-		Port:      c.cfg.Port,
-		Username:  username,
-		Password:  password,
-		SSL:       *c.cfg.SSL,
-		TLSConfig: tlsConfig,
-		LocalName: c.cfg.LocalName,
+	localname := c.cfg.LocalName
+	if localname == "" {
+		c.cfg.LocalName, err = os.Hostname()
+		if err != nil {
+			log.Warn().Err(err).Msg("Cannot retrieve hostname for local name")
+		}
 	}
 
-	return dialer.DialAndSend(mailMessage)
+	client, err := mail.NewClient(c.cfg.Host,
+		mail.WithSMTPAuth(mail.SMTPAuthAutoDiscover),
+		mail.WithPort(c.cfg.Port),
+		mail.WithUsername(username),
+		mail.WithPassword(password),
+		mail.WithHELO(localname),
+	)
+	if err != nil {
+		log.Warn().Err(err).Msg("Cannot create mail client")
+	}
+	if *c.cfg.SSL {
+		client.SetSSL(*c.cfg.SSL)
+	}
+	if *c.cfg.InsecureSkipVerify {
+		if err = client.SetTLSConfig(&tls.Config{InsecureSkipVerify: true}); err != nil {
+			log.Warn().Err(err).Msg("Cannot set TLS config")
+		}
+	}
+
+	return client.DialAndSend(mailMessage)
 }
