@@ -340,6 +340,10 @@ func handle206Response(streams chan io.ReadCloser, errs chan error, body io.Read
 			}
 			return
 		}
+		if parts >= len(chunks) {
+			errs <- errors.New("too many parts returned by the server")
+			break
+		}
 		s := signalCloseReader{
 			closed: make(chan struct{}),
 			stream: p,
@@ -565,7 +569,7 @@ func (s *dockerImageSource) getOneSignature(ctx context.Context, sigURL *url.URL
 			logrus.Debugf("... got status 404, as expected = end of signatures")
 			return nil, true, nil
 		} else if res.StatusCode != http.StatusOK {
-			return nil, false, fmt.Errorf("reading signature from %s: status %d (%s)", sigURL.Redacted(), res.StatusCode, http.StatusText(res.StatusCode))
+			return nil, false, fmt.Errorf("reading signature from %s: %w", sigURL.Redacted(), newUnexpectedHTTPStatusError(res))
 		}
 
 		contentType := res.Header.Get("Content-Type")
