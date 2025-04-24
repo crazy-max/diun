@@ -5,11 +5,12 @@ const NotifTelegramDefaultTemplateBody = `Docker tag {{ if .Entry.Image.HubLink 
 
 // NotifTelegram holds Telegram notification configuration details
 type NotifTelegram struct {
-	Token        string   `yaml:"token,omitempty" json:"token,omitempty" validate:"omitempty"`
-	TokenFile    string   `yaml:"tokenFile,omitempty" json:"tokenFile,omitempty" validate:"omitempty,file"`
-	ChatIDs      []string `yaml:"chatIDs,omitempty" json:"chatIDs,omitempty" validate:"omitempty"`
-	ChatIDsFile  string   `yaml:"chatIDsFile,omitempty" json:"chatIDsFile,omitempty" validate:"omitempty,file"`
-	TemplateBody string   `yaml:"templateBody,omitempty" json:"templateBody,omitempty" validate:"required"`
+	Token               string   `yaml:"token,omitempty" json:"token,omitempty" validate:"omitempty"`
+	TokenFile           string   `yaml:"tokenFile,omitempty" json:"tokenFile,omitempty" validate:"omitempty,file"`
+	ChatIDs             []string `yaml:"chatIDs,omitempty" json:"chatIDs,omitempty" validate:"omitempty"`
+	ChatIDsFile         string   `yaml:"chatIDsFile,omitempty" json:"chatIDsFile,omitempty" validate:"omitempty,file"`
+	TemplateBody        string   `yaml:"templateBody,omitempty" json:"templateBody,omitempty" validate:"required"`
+	DisableNotification *bool    `yaml:"disableNotification,omitempty" json:"disableNotification,omitempty" validate:"omitempty"`
 }
 
 // GetDefaults gets the default values
