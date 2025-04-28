@@ -69,9 +69,9 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	}
 	content.WriteString(string(body))
 
-	var fields []EmbedField
+	var embeds []Embed
 	if *c.cfg.RenderFields {
-		fields = []EmbedField{
+		fields := []EmbedField{
 			{
 				Name:  "Hostname",
 				Value: c.meta.Hostname,
@@ -99,14 +99,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 				Value: entry.Image.HubLink,
 			})
 		}
-	}
-
-	dataBuf := new(bytes.Buffer)
-	if err := json.NewEncoder(dataBuf).Encode(Message{
-		Content:   content.String(),
-		Username:  c.meta.Name,
-		AvatarURL: c.meta.Logo,
-		Embeds: []Embed{
+		embeds = []Embed{
 			{
 				Author: EmbedAuthor{
 					Name:    c.meta.Name,
@@ -118,7 +111,15 @@ func (c *Client) Send(entry model.NotifEntry) error {
 					Text: fmt.Sprintf("%s © %d %s %s", c.meta.Author, time.Now().Year(), c.meta.Name, c.meta.Version),
 				},
 			},
-		},
+		}
+	}
+
+	dataBuf := new(bytes.Buffer)
+	if err := json.NewEncoder(dataBuf).Encode(Message{
+		Content:   content.String(),
+		Username:  c.meta.Name,
+		AvatarURL: c.meta.Logo,
+		Embeds:    embeds,
 	}); err != nil {
 		return err
 	}
