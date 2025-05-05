@@ -71,6 +71,8 @@ type Kong struct {
 	postBuildOptions []Option
 	embedded         []embedded
 	dynamicCommands  []*dynamicCommand
+
+	hooks map[string][]reflect.Value
 }
 
 // New creates a new Kong parser on grammar.
@@ -84,6 +86,7 @@ func New(grammar any, options ...Option) (*Kong, error) {
 		registry:      NewRegistry().RegisterDefaults(),
 		vars:          Vars{},
 		bindings:      bindings{},
+		hooks:         make(map[string][]reflect.Value),
 		helpFormatter: DefaultHelpValueFormatter,
 		ignoreFields:  make([]*regexp.Regexp, 0),
 		flagNamer: func(s string) string {
@@ -270,6 +273,11 @@ func (k *Kong) interpolateValue(value *Value, vars Vars) (err error) {
 		if len(value.Flag.Envs) != 0 {
 			updatedVars["env"] = value.Flag.Envs[0]
 		}
+
+		value.Flag.PlaceHolder, err = interpolate(value.Flag.PlaceHolder, vars, updatedVars)
+		if err != nil {
+			return fmt.Errorf("placeholder value for %s: %s", value.Summary(), err)
+		}
 	}
 	value.Help, err = interpolate(value.Help, vars, updatedVars)
 	if err != nil {
@@ -283,7 +291,7 @@ func (k *Kong) extraFlags() []*Flag {
 	if k.noDefaultHelp {
 		return nil
 	}
-	var helpTarget helpValue
+	var helpTarget helpFlag
 	value := reflect.ValueOf(&helpTarget).Elem()
 	helpFlag := &Flag{
 		Short: 'h',
@@ -311,11 +319,11 @@ func (k *Kong) extraFlags() []*Flag {
 // invalid one, which will report a normal error).
 func (k *Kong) Parse(args []string) (ctx *Context, err error) {
 	ctx, err = Trace(k, args)
-	if err != nil {
-		return nil, err
+	if err != nil { // Trace is not expected to return an err
+		return nil, &ParseError{error: err, Context: ctx, exitCode: exitUsageError}
 	}
 	if ctx.Error != nil {
-		return nil, &ParseError{error: ctx.Error, Context: ctx}
+		return nil, &ParseError{error: ctx.Error, Context: ctx, exitCode: exitUsageError}
 	}
 	if err = k.applyHook(ctx, "BeforeReset"); err != nil {
 		return nil, &ParseError{error: err, Context: ctx}
@@ -332,11 +340,11 @@ func (k *Kong) Parse(args []string) (ctx *Context, err error) {
 	if err = k.applyHook(ctx, "BeforeApply"); err != nil {
 		return nil, &ParseError{error: err, Context: ctx}
 	}
-	if _, err = ctx.Apply(); err != nil {
+	if _, err = ctx.Apply(); err != nil { // Apply is not expected to return an err
 		return nil, &ParseError{error: err, Context: ctx}
 	}
 	if err = ctx.Validate(); err != nil {
-		return nil, &ParseError{error: err, Context: ctx}
+		return nil, &ParseError{error: err, Context: ctx, exitCode: exitUsageError}
 	}
 	if err = k.applyHook(ctx, "AfterApply"); err != nil {
 		return nil, &ParseError{error: err, Context: ctx}
@@ -361,7 +369,7 @@ func (k *Kong) applyHook(ctx *Context, name string) error {
 		default:
 			panic("unsupported Path")
 		}
-		for _, method := range getMethods(value, name) {
+		for _, method := range k.getMethods(value, name) {
 			binds := k.bindings.clone()
 			binds.add(ctx, trace)
 			binds.add(trace.Node().Vars().CloneWith(k.vars))
@@ -373,6 +381,16 @@ func (k *Kong) applyHook(ctx *Context, name string) error {
 	}
 	// Path[0] will always be the app root.
 	return k.applyHookToDefaultFlags(ctx, ctx.Path[0].Node(), name)
+}
+
+func (k *Kong) getMethods(value reflect.Value, name string) []reflect.Value {
+	return append(
+		// Identify callbacks by reflecting on value
+		getMethods(value, name),
+
+		// Identify callbacks that were registered with a kong.Option
+		k.hooks[name]...,
+	)
 }
 
 // Call hook on any unset flags with default values.
@@ -428,13 +446,15 @@ func (k *Kong) Errorf(format string, args ...any) *Kong {
 	return k
 }
 
-// Fatalf writes a message to Kong.Stderr with the application name prefixed then exits with a non-zero status.
+// Fatalf writes a message to Kong.Stderr with the application name prefixed then exits with status 1.
 func (k *Kong) Fatalf(format string, args ...any) {
 	k.Errorf(format, args...)
 	k.Exit(1)
 }
 
 // FatalIfErrorf terminates with an error message if err != nil.
+// If the error implements the ExitCoder interface, the ExitCode() method is called and
+// the application exits with that status. Otherwise, the application exits with status 1.
 func (k *Kong) FatalIfErrorf(err error, args ...any) {
 	if err == nil {
 		return
@@ -455,7 +475,8 @@ func (k *Kong) FatalIfErrorf(err error, args ...any) {
 			fmt.Fprintln(k.Stdout)
 		}
 	}
-	k.Fatalf("%s", msg)
+	k.Errorf("%s", msg)
+	k.Exit(exitCodeFromError(err))
 }
 
 // LoadConfig from path using the loader configured via Configuration(loader).
