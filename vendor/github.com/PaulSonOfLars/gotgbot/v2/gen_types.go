@@ -21,6 +21,36 @@ var (
 	_ ReplyMarkup = ReplyKeyboardRemove{}
 )
 
+// AcceptedGiftTypes (https://core.telegram.org/bots/api#acceptedgifttypes)
+//
+// This object describes the types of gifts that can be gifted to a user or a chat.
+type AcceptedGiftTypes struct {
+	// True, if unlimited regular gifts are accepted
+	UnlimitedGifts bool `json:"unlimited_gifts"`
+	// True, if limited regular gifts are accepted
+	LimitedGifts bool `json:"limited_gifts"`
+	// True, if unique gifts or gifts that can be upgraded to unique for free are accepted
+	UniqueGifts bool `json:"unique_gifts"`
+	// True, if a Telegram Premium subscription is accepted
+	PremiumSubscription bool `json:"premium_subscription"`
+}
+
+// AffiliateInfo (https://core.telegram.org/bots/api#affiliateinfo)
+//
+// Contains information about the affiliate that received a commission via this transaction.
+type AffiliateInfo struct {
+	// Optional. The bot or the user that received an affiliate commission if it was received by a bot or a user
+	AffiliateUser *User `json:"affiliate_user,omitempty"`
+	// Optional. The chat that received an affiliate commission if it was received by a chat
+	AffiliateChat *Chat `json:"affiliate_chat,omitempty"`
+	// The number of Telegram Stars received by the affiliate for each 1000 Telegram Stars received by the bot from referred users
+	CommissionPerMille int64 `json:"commission_per_mille"`
+	// Integer amount of Telegram Stars received by the affiliate from the transaction, rounded to 0; can be negative for refunds
+	Amount int64 `json:"amount"`
+	// Optional. The number of 1/1000000000 shares of Telegram Stars received by the affiliate; from -999999999 to 999999999; can be negative for refunds
+	NanostarAmount int64 `json:"nanostar_amount,omitempty"`
+}
+
 // Animation (https://core.telegram.org/bots/api#animation)
 //
 // This object represents an animation file (GIF or H.264/MPEG-4 AVC video without sound).
@@ -541,7 +571,7 @@ func (v BackgroundTypeFill) backgroundType() {}
 
 // BackgroundTypePattern (https://core.telegram.org/bots/api#backgroundtypepattern)
 //
-// The background is a PNG or TGV (gzipped subset of SVG with MIME type "application/x-tgwallpattern") pattern to be combined with the background fill chosen by the user.
+// The background is a .PNG or .TGV (gzipped subset of SVG with MIME type "application/x-tgwallpattern") pattern to be combined with the background fill chosen by the user.
 type BackgroundTypePattern struct {
 	// Document with the pattern
 	Document Document `json:"document"`
@@ -1006,6 +1036,40 @@ type BotShortDescription struct {
 	ShortDescription string `json:"short_description"`
 }
 
+// BusinessBotRights (https://core.telegram.org/bots/api#businessbotrights)
+//
+// Represents the rights of a business bot.
+type BusinessBotRights struct {
+	// Optional. True, if the bot can send and edit messages in the private chats that had incoming messages in the last 24 hours
+	CanReply bool `json:"can_reply,omitempty"`
+	// Optional. True, if the bot can mark incoming private messages as read
+	CanReadMessages bool `json:"can_read_messages,omitempty"`
+	// Optional. True, if the bot can delete messages sent by the bot
+	CanDeleteOutgoingMessages bool `json:"can_delete_outgoing_messages,omitempty"`
+	// Optional. True, if the bot can delete all private messages in managed chats
+	CanDeleteAllMessages bool `json:"can_delete_all_messages,omitempty"`
+	// Optional. True, if the bot can edit the first and last name of the business account
+	CanEditName bool `json:"can_edit_name,omitempty"`
+	// Optional. True, if the bot can edit the bio of the business account
+	CanEditBio bool `json:"can_edit_bio,omitempty"`
+	// Optional. True, if the bot can edit the profile photo of the business account
+	CanEditProfilePhoto bool `json:"can_edit_profile_photo,omitempty"`
+	// Optional. True, if the bot can edit the username of the business account
+	CanEditUsername bool `json:"can_edit_username,omitempty"`
+	// Optional. True, if the bot can change the privacy settings pertaining to gifts for the business account
+	CanChangeGiftSettings bool `json:"can_change_gift_settings,omitempty"`
+	// Optional. True, if the bot can view gifts and the amount of Telegram Stars owned by the business account
+	CanViewGiftsAndStars bool `json:"can_view_gifts_and_stars,omitempty"`
+	// Optional. True, if the bot can convert regular gifts owned by the business account to Telegram Stars
+	CanConvertGiftsToStars bool `json:"can_convert_gifts_to_stars,omitempty"`
+	// Optional. True, if the bot can transfer and upgrade gifts owned by the business account
+	CanTransferAndUpgradeGifts bool `json:"can_transfer_and_upgrade_gifts,omitempty"`
+	// Optional. True, if the bot can transfer Telegram Stars received by the business account to its own account, or use them to upgrade and transfer gifts
+	CanTransferStars bool `json:"can_transfer_stars,omitempty"`
+	// Optional. True, if the bot can post, edit and delete stories on behalf of the business account
+	CanManageStories bool `json:"can_manage_stories,omitempty"`
+}
+
 // BusinessConnection (https://core.telegram.org/bots/api#businessconnection)
 //
 // Describes the connection of the bot with a business account.
@@ -1018,8 +1082,8 @@ type BusinessConnection struct {
 	UserChatId int64 `json:"user_chat_id"`
 	// Date the connection was established in Unix time
 	Date int64 `json:"date"`
-	// True, if the bot can act on behalf of the business account in chats that were active in the last 24 hours
-	CanReply bool `json:"can_reply"`
+	// Optional. Rights of the business bot
+	Rights *BusinessBotRights `json:"rights,omitempty"`
 	// True, if the connection is active
 	IsEnabled bool `json:"is_enabled"`
 }
@@ -1620,6 +1684,8 @@ type ChatFullInfo struct {
 	PinnedMessage *Message `json:"pinned_message,omitempty"`
 	// Optional. Default chat member permissions, for groups and supergroups
 	Permissions *ChatPermissions `json:"permissions,omitempty"`
+	// Information about types of gifts that are accepted by the chat or by the corresponding user for private chats
+	AcceptedGiftTypes AcceptedGiftTypes `json:"accepted_gift_types"`
 	// Optional. True, if paid media messages can be sent or forwarded to the channel chat. The field is available only for channel chats.
 	CanSendPaidMedia bool `json:"can_send_paid_media,omitempty"`
 	// Optional. For supergroups, the minimum allowed delay between consecutive messages sent by each unprivileged user; in seconds
@@ -1683,6 +1749,7 @@ func (v *ChatFullInfo) UnmarshalJSON(b []byte) error {
 		InviteLink                         string                `json:"invite_link"`
 		PinnedMessage                      *Message              `json:"pinned_message"`
 		Permissions                        *ChatPermissions      `json:"permissions"`
+		AcceptedGiftTypes                  AcceptedGiftTypes     `json:"accepted_gift_types"`
 		CanSendPaidMedia                   bool                  `json:"can_send_paid_media"`
 		SlowModeDelay                      int64                 `json:"slow_mode_delay"`
 		UnrestrictBoostCount               int64                 `json:"unrestrict_boost_count"`
@@ -1737,6 +1804,7 @@ func (v *ChatFullInfo) UnmarshalJSON(b []byte) error {
 	v.InviteLink = t.InviteLink
 	v.PinnedMessage = t.PinnedMessage
 	v.Permissions = t.Permissions
+	v.AcceptedGiftTypes = t.AcceptedGiftTypes
 	v.CanSendPaidMedia = t.CanSendPaidMedia
 	v.SlowModeDelay = t.SlowModeDelay
 	v.UnrestrictBoostCount = t.UnrestrictBoostCount
@@ -2843,6 +2911,54 @@ type GeneralForumTopicHidden struct{}
 // This object represents a service message about General forum topic unhidden in the chat. Currently holds no information.
 type GeneralForumTopicUnhidden struct{}
 
+// Gift (https://core.telegram.org/bots/api#gift)
+//
+// This object represents a gift that can be sent by the bot.
+type Gift struct {
+	// Unique identifier of the gift
+	Id string `json:"id"`
+	// The sticker that represents the gift
+	Sticker Sticker `json:"sticker"`
+	// The number of Telegram Stars that must be paid to send the sticker
+	StarCount int64 `json:"star_count"`
+	// Optional. The number of Telegram Stars that must be paid to upgrade the gift to a unique one
+	UpgradeStarCount int64 `json:"upgrade_star_count,omitempty"`
+	// Optional. The total number of the gifts of this type that can be sent; for limited gifts only
+	TotalCount int64 `json:"total_count,omitempty"`
+	// Optional. The number of remaining gifts of this type that can be sent; for limited gifts only
+	RemainingCount int64 `json:"remaining_count,omitempty"`
+}
+
+// GiftInfo (https://core.telegram.org/bots/api#giftinfo)
+//
+// Describes a service message about a regular gift that was sent or received.
+type GiftInfo struct {
+	// Information about the gift
+	Gift Gift `json:"gift"`
+	// Optional. Unique identifier of the received gift for the bot; only present for gifts received on behalf of business accounts
+	OwnedGiftId string `json:"owned_gift_id,omitempty"`
+	// Optional. Number of Telegram Stars that can be claimed by the receiver by converting the gift; omitted if conversion to Telegram Stars is impossible
+	ConvertStarCount int64 `json:"convert_star_count,omitempty"`
+	// Optional. Number of Telegram Stars that were prepaid by the sender for the ability to upgrade the gift
+	PrepaidUpgradeStarCount int64 `json:"prepaid_upgrade_star_count,omitempty"`
+	// Optional. True, if the gift can be upgraded to a unique gift
+	CanBeUpgraded bool `json:"can_be_upgraded,omitempty"`
+	// Optional. Text of the message that was added to the gift
+	Text string `json:"text,omitempty"`
+	// Optional. Special entities that appear in the text
+	Entities []MessageEntity `json:"entities,omitempty"`
+	// Optional. True, if the sender and gift text are shown only to the gift receiver; otherwise, everyone will be able to see them
+	IsPrivate bool `json:"is_private,omitempty"`
+}
+
+// Gifts (https://core.telegram.org/bots/api#gifts)
+//
+// This object represent a list of gifts.
+type Gifts struct {
+	// The list of gifts
+	Gifts []Gift `json:"gifts,omitempty"`
+}
+
 // Giveaway (https://core.telegram.org/bots/api#giveaway)
 //
 // This object represents a message about a scheduled giveaway.
@@ -3104,8 +3220,6 @@ type MergedInlineQueryResult struct {
 	VoiceFileId string `json:"voice_file_id,omitempty"`
 	// Optional. URL of the result (Only for article)
 	Url string `json:"url,omitempty"`
-	// Optional. Pass True if you don't want the URL to be shown in the message (Only for article)
-	HideUrl bool `json:"hide_url,omitempty"`
 	// Optional. Url of the thumbnail for the result (Only for article, contact, document, gif, location, mpeg4_gif, photo, venue, video)
 	ThumbnailUrl string `json:"thumbnail_url,omitempty"`
 	// Optional. Thumbnail width (Only for article, contact, document, location, venue)
@@ -3132,7 +3246,7 @@ type MergedInlineQueryResult struct {
 	DocumentUrl string `json:"document_url,omitempty"`
 	// Optional. MIME type of the content of the file, either "application/pdf" or "application/zip" (Only for document, video)
 	MimeType string `json:"mime_type,omitempty"`
-	// Optional. A valid URL for the GIF file. File size must not exceed 1MB (Only for gif)
+	// Optional. A valid URL for the GIF file (Only for gif)
 	GifUrl string `json:"gif_url,omitempty"`
 	// Optional. Width of the GIF (Only for gif)
 	GifWidth int64 `json:"gif_width,omitempty"`
@@ -3154,7 +3268,7 @@ type MergedInlineQueryResult struct {
 	Heading int64 `json:"heading,omitempty"`
 	// Optional. For live locations, a maximum distance for proximity alerts about approaching another chat member, in meters. Must be between 1 and 100000 if specified. (Only for location)
 	ProximityAlertRadius int64 `json:"proximity_alert_radius,omitempty"`
-	// Optional. A valid URL for the MPEG4 file. File size must not exceed 1MB (Only for mpeg4_gif)
+	// Optional. A valid URL for the MPEG4 file (Only for mpeg4_gif)
 	Mpeg4Url string `json:"mpeg4_url,omitempty"`
 	// Optional. Video width (Only for mpeg4_gif)
 	Mpeg4Width int64 `json:"mpeg4_width,omitempty"`
@@ -3224,8 +3338,6 @@ type InlineQueryResultArticle struct {
 	ReplyMarkup *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
 	// Optional. URL of the result
 	Url string `json:"url,omitempty"`
-	// Optional. Pass True if you don't want the URL to be shown in the message
-	HideUrl bool `json:"hide_url,omitempty"`
 	// Optional. Short description of the result
 	Description string `json:"description,omitempty"`
 	// Optional. Url of the thumbnail for the result
@@ -3255,7 +3367,6 @@ func (v InlineQueryResultArticle) MergeInlineQueryResult() MergedInlineQueryResu
 		InputMessageContent: v.InputMessageContent,
 		ReplyMarkup:         v.ReplyMarkup,
 		Url:                 v.Url,
-		HideUrl:             v.HideUrl,
 		Description:         v.Description,
 		ThumbnailUrl:        v.ThumbnailUrl,
 		ThumbnailWidth:      v.ThumbnailWidth,
@@ -4059,7 +4170,7 @@ func (v InlineQueryResultGame) inlineQueryResult() {}
 type InlineQueryResultGif struct {
 	// Unique identifier for this result, 1-64 bytes
 	Id string `json:"id"`
-	// A valid URL for the GIF file. File size must not exceed 1MB
+	// A valid URL for the GIF file
 	GifUrl string `json:"gif_url"`
 	// Optional. Width of the GIF
 	GifWidth int64 `json:"gif_width,omitempty"`
@@ -4218,7 +4329,7 @@ func (v InlineQueryResultLocation) inlineQueryResult() {}
 type InlineQueryResultMpeg4Gif struct {
 	// Unique identifier for this result, 1-64 bytes
 	Id string `json:"id"`
-	// A valid URL for the MPEG4 file. File size must not exceed 1MB
+	// A valid URL for the MPEG4 file
 	Mpeg4Url string `json:"mpeg4_url"`
 	// Optional. Video width
 	Mpeg4Width int64 `json:"mpeg4_width,omitempty"`
@@ -4762,6 +4873,10 @@ type MergedInputMedia struct {
 	Performer string `json:"performer,omitempty"`
 	// Optional. Title of the audio (Only for audio)
 	Title string `json:"title,omitempty"`
+	// Optional. Cover for the video in the message. Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass "attach://<file_attach_name>" to upload a new one using multipart/form-data under <file_attach_name> name. More information on Sending Files: https://core.telegram.org/bots/api#sending-files (Only for video)
+	Cover string `json:"cover,omitempty"`
+	// Optional. Start timestamp for the video in the message (Only for video)
+	StartTimestamp int64 `json:"start_timestamp,omitempty"`
 	// Optional. Pass True if the uploaded video is suitable for streaming (Only for video)
 	SupportsStreaming bool `json:"supports_streaming,omitempty"`
 }
@@ -5103,6 +5218,10 @@ type InputMediaVideo struct {
 	Media InputFileOrString `json:"media"`
 	// Optional. Thumbnail of the file sent; can be ignored if thumbnail generation for the file is supported server-side. The thumbnail should be in JPEG format and less than 200 kB in size. A thumbnail's width and height should not exceed 320. Ignored if the file is not uploaded using multipart/form-data. Thumbnails can't be reused and can be only uploaded as a new file, so you can pass "attach://<file_attach_name>" if the thumbnail was uploaded using multipart/form-data under <file_attach_name>. More information on Sending Files: https://core.telegram.org/bots/api#sending-files
 	Thumbnail InputFile `json:"thumbnail,omitempty"`
+	// Optional. Cover for the video in the message. Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass "attach://<file_attach_name>" to upload a new one using multipart/form-data under <file_attach_name> name. More information on Sending Files: https://core.telegram.org/bots/api#sending-files
+	Cover string `json:"cover,omitempty"`
+	// Optional. Start timestamp for the video in the message
+	StartTimestamp int64 `json:"start_timestamp,omitempty"`
 	// Optional. Caption of the video to be sent, 0-1024 characters after entities parsing
 	Caption string `json:"caption,omitempty"`
 	// Optional. Mode for parsing entities in the video caption. See formatting options for more details.
@@ -5139,6 +5258,8 @@ func (v InputMediaVideo) MergeInputMedia() MergedInputMedia {
 		Type:                  "video",
 		Media:                 v.Media,
 		Thumbnail:             v.Thumbnail,
+		Cover:                 v.Cover,
+		StartTimestamp:        v.StartTimestamp,
 		Caption:               v.Caption,
 		ParseMode:             v.ParseMode,
 		CaptionEntities:       v.CaptionEntities,
@@ -5237,6 +5358,10 @@ type MergedInputPaidMedia struct {
 	Media InputFileOrString `json:"media"`
 	// Optional. Thumbnail of the file sent; can be ignored if thumbnail generation for the file is supported server-side. The thumbnail should be in JPEG format and less than 200 kB in size. A thumbnail's width and height should not exceed 320. Ignored if the file is not uploaded using multipart/form-data. Thumbnails can't be reused and can be only uploaded as a new file, so you can pass "attach://<file_attach_name>" if the thumbnail was uploaded using multipart/form-data under <file_attach_name>. More information on Sending Files: https://core.telegram.org/bots/api#sending-files (Only for video)
 	Thumbnail InputFile `json:"thumbnail,omitempty"`
+	// Optional. Cover for the video in the message. Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass "attach://<file_attach_name>" to upload a new one using multipart/form-data under <file_attach_name> name. More information on Sending Files: https://core.telegram.org/bots/api#sending-files (Only for video)
+	Cover string `json:"cover,omitempty"`
+	// Optional. Start timestamp for the video in the message (Only for video)
+	StartTimestamp int64 `json:"start_timestamp,omitempty"`
 	// Optional. Video width (Only for video)
 	Width int64 `json:"width,omitempty"`
 	// Optional. Video height (Only for video)
@@ -5326,6 +5451,10 @@ type InputPaidMediaVideo struct {
 	Media InputFileOrString `json:"media"`
 	// Optional. Thumbnail of the file sent; can be ignored if thumbnail generation for the file is supported server-side. The thumbnail should be in JPEG format and less than 200 kB in size. A thumbnail's width and height should not exceed 320. Ignored if the file is not uploaded using multipart/form-data. Thumbnails can't be reused and can be only uploaded as a new file, so you can pass "attach://<file_attach_name>" if the thumbnail was uploaded using multipart/form-data under <file_attach_name>. More information on Sending Files: https://core.telegram.org/bots/api#sending-files
 	Thumbnail InputFile `json:"thumbnail,omitempty"`
+	// Optional. Cover for the video in the message. Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass "attach://<file_attach_name>" to upload a new one using multipart/form-data under <file_attach_name> name. More information on Sending Files: https://core.telegram.org/bots/api#sending-files
+	Cover string `json:"cover,omitempty"`
+	// Optional. Start timestamp for the video in the message
+	StartTimestamp int64 `json:"start_timestamp,omitempty"`
 	// Optional. Video width
 	Width int64 `json:"width,omitempty"`
 	// Optional. Video height
@@ -5352,6 +5481,8 @@ func (v InputPaidMediaVideo) MergeInputPaidMedia() MergedInputPaidMedia {
 		Type:              "video",
 		Media:             v.Media,
 		Thumbnail:         v.Thumbnail,
+		Cover:             v.Cover,
+		StartTimestamp:    v.StartTimestamp,
 		Width:             v.Width,
 		Height:            v.Height,
 		Duration:          v.Duration,
@@ -5405,13 +5536,134 @@ type InputPollOption struct {
 	TextEntities []MessageEntity `json:"text_entities,omitempty"`
 }
 
+// InputProfilePhoto (https://core.telegram.org/bots/api#inputprofilephoto)
+//
+// This object describes a profile photo to set. Currently, it can be one of
+//   - InputProfilePhotoStatic
+//   - InputProfilePhotoAnimated
+type InputProfilePhoto interface {
+	GetType() string
+	// MergeInputProfilePhoto returns a MergedInputProfilePhoto struct to simplify working with complex telegram types in a non-generic world.
+	MergeInputProfilePhoto() MergedInputProfilePhoto
+	// inputProfilePhoto exists to avoid external types implementing this interface.
+	inputProfilePhoto()
+}
+
+// Ensure that all subtypes correctly implement the parent interface.
+var (
+	_ InputProfilePhoto = InputProfilePhotoStatic{}
+	_ InputProfilePhoto = InputProfilePhotoAnimated{}
+)
+
+// MergedInputProfilePhoto is a helper type to simplify interactions with the various InputProfilePhoto subtypes.
+type MergedInputProfilePhoto struct {
+	// Type of the profile photo, must be "static"
+	Type string `json:"type"`
+	// Optional. The static profile photo. Profile photos can't be reused and can only be uploaded as a new file, so you can pass "attach://<file_attach_name>" if the photo was uploaded using multipart/form-data under <file_attach_name>. More information on Sending Files: https://core.telegram.org/bots/api#sending-files (Only for static)
+	Photo string `json:"photo,omitempty"`
+	// Optional. The animated profile photo. Profile photos can't be reused and can only be uploaded as a new file, so you can pass "attach://<file_attach_name>" if the photo was uploaded using multipart/form-data under <file_attach_name>. More information on Sending Files: https://core.telegram.org/bots/api#sending-files (Only for animated)
+	Animation string `json:"animation,omitempty"`
+	// Optional. Timestamp in seconds of the frame that will be used as the static profile photo. Defaults to 0.0. (Only for animated)
+	MainFrameTimestamp float64 `json:"main_frame_timestamp,omitempty"`
+}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v MergedInputProfilePhoto) GetType() string {
+	return v.Type
+}
+
+// MergedInputProfilePhoto.inputProfilePhoto is a dummy method to avoid interface implementation.
+func (v MergedInputProfilePhoto) inputProfilePhoto() {}
+
+// MergeInputProfilePhoto returns a MergedInputProfilePhoto struct to simplify working with types in a non-generic world.
+func (v MergedInputProfilePhoto) MergeInputProfilePhoto() MergedInputProfilePhoto {
+	return v
+}
+
+// InputProfilePhotoAnimated (https://core.telegram.org/bots/api#inputprofilephotoanimated)
+//
+// An animated profile photo in the MPEG4 format.
+type InputProfilePhotoAnimated struct {
+	// The animated profile photo. Profile photos can't be reused and can only be uploaded as a new file, so you can pass "attach://<file_attach_name>" if the photo was uploaded using multipart/form-data under <file_attach_name>. More information on Sending Files: https://core.telegram.org/bots/api#sending-files
+	Animation string `json:"animation"`
+	// Optional. Timestamp in seconds of the frame that will be used as the static profile photo. Defaults to 0.0.
+	MainFrameTimestamp float64 `json:"main_frame_timestamp,omitempty"`
+}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v InputProfilePhotoAnimated) GetType() string {
+	return "animated"
+}
+
+// MergeInputProfilePhoto returns a MergedInputProfilePhoto struct to simplify working with types in a non-generic world.
+func (v InputProfilePhotoAnimated) MergeInputProfilePhoto() MergedInputProfilePhoto {
+	return MergedInputProfilePhoto{
+		Type:               "animated",
+		Animation:          v.Animation,
+		MainFrameTimestamp: v.MainFrameTimestamp,
+	}
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v InputProfilePhotoAnimated) MarshalJSON() ([]byte, error) {
+	type alias InputProfilePhotoAnimated
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  "animated",
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// InputProfilePhotoAnimated.inputProfilePhoto is a dummy method to avoid interface implementation.
+func (v InputProfilePhotoAnimated) inputProfilePhoto() {}
+
+// InputProfilePhotoStatic (https://core.telegram.org/bots/api#inputprofilephotostatic)
+//
+// A static profile photo in the .JPG format.
+type InputProfilePhotoStatic struct {
+	// The static profile photo. Profile photos can't be reused and can only be uploaded as a new file, so you can pass "attach://<file_attach_name>" if the photo was uploaded using multipart/form-data under <file_attach_name>. More information on Sending Files: https://core.telegram.org/bots/api#sending-files
+	Photo string `json:"photo"`
+}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v InputProfilePhotoStatic) GetType() string {
+	return "static"
+}
+
+// MergeInputProfilePhoto returns a MergedInputProfilePhoto struct to simplify working with types in a non-generic world.
+func (v InputProfilePhotoStatic) MergeInputProfilePhoto() MergedInputProfilePhoto {
+	return MergedInputProfilePhoto{
+		Type:  "static",
+		Photo: v.Photo,
+	}
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v InputProfilePhotoStatic) MarshalJSON() ([]byte, error) {
+	type alias InputProfilePhotoStatic
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  "static",
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// InputProfilePhotoStatic.inputProfilePhoto is a dummy method to avoid interface implementation.
+func (v InputProfilePhotoStatic) inputProfilePhoto() {}
+
 // InputSticker (https://core.telegram.org/bots/api#inputsticker)
 //
 // This object describes a sticker to be added to a sticker set.
 type InputSticker struct {
-	// The added sticker. Pass a file_id as a String to send a file that already exists on the Telegram servers, pass an HTTP URL as a String for Telegram to get a file from the Internet, upload a new one using multipart/form-data, or pass "attach://<file_attach_name>" to upload a new one using multipart/form-data under <file_attach_name> name. Animated and video stickers can't be uploaded via HTTP URL. More information on Sending Files: https://core.telegram.org/bots/api#sending-files
-	Sticker InputFileOrString `json:"sticker"`
-	// Format of the added sticker, must be one of "static" for a .WEBP or .PNG image, "animated" for a .TGS animation, "video" for a WEBM video
+	// The added sticker. Pass a file_id as a String to send a file that already exists on the Telegram servers, pass an HTTP URL as a String for Telegram to get a file from the Internet, or pass "attach://<file_attach_name>" to upload a new file using multipart/form-data under <file_attach_name> name. Animated and video stickers can't be uploaded via HTTP URL. More information on Sending Files: https://core.telegram.org/bots/api#sending-files
+	Sticker string `json:"sticker"`
+	// Format of the added sticker, must be one of "static" for a .WEBP or .PNG image, "animated" for a .TGS animation, "video" for a .WEBM video
 	Format string `json:"format"`
 	// List of 1-20 emoji associated with the sticker
 	EmojiList []string `json:"emoji_list,omitempty"`
@@ -5421,16 +5673,136 @@ type InputSticker struct {
 	Keywords []string `json:"keywords,omitempty"`
 }
 
-func (v InputSticker) InputParams(mediaName string, data map[string]FileReader) ([]byte, error) {
-	if v.Sticker != nil {
-		err := v.Sticker.Attach(mediaName, data)
-		if err != nil {
-			return nil, fmt.Errorf("failed to attach input file for %s: %w", mediaName, err)
-		}
-	}
-
-	return json.Marshal(v)
+// InputStoryContent (https://core.telegram.org/bots/api#inputstorycontent)
+//
+// This object describes the content of a story to post. Currently, it can be one of
+//   - InputStoryContentPhoto
+//   - InputStoryContentVideo
+type InputStoryContent interface {
+	GetType() string
+	// MergeInputStoryContent returns a MergedInputStoryContent struct to simplify working with complex telegram types in a non-generic world.
+	MergeInputStoryContent() MergedInputStoryContent
+	// inputStoryContent exists to avoid external types implementing this interface.
+	inputStoryContent()
 }
+
+// Ensure that all subtypes correctly implement the parent interface.
+var (
+	_ InputStoryContent = InputStoryContentPhoto{}
+	_ InputStoryContent = InputStoryContentVideo{}
+)
+
+// MergedInputStoryContent is a helper type to simplify interactions with the various InputStoryContent subtypes.
+type MergedInputStoryContent struct {
+	// Type of the content, must be "photo"
+	Type string `json:"type"`
+	// Optional. The photo to post as a story. The photo must be of the size 1080x1920 and must not exceed 10 MB. The photo can't be reused and can only be uploaded as a new file, so you can pass "attach://<file_attach_name>" if the photo was uploaded using multipart/form-data under <file_attach_name>. More information on Sending Files: https://core.telegram.org/bots/api#sending-files (Only for photo)
+	Photo string `json:"photo,omitempty"`
+	// Optional. The video to post as a story. The video must be of the size 720x1280, streamable, encoded with H.265 codec, with key frames added each second in the MPEG4 format, and must not exceed 30 MB. The video can't be reused and can only be uploaded as a new file, so you can pass "attach://<file_attach_name>" if the video was uploaded using multipart/form-data under <file_attach_name>. More information on Sending Files: https://core.telegram.org/bots/api#sending-files (Only for video)
+	Video string `json:"video,omitempty"`
+	// Optional. Precise duration of the video in seconds; 0-60 (Only for video)
+	Duration float64 `json:"duration,omitempty"`
+	// Optional. Timestamp in seconds of the frame that will be used as the static cover for the story. Defaults to 0.0. (Only for video)
+	CoverFrameTimestamp float64 `json:"cover_frame_timestamp,omitempty"`
+	// Optional. Pass True if the video has no sound (Only for video)
+	IsAnimation bool `json:"is_animation,omitempty"`
+}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v MergedInputStoryContent) GetType() string {
+	return v.Type
+}
+
+// MergedInputStoryContent.inputStoryContent is a dummy method to avoid interface implementation.
+func (v MergedInputStoryContent) inputStoryContent() {}
+
+// MergeInputStoryContent returns a MergedInputStoryContent struct to simplify working with types in a non-generic world.
+func (v MergedInputStoryContent) MergeInputStoryContent() MergedInputStoryContent {
+	return v
+}
+
+// InputStoryContentPhoto (https://core.telegram.org/bots/api#inputstorycontentphoto)
+//
+// Describes a photo to post as a story.
+type InputStoryContentPhoto struct {
+	// The photo to post as a story. The photo must be of the size 1080x1920 and must not exceed 10 MB. The photo can't be reused and can only be uploaded as a new file, so you can pass "attach://<file_attach_name>" if the photo was uploaded using multipart/form-data under <file_attach_name>. More information on Sending Files: https://core.telegram.org/bots/api#sending-files
+	Photo string `json:"photo"`
+}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v InputStoryContentPhoto) GetType() string {
+	return "photo"
+}
+
+// MergeInputStoryContent returns a MergedInputStoryContent struct to simplify working with types in a non-generic world.
+func (v InputStoryContentPhoto) MergeInputStoryContent() MergedInputStoryContent {
+	return MergedInputStoryContent{
+		Type:  "photo",
+		Photo: v.Photo,
+	}
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v InputStoryContentPhoto) MarshalJSON() ([]byte, error) {
+	type alias InputStoryContentPhoto
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  "photo",
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// InputStoryContentPhoto.inputStoryContent is a dummy method to avoid interface implementation.
+func (v InputStoryContentPhoto) inputStoryContent() {}
+
+// InputStoryContentVideo (https://core.telegram.org/bots/api#inputstorycontentvideo)
+//
+// Describes a video to post as a story.
+type InputStoryContentVideo struct {
+	// The video to post as a story. The video must be of the size 720x1280, streamable, encoded with H.265 codec, with key frames added each second in the MPEG4 format, and must not exceed 30 MB. The video can't be reused and can only be uploaded as a new file, so you can pass "attach://<file_attach_name>" if the video was uploaded using multipart/form-data under <file_attach_name>. More information on Sending Files: https://core.telegram.org/bots/api#sending-files
+	Video string `json:"video"`
+	// Optional. Precise duration of the video in seconds; 0-60
+	Duration float64 `json:"duration,omitempty"`
+	// Optional. Timestamp in seconds of the frame that will be used as the static cover for the story. Defaults to 0.0.
+	CoverFrameTimestamp float64 `json:"cover_frame_timestamp,omitempty"`
+	// Optional. Pass True if the video has no sound
+	IsAnimation bool `json:"is_animation,omitempty"`
+}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v InputStoryContentVideo) GetType() string {
+	return "video"
+}
+
+// MergeInputStoryContent returns a MergedInputStoryContent struct to simplify working with types in a non-generic world.
+func (v InputStoryContentVideo) MergeInputStoryContent() MergedInputStoryContent {
+	return MergedInputStoryContent{
+		Type:                "video",
+		Video:               v.Video,
+		Duration:            v.Duration,
+		CoverFrameTimestamp: v.CoverFrameTimestamp,
+		IsAnimation:         v.IsAnimation,
+	}
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v InputStoryContentVideo) MarshalJSON() ([]byte, error) {
+	type alias InputStoryContentVideo
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  "video",
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// InputStoryContentVideo.inputStoryContent is a dummy method to avoid interface implementation.
+func (v InputStoryContentVideo) inputStoryContent() {}
 
 // InputTextMessageContent (https://core.telegram.org/bots/api#inputtextmessagecontent)
 //
@@ -5611,6 +5983,20 @@ type Location struct {
 	ProximityAlertRadius int64 `json:"proximity_alert_radius,omitempty"`
 }
 
+// LocationAddress (https://core.telegram.org/bots/api#locationaddress)
+//
+// Describes the physical address of a location.
+type LocationAddress struct {
+	// The two-letter ISO 3166-1 alpha-2 country code of the country where the location is located
+	CountryCode string `json:"country_code"`
+	// Optional. State of the location
+	State string `json:"state,omitempty"`
+	// Optional. City of the location
+	City string `json:"city,omitempty"`
+	// Optional. Street address of the location
+	Street string `json:"street,omitempty"`
+}
+
 // LoginUrl (https://core.telegram.org/bots/api#loginurl)
 //
 // This object represents a parameter of the inline keyboard button used to automatically authorize a user. Serves as a great replacement for the Telegram Login Widget when the user is coming from Telegram. All the user needs to do is tap/click a button and confirm that they want to log in:
@@ -5671,6 +6057,8 @@ type MaybeInaccessibleMessage interface {
 	Forward(b *Bot, chatId int64, opts *ForwardMessageOpts) (*Message, error)
 	// Pin Helper method for Bot.PinChatMessage.
 	Pin(b *Bot, opts *PinChatMessageOpts) (bool, error)
+	// ReadBusiness Helper method for Bot.ReadBusinessMessage.
+	ReadBusiness(b *Bot, businessConnectionId string, opts *ReadBusinessMessageOpts) (bool, error)
 	// SetReaction Helper method for Bot.SetMessageReaction.
 	SetReaction(b *Bot, opts *SetMessageReactionOpts) (bool, error)
 	// StopLiveLocation Helper method for Bot.StopMessageLiveLocation.
@@ -5954,6 +6342,8 @@ type Message struct {
 	MediaGroupId string `json:"media_group_id,omitempty"`
 	// Optional. Signature of the post author for messages in channels, or the custom title of an anonymous group administrator
 	AuthorSignature string `json:"author_signature,omitempty"`
+	// Optional. The number of Telegram Stars that were paid by the sender of the message to send it
+	PaidStarCount int64 `json:"paid_star_count,omitempty"`
 	// Optional. For text messages, the actual UTF-8 text of the message
 	Text string `json:"text,omitempty"`
 	// Optional. For text messages, special entities like usernames, URLs, bot commands, etc. that appear in the text
@@ -6036,6 +6426,10 @@ type Message struct {
 	UsersShared *UsersShared `json:"users_shared,omitempty"`
 	// Optional. Service message: a chat was shared with the bot
 	ChatShared *ChatShared `json:"chat_shared,omitempty"`
+	// Optional. Service message: a regular gift was sent or received
+	Gift *GiftInfo `json:"gift,omitempty"`
+	// Optional. Service message: a unique gift was sent or received
+	UniqueGift *UniqueGiftInfo `json:"unique_gift,omitempty"`
 	// Optional. The domain name of the website on which the user has logged in. More about Telegram Login: https://core.telegram.org/widgets/login
 	ConnectedWebsite string `json:"connected_website,omitempty"`
 	// Optional. Service message: the user allowed the bot to write messages after adding it to the attachment or side menu, launching a Web App from a link, or accepting an explicit request from a Web App sent by the method requestWriteAccess
@@ -6068,6 +6462,8 @@ type Message struct {
 	GiveawayWinners *GiveawayWinners `json:"giveaway_winners,omitempty"`
 	// Optional. Service message: a giveaway without public winners was completed
 	GiveawayCompleted *GiveawayCompleted `json:"giveaway_completed,omitempty"`
+	// Optional. Service message: the price for paid messages has changed in the chat
+	PaidMessagePriceChanged *PaidMessagePriceChanged `json:"paid_message_price_changed,omitempty"`
 	// Optional. Service message: video chat scheduled
 	VideoChatScheduled *VideoChatScheduled `json:"video_chat_scheduled,omitempty"`
 	// Optional. Service message: video chat started
@@ -6108,6 +6504,7 @@ func (v *Message) UnmarshalJSON(b []byte) error {
 		IsFromOffline                 bool                           `json:"is_from_offline"`
 		MediaGroupId                  string                         `json:"media_group_id"`
 		AuthorSignature               string                         `json:"author_signature"`
+		PaidStarCount                 int64                          `json:"paid_star_count"`
 		Text                          string                         `json:"text"`
 		Entities                      []MessageEntity                `json:"entities"`
 		LinkPreviewOptions            *LinkPreviewOptions            `json:"link_preview_options"`
@@ -6149,6 +6546,8 @@ func (v *Message) UnmarshalJSON(b []byte) error {
 		RefundedPayment               *RefundedPayment               `json:"refunded_payment"`
 		UsersShared                   *UsersShared                   `json:"users_shared"`
 		ChatShared                    *ChatShared                    `json:"chat_shared"`
+		Gift                          *GiftInfo                      `json:"gift"`
+		UniqueGift                    *UniqueGiftInfo                `json:"unique_gift"`
 		ConnectedWebsite              string                         `json:"connected_website"`
 		WriteAccessAllowed            *WriteAccessAllowed            `json:"write_access_allowed"`
 		PassportData                  *PassportData                  `json:"passport_data"`
@@ -6165,6 +6564,7 @@ func (v *Message) UnmarshalJSON(b []byte) error {
 		Giveaway                      *Giveaway                      `json:"giveaway"`
 		GiveawayWinners               *GiveawayWinners               `json:"giveaway_winners"`
 		GiveawayCompleted             *GiveawayCompleted             `json:"giveaway_completed"`
+		PaidMessagePriceChanged       *PaidMessagePriceChanged       `json:"paid_message_price_changed"`
 		VideoChatScheduled            *VideoChatScheduled            `json:"video_chat_scheduled"`
 		VideoChatStarted              *VideoChatStarted              `json:"video_chat_started"`
 		VideoChatEnded                *VideoChatEnded                `json:"video_chat_ended"`
@@ -6203,6 +6603,7 @@ func (v *Message) UnmarshalJSON(b []byte) error {
 	v.IsFromOffline = t.IsFromOffline
 	v.MediaGroupId = t.MediaGroupId
 	v.AuthorSignature = t.AuthorSignature
+	v.PaidStarCount = t.PaidStarCount
 	v.Text = t.Text
 	v.Entities = t.Entities
 	v.LinkPreviewOptions = t.LinkPreviewOptions
@@ -6247,6 +6648,8 @@ func (v *Message) UnmarshalJSON(b []byte) error {
 	v.RefundedPayment = t.RefundedPayment
 	v.UsersShared = t.UsersShared
 	v.ChatShared = t.ChatShared
+	v.Gift = t.Gift
+	v.UniqueGift = t.UniqueGift
 	v.ConnectedWebsite = t.ConnectedWebsite
 	v.WriteAccessAllowed = t.WriteAccessAllowed
 	v.PassportData = t.PassportData
@@ -6263,6 +6666,7 @@ func (v *Message) UnmarshalJSON(b []byte) error {
 	v.Giveaway = t.Giveaway
 	v.GiveawayWinners = t.GiveawayWinners
 	v.GiveawayCompleted = t.GiveawayCompleted
+	v.PaidMessagePriceChanged = t.PaidMessagePriceChanged
 	v.VideoChatScheduled = t.VideoChatScheduled
 	v.VideoChatStarted = t.VideoChatStarted
 	v.VideoChatEnded = t.VideoChatEnded
@@ -6738,6 +7142,223 @@ type OrderInfo struct {
 	ShippingAddress *ShippingAddress `json:"shipping_address,omitempty"`
 }
 
+// OwnedGift (https://core.telegram.org/bots/api#ownedgift)
+//
+// This object describes a gift received and owned by a user or a chat. Currently, it can be one of
+//   - OwnedGiftRegular
+//   - OwnedGiftUnique
+type OwnedGift interface {
+	GetType() string
+	GetSendDate() int64
+	// ownedGift exists to avoid external types implementing this interface.
+	ownedGift()
+}
+
+// Ensure that all subtypes correctly implement the parent interface.
+var (
+	_ OwnedGift = OwnedGiftRegular{}
+	_ OwnedGift = OwnedGiftUnique{}
+)
+
+// unmarshalOwnedGiftArray is a JSON unmarshalling helper which allows unmarshalling an array of interfaces
+// using unmarshalOwnedGift.
+func unmarshalOwnedGiftArray(d json.RawMessage) ([]OwnedGift, error) {
+	if len(d) == 0 {
+		return nil, nil
+	}
+
+	var ds []json.RawMessage
+	err := json.Unmarshal(d, &ds)
+	if err != nil {
+		return nil, fmt.Errorf("failed to unmarshal initial OwnedGift JSON into an array: %w", err)
+	}
+
+	var vs []OwnedGift
+	for idx, d := range ds {
+		v, err := unmarshalOwnedGift(d)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal OwnedGift on array item %d: %w", idx, err)
+		}
+		vs = append(vs, v)
+	}
+
+	return vs, nil
+}
+
+// unmarshalOwnedGift is a JSON unmarshal helper to marshal the right structs into a OwnedGift interface
+// based on the Type field.
+func unmarshalOwnedGift(d json.RawMessage) (OwnedGift, error) {
+	if len(d) == 0 {
+		return nil, nil
+	}
+
+	t := struct {
+		Type string
+	}{}
+	err := json.Unmarshal(d, &t)
+	if err != nil {
+		return nil, fmt.Errorf("failed to unmarshal OwnedGift for constant field 'Type': %w", err)
+	}
+
+	switch t.Type {
+	case "regular":
+		s := OwnedGiftRegular{}
+		err := json.Unmarshal(d, &s)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal OwnedGift for value 'regular': %w", err)
+		}
+		return s, nil
+
+	case "unique":
+		s := OwnedGiftUnique{}
+		err := json.Unmarshal(d, &s)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal OwnedGift for value 'unique': %w", err)
+		}
+		return s, nil
+
+	}
+	return nil, fmt.Errorf("unknown interface for OwnedGift with Type %v", t.Type)
+}
+
+// OwnedGiftRegular (https://core.telegram.org/bots/api#ownedgiftregular)
+//
+// Describes a regular gift owned by a user or a chat.
+type OwnedGiftRegular struct {
+	// Information about the regular gift
+	Gift Gift `json:"gift"`
+	// Optional. Unique identifier of the gift for the bot; for gifts received on behalf of business accounts only
+	OwnedGiftId string `json:"owned_gift_id,omitempty"`
+	// Optional. Sender of the gift if it is a known user
+	SenderUser *User `json:"sender_user,omitempty"`
+	// Date the gift was sent in Unix time
+	SendDate int64 `json:"send_date"`
+	// Optional. Text of the message that was added to the gift
+	Text string `json:"text,omitempty"`
+	// Optional. Special entities that appear in the text
+	Entities []MessageEntity `json:"entities,omitempty"`
+	// Optional. True, if the sender and gift text are shown only to the gift receiver; otherwise, everyone will be able to see them
+	IsPrivate bool `json:"is_private,omitempty"`
+	// Optional. True, if the gift is displayed on the account's profile page; for gifts received on behalf of business accounts only
+	IsSaved bool `json:"is_saved,omitempty"`
+	// Optional. True, if the gift can be upgraded to a unique gift; for gifts received on behalf of business accounts only
+	CanBeUpgraded bool `json:"can_be_upgraded,omitempty"`
+	// Optional. True, if the gift was refunded and isn't available anymore
+	WasRefunded bool `json:"was_refunded,omitempty"`
+	// Optional. Number of Telegram Stars that can be claimed by the receiver instead of the gift; omitted if the gift cannot be converted to Telegram Stars
+	ConvertStarCount int64 `json:"convert_star_count,omitempty"`
+	// Optional. Number of Telegram Stars that were paid by the sender for the ability to upgrade the gift
+	PrepaidUpgradeStarCount int64 `json:"prepaid_upgrade_star_count,omitempty"`
+}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v OwnedGiftRegular) GetType() string {
+	return "regular"
+}
+
+// GetSendDate is a helper method to easily access the common fields of an interface.
+func (v OwnedGiftRegular) GetSendDate() int64 {
+	return v.SendDate
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v OwnedGiftRegular) MarshalJSON() ([]byte, error) {
+	type alias OwnedGiftRegular
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  "regular",
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// OwnedGiftRegular.ownedGift is a dummy method to avoid interface implementation.
+func (v OwnedGiftRegular) ownedGift() {}
+
+// OwnedGiftUnique (https://core.telegram.org/bots/api#ownedgiftunique)
+//
+// Describes a unique gift received and owned by a user or a chat.
+type OwnedGiftUnique struct {
+	// Information about the unique gift
+	Gift UniqueGift `json:"gift"`
+	// Optional. Unique identifier of the received gift for the bot; for gifts received on behalf of business accounts only
+	OwnedGiftId string `json:"owned_gift_id,omitempty"`
+	// Optional. Sender of the gift if it is a known user
+	SenderUser *User `json:"sender_user,omitempty"`
+	// Date the gift was sent in Unix time
+	SendDate int64 `json:"send_date"`
+	// Optional. True, if the gift is displayed on the account's profile page; for gifts received on behalf of business accounts only
+	IsSaved bool `json:"is_saved,omitempty"`
+	// Optional. True, if the gift can be transferred to another owner; for gifts received on behalf of business accounts only
+	CanBeTransferred bool `json:"can_be_transferred,omitempty"`
+	// Optional. Number of Telegram Stars that must be paid to transfer the gift; omitted if the bot cannot transfer the gift
+	TransferStarCount int64 `json:"transfer_star_count,omitempty"`
+}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v OwnedGiftUnique) GetType() string {
+	return "unique"
+}
+
+// GetSendDate is a helper method to easily access the common fields of an interface.
+func (v OwnedGiftUnique) GetSendDate() int64 {
+	return v.SendDate
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v OwnedGiftUnique) MarshalJSON() ([]byte, error) {
+	type alias OwnedGiftUnique
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  "unique",
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// OwnedGiftUnique.ownedGift is a dummy method to avoid interface implementation.
+func (v OwnedGiftUnique) ownedGift() {}
+
+// OwnedGifts (https://core.telegram.org/bots/api#ownedgifts)
+//
+// Contains the list of gifts received and owned by a user or a chat.
+type OwnedGifts struct {
+	// The total number of gifts owned by the user or the chat
+	TotalCount int64 `json:"total_count"`
+	// The list of gifts
+	Gifts []OwnedGift `json:"gifts,omitempty"`
+	// Optional. Offset for the next request. If empty, then there are no more results
+	NextOffset string `json:"next_offset,omitempty"`
+}
+
+// UnmarshalJSON is a custom JSON unmarshaller to use the helpers which allow for unmarshalling structs into interfaces.
+func (v *OwnedGifts) UnmarshalJSON(b []byte) error {
+	// All fields in OwnedGifts, with interface fields as json.RawMessage
+	type tmp struct {
+		TotalCount int64           `json:"total_count"`
+		Gifts      json.RawMessage `json:"gifts"`
+		NextOffset string          `json:"next_offset"`
+	}
+	t := tmp{}
+	err := json.Unmarshal(b, &t)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal OwnedGifts JSON into tmp struct: %w", err)
+	}
+
+	v.TotalCount = t.TotalCount
+	v.Gifts, err = unmarshalOwnedGiftArray(t.Gifts)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal custom JSON field Gifts: %w", err)
+	}
+	v.NextOffset = t.NextOffset
+
+	return nil
+}
+
 // PaidMedia (https://core.telegram.org/bots/api#paidmedia)
 //
 // This object describes paid media. Currently, it can be one of
@@ -7015,6 +7636,14 @@ func (v PaidMediaVideo) MarshalJSON() ([]byte, error) {
 
 // PaidMediaVideo.paidMedia is a dummy method to avoid interface implementation.
 func (v PaidMediaVideo) paidMedia() {}
+
+// PaidMessagePriceChanged (https://core.telegram.org/bots/api#paidmessagepricechanged)
+//
+// Describes a service message about a change in the price of paid messages within a chat.
+type PaidMessagePriceChanged struct {
+	// The new number of Telegram Stars that must be paid by non-administrator users of the supergroup chat for each sent message
+	PaidMessageStarCount int64 `json:"paid_message_star_count"`
+}
 
 // PassportData (https://core.telegram.org/bots/api#passportdata)
 //
@@ -7694,6 +8323,16 @@ type PreCheckoutQuery struct {
 	OrderInfo *OrderInfo `json:"order_info,omitempty"`
 }
 
+// PreparedInlineMessage (https://core.telegram.org/bots/api#preparedinlinemessage)
+//
+// Describes an inline message to be sent by a user of a Mini App.
+type PreparedInlineMessage struct {
+	// Unique identifier of the prepared message
+	Id string `json:"id"`
+	// Expiration date of the prepared message, in Unix time. Expired prepared messages can no longer be used
+	ExpirationDate int64 `json:"expiration_date"`
+}
+
 // ProximityAlertTriggered (https://core.telegram.org/bots/api#proximityalerttriggered)
 //
 // This object represents the content of a service message, sent whenever a user in the chat triggers a proximity alert set by another user.
@@ -8325,14 +8964,26 @@ type ShippingQuery struct {
 	ShippingAddress ShippingAddress `json:"shipping_address"`
 }
 
+// StarAmount (https://core.telegram.org/bots/api#staramount)
+//
+// Describes an amount of Telegram Stars.
+type StarAmount struct {
+	// Integer amount of Telegram Stars, rounded to 0; can be negative
+	Amount int64 `json:"amount"`
+	// Optional. The number of 1/1000000000 shares of Telegram Stars; from -999999999 to 999999999; can be negative if and only if amount is non-positive
+	NanostarAmount int64 `json:"nanostar_amount,omitempty"`
+}
+
 // StarTransaction (https://core.telegram.org/bots/api#startransaction)
 //
-// Describes a Telegram Star transaction.
+// Describes a Telegram Star transaction. Note that if the buyer initiates a chargeback with the payment provider from whom they acquired Stars (e.g., Apple, Google) following this transaction, the refunded Stars will be deducted from the bot's balance. This is outside of Telegram's control.
 type StarTransaction struct {
 	// Unique identifier of the transaction. Coincides with the identifier of the original transaction for refund transactions. Coincides with SuccessfulPayment.telegram_payment_charge_id for successful incoming payments from users.
 	Id string `json:"id"`
-	// Number of Telegram Stars transferred by the transaction
+	// Integer amount of Telegram Stars transferred by the transaction
 	Amount int64 `json:"amount"`
+	// Optional. The number of 1/1000000000 shares of Telegram Stars transferred by the transaction; from 0 to 999999999
+	NanostarAmount int64 `json:"nanostar_amount,omitempty"`
 	// Date the transaction was created in Unix time
 	Date int64 `json:"date"`
 	// Optional. Source of an incoming transaction (e.g., a user purchasing goods or services, Fragment refunding a failed withdrawal). Only for incoming transactions
@@ -8345,11 +8996,12 @@ type StarTransaction struct {
 func (v *StarTransaction) UnmarshalJSON(b []byte) error {
 	// All fields in StarTransaction, with interface fields as json.RawMessage
 	type tmp struct {
-		Id       string          `json:"id"`
-		Amount   int64           `json:"amount"`
-		Date     int64           `json:"date"`
-		Source   json.RawMessage `json:"source"`
-		Receiver json.RawMessage `json:"receiver"`
+		Id             string          `json:"id"`
+		Amount         int64           `json:"amount"`
+		NanostarAmount int64           `json:"nanostar_amount"`
+		Date           int64           `json:"date"`
+		Source         json.RawMessage `json:"source"`
+		Receiver       json.RawMessage `json:"receiver"`
 	}
 	t := tmp{}
 	err := json.Unmarshal(b, &t)
@@ -8359,6 +9011,7 @@ func (v *StarTransaction) UnmarshalJSON(b []byte) error {
 
 	v.Id = t.Id
 	v.Amount = t.Amount
+	v.NanostarAmount = t.NanostarAmount
 	v.Date = t.Date
 	v.Source, err = unmarshalTransactionPartner(t.Source)
 	if err != nil {
@@ -8442,9 +9095,306 @@ type Story struct {
 	Id int64 `json:"id"`
 }
 
+// StoryArea (https://core.telegram.org/bots/api#storyarea)
+//
+// Describes a clickable area on a story media.
+type StoryArea struct {
+	// Position of the area
+	Position StoryAreaPosition `json:"position"`
+	// Type of the area
+	Type StoryAreaType `json:"type"`
+}
+
+// StoryAreaPosition (https://core.telegram.org/bots/api#storyareaposition)
+//
+// Describes the position of a clickable area within a story.
+type StoryAreaPosition struct {
+	// The abscissa of the area's center, as a percentage of the media width
+	XPercentage float64 `json:"x_percentage"`
+	// The ordinate of the area's center, as a percentage of the media height
+	YPercentage float64 `json:"y_percentage"`
+	// The width of the area's rectangle, as a percentage of the media width
+	WidthPercentage float64 `json:"width_percentage"`
+	// The height of the area's rectangle, as a percentage of the media height
+	HeightPercentage float64 `json:"height_percentage"`
+	// The clockwise rotation angle of the rectangle, in degrees; 0-360
+	RotationAngle float64 `json:"rotation_angle"`
+	// The radius of the rectangle corner rounding, as a percentage of the media width
+	CornerRadiusPercentage float64 `json:"corner_radius_percentage"`
+}
+
+// StoryAreaType (https://core.telegram.org/bots/api#storyareatype)
+//
+// Describes the type of a clickable area on a story. Currently, it can be one of
+//   - StoryAreaTypeLocation
+//   - StoryAreaTypeSuggestedReaction
+//   - StoryAreaTypeLink
+//   - StoryAreaTypeWeather
+//   - StoryAreaTypeUniqueGift
+type StoryAreaType interface {
+	GetType() string
+	// MergeStoryAreaType returns a MergedStoryAreaType struct to simplify working with complex telegram types in a non-generic world.
+	MergeStoryAreaType() MergedStoryAreaType
+	// storyAreaType exists to avoid external types implementing this interface.
+	storyAreaType()
+}
+
+// Ensure that all subtypes correctly implement the parent interface.
+var (
+	_ StoryAreaType = StoryAreaTypeLocation{}
+	_ StoryAreaType = StoryAreaTypeSuggestedReaction{}
+	_ StoryAreaType = StoryAreaTypeLink{}
+	_ StoryAreaType = StoryAreaTypeWeather{}
+	_ StoryAreaType = StoryAreaTypeUniqueGift{}
+)
+
+// MergedStoryAreaType is a helper type to simplify interactions with the various StoryAreaType subtypes.
+type MergedStoryAreaType struct {
+	// Type of the area
+	Type string `json:"type"`
+	// Optional. Location latitude in degrees (Only for location)
+	Latitude float64 `json:"latitude,omitempty"`
+	// Optional. Location longitude in degrees (Only for location)
+	Longitude float64 `json:"longitude,omitempty"`
+	// Optional. Address of the location (Only for location)
+	Address *LocationAddress `json:"address,omitempty"`
+	// Optional. Type of the reaction (Only for suggested_reaction)
+	ReactionType ReactionType `json:"reaction_type,omitempty"`
+	// Optional. Pass True if the reaction area has a dark background (Only for suggested_reaction)
+	IsDark bool `json:"is_dark,omitempty"`
+	// Optional. Pass True if reaction area corner is flipped (Only for suggested_reaction)
+	IsFlipped bool `json:"is_flipped,omitempty"`
+	// Optional. HTTP or tg:// URL to be opened when the area is clicked (Only for link)
+	Url string `json:"url,omitempty"`
+	// Optional. Temperature, in degree Celsius (Only for weather)
+	Temperature float64 `json:"temperature,omitempty"`
+	// Optional. Emoji representing the weather (Only for weather)
+	Emoji string `json:"emoji,omitempty"`
+	// Optional. A color of the area background in the ARGB format (Only for weather)
+	BackgroundColor int64 `json:"background_color,omitempty"`
+	// Optional. Unique name of the gift (Only for unique_gift)
+	Name string `json:"name,omitempty"`
+}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v MergedStoryAreaType) GetType() string {
+	return v.Type
+}
+
+// MergedStoryAreaType.storyAreaType is a dummy method to avoid interface implementation.
+func (v MergedStoryAreaType) storyAreaType() {}
+
+// MergeStoryAreaType returns a MergedStoryAreaType struct to simplify working with types in a non-generic world.
+func (v MergedStoryAreaType) MergeStoryAreaType() MergedStoryAreaType {
+	return v
+}
+
+// StoryAreaTypeLink (https://core.telegram.org/bots/api#storyareatypelink)
+//
+// Describes a story area pointing to an HTTP or tg:// link. Currently, a story can have up to 3 link areas.
+type StoryAreaTypeLink struct {
+	// HTTP or tg:// URL to be opened when the area is clicked
+	Url string `json:"url"`
+}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v StoryAreaTypeLink) GetType() string {
+	return "link"
+}
+
+// MergeStoryAreaType returns a MergedStoryAreaType struct to simplify working with types in a non-generic world.
+func (v StoryAreaTypeLink) MergeStoryAreaType() MergedStoryAreaType {
+	return MergedStoryAreaType{
+		Type: "link",
+		Url:  v.Url,
+	}
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v StoryAreaTypeLink) MarshalJSON() ([]byte, error) {
+	type alias StoryAreaTypeLink
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  "link",
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// StoryAreaTypeLink.storyAreaType is a dummy method to avoid interface implementation.
+func (v StoryAreaTypeLink) storyAreaType() {}
+
+// StoryAreaTypeLocation (https://core.telegram.org/bots/api#storyareatypelocation)
+//
+// Describes a story area pointing to a location. Currently, a story can have up to 10 location areas.
+type StoryAreaTypeLocation struct {
+	// Location latitude in degrees
+	Latitude float64 `json:"latitude"`
+	// Location longitude in degrees
+	Longitude float64 `json:"longitude"`
+	// Optional. Address of the location
+	Address *LocationAddress `json:"address,omitempty"`
+}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v StoryAreaTypeLocation) GetType() string {
+	return "location"
+}
+
+// MergeStoryAreaType returns a MergedStoryAreaType struct to simplify working with types in a non-generic world.
+func (v StoryAreaTypeLocation) MergeStoryAreaType() MergedStoryAreaType {
+	return MergedStoryAreaType{
+		Type:      "location",
+		Latitude:  v.Latitude,
+		Longitude: v.Longitude,
+		Address:   v.Address,
+	}
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v StoryAreaTypeLocation) MarshalJSON() ([]byte, error) {
+	type alias StoryAreaTypeLocation
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  "location",
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// StoryAreaTypeLocation.storyAreaType is a dummy method to avoid interface implementation.
+func (v StoryAreaTypeLocation) storyAreaType() {}
+
+// StoryAreaTypeSuggestedReaction (https://core.telegram.org/bots/api#storyareatypesuggestedreaction)
+//
+// Describes a story area pointing to a suggested reaction. Currently, a story can have up to 5 suggested reaction areas.
+type StoryAreaTypeSuggestedReaction struct {
+	// Type of the reaction
+	ReactionType ReactionType `json:"reaction_type"`
+	// Optional. Pass True if the reaction area has a dark background
+	IsDark bool `json:"is_dark,omitempty"`
+	// Optional. Pass True if reaction area corner is flipped
+	IsFlipped bool `json:"is_flipped,omitempty"`
+}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v StoryAreaTypeSuggestedReaction) GetType() string {
+	return "suggested_reaction"
+}
+
+// MergeStoryAreaType returns a MergedStoryAreaType struct to simplify working with types in a non-generic world.
+func (v StoryAreaTypeSuggestedReaction) MergeStoryAreaType() MergedStoryAreaType {
+	return MergedStoryAreaType{
+		Type:         "suggested_reaction",
+		ReactionType: v.ReactionType,
+		IsDark:       v.IsDark,
+		IsFlipped:    v.IsFlipped,
+	}
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v StoryAreaTypeSuggestedReaction) MarshalJSON() ([]byte, error) {
+	type alias StoryAreaTypeSuggestedReaction
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  "suggested_reaction",
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// StoryAreaTypeSuggestedReaction.storyAreaType is a dummy method to avoid interface implementation.
+func (v StoryAreaTypeSuggestedReaction) storyAreaType() {}
+
+// StoryAreaTypeUniqueGift (https://core.telegram.org/bots/api#storyareatypeuniquegift)
+//
+// Describes a story area pointing to a unique gift. Currently, a story can have at most 1 unique gift area.
+type StoryAreaTypeUniqueGift struct {
+	// Unique name of the gift
+	Name string `json:"name"`
+}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v StoryAreaTypeUniqueGift) GetType() string {
+	return "unique_gift"
+}
+
+// MergeStoryAreaType returns a MergedStoryAreaType struct to simplify working with types in a non-generic world.
+func (v StoryAreaTypeUniqueGift) MergeStoryAreaType() MergedStoryAreaType {
+	return MergedStoryAreaType{
+		Type: "unique_gift",
+		Name: v.Name,
+	}
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v StoryAreaTypeUniqueGift) MarshalJSON() ([]byte, error) {
+	type alias StoryAreaTypeUniqueGift
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  "unique_gift",
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// StoryAreaTypeUniqueGift.storyAreaType is a dummy method to avoid interface implementation.
+func (v StoryAreaTypeUniqueGift) storyAreaType() {}
+
+// StoryAreaTypeWeather (https://core.telegram.org/bots/api#storyareatypeweather)
+//
+// Describes a story area containing weather information. Currently, a story can have up to 3 weather areas.
+type StoryAreaTypeWeather struct {
+	// Temperature, in degree Celsius
+	Temperature float64 `json:"temperature"`
+	// Emoji representing the weather
+	Emoji string `json:"emoji"`
+	// A color of the area background in the ARGB format
+	BackgroundColor int64 `json:"background_color"`
+}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v StoryAreaTypeWeather) GetType() string {
+	return "weather"
+}
+
+// MergeStoryAreaType returns a MergedStoryAreaType struct to simplify working with types in a non-generic world.
+func (v StoryAreaTypeWeather) MergeStoryAreaType() MergedStoryAreaType {
+	return MergedStoryAreaType{
+		Type:            "weather",
+		Temperature:     v.Temperature,
+		Emoji:           v.Emoji,
+		BackgroundColor: v.BackgroundColor,
+	}
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v StoryAreaTypeWeather) MarshalJSON() ([]byte, error) {
+	type alias StoryAreaTypeWeather
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  "weather",
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// StoryAreaTypeWeather.storyAreaType is a dummy method to avoid interface implementation.
+func (v StoryAreaTypeWeather) storyAreaType() {}
+
 // SuccessfulPayment (https://core.telegram.org/bots/api#successfulpayment)
 //
-// This object contains basic information about a successful payment.
+// This object contains basic information about a successful payment. Note that if the buyer initiates a chargeback with the relevant payment provider following this transaction, the funds may be debited from your balance. This is outside of Telegram's control.
 type SuccessfulPayment struct {
 	// Three-letter ISO 4217 currency code, or "XTR" for payments in Telegram Stars
 	Currency string `json:"currency"`
@@ -8452,6 +9402,12 @@ type SuccessfulPayment struct {
 	TotalAmount int64 `json:"total_amount"`
 	// Bot-specified invoice payload
 	InvoicePayload string `json:"invoice_payload"`
+	// Optional. Expiration date of the subscription, in Unix time; for recurring payments only
+	SubscriptionExpirationDate int64 `json:"subscription_expiration_date,omitempty"`
+	// Optional. True, if the payment is a recurring payment for a subscription
+	IsRecurring bool `json:"is_recurring,omitempty"`
+	// Optional. True, if the payment is the first payment for a subscription
+	IsFirstRecurring bool `json:"is_first_recurring,omitempty"`
 	// Optional. Identifier of the shipping option chosen by the user
 	ShippingOptionId string `json:"shipping_option_id,omitempty"`
 	// Optional. Order information provided by the user
@@ -8496,6 +9452,8 @@ type TextQuote struct {
 //
 // This object describes the source of a transaction, or its recipient for outgoing transactions. Currently, it can be one of
 //   - TransactionPartnerUser
+//   - TransactionPartnerChat
+//   - TransactionPartnerAffiliateProgram
 //   - TransactionPartnerFragment
 //   - TransactionPartnerTelegramAds
 //   - TransactionPartnerTelegramApi
@@ -8511,6 +9469,8 @@ type TransactionPartner interface {
 // Ensure that all subtypes correctly implement the parent interface.
 var (
 	_ TransactionPartner = TransactionPartnerUser{}
+	_ TransactionPartner = TransactionPartnerChat{}
+	_ TransactionPartner = TransactionPartnerAffiliateProgram{}
 	_ TransactionPartner = TransactionPartnerFragment{}
 	_ TransactionPartner = TransactionPartnerTelegramAds{}
 	_ TransactionPartner = TransactionPartnerTelegramApi{}
@@ -8521,14 +9481,30 @@ var (
 type MergedTransactionPartner struct {
 	// Type of the transaction partner
 	Type string `json:"type"`
+	// Optional. Type of the transaction, currently one of "invoice_payment" for payments via invoices, "paid_media_payment" for payments for paid media, "gift_purchase" for gifts sent by the bot, "premium_purchase" for Telegram Premium subscriptions gifted by the bot, "business_account_transfer" for direct transfers from managed business accounts (Only for user)
+	TransactionType string `json:"transaction_type,omitempty"`
 	// Optional. Information about the user (Only for user)
 	User *User `json:"user,omitempty"`
-	// Optional. Bot-specified invoice payload (Only for user)
+	// Optional. Information about the affiliate that received a commission via this transaction. Can be available only for "invoice_payment" and "paid_media_payment" transactions. (Only for user)
+	Affiliate *AffiliateInfo `json:"affiliate,omitempty"`
+	// Optional. Bot-specified invoice payload. Can be available only for "invoice_payment" transactions. (Only for user)
 	InvoicePayload string `json:"invoice_payload,omitempty"`
-	// Optional. Information about the paid media bought by the user (Only for user)
+	// Optional. The duration of the paid subscription. Can be available only for "invoice_payment" transactions. (Only for user)
+	SubscriptionPeriod int64 `json:"subscription_period,omitempty"`
+	// Optional. Information about the paid media bought by the user; for "paid_media_payment" transactions only (Only for user)
 	PaidMedia []PaidMedia `json:"paid_media,omitempty"`
-	// Optional. Bot-specified paid media payload (Only for user)
+	// Optional. Bot-specified paid media payload. Can be available only for "paid_media_payment" transactions. (Only for user)
 	PaidMediaPayload string `json:"paid_media_payload,omitempty"`
+	// Optional. The gift sent to the user by the bot; for "gift_purchase" transactions only (Only for user, chat)
+	Gift *Gift `json:"gift,omitempty"`
+	// Optional. Number of months the gifted Telegram Premium subscription will be active for; for "premium_purchase" transactions only (Only for user)
+	PremiumSubscriptionDuration int64 `json:"premium_subscription_duration,omitempty"`
+	// Optional. Information about the chat (Only for chat)
+	Chat *Chat `json:"chat,omitempty"`
+	// Optional. Information about the bot that sponsored the affiliate program (Only for affiliate_program)
+	SponsorUser *User `json:"sponsor_user,omitempty"`
+	// Optional. The number of Telegram Stars received by the bot for each 1000 Telegram Stars received by the affiliate program sponsor from referred users (Only for affiliate_program)
+	CommissionPerMille int64 `json:"commission_per_mille,omitempty"`
 	// Optional. State of the transaction if the transaction is outgoing (Only for fragment)
 	WithdrawalState RevenueWithdrawalState `json:"withdrawal_state,omitempty"`
 	// Optional. The number of successful requests that exceeded regular limits and were therefore billed (Only for telegram_api)
@@ -8597,6 +9573,22 @@ func unmarshalTransactionPartner(d json.RawMessage) (TransactionPartner, error) 
 		}
 		return s, nil
 
+	case "chat":
+		s := TransactionPartnerChat{}
+		err := json.Unmarshal(d, &s)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal TransactionPartner for value 'chat': %w", err)
+		}
+		return s, nil
+
+	case "affiliate_program":
+		s := TransactionPartnerAffiliateProgram{}
+		err := json.Unmarshal(d, &s)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal TransactionPartner for value 'affiliate_program': %w", err)
+		}
+		return s, nil
+
 	case "fragment":
 		s := TransactionPartnerFragment{}
 		err := json.Unmarshal(d, &s)
@@ -8632,6 +9624,86 @@ func unmarshalTransactionPartner(d json.RawMessage) (TransactionPartner, error) 
 	}
 	return nil, fmt.Errorf("unknown interface for TransactionPartner with Type %v", t.Type)
 }
+
+// TransactionPartnerAffiliateProgram (https://core.telegram.org/bots/api#transactionpartneraffiliateprogram)
+//
+// Describes the affiliate program that issued the affiliate commission received via this transaction.
+type TransactionPartnerAffiliateProgram struct {
+	// Optional. Information about the bot that sponsored the affiliate program
+	SponsorUser *User `json:"sponsor_user,omitempty"`
+	// The number of Telegram Stars received by the bot for each 1000 Telegram Stars received by the affiliate program sponsor from referred users
+	CommissionPerMille int64 `json:"commission_per_mille"`
+}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v TransactionPartnerAffiliateProgram) GetType() string {
+	return "affiliate_program"
+}
+
+// MergeTransactionPartner returns a MergedTransactionPartner struct to simplify working with types in a non-generic world.
+func (v TransactionPartnerAffiliateProgram) MergeTransactionPartner() MergedTransactionPartner {
+	return MergedTransactionPartner{
+		Type:               "affiliate_program",
+		SponsorUser:        v.SponsorUser,
+		CommissionPerMille: v.CommissionPerMille,
+	}
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v TransactionPartnerAffiliateProgram) MarshalJSON() ([]byte, error) {
+	type alias TransactionPartnerAffiliateProgram
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  "affiliate_program",
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// TransactionPartnerAffiliateProgram.transactionPartner is a dummy method to avoid interface implementation.
+func (v TransactionPartnerAffiliateProgram) transactionPartner() {}
+
+// TransactionPartnerChat (https://core.telegram.org/bots/api#transactionpartnerchat)
+//
+// Describes a transaction with a chat.
+type TransactionPartnerChat struct {
+	// Information about the chat
+	Chat Chat `json:"chat"`
+	// Optional. The gift sent to the chat by the bot
+	Gift *Gift `json:"gift,omitempty"`
+}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v TransactionPartnerChat) GetType() string {
+	return "chat"
+}
+
+// MergeTransactionPartner returns a MergedTransactionPartner struct to simplify working with types in a non-generic world.
+func (v TransactionPartnerChat) MergeTransactionPartner() MergedTransactionPartner {
+	return MergedTransactionPartner{
+		Type: "chat",
+		Chat: &v.Chat,
+		Gift: v.Gift,
+	}
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v TransactionPartnerChat) MarshalJSON() ([]byte, error) {
+	type alias TransactionPartnerChat
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  "chat",
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// TransactionPartnerChat.transactionPartner is a dummy method to avoid interface implementation.
+func (v TransactionPartnerChat) transactionPartner() {}
 
 // TransactionPartnerFragment (https://core.telegram.org/bots/api#transactionpartnerfragment)
 //
@@ -8797,24 +9869,39 @@ func (v TransactionPartnerTelegramApi) transactionPartner() {}
 //
 // Describes a transaction with a user.
 type TransactionPartnerUser struct {
+	// Type of the transaction, currently one of "invoice_payment" for payments via invoices, "paid_media_payment" for payments for paid media, "gift_purchase" for gifts sent by the bot, "premium_purchase" for Telegram Premium subscriptions gifted by the bot, "business_account_transfer" for direct transfers from managed business accounts
+	TransactionType string `json:"transaction_type"`
 	// Information about the user
 	User User `json:"user"`
-	// Optional. Bot-specified invoice payload
+	// Optional. Information about the affiliate that received a commission via this transaction. Can be available only for "invoice_payment" and "paid_media_payment" transactions.
+	Affiliate *AffiliateInfo `json:"affiliate,omitempty"`
+	// Optional. Bot-specified invoice payload. Can be available only for "invoice_payment" transactions.
 	InvoicePayload string `json:"invoice_payload,omitempty"`
-	// Optional. Information about the paid media bought by the user
+	// Optional. The duration of the paid subscription. Can be available only for "invoice_payment" transactions.
+	SubscriptionPeriod int64 `json:"subscription_period,omitempty"`
+	// Optional. Information about the paid media bought by the user; for "paid_media_payment" transactions only
 	PaidMedia []PaidMedia `json:"paid_media,omitempty"`
-	// Optional. Bot-specified paid media payload
+	// Optional. Bot-specified paid media payload. Can be available only for "paid_media_payment" transactions.
 	PaidMediaPayload string `json:"paid_media_payload,omitempty"`
+	// Optional. The gift sent to the user by the bot; for "gift_purchase" transactions only
+	Gift *Gift `json:"gift,omitempty"`
+	// Optional. Number of months the gifted Telegram Premium subscription will be active for; for "premium_purchase" transactions only
+	PremiumSubscriptionDuration int64 `json:"premium_subscription_duration,omitempty"`
 }
 
 // UnmarshalJSON is a custom JSON unmarshaller to use the helpers which allow for unmarshalling structs into interfaces.
 func (v *TransactionPartnerUser) UnmarshalJSON(b []byte) error {
 	// All fields in TransactionPartnerUser, with interface fields as json.RawMessage
 	type tmp struct {
-		User             User            `json:"user"`
-		InvoicePayload   string          `json:"invoice_payload"`
-		PaidMedia        json.RawMessage `json:"paid_media"`
-		PaidMediaPayload string          `json:"paid_media_payload"`
+		TransactionType             string          `json:"transaction_type"`
+		User                        User            `json:"user"`
+		Affiliate                   *AffiliateInfo  `json:"affiliate"`
+		InvoicePayload              string          `json:"invoice_payload"`
+		SubscriptionPeriod          int64           `json:"subscription_period"`
+		PaidMedia                   json.RawMessage `json:"paid_media"`
+		PaidMediaPayload            string          `json:"paid_media_payload"`
+		Gift                        *Gift           `json:"gift"`
+		PremiumSubscriptionDuration int64           `json:"premium_subscription_duration"`
 	}
 	t := tmp{}
 	err := json.Unmarshal(b, &t)
@@ -8822,13 +9909,18 @@ func (v *TransactionPartnerUser) UnmarshalJSON(b []byte) error {
 		return fmt.Errorf("failed to unmarshal TransactionPartnerUser JSON into tmp struct: %w", err)
 	}
 
+	v.TransactionType = t.TransactionType
 	v.User = t.User
+	v.Affiliate = t.Affiliate
 	v.InvoicePayload = t.InvoicePayload
+	v.SubscriptionPeriod = t.SubscriptionPeriod
 	v.PaidMedia, err = unmarshalPaidMediaArray(t.PaidMedia)
 	if err != nil {
 		return fmt.Errorf("failed to unmarshal custom JSON field PaidMedia: %w", err)
 	}
 	v.PaidMediaPayload = t.PaidMediaPayload
+	v.Gift = t.Gift
+	v.PremiumSubscriptionDuration = t.PremiumSubscriptionDuration
 
 	return nil
 }
@@ -8841,11 +9933,16 @@ func (v TransactionPartnerUser) GetType() string {
 // MergeTransactionPartner returns a MergedTransactionPartner struct to simplify working with types in a non-generic world.
 func (v TransactionPartnerUser) MergeTransactionPartner() MergedTransactionPartner {
 	return MergedTransactionPartner{
-		Type:             "user",
-		User:             &v.User,
-		InvoicePayload:   v.InvoicePayload,
-		PaidMedia:        v.PaidMedia,
-		PaidMediaPayload: v.PaidMediaPayload,
+		Type:                        "user",
+		TransactionType:             v.TransactionType,
+		User:                        &v.User,
+		Affiliate:                   v.Affiliate,
+		InvoicePayload:              v.InvoicePayload,
+		SubscriptionPeriod:          v.SubscriptionPeriod,
+		PaidMedia:                   v.PaidMedia,
+		PaidMediaPayload:            v.PaidMediaPayload,
+		Gift:                        v.Gift,
+		PremiumSubscriptionDuration: v.PremiumSubscriptionDuration,
 	}
 }
 
@@ -8864,6 +9961,88 @@ func (v TransactionPartnerUser) MarshalJSON() ([]byte, error) {
 
 // TransactionPartnerUser.transactionPartner is a dummy method to avoid interface implementation.
 func (v TransactionPartnerUser) transactionPartner() {}
+
+// UniqueGift (https://core.telegram.org/bots/api#uniquegift)
+//
+// This object describes a unique gift that was upgraded from a regular gift.
+type UniqueGift struct {
+	// Human-readable name of the regular gift from which this unique gift was upgraded
+	BaseName string `json:"base_name"`
+	// Unique name of the gift. This name can be used in https://t.me/nft/... links and story areas
+	Name string `json:"name"`
+	// Unique number of the upgraded gift among gifts upgraded from the same regular gift
+	Number int64 `json:"number"`
+	// Model of the gift
+	Model UniqueGiftModel `json:"model"`
+	// Symbol of the gift
+	Symbol UniqueGiftSymbol `json:"symbol"`
+	// Backdrop of the gift
+	Backdrop UniqueGiftBackdrop `json:"backdrop"`
+}
+
+// UniqueGiftBackdrop (https://core.telegram.org/bots/api#uniquegiftbackdrop)
+//
+// This object describes the backdrop of a unique gift.
+type UniqueGiftBackdrop struct {
+	// Name of the backdrop
+	Name string `json:"name"`
+	// Colors of the backdrop
+	Colors UniqueGiftBackdropColors `json:"colors"`
+	// The number of unique gifts that receive this backdrop for every 1000 gifts upgraded
+	RarityPerMille int64 `json:"rarity_per_mille"`
+}
+
+// UniqueGiftBackdropColors (https://core.telegram.org/bots/api#uniquegiftbackdropcolors)
+//
+// This object describes the colors of the backdrop of a unique gift.
+type UniqueGiftBackdropColors struct {
+	// The color in the center of the backdrop in RGB format
+	CenterColor int64 `json:"center_color"`
+	// The color on the edges of the backdrop in RGB format
+	EdgeColor int64 `json:"edge_color"`
+	// The color to be applied to the symbol in RGB format
+	SymbolColor int64 `json:"symbol_color"`
+	// The color for the text on the backdrop in RGB format
+	TextColor int64 `json:"text_color"`
+}
+
+// UniqueGiftInfo (https://core.telegram.org/bots/api#uniquegiftinfo)
+//
+// Describes a service message about a unique gift that was sent or received.
+type UniqueGiftInfo struct {
+	// Information about the gift
+	Gift UniqueGift `json:"gift"`
+	// Origin of the gift. Currently, either "upgrade" or "transfer"
+	Origin string `json:"origin"`
+	// Optional. Unique identifier of the received gift for the bot; only present for gifts received on behalf of business accounts
+	OwnedGiftId string `json:"owned_gift_id,omitempty"`
+	// Optional. Number of Telegram Stars that must be paid to transfer the gift; omitted if the bot cannot transfer the gift
+	TransferStarCount int64 `json:"transfer_star_count,omitempty"`
+}
+
+// UniqueGiftModel (https://core.telegram.org/bots/api#uniquegiftmodel)
+//
+// This object describes the model of a unique gift.
+type UniqueGiftModel struct {
+	// Name of the model
+	Name string `json:"name"`
+	// The sticker that represents the unique gift
+	Sticker Sticker `json:"sticker"`
+	// The number of unique gifts that receive this model for every 1000 gifts upgraded
+	RarityPerMille int64 `json:"rarity_per_mille"`
+}
+
+// UniqueGiftSymbol (https://core.telegram.org/bots/api#uniquegiftsymbol)
+//
+// This object describes the symbol shown on the pattern of a unique gift.
+type UniqueGiftSymbol struct {
+	// Name of the symbol
+	Name string `json:"name"`
+	// The sticker that represents the unique gift
+	Sticker Sticker `json:"sticker"`
+	// The number of unique gifts that receive this model for every 1000 gifts upgraded
+	RarityPerMille int64 `json:"rarity_per_mille"`
+}
 
 // Update (https://core.telegram.org/bots/api#update)
 //
@@ -9016,6 +10195,10 @@ type Video struct {
 	Duration int64 `json:"duration"`
 	// Optional. Video thumbnail
 	Thumbnail *PhotoSize `json:"thumbnail,omitempty"`
+	// Optional. Available sizes of the cover of the video in the message
+	Cover []PhotoSize `json:"cover,omitempty"`
+	// Optional. Timestamp in seconds from which the video will play in the message
+	StartTimestamp int64 `json:"start_timestamp,omitempty"`
 	// Optional. Original filename as defined by the sender
 	FileName string `json:"file_name,omitempty"`
 	// Optional. MIME type of the file as defined by the sender
