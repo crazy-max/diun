@@ -3,6 +3,7 @@ package private
 import (
 	"context"
 	"io"
+	"time"
 
 	"github.com/containers/image/v5/docker/reference"
 	"github.com/containers/image/v5/internal/blobinfocache"
@@ -10,6 +11,7 @@ import (
 	compression "github.com/containers/image/v5/pkg/compression/types"
 	"github.com/containers/image/v5/types"
 	"github.com/opencontainers/go-digest"
+	imgspecv1 "github.com/opencontainers/image-spec/specs-go/v1"
 )
 
 // ImageSourceInternalOnly is the part of private.ImageSource that is not
@@ -40,6 +42,12 @@ type ImageDestinationInternalOnly interface {
 	SupportsPutBlobPartial() bool
 	// FIXME: Add SupportsSignaturesWithFormat or something like that, to allow early failures
 	// on unsupported formats.
+
+	// NoteOriginalOCIConfig provides the config of the image, as it exists on the source, BUT converted to OCI format,
+	// or an error obtaining that value (e.g. if the image is an artifact and not a container image).
+	// The destination can use it in its TryReusingBlob/PutBlob implementations
+	// (otherwise it only obtains the final config after all layers are written).
+	NoteOriginalOCIConfig(ociConfig *imgspecv1.Image, configErr error) error
 
 	// PutBlobWithOptions writes contents of stream and returns data representing the result.
 	// inputInfo.Digest can be optionally provided if known; if provided, and stream is read to the end without error, the digest MUST match the stream contents.
@@ -163,6 +171,12 @@ type CommitOptions struct {
 	// What “resolved” means is transport-specific.
 	// Transports which don’t support reporting resolved references can ignore the field; the generic copy code writes "nil" into the value.
 	ReportResolvedReference *types.ImageReference
+	// Timestamp, if set, will force timestamps of content created in the destination to this value.
+	// Most transports don't support this.
+	//
+	// In oci-archive: destinations, this will set the create/mod/access timestamps in each tar entry
+	// (but not a timestamp of the created archive file).
+	Timestamp *time.Time
 }
 
 // ImageSourceChunk is a portion of a blob.
