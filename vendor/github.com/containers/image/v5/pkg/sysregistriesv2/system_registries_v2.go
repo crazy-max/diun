@@ -1,11 +1,14 @@
 package sysregistriesv2
 
 import (
+	"errors"
 	"fmt"
 	"io/fs"
+	"maps"
 	"os"
 	"path/filepath"
 	"reflect"
+	"slices"
 	"sort"
 	"strings"
 	"sync"
@@ -17,7 +20,6 @@ import (
 	"github.com/containers/storage/pkg/homedir"
 	"github.com/containers/storage/pkg/regexp"
 	"github.com/sirupsen/logrus"
-	"golang.org/x/exp/maps"
 )
 
 // systemRegistriesConfPath is the path to the system-wide registry
@@ -429,7 +431,8 @@ func (config *V2RegistriesConf) postProcessRegistries() error {
 			return fmt.Errorf("pull-from-mirror must not be set for a non-mirror registry %q", reg.Prefix)
 		}
 		// make sure mirrors are valid
-		for _, mir := range reg.Mirrors {
+		for j := range reg.Mirrors {
+			mir := &reg.Mirrors[j]
 			mir.Location, err = parseLocation(mir.Location)
 			if err != nil {
 				return err
@@ -744,6 +747,11 @@ func tryUpdatingCache(ctx *types.SystemContext, wrapper configWrapper) (*parsedC
 		// Enforce v2 format for drop-in-configs.
 		dropIn, err := loadConfigFile(path, true)
 		if err != nil {
+			if errors.Is(err, fs.ErrNotExist) {
+				// file must have been removed between the directory listing
+				// and the open call, ignore that as it is a expected race
+				continue
+			}
 			return nil, fmt.Errorf("loading drop-in registries configuration %q: %w", path, err)
 		}
 		config.updateWithConfigurationFrom(dropIn)
@@ -1034,12 +1042,10 @@ func (c *parsedConfig) updateWithConfigurationFrom(updates *parsedConfig) {
 	}
 
 	// Go maps have a non-deterministic order when iterating the keys, so
-	// we dump them in a slice and sort it to enforce some order in
-	// Registries slice.  Some consumers of c/image (e.g., CRI-O) log the
-	// configuration where a non-deterministic order could easily cause
-	// confusion.
-	prefixes := maps.Keys(registryMap)
-	sort.Strings(prefixes)
+	// we sort the keys to enforce some order in Registries slice.
+	// Some consumers of c/image (e.g., CRI-O) log the configuration
+	// and a non-deterministic order could easily cause confusion.
+	prefixes := slices.Sorted(maps.Keys(registryMap))
 
 	c.partialV2.Registries = []Registry{}
 	for _, prefix := range prefixes {
