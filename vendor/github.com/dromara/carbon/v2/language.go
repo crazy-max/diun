@@ -4,6 +4,7 @@ import (
 	"embed"
 	"encoding/json"
 	"fmt"
+	"slices"
 	"strconv"
 	"strings"
 	"sync"
@@ -12,16 +13,13 @@ import (
 //go:embed lang
 var fs embed.FS
 
-var (
-	// invalid locale error
-	// 无效的区域错误
-	invalidLocaleError = func(locale string) error {
-		return fmt.Errorf("invalid locale file %q, please make sure the json file exists and is valid", locale)
-	}
-)
+var validResourcesKey = []string{
+	"months", "short_months", "weeks", "short_weeks", "seasons", "constellations",
+	"year", "month", "week", "day", "hour", "minute", "second",
+	"now", "ago", "from_now", "before", "after",
+}
 
 // Language defines a Language struct.
-// 定义 Language 结构体
 type Language struct {
 	dir       string
 	locale    string
@@ -31,68 +29,106 @@ type Language struct {
 }
 
 // NewLanguage returns a new Language instance.
-// 初始化 Language 结构体
 func NewLanguage() *Language {
 	return &Language{
-		dir:       "lang/",
-		locale:    defaultLocale,
+		dir:       "lang",
+		locale:    DefaultLocale,
 		resources: make(map[string]string),
 		rw:        new(sync.RWMutex),
 	}
 }
 
-// SetLanguage sets language.
-// 设置语言对象
-func SetLanguage(lang *Language) Carbon {
-	c := NewCarbon()
-	lang.SetLocale(lang.locale)
-	c.lang, c.Error = lang, lang.Error
-	return c
+// Copy returns a new copy of the current Language instance
+func (lang *Language) Copy() *Language {
+	if lang == nil {
+		return nil
+	}
+	newLang := &Language{
+		dir:    lang.dir,
+		locale: lang.locale,
+		Error:  lang.Error,
+		rw:     new(sync.RWMutex),
+	}
+	if lang.resources == nil {
+		return newLang
+	}
+	newLang.resources = make(map[string]string)
+	for i := range lang.resources {
+		newLang.resources[i] = lang.resources[i]
+	}
+	return newLang
 }
 
 // SetLocale sets language locale.
-// 设置区域
 func (lang *Language) SetLocale(locale string) *Language {
+	if lang == nil || lang.Error != nil {
+		return lang
+	}
+	if locale == "" {
+		lang.Error = ErrEmptyLocale()
+		return lang
+	}
+
 	lang.rw.Lock()
 	defer lang.rw.Unlock()
 
-	if len(lang.resources) != 0 {
-		return lang
-	}
 	lang.locale = locale
-	fileName := lang.dir + locale + ".json"
-	bytes, err := fs.ReadFile(fileName)
-	if err != nil {
-		lang.Error = invalidLocaleError(fileName)
+	fileName := fmt.Sprintf("%s/%s.json", lang.dir, locale)
+	var (
+		bs  []byte
+		err error
+	)
+	if bs, err = fs.ReadFile(fileName); err != nil {
+		lang.Error = fmt.Errorf("%w: %w", ErrNotExistLocale(fileName), err)
 		return lang
 	}
-	_ = json.Unmarshal(bytes, &lang.resources)
+	_ = json.Unmarshal(bs, &lang.resources)
 	return lang
 }
 
 // SetResources sets language resources.
-// 设置资源
 func (lang *Language) SetResources(resources map[string]string) *Language {
+	if lang == nil || lang.Error != nil {
+		return lang
+	}
+	if len(resources) == 0 {
+		lang.Error = ErrEmptyResources()
+		return lang
+	}
+
 	lang.rw.Lock()
 	defer lang.rw.Unlock()
 
 	if len(lang.resources) == 0 {
 		lang.resources = resources
-		return lang
 	}
-	for k, v := range resources {
-		if _, ok := lang.resources[k]; ok {
-			lang.resources[k] = v
+
+	for i := range resources {
+		if !slices.Contains(validResourcesKey, i) {
+			lang.Error = ErrInvalidResourcesError(resources)
+			return lang
+		}
+		if _, ok := lang.resources[i]; ok {
+			lang.resources[i] = resources[i]
 		}
 	}
+
 	return lang
 }
 
 // returns a translated string.
-// 翻译转换
 func (lang *Language) translate(unit string, value int64) string {
+	if lang == nil || lang.resources == nil {
+		return ""
+	}
+
+	lang.rw.Lock()
+	defer lang.rw.Unlock()
+
 	if len(lang.resources) == 0 {
-		lang.SetLocale(defaultLocale)
+		lang.rw.Unlock()
+		lang.SetLocale(DefaultLocale)
+		lang.rw.Lock()
 	}
 	slice := strings.Split(lang.resources[unit], "|")
 	number := getAbsValue(value)

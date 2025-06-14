@@ -1,45 +1,58 @@
 package carbon
 
 var (
-	// default layout
-	// 默认布局模板
-	defaultLayout = DateTimeLayout
+	// DefaultLayout default layout
+	DefaultLayout = DateTimeLayout
 
-	// default timezone
-	// 默认时区
-	defaultTimezone = Local
+	// DefaultTimezone default timezone
+	DefaultTimezone = UTC
 
-	// default week start date
-	// 默认一周开始日期
-	defaultWeekStartsAt = Sunday
+	// DefaultLocale default language locale
+	DefaultLocale = "en"
 
-	// default language locale
-	// 默认语言区域
-	defaultLocale = "en"
+	// DefaultWeekStartsAt default start date of the week
+	DefaultWeekStartsAt = Monday
+
+	// DefaultWeekendDays default weekend days of the week
+	DefaultWeekendDays = []Weekday{
+		Saturday, Sunday,
+	}
 )
 
-// Default defines a Default struct.
-// 定义 Default 结构体
 type Default struct {
 	Layout       string
 	Timezone     string
-	WeekStartsAt string
 	Locale       string
+	WeekStartsAt Weekday
+	WeekendDays  []Weekday
 }
 
 // SetDefault sets default.
-// 设置全局默认值
 func SetDefault(d Default) {
 	if d.Layout != "" {
-		defaultLayout = d.Layout
+		DefaultLayout = d.Layout
 	}
 	if d.Timezone != "" {
-		defaultTimezone = d.Timezone
-	}
-	if d.WeekStartsAt != "" {
-		defaultWeekStartsAt = d.WeekStartsAt
+		DefaultTimezone = d.Timezone
 	}
 	if d.Locale != "" {
-		defaultLocale = d.Locale
+		DefaultLocale = d.Locale
+	}
+	if d.WeekStartsAt.String() != "" {
+		DefaultWeekStartsAt = d.WeekStartsAt
+	}
+	if len(d.WeekendDays) > 0 {
+		DefaultWeekendDays = d.WeekendDays
+	}
+}
+
+// ResetDefault resets default.
+func ResetDefault() {
+	DefaultLayout = DateTimeLayout
+	DefaultTimezone = UTC
+	DefaultLocale = "en"
+	DefaultWeekStartsAt = Monday
+	DefaultWeekendDays = []Weekday{
+		Saturday, Sunday,
 	}
 }

@@ -4,38 +4,94 @@ import (
 	"fmt"
 )
 
-// returns an invalid timezone error.
-// 无效的时区错误
-var invalidTimezoneError = func(timezone string) error {
-	return fmt.Errorf("invalid timezone %q, please see the file %q for all valid timezones", timezone, "$GOROOT/lib/time/zoneinfo.zip")
-}
+var (
+	// ErrFailedParse failed to parse error.
+	ErrFailedParse = func(value any) error {
+		return fmt.Errorf("failed to parse %v as carbon", value)
+	}
 
-// returns an invalid location error.
-// 无效的地区错误
-var invalidLocationError = func() error {
-	return fmt.Errorf("invalid location, please make sure the location is valid")
-}
+	// ErrFailedScan failed to scan error.
+	ErrFailedScan = func(value any) error {
+		return fmt.Errorf("failed to scan %v as carbon", value)
+	}
 
-// returns an invalid duration error.
-// 无效的时长错误
-var invalidDurationError = func(duration string) error {
-	return fmt.Errorf("invalid duration %q, please make sure the duration is valid", duration)
-}
+	// ErrInvalidTimestamp invalid timestamp error.
+	ErrInvalidTimestamp = func(value string) error {
+		return fmt.Errorf("invalid timestamp %v", value)
+	}
 
-// returns an invalid value error.
-// 无效的时间字符串错误
-var invalidValueError = func(value string) error {
-	return fmt.Errorf("cannot parse string %q as carbon, please make sure the value is valid", value)
-}
+	// ErrNilLocation nil location error.
+	ErrNilLocation = func() error {
+		return fmt.Errorf("location cannot be nil")
+	}
 
-// returns an invalid layout error.
-// 无效的布局模板错误
-var invalidLayoutError = func(value, layout string) error {
-	return fmt.Errorf("cannot parse string %q as carbon by layout %q, please make sure the value and layout match", value, layout)
-}
+	// ErrNilLanguage nil language error.
+	ErrNilLanguage = func() error {
+		return fmt.Errorf("language cannot be nil")
+	}
 
-// returns an invalid format error.
-// 无效的格式模板错误
-var invalidFormatError = func(value, format string) error {
-	return fmt.Errorf("cannot parse string %q as carbon by format %q, please make sure the value and format match", value, format)
-}
+	// ErrInvalidLanguage invalid language error.
+	ErrInvalidLanguage = func(lang *Language) error {
+		return fmt.Errorf("invalid Language %v", lang)
+	}
+
+	// ErrEmptyLocale empty locale error.
+	ErrEmptyLocale = func() error {
+		return fmt.Errorf("locale cannot be empty")
+	}
+
+	// ErrNotExistLocale not exist locale error.
+	ErrNotExistLocale = func(locale string) error {
+		return fmt.Errorf("locale %q doesn't exist", locale)
+	}
+
+	// ErrEmptyResources empty resources error.
+	ErrEmptyResources = func() error {
+		return fmt.Errorf("resources cannot be empty")
+	}
+
+	// ErrInvalidResourcesError invalid resources error.
+	ErrInvalidResourcesError = func(resources map[string]string) error {
+		return fmt.Errorf("invalid resources %v", resources)
+	}
+
+	// ErrEmptyTimezone empty timezone error.
+	ErrEmptyTimezone = func() error {
+		return fmt.Errorf("timezone cannot be empty")
+	}
+
+	// ErrInvalidTimezone invalid timezone error.
+	ErrInvalidTimezone = func(timezone string) error {
+		return fmt.Errorf("invalid timezone %q, please see the file %q for all valid timezones", timezone, "$GOROOT/lib/time/zoneinfo.zip")
+	}
+
+	// ErrEmptyDuration empty duration error.
+	ErrEmptyDuration = func() error {
+		return fmt.Errorf("duration cannot be empty")
+	}
+
+	// ErrInvalidDuration invalid duration error.
+	ErrInvalidDuration = func(duration string) error {
+		return fmt.Errorf("invalid duration %q", duration)
+	}
+
+	// ErrEmptyLayout empty layout error.
+	ErrEmptyLayout = func() error {
+		return fmt.Errorf("layout cannot be empty")
+	}
+
+	// ErrMismatchedLayout mismatched layout error.
+	ErrMismatchedLayout = func(value, layout string) error {
+		return fmt.Errorf("value %q and layout %q are mismatched", value, layout)
+	}
+
+	// ErrEmptyFormat empty format error.
+	ErrEmptyFormat = func() error {
+		return fmt.Errorf("format cannot be empty")
+	}
+
+	// ErrMismatchedFormat mismatched format error.
+	ErrMismatchedFormat = func(value, format string) error {
+		return fmt.Errorf("value %q and format %q are mismatched", value, format)
+	}
+)
