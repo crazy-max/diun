@@ -189,7 +189,7 @@ github.com/eclipse/paho.mqtt.golang/packets
 ## explicit; go 1.13
 github.com/emicklei/go-restful/v3
 github.com/emicklei/go-restful/v3/log
-# github.com/felixge/fgprof v0.9.3
+# github.com/felixge/fgprof v0.9.5
 ## explicit; go 1.14
 github.com/felixge/fgprof
 # github.com/felixge/httpsnoop v1.0.4
@@ -309,8 +309,8 @@ github.com/imdario/mergo
 # github.com/jaytaylor/html2text v0.0.0-20180606194806-57d518f124b0
 ## explicit
 github.com/jaytaylor/html2text
-# github.com/jedib0t/go-pretty/v6 v6.6.5
-## explicit; go 1.17
+# github.com/jedib0t/go-pretty/v6 v6.6.7
+## explicit; go 1.18
 github.com/jedib0t/go-pretty/v6/table
 github.com/jedib0t/go-pretty/v6/text
 # github.com/josharian/intern v1.0.0
