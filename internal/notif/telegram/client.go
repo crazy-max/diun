@@ -104,15 +104,20 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		return err
 	}
 
+	disableNotification := false
+	if c.cfg.DisableNotification != nil {
+		disableNotification = *c.cfg.DisableNotification
+	}
+
 	for _, cid := range parsedChatIDs {
 		if len(cid.topics) > 0 {
 			for _, topic := range cid.topics {
-				if err = sendTelegramMessage(bot, cid.id, topic, string(body)); err != nil {
+				if err = sendTelegramMessage(bot, cid.id, topic, string(body), disableNotification); err != nil {
 					return err
 				}
 			}
 		} else {
-			if err = sendTelegramMessage(bot, cid.id, 0, string(body)); err != nil {
+			if err = sendTelegramMessage(bot, cid.id, 0, string(body), disableNotification); err != nil {
 				return err
 			}
 		}
@@ -151,11 +156,12 @@ func parseChatIDs(entries []string) ([]chatID, error) {
 	return chatIDs, nil
 }
 
-func sendTelegramMessage(bot *gotgbot.Bot, chatID int64, threadID int64, message string) error {
+func sendTelegramMessage(bot *gotgbot.Bot, chatID int64, threadID int64, message string, disableNotification bool) error {
 	_, err := bot.SendMessage(chatID, message, &gotgbot.SendMessageOpts{
-		MessageThreadId:    threadID,
-		ParseMode:          gotgbot.ParseModeMarkdown,
-		LinkPreviewOptions: &gotgbot.LinkPreviewOptions{IsDisabled: true},
+		MessageThreadId:     threadID,
+		ParseMode:           gotgbot.ParseModeMarkdown,
+		LinkPreviewOptions:  &gotgbot.LinkPreviewOptions{IsDisabled: true},
+		DisableNotification: disableNotification,
 	})
 	return err
 }
