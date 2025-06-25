@@ -14,7 +14,7 @@ require (
 	github.com/crazy-max/gohealthchecks v0.5.0
 	github.com/crazy-max/gonfig v0.7.1
 	github.com/distribution/reference v0.6.0
-	github.com/docker/docker v27.3.1+incompatible
+	github.com/docker/docker v28.3.0+incompatible
 	github.com/docker/go-connections v0.5.0
 	github.com/docker/go-units v0.5.0
 	github.com/dromara/carbon/v2 v2.6.8
@@ -63,6 +63,8 @@ require (
 	github.com/andybalholm/cascadia v1.3.2 // indirect
 	github.com/aokoli/goutils v1.0.1 // indirect
 	github.com/aymerick/douceur v0.2.0 // indirect
+	github.com/containerd/errdefs v0.3.0 // indirect
+	github.com/containerd/errdefs/pkg v0.3.0 // indirect
 	github.com/containerd/log v0.1.0 // indirect
 	github.com/containerd/typeurl/v2 v2.2.0 // indirect
 	github.com/containers/libtrust v0.0.0-20230121012942-c1716e8a8d01 // indirect
@@ -113,6 +115,7 @@ require (
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/moby/docker-image-spec v1.3.1 // indirect
+	github.com/moby/sys/atomicwriter v0.1.0 // indirect
 	github.com/moby/sys/capability v0.3.0 // indirect
 	github.com/moby/sys/mountinfo v0.7.2 // indirect
 	github.com/moby/sys/user v0.3.0 // indirect
