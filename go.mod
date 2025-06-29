@@ -3,7 +3,7 @@ module github.com/crazy-max/diun/v4
 go 1.23.0
 
 require (
-	dario.cat/mergo v1.0.1
+	dario.cat/mergo v1.0.2
 	github.com/AlecAivazis/survey/v2 v2.3.7
 	github.com/PaulSonOfLars/gotgbot/v2 v2.0.0-rc.32
 	github.com/alecthomas/kong v1.6.1
