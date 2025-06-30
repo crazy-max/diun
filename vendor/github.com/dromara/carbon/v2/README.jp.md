@@ -1,4 +1,4 @@
-# Carbon
+<p align="center" style="margin-bottom: -10px"><a href="https://carbon.go-pkg.com/" target="_blank"><img src="https://gitee.com/dromara/carbon/raw/master/logo.svg" width="15%" alt="carbon" /></a></p>
 
 [![Carbon Release](https://img.shields.io/github/release/dromara/carbon.svg)](https://github.com/dromara/carbon/releases)
 [![Go Test](https://github.com/dromara/carbon/actions/workflows/test.yml/badge.svg)](https://github.com/dromara/carbon/actions)
@@ -12,7 +12,7 @@
 
 ## イントロ
 
-軽量、セマンティック、開発者に優しい `golang` 時間処理ライブラリ, `いかなる`第三者ライブラリにも依存せず、` 100%`ユニットテストカバレッジ率は、[awesome-go](https://github.com/avelino/awesome-go#date-and-time "awesome-go") と [hello-github](https://hellogithub.com/en/repository/dromara/carbon "hello-github") 収録
+`Carbon` は軽量、セマンティック、開発者に優しい `golang` 時間処理ライブラリ, `いかなる`第三者ライブラリにも依存せず、`100%`ユニットテストカバレッジ率は、[awesome-go](https://github.com/avelino/awesome-go#date-and-time "awesome-go") と [hello-github](https://hellogithub.com/en/repository/dromara/carbon "hello-github") 収録
 
 ## リポジトリ
 
@@ -75,6 +75,7 @@ carbon.Parse("2020-07-05 13:14:15").SetLocale("jp").DiffForHumans() // 1 ヶ月�
 carbon.ClearTestNow()
 carbon.IsTestNow() // false
 ```
+詳細については <a href="https://carbon.go-pkg.com" target="_blank">carbon.go-pkg.com</a>
 
 ## リファレンス
 
