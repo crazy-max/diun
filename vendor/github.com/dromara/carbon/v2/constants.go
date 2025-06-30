@@ -5,7 +5,7 @@ import (
 )
 
 // Version current version
-const Version = "2.6.7"
+const Version = "2.6.9"
 
 // timezone constants
 const (
@@ -88,6 +88,14 @@ const (
 	December  = time.December
 )
 
+// season constants
+const (
+	Spring = "Spring"
+	Summer = "Summer"
+	Autumn = "Autumn"
+	Winter = "Winter"
+)
+
 // constellation constants
 const (
 	Aries       = "Aries"
@@ -113,14 +121,6 @@ const (
 	Friday    = time.Friday
 	Saturday  = time.Saturday
 	Sunday    = time.Sunday
-)
-
-// season constants
-const (
-	Spring = "Spring"
-	Summer = "Summer"
-	Autumn = "Autumn"
-	Winter = "Winter"
 )
 
 // number constants
