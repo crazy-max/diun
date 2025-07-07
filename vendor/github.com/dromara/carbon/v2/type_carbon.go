@@ -68,8 +68,3 @@ func (c *Carbon) String() string {
 	}
 	return c.Layout(c.currentLayout)
 }
-
-// GormDataType implements "gorm.GormDataTypeInterface" interface for Carbon struct.
-func (c *Carbon) GormDataType() string {
-	return "datetime"
-}
