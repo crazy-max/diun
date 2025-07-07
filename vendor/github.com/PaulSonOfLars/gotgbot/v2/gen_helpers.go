@@ -240,6 +240,11 @@ func (im InaccessibleMessage) EditCaption(b *Bot, opts *EditMessageCaptionOpts) 
 	return b.EditMessageCaption(opts)
 }
 
+// EditChecklist Helper method for Bot.EditMessageChecklist.
+func (im InaccessibleMessage) EditChecklist(b *Bot, businessConnectionId string, checklist InputChecklist, opts *EditMessageChecklistOpts) (*Message, error) {
+	return b.EditMessageChecklist(businessConnectionId, im.Chat.Id, im.MessageId, checklist, opts)
+}
+
 // EditLiveLocation Helper method for Bot.EditMessageLiveLocation.
 func (im InaccessibleMessage) EditLiveLocation(b *Bot, latitude float64, longitude float64, opts *EditMessageLiveLocationOpts) (*Message, bool, error) {
 	if opts == nil {
@@ -382,6 +387,11 @@ func (m Message) EditCaption(b *Bot, opts *EditMessageCaptionOpts) (*Message, bo
 	}
 
 	return b.EditMessageCaption(opts)
+}
+
+// EditChecklist Helper method for Bot.EditMessageChecklist.
+func (m Message) EditChecklist(b *Bot, businessConnectionId string, checklist InputChecklist, opts *EditMessageChecklistOpts) (*Message, error) {
+	return b.EditMessageChecklist(businessConnectionId, m.Chat.Id, m.MessageId, checklist, opts)
 }
 
 // EditLiveLocation Helper method for Bot.EditMessageLiveLocation.

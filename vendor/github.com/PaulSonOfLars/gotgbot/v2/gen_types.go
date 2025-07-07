@@ -1045,7 +1045,7 @@ type BusinessBotRights struct {
 	// Optional. True, if the bot can mark incoming private messages as read
 	CanReadMessages bool `json:"can_read_messages,omitempty"`
 	// Optional. True, if the bot can delete messages sent by the bot
-	CanDeleteOutgoingMessages bool `json:"can_delete_outgoing_messages,omitempty"`
+	CanDeleteSentMessages bool `json:"can_delete_sent_messages,omitempty"`
 	// Optional. True, if the bot can delete all private messages in managed chats
 	CanDeleteAllMessages bool `json:"can_delete_all_messages,omitempty"`
 	// Optional. True, if the bot can edit the first and last name of the business account
@@ -1225,7 +1225,7 @@ type Chat struct {
 type ChatAdministratorRights struct {
 	// True, if the user's presence in the chat is hidden
 	IsAnonymous bool `json:"is_anonymous"`
-	// True, if the administrator can access the chat event log, get boost list, see hidden supergroup and channel members, report spam messages and ignore slow mode. Implied by any other administrator privilege.
+	// True, if the administrator can access the chat event log, get boost list, see hidden supergroup and channel members, report spam messages, ignore slow mode, and send messages to the chat without paying Telegram Stars. Implied by any other administrator privilege.
 	CanManageChat bool `json:"can_manage_chat"`
 	// True, if the administrator can delete messages of other users
 	CanDeleteMessages bool `json:"can_delete_messages"`
@@ -1245,7 +1245,7 @@ type ChatAdministratorRights struct {
 	CanEditStories bool `json:"can_edit_stories"`
 	// True, if the administrator can delete stories posted by other users
 	CanDeleteStories bool `json:"can_delete_stories"`
-	// Optional. True, if the administrator can post messages in the channel, or access channel statistics; for channels only
+	// Optional. True, if the administrator can post messages in the channel, approve suggested posts, or access channel statistics; for channels only
 	CanPostMessages bool `json:"can_post_messages,omitempty"`
 	// Optional. True, if the administrator can edit messages of other users and can pin messages; for channels only
 	CanEditMessages bool `json:"can_edit_messages,omitempty"`
@@ -1918,7 +1918,7 @@ type MergedChatMember struct {
 	CustomTitle string `json:"custom_title,omitempty"`
 	// Optional. True, if the bot is allowed to edit administrator privileges of that user (Only for administrator)
 	CanBeEdited bool `json:"can_be_edited,omitempty"`
-	// Optional. True, if the administrator can access the chat event log, get boost list, see hidden supergroup and channel members, report spam messages and ignore slow mode. Implied by any other administrator privilege. (Only for administrator)
+	// Optional. True, if the administrator can access the chat event log, get boost list, see hidden supergroup and channel members, report spam messages, ignore slow mode, and send messages to the chat without paying Telegram Stars. Implied by any other administrator privilege. (Only for administrator)
 	CanManageChat bool `json:"can_manage_chat,omitempty"`
 	// Optional. True, if the administrator can delete messages of other users (Only for administrator)
 	CanDeleteMessages bool `json:"can_delete_messages,omitempty"`
@@ -1938,7 +1938,7 @@ type MergedChatMember struct {
 	CanEditStories bool `json:"can_edit_stories,omitempty"`
 	// Optional. True, if the administrator can delete stories posted by other users (Only for administrator)
 	CanDeleteStories bool `json:"can_delete_stories,omitempty"`
-	// Optional. True, if the administrator can post messages in the channel, or access channel statistics; for channels only (Only for administrator)
+	// Optional. True, if the administrator can post messages in the channel, approve suggested posts, or access channel statistics; for channels only (Only for administrator)
 	CanPostMessages bool `json:"can_post_messages,omitempty"`
 	// Optional. True, if the administrator can edit messages of other users and can pin messages; for channels only (Only for administrator)
 	CanEditMessages bool `json:"can_edit_messages,omitempty"`
@@ -1964,7 +1964,7 @@ type MergedChatMember struct {
 	CanSendVideoNotes bool `json:"can_send_video_notes,omitempty"`
 	// Optional. True, if the user is allowed to send voice notes (Only for restricted)
 	CanSendVoiceNotes bool `json:"can_send_voice_notes,omitempty"`
-	// Optional. True, if the user is allowed to send polls (Only for restricted)
+	// Optional. True, if the user is allowed to send polls and checklists (Only for restricted)
 	CanSendPolls bool `json:"can_send_polls,omitempty"`
 	// Optional. True, if the user is allowed to send animations, games, stickers and use inline bots (Only for restricted)
 	CanSendOtherMessages bool `json:"can_send_other_messages,omitempty"`
@@ -2093,7 +2093,7 @@ type ChatMemberAdministrator struct {
 	CanBeEdited bool `json:"can_be_edited"`
 	// True, if the user's presence in the chat is hidden
 	IsAnonymous bool `json:"is_anonymous"`
-	// True, if the administrator can access the chat event log, get boost list, see hidden supergroup and channel members, report spam messages and ignore slow mode. Implied by any other administrator privilege.
+	// True, if the administrator can access the chat event log, get boost list, see hidden supergroup and channel members, report spam messages, ignore slow mode, and send messages to the chat without paying Telegram Stars. Implied by any other administrator privilege.
 	CanManageChat bool `json:"can_manage_chat"`
 	// True, if the administrator can delete messages of other users
 	CanDeleteMessages bool `json:"can_delete_messages"`
@@ -2113,7 +2113,7 @@ type ChatMemberAdministrator struct {
 	CanEditStories bool `json:"can_edit_stories"`
 	// True, if the administrator can delete stories posted by other users
 	CanDeleteStories bool `json:"can_delete_stories"`
-	// Optional. True, if the administrator can post messages in the channel, or access channel statistics; for channels only
+	// Optional. True, if the administrator can post messages in the channel, approve suggested posts, or access channel statistics; for channels only
 	CanPostMessages bool `json:"can_post_messages,omitempty"`
 	// Optional. True, if the administrator can edit messages of other users and can pin messages; for channels only
 	CanEditMessages bool `json:"can_edit_messages,omitempty"`
@@ -2378,7 +2378,7 @@ type ChatMemberRestricted struct {
 	CanSendVideoNotes bool `json:"can_send_video_notes"`
 	// True, if the user is allowed to send voice notes
 	CanSendVoiceNotes bool `json:"can_send_voice_notes"`
-	// True, if the user is allowed to send polls
+	// True, if the user is allowed to send polls and checklists
 	CanSendPolls bool `json:"can_send_polls"`
 	// True, if the user is allowed to send animations, games, stickers and use inline bots
 	CanSendOtherMessages bool `json:"can_send_other_messages"`
@@ -2523,7 +2523,7 @@ type ChatPermissions struct {
 	CanSendVideoNotes bool `json:"can_send_video_notes,omitempty"`
 	// Optional. True, if the user is allowed to send voice notes
 	CanSendVoiceNotes bool `json:"can_send_voice_notes,omitempty"`
-	// Optional. True, if the user is allowed to send polls
+	// Optional. True, if the user is allowed to send polls and checklists
 	CanSendPolls bool `json:"can_send_polls,omitempty"`
 	// Optional. True, if the user is allowed to send animations, games, stickers and use inline bots
 	CanSendOtherMessages bool `json:"can_send_other_messages,omitempty"`
@@ -2567,6 +2567,60 @@ type ChatShared struct {
 	Username string `json:"username,omitempty"`
 	// Optional. Available sizes of the chat photo, if the photo was requested by the bot
 	Photo []PhotoSize `json:"photo,omitempty"`
+}
+
+// Checklist (https://core.telegram.org/bots/api#checklist)
+//
+// Describes a checklist.
+type Checklist struct {
+	// Title of the checklist
+	Title string `json:"title"`
+	// Optional. Special entities that appear in the checklist title
+	TitleEntities []MessageEntity `json:"title_entities,omitempty"`
+	// List of tasks in the checklist
+	Tasks []ChecklistTask `json:"tasks,omitempty"`
+	// Optional. True, if users other than the creator of the list can add tasks to the list
+	OthersCanAddTasks bool `json:"others_can_add_tasks,omitempty"`
+	// Optional. True, if users other than the creator of the list can mark tasks as done or not done
+	OthersCanMarkTasksAsDone bool `json:"others_can_mark_tasks_as_done,omitempty"`
+}
+
+// ChecklistTask (https://core.telegram.org/bots/api#checklisttask)
+//
+// Describes a task in a checklist.
+type ChecklistTask struct {
+	// Unique identifier of the task
+	Id int64 `json:"id"`
+	// Text of the task
+	Text string `json:"text"`
+	// Optional. Special entities that appear in the task text
+	TextEntities []MessageEntity `json:"text_entities,omitempty"`
+	// Optional. User that completed the task; omitted if the task wasn't completed
+	CompletedByUser *User `json:"completed_by_user,omitempty"`
+	// Optional. Point in time (Unix timestamp) when the task was completed; 0 if the task wasn't completed
+	CompletionDate int64 `json:"completion_date,omitempty"`
+}
+
+// ChecklistTasksAdded (https://core.telegram.org/bots/api#checklisttasksadded)
+//
+// Describes a service message about tasks added to a checklist.
+type ChecklistTasksAdded struct {
+	// Optional. Message containing the checklist to which the tasks were added. Note that the Message object in this field will not contain the reply_to_message field even if it itself is a reply.
+	ChecklistMessage *Message `json:"checklist_message,omitempty"`
+	// List of tasks added to the checklist
+	Tasks []ChecklistTask `json:"tasks,omitempty"`
+}
+
+// ChecklistTasksDone (https://core.telegram.org/bots/api#checklisttasksdone)
+//
+// Describes a service message about checklist tasks marked as done or not done.
+type ChecklistTasksDone struct {
+	// Optional. Message containing the checklist whose tasks were marked as done or not done. Note that the Message object in this field will not contain the reply_to_message field even if it itself is a reply.
+	ChecklistMessage *Message `json:"checklist_message,omitempty"`
+	// Optional. Identifiers of the tasks that were marked as done
+	MarkedAsDoneTaskIds []int64 `json:"marked_as_done_task_ids,omitempty"`
+	// Optional. Identifiers of the tasks that were marked as not done
+	MarkedAsNotDoneTaskIds []int64 `json:"marked_as_not_done_task_ids,omitempty"`
 }
 
 // ChosenInlineResult (https://core.telegram.org/bots/api#choseninlineresult)
@@ -2618,6 +2672,16 @@ type Dice struct {
 	Emoji string `json:"emoji"`
 	// Value of the dice, 1-6 for "🎲", "🎯" and "🎳" base emoji, 1-5 for "🏀" and "⚽" base emoji, 1-64 for "🎰" base emoji
 	Value int64 `json:"value"`
+}
+
+// DirectMessagePriceChanged (https://core.telegram.org/bots/api#directmessagepricechanged)
+//
+// Describes a service message about a change in the price of direct messages sent to a channel chat.
+type DirectMessagePriceChanged struct {
+	// True, if direct messages are enabled for the channel chat; false otherwise
+	AreDirectMessagesEnabled bool `json:"are_direct_messages_enabled"`
+	// Optional. The new number of Telegram Stars that must be paid by users for each direct message sent to the channel. Does not apply to users who have been exempted by administrators. Defaults to 0.
+	DirectMessageStarCount int64 `json:"direct_message_star_count,omitempty"`
 }
 
 // Document (https://core.telegram.org/bots/api#document)
@@ -2710,6 +2774,8 @@ type ExternalReplyInfo struct {
 	Voice *Voice `json:"voice,omitempty"`
 	// Optional. True, if the message media is covered by a spoiler animation
 	HasMediaSpoiler bool `json:"has_media_spoiler,omitempty"`
+	// Optional. Message is a checklist
+	Checklist *Checklist `json:"checklist,omitempty"`
 	// Optional. Message is a shared contact, information about the contact
 	Contact *Contact `json:"contact,omitempty"`
 	// Optional. Message is a dice with random value
@@ -2749,6 +2815,7 @@ func (v *ExternalReplyInfo) UnmarshalJSON(b []byte) error {
 		VideoNote          *VideoNote          `json:"video_note"`
 		Voice              *Voice              `json:"voice"`
 		HasMediaSpoiler    bool                `json:"has_media_spoiler"`
+		Checklist          *Checklist          `json:"checklist"`
 		Contact            *Contact            `json:"contact"`
 		Dice               *Dice               `json:"dice"`
 		Game               *Game               `json:"game"`
@@ -2783,6 +2850,7 @@ func (v *ExternalReplyInfo) UnmarshalJSON(b []byte) error {
 	v.VideoNote = t.VideoNote
 	v.Voice = t.Voice
 	v.HasMediaSpoiler = t.HasMediaSpoiler
+	v.Checklist = t.Checklist
 	v.Contact = t.Contact
 	v.Dice = t.Dice
 	v.Game = t.Game
@@ -4725,6 +4793,38 @@ type InlineQueryResultsButton struct {
 	StartParameter string `json:"start_parameter,omitempty"`
 }
 
+// InputChecklist (https://core.telegram.org/bots/api#inputchecklist)
+//
+// Describes a checklist to create.
+type InputChecklist struct {
+	// Title of the checklist; 1-255 characters after entities parsing
+	Title string `json:"title"`
+	// Optional. Mode for parsing entities in the title. See formatting options for more details.
+	ParseMode string `json:"parse_mode,omitempty"`
+	// Optional. List of special entities that appear in the title, which can be specified instead of parse_mode. Currently, only bold, italic, underline, strikethrough, spoiler, and custom_emoji entities are allowed.
+	TitleEntities []MessageEntity `json:"title_entities,omitempty"`
+	// List of 1-30 tasks in the checklist
+	Tasks []InputChecklistTask `json:"tasks,omitempty"`
+	// Optional. Pass True if other users can add tasks to the checklist
+	OthersCanAddTasks bool `json:"others_can_add_tasks,omitempty"`
+	// Optional. Pass True if other users can mark tasks as done or not done in the checklist
+	OthersCanMarkTasksAsDone bool `json:"others_can_mark_tasks_as_done,omitempty"`
+}
+
+// InputChecklistTask (https://core.telegram.org/bots/api#inputchecklisttask)
+//
+// Describes a task to add to a checklist.
+type InputChecklistTask struct {
+	// Unique identifier of the task; must be positive and unique among all task identifiers currently present in the checklist
+	Id int64 `json:"id"`
+	// Text of the task; 1-100 characters after entities parsing
+	Text string `json:"text"`
+	// Optional. Mode for parsing entities in the text. See formatting options for more details.
+	ParseMode string `json:"parse_mode,omitempty"`
+	// Optional. List of special entities that appear in the text, which can be specified instead of parse_mode. Currently, only bold, italic, underline, strikethrough, spoiler, and custom_emoji entities are allowed.
+	TextEntities []MessageEntity `json:"text_entities,omitempty"`
+}
+
 // InputContactMessageContent (https://core.telegram.org/bots/api#inputcontactmessagecontent)
 //
 // Represents the content of a contact message to be sent as the result of an inline query.
@@ -5557,7 +5657,7 @@ var (
 
 // MergedInputProfilePhoto is a helper type to simplify interactions with the various InputProfilePhoto subtypes.
 type MergedInputProfilePhoto struct {
-	// Type of the profile photo, must be "static"
+	// Type of the profile photo
 	Type string `json:"type"`
 	// Optional. The static profile photo. Profile photos can't be reused and can only be uploaded as a new file, so you can pass "attach://<file_attach_name>" if the photo was uploaded using multipart/form-data under <file_attach_name>. More information on Sending Files: https://core.telegram.org/bots/api#sending-files (Only for static)
 	Photo string `json:"photo,omitempty"`
@@ -5694,7 +5794,7 @@ var (
 
 // MergedInputStoryContent is a helper type to simplify interactions with the various InputStoryContent subtypes.
 type MergedInputStoryContent struct {
-	// Type of the content, must be "photo"
+	// Type of the content
 	Type string `json:"type"`
 	// Optional. The photo to post as a story. The photo must be of the size 1080x1920 and must not exceed 10 MB. The photo can't be reused and can only be uploaded as a new file, so you can pass "attach://<file_attach_name>" if the photo was uploaded using multipart/form-data under <file_attach_name>. More information on Sending Files: https://core.telegram.org/bots/api#sending-files (Only for photo)
 	Photo string `json:"photo,omitempty"`
@@ -6045,6 +6145,8 @@ type MaybeInaccessibleMessage interface {
 	Delete(b *Bot, opts *DeleteMessageOpts) (bool, error)
 	// EditCaption Helper method for Bot.EditMessageCaption.
 	EditCaption(b *Bot, opts *EditMessageCaptionOpts) (*Message, bool, error)
+	// EditChecklist Helper method for Bot.EditMessageChecklist.
+	EditChecklist(b *Bot, businessConnectionId string, checklist InputChecklist, opts *EditMessageChecklistOpts) (*Message, error)
 	// EditLiveLocation Helper method for Bot.EditMessageLiveLocation.
 	EditLiveLocation(b *Bot, latitude float64, longitude float64, opts *EditMessageLiveLocationOpts) (*Message, bool, error)
 	// EditMedia Helper method for Bot.EditMessageMedia.
@@ -6380,6 +6482,8 @@ type Message struct {
 	ShowCaptionAboveMedia bool `json:"show_caption_above_media,omitempty"`
 	// Optional. True, if the message media is covered by a spoiler animation
 	HasMediaSpoiler bool `json:"has_media_spoiler,omitempty"`
+	// Optional. Message is a checklist
+	Checklist *Checklist `json:"checklist,omitempty"`
 	// Optional. Message is a shared contact, information about the contact
 	Contact *Contact `json:"contact,omitempty"`
 	// Optional. Message is a dice with random value
@@ -6442,6 +6546,12 @@ type Message struct {
 	BoostAdded *ChatBoostAdded `json:"boost_added,omitempty"`
 	// Optional. Service message: chat background set
 	ChatBackgroundSet *ChatBackground `json:"chat_background_set,omitempty"`
+	// Optional. Service message: some tasks in a checklist were marked as done or not done
+	ChecklistTasksDone *ChecklistTasksDone `json:"checklist_tasks_done,omitempty"`
+	// Optional. Service message: tasks were added to a checklist
+	ChecklistTasksAdded *ChecklistTasksAdded `json:"checklist_tasks_added,omitempty"`
+	// Optional. Service message: the price for paid messages in the corresponding direct messages chat of a channel has changed
+	DirectMessagePriceChanged *DirectMessagePriceChanged `json:"direct_message_price_changed,omitempty"`
 	// Optional. Service message: forum topic created
 	ForumTopicCreated *ForumTopicCreated `json:"forum_topic_created,omitempty"`
 	// Optional. Service message: forum topic edited
@@ -6523,6 +6633,7 @@ func (v *Message) UnmarshalJSON(b []byte) error {
 		CaptionEntities               []MessageEntity                `json:"caption_entities"`
 		ShowCaptionAboveMedia         bool                           `json:"show_caption_above_media"`
 		HasMediaSpoiler               bool                           `json:"has_media_spoiler"`
+		Checklist                     *Checklist                     `json:"checklist"`
 		Contact                       *Contact                       `json:"contact"`
 		Dice                          *Dice                          `json:"dice"`
 		Game                          *Game                          `json:"game"`
@@ -6554,6 +6665,9 @@ func (v *Message) UnmarshalJSON(b []byte) error {
 		ProximityAlertTriggered       *ProximityAlertTriggered       `json:"proximity_alert_triggered"`
 		BoostAdded                    *ChatBoostAdded                `json:"boost_added"`
 		ChatBackgroundSet             *ChatBackground                `json:"chat_background_set"`
+		ChecklistTasksDone            *ChecklistTasksDone            `json:"checklist_tasks_done"`
+		ChecklistTasksAdded           *ChecklistTasksAdded           `json:"checklist_tasks_added"`
+		DirectMessagePriceChanged     *DirectMessagePriceChanged     `json:"direct_message_price_changed"`
 		ForumTopicCreated             *ForumTopicCreated             `json:"forum_topic_created"`
 		ForumTopicEdited              *ForumTopicEdited              `json:"forum_topic_edited"`
 		ForumTopicClosed              *ForumTopicClosed              `json:"forum_topic_closed"`
@@ -6622,6 +6736,7 @@ func (v *Message) UnmarshalJSON(b []byte) error {
 	v.CaptionEntities = t.CaptionEntities
 	v.ShowCaptionAboveMedia = t.ShowCaptionAboveMedia
 	v.HasMediaSpoiler = t.HasMediaSpoiler
+	v.Checklist = t.Checklist
 	v.Contact = t.Contact
 	v.Dice = t.Dice
 	v.Game = t.Game
@@ -6656,6 +6771,9 @@ func (v *Message) UnmarshalJSON(b []byte) error {
 	v.ProximityAlertTriggered = t.ProximityAlertTriggered
 	v.BoostAdded = t.BoostAdded
 	v.ChatBackgroundSet = t.ChatBackgroundSet
+	v.ChecklistTasksDone = t.ChecklistTasksDone
+	v.ChecklistTasksAdded = t.ChecklistTasksAdded
+	v.DirectMessagePriceChanged = t.DirectMessagePriceChanged
 	v.ForumTopicCreated = t.ForumTopicCreated
 	v.ForumTopicEdited = t.ForumTopicEdited
 	v.ForumTopicClosed = t.ForumTopicClosed
@@ -7295,6 +7413,8 @@ type OwnedGiftUnique struct {
 	CanBeTransferred bool `json:"can_be_transferred,omitempty"`
 	// Optional. Number of Telegram Stars that must be paid to transfer the gift; omitted if the bot cannot transfer the gift
 	TransferStarCount int64 `json:"transfer_star_count,omitempty"`
+	// Optional. Point in time (Unix timestamp) when the gift can be transferred. If it is in the past, then the gift can be transferred now
+	NextTransferDate string `json:"next_transfer_date,omitempty"`
 }
 
 // GetType is a helper method to easily access the common fields of an interface.
@@ -8402,7 +8522,7 @@ var (
 type MergedReactionType struct {
 	// Type of the reaction
 	Type string `json:"type"`
-	// Optional. Reaction emoji. Currently, it can be one of "👍", "👎", "❤", "🔥", "🥰", "👏", "😁", "🤔", "🤯", "😱", "🤬", "😢", "🎉", "🤩", "🤮", "💩", "🙏", "👌", "🕊", "🤡", "🥱", "🥴", "😍", "🐳", "❤‍🔥", "🌚", "🌭", "💯", "🤣", "⚡", "🍌", "🏆", "💔", "🤨", "😐", "🍓", "🍾", "💋", "🖕", "😈", "😴", "😭", "🤓", "👻", "👨‍💻", "👀", "🎃", "🙈", "😇", "😨", "🤝", "✍", "🤗", "🫡", "🎅", "🎄", "☃", "💅", "🤪", "🗿", "🆒", "💘", "🙉", "🦄", "😘", "💊", "🙊", "😎", "👾", "🤷‍♂", "🤷", "🤷‍♀", "😡" (Only for emoji)
+	// Optional. Reaction emoji. Currently, it can be one of "❤", "👍", "👎", "🔥", "🥰", "👏", "😁", "🤔", "🤯", "😱", "🤬", "😢", "🎉", "🤩", "🤮", "💩", "🙏", "👌", "🕊", "🤡", "🥱", "🥴", "😍", "🐳", "❤‍🔥", "🌚", "🌭", "💯", "🤣", "⚡", "🍌", "🏆", "💔", "🤨", "😐", "🍓", "🍾", "💋", "🖕", "😈", "😴", "😭", "🤓", "👻", "👨‍💻", "👀", "🎃", "🙈", "😇", "😨", "🤝", "✍", "🤗", "🫡", "🎅", "🎄", "☃", "💅", "🤪", "🗿", "🆒", "💘", "🙉", "🦄", "😘", "💊", "🙊", "😎", "👾", "🤷‍♂", "🤷", "🤷‍♀", "😡" (Only for emoji)
 	Emoji string `json:"emoji,omitempty"`
 	// Optional. Custom emoji identifier (Only for custom_emoji)
 	CustomEmojiId string `json:"custom_emoji_id,omitempty"`
@@ -8531,7 +8651,7 @@ func (v ReactionTypeCustomEmoji) reactionType() {}
 //
 // The reaction is based on an emoji.
 type ReactionTypeEmoji struct {
-	// Reaction emoji. Currently, it can be one of "👍", "👎", "❤", "🔥", "🥰", "👏", "😁", "🤔", "🤯", "😱", "🤬", "😢", "🎉", "🤩", "🤮", "💩", "🙏", "👌", "🕊", "🤡", "🥱", "🥴", "😍", "🐳", "❤‍🔥", "🌚", "🌭", "💯", "🤣", "⚡", "🍌", "🏆", "💔", "🤨", "😐", "🍓", "🍾", "💋", "🖕", "😈", "😴", "😭", "🤓", "👻", "👨‍💻", "👀", "🎃", "🙈", "😇", "😨", "🤝", "✍", "🤗", "🫡", "🎅", "🎄", "☃", "💅", "🤪", "🗿", "🆒", "💘", "🙉", "🦄", "😘", "💊", "🙊", "😎", "👾", "🤷‍♂", "🤷", "🤷‍♀", "😡"
+	// Reaction emoji. Currently, it can be one of "❤", "👍", "👎", "🔥", "🥰", "👏", "😁", "🤔", "🤯", "😱", "🤬", "😢", "🎉", "🤩", "🤮", "💩", "🙏", "👌", "🕊", "🤡", "🥱", "🥴", "😍", "🐳", "❤‍🔥", "🌚", "🌭", "💯", "🤣", "⚡", "🍌", "🏆", "💔", "🤨", "😐", "🍓", "🍾", "💋", "🖕", "😈", "😴", "😭", "🤓", "👻", "👨‍💻", "👀", "🎃", "🙈", "😇", "😨", "🤝", "✍", "🤗", "🫡", "🎅", "🎄", "☃", "💅", "🤪", "🗿", "🆒", "💘", "🙉", "🦄", "😘", "💊", "🙊", "😎", "👾", "🤷‍♂", "🤷", "🤷‍♀", "😡"
 	Emoji string `json:"emoji"`
 }
 
@@ -10012,12 +10132,16 @@ type UniqueGiftBackdropColors struct {
 type UniqueGiftInfo struct {
 	// Information about the gift
 	Gift UniqueGift `json:"gift"`
-	// Origin of the gift. Currently, either "upgrade" or "transfer"
+	// Origin of the gift. Currently, either "upgrade" for gifts upgraded from regular gifts, "transfer" for gifts transferred from other users or channels, or "resale" for gifts bought from other users
 	Origin string `json:"origin"`
+	// Optional. For gifts bought from other users, the price paid for the gift
+	LastResaleStarCount int64 `json:"last_resale_star_count,omitempty"`
 	// Optional. Unique identifier of the received gift for the bot; only present for gifts received on behalf of business accounts
 	OwnedGiftId string `json:"owned_gift_id,omitempty"`
 	// Optional. Number of Telegram Stars that must be paid to transfer the gift; omitted if the bot cannot transfer the gift
 	TransferStarCount int64 `json:"transfer_star_count,omitempty"`
+	// Optional. Point in time (Unix timestamp) when the gift can be transferred. If it is in the past, then the gift can be transferred now
+	NextTransferDate string `json:"next_transfer_date,omitempty"`
 }
 
 // UniqueGiftModel (https://core.telegram.org/bots/api#uniquegiftmodel)
