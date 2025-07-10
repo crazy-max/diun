@@ -1,7 +1,10 @@
 package model
 
 import (
+	"encoding/json"
+
 	"github.com/crazy-max/diun/v4/pkg/registry"
+	"github.com/pkg/errors"
 )
 
 // Image holds image configuration
@@ -18,6 +21,38 @@ type Image struct {
 	HubTpl      string            `yaml:"hub_tpl,omitempty" json:",omitempty"`
 	HubLink     string            `yaml:"hub_link,omitempty" json:",omitempty"`
 	Metadata    map[string]string `yaml:"metadata,omitempty" json:",omitempty"`
+}
+
+func (i Image) hash() (string, error) {
+	// Return json serialized image to use as a hashable key
+	b, err := json.Marshal(i)
+	if err != nil {
+		return "", errors.Errorf("cannot hash image: %v", err)
+	}
+
+	return string(b), nil
+}
+
+type ImageList []Image
+
+// Dedupe removes duplicate images from the list and returns a new list
+func (il ImageList) Dedupe() []Image {
+	keys := make(map[string]bool)
+	list := []Image{}
+	for _, entry := range il {
+		hash, err := entry.hash()
+		if err != nil {
+			// If we couldn't hash the entry, we can't dedupe it so we add it anyway
+			list = append(list, entry)
+		} else {
+			if _, value := keys[hash]; !value {
+				keys[hash] = true
+				list = append(list, entry)
+			}
+		}
+	}
+
+	return list
 }
 
 // ImagePlatform holds image platform configuration
