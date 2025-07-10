@@ -22,11 +22,11 @@ Allow sending notifications to your Discord channel.
     ```
 
 | Name               | Default                            | Description                                                                                               |
-|--------------------|------------------------------------|-----------------------------------------------------------------------------------------------------------|
+| ------------------ | ---------------------------------- | --------------------------------------------------------------------------------------------------------- |
 | `webhookURL`       |                                    | Discord [incoming webhook URL](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks) |
 | `webhookURLFile`   |                                    | Use content of secret file as webhook URL if `webhookURL` is not defined                                  |
 | `mentions`         |                                    | List of users or roles to notify                                                                          |
-| `renderFields`     | `true`                             | Render [field objects](https://discordjs.guide/popular-topics/embeds.html)                                |
+| `renderFields`     | `true`                             | Render embed and [field objects](https://discordjs.guide/popular-topics/embeds.html)                      |
 | `timeout`          | `10s`                              | Timeout specifies a time limit for the request to be made                                                 |
 | `templateBody`[^1] | See [below](#default-templatebody) | [Notification template](../faq.md#notification-template) for message body                                 |
 
