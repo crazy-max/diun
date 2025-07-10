@@ -100,6 +100,9 @@ enabled.
     ```
 
 !!! abstract "Environment variables"
+
+Comma separated list of regular expressions to include tags.
+
     * `DIUN_DEFAULTS_INCLUDETAGS=^\d+\.\d+\.\d+$`
 
 ### `excludeTags`
@@ -115,6 +118,9 @@ enabled.
     ```
 
 !!! abstract "Environment variables"
+
+Comma separated list of regular expressions to include tags.
+
     * `DIUN_DEFAULTS_EXCLUDETAGS=dev`
 
 ### `metadata`
