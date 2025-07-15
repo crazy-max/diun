@@ -119,6 +119,7 @@ nav:
   - Notifications:
     - Amqp: notif/amqp.md
     - Discord: notif/discord.md
+    - Elasticsearch: notif/elasticsearch.md
     - Gotify: notif/gotify.md
     - Mail: notif/mail.md
     - Matrix: notif/matrix.md

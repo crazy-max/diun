@@ -246,6 +246,7 @@ Can be transposed to:
 * notif
     * [amqp](../notif/amqp.md)
     * [discord](../notif/discord.md)
+    * [elasticsearch](../notif/elasticsearch.md)
     * [gotify](../notif/gotify.md)
     * [mail](../notif/mail.md)
     * [matrix](../notif/matrix.md)

@@ -32,21 +32,22 @@ type NotifEntry struct {
 
 // Notif holds data necessary for notification configuration
 type Notif struct {
-	Amqp       *NotifAmqp       `yaml:"amqp,omitempty" json:"amqp,omitempty"`
-	Discord    *NotifDiscord    `yaml:"discord,omitempty" json:"discord,omitempty"`
-	Gotify     *NotifGotify     `yaml:"gotify,omitempty" json:"gotify,omitempty"`
-	Mail       *NotifMail       `yaml:"mail,omitempty" json:"mail,omitempty"`
-	Matrix     *NotifMatrix     `yaml:"matrix,omitempty" json:"matrix,omitempty"`
-	Mqtt       *NotifMqtt       `yaml:"mqtt,omitempty" json:"mqtt,omitempty"`
-	Ntfy       *NotifNtfy       `yaml:"ntfy,omitempty" json:"ntfy,omitempty"`
-	Pushover   *NotifPushover   `yaml:"pushover,omitempty" json:"pushover,omitempty"`
-	RocketChat *NotifRocketChat `yaml:"rocketchat,omitempty" json:"rocketchat,omitempty"`
-	Script     *NotifScript     `yaml:"script,omitempty" json:"script,omitempty"`
-	SignalRest *NotifSignalRest `yaml:"signalrest,omitempty" json:"signalrest,omitempty"`
-	Slack      *NotifSlack      `yaml:"slack,omitempty" json:"slack,omitempty"`
-	Teams      *NotifTeams      `yaml:"teams,omitempty" json:"teams,omitempty"`
-	Telegram   *NotifTelegram   `yaml:"telegram,omitempty" json:"telegram,omitempty"`
-	Webhook    *NotifWebhook    `yaml:"webhook,omitempty" json:"webhook,omitempty"`
+	Amqp          *NotifAmqp          `yaml:"amqp,omitempty" json:"amqp,omitempty"`
+	Discord       *NotifDiscord       `yaml:"discord,omitempty" json:"discord,omitempty"`
+	Elasticsearch *NotifElasticsearch `yaml:"elasticsearch,omitempty" json:"elasticsearch,omitempty"`
+	Gotify        *NotifGotify        `yaml:"gotify,omitempty" json:"gotify,omitempty"`
+	Mail          *NotifMail          `yaml:"mail,omitempty" json:"mail,omitempty"`
+	Matrix        *NotifMatrix        `yaml:"matrix,omitempty" json:"matrix,omitempty"`
+	Mqtt          *NotifMqtt          `yaml:"mqtt,omitempty" json:"mqtt,omitempty"`
+	Ntfy          *NotifNtfy          `yaml:"ntfy,omitempty" json:"ntfy,omitempty"`
+	Pushover      *NotifPushover      `yaml:"pushover,omitempty" json:"pushover,omitempty"`
+	RocketChat    *NotifRocketChat    `yaml:"rocketchat,omitempty" json:"rocketchat,omitempty"`
+	Script        *NotifScript        `yaml:"script,omitempty" json:"script,omitempty"`
+	SignalRest    *NotifSignalRest    `yaml:"signalrest,omitempty" json:"signalrest,omitempty"`
+	Slack         *NotifSlack         `yaml:"slack,omitempty" json:"slack,omitempty"`
+	Teams         *NotifTeams         `yaml:"teams,omitempty" json:"teams,omitempty"`
+	Telegram      *NotifTelegram      `yaml:"telegram,omitempty" json:"telegram,omitempty"`
+	Webhook       *NotifWebhook       `yaml:"webhook,omitempty" json:"webhook,omitempty"`
 }
 
 // GetDefaults gets the default values
