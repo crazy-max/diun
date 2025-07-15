@@ -94,6 +94,17 @@ func TestLoadFile(t *testing.T) {
 						Timeout:      utl.NewDuration(10 * time.Second),
 						TemplateBody: model.NotifDefaultTemplateBody,
 					},
+					Elasticsearch: &model.NotifElasticsearch{
+						Scheme:             "https",
+						Host:               "localhost",
+						Port:               9200,
+						Username:           "elastic",
+						Password:           "password",
+						Client:             "diun",
+						Index:              "diun-notifications",
+						Timeout:            utl.NewDuration(10 * time.Second),
+						InsecureSkipVerify: false,
+					},
 					Gotify: &model.NotifGotify{
 						Endpoint:      "http://gotify.foo.com",
 						Token:         "Token123456",

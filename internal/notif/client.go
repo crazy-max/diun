@@ -7,6 +7,7 @@ import (
 	"github.com/crazy-max/diun/v4/internal/notif/amqp"
 	"github.com/crazy-max/diun/v4/internal/notif/apprise"
 	"github.com/crazy-max/diun/v4/internal/notif/discord"
+	"github.com/crazy-max/diun/v4/internal/notif/elasticsearch"
 	"github.com/crazy-max/diun/v4/internal/notif/gotify"
 	"github.com/crazy-max/diun/v4/internal/notif/mail"
 	"github.com/crazy-max/diun/v4/internal/notif/matrix"
@@ -53,6 +54,9 @@ func New(config *model.Notif, meta model.Meta) (*Client, error) {
 	}
 	if config.Discord != nil {
 		c.notifiers = append(c.notifiers, discord.New(config.Discord, meta))
+	}
+	if config.Elasticsearch != nil {
+		c.notifiers = append(c.notifiers, elasticsearch.New(config.Elasticsearch, meta))
 	}
 	if config.Gotify != nil {
 		c.notifiers = append(c.notifiers, gotify.New(config.Gotify, meta))
