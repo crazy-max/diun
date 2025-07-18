@@ -34,7 +34,7 @@ func CreateFromTimestamp(timestamp int64, timezone ...string) *Carbon {
 	if loc, err = parseTimezone(tz); err != nil {
 		return &Carbon{Error: err}
 	}
-	return NewCarbon(time.Unix(timestamp, 0).In(loc))
+	return NewCarbon(time.Unix(timestamp, MinNanosecond).In(loc))
 }
 
 // CreateFromTimestampMilli creates a Carbon instance from a given timestamp with millisecond precision.
@@ -93,7 +93,7 @@ func CreateFromTimestampNano(timestampNano int64, timezone ...string) *Carbon {
 
 // CreateFromDateTime creates a Carbon instance from a given date and time.
 func CreateFromDateTime(year, month, day, hour, minute, second int, timezone ...string) *Carbon {
-	return create(year, month, day, hour, minute, second, 0, timezone...)
+	return create(year, month, day, hour, minute, second, MinNanosecond, timezone...)
 }
 
 // CreateFromDateTimeMilli creates a Carbon instance from a given date, time and millisecond.
@@ -113,28 +113,28 @@ func CreateFromDateTimeNano(year, month, day, hour, minute, second, nanosecond i
 
 // CreateFromDate creates a Carbon instance from a given date.
 func CreateFromDate(year, month, day int, timezone ...string) *Carbon {
-	return create(year, month, day, 0, 0, 0, 0, timezone...)
+	return create(year, month, day, MinHour, MinMinute, MinSecond, MinNanosecond, timezone...)
 }
 
 // CreateFromDateMilli creates a Carbon instance from a given date and millisecond.
 func CreateFromDateMilli(year, month, day, millisecond int, timezone ...string) *Carbon {
-	return create(year, month, day, 0, 0, 0, millisecond*1e6, timezone...)
+	return create(year, month, day, MinHour, MinMinute, MinSecond, millisecond*1e6, timezone...)
 }
 
 // CreateFromDateMicro creates a Carbon instance from a given date and microsecond.
 func CreateFromDateMicro(year, month, day, microsecond int, timezone ...string) *Carbon {
-	return create(year, month, day, 0, 0, 0, microsecond*1e3, timezone...)
+	return create(year, month, day, MinHour, MinMinute, MinSecond, microsecond*1e3, timezone...)
 }
 
 // CreateFromDateNano creates a Carbon instance from a given date and nanosecond.
 func CreateFromDateNano(year, month, day, nanosecond int, timezone ...string) *Carbon {
-	return create(year, month, day, 0, 0, 0, nanosecond, timezone...)
+	return create(year, month, day, MinHour, MinMinute, MinSecond, nanosecond, timezone...)
 }
 
 // CreateFromTime creates a Carbon instance from a given time(year, month and day are taken from the current time).
 func CreateFromTime(hour, minute, second int, timezone ...string) *Carbon {
 	year, month, day := Now(timezone...).Date()
-	return create(year, month, day, hour, minute, second, 0, timezone...)
+	return create(year, month, day, hour, minute, second, MinNanosecond, timezone...)
 }
 
 // CreateFromTimeMilli creates a Carbon instance from a given time and millisecond(year, month and day are taken from the current time).

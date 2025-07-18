@@ -1,0 +1,1901 @@
+[
+  {
+    "description": "Julian calendar reform date",
+    "julian": 2299160.5,
+    "gregorian": {
+      "year": 1582,
+      "month": 10,
+      "day": 15
+    }
+  },
+  {
+    "description": "Julian Day Number epoch",
+    "julian": 0.0,
+    "gregorian": {
+      "year": -4712,
+      "month": 1,
+      "day": 1
+    }
+  },
+  {
+    "description": "Julian 2020-01-01",
+    "julian": 2458862.5,
+    "gregorian": {
+      "year": 2020,
+      "month": 1,
+      "day": 14
+    }
+  },
+  {
+    "description": "Julian 2021-01-01",
+    "julian": 2459228.5,
+    "gregorian": {
+      "year": 2021,
+      "month": 1,
+      "day": 14
+    }
+  },
+  {
+    "description": "Julian 2022-01-01",
+    "julian": 2459593.5,
+    "gregorian": {
+      "year": 2022,
+      "month": 1,
+      "day": 14
+    }
+  },
+  {
+    "description": "Julian 2023-01-01",
+    "julian": 2459958.5,
+    "gregorian": {
+      "year": 2023,
+      "month": 1,
+      "day": 14
+    }
+  },
+  {
+    "description": "Julian 2024-01-01",
+    "julian": 2460323.5,
+    "gregorian": {
+      "year": 2024,
+      "month": 1,
+      "day": 14
+    }
+  },
+  {
+    "description": "Julian leap year 2020-02-29",
+    "julian": 2458921.5,
+    "gregorian": {
+      "year": 2020,
+      "month": 3,
+      "day": 13
+    }
+  },
+  {
+    "description": "Julian leap year 2024-02-29",
+    "julian": 2460382.5,
+    "gregorian": {
+      "year": 2024,
+      "month": 3,
+      "day": 13
+    }
+  },
+  {
+    "description": "Julian 2020-02-01",
+    "julian": 2458893.5,
+    "gregorian": {
+      "year": 2020,
+      "month": 2,
+      "day": 14
+    }
+  },
+  {
+    "description": "Julian 2020-03-01",
+    "julian": 2458922.5,
+    "gregorian": {
+      "year": 2020,
+      "month": 3,
+      "day": 14
+    }
+  },
+  {
+    "description": "Julian 2020-04-01",
+    "julian": 2458953.5,
+    "gregorian": {
+      "year": 2020,
+      "month": 4,
+      "day": 14
+    }
+  },
+  {
+    "description": "Julian 2020-05-01",
+    "julian": 2458983.5,
+    "gregorian": {
+      "year": 2020,
+      "month": 5,
+      "day": 14
+    }
+  },
+  {
+    "description": "Julian 2020-06-01",
+    "julian": 2459014.5,
+    "gregorian": {
+      "year": 2020,
+      "month": 6,
+      "day": 14
+    }
+  },
+  {
+    "description": "Julian 2020-07-01",
+    "julian": 2459044.5,
+    "gregorian": {
+      "year": 2020,
+      "month": 7,
+      "day": 14
+    }
+  },
+  {
+    "description": "Julian 2020-08-01",
+    "julian": 2459075.5,
+    "gregorian": {
+      "year": 2020,
+      "month": 8,
+      "day": 14
+    }
+  },
+  {
+    "description": "Julian 2020-09-01",
+    "julian": 2459106.5,
+    "gregorian": {
+      "year": 2020,
+      "month": 9,
+      "day": 14
+    }
+  },
+  {
+    "description": "Julian 2020-10-01",
+    "julian": 2459136.5,
+    "gregorian": {
+      "year": 2020,
+      "month": 10,
+      "day": 14
+    }
+  },
+  {
+    "description": "Julian 2020-11-01",
+    "julian": 2459167.5,
+    "gregorian": {
+      "year": 2020,
+      "month": 11,
+      "day": 14
+    }
+  },
+  {
+    "description": "Julian 2020-12-01",
+    "julian": 2459197.5,
+    "gregorian": {
+      "year": 2020,
+      "month": 12,
+      "day": 14
+    }
+  },
+  {
+    "description": "Julian 2020-12-31",
+    "julian": 2459227.5,
+    "gregorian": {
+      "year": 2021,
+      "month": 1,
+      "day": 13
+    }
+  },
+  {
+    "description": "Julian 2021-12-31",
+    "julian": 2459592.5,
+    "gregorian": {
+      "year": 2022,
+      "month": 1,
+      "day": 13
+    }
+  },
+  {
+    "description": "Julian 2022-12-31",
+    "julian": 2459957.5,
+    "gregorian": {
+      "year": 2023,
+      "month": 1,
+      "day": 13
+    }
+  },
+  {
+    "description": "Julian 2023-12-31",
+    "julian": 2460322.5,
+    "gregorian": {
+      "year": 2024,
+      "month": 1,
+      "day": 13
+    }
+  },
+  {
+    "description": "Julian 2024-12-31",
+    "julian": 2460688.5,
+    "gregorian": {
+      "year": 2025,
+      "month": 1,
+      "day": 13
+    }
+  },
+  {
+    "description": "Julian 2020-01-01",
+    "julian": 2458849.5,
+    "gregorian": {
+      "year": 2020,
+      "month": 1,
+      "day": 1
+    }
+  },
+  {
+    "description": "Julian 2020-02-01",
+    "julian": 2458880.5,
+    "gregorian": {
+      "year": 2020,
+      "month": 2,
+      "day": 1
+    }
+  },
+  {
+    "description": "Julian 2020-03-01",
+    "julian": 2458909.5,
+    "gregorian": {
+      "year": 2020,
+      "month": 3,
+      "day": 1
+    }
+  },
+  {
+    "description": "Julian 2020-04-01",
+    "julian": 2458940.5,
+    "gregorian": {
+      "year": 2020,
+      "month": 4,
+      "day": 1
+    }
+  },
+  {
+    "description": "Julian 2020-05-01",
+    "julian": 2458970.5,
+    "gregorian": {
+      "year": 2020,
+      "month": 5,
+      "day": 1
+    }
+  },
+  {
+    "description": "Julian 2020-06-01",
+    "julian": 2459001.5,
+    "gregorian": {
+      "year": 2020,
+      "month": 6,
+      "day": 1
+    }
+  },
+  {
+    "description": "Julian 2020-07-01",
+    "julian": 2459031.5,
+    "gregorian": {
+      "year": 2020,
+      "month": 7,
+      "day": 1
+    }
+  },
+  {
+    "description": "Julian 2020-08-01",
+    "julian": 2459062.5,
+    "gregorian": {
+      "year": 2020,
+      "month": 8,
+      "day": 1
+    }
+  },
+  {
+    "description": "Julian 2020-09-01",
+    "julian": 2459093.5,
+    "gregorian": {
+      "year": 2020,
+      "month": 9,
+      "day": 1
+    }
+  },
+  {
+    "description": "Julian 2020-10-01",
+    "julian": 2459123.5,
+    "gregorian": {
+      "year": 2020,
+      "month": 10,
+      "day": 1
+    }
+  },
+  {
+    "description": "Julian 2020-11-01",
+    "julian": 2459154.5,
+    "gregorian": {
+      "year": 2020,
+      "month": 11,
+      "day": 1
+    }
+  },
+  {
+    "description": "Julian 2020-12-01",
+    "julian": 2459184.5,
+    "gregorian": {
+      "year": 2020,
+      "month": 12,
+      "day": 1
+    }
+  },
+  {
+    "description": "Julian 2020-01-31",
+    "julian": 2458879.5,
+    "gregorian": {
+      "year": 2020,
+      "month": 1,
+      "day": 31
+    }
+  },
+  {
+    "description": "Julian 2020-02-29",
+    "julian": 2458908.5,
+    "gregorian": {
+      "year": 2020,
+      "month": 2,
+      "day": 29
+    }
+  },
+  {
+    "description": "Julian 2020-03-31",
+    "julian": 2458939.5,
+    "gregorian": {
+      "year": 2020,
+      "month": 3,
+      "day": 31
+    }
+  },
+  {
+    "description": "Julian 2020-04-30",
+    "julian": 2458969.5,
+    "gregorian": {
+      "year": 2020,
+      "month": 4,
+      "day": 30
+    }
+  },
+  {
+    "description": "Julian 2020-05-31",
+    "julian": 2459000.5,
+    "gregorian": {
+      "year": 2020,
+      "month": 5,
+      "day": 31
+    }
+  },
+  {
+    "description": "Julian 2020-06-30",
+    "julian": 2459030.5,
+    "gregorian": {
+      "year": 2020,
+      "month": 6,
+      "day": 30
+    }
+  },
+  {
+    "description": "Julian 2020-07-31",
+    "julian": 2459061.5,
+    "gregorian": {
+      "year": 2020,
+      "month": 7,
+      "day": 31
+    }
+  },
+  {
+    "description": "Julian 2020-08-31",
+    "julian": 2459092.5,
+    "gregorian": {
+      "year": 2020,
+      "month": 8,
+      "day": 31
+    }
+  },
+  {
+    "description": "Julian 2020-09-30",
+    "julian": 2459122.5,
+    "gregorian": {
+      "year": 2020,
+      "month": 9,
+      "day": 30
+    }
+  },
+  {
+    "description": "Julian 2020-10-31",
+    "julian": 2459153.5,
+    "gregorian": {
+      "year": 2020,
+      "month": 10,
+      "day": 31
+    }
+  },
+  {
+    "description": "Julian 2020-11-30",
+    "julian": 2459183.5,
+    "gregorian": {
+      "year": 2020,
+      "month": 11,
+      "day": 30
+    }
+  },
+  {
+    "description": "Julian 2020-12-31",
+    "julian": 2459214.5,
+    "gregorian": {
+      "year": 2020,
+      "month": 12,
+      "day": 31
+    }
+  },
+  {
+    "description": "Julian 2021-01-01",
+    "julian": 2459215.5,
+    "gregorian": {
+      "year": 2021,
+      "month": 1,
+      "day": 1
+    }
+  },
+  {
+    "description": "Julian 2021-02-01",
+    "julian": 2459246.5,
+    "gregorian": {
+      "year": 2021,
+      "month": 2,
+      "day": 1
+    }
+  },
+  {
+    "description": "Julian 2021-03-01",
+    "julian": 2459274.5,
+    "gregorian": {
+      "year": 2021,
+      "month": 3,
+      "day": 1
+    }
+  },
+  {
+    "description": "Julian 2021-04-01",
+    "julian": 2459305.5,
+    "gregorian": {
+      "year": 2021,
+      "month": 4,
+      "day": 1
+    }
+  },
+  {
+    "description": "Julian 2021-05-01",
+    "julian": 2459335.5,
+    "gregorian": {
+      "year": 2021,
+      "month": 5,
+      "day": 1
+    }
+  },
+  {
+    "description": "Julian 2021-06-01",
+    "julian": 2459366.5,
+    "gregorian": {
+      "year": 2021,
+      "month": 6,
+      "day": 1
+    }
+  },
+  {
+    "description": "Julian 2021-07-01",
+    "julian": 2459396.5,
+    "gregorian": {
+      "year": 2021,
+      "month": 7,
+      "day": 1
+    }
+  },
+  {
+    "description": "Julian 2021-08-01",
+    "julian": 2459427.5,
+    "gregorian": {
+      "year": 2021,
+      "month": 8,
+      "day": 1
+    }
+  },
+  {
+    "description": "Julian 2021-09-01",
+    "julian": 2459458.5,
+    "gregorian": {
+      "year": 2021,
+      "month": 9,
+      "day": 1
+    }
+  },
+  {
+    "description": "Julian 2021-10-01",
+    "julian": 2459488.5,
+    "gregorian": {
+      "year": 2021,
+      "month": 10,
+      "day": 1
+    }
+  },
+  {
+    "description": "Julian 2021-11-01",
+    "julian": 2459519.5,
+    "gregorian": {
+      "year": 2021,
+      "month": 11,
+      "day": 1
+    }
+  },
+  {
+    "description": "Julian 2021-12-01",
+    "julian": 2459549.5,
+    "gregorian": {
+      "year": 2021,
+      "month": 12,
+      "day": 1
+    }
+  },
+  {
+    "description": "Julian 2021-01-31",
+    "julian": 2459245.5,
+    "gregorian": {
+      "year": 2021,
+      "month": 1,
+      "day": 31
+    }
+  },
+  {
+    "description": "Julian 2021-02-28",
+    "julian": 2459273.5,
+    "gregorian": {
+      "year": 2021,
+      "month": 2,
+      "day": 28
+    }
+  },
+  {
+    "description": "Julian 2021-03-31",
+    "julian": 2459304.5,
+    "gregorian": {
+      "year": 2021,
+      "month": 3,
+      "day": 31
+    }
+  },
+  {
+    "description": "Julian 2021-04-30",
+    "julian": 2459334.5,
+    "gregorian": {
+      "year": 2021,
+      "month": 4,
+      "day": 30
+    }
+  },
+  {
+    "description": "Julian 2021-05-31",
+    "julian": 2459365.5,
+    "gregorian": {
+      "year": 2021,
+      "month": 5,
+      "day": 31
+    }
+  },
+  {
+    "description": "Julian 2021-06-30",
+    "julian": 2459395.5,
+    "gregorian": {
+      "year": 2021,
+      "month": 6,
+      "day": 30
+    }
+  },
+  {
+    "description": "Julian 2021-07-31",
+    "julian": 2459426.5,
+    "gregorian": {
+      "year": 2021,
+      "month": 7,
+      "day": 31
+    }
+  },
+  {
+    "description": "Julian 2021-08-31",
+    "julian": 2459457.5,
+    "gregorian": {
+      "year": 2021,
+      "month": 8,
+      "day": 31
+    }
+  },
+  {
+    "description": "Julian 2021-09-30",
+    "julian": 2459487.5,
+    "gregorian": {
+      "year": 2021,
+      "month": 9,
+      "day": 30
+    }
+  },
+  {
+    "description": "Julian 2021-10-31",
+    "julian": 2459518.5,
+    "gregorian": {
+      "year": 2021,
+      "month": 10,
+      "day": 31
+    }
+  },
+  {
+    "description": "Julian 2021-11-30",
+    "julian": 2459548.5,
+    "gregorian": {
+      "year": 2021,
+      "month": 11,
+      "day": 30
+    }
+  },
+  {
+    "description": "Julian 2021-12-31",
+    "julian": 2459579.5,
+    "gregorian": {
+      "year": 2021,
+      "month": 12,
+      "day": 31
+    }
+  },
+  {
+    "description": "Julian 2022-01-01",
+    "julian": 2459580.5,
+    "gregorian": {
+      "year": 2022,
+      "month": 1,
+      "day": 1
+    }
+  },
+  {
+    "description": "Julian 2022-02-01",
+    "julian": 2459611.5,
+    "gregorian": {
+      "year": 2022,
+      "month": 2,
+      "day": 1
+    }
+  },
+  {
+    "description": "Julian 2022-03-01",
+    "julian": 2459639.5,
+    "gregorian": {
+      "year": 2022,
+      "month": 3,
+      "day": 1
+    }
+  },
+  {
+    "description": "Julian 2022-04-01",
+    "julian": 2459670.5,
+    "gregorian": {
+      "year": 2022,
+      "month": 4,
+      "day": 1
+    }
+  },
+  {
+    "description": "Julian 2022-05-01",
+    "julian": 2459700.5,
+    "gregorian": {
+      "year": 2022,
+      "month": 5,
+      "day": 1
+    }
+  },
+  {
+    "description": "Julian 2022-06-01",
+    "julian": 2459731.5,
+    "gregorian": {
+      "year": 2022,
+      "month": 6,
+      "day": 1
+    }
+  },
+  {
+    "description": "Julian 2022-07-01",
+    "julian": 2459761.5,
+    "gregorian": {
+      "year": 2022,
+      "month": 7,
+      "day": 1
+    }
+  },
+  {
+    "description": "Julian 2022-08-01",
+    "julian": 2459792.5,
+    "gregorian": {
+      "year": 2022,
+      "month": 8,
+      "day": 1
+    }
+  },
+  {
+    "description": "Julian 2022-09-01",
+    "julian": 2459823.5,
+    "gregorian": {
+      "year": 2022,
+      "month": 9,
+      "day": 1
+    }
+  },
+  {
+    "description": "Julian 2022-10-01",
+    "julian": 2459853.5,
+    "gregorian": {
+      "year": 2022,
+      "month": 10,
+      "day": 1
+    }
+  },
+  {
+    "description": "Julian 2022-11-01",
+    "julian": 2459884.5,
+    "gregorian": {
+      "year": 2022,
+      "month": 11,
+      "day": 1
+    }
+  },
+  {
+    "description": "Julian 2022-12-01",
+    "julian": 2459914.5,
+    "gregorian": {
+      "year": 2022,
+      "month": 12,
+      "day": 1
+    }
+  },
+  {
+    "description": "Julian 2022-01-31",
+    "julian": 2459610.5,
+    "gregorian": {
+      "year": 2022,
+      "month": 1,
+      "day": 31
+    }
+  },
+  {
+    "description": "Julian 2022-02-28",
+    "julian": 2459638.5,
+    "gregorian": {
+      "year": 2022,
+      "month": 2,
+      "day": 28
+    }
+  },
+  {
+    "description": "Julian 2022-03-31",
+    "julian": 2459669.5,
+    "gregorian": {
+      "year": 2022,
+      "month": 3,
+      "day": 31
+    }
+  },
+  {
+    "description": "Julian 2022-04-30",
+    "julian": 2459699.5,
+    "gregorian": {
+      "year": 2022,
+      "month": 4,
+      "day": 30
+    }
+  },
+  {
+    "description": "Julian 2022-05-31",
+    "julian": 2459730.5,
+    "gregorian": {
+      "year": 2022,
+      "month": 5,
+      "day": 31
+    }
+  },
+  {
+    "description": "Julian 2022-06-30",
+    "julian": 2459760.5,
+    "gregorian": {
+      "year": 2022,
+      "month": 6,
+      "day": 30
+    }
+  },
+  {
+    "description": "Julian 2022-07-31",
+    "julian": 2459791.5,
+    "gregorian": {
+      "year": 2022,
+      "month": 7,
+      "day": 31
+    }
+  },
+  {
+    "description": "Julian 2022-08-31",
+    "julian": 2459822.5,
+    "gregorian": {
+      "year": 2022,
+      "month": 8,
+      "day": 31
+    }
+  },
+  {
+    "description": "Julian 2022-09-30",
+    "julian": 2459852.5,
+    "gregorian": {
+      "year": 2022,
+      "month": 9,
+      "day": 30
+    }
+  },
+  {
+    "description": "Julian 2022-10-31",
+    "julian": 2459883.5,
+    "gregorian": {
+      "year": 2022,
+      "month": 10,
+      "day": 31
+    }
+  },
+  {
+    "description": "Julian 2022-11-30",
+    "julian": 2459913.5,
+    "gregorian": {
+      "year": 2022,
+      "month": 11,
+      "day": 30
+    }
+  },
+  {
+    "description": "Julian 2022-12-31",
+    "julian": 2459944.5,
+    "gregorian": {
+      "year": 2022,
+      "month": 12,
+      "day": 31
+    }
+  },
+  {
+    "description": "Julian 2023-01-01",
+    "julian": 2459945.5,
+    "gregorian": {
+      "year": 2023,
+      "month": 1,
+      "day": 1
+    }
+  },
+  {
+    "description": "Julian 2023-02-01",
+    "julian": 2459976.5,
+    "gregorian": {
+      "year": 2023,
+      "month": 2,
+      "day": 1
+    }
+  },
+  {
+    "description": "Julian 2023-03-01",
+    "julian": 2460004.5,
+    "gregorian": {
+      "year": 2023,
+      "month": 3,
+      "day": 1
+    }
+  },
+  {
+    "description": "Julian 2023-04-01",
+    "julian": 2460035.5,
+    "gregorian": {
+      "year": 2023,
+      "month": 4,
+      "day": 1
+    }
+  },
+  {
+    "description": "Julian 2023-05-01",
+    "julian": 2460065.5,
+    "gregorian": {
+      "year": 2023,
+      "month": 5,
+      "day": 1
+    }
+  },
+  {
+    "description": "Julian 2023-06-01",
+    "julian": 2460096.5,
+    "gregorian": {
+      "year": 2023,
+      "month": 6,
+      "day": 1
+    }
+  },
+  {
+    "description": "Julian 2023-07-01",
+    "julian": 2460126.5,
+    "gregorian": {
+      "year": 2023,
+      "month": 7,
+      "day": 1
+    }
+  },
+  {
+    "description": "Julian 2023-08-01",
+    "julian": 2460157.5,
+    "gregorian": {
+      "year": 2023,
+      "month": 8,
+      "day": 1
+    }
+  },
+  {
+    "description": "Julian 2023-09-01",
+    "julian": 2460188.5,
+    "gregorian": {
+      "year": 2023,
+      "month": 9,
+      "day": 1
+    }
+  },
+  {
+    "description": "Julian 2023-10-01",
+    "julian": 2460218.5,
+    "gregorian": {
+      "year": 2023,
+      "month": 10,
+      "day": 1
+    }
+  },
+  {
+    "description": "Julian 2023-11-01",
+    "julian": 2460249.5,
+    "gregorian": {
+      "year": 2023,
+      "month": 11,
+      "day": 1
+    }
+  },
+  {
+    "description": "Julian 2023-12-01",
+    "julian": 2460279.5,
+    "gregorian": {
+      "year": 2023,
+      "month": 12,
+      "day": 1
+    }
+  },
+  {
+    "description": "Julian 2023-01-31",
+    "julian": 2459975.5,
+    "gregorian": {
+      "year": 2023,
+      "month": 1,
+      "day": 31
+    }
+  },
+  {
+    "description": "Julian 2023-02-28",
+    "julian": 2460003.5,
+    "gregorian": {
+      "year": 2023,
+      "month": 2,
+      "day": 28
+    }
+  },
+  {
+    "description": "Julian 2023-03-31",
+    "julian": 2460034.5,
+    "gregorian": {
+      "year": 2023,
+      "month": 3,
+      "day": 31
+    }
+  },
+  {
+    "description": "Julian 2023-04-30",
+    "julian": 2460064.5,
+    "gregorian": {
+      "year": 2023,
+      "month": 4,
+      "day": 30
+    }
+  },
+  {
+    "description": "Julian 2023-05-31",
+    "julian": 2460095.5,
+    "gregorian": {
+      "year": 2023,
+      "month": 5,
+      "day": 31
+    }
+  },
+  {
+    "description": "Julian 2023-06-30",
+    "julian": 2460125.5,
+    "gregorian": {
+      "year": 2023,
+      "month": 6,
+      "day": 30
+    }
+  },
+  {
+    "description": "Julian 2023-07-31",
+    "julian": 2460156.5,
+    "gregorian": {
+      "year": 2023,
+      "month": 7,
+      "day": 31
+    }
+  },
+  {
+    "description": "Julian 2023-08-31",
+    "julian": 2460187.5,
+    "gregorian": {
+      "year": 2023,
+      "month": 8,
+      "day": 31
+    }
+  },
+  {
+    "description": "Julian 2023-09-30",
+    "julian": 2460217.5,
+    "gregorian": {
+      "year": 2023,
+      "month": 9,
+      "day": 30
+    }
+  },
+  {
+    "description": "Julian 2023-10-31",
+    "julian": 2460248.5,
+    "gregorian": {
+      "year": 2023,
+      "month": 10,
+      "day": 31
+    }
+  },
+  {
+    "description": "Julian 2023-11-30",
+    "julian": 2460278.5,
+    "gregorian": {
+      "year": 2023,
+      "month": 11,
+      "day": 30
+    }
+  },
+  {
+    "description": "Julian 2023-12-31",
+    "julian": 2460309.5,
+    "gregorian": {
+      "year": 2023,
+      "month": 12,
+      "day": 31
+    }
+  },
+  {
+    "description": "Julian 2024-01-01",
+    "julian": 2460310.5,
+    "gregorian": {
+      "year": 2024,
+      "month": 1,
+      "day": 1
+    }
+  },
+  {
+    "description": "Julian 2024-02-01",
+    "julian": 2460341.5,
+    "gregorian": {
+      "year": 2024,
+      "month": 2,
+      "day": 1
+    }
+  },
+  {
+    "description": "Julian 2024-03-01",
+    "julian": 2460370.5,
+    "gregorian": {
+      "year": 2024,
+      "month": 3,
+      "day": 1
+    }
+  },
+  {
+    "description": "Julian 2024-04-01",
+    "julian": 2460401.5,
+    "gregorian": {
+      "year": 2024,
+      "month": 4,
+      "day": 1
+    }
+  },
+  {
+    "description": "Julian 2024-05-01",
+    "julian": 2460431.5,
+    "gregorian": {
+      "year": 2024,
+      "month": 5,
+      "day": 1
+    }
+  },
+  {
+    "description": "Julian 2024-06-01",
+    "julian": 2460462.5,
+    "gregorian": {
+      "year": 2024,
+      "month": 6,
+      "day": 1
+    }
+  },
+  {
+    "description": "Julian 2024-07-01",
+    "julian": 2460492.5,
+    "gregorian": {
+      "year": 2024,
+      "month": 7,
+      "day": 1
+    }
+  },
+  {
+    "description": "Julian 2024-08-01",
+    "julian": 2460523.5,
+    "gregorian": {
+      "year": 2024,
+      "month": 8,
+      "day": 1
+    }
+  },
+  {
+    "description": "Julian 2024-09-01",
+    "julian": 2460554.5,
+    "gregorian": {
+      "year": 2024,
+      "month": 9,
+      "day": 1
+    }
+  },
+  {
+    "description": "Julian 2024-10-01",
+    "julian": 2460584.5,
+    "gregorian": {
+      "year": 2024,
+      "month": 10,
+      "day": 1
+    }
+  },
+  {
+    "description": "Julian 2024-11-01",
+    "julian": 2460615.5,
+    "gregorian": {
+      "year": 2024,
+      "month": 11,
+      "day": 1
+    }
+  },
+  {
+    "description": "Julian 2024-12-01",
+    "julian": 2460645.5,
+    "gregorian": {
+      "year": 2024,
+      "month": 12,
+      "day": 1
+    }
+  },
+  {
+    "description": "Julian 2024-01-31",
+    "julian": 2460340.5,
+    "gregorian": {
+      "year": 2024,
+      "month": 1,
+      "day": 31
+    }
+  },
+  {
+    "description": "Julian 2024-02-29",
+    "julian": 2460369.5,
+    "gregorian": {
+      "year": 2024,
+      "month": 2,
+      "day": 29
+    }
+  },
+  {
+    "description": "Julian 2024-03-31",
+    "julian": 2460400.5,
+    "gregorian": {
+      "year": 2024,
+      "month": 3,
+      "day": 31
+    }
+  },
+  {
+    "description": "Julian 2024-04-30",
+    "julian": 2460430.5,
+    "gregorian": {
+      "year": 2024,
+      "month": 4,
+      "day": 30
+    }
+  },
+  {
+    "description": "Julian 2024-05-31",
+    "julian": 2460461.5,
+    "gregorian": {
+      "year": 2024,
+      "month": 5,
+      "day": 31
+    }
+  },
+  {
+    "description": "Julian 2024-06-30",
+    "julian": 2460491.5,
+    "gregorian": {
+      "year": 2024,
+      "month": 6,
+      "day": 30
+    }
+  },
+  {
+    "description": "Julian 2024-07-31",
+    "julian": 2460522.5,
+    "gregorian": {
+      "year": 2024,
+      "month": 7,
+      "day": 31
+    }
+  },
+  {
+    "description": "Julian 2024-08-31",
+    "julian": 2460553.5,
+    "gregorian": {
+      "year": 2024,
+      "month": 8,
+      "day": 31
+    }
+  },
+  {
+    "description": "Julian 2024-09-30",
+    "julian": 2460583.5,
+    "gregorian": {
+      "year": 2024,
+      "month": 9,
+      "day": 30
+    }
+  },
+  {
+    "description": "Julian 2024-10-31",
+    "julian": 2460614.5,
+    "gregorian": {
+      "year": 2024,
+      "month": 10,
+      "day": 31
+    }
+  },
+  {
+    "description": "Julian 2024-11-30",
+    "julian": 2460644.5,
+    "gregorian": {
+      "year": 2024,
+      "month": 11,
+      "day": 30
+    }
+  },
+  {
+    "description": "Julian 2024-12-31",
+    "julian": 2460675.5,
+    "gregorian": {
+      "year": 2024,
+      "month": 12,
+      "day": 31
+    }
+  },
+  {
+    "description": "Julian 2020-01-16",
+    "julian": 2458864.5,
+    "gregorian": {
+      "year": 2020,
+      "month": 1,
+      "day": 16
+    }
+  },
+  {
+    "description": "Julian 2020-02-15",
+    "julian": 2458894.5,
+    "gregorian": {
+      "year": 2020,
+      "month": 2,
+      "day": 15
+    }
+  },
+  {
+    "description": "Julian 2020-03-16",
+    "julian": 2458924.5,
+    "gregorian": {
+      "year": 2020,
+      "month": 3,
+      "day": 16
+    }
+  },
+  {
+    "description": "Julian 2020-04-15",
+    "julian": 2458954.5,
+    "gregorian": {
+      "year": 2020,
+      "month": 4,
+      "day": 15
+    }
+  },
+  {
+    "description": "Julian 2020-05-16",
+    "julian": 2458985.5,
+    "gregorian": {
+      "year": 2020,
+      "month": 5,
+      "day": 16
+    }
+  },
+  {
+    "description": "Julian 2020-06-15",
+    "julian": 2459015.5,
+    "gregorian": {
+      "year": 2020,
+      "month": 6,
+      "day": 15
+    }
+  },
+  {
+    "description": "Julian 2020-07-16",
+    "julian": 2459046.5,
+    "gregorian": {
+      "year": 2020,
+      "month": 7,
+      "day": 16
+    }
+  },
+  {
+    "description": "Julian 2020-08-16",
+    "julian": 2459077.5,
+    "gregorian": {
+      "year": 2020,
+      "month": 8,
+      "day": 16
+    }
+  },
+  {
+    "description": "Julian 2020-09-15",
+    "julian": 2459107.5,
+    "gregorian": {
+      "year": 2020,
+      "month": 9,
+      "day": 15
+    }
+  },
+  {
+    "description": "Julian 2020-10-16",
+    "julian": 2459138.5,
+    "gregorian": {
+      "year": 2020,
+      "month": 10,
+      "day": 16
+    }
+  },
+  {
+    "description": "Julian 2020-11-15",
+    "julian": 2459168.5,
+    "gregorian": {
+      "year": 2020,
+      "month": 11,
+      "day": 15
+    }
+  },
+  {
+    "description": "Julian 2020-12-16",
+    "julian": 2459199.5,
+    "gregorian": {
+      "year": 2020,
+      "month": 12,
+      "day": 16
+    }
+  },
+  {
+    "description": "Julian 2021-01-16",
+    "julian": 2459230.5,
+    "gregorian": {
+      "year": 2021,
+      "month": 1,
+      "day": 16
+    }
+  },
+  {
+    "description": "Julian 2021-02-14",
+    "julian": 2459259.5,
+    "gregorian": {
+      "year": 2021,
+      "month": 2,
+      "day": 14
+    }
+  },
+  {
+    "description": "Julian 2021-03-16",
+    "julian": 2459289.5,
+    "gregorian": {
+      "year": 2021,
+      "month": 3,
+      "day": 16
+    }
+  },
+  {
+    "description": "Julian 2021-04-15",
+    "julian": 2459319.5,
+    "gregorian": {
+      "year": 2021,
+      "month": 4,
+      "day": 15
+    }
+  },
+  {
+    "description": "Julian 2021-05-16",
+    "julian": 2459350.5,
+    "gregorian": {
+      "year": 2021,
+      "month": 5,
+      "day": 16
+    }
+  },
+  {
+    "description": "Julian 2021-06-15",
+    "julian": 2459380.5,
+    "gregorian": {
+      "year": 2021,
+      "month": 6,
+      "day": 15
+    }
+  },
+  {
+    "description": "Julian 2021-07-16",
+    "julian": 2459411.5,
+    "gregorian": {
+      "year": 2021,
+      "month": 7,
+      "day": 16
+    }
+  },
+  {
+    "description": "Julian 2021-08-16",
+    "julian": 2459442.5,
+    "gregorian": {
+      "year": 2021,
+      "month": 8,
+      "day": 16
+    }
+  },
+  {
+    "description": "Julian 2021-09-15",
+    "julian": 2459472.5,
+    "gregorian": {
+      "year": 2021,
+      "month": 9,
+      "day": 15
+    }
+  },
+  {
+    "description": "Julian 2021-10-16",
+    "julian": 2459503.5,
+    "gregorian": {
+      "year": 2021,
+      "month": 10,
+      "day": 16
+    }
+  },
+  {
+    "description": "Julian 2021-11-15",
+    "julian": 2459533.5,
+    "gregorian": {
+      "year": 2021,
+      "month": 11,
+      "day": 15
+    }
+  },
+  {
+    "description": "Julian 2021-12-16",
+    "julian": 2459564.5,
+    "gregorian": {
+      "year": 2021,
+      "month": 12,
+      "day": 16
+    }
+  },
+  {
+    "description": "Julian 2022-01-16",
+    "julian": 2459595.5,
+    "gregorian": {
+      "year": 2022,
+      "month": 1,
+      "day": 16
+    }
+  },
+  {
+    "description": "Julian 2022-02-14",
+    "julian": 2459624.5,
+    "gregorian": {
+      "year": 2022,
+      "month": 2,
+      "day": 14
+    }
+  },
+  {
+    "description": "Julian 2022-03-16",
+    "julian": 2459654.5,
+    "gregorian": {
+      "year": 2022,
+      "month": 3,
+      "day": 16
+    }
+  },
+  {
+    "description": "Julian 2022-04-15",
+    "julian": 2459684.5,
+    "gregorian": {
+      "year": 2022,
+      "month": 4,
+      "day": 15
+    }
+  },
+  {
+    "description": "Julian 2022-05-16",
+    "julian": 2459715.5,
+    "gregorian": {
+      "year": 2022,
+      "month": 5,
+      "day": 16
+    }
+  },
+  {
+    "description": "Julian 2022-06-15",
+    "julian": 2459745.5,
+    "gregorian": {
+      "year": 2022,
+      "month": 6,
+      "day": 15
+    }
+  },
+  {
+    "description": "Julian 2022-07-16",
+    "julian": 2459776.5,
+    "gregorian": {
+      "year": 2022,
+      "month": 7,
+      "day": 16
+    }
+  },
+  {
+    "description": "Julian 2022-08-16",
+    "julian": 2459807.5,
+    "gregorian": {
+      "year": 2022,
+      "month": 8,
+      "day": 16
+    }
+  },
+  {
+    "description": "Julian 2022-09-15",
+    "julian": 2459837.5,
+    "gregorian": {
+      "year": 2022,
+      "month": 9,
+      "day": 15
+    }
+  },
+  {
+    "description": "Julian 2022-10-16",
+    "julian": 2459868.5,
+    "gregorian": {
+      "year": 2022,
+      "month": 10,
+      "day": 16
+    }
+  },
+  {
+    "description": "Julian 2022-11-15",
+    "julian": 2459898.5,
+    "gregorian": {
+      "year": 2022,
+      "month": 11,
+      "day": 15
+    }
+  },
+  {
+    "description": "Julian 2022-12-16",
+    "julian": 2459929.5,
+    "gregorian": {
+      "year": 2022,
+      "month": 12,
+      "day": 16
+    }
+  },
+  {
+    "description": "Julian 2023-01-16",
+    "julian": 2459960.5,
+    "gregorian": {
+      "year": 2023,
+      "month": 1,
+      "day": 16
+    }
+  },
+  {
+    "description": "Julian 2023-02-14",
+    "julian": 2459989.5,
+    "gregorian": {
+      "year": 2023,
+      "month": 2,
+      "day": 14
+    }
+  },
+  {
+    "description": "Julian 2023-03-16",
+    "julian": 2460019.5,
+    "gregorian": {
+      "year": 2023,
+      "month": 3,
+      "day": 16
+    }
+  },
+  {
+    "description": "Julian 2023-04-15",
+    "julian": 2460049.5,
+    "gregorian": {
+      "year": 2023,
+      "month": 4,
+      "day": 15
+    }
+  },
+  {
+    "description": "Julian 2023-05-16",
+    "julian": 2460080.5,
+    "gregorian": {
+      "year": 2023,
+      "month": 5,
+      "day": 16
+    }
+  },
+  {
+    "description": "Julian 2023-06-15",
+    "julian": 2460110.5,
+    "gregorian": {
+      "year": 2023,
+      "month": 6,
+      "day": 15
+    }
+  },
+  {
+    "description": "Julian 2023-07-16",
+    "julian": 2460141.5,
+    "gregorian": {
+      "year": 2023,
+      "month": 7,
+      "day": 16
+    }
+  },
+  {
+    "description": "Julian 2023-08-16",
+    "julian": 2460172.5,
+    "gregorian": {
+      "year": 2023,
+      "month": 8,
+      "day": 16
+    }
+  },
+  {
+    "description": "Julian 2023-09-15",
+    "julian": 2460202.5,
+    "gregorian": {
+      "year": 2023,
+      "month": 9,
+      "day": 15
+    }
+  },
+  {
+    "description": "Julian 2023-10-16",
+    "julian": 2460233.5,
+    "gregorian": {
+      "year": 2023,
+      "month": 10,
+      "day": 16
+    }
+  },
+  {
+    "description": "Julian 2023-11-15",
+    "julian": 2460263.5,
+    "gregorian": {
+      "year": 2023,
+      "month": 11,
+      "day": 15
+    }
+  },
+  {
+    "description": "Julian 2023-12-16",
+    "julian": 2460294.5,
+    "gregorian": {
+      "year": 2023,
+      "month": 12,
+      "day": 16
+    }
+  },
+  {
+    "description": "Julian 2024-01-16",
+    "julian": 2460325.5,
+    "gregorian": {
+      "year": 2024,
+      "month": 1,
+      "day": 16
+    }
+  },
+  {
+    "description": "Julian 2024-02-15",
+    "julian": 2460355.5,
+    "gregorian": {
+      "year": 2024,
+      "month": 2,
+      "day": 15
+    }
+  },
+  {
+    "description": "Julian 2024-03-16",
+    "julian": 2460385.5,
+    "gregorian": {
+      "year": 2024,
+      "month": 3,
+      "day": 16
+    }
+  },
+  {
+    "description": "Julian 2024-04-15",
+    "julian": 2460415.5,
+    "gregorian": {
+      "year": 2024,
+      "month": 4,
+      "day": 15
+    }
+  },
+  {
+    "description": "Julian 2024-05-16",
+    "julian": 2460446.5,
+    "gregorian": {
+      "year": 2024,
+      "month": 5,
+      "day": 16
+    }
+  },
+  {
+    "description": "Julian 2024-06-15",
+    "julian": 2460476.5,
+    "gregorian": {
+      "year": 2024,
+      "month": 6,
+      "day": 15
+    }
+  },
+  {
+    "description": "Julian 2024-07-16",
+    "julian": 2460507.5,
+    "gregorian": {
+      "year": 2024,
+      "month": 7,
+      "day": 16
+    }
+  },
+  {
+    "description": "Julian 2024-08-16",
+    "julian": 2460538.5,
+    "gregorian": {
+      "year": 2024,
+      "month": 8,
+      "day": 16
+    }
+  },
+  {
+    "description": "Julian 2024-09-15",
+    "julian": 2460568.5,
+    "gregorian": {
+      "year": 2024,
+      "month": 9,
+      "day": 15
+    }
+  },
+  {
+    "description": "Julian 2024-10-16",
+    "julian": 2460599.5,
+    "gregorian": {
+      "year": 2024,
+      "month": 10,
+      "day": 16
+    }
+  },
+  {
+    "description": "Julian 2024-11-15",
+    "julian": 2460629.5,
+    "gregorian": {
+      "year": 2024,
+      "month": 11,
+      "day": 15
+    }
+  },
+  {
+    "description": "Julian 2024-12-16",
+    "julian": 2460660.5,
+    "gregorian": {
+      "year": 2024,
+      "month": 12,
+      "day": 16
+    }
+  },
+  {
+    "description": "Julian 1000-01-01",
+    "julian": 2086313.5,
+    "gregorian": {
+      "year": 1000,
+      "month": 1,
+      "day": 7
+    }
+  },
+  {
+    "description": "Julian 1500-06-15",
+    "julian": 2269108.5,
+    "gregorian": {
+      "year": 1500,
+      "month": 6,
+      "day": 25
+    }
+  },
+  {
+    "description": "Julian 1600-12-25",
+    "julian": 2305816.5,
+    "gregorian": {
+      "year": 1601,
+      "month": 1,
+      "day": 4
+    }
+  },
+  {
+    "description": "Julian 1700-03-01",
+    "julian": 2342042.5,
+    "gregorian": {
+      "year": 1700,
+      "month": 3,
+      "day": 12
+    }
+  },
+  {
+    "description": "Julian 1800-07-04",
+    "julian": 2378692.5,
+    "gregorian": {
+      "year": 1800,
+      "month": 7,
+      "day": 16
+    }
+  },
+  {
+    "description": "Julian 1900-01-01",
+    "julian": 2415032.5,
+    "gregorian": {
+      "year": 1900,
+      "month": 1,
+      "day": 13
+    }
+  }
+]

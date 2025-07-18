@@ -1,4 +1,4 @@
-<p align="center" style="margin-bottom: -10px"><a href="https://carbon.go-pkg.com/zh" target="_blank"><img src="https://carbon.go-pkg.com/logo.svg?v=2.6.x" width="15%" alt="carbon" /></a></p>
+<p align="center" style="margin-bottom: -10px"><a href="https://carbon.go-pkg.com/ko" target="_blank"><img src="https://carbon.go-pkg.com/logo.svg?v=2.6.x" width="15%" alt="carbon" /></a></p>
 
 [![Carbon Release](https://img.shields.io/github/release/dromara/carbon.svg)](https://github.com/dromara/carbon/releases)
 [![Go Test](https://github.com/dromara/carbon/actions/workflows/test.yml/badge.svg)](https://github.com/dromara/carbon/actions)
@@ -9,13 +9,13 @@
 [![HelloGitHub](https://api.hellogithub.com/v1/widgets/recommend.svg?rid=0eddd8c3469549b7b246f85a83d1c42e&claim_uid=kKBvMpyxSgLhmJO&theme=small)](https://hellogithub.com/en/repository/dromara/carbon)
 [![License](https://img.shields.io/github/license/dromara/carbon)](https://github.com/dromara/carbon/blob/master/LICENSE)
 
-English | [简体中文](README.cn.md) | [日本語](README.ja.md) | [한국어](README.ko.md)
+한국어 | [English](README.md) | [简体中文](README.zh.md) | [日本語](README.ja.md)
 
-## Introduction
+## 소개
 
-`Carbon` is a simple, semantic and developer-friendly time package for `golang`, `100%` unit test coverage, doesn't depend on `any` third-party package and has been included by [awesome-go](https://github.com/avelino/awesome-go#date-and-time "awesome-go") and [hello-github](https://hellogithub.com/en/repository/dromara/carbon "hello-github")
+`Carbon`은 `golang`을 위한 간단하고, 의미론적이며, 개발자 친화적인 시간 패키지입니다. `100%` 단위 테스트 커버리지를 제공하며, `어떤` 서드파티 패키지에도 의존하지 않으며, [awesome-go](https://github.com/avelino/awesome-go#date-and-time "awesome-go")와 [hello-github](https://hellogithub.com/en/repository/dromara/carbon "hello-github")에 포함되어 있습니다.
 
-## Repository
+## 저장소
 
 [github.com/dromara/carbon](https://github.com/dromara/carbon "github.com/dromara/carbon")
 
@@ -23,36 +23,33 @@ English | [简体中文](README.cn.md) | [日本語](README.ja.md) | [한국어]
 
 [gitcode.com/dromara/carbon](https://gitcode.com/dromara/carbon "gitcode.com/dromara/carbon")
 
-## Quick Start
+## 빠른 시작
 
-### Installation
+### 설치
 > go version >= 1.21
 
 ```go
-// By github
+// GitHub를 통해
 go get -u github.com/dromara/carbon/v2
 import "github.com/dromara/carbon/v2"
 
-// By gitee
+// Gitee를 통해
 go get -u gitee.com/dromara/carbon/v2
 import "gitee.com/dromara/carbon/v2"
 
-// By gitcode
+// GitCode를 통해
 go get -u gitcode.com/dromara/carbon/v2
 import "gitee.com/dromara/gitcode/v2"
 ```
 
-`Carbon` was donated to the [dromara](https://dromara.org/ "dromara") organization, the repository URL has changed. If
-the previous repository used was `golang-module/carbon`, please replace the original repository with the new repository
-in `go.mod`, or execute the following command:
+`Carbon`은 [dromara](https://dromara.org/ "dromara") 조직에 기부되었으며, 저장소 URL이 변경되었습니다. 이전에 사용하던 저장소가 `golang-module/carbon`이었다면, `go.mod`에서 원래 저장소를 새 저장소로 교체하거나 다음 명령을 실행하세요:
 
 ```go
 go mod edit -replace github.com/golang-module/carbon/v2 = github.com/dromara/carbon/v2
 ```
 
-### Example Usage
-Default timezone is `UTC`, language locale is `English`, start day of the week is `Monday` and weekend days of the week
-are `Saturday` and `Sunday`.
+### 사용 예시
+기본 시간대는 `UTC`이고, 언어 로케일은 `English`이며, 주의 시작일은 `Monday`이고 주말은 `Saturday`와 `Sunday`입니다.
 
 ```go
 carbon.SetTestNow(carbon.Parse("2020-08-05 13:14:15.999999999"))
@@ -80,11 +77,9 @@ carbon.ClearTestNow()
 carbon.IsTestNow() // false
 ```
 
-For more usage examples, please refer to <a href="https://carbon.go-pkg.com/zh" target="_blank">official document</a>. 
+더 많은 사용 예시는 <a href="https://carbon.go-pkg.com/ko" target="_blank">공식 문서</a>를 참조하세요. 성능 테스트 보고서는 [분석 보고서](test_report.ko.md)를 참조하세요.
 
-For performance test reports, please refer to [analysis report](test_report.en.md)
-
-## References
+## 참고 자료
 
 * [briannesbitt/carbon](https://github.com/briannesbitt/Carbon)
 * [nodatime/nodatime](https://github.com/nodatime/nodatime)
@@ -95,22 +90,21 @@ For performance test reports, please refer to [analysis report](test_report.en.m
 * [moment/moment](https://github.com/moment/moment)
 * [iamkun/dayjs](https://github.com/iamkun/dayjs)
 
-## Contributors
-Thanks to all the following who contributed to `Carbon`:
+## 기여자
+`Carbon`에 기여한 모든 분들께 감사드립니다:
 
 <a href="https://github.com/dromara/carbon/graphs/contributors"><img src="https://contrib.rocks/image?repo=dromara/carbon&max=100&columns=16" /></a>
 
-## Sponsors
+## 스폰서
 
-`Carbon` is a non-commercial open source project. If you want to support `Carbon`, you can [buy a cup of coffee](https://carbon.go-pkg.com/sponsor.html) for developer.
+`Carbon`은 비상업적 오픈소스 프로젝트입니다. `Carbon`을 지원하고 싶으시다면 개발자에게 [커피 한 잔을 사주세요](https://carbon.go-pkg.com/ko/sponsor.html).
 
-## Thanks
+## 감사의 말
 
-`Carbon` had been being developed with GoLand under the free JetBrains Open Source license, I would like to express my
-thanks here.
+`Carbon`은 JetBrains 오픈소스 라이선스의 무료 GoLand로 개발되었습니다. 여기서 감사의 말을 전하고 싶습니다.
 
 <a href="https://www.jetbrains.com" target="_blank"><img src="https://carbon.go-pkg.com/jetbrains.svg?v=2.6.x" height="50" alt="JetBrains"/></a>
 
-## License
+## 라이선스
 
-`Carbon` is licensed under the `MIT` License, see the [LICENSE](./LICENSE) file for details.
+`Carbon`은 `MIT` 라이선스 하에 제공됩니다. 자세한 내용은 [LICENSE](./LICENSE) 파일을 참조하세요.
