@@ -1,22 +1,23 @@
-# Carbon  #
+<p align="center" style="margin-bottom: -10px"><a href="https://carbon.go-pkg.com/zh" target="_blank"><img src="https://carbon.go-pkg.com/logo.svg?v=2.6.x" width="15%" alt="carbon" /></a></p>
 
 [![Carbon Release](https://img.shields.io/github/release/dromara/carbon.svg)](https://github.com/dromara/carbon/releases)
 [![Go Test](https://github.com/dromara/carbon/actions/workflows/test.yml/badge.svg)](https://github.com/dromara/carbon/actions)
 [![Go Report Card](https://goreportcard.com/badge/github.com/dromara/carbon/v2)](https://goreportcard.com/report/github.com/dromara/carbon/v2)
 [![Go Coverage](https://codecov.io/gh/dromara/carbon/branch/master/graph/badge.svg)](https://codecov.io/gh/dromara/carbon)
 [![Carbon Doc](https://img.shields.io/badge/go.dev-reference-brightgreen?logo=go&logoColor=white&style=flat)](https://pkg.go.dev/github.com/dromara/carbon/v2)
-<a href="https://hellogithub.com/repository/0eddd8c3469549b7b246f85a83d1c42e" target="_blank"><img src="https://api.hellogithub.com/v1/widgets/recommend.svg?rid=0eddd8c3469549b7b246f85a83d1c42e&claim_uid=kKBvMpyxSgLhmJO&theme=small" alt="Featured｜HelloGitHub" /></a>
+[![Awesome](https://awesome.re/badge-flat2.svg)](https://github.com/avelino/awesome-go#date-and-time)
+[![HelloGitHub](https://api.hellogithub.com/v1/widgets/recommend.svg?rid=0eddd8c3469549b7b246f85a83d1c42e&claim_uid=kKBvMpyxSgLhmJO&theme=small)](https://hellogithub.com/en/repository/dromara/carbon)
 [![License](https://img.shields.io/github/license/dromara/carbon)](https://github.com/dromara/carbon/blob/master/LICENSE)
 
-简体中文 | [English](README.md) | [日本語](README.jp.md)
+简体中文 | [English](README.md) | [日本語](README.ja.md) | [한국어](README.ko.md)
 
 ## 项目简介
 
-一个轻量级、语义化、对开发者友好的 `golang` 时间处理库，不依赖于 `任何` 第三方库， `100%` 单元测试覆盖率，已被 [awesome-go](https://github.com/yinggaozhen/awesome-go-cn#日期和时间 "awesome-go-cn") 和 [hello-github](https://hellogithub.com/repository/dromara/carbon "hello-github") 收录，并获得
+`Carbon` 是一个轻量级、语义化、对开发者友好的 `golang` 时间处理库，不依赖于 `任何` 第三方库， `100%` 单元测试覆盖率，已被 [awesome-go](https://github.com/yinggaozhen/awesome-go-cn#日期和时间 "awesome-go-cn") 和 [hello-github](https://hellogithub.com/repository/dromara/carbon "hello-github") 收录，并获得
 `gitee` 2024 年最有价值项目（`GVP`）和 `gitcode` 2024 年度开源摘星计划 (`G-Star`) 项目
 
-<img src="https://gitee.com/dromara/carbon/raw/master/gvp.jpg" width="100%" alt="gvp"/>
-<img src="https://gitee.com/dromara/carbon/raw/master/gstar.jpg" width="100%" alt="g-star"/>
+<img src="https://carbon.go-pkg.com/gvp.jpg?v=2.6.x" width="100%" alt="gvp"/>
+<img src="https://carbon.go-pkg.com/gstar.jpg?v=2.6.x" width="100%" alt="g-star"/>
 
 ## 仓库地址
 
@@ -82,10 +83,7 @@ carbon.Parse("2020-07-05 13:14:15").SetLocale("zh-CN").DiffForHumans() // 1 月�
 carbon.ClearTestNow()
 carbon.IsTestNow() // false
 ```
-
-## 文档
-
-请访问 [carbon.go-pkg.com](https://carbon.go-pkg.com) 查看完整文档
+更多用法示例请查看 <a href="https://carbon.go-pkg.com/zh" target="_blank">官方文档</a>，性能测试报告请查看 [分析报告](test_report.cn.md)
 
 ## 参考项目
 
@@ -107,13 +105,13 @@ carbon.IsTestNow() // false
 ## 赞助
 
 `Carbon` 是一个非商业开源项目, 如果你想支持 `Carbon`,
-你可以为开发者 [购买一杯咖啡](https://www.gouguoyin.com/zanzhu.html)
+你可以为开发者 [购买一杯咖啡](https://carbon.go-pkg.com/zh/sponsor.html)
 
 ## 致谢
 
 `Carbon`已获取免费的 JetBrains 开源许可证，在此表示感谢
 
-<a href="https://www.jetbrains.com"><img src="https://foruda.gitee.com/images/1704325523163241662/1bf21f86_544375.png" height="100" alt="JetBrains"/></a>
+<a href="https://www.jetbrains.com" target="_blank"><img src="https://carbon.go-pkg.com/jetbrains.svg?v=2.6.x" height="50" alt="JetBrains"/></a>
 
 ## 开源协议
 

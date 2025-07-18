@@ -1,6 +1,7 @@
 package carbon
 
 import (
+	"github.com/dromara/carbon/v2/calendar/hebrew"
 	"github.com/dromara/carbon/v2/calendar/julian"
 	"github.com/dromara/carbon/v2/calendar/lunar"
 	"github.com/dromara/carbon/v2/calendar/persian"
@@ -69,4 +70,27 @@ func CreateFromPersian(year, month, day int) *Carbon {
 		return &Carbon{Error: p.Error}
 	}
 	return NewCarbon(p.ToGregorian(DefaultTimezone).Time)
+}
+
+// Hebrew converts Carbon instance to Hebrew instance.
+func (c *Carbon) Hebrew() *hebrew.Hebrew {
+	if c.IsNil() {
+		return nil
+	}
+	if c.IsZero() || c.IsEmpty() {
+		return &hebrew.Hebrew{}
+	}
+	if c.HasError() {
+		return &hebrew.Hebrew{Error: c.Error}
+	}
+	return hebrew.FromStdTime(c.StdTime())
+}
+
+// CreateFromHebrew creates a Carbon instance from Hebrew date.
+func CreateFromHebrew(year, month, day int) *Carbon {
+	h := hebrew.NewHebrew(year, month, day)
+	if h.Error != nil {
+		return &Carbon{isEmpty: true}
+	}
+	return NewCarbon(h.ToGregorian(DefaultTimezone).Time)
 }
