@@ -1,6 +1,7 @@
 # Notifications configuration
 
 * [`amqp`](../notif/amqp.md)
+* [`apprise`](../notif/apprise.md)
 * [`discord`](../notif/discord.md)
 * [`gotify`](../notif/gotify.md)
 * [`mail`](../notif/mail.md)
