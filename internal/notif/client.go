@@ -5,6 +5,7 @@ import (
 
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/internal/notif/amqp"
+	"github.com/crazy-max/diun/v4/internal/notif/apprise"
 	"github.com/crazy-max/diun/v4/internal/notif/discord"
 	"github.com/crazy-max/diun/v4/internal/notif/gotify"
 	"github.com/crazy-max/diun/v4/internal/notif/mail"
@@ -46,6 +47,9 @@ func New(config *model.Notif, meta model.Meta) (*Client, error) {
 	// Add notifiers
 	if config.Amqp != nil {
 		c.notifiers = append(c.notifiers, amqp.New(config.Amqp, meta))
+	}
+	if config.Apprise != nil {
+		c.notifiers = append(c.notifiers, apprise.New(config.Apprise, meta))
 	}
 	if config.Discord != nil {
 		c.notifiers = append(c.notifiers, discord.New(config.Discord, meta))

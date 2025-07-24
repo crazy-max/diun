@@ -33,6 +33,7 @@ type NotifEntry struct {
 // Notif holds data necessary for notification configuration
 type Notif struct {
 	Amqp       *NotifAmqp       `yaml:"amqp,omitempty" json:"amqp,omitempty"`
+	Apprise    *NotifApprise    `yaml:"apprise,omitempty" json:"apprise,omitempty"`
 	Discord    *NotifDiscord    `yaml:"discord,omitempty" json:"discord,omitempty"`
 	Gotify     *NotifGotify     `yaml:"gotify,omitempty" json:"gotify,omitempty"`
 	Mail       *NotifMail       `yaml:"mail,omitempty" json:"mail,omitempty"`
