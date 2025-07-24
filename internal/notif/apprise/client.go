@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/url"
+	"path"
 
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/internal/msg"
@@ -57,10 +58,12 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		Message string   `json:"body"`
 		Title   string   `json:"title"`
 		Tags    []string `json:"tags"`
+		URLs    []string `json:"urls"`
 	}{
 		Message: string(body),
 		Title:   string(title),
 		Tags:    c.cfg.Tags,
+		URLs:    c.cfg.URLs,
 	}); err != nil {
 		return err
 	}
@@ -68,6 +71,12 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	u, err := url.Parse(c.cfg.Endpoint)
 	if err != nil {
 		return err
+	}
+
+	u.Path = path.Join(u.Path, "notify")
+
+	if c.cfg.Token != "" {
+		u.Path = path.Join(u.Path, c.cfg.Token)
 	}
 
 	q := u.Query()

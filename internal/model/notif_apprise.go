@@ -9,7 +9,9 @@ import (
 // NotifApprise holds apprise notification configuration details
 type NotifApprise struct {
 	Endpoint      string         `yaml:"endpoint,omitempty" json:"endpoint,omitempty" validate:"required"`
-	Tags          []string       `yaml:"tags,omitempty" json:"tags,omitempty" validate:"required"`
+	Token         string         `yaml:"token,omitempty" json:"token,omitempty" validate:"omitempty"`
+	Tags          []string       `yaml:"tags,omitempty" json:"tags,omitempty" validate:"omitempty"`
+	URLs          []string       `yaml:"urls,omitempty" json:"urls,omitempty" validate:"omitempty"`
 	Timeout       *time.Duration `yaml:"timeout,omitempty" json:"timeout,omitempty" validate:"required"`
 	TemplateTitle string         `yaml:"templateTitle,omitempty" json:"templateTitle,omitempty" validate:"required"`
 	TemplateBody  string         `yaml:"templateBody,omitempty" json:"templateBody,omitempty" validate:"required"`
@@ -24,8 +26,6 @@ func (s *NotifApprise) GetDefaults() *NotifApprise {
 
 // SetDefaults sets the default values
 func (s *NotifApprise) SetDefaults() {
-	s.Endpoint = "http://apprise:8000/notify/apprise"
-	s.Tags = []string{"all"}
 	s.Timeout = utl.NewDuration(10 * time.Second)
 	s.TemplateTitle = NotifDefaultTemplateTitle
 	s.TemplateBody = NotifDefaultTemplateBody
