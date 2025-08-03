@@ -73,6 +73,14 @@ func TestLoadFile(t *testing.T) {
 						Password: "guest",
 						Queue:    "queue",
 					},
+					Apprise: &model.NotifApprise{
+						Endpoint:      "http://apprise:8000",
+						Token:         "abc",
+						Tags:          []string{"diun"},
+						Timeout:       utl.NewDuration(10 * time.Second),
+						TemplateTitle: model.NotifDefaultTemplateTitle,
+						TemplateBody:  model.NotifDefaultTemplateBody,
+					},
 					Discord: &model.NotifDiscord{
 						WebhookURL: "https://discordapp.com/api/webhooks/1234567890/Abcd-eFgh-iJklmNo_pqr",
 						Mentions: []string{

@@ -24,6 +24,11 @@ notif:
     username: guest
     password: guest
     queue: queue
+  apprise:
+    endpoint: http://apprise:8000
+    token: abc
+    tags:
+      - diun
   discord:
     webhookURL: https://discordapp.com/api/webhooks/1234567890/Abcd-eFgh-iJklmNo_pqr
     mentions:
