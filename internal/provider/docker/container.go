@@ -9,7 +9,7 @@ import (
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/internal/provider"
 	"github.com/crazy-max/diun/v4/pkg/docker"
-	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/go-units"
 )
@@ -43,7 +43,7 @@ func (c *Client) listContainerImage() []model.Image {
 	var list []model.Image
 	for _, ctn := range ctns {
 		imageName := ctn.Image
-		imageRaw, err := cli.ImageInspectWithRaw(imageName)
+		imageInfo, err := cli.ImageInspect(imageName)
 		if err != nil {
 			c.logger.Error().Err(err).
 				Str("ctn_id", ctn.ID).
@@ -52,7 +52,7 @@ func (c *Client) listContainerImage() []model.Image {
 			continue
 		}
 
-		if local := cli.IsLocalImage(imageRaw); local {
+		if local := cli.IsLocalImage(imageInfo); local {
 			c.logger.Debug().
 				Str("ctn_id", ctn.ID).
 				Str("ctn_image", imageName).
@@ -60,7 +60,7 @@ func (c *Client) listContainerImage() []model.Image {
 			continue
 		}
 
-		if dangling := cli.IsDanglingImage(imageRaw); dangling {
+		if dangling := cli.IsDanglingImage(imageInfo); dangling {
 			c.logger.Debug().
 				Str("ctn_id", ctn.ID).
 				Str("ctn_image", imageName).
@@ -69,18 +69,18 @@ func (c *Client) listContainerImage() []model.Image {
 		}
 
 		if cli.IsDigest(imageName) {
-			if len(imageRaw.RepoDigests) > 0 {
+			if len(imageInfo.RepoDigests) > 0 {
 				c.logger.Debug().
 					Str("ctn_id", ctn.ID).
 					Str("ctn_image", imageName).
-					Strs("img_repodigests", imageRaw.RepoDigests).
+					Strs("img_repodigests", imageInfo.RepoDigests).
 					Msg("Using first image repo digest available as image name")
-				imageName = imageRaw.RepoDigests[0]
+				imageName = imageInfo.RepoDigests[0]
 			} else {
 				c.logger.Debug().
 					Str("ctn_id", ctn.ID).
 					Str("ctn_image", imageName).
-					Strs("img_repodigests", imageRaw.RepoDigests).
+					Strs("img_repodigests", imageInfo.RepoDigests).
 					Msg("Skip unknown image digest ref")
 				continue
 			}
@@ -115,7 +115,7 @@ func (c *Client) listContainerImage() []model.Image {
 	return list
 }
 
-func metadata(ctn types.Container) map[string]string {
+func metadata(ctn container.Summary) map[string]string {
 	return map[string]string{
 		"ctn_id":        ctn.ID,
 		"ctn_names":     formatNames(ctn.Names),

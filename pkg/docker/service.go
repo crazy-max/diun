@@ -3,14 +3,13 @@ package docker
 import (
 	"sort"
 
-	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/swarm"
 )
 
 // ServiceList returns Swarm services
 func (c *Client) ServiceList(filterArgs filters.Args) ([]swarm.Service, error) {
-	services, err := c.API.ServiceList(c.ctx, types.ServiceListOptions{
+	services, err := c.API.ServiceList(c.ctx, swarm.ServiceListOptions{
 		Filters: filterArgs,
 	})
 	if err != nil {

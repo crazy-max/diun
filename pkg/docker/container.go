@@ -3,13 +3,12 @@ package docker
 import (
 	"sort"
 
-	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
 )
 
 // ContainerList returns Docker containers
-func (c *Client) ContainerList(filterArgs filters.Args) ([]types.Container, error) {
+func (c *Client) ContainerList(filterArgs filters.Args) ([]container.Summary, error) {
 	containers, err := c.API.ContainerList(c.ctx, container.ListOptions{
 		Filters: filterArgs,
 	})
