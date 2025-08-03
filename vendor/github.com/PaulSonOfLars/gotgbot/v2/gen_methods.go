@@ -1067,7 +1067,7 @@ type DeleteBusinessMessagesOpts struct {
 
 // DeleteBusinessMessages (https://core.telegram.org/bots/api#deletebusinessmessages)
 //
-// Delete messages on behalf of a business account. Requires the can_delete_outgoing_messages business bot right to delete messages sent by the bot itself, or the can_delete_all_messages business bot right to delete any message. Returns True on success.
+// Delete messages on behalf of a business account. Requires the can_delete_sent_messages business bot right to delete messages sent by the bot itself, or the can_delete_all_messages business bot right to delete any message. Returns True on success.
 //   - businessConnectionId (type string): Unique identifier of the business connection on behalf of which to delete the messages
 //   - messageIds (type []int64): A JSON-serialized list of 1-100 identifiers of messages to delete. All messages must be from the same chat. See deleteMessage for limitations on which messages can be deleted
 //   - opts (type DeleteBusinessMessagesOpts): All optional parameters.
@@ -1736,6 +1736,59 @@ func (bot *Bot) EditMessageCaptionWithContext(ctx context.Context, opts *EditMes
 	}
 	return &m, true, nil
 
+}
+
+// EditMessageChecklistOpts is the set of optional fields for Bot.EditMessageChecklist and Bot.EditMessageChecklistWithContext.
+type EditMessageChecklistOpts struct {
+	// A JSON-serialized object for the new inline keyboard for the message
+	ReplyMarkup InlineKeyboardMarkup
+	// RequestOpts are an additional optional field to configure timeouts for individual requests
+	RequestOpts *RequestOpts
+}
+
+// EditMessageChecklist (https://core.telegram.org/bots/api#editmessagechecklist)
+//
+// Use this method to edit a checklist on behalf of a connected business account. On success, the edited Message is returned.
+//   - businessConnectionId (type string): Unique identifier of the business connection on behalf of which the message will be sent
+//   - chatId (type int64): Unique identifier for the target chat
+//   - messageId (type int64): Unique identifier for the target message
+//   - checklist (type InputChecklist): A JSON-serialized object for the new checklist
+//   - opts (type EditMessageChecklistOpts): All optional parameters.
+func (bot *Bot) EditMessageChecklist(businessConnectionId string, chatId int64, messageId int64, checklist InputChecklist, opts *EditMessageChecklistOpts) (*Message, error) {
+	return bot.EditMessageChecklistWithContext(context.Background(), businessConnectionId, chatId, messageId, checklist, opts)
+}
+
+// EditMessageChecklistWithContext is the same as Bot.EditMessageChecklist, but with a context.Context parameter
+func (bot *Bot) EditMessageChecklistWithContext(ctx context.Context, businessConnectionId string, chatId int64, messageId int64, checklist InputChecklist, opts *EditMessageChecklistOpts) (*Message, error) {
+	v := map[string]string{}
+	v["business_connection_id"] = businessConnectionId
+	v["chat_id"] = strconv.FormatInt(chatId, 10)
+	v["message_id"] = strconv.FormatInt(messageId, 10)
+	bs, err := json.Marshal(checklist)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal field checklist: %w", err)
+	}
+	v["checklist"] = string(bs)
+	if opts != nil {
+		bs, err := json.Marshal(opts.ReplyMarkup)
+		if err != nil {
+			return nil, fmt.Errorf("failed to marshal field reply_markup: %w", err)
+		}
+		v["reply_markup"] = string(bs)
+	}
+
+	var reqOpts *RequestOpts
+	if opts != nil {
+		reqOpts = opts.RequestOpts
+	}
+
+	r, err := bot.RequestWithContext(ctx, "editMessageChecklist", v, nil, reqOpts)
+	if err != nil {
+		return nil, err
+	}
+
+	var m Message
+	return &m, json.Unmarshal(r, &m)
 }
 
 // EditMessageLiveLocationOpts is the set of optional fields for Bot.EditMessageLiveLocation and Bot.EditMessageLiveLocationWithContext.
@@ -3021,6 +3074,38 @@ func (bot *Bot) GetMyShortDescriptionWithContext(ctx context.Context, opts *GetM
 	return &b, json.Unmarshal(r, &b)
 }
 
+// GetMyStarBalanceOpts is the set of optional fields for Bot.GetMyStarBalance and Bot.GetMyStarBalanceWithContext.
+type GetMyStarBalanceOpts struct {
+	// RequestOpts are an additional optional field to configure timeouts for individual requests
+	RequestOpts *RequestOpts
+}
+
+// GetMyStarBalance (https://core.telegram.org/bots/api#getmystarbalance)
+//
+// A method to get the current Telegram Stars balance of the bot. Requires no parameters. On success, returns a StarAmount object.
+//   - opts (type GetMyStarBalanceOpts): All optional parameters.
+func (bot *Bot) GetMyStarBalance(opts *GetMyStarBalanceOpts) (*StarAmount, error) {
+	return bot.GetMyStarBalanceWithContext(context.Background(), opts)
+}
+
+// GetMyStarBalanceWithContext is the same as Bot.GetMyStarBalance, but with a context.Context parameter
+func (bot *Bot) GetMyStarBalanceWithContext(ctx context.Context, opts *GetMyStarBalanceOpts) (*StarAmount, error) {
+	v := map[string]string{}
+
+	var reqOpts *RequestOpts
+	if opts != nil {
+		reqOpts = opts.RequestOpts
+	}
+
+	r, err := bot.RequestWithContext(ctx, "getMyStarBalance", v, nil, reqOpts)
+	if err != nil {
+		return nil, err
+	}
+
+	var s StarAmount
+	return &s, json.Unmarshal(r, &s)
+}
+
 // GetStarTransactionsOpts is the set of optional fields for Bot.GetStarTransactions and Bot.GetStarTransactionsWithContext.
 type GetStarTransactionsOpts struct {
 	// Number of transactions to skip in the response
@@ -3548,7 +3633,7 @@ func (bot *Bot) PostStoryWithContext(ctx context.Context, businessConnectionId s
 type PromoteChatMemberOpts struct {
 	// Pass True if the administrator's presence in the chat is hidden
 	IsAnonymous bool
-	// Pass True if the administrator can access the chat event log, get boost list, see hidden supergroup and channel members, report spam messages and ignore slow mode. Implied by any other administrator privilege.
+	// Pass True if the administrator can access the chat event log, get boost list, see hidden supergroup and channel members, report spam messages, ignore slow mode, and send messages to the chat without paying Telegram Stars. Implied by any other administrator privilege.
 	CanManageChat bool
 	// Pass True if the administrator can delete messages of other users
 	CanDeleteMessages bool
@@ -3568,7 +3653,7 @@ type PromoteChatMemberOpts struct {
 	CanEditStories bool
 	// Pass True if the administrator can delete stories posted by other users
 	CanDeleteStories bool
-	// Pass True if the administrator can post messages in the channel, or access channel statistics; for channels only
+	// Pass True if the administrator can post messages in the channel, approve suggested posts, or access channel statistics; for channels only
 	CanPostMessages bool
 	// Pass True if the administrator can edit messages of other users and can pin messages; for channels only
 	CanEditMessages bool
@@ -4356,6 +4441,75 @@ func (bot *Bot) SendChatActionWithContext(ctx context.Context, chatId int64, act
 
 	var b bool
 	return b, json.Unmarshal(r, &b)
+}
+
+// SendChecklistOpts is the set of optional fields for Bot.SendChecklist and Bot.SendChecklistWithContext.
+type SendChecklistOpts struct {
+	// Sends the message silently. Users will receive a notification with no sound.
+	DisableNotification bool
+	// Protects the contents of the sent message from forwarding and saving
+	ProtectContent bool
+	// Unique identifier of the message effect to be added to the message
+	MessageEffectId string
+	// A JSON-serialized object for description of the message to reply to
+	ReplyParameters *ReplyParameters
+	// A JSON-serialized object for an inline keyboard
+	ReplyMarkup InlineKeyboardMarkup
+	// RequestOpts are an additional optional field to configure timeouts for individual requests
+	RequestOpts *RequestOpts
+}
+
+// SendChecklist (https://core.telegram.org/bots/api#sendchecklist)
+//
+// Use this method to send a checklist on behalf of a connected business account. On success, the sent Message is returned.
+//   - businessConnectionId (type string): Unique identifier of the business connection on behalf of which the message will be sent
+//   - chatId (type int64): Unique identifier for the target chat
+//   - checklist (type InputChecklist): A JSON-serialized object for the checklist to send
+//   - opts (type SendChecklistOpts): All optional parameters.
+func (bot *Bot) SendChecklist(businessConnectionId string, chatId int64, checklist InputChecklist, opts *SendChecklistOpts) (*Message, error) {
+	return bot.SendChecklistWithContext(context.Background(), businessConnectionId, chatId, checklist, opts)
+}
+
+// SendChecklistWithContext is the same as Bot.SendChecklist, but with a context.Context parameter
+func (bot *Bot) SendChecklistWithContext(ctx context.Context, businessConnectionId string, chatId int64, checklist InputChecklist, opts *SendChecklistOpts) (*Message, error) {
+	v := map[string]string{}
+	v["business_connection_id"] = businessConnectionId
+	v["chat_id"] = strconv.FormatInt(chatId, 10)
+	bs, err := json.Marshal(checklist)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal field checklist: %w", err)
+	}
+	v["checklist"] = string(bs)
+	if opts != nil {
+		v["disable_notification"] = strconv.FormatBool(opts.DisableNotification)
+		v["protect_content"] = strconv.FormatBool(opts.ProtectContent)
+		v["message_effect_id"] = opts.MessageEffectId
+		if opts.ReplyParameters != nil {
+			bs, err := json.Marshal(opts.ReplyParameters)
+			if err != nil {
+				return nil, fmt.Errorf("failed to marshal field reply_parameters: %w", err)
+			}
+			v["reply_parameters"] = string(bs)
+		}
+		bs, err := json.Marshal(opts.ReplyMarkup)
+		if err != nil {
+			return nil, fmt.Errorf("failed to marshal field reply_markup: %w", err)
+		}
+		v["reply_markup"] = string(bs)
+	}
+
+	var reqOpts *RequestOpts
+	if opts != nil {
+		reqOpts = opts.RequestOpts
+	}
+
+	r, err := bot.RequestWithContext(ctx, "sendChecklist", v, nil, reqOpts)
+	if err != nil {
+		return nil, err
+	}
+
+	var m Message
+	return &m, json.Unmarshal(r, &m)
 }
 
 // SendContactOpts is the set of optional fields for Bot.SendContact and Bot.SendContactWithContext.
@@ -5452,7 +5606,7 @@ type SendPollOpts struct {
 // Use this method to send a native poll. On success, the sent Message is returned.
 //   - chatId (type int64): Unique identifier for the target chat
 //   - question (type string): Poll question, 1-300 characters
-//   - options (type []InputPollOption): A JSON-serialized list of 2-10 answer options
+//   - options (type []InputPollOption): A JSON-serialized list of 2-12 answer options
 //   - opts (type SendPollOpts): All optional parameters.
 func (bot *Bot) SendPoll(chatId int64, question string, options []InputPollOption, opts *SendPollOpts) (*Message, error) {
 	return bot.SendPollWithContext(context.Background(), chatId, question, options, opts)
