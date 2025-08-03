@@ -1,18 +1,19 @@
-# Carbon
+<p align="center" style="margin-bottom: -10px"><a href="https://carbon.go-pkg.com/zh" target="_blank"><img src="https://carbon.go-pkg.com/logo.svg?v=2.6.x" width="15%" alt="carbon" /></a></p>
 
 [![Carbon Release](https://img.shields.io/github/release/dromara/carbon.svg)](https://github.com/dromara/carbon/releases)
 [![Go Test](https://github.com/dromara/carbon/actions/workflows/test.yml/badge.svg)](https://github.com/dromara/carbon/actions)
 [![Go Report Card](https://goreportcard.com/badge/github.com/dromara/carbon/v2)](https://goreportcard.com/report/github.com/dromara/carbon/v2)
 [![Go Coverage](https://codecov.io/gh/dromara/carbon/branch/master/graph/badge.svg)](https://codecov.io/gh/dromara/carbon)
 [![Carbon Doc](https://img.shields.io/badge/go.dev-reference-brightgreen?logo=go&logoColor=white&style=flat)](https://pkg.go.dev/github.com/dromara/carbon/v2)
-<a href="https://hellogithub.com/en/repository/dromara/carbon" target="_blank"><img src="https://api.hellogithub.com/v1/widgets/recommend.svg?rid=0eddd8c3469549b7b246f85a83d1c42e&claim_uid=kKBvMpyxSgLhmJO&theme=small" alt="Featured｜HelloGitHub" /></a>
+[![Awesome](https://awesome.re/badge-flat2.svg)](https://github.com/avelino/awesome-go#date-and-time)
+[![HelloGitHub](https://api.hellogithub.com/v1/widgets/recommend.svg?rid=0eddd8c3469549b7b246f85a83d1c42e&claim_uid=kKBvMpyxSgLhmJO&theme=small)](https://hellogithub.com/en/repository/dromara/carbon)
 [![License](https://img.shields.io/github/license/dromara/carbon)](https://github.com/dromara/carbon/blob/master/LICENSE)
 
-日本語 | [English](README.md) | [简体中文](README.cn.md)
+日本語 | [English](README.md) | [简体中文](README.cn.md) | [한국어](README.ko.md)
 
 ## イントロ
 
-軽量、セマンティック、開発者に優しい `golang` 時間処理ライブラリ, `いかなる`第三者ライブラリにも依存せず、` 100%`ユニットテストカバレッジ率は、[awesome-go](https://github.com/avelino/awesome-go#date-and-time "awesome-go") と [hello-github](https://hellogithub.com/en/repository/dromara/carbon "hello-github") 収録
+`Carbon` は軽量、セマンティック、開発者に優しい `golang` 時間処理ライブラリ, `いかなる`第三者ライブラリにも依存せず、`100%`ユニットテストカバレッジ率は、[awesome-go](https://github.com/avelino/awesome-go#date-and-time "awesome-go") と [hello-github](https://hellogithub.com/en/repository/dromara/carbon "hello-github") 収録
 
 ## リポジトリ
 
@@ -75,6 +76,9 @@ carbon.Parse("2020-07-05 13:14:15").SetLocale("jp").DiffForHumans() // 1 ヶ月�
 carbon.ClearTestNow()
 carbon.IsTestNow() // false
 ```
+詳細については <a href="https://carbon.go-pkg.com/ja" target="_blank">公式ドキュメント</a>
+
+より多くの使用例については、<a href="https://carbon.go-pkg.com/ja" target="_blank">公式ドキュメント</a>をご覧ください。性能テストレポートについては、[分析报告](test_report.ja.md)をご参照ください
 
 ## リファレンス
 
@@ -94,14 +98,14 @@ carbon.IsTestNow() // false
 
 ## スポンサー
 
-`Carbon` は非営利のオープンソースプロジェクトです，`Carbon` をサポートしたい場合は、開発者のために [コーヒーを1杯購入](https://opencollective.com/go-carbon) できます
+`Carbon` は非営利のオープンソースプロジェクトです，`Carbon` をサポートしたい場合は、開発者のために [コーヒーを1杯購入](https://carbon.go-pkg.com/ja/sponsor.html) できます
 
 ## 謝辞
 
 `Carbon` は無料の JetBrains オープンソースライセンスを取得しました，これに感謝します
 
-<a href="https://www.jetbrains.com"><img src="https://foruda.gitee.com/images/1704325523163241662/1bf21f86_544375.png" height="100" alt="JetBrains"/></a>
+<a href="https://www.jetbrains.com" target="_blank"><img src="https://carbon.go-pkg.com/jetbrains.svg?v=2.6.x" height="50" alt="JetBrains"/></a>
 
 ## オープンソースプロトコル
 
-`Carbon` は `MIT` オープンソースプロトコルに準拠しており、詳細は[LICENSE]（./LICENSE）を参照してください
+`Carbon` は `MIT` オープンソースプロトコルに準拠しており、詳細は [LICENSE](./LICENSE) を参照してください

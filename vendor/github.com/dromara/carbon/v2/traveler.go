@@ -20,6 +20,8 @@ func Now(timezone ...string) *Carbon {
 		return &Carbon{Error: err}
 	}
 	if IsTestNow() {
+		frozenNow.rw.RLock()
+		defer frozenNow.rw.RUnlock()
 		return frozenNow.testNow.Copy().SetLocation(loc)
 	}
 	return CreateFromStdTime(time.Now().In(loc))

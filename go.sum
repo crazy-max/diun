@@ -96,8 +96,8 @@ github.com/docker/go-metrics v0.0.1 h1:AgB/0SvBxihN0X8OR4SjsblXkbMvalQ8cjmtKQ2rQ
 github.com/docker/go-metrics v0.0.1/go.mod h1:cG1hvH2utMXtqgqqYE9plW6lDxS3/5ayHzueweSI3Vw=
 github.com/docker/go-units v0.5.0 h1:69rxXcBk27SvSaaxTtLh/8llcHD8vYHT7WSdRZ/jvr4=
 github.com/docker/go-units v0.5.0/go.mod h1:fgPhTUdO+D/Jk86RDLlptpiXQzgHJF7gydDDbaIK4Dk=
-github.com/dromara/carbon/v2 v2.6.8 h1:2iWFoekr7p5WAWb5NK7Edf4Co8GQKSinh24+osgGt2Y=
-github.com/dromara/carbon/v2 v2.6.8/go.mod h1:7GXqCUplwN1s1b4whGk2zX4+g4CMCoDIZzmjlyt0vLY=
+github.com/dromara/carbon/v2 v2.6.11 h1:wnAWZ+sbza1uXw3r05hExNSCaBPFaarWfUvYAX86png=
+github.com/dromara/carbon/v2 v2.6.11/go.mod h1:7GXqCUplwN1s1b4whGk2zX4+g4CMCoDIZzmjlyt0vLY=
 github.com/eclipse/paho.mqtt.golang v1.5.0 h1:EH+bUVJNgttidWFkLLVKaQPGmkTUfQQqjOsyvMGvD6o=
 github.com/eclipse/paho.mqtt.golang v1.5.0/go.mod h1:du/2qNQVqJf/Sqs4MEL77kR8QTqANF7XU7Fk0aOTAgk=
 github.com/emicklei/go-restful/v3 v3.11.0 h1:rAQeMHw1c7zTmncogyy8VvRZwtkmkZ4FxERmMY4rD+g=

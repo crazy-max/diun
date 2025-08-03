@@ -174,10 +174,11 @@ github.com/docker/go-connections/tlsconfig
 # github.com/docker/go-units v0.5.0
 ## explicit
 github.com/docker/go-units
-# github.com/dromara/carbon/v2 v2.6.8
+# github.com/dromara/carbon/v2 v2.6.11
 ## explicit; go 1.21
 github.com/dromara/carbon/v2
 github.com/dromara/carbon/v2/calendar
+github.com/dromara/carbon/v2/calendar/hebrew
 github.com/dromara/carbon/v2/calendar/julian
 github.com/dromara/carbon/v2/calendar/lunar
 github.com/dromara/carbon/v2/calendar/persian
