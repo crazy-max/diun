@@ -10,6 +10,7 @@ import (
 type NotifApprise struct {
 	Endpoint      string         `yaml:"endpoint,omitempty" json:"endpoint,omitempty" validate:"required"`
 	Token         string         `yaml:"token,omitempty" json:"token,omitempty" validate:"omitempty"`
+	TokenFile     string         `yaml:"tokenFile,omitempty" json:"tokenFile,omitempty" validate:"omitempty,file"`
 	Tags          []string       `yaml:"tags,omitempty" json:"tags,omitempty" validate:"omitempty"`
 	URLs          []string       `yaml:"urls,omitempty" json:"urls,omitempty" validate:"omitempty"`
 	Timeout       *time.Duration `yaml:"timeout,omitempty" json:"timeout,omitempty" validate:"required"`

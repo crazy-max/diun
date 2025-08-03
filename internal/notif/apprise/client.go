@@ -11,6 +11,7 @@ import (
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/internal/msg"
 	"github.com/crazy-max/diun/v4/internal/notif/notifier"
+	"github.com/crazy-max/diun/v4/pkg/utl"
 	"github.com/pkg/errors"
 )
 
@@ -75,8 +76,12 @@ func (c *Client) Send(entry model.NotifEntry) error {
 
 	u.Path = path.Join(u.Path, "notify")
 
-	if c.cfg.Token != "" {
-		u.Path = path.Join(u.Path, c.cfg.Token)
+	if c.cfg.Token != "" || c.cfg.TokenFile != "" {
+		token, err := utl.GetSecret(c.cfg.Token, c.cfg.TokenFile)
+		if err != nil {
+			return errors.Wrap(err, "cannot retrieve token secret for Apprise notifier")
+		}
+		u.Path = path.Join(u.Path, token)
 	}
 
 	q := u.Query()
