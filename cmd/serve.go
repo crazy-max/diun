@@ -15,14 +15,14 @@ import (
 
 // ServeCmd holds serve command args and flags
 type ServeCmd struct {
-	Cfgfile       string `kong:"name='config',env='CONFIG',help='Diun configuration file.'"`
-	ProfilerPath  string `kong:"name='profiler-path',env='PROFILER_PATH',help='Base path where profiling files are written.'"`
-	Profiler      string `kong:"name='profiler',env='PROFILER',help='Profiler to use.'"`
-	LogLevel      string `kong:"name='log-level',env='LOG_LEVEL',default='info',help='Set log level.'"`
-	LogJSON       bool   `kong:"name='log-json',env='LOG_JSON',default='false',help='Enable JSON logging output.'"`
-	LogCaller     bool   `kong:"name='log-caller',env='LOG_CALLER',default='false',help='Add file:line of the caller to log output.'"`
-	LogNoColor    bool   `kong:"name='log-nocolor',env='LOG_NOCOLOR',default='false',help='Disables the colorized output.'"`
-	GRPCAuthority string `kong:"name='grpc-authority',env='GRPC_AUTHORITY',default=':42286',help='Address used to expose the gRPC server.'"`
+	Cfgfile       string `name:"config" env:"CONFIG" help:"Diun configuration file."`
+	ProfilerPath  string `name:"profiler-path" env:"PROFILER_PATH" help:"Base path where profiling files are written."`
+	Profiler      string `name:"profiler" env:"PROFILER" help:"Profiler to use."`
+	LogLevel      string `name:"log-level" env:"LOG_LEVEL" default:"info" help:"Set log level."`
+	LogJSON       bool   `name:"log-json" env:"LOG_JSON" default:"false" help:"Enable JSON logging output.'"`
+	LogCaller     bool   `name:"log-caller" env:"LOG_CALLER" default:"false" help:"Add file:line of the caller to log output."`
+	LogNoColor    bool   `name:"log-nocolor" env:"LOG_NOCOLOR" default:"false" help:"Disables the colorized output."`
+	GRPCAuthority string `name:"grpc-authority" env:"GRPC_AUTHORITY" default:":42286" help:"Address used to expose the gRPC server."`
 }
 
 func (s *ServeCmd) Run(ctx *Context) error {
