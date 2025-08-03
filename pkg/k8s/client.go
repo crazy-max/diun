@@ -68,7 +68,7 @@ func newInClusterClient(opts Options) (*kubernetes.Clientset, error) {
 		config.Host = opts.Endpoint
 	}
 	if opts.TLSInsecure != nil {
-		config.TLSClientConfig.Insecure = *opts.TLSInsecure
+		config.Insecure = *opts.TLSInsecure
 	}
 
 	return kubernetes.NewForConfig(config)
@@ -80,7 +80,7 @@ func newExternalClusterClientFromFile(opts Options, file string) (*kubernetes.Cl
 		return nil, err
 	}
 	if opts.TLSInsecure != nil {
-		configFromFlags.TLSClientConfig.Insecure = *opts.TLSInsecure
+		configFromFlags.Insecure = *opts.TLSInsecure
 	}
 
 	return kubernetes.NewForConfig(configFromFlags)
@@ -113,7 +113,7 @@ func newExternalClusterClient(opts Options) (*kubernetes.Clientset, error) {
 		}
 	}
 	if opts.TLSInsecure != nil {
-		config.TLSClientConfig.Insecure = *opts.TLSInsecure
+		config.Insecure = *opts.TLSInsecure
 	}
 
 	return kubernetes.NewForConfig(config)

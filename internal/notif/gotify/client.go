@@ -89,11 +89,12 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	q.Set("token", token)
 	u.RawQuery = q.Encode()
 
-	hc := http.Client{}
-	ctx, cancel := context.WithTimeout(context.Background(), *c.cfg.Timeout)
-	defer cancel()
+	cancelCtx, cancel := context.WithCancelCause(context.Background())
+	timeoutCtx, _ := context.WithTimeoutCause(cancelCtx, *c.cfg.Timeout, errors.WithStack(context.DeadlineExceeded)) //nolint:govet // no need to manually cancel this context as we already rely on parent
+	defer func() { cancel(errors.WithStack(context.Canceled)) }()
 
-	req, err := http.NewRequestWithContext(ctx, "POST", u.String(), bytes.NewBuffer(jsonBody))
+	hc := http.Client{}
+	req, err := http.NewRequestWithContext(timeoutCtx, "POST", u.String(), bytes.NewBuffer(jsonBody))
 	if err != nil {
 		return err
 	}
