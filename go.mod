@@ -1,6 +1,6 @@
 module github.com/crazy-max/diun/v4
 
-go 1.23.3
+go 1.24.0
 
 require (
 	dario.cat/mergo v1.0.2
