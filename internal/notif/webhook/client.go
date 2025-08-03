@@ -8,6 +8,7 @@ import (
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/internal/msg"
 	"github.com/crazy-max/diun/v4/internal/notif/notifier"
+	"github.com/pkg/errors"
 )
 
 // Client represents an active webhook notification object
@@ -47,11 +48,12 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		return err
 	}
 
-	hc := http.Client{}
-	ctx, cancel := context.WithTimeout(context.Background(), *c.cfg.Timeout)
-	defer cancel()
+	cancelCtx, cancel := context.WithCancelCause(context.Background())
+	timeoutCtx, _ := context.WithTimeoutCause(cancelCtx, *c.cfg.Timeout, errors.WithStack(context.DeadlineExceeded)) //nolint:govet // no need to manually cancel this context as we already rely on parent
+	defer func() { cancel(errors.WithStack(context.Canceled)) }()
 
-	req, err := http.NewRequestWithContext(ctx, "POST", c.cfg.Endpoint, bytes.NewBuffer(body))
+	hc := http.Client{}
+	req, err := http.NewRequestWithContext(timeoutCtx, "POST", c.cfg.Endpoint, bytes.NewBuffer(body))
 	if err != nil {
 		return err
 	}

@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/containers/image/v5/types"
+	"github.com/pkg/errors"
 )
 
 // Client represents an active docker registry object
@@ -43,9 +44,11 @@ func New(opts Options) (*Client, error) {
 
 func (c *Client) timeoutContext() (context.Context, context.CancelFunc) {
 	ctx := context.Background()
-	var cancel context.CancelFunc = func() {}
+	var cancelFunc context.CancelFunc = func() {}
 	if c.opts.Timeout > 0 {
-		ctx, cancel = context.WithTimeout(ctx, c.opts.Timeout)
+		cancelCtx, cancel := context.WithCancelCause(ctx)
+		ctx, _ = context.WithTimeoutCause(cancelCtx, c.opts.Timeout, errors.WithStack(context.DeadlineExceeded)) //nolint:govet // no need to manually cancel this context as we already rely on parent
+		cancelFunc = func() { cancel(errors.WithStack(context.Canceled)) }
 	}
-	return ctx, cancel
+	return ctx, cancelFunc
 }

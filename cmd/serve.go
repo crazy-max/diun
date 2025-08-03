@@ -79,7 +79,7 @@ func (s *ServeCmd) Run(ctx *Context) error {
 		case "block":
 			defer profile.Start(profile.BlockProfile, profilePath).Stop()
 		default:
-			log.Fatal().Msgf("Unknown profiler: %s", s.Profiler)
+			log.Fatal().Msgf("Unknown profiler: %s", s.Profiler) //nolint:gocritic // defer not set if profiler is unknown
 		}
 	}
 

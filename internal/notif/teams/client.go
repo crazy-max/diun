@@ -110,11 +110,12 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		return err
 	}
 
-	hc := http.Client{}
-	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(10)*time.Second)
-	defer cancel()
+	cancelCtx, cancel := context.WithCancelCause(context.Background())
+	timeoutCtx, _ := context.WithTimeoutCause(cancelCtx, 10*time.Second, errors.WithStack(context.DeadlineExceeded)) //nolint:govet // no need to manually cancel this context as we already rely on parent
+	defer func() { cancel(errors.WithStack(context.Canceled)) }()
 
-	req, err := http.NewRequestWithContext(ctx, "POST", webhookURL, bytes.NewBuffer(jsonBody))
+	hc := http.Client{}
+	req, err := http.NewRequestWithContext(timeoutCtx, "POST", webhookURL, bytes.NewBuffer(jsonBody))
 	if err != nil {
 		return err
 	}
