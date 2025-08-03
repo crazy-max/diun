@@ -14,27 +14,35 @@ import (
 	units "github.com/docker/go-units"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/tidwall/pretty"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/protobuf/encoding/protojson"
 )
 
 // ImageCmd holds image command
 type ImageCmd struct {
-	List    ImageListCmd    `kong:"cmd,default='1',help='List images in database.'"`
-	Inspect ImageInspectCmd `kong:"cmd,help='Display information of an image in database.'"`
-	Remove  ImageRemoveCmd  `kong:"cmd,help='Remove an image manifest from database.'"`
-	Prune   ImagePruneCmd   `kong:"cmd,help='Remove all manifests from the database.'"`
+	List    ImageListCmd    `cmd:"" default:"1" help:"List images in database."`
+	Inspect ImageInspectCmd `cmd:"" help:"Display information of an image in database."`
+	Remove  ImageRemoveCmd  `cmd:"" help:"Remove an image manifest from database."`
+	Prune   ImagePruneCmd   `cmd:"" help:"Remove all manifests from the database."`
 }
 
 // ImageListCmd holds image list command
 type ImageListCmd struct {
-	CliGlobals
-	Raw bool `kong:"name='raw',default='false',help='JSON output.'"`
+	Raw           bool   `name:"raw" default:"false" help:"JSON output."`
+	GRPCAuthority string `name:"grpc-authority" default:"127.0.0.1:42286" help:"Link to Diun gRPC server."`
 }
 
 func (s *ImageListCmd) Run(_ *Context) error {
-	defer s.conn.Close()
+	conn, err := grpc.NewClient(s.GRPCAuthority, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		return err
+	}
+	defer conn.Close()
 
-	il, err := s.imageSvc.ImageList(context.Background(), &pb.ImageListRequest{})
+	imageSvc := pb.NewImageServiceClient(conn)
+
+	il, err := imageSvc.ImageList(context.Background(), &pb.ImageListRequest{})
 	if err != nil {
 		return err
 	}
@@ -68,15 +76,21 @@ func (s *ImageListCmd) Run(_ *Context) error {
 
 // ImageInspectCmd holds image inspect command
 type ImageInspectCmd struct {
-	CliGlobals
-	Image string `kong:"name='image',required,help='Image to inspect.'"`
-	Raw   bool   `kong:"name='raw',default='false',help='JSON output.'"`
+	Image         string `name:"image" required:"" help:"Image to inspect."`
+	Raw           bool   `name:"raw" default:"false" help:"JSON output."`
+	GRPCAuthority string `name:"grpc-authority" default:"127.0.0.1:42286" help:"Link to Diun gRPC server."`
 }
 
 func (s *ImageInspectCmd) Run(_ *Context) error {
-	defer s.conn.Close()
+	conn, err := grpc.NewClient(s.GRPCAuthority, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		return err
+	}
+	defer conn.Close()
 
-	ii, err := s.imageSvc.ImageInspect(context.Background(), &pb.ImageInspectRequest{
+	imageSvc := pb.NewImageServiceClient(conn)
+
+	ii, err := imageSvc.ImageInspect(context.Background(), &pb.ImageInspectRequest{
 		Name: s.Image,
 	})
 	if err != nil {
@@ -107,14 +121,20 @@ func (s *ImageInspectCmd) Run(_ *Context) error {
 
 // ImageRemoveCmd holds image remove command
 type ImageRemoveCmd struct {
-	CliGlobals
-	Image string `kong:"name='image',required,help='Image to remove.'"`
+	Image         string `name:"image" required:"" help:"Image to remove."`
+	GRPCAuthority string `name:"grpc-authority" default:"127.0.0.1:42286" help:"Link to Diun gRPC server."`
 }
 
 func (s *ImageRemoveCmd) Run(_ *Context) error {
-	defer s.conn.Close()
+	conn, err := grpc.NewClient(s.GRPCAuthority, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		return err
+	}
+	defer conn.Close()
 
-	removed, err := s.imageSvc.ImageRemove(context.Background(), &pb.ImageRemoveRequest{
+	imageSvc := pb.NewImageServiceClient(conn)
+
+	removed, err := imageSvc.ImageRemove(context.Background(), &pb.ImageRemoveRequest{
 		Name: s.Image,
 	})
 	if err != nil {
@@ -137,10 +157,10 @@ func (s *ImageRemoveCmd) Run(_ *Context) error {
 
 // ImagePruneCmd holds image prune command
 type ImagePruneCmd struct {
-	CliGlobals
-	// All    bool   `kong:"name='all',default='false',help='Remove all manifests from the database.'"`
-	// Filter string `kong:"name='filter',help='Provide filter values (e.g., until=24h).'"`
-	Force bool `kong:"name='force',default='false',help='Do not prompt for confirmation.'"`
+	// All    bool   `name:"all' default:"false help:"Remove all manifests from the database."`
+	// Filter string `name:"filter help:"Provide filter values (e.g., until=24h)."`
+	Force         bool   `name:"force" default:"false" help:"Do not prompt for confirmation."`
+	GRPCAuthority string `name:"grpc-authority" default:"127.0.0.1:42286" help:"Link to Diun gRPC server."`
 }
 
 const (
@@ -148,7 +168,13 @@ const (
 )
 
 func (s *ImagePruneCmd) Run(_ *Context) error {
-	defer s.conn.Close()
+	conn, err := grpc.NewClient(s.GRPCAuthority, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		return err
+	}
+	defer conn.Close()
+
+	imageSvc := pb.NewImageServiceClient(conn)
 
 	if !s.Force {
 		var confirmed bool
@@ -163,7 +189,7 @@ func (s *ImagePruneCmd) Run(_ *Context) error {
 		}
 	}
 
-	removed, err := s.imageSvc.ImagePrune(context.Background(), &pb.ImagePruneRequest{
+	removed, err := imageSvc.ImagePrune(context.Background(), &pb.ImagePruneRequest{
 		//All:    s.All,
 		//Filter: s.Filter,
 	})
