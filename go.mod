@@ -158,3 +158,5 @@ require (
 	sigs.k8s.io/structured-merge-diff/v4 v4.4.2 // indirect
 	sigs.k8s.io/yaml v1.4.0 // indirect
 )
+
+replace google.golang.org/genproto => google.golang.org/genproto v0.0.0-20250324211829-b45e905df463 // https://github.com/crazy-max/diun/pull/1445#issuecomment-3148492660
