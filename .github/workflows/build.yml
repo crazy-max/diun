@@ -145,6 +145,35 @@ jobs:
           directory: ${{ env.DESTDIR }}/coverage
           token: ${{ secrets.CODECOV_TOKEN }}
 
+  govulncheck:
+    runs-on: ubuntu-latest
+    permissions:
+      # same as global permission
+      contents: read
+      # required to write sarif report
+      security-events: write
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v4
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      -
+        name: Run
+        uses: docker/bake-action@v6
+        with:
+          source: .
+          targets: govulncheck
+        env:
+          GOVULNCHECK_FORMAT: sarif
+      -
+        name: Upload SARIF report
+        if: ${{ github.ref == 'refs/heads/master' }}
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: ${{ env.DESTDIR }}/govulncheck.out
+
   artifact:
     runs-on: ubuntu-latest
     needs:
