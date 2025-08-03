@@ -16,6 +16,10 @@ variable "GOLANGCI_LINT_MULTIPLATFORM" {
   default = null
 }
 
+variable "GOLANGCI_FROM_SOURCE" {
+  default = null
+}
+
 target "_common" {
   args = {
     GO_VERSION = GO_VERSION
@@ -134,6 +138,9 @@ target "lint" {
   inherits = ["_common"]
   dockerfile = "./hack/lint.Dockerfile"
   target = "lint"
+  args = {
+    GOLANGCI_FROM_SOURCE = GOLANGCI_FROM_SOURCE
+  }
   output = ["type=cacheonly"]
     platforms = GOLANGCI_LINT_MULTIPLATFORM != null ? [
     "darwin/amd64",
