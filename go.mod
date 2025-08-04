@@ -23,7 +23,7 @@ require (
 	github.com/go-playground/validator/v10 v10.27.0
 	github.com/gregdel/pushover v1.3.1
 	github.com/hashicorp/nomad/api v0.0.0-20231213195942-64e3dca9274b // v1.7.2
-	github.com/jedib0t/go-pretty/v6 v6.6.7
+	github.com/jedib0t/go-pretty/v6 v6.6.8
 	github.com/matcornic/hermes/v2 v2.1.0
 	github.com/matrix-org/gomatrix v0.0.0-20210324163249-be2af5ef2e16
 	github.com/microcosm-cc/bluemonday v1.0.27
