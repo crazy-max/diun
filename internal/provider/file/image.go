@@ -33,7 +33,7 @@ func (c *Client) listFileImage() []model.Image {
 
 		for _, item := range items {
 			// Set default WatchRepo
-			if item.WatchRepo == nil {
+			if item.WatchRepo == "" {
 				item.WatchRepo = c.defaults.WatchRepo
 			}
 			// Check NotifyOn
