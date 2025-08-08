@@ -15,7 +15,7 @@ require (
 	github.com/crazy-max/gonfig v0.7.1
 	github.com/distribution/reference v0.6.0
 	github.com/docker/docker v28.3.3+incompatible
-	github.com/docker/go-connections v0.5.0
+	github.com/docker/go-connections v0.6.0
 	github.com/docker/go-units v0.5.0
 	github.com/dromara/carbon/v2 v2.6.11
 	github.com/eclipse/paho.mqtt.golang v1.5.0
