@@ -42,7 +42,7 @@ require (
 	github.com/tidwall/pretty v1.2.1
 	go.etcd.io/bbolt v1.4.2
 	golang.org/x/mod v0.26.0
-	golang.org/x/sys v0.34.0
+	golang.org/x/sys v0.35.0
 	google.golang.org/grpc v1.74.2
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.5.1
 	google.golang.org/protobuf v1.36.6
