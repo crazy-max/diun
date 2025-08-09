@@ -3,6 +3,7 @@
 * [`amqp`](../notif/amqp.md)
 * [`apprise`](../notif/apprise.md)
 * [`discord`](../notif/discord.md)
+* [`elasticsearch`](../notif/elasticsearch.md)
 * [`gotify`](../notif/gotify.md)
 * [`mail`](../notif/mail.md)
 * [`matrix`](../notif/matrix.md)
