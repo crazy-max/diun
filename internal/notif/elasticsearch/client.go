@@ -5,8 +5,9 @@ import (
 	"context"
 	"crypto/tls"
 	"encoding/json"
-	"fmt"
 	"net/http"
+	"net/url"
+	"path"
 	"time"
 
 	"github.com/crazy-max/diun/v4/internal/model"
@@ -85,7 +86,11 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	// Build the Elasticsearch indexing URL
 	// This uses the Index API (POST /{index}/_doc) to create a document with an auto-generated _id:
 	// https://www.elastic.co/docs/api/doc/elasticsearch/operation/operation-create
-	url := fmt.Sprintf("%s://%s:%d/%s/_doc", c.cfg.Scheme, c.cfg.Host, c.cfg.Port, c.cfg.Index)
+	u, err := url.Parse(c.cfg.Address)
+	if err != nil {
+		return err
+	}
+	u.Path = path.Join(u.Path, c.cfg.Index, "_doc")
 
 	cancelCtx, cancel := context.WithCancelCause(context.Background())
 	timeoutCtx, _ := context.WithTimeoutCause(cancelCtx, *c.cfg.Timeout, errors.WithStack(context.DeadlineExceeded)) //nolint:govet // no need to manually cancel this context as we already rely on parent
@@ -99,7 +104,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		},
 	}
 
-	req, err := http.NewRequestWithContext(timeoutCtx, "POST", url, bytes.NewBuffer(body))
+	req, err := http.NewRequestWithContext(timeoutCtx, "POST", u.String(), bytes.NewBuffer(body))
 	if err != nil {
 		return err
 	}

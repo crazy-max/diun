@@ -7,9 +7,7 @@ import (
 )
 
 type NotifElasticsearch struct {
-	Scheme             string         `yaml:"scheme,omitempty" json:"scheme,omitempty" validate:"required,oneof=http https"`
-	Host               string         `yaml:"host,omitempty" json:"host,omitempty" validate:"required"`
-	Port               int            `yaml:"port,omitempty" json:"port,omitempty" validate:"required,min=1"`
+	Address            string         `yaml:"address,omitempty" json:"address,omitempty" validate:"required"`
 	Username           string         `yaml:"username,omitempty" json:"username,omitempty" validate:"omitempty"`
 	UsernameFile       string         `yaml:"usernameFile,omitempty" json:"usernameFile,omitempty" validate:"omitempty,file"`
 	Password           string         `yaml:"password,omitempty" json:"password,omitempty" validate:"omitempty"`
@@ -29,9 +27,7 @@ func (s *NotifElasticsearch) GetDefaults() *NotifElasticsearch {
 
 // SetDefaults sets the default values
 func (s *NotifElasticsearch) SetDefaults() {
-	s.Scheme = "http"
-	s.Host = "localhost"
-	s.Port = 9200
+	s.Address = "http://localhost:9200"
 	s.Client = "diun"
 	s.Index = "diun-notifications"
 	s.Timeout = utl.NewDuration(10 * time.Second)

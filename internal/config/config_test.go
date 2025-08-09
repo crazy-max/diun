@@ -95,9 +95,7 @@ func TestLoadFile(t *testing.T) {
 						TemplateBody: model.NotifDefaultTemplateBody,
 					},
 					Elasticsearch: &model.NotifElasticsearch{
-						Scheme:             "https",
-						Host:               "localhost",
-						Port:               9200,
+						Address:            "https://elastic.foo.com",
 						Username:           "elastic",
 						Password:           "password",
 						Client:             "diun",

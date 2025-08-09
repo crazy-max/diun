@@ -40,9 +40,7 @@ notif:
     renderFields: true
     timeout: 10s
   elasticsearch:
-    scheme: https
-    host: localhost
-    port: 9200
+    address: https://elastic.foo.com
     username: elastic
     password: password
     client: diun

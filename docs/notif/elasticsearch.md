@@ -8,9 +8,7 @@ Send notifications to your Elasticsearch cluster as structured documents.
     ```yaml
     notif:
       elasticsearch:
-        scheme: https
-        host: localhost
-        port: 9200
+        address: http://localhost:9200
         username: elastic
         password: password
         client: diun
@@ -19,24 +17,20 @@ Send notifications to your Elasticsearch cluster as structured documents.
         insecureSkipVerify: false
     ```
 
-| Name                 | Default              | Description                                                         |
-| -------------------- | -------------------- | ------------------------------------------------------------------- |
-| `scheme`[^1]         | `http`               | Elasticsearch scheme (`http` or `https`)                            |
-| `host`[^1]           | `localhost`          | Elasticsearch host                                                  |
-| `port`[^1]           | `9200`               | Elasticsearch port                                                  |
-| `username`           |                      | Elasticsearch username for authentication                           |
-| `usernameFile`       |                      | Use content of secret file as username if `username` is not defined |
-| `password`           |                      | Elasticsearch password for authentication                           |
-| `passwordFile`       |                      | Use content of secret file as password if `password` is not defined |
-| `client`[^1]         | `diun`               | Client name to identify the source of notifications                 |
-| `index`[^1]          | `diun-notifications` | Elasticsearch index name where notifications will be stored         |
-| `timeout`[^1]        | `10s`                | Timeout specifies a time limit for the request to be made           |
-| `insecureSkipVerify` | `false`              | Skip TLS certificate verification                                   |
+| Name                 | Default                 | Description                                                         |
+|----------------------|-------------------------|---------------------------------------------------------------------|
+| `address`[^1]        | `http://localhost:9200` | Elasticsearch base URL                                              |
+| `username`           |                         | Elasticsearch username for authentication                           |
+| `usernameFile`       |                         | Use content of secret file as username if `username` is not defined |
+| `password`           |                         | Elasticsearch password for authentication                           |
+| `passwordFile`       |                         | Use content of secret file as password if `password` is not defined |
+| `client`[^1]         | `diun`                  | Client name to identify the source of notifications                 |
+| `index`[^1]          | `diun-notifications`    | Elasticsearch index name where notifications will be stored         |
+| `timeout`[^1]        | `10s`                   | Timeout specifies a time limit for the request to be made           |
+| `insecureSkipVerify` | `false`                 | Skip TLS certificate verification                                   |
 
 !!! abstract "Environment variables"
-    * `DIUN_NOTIF_ELASTICSEARCH_SCHEME`
-    * `DIUN_NOTIF_ELASTICSEARCH_HOST`
-    * `DIUN_NOTIF_ELASTICSEARCH_PORT`
+    * `DIUN_NOTIF_ELASTICSEARCH_ADDRESS`
     * `DIUN_NOTIF_ELASTICSEARCH_USERNAME`
     * `DIUN_NOTIF_ELASTICSEARCH_USERNAMEFILE`
     * `DIUN_NOTIF_ELASTICSEARCH_PASSWORD`
@@ -48,7 +42,7 @@ Send notifications to your Elasticsearch cluster as structured documents.
 
 ## Document Structure
 
-Each notification is stored as a JSON document with following structure:
+Each notification is stored as a JSON document with the following structure:
 
 ```json
 {
