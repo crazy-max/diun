@@ -41,6 +41,7 @@ Following environment variables can also be used in place:
 | `CONFIG`         |          | Diun configuration file                                              |
 | `PROFILER_PATH`  |          | Base path where profiling files are written                          |
 | `PROFILER`       |          | [Profiler](../faq.md#profiling) to use                               |
+| `CA_CERTIFICATE` |          | Path to a [custom CA certificate](../faq.md#custom-ca-certificate)   |
 | `LOG_LEVEL`      | `info`   | One of `panic`, `fatal`, `error`, `warn`, `info`, `debug` or `trace` |
 | `LOG_JSON`       | `false`  | Enable JSON logging output                                           |
 | `LOG_CALLER`     | `false`  | Enable to add `file:line` of the caller                              |

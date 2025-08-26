@@ -333,6 +333,55 @@ The following profilers are available:
 * `threads` enables thread creation profiling
 * `block` enables block (contention) profiling
 
+## Custom CA Certificate
+
+Diun allows to add custom CA certificates to the container. This enables to interact with services whose TLS certificates are signed by a custom CA as sometimes found in internal networks of private or corporate environments.
+
+To trust the root or intermediate certificate within the docker container you need to
+
+1. mount the ca certificate into the container
+2. set the environment variable CA_CERTIFICATE to the path the cert is mounted to
+
+Usage with docker-compose.yml:
+
+```yaml
+name: diun
+
+services:
+  diun:
+    image: crazymax/diun:latest
+    command: serve
+    volumes:
+      - "./data:/data"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "./cacert.crt:/tmp/cacert.crt:ro"
+    environment:
+      - "TZ=Europe/Berlin"
+      - "DIUN_WATCH_WORKERS=20"
+      - "DIUN_WATCH_SCHEDULE=@daily"
+      - "DIUN_WATCH_JITTER=30s"
+      - "DIUN_PROVIDERS_DOCKER=true"
+      - "CA_CERTIFICATE=/tmp/cacert.crt"
+    restart: always
+```
+
+Usage with docker run:
+
+```
+docker run -d --name diun \
+  -v "$PWD/data:/data" \
+  -v "/var/run/docker.sock:/var/run/docker.sock" \
+  -v "$PWD/cacert.crt:/tmp/cacert.crt:ro" \
+  -e "TZ=Europe/Berlin" \
+  -e "DIUN_WATCH_WORKERS=20" \
+  -e "DIUN_WATCH_SCHEDULE=@daily" \
+  -e "DIUN_WATCH_JITTER=30s" \
+  -e "DIUN_PROVIDERS_DOCKER=true" \
+  -e "CA_CERTIFICATE=/tmp/cacert.crt" \
+  --restart always \
+  crazymax/diun:latest
+```
+
 ## Image with digest and `image:tag@digest` format
 
 Analysis of an image with a digest but without tag will be done using `latest`
