@@ -120,6 +120,7 @@ nav:
     - Amqp: notif/amqp.md
     - Apprise: notif/apprise.md
     - Discord: notif/discord.md
+    - Elasticsearch: notif/elasticsearch.md
     - Gotify: notif/gotify.md
     - Mail: notif/mail.md
     - Matrix: notif/matrix.md
