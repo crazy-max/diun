@@ -101,8 +101,10 @@ COPY --link --from=releaser /out /
 FROM alpine:${ALPINE_VERSION}
 RUN apk --update --no-cache add ca-certificates openssl tzdata
 COPY --from=build /usr/bin/diun /usr/local/bin/diun
+COPY --chown=1000:1000 entrypoint/docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 ENV PROFILER_PATH="/profiler" \
   DIUN_DB_PATH="/data/diun.db"
 VOLUME [ "/data" ]
-ENTRYPOINT [ "diun" ]
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 CMD [ "serve" ]
