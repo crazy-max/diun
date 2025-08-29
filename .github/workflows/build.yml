@@ -27,8 +27,8 @@ jobs:
   prepare:
     runs-on: ubuntu-latest
     outputs:
-      validate-includes: ${{ steps.validate.outputs.includes }}
-      artifact-platforms: ${{ steps.artifact.outputs.platforms }}
+      validate-includes: ${{ steps.validate.outputs.matrix }}
+      artifact-includes: ${{ steps.artifact.outputs.matrix }}
     steps:
       -
         name: Checkout
@@ -36,66 +36,19 @@ jobs:
       -
         name: Validate matrix
         id: validate
-        uses: actions/github-script@v7
+        uses: docker/bake-action/subaction/matrix@v6
+        with:
+          target: validate
+          fields: platforms
         env:
           GOLANGCI_LINT_MULTIPLATFORM: 1
-        with:
-          script: |
-            let def = {};
-            await core.group(`Parsing definition`, async () => {
-              const resPrint = await exec.getExecOutput('docker', ['buildx', 'bake', 'validate', '--print'], {
-                ignoreReturnCode: true
-              });
-              if (resPrint.stderr.length > 0 && resPrint.exitCode != 0) {
-                throw new Error(res.stderr);
-              }
-              def = JSON.parse(resPrint.stdout.trim());
-            });
-            await core.group(`Generating matrix`, async () => {
-              const includes = [];
-              for (const targetName of Object.keys(def.target)) {
-                const target = def.target[targetName];
-                if (target.platforms && target.platforms.length > 0) {
-                  target.platforms.forEach(platform => {
-                    includes.push({
-                      target: targetName,
-                      platform: platform
-                    });
-                  });
-                } else {
-                  includes.push({
-                    target: targetName
-                  });
-                }
-              }
-              core.info(JSON.stringify(includes, null, 2));
-              core.setOutput('includes', JSON.stringify(includes));
-            });
       -
         name: Artifact matrix
         id: artifact
-        uses: actions/github-script@v7
+        uses: docker/bake-action/subaction/matrix@v6
         with:
-          script: |
-            const targetName = 'artifact-all';
-            let def = {};
-            await core.group(`Parsing definition`, async () => {
-              const resPrint = await exec.getExecOutput('docker', ['buildx', 'bake', targetName, '--print'], {
-                ignoreReturnCode: true
-              });
-              if (resPrint.stderr.length > 0 && resPrint.exitCode != 0) {
-                throw new Error(res.stderr);
-              }
-              def = JSON.parse(resPrint.stdout.trim());
-            });
-            await core.group(`Generating matrix`, async () => {
-              const platforms = def.target?.[targetName]?.platforms ?? [];
-              if (platforms.length === 0) {
-                throw new Error(`No platforms found for ${targetName} target`);
-              }
-              core.info(JSON.stringify(platforms, null, 2));
-              core.setOutput('platforms', JSON.stringify(platforms));
-            });
+          target: artifact-all
+          fields: platforms
 
   validate:
     runs-on: ubuntu-latest
@@ -119,7 +72,7 @@ jobs:
           source: .
           targets: ${{ matrix.target }}
           set: |
-            *.platform=${{ matrix.platform }}
+            *.platform=${{ matrix.platforms }}
 
   test:
     runs-on: ubuntu-latest
@@ -183,12 +136,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: ${{ fromJson(needs.prepare.outputs.artifact-platforms) }}
+        include: ${{ fromJson(needs.prepare.outputs.artifact-includes) }}
     steps:
       -
         name: Prepare
         run: |
-          platform=${{ matrix.platform }}
+          platform=${{ matrix.platforms }}
           echo "PLATFORM_PAIR=${platform//\//-}" >> $GITHUB_ENV
       -
         name: Checkout
@@ -211,7 +164,7 @@ jobs:
           sbom: true
           pull: true
           set: |
-            *.platform=${{ matrix.platform }}
+            *.platform=${{ matrix.platforms }}
       -
         name: Rename provenance and sbom
         working-directory: ${{ env.DESTDIR }}/artifact
