@@ -18,16 +18,18 @@ Notifications can be sent using an apprise api instance.
               Docker tag {{ .Entry.Image }} which you subscribed to through {{ .Entry.Provider }} provider has been released.
     ```
 
-| Name            | Default                             | Description                                                                |
-|-----------------|-------------------------------------|----------------------------------------------------------------------------|
-| `endpoint`[^1]  |                                     | Hostname and port of your apprise api instance                             |
-| `token`[^2]     |                                     | token representing your config file (Config Key)                           |
-| `tokenFile`     |                                     | Use content of secret file as application token if `token` not defined     |
-| `tags`          |                                     | List of Tags in your config file you want to notify                        |
-| `urls`[^2]      |                                     | List of [URLs](https://github.com/caronc/apprise/wiki/URLBasics) to notify |
-| `timeout`       | `10s`                               | Timeout specifies a time limit for the request to be made                  |
-| `templateTitle` | See [below](#default-templatetitle) | [Notification template](../faq.md#notification-template) for message title |
-| `templateBody`  | See [below](#default-templatebody)  | [Notification template](../faq.md#notification-template) for message body  |
+| Name             | Default                             | Description                                                                |
+|------------------|-------------------------------------|----------------------------------------------------------------------------|
+| `endpoint`[^1]   |                                     | Hostname and port of your apprise api instance                             |
+| `token`[^2]      |                                     | token representing your config file (Config Key)                           |
+| `tokenFile`      |                                     | Use content of secret file as application token if `token` not defined     |
+| `tags`           |                                     | List of Tags in your config file you want to notify                        |
+| `urls`[^2]       |                                     | List of [URLs](https://github.com/caronc/apprise/wiki/URLBasics) to notify |
+| `timeout`        | `10s`                               | Timeout specifies a time limit for the request to be made                  |
+| `tlsSkipVerify`  | `false`                             | Skip TLS certificate verification                                          |
+| `tlsCaCertFiles` |                                     | List of paths to custom CA certificate files to use for TLS verification   |
+| `templateTitle`  | See [below](#default-templatetitle) | [Notification template](../faq.md#notification-template) for message title |
+| `templateBody`   | See [below](#default-templatebody)  | [Notification template](../faq.md#notification-template) for message body  |
 
 !!! abstract "Environment variables"
     * `DIUN_NOTIF_APPRISE_ENDPOINT`
@@ -35,6 +37,8 @@ Notifications can be sent using an apprise api instance.
     * `DIUN_NOTIF_APPRISE_TAGS`
     * `DIUN_NOTIF_APPRISE_URLS`
     * `DIUN_NOTIF_APPRISE_TIMEOUT`
+    * `DIUN_NOTIF_APPRISE_TLSSKIPVERIFY`
+    * `DIUN_NOTIF_APPRISE_TLSCACERTFILES`
     * `DIUN_NOTIF_APPRISE_TEMPLATETITLE`
     * `DIUN_NOTIF_APPRISE_TEMPLATEBODY`
 

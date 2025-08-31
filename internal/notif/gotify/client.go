@@ -93,7 +93,15 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	timeoutCtx, _ := context.WithTimeoutCause(cancelCtx, *c.cfg.Timeout, errors.WithStack(context.DeadlineExceeded)) //nolint:govet // no need to manually cancel this context as we already rely on parent
 	defer func() { cancel(errors.WithStack(context.Canceled)) }()
 
-	hc := http.Client{}
+	tlsConfig, err := utl.LoadTLSConfig(c.cfg.TLSSkipVerify, c.cfg.TLSCACertFiles)
+	if err != nil {
+		return errors.Wrap(err, "cannot load TLS configuration for Gotify notifier")
+	}
+	hc := http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: tlsConfig,
+		},
+	}
 	req, err := http.NewRequestWithContext(timeoutCtx, "POST", u.String(), bytes.NewBuffer(jsonBody))
 	if err != nil {
 		return err

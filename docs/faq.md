@@ -296,6 +296,43 @@ And for `semver`:
 ]
 ```
 
+## Custom CA certificates for notification endpoints
+
+If your notification endpoint (e.g. Gotify, Ntfy, Telegram, Webhook, etc.) is
+using a self-signed certificate or a certificate issued by a private CA, you
+can provide the CA certificate to Diun through the `tlsCaCertFiles` setting:
+
+```yaml
+notif:
+  gotify:
+    endpoint: https://gotify.foo.com
+    token: Token123456
+    tlsCaCertFiles:
+      - /certs/ca-gotify.crt
+```
+
+Then mount the certificate file in the container:
+
+```yaml
+name: diun
+
+services:
+  diun:
+    image: crazymax/diun:latest
+    container_name: diun
+    command: serve
+    volumes:
+      - "./data:/data"
+      - "/etc/ssl/certs/ca-gotify.crt:/certs/ca-gotify.crt:ro"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    environment:
+      - "TZ=Europe/Paris"
+      - "DIUN_WATCH_SCHEDULE=0 */6 * * *"
+      - "DIUN_PROVIDERS_DOCKER=true"
+      - "DIUN_PROVIDERS_DOCKER_WATCHBYDEFAULT=true"
+    restart: always
+```
+
 ## Profiling
 
 Diun provides a simple way to manage runtime/pprof profiling through the

@@ -18,6 +18,8 @@ type NotifRocketChat struct {
 	TokenFile        string         `yaml:"tokenFile,omitempty" json:"tokenFile,omitempty" validate:"omitempty,file"`
 	RenderAttachment *bool          `yaml:"renderAttachment,omitempty" json:"renderAttachment,omitempty" validate:"required"`
 	Timeout          *time.Duration `yaml:"timeout,omitempty" json:"timeout,omitempty" validate:"required"`
+	TLSSkipVerify    bool           `yaml:"tlsSkipVerify,omitempty" json:"tlsSkipVerify,omitempty" validate:"omitempty"`
+	TLSCACertFiles   []string       `yaml:"tlsCaCertFiles,omitempty" json:"tlsCaCertFiles,omitempty" validate:"omitempty"`
 	TemplateTitle    string         `yaml:"templateTitle,omitempty" json:"templateTitle,omitempty" validate:"required"`
 	TemplateBody     string         `yaml:"templateBody,omitempty" json:"templateBody,omitempty" validate:"required"`
 }

@@ -35,7 +35,6 @@ notif:
     client: diun
     index: diun-notifications
     timeout: 10s
-    insecureSkipVerify: false
   gotify:
     endpoint: http://gotify.foo.com
     token: Token123456

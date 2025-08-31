@@ -95,13 +95,12 @@ func TestLoadFile(t *testing.T) {
 						TemplateBody: model.NotifDefaultTemplateBody,
 					},
 					Elasticsearch: &model.NotifElasticsearch{
-						Address:            "https://elastic.foo.com",
-						Username:           "elastic",
-						Password:           "password",
-						Client:             "diun",
-						Index:              "diun-notifications",
-						Timeout:            utl.NewDuration(10 * time.Second),
-						InsecureSkipVerify: false,
+						Address:  "https://elastic.foo.com",
+						Username: "elastic",
+						Password: "password",
+						Client:   "diun",
+						Index:    "diun-notifications",
+						Timeout:  utl.NewDuration(10 * time.Second),
 					},
 					Gotify: &model.NotifGotify{
 						Endpoint:      "http://gotify.foo.com",
@@ -188,6 +187,7 @@ for <code>{{ .Entry.Manifest.Platform }}</code> platform.
 					Teams: &model.NotifTeams{
 						WebhookURL:   "https://outlook.office.com/webhook/ABCD12EFG/HIJK34LMN/01234567890abcdefghij",
 						RenderFacts:  utl.NewFalse(),
+						Timeout:      utl.NewDuration(10 * time.Second),
 						TemplateBody: model.NotifTeamsDefaultTemplateBody,
 					},
 					Telegram: &model.NotifTelegram{
