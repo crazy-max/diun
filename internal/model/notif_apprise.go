@@ -8,14 +8,16 @@ import (
 
 // NotifApprise holds apprise notification configuration details
 type NotifApprise struct {
-	Endpoint      string         `yaml:"endpoint,omitempty" json:"endpoint,omitempty" validate:"required"`
-	Token         string         `yaml:"token,omitempty" json:"token,omitempty" validate:"omitempty"`
-	TokenFile     string         `yaml:"tokenFile,omitempty" json:"tokenFile,omitempty" validate:"omitempty,file"`
-	Tags          []string       `yaml:"tags,omitempty" json:"tags,omitempty" validate:"omitempty"`
-	URLs          []string       `yaml:"urls,omitempty" json:"urls,omitempty" validate:"omitempty"`
-	Timeout       *time.Duration `yaml:"timeout,omitempty" json:"timeout,omitempty" validate:"required"`
-	TemplateTitle string         `yaml:"templateTitle,omitempty" json:"templateTitle,omitempty" validate:"required"`
-	TemplateBody  string         `yaml:"templateBody,omitempty" json:"templateBody,omitempty" validate:"required"`
+	Endpoint       string         `yaml:"endpoint,omitempty" json:"endpoint,omitempty" validate:"required"`
+	Token          string         `yaml:"token,omitempty" json:"token,omitempty" validate:"omitempty"`
+	TokenFile      string         `yaml:"tokenFile,omitempty" json:"tokenFile,omitempty" validate:"omitempty,file"`
+	Tags           []string       `yaml:"tags,omitempty" json:"tags,omitempty" validate:"omitempty"`
+	URLs           []string       `yaml:"urls,omitempty" json:"urls,omitempty" validate:"omitempty"`
+	Timeout        *time.Duration `yaml:"timeout,omitempty" json:"timeout,omitempty" validate:"required"`
+	TLSSkipVerify  bool           `yaml:"tlsSkipVerify,omitempty" json:"tlsSkipVerify,omitempty" validate:"omitempty"`
+	TLSCACertFiles []string       `yaml:"tlsCaCertFiles,omitempty" json:"tlsCaCertFiles,omitempty" validate:"omitempty"`
+	TemplateTitle  string         `yaml:"templateTitle,omitempty" json:"templateTitle,omitempty" validate:"required"`
+	TemplateBody   string         `yaml:"templateBody,omitempty" json:"templateBody,omitempty" validate:"required"`
 }
 
 // GetDefaults gets the default values

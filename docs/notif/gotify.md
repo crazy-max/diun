@@ -24,6 +24,8 @@ Notifications can be sent using a [Gotify](https://gotify.net/) instance.
 | `tokenFile`         |                                     | Use content of secret file as application token if `token` not defined     |
 | `priority`          | `1`                                 | The priority of the message                                                |
 | `timeout`           | `10s`                               | Timeout specifies a time limit for the request to be made                  |
+| `tlsSkipVerify`     | `false`                             | Skip TLS certificate verification                                          |
+| `tlsCaCertFiles`    |                                     | List of paths to custom CA certificate files to use for TLS verification   |
 | `templateTitle`[^1] | See [below](#default-templatetitle) | [Notification template](../faq.md#notification-template) for message title |
 | `templateBody`[^1]  | See [below](#default-templatebody)  | [Notification template](../faq.md#notification-template) for message body  |
 
@@ -33,6 +35,8 @@ Notifications can be sent using a [Gotify](https://gotify.net/) instance.
     * `DIUN_NOTIF_GOTIFY_TOKENFILE`
     * `DIUN_NOTIF_GOTIFY_PRIORITY`
     * `DIUN_NOTIF_GOTIFY_TIMEOUT`
+    * `DIUN_NOTIF_GOTIFY_TLSSKIPVERIFY`
+    * `DIUN_NOTIF_GOTIFY_TLSCACERTFILES`
     * `DIUN_NOTIF_GOTIFY_TEMPLATETITLE`
     * `DIUN_NOTIF_GOTIFY_TEMPLATEBODY`
 

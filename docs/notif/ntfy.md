@@ -28,6 +28,8 @@ Notifications can be sent using a [ntfy](https://ntfy.sh/) instance.
 | `priority`          | 3                                   | The priority of the message                                                |
 | `tags`              | `["package"]`                       | Emoji to go in your notiication                                            |
 | `timeout`           | `10s`                               | Timeout specifies a time limit for the request to be made                  |
+| `tlsSkipVerify`     | `false`                             | Skip TLS certificate verification                                          |
+| `tlsCaCertFiles`    |                                     | List of paths to custom CA certificate files to use for TLS verification   |
 | `templateTitle`[^1] | See [below](#default-templatetitle) | [Notification template](../faq.md#notification-template) for message title |
 | `templateBody`[^1]  | See [below](#default-templatebody)  | [Notification template](../faq.md#notification-template) for message body  |
 
@@ -39,6 +41,8 @@ Notifications can be sent using a [ntfy](https://ntfy.sh/) instance.
     * `DIUN_NOTIF_NTFY_PRIORITY`
     * `DIUN_NOTIF_NTFY_TAGS`
     * `DIUN_NOTIF_NTFY_TIMEOUT`
+    * `DIUN_NOTIF_NTFY_TLSSKIPVERIFY`
+    * `DIUN_NOTIF_NTFY_TLSCACERTFILES`
     * `DIUN_NOTIF_NTFY_TEMPLATETITLE`
     * `DIUN_NOTIF_NTFY_TEMPLATEBODY`
 
