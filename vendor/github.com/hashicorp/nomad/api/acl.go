@@ -67,6 +67,16 @@ func (a *ACLPolicies) Info(policyName string, q *QueryOptions) (*ACLPolicy, *Que
 	return &resp, wm, nil
 }
 
+// Self is used to query policies attached to a workload identity
+func (a *ACLPolicies) Self(q *QueryOptions) ([]*ACLPolicyListStub, *QueryMeta, error) {
+	var resp []*ACLPolicyListStub
+	wm, err := a.client.query("/v1/acl/policy/self", &resp, q)
+	if err != nil {
+		return nil, nil, err
+	}
+	return resp, wm, nil
+}
+
 // ACLTokens is used to query the ACL token endpoints.
 type ACLTokens struct {
 	client *Client
@@ -509,6 +519,7 @@ func (a *ACLAuth) Login(req *ACLLoginRequest, q *WriteOptions) (*ACLToken, *Writ
 type ACLPolicyListStub struct {
 	Name        string
 	Description string
+	JobACL      *JobACL
 	CreateIndex uint64
 	ModifyIndex uint64
 }
@@ -826,6 +837,13 @@ type ACLAuthMethodConfig struct {
 	OIDCClientID string
 	// The OAuth Client Secret configured with the OIDC provider
 	OIDCClientSecret string
+	// Optionally send a signed JWT ("private key jwt") as a client assertion
+	// to the OIDC provider
+	OIDCClientAssertion *OIDCClientAssertion
+	// Enable S256 PKCE challenge verification.
+	OIDCEnablePKCE bool
+	// Disable claims from the OIDC UserInfo endpoint
+	OIDCDisableUserInfo bool
 	// List of OIDC scopes
 	OIDCScopes []string
 	// List of auth claims that are valid for login
@@ -855,6 +873,9 @@ type ACLAuthMethodConfig struct {
 	// (value).
 	ClaimMappings     map[string]string
 	ListClaimMappings map[string]string
+	// Enables logging of claims and binding-rule evaluations when
+	// debug level logging is enabled.
+	VerboseLogging bool
 }
 
 // MarshalJSON implements the json.Marshaler interface and allows
@@ -943,6 +964,118 @@ func (c *ACLAuthMethodConfig) UnmarshalJSON(data []byte) error {
 		}
 	}
 	return nil
+}
+
+// OIDCClientAssertionKeySource specifies what key material should be used
+// to sign an OIDCClientAssertion.
+type OIDCClientAssertionKeySource string
+
+const (
+	// OIDCKeySourceNomad signs the OIDCClientAssertion JWT with Nomad's
+	// internal private key. Its public key is exposed at /.well-known/jwks.json
+	OIDCKeySourceNomad OIDCClientAssertionKeySource = "nomad"
+	// OIDCKeySourcePrivateKey signs the OIDCClientAssertion JWT with
+	// key material defined in OIDCClientAssertion.PrivateKey
+	OIDCKeySourcePrivateKey OIDCClientAssertionKeySource = "private_key"
+	// OIDCKeySourceClientSecret signs the OIDCClientAssertion JWT with
+	// ACLAuthMethod.ClientSecret
+	OIDCKeySourceClientSecret OIDCClientAssertionKeySource = "client_secret"
+)
+
+// OIDCClientAssertion (a.k.a private_key_jwt) is used to send
+// a client_assertion along with an OIDC token request.
+// Reference: https://oauth.net/private-key-jwt/
+// See also: structs.OIDCClientAssertion
+type OIDCClientAssertion struct {
+	// Audience is/are who will be processing the assertion.
+	// Defaults to the parent `ACLAuthMethodConfig`'s `OIDCDiscoveryURL`
+	Audience []string
+
+	// KeySource is where to get the private key to sign the JWT.
+	// It is the one field that *must* be set to enable client assertions.
+	// Available sources:
+	// - "nomad": Use current active key in Nomad's keyring
+	// - "private_key": Use key material in the `PrivateKey` field
+	// - "client_secret": Use the `OIDCClientSecret` inherited from the parent
+	//   `ACLAuthMethodConfig` as an HMAC key
+	KeySource OIDCClientAssertionKeySource
+
+	// KeyAlgorithm is the key's algorithm.
+	// Its default values are based on the `KeySource`:
+	// - "nomad": "RS256" (from Nomad's keyring, must not be changed)
+	// - "private_key": "RS256" (must be RS256, RS384, or RS512)
+	// - "client_secret": "HS256" (must be HS256, HS384, or HS512)
+	KeyAlgorithm string
+
+	// PrivateKey contains external key material provided by users.
+	// `KeySource` must be "private_key" to enable this.
+	PrivateKey *OIDCClientAssertionKey
+
+	// ExtraHeaders are added to the JWT headers, alongside "kid" and "type"
+	// Setting the "kid" header here is not allowed; use `PrivateKey.KeyID`.
+	ExtraHeaders map[string]string
+}
+
+// OIDCClientAssertionKeyIDHeader is the header that the OIDC provider will use
+// to look up the certificate or public key that it needs to verify the
+// private key JWT signature.
+type OIDCClientAssertionKeyIDHeader string
+
+const (
+	OIDCClientAssertionHeaderKid     OIDCClientAssertionKeyIDHeader = "kid"
+	OIDCClientAssertionHeaderX5t     OIDCClientAssertionKeyIDHeader = "x5t"
+	OIDCClientAssertionHeaderX5tS256 OIDCClientAssertionKeyIDHeader = "x5t#S256"
+)
+
+// OIDCClientAssertionKey contains key material provided by users for Nomad
+// to use to sign the private key JWT.
+//
+// PemKey or PemKeyFile must contain an RSA private key in PEM format.
+//
+// PemCert, PemCertFile may contain an x509 certificate created with
+// the Key, used to derive the KeyID. Alternatively, KeyID may be set manually.
+//
+// PemKeyFile and PemCertFile, if set, must be an absolute path to a file
+// present on disk on any Nomad servers that may become cluster leaders.
+type OIDCClientAssertionKey struct {
+	// PemKey is an RSA private key, in pem format. It is used to sign the JWT.
+	// Mutually exclusive with `PemKeyFile`.
+	PemKey string
+	// PemKeyFile is an absolute path to a private key on Nomad servers' disk,
+	// in pem format. It is used to sign the JWT.
+	// Mutually exclusive with `PemKey`.
+	PemKeyFile string
+
+	// KeyIDHeader is which header the provider will use to find the
+	// public key to verify the signed JWT. Its default values vary
+	// based on which of the other required fields is set:
+	// - KeyID: "kid"
+	// - PemCert: "x5t#S256"
+	// - PemCertFile: "x5t#S256"
+	//
+	// Refer to the JWS RFC for information on these headers:
+	// - "kid":  https://datatracker.ietf.org/doc/html/rfc7515#section-4.1.4
+	// - "x5t":  https://datatracker.ietf.org/doc/html/rfc7515#section-4.1.7
+	// - "x5t#S256": https://datatracker.ietf.org/doc/html/rfc7515#section-4.1.8
+	//
+	// If you need to set some other header not supported here,
+	// you may use OIDCClientAssertion.ExtraHeaders.
+	KeyIDHeader OIDCClientAssertionKeyIDHeader
+	// KeyID may be set manually and becomes the "kid" header.
+	// Mutually exclusive with `PemCert` and `PemCertFile`.
+	// Allowed `KeyIDHeader` values: "kid" (the default)
+	KeyID string
+	// PemCert is an x509 certificate, signed by the private key or a CA,
+	// in pem format. It is used to derive an x5t#S256 (or x5t) header.
+	// Mutually exclusive with `PemCertFile` and `KeyID`.
+	// Allowed `KeyIDHeader` values: "x5t", "x5t#S256" (default "x5t#S256")
+	PemCert string
+	// PemCertFile is an absolute path to an x509 certificate on Nomad servers'
+	// disk, signed by the private key or a CA, in pem format.
+	// It is used to derive an x5t#S256 (or x5t) header.
+	// Mutually exclusive with `PemCert` and `KeyID`.
+	// Allowed `KeyIDHeader` values: "x5t", "x5t#S256" (default "x5t#S256")
+	PemCertFile string
 }
 
 // ACLAuthMethodListStub is the stub object returned when performing a listing
