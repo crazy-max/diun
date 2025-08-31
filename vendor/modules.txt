@@ -278,9 +278,6 @@ github.com/gorilla/mux
 # github.com/gorilla/websocket v1.5.4-0.20250319132907-e064f32e3674
 ## explicit; go 1.20
 github.com/gorilla/websocket
-# github.com/gregdel/pushover v1.3.1
-## explicit; go 1.14
-github.com/gregdel/pushover
 # github.com/hashicorp/cronexpr v1.1.2
 ## explicit
 github.com/hashicorp/cronexpr

@@ -160,6 +160,7 @@ for <code>{{ .Entry.Manifest.Platform }}</code> platform.
 					Pushover: &model.NotifPushover{
 						Token:         "uQiRzpo4DXghDmr9QzzfQu27cmVRsG",
 						Recipient:     "gznej3rKEVAvPUxu9vvNnqpmZpokzF",
+						Timeout:       utl.NewDuration(10 * time.Second),
 						TemplateTitle: model.NotifDefaultTemplateTitle,
 						TemplateBody:  model.NotifDefaultTemplateBody,
 					},
