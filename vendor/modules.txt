@@ -66,7 +66,7 @@ github.com/containerd/platforms
 # github.com/containerd/typeurl/v2 v2.2.3
 ## explicit; go 1.21
 github.com/containerd/typeurl/v2
-# github.com/containers/image/v5 v5.36.1
+# github.com/containers/image/v5 v5.36.2
 ## explicit; go 1.23.3
 github.com/containers/image/v5/docker
 github.com/containers/image/v5/docker/policyconfiguration
