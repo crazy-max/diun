@@ -7,9 +7,9 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/containers/image/v5/docker/reference"
 	digest "github.com/opencontainers/go-digest"
 	"github.com/pkg/errors"
+	"go.podman.io/image/v5/docker/reference"
 )
 
 // Image holds information about an image.

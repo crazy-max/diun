@@ -6,9 +6,9 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/containers/image/v5/docker"
 	"github.com/crazy-max/diun/v4/pkg/utl"
 	"github.com/pkg/errors"
+	"go.podman.io/image/v5/docker"
 	"golang.org/x/mod/semver"
 )
 

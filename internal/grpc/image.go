@@ -4,10 +4,10 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/containers/image/v5/docker/reference"
 	"github.com/crazy-max/diun/v4/pb"
 	"github.com/crazy-max/diun/v4/pkg/registry"
 	"github.com/pkg/errors"
+	"go.podman.io/image/v5/docker/reference"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 

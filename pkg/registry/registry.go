@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/containers/image/v5/types"
 	"github.com/pkg/errors"
+	"go.podman.io/image/v5/types"
 )
 
 // Client represents an active docker registry object
