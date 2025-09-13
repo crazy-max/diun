@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/containers/image/v5/docker"
-	"github.com/containers/image/v5/types"
 	"github.com/distribution/reference"
 	"github.com/pkg/errors"
+	"go.podman.io/image/v5/docker"
+	"go.podman.io/image/v5/types"
 )
 
 func ImageReference(name string) (types.ImageReference, error) {
