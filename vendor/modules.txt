@@ -142,8 +142,8 @@ github.com/dromara/carbon/v2/calendar/hebrew
 github.com/dromara/carbon/v2/calendar/julian
 github.com/dromara/carbon/v2/calendar/lunar
 github.com/dromara/carbon/v2/calendar/persian
-# github.com/eclipse/paho.mqtt.golang v1.5.0
-## explicit; go 1.20
+# github.com/eclipse/paho.mqtt.golang v1.5.1
+## explicit; go 1.24.0
 github.com/eclipse/paho.mqtt.golang
 github.com/eclipse/paho.mqtt.golang/packets
 # github.com/emicklei/go-restful/v3 v3.11.0
@@ -504,16 +504,16 @@ go.podman.io/storage/pkg/reexec
 go.podman.io/storage/pkg/regexp
 go.podman.io/storage/pkg/system
 go.podman.io/storage/pkg/unshare
-# golang.org/x/crypto v0.41.0
-## explicit; go 1.23.0
+# golang.org/x/crypto v0.42.0
+## explicit; go 1.24.0
 golang.org/x/crypto/pbkdf2
 golang.org/x/crypto/scrypt
 golang.org/x/crypto/sha3
 # golang.org/x/mod v0.27.0
 ## explicit; go 1.23.0
 golang.org/x/mod/semver
-# golang.org/x/net v0.43.0
-## explicit; go 1.23.0
+# golang.org/x/net v0.44.0
+## explicit; go 1.24.0
 golang.org/x/net/html
 golang.org/x/net/html/atom
 golang.org/x/net/http/httpguts
@@ -529,21 +529,21 @@ golang.org/x/net/trace
 ## explicit; go 1.23.0
 golang.org/x/oauth2
 golang.org/x/oauth2/internal
-# golang.org/x/sync v0.16.0
-## explicit; go 1.23.0
+# golang.org/x/sync v0.17.0
+## explicit; go 1.24.0
 golang.org/x/sync/errgroup
 golang.org/x/sync/semaphore
-# golang.org/x/sys v0.35.0
-## explicit; go 1.23.0
+# golang.org/x/sys v0.36.0
+## explicit; go 1.24.0
 golang.org/x/sys/cpu
 golang.org/x/sys/plan9
 golang.org/x/sys/unix
 golang.org/x/sys/windows
-# golang.org/x/term v0.34.0
-## explicit; go 1.23.0
+# golang.org/x/term v0.35.0
+## explicit; go 1.24.0
 golang.org/x/term
-# golang.org/x/text v0.28.0
-## explicit; go 1.23.0
+# golang.org/x/text v0.29.0
+## explicit; go 1.24.0
 golang.org/x/text/cases
 golang.org/x/text/internal
 golang.org/x/text/internal/language

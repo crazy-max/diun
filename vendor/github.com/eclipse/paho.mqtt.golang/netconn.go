@@ -50,16 +50,7 @@ func openConnection(uri *url.URL, tlsc *tls.Config, timeout time.Duration, heade
 		conn, err := NewWebsocket(dialURI.String(), tlsc, timeout, headers, websocketOptions)
 		return conn, err
 	case "mqtt", "tcp":
-		allProxy := os.Getenv("all_proxy")
-		if len(allProxy) == 0 {
-			conn, err := dialer.Dial("tcp", uri.Host)
-			if err != nil {
-				return nil, err
-			}
-			return conn, nil
-		}
-		proxyDialer := proxy.FromEnvironment()
-
+		proxyDialer := proxy.FromEnvironmentUsing(dialer)
 		conn, err := proxyDialer.Dial("tcp", uri.Host)
 		if err != nil {
 			return nil, err
