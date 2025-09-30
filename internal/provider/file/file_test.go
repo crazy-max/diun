@@ -5,7 +5,6 @@ import (
 
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/pkg/registry"
-	"github.com/crazy-max/diun/v4/pkg/utl"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -42,7 +41,7 @@ var (
 			Provider: "file",
 			Image: model.Image{
 				Name:      "docker.bintray.io/jfrog/xray-server:2.8.6",
-				WatchRepo: utl.NewTrue(),
+				WatchRepo: model.WatchRepoAll,
 				NotifyOn: []model.NotifyOn{
 					model.NotifyOnNew,
 				},
@@ -78,7 +77,7 @@ var (
 			Provider: "file",
 			Image: model.Image{
 				Name:      "crazymax/swarm-cronjob",
-				WatchRepo: utl.NewTrue(),
+				WatchRepo: model.WatchRepoAll,
 				NotifyOn:  model.NotifyOnDefaults,
 				SortTags:  registry.SortTagSemver,
 				MaxTags:   25,
@@ -94,7 +93,7 @@ var (
 			Provider: "file",
 			Image: model.Image{
 				Name:      "docker.io/portainer/portainer",
-				WatchRepo: utl.NewTrue(),
+				WatchRepo: model.WatchRepoAll,
 				NotifyOn:  model.NotifyOnDefaults,
 				MaxTags:   10,
 				SortTags:  registry.SortTagReverse,
@@ -110,7 +109,7 @@ var (
 			Provider: "file",
 			Image: model.Image{
 				Name:      "traefik",
-				WatchRepo: utl.NewTrue(),
+				WatchRepo: model.WatchRepoAll,
 				NotifyOn:  model.NotifyOnDefaults,
 				SortTags:  registry.SortTagDefault,
 				MaxTags:   25,
@@ -176,7 +175,7 @@ var (
 			Provider: "file",
 			Image: model.Image{
 				Name:      "crazymax/ddns-route53",
-				WatchRepo: utl.NewTrue(),
+				WatchRepo: model.WatchRepoAll,
 				NotifyOn:  model.NotifyOnDefaults,
 				SortTags:  registry.SortTagReverse,
 				MaxTags:   25,
@@ -261,10 +260,10 @@ func TestDefaultImageOptions(t *testing.T) {
 	fc := New(&model.PrdFile{
 		Filename: "./fixtures/dockerhub.yml",
 	}, &model.Defaults{
-		WatchRepo: utl.NewTrue(),
+		WatchRepo: model.WatchRepoAll,
 	})
 
 	for _, job := range fc.ListJob() {
-		assert.True(t, *job.Image.WatchRepo)
+		assert.Equal(t, model.WatchRepoAll, job.Image.WatchRepo)
 	}
 }
