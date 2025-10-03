@@ -330,6 +330,11 @@ func decodeBytes(b io.Reader) ([]byte, error) {
 }
 
 func encodeBytes(field []byte) []byte {
+	// Attempting to encode more than 65,535 bytes would lead to an unexpected 16-bit length and extra data written
+	// (which would be parsed as later parts of the message). The safest option is to truncate.
+	if len(field) > 65535 {
+		field = field[0:65535]
+	}
 	fieldLength := make([]byte, 2)
 	binary.BigEndian.PutUint16(fieldLength, uint16(len(field)))
 	return append(fieldLength, field...)
