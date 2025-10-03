@@ -35,10 +35,15 @@ func (c *Carbon) ToMonthString(timezone ...string) string {
 		return ""
 	}
 
-	c.lang.rw.RLock()
-	defer c.lang.rw.RUnlock()
+	lang := c.lang
+	if lang == nil {
+		return ""
+	}
 
-	if resources, ok := c.lang.resources["months"]; ok {
+	lang.rw.RLock()
+	defer lang.rw.RUnlock()
+
+	if resources, ok := lang.resources["months"]; ok {
 		slice := strings.Split(resources, "|")
 		if len(slice) == MonthsPerYear {
 			return slice[c.Month()-1]
@@ -56,10 +61,15 @@ func (c *Carbon) ToShortMonthString(timezone ...string) string {
 		return ""
 	}
 
-	c.lang.rw.RLock()
-	defer c.lang.rw.RUnlock()
+	lang := c.lang
+	if lang == nil {
+		return ""
+	}
 
-	if resources, ok := c.lang.resources["short_months"]; ok {
+	lang.rw.RLock()
+	defer lang.rw.RUnlock()
+
+	if resources, ok := lang.resources["short_months"]; ok {
 		slice := strings.Split(resources, "|")
 		if len(slice) == MonthsPerYear {
 			return slice[c.Month()-1]
@@ -77,10 +87,15 @@ func (c *Carbon) ToWeekString(timezone ...string) string {
 		return ""
 	}
 
-	c.lang.rw.RLock()
-	defer c.lang.rw.RUnlock()
+	lang := c.lang
+	if lang == nil {
+		return ""
+	}
 
-	if resources, ok := c.lang.resources["weeks"]; ok {
+	lang.rw.RLock()
+	defer lang.rw.RUnlock()
+
+	if resources, ok := lang.resources["weeks"]; ok {
 		slice := strings.Split(resources, "|")
 		if len(slice) == DaysPerWeek {
 			return slice[c.DayOfWeek()%DaysPerWeek]
@@ -98,10 +113,15 @@ func (c *Carbon) ToShortWeekString(timezone ...string) string {
 		return ""
 	}
 
-	c.lang.rw.RLock()
-	defer c.lang.rw.RUnlock()
+	lang := c.lang
+	if lang == nil {
+		return ""
+	}
 
-	if resources, ok := c.lang.resources["short_weeks"]; ok {
+	lang.rw.RLock()
+	defer lang.rw.RUnlock()
+
+	if resources, ok := lang.resources["short_weeks"]; ok {
 		slice := strings.Split(resources, "|")
 		if len(slice) == DaysPerWeek {
 			return slice[c.DayOfWeek()%DaysPerWeek]
