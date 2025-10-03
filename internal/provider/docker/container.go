@@ -40,7 +40,7 @@ func (c *Client) listContainerImage() []model.Image {
 		return []model.Image{}
 	}
 
-	var list []model.Image
+	var list model.ImageList
 	for _, ctn := range ctns {
 		imageName := ctn.Image
 		imageInfo, err := cli.ImageInspect(imageName)
@@ -112,7 +112,7 @@ func (c *Client) listContainerImage() []model.Image {
 		list = append(list, image)
 	}
 
-	return list
+	return list.Dedupe()
 }
 
 func metadata(ctn container.Summary) map[string]string {
