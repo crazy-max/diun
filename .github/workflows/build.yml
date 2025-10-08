@@ -124,7 +124,7 @@ jobs:
       -
         name: Upload SARIF report
         if: ${{ github.ref == 'refs/heads/master' }}
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: ${{ env.DESTDIR }}/govulncheck.out
 
@@ -340,6 +340,6 @@ jobs:
           image: registry://${{ env.DOCKERHUB_SLUG }}:edge
       -
         name: Upload SARIF report
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: ${{ steps.scout.outputs.result-file }}
