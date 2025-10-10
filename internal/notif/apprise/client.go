@@ -77,7 +77,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	u.Path = path.Join(u.Path, "notify")
 
 	if c.cfg.Token != "" || c.cfg.TokenFile != "" {
-		token, err := utl.GetSecret(c.cfg.Token, c.cfg.TokenFile)
+		token, err := utl.GetValueOrFileContents(c.cfg.Token, c.cfg.TokenFile)
 		if err != nil {
 			return errors.Wrap(err, "cannot retrieve token secret for Apprise notifier")
 		}

@@ -113,11 +113,11 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		}
 	}
 
-	username, err := utl.GetSecret(c.cfg.Username, c.cfg.UsernameFile)
+	username, err := utl.GetValueOrFileContents(c.cfg.Username, c.cfg.UsernameFile)
 	if err != nil {
 		log.Warn().Err(err).Msg("Cannot retrieve username secret for mail notifier")
 	}
-	password, err := utl.GetSecret(c.cfg.Password, c.cfg.PasswordFile)
+	password, err := utl.GetValueOrFileContents(c.cfg.Password, c.cfg.PasswordFile)
 	if err != nil {
 		log.Warn().Err(err).Msg("Cannot retrieve password secret for mail notifier")
 	}

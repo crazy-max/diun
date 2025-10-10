@@ -93,7 +93,7 @@ func newExternalClusterClient(opts Options) (*kubernetes.Clientset, error) {
 		return nil, errors.New("endpoint missing for external cluster client")
 	}
 
-	opts.Token, err = utl.GetSecret(opts.Token, opts.TokenFile)
+	opts.Token, err = utl.GetValueOrFileContents(opts.Token, opts.TokenFile)
 	if err != nil {
 		return nil, errors.Wrap(err, "cannot retrieve bearer token")
 	}

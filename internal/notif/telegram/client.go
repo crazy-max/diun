@@ -44,13 +44,13 @@ func (c *Client) Name() string {
 
 // Send creates and sends a Telegram notification with an entry
 func (c *Client) Send(entry model.NotifEntry) error {
-	token, err := utl.GetSecret(c.cfg.Token, c.cfg.TokenFile)
+	token, err := utl.GetValueOrFileContents(c.cfg.Token, c.cfg.TokenFile)
 	if err != nil {
 		return errors.Wrap(err, "cannot retrieve token secret for Telegram notifier")
 	}
 
 	cids := c.cfg.ChatIDs
-	cidsRaw, err := utl.GetSecret("", c.cfg.ChatIDsFile)
+	cidsRaw, err := utl.GetValueOrFileContents("", c.cfg.ChatIDsFile)
 	if err != nil {
 		return errors.Wrap(err, "cannot retrieve chat IDs secret for Telegram notifier")
 	}
@@ -81,7 +81,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		return errors.Wrap(err, "failed to create telegram bot client")
 	}
 
-	templateBody, err := utl.GetTemplate(c.cfg.TemplateBody, c.cfg.TemplateFile)
+	templateBody, err := utl.GetValueOrFileContents(c.cfg.TemplateBody, c.cfg.TemplateFile)
 	if err != nil {
 		return errors.Wrap(err, "cannot get template for Telegram notifier")
 	}

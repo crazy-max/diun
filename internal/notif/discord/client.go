@@ -43,7 +43,7 @@ func (c *Client) Name() string {
 func (c *Client) Send(entry model.NotifEntry) error {
 	var content bytes.Buffer
 
-	webhookURL, err := utl.GetSecret(c.cfg.WebhookURL, c.cfg.WebhookURLFile)
+	webhookURL, err := utl.GetValueOrFileContents(c.cfg.WebhookURL, c.cfg.WebhookURLFile)
 	if err != nil {
 		return errors.Wrap(err, "cannot retrieve webhook URL for Discord notifier")
 	}
