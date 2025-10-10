@@ -35,12 +35,12 @@ func (c *Client) Name() string {
 
 // Send creates and sends a mqtt notification with an entry
 func (c *Client) Send(entry model.NotifEntry) error {
-	username, err := utl.GetSecret(c.cfg.Username, c.cfg.UsernameFile)
+	username, err := utl.GetValueOrFileContents(c.cfg.Username, c.cfg.UsernameFile)
 	if err != nil {
 		return err
 	}
 
-	password, err := utl.GetSecret(c.cfg.Password, c.cfg.PasswordFile)
+	password, err := utl.GetValueOrFileContents(c.cfg.Password, c.cfg.PasswordFile)
 	if err != nil {
 		return err
 	}
