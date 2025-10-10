@@ -67,6 +67,20 @@ func GetSecret(plaintext, filename string) (string, error) {
 	return "", nil
 }
 
+// GetTemplate retrieves template's value from plaintext or filename if defined
+func GetTemplate(plaintext, filename string) (string, error) {
+	if plaintext != "" {
+		return plaintext, nil
+	} else if filename != "" {
+		b, err := os.ReadFile(filename)
+		if err != nil {
+			return "", err
+		}
+		return string(b), nil
+	}
+	return "", nil
+}
+
 // NewFalse returns a false bool pointer
 func NewFalse() *bool {
 	b := false

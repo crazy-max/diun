@@ -81,10 +81,15 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		return errors.Wrap(err, "failed to create telegram bot client")
 	}
 
+	templateBody, err := utl.GetTemplate(c.cfg.TemplateBody, c.cfg.TemplateFile)
+	if err != nil {
+		return errors.Wrap(err, "cannot get template for Telegram notifier")
+	}
+
 	message, err := msg.New(msg.Options{
 		Meta:         c.meta,
 		Entry:        entry,
-		TemplateBody: c.cfg.TemplateBody,
+		TemplateBody: templateBody,
 		TemplateFuncs: template.FuncMap{
 			"escapeMarkdown": func(text string) string {
 				text = strings.ReplaceAll(text, "_", "\\_")

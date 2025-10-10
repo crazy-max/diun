@@ -12,6 +12,7 @@ type NotifTelegram struct {
 	ChatIDs             []string `yaml:"chatIDs,omitempty" json:"chatIDs,omitempty" validate:"omitempty"`
 	ChatIDsFile         string   `yaml:"chatIDsFile,omitempty" json:"chatIDsFile,omitempty" validate:"omitempty,file"`
 	TemplateBody        string   `yaml:"templateBody,omitempty" json:"templateBody,omitempty" validate:"required"`
+	TemplateFile        string   `yaml:"templateFile,omitempty" json:"templateFile,omitempty" validate:"omitempty,file"`
 	DisableNotification *bool    `yaml:"disableNotification,omitempty" json:"disableNotification,omitempty" validate:"omitempty"`
 }
 
