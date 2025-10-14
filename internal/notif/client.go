@@ -119,7 +119,7 @@ func SanitizeUrlTokens(err error) string {
 		return ""
 	}
 	params := []string{"token", "apikey", "api_key", "access_token", "auth", "authorization", "jwt", "sessionid", "session_id", "password", "secret", "key", "code"}
-	pattern := `([?&](` + strings.Join(params, "|") + `)=)[^&"\s]+` // scan ? or & followed by param name and =, then redact until & or space or " (end of URL)
+	pattern := `([?&](` + strings.Join(params, "|") + `)=)[^&"\s]+` // scan ? or & followed by one of the param names and =, then redact until &, whitespace, or " (end of URL)
 	re := regexp.MustCompile(pattern)
 	return re.ReplaceAllString(err.Error(), `$1[REDACTED]`) // leave param name, redact secret value
 }
