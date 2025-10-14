@@ -1,6 +1,7 @@
 package notif
 
 import (
+	"regexp"
 	"strings"
 
 	"github.com/crazy-max/diun/v4/internal/model"
@@ -107,9 +108,20 @@ func (c *Client) Send(entry model.NotifEntry) {
 	for _, n := range c.notifiers {
 		log.Debug().Str("image", entry.Image.String()).Msgf("Sending %s notification...", n.Name())
 		if err := n.Send(entry); err != nil {
-			log.Error().Err(err).Str("image", entry.Image.String()).Msgf("%s notification failed", strings.Title(n.Name())) //nolint:staticcheck // ignoring "SA1019: strings.Title is deprecated", as for our use we don't need full unicode support
+			log.Error().Str("image", entry.Image.String()).Msgf("%s notification failed: %s", strings.Title(n.Name()), SanitizeUrlTokens(err)) //nolint:staticcheck // ignoring "SA1019: strings.Title is deprecated", as for our use we don't need full unicode support
 		}
 	}
+}
+
+// SanitizeUrlTokens redacts auth tokens in URLs from error messages
+func SanitizeUrlTokens(err error) string {
+	if err == nil {
+		return ""
+	}
+	params := []string{"token", "apikey", "api_key", "access_token", "auth", "authorization", "jwt", "sessionid", "session_id", "password", "secret", "key", "code"}
+	pattern := `([?&](` + strings.Join(params, "|") + `)=)[^&"\s]+` // scan ? or & followed by param name and =, then redact until & or space or " (end of URL)
+	re := regexp.MustCompile(pattern)
+	return re.ReplaceAllString(err.Error(), `$1[REDACTED]`) // leave param name, redact secret value
 }
 
 // List returns created notifiers
