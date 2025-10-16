@@ -6,6 +6,7 @@
   "weeks": "Domenica|Lunedí|Martedí|Mercoledí|Giovedí|Venerdí|Sabato",
   "short_weeks": "Dom|Lun|Mar|Mer|Gio|Ven|Sab",
   "seasons": "Primavera|Estate|Autunno|Inverno",
+  "constellations": "Ariete|Toro|Gemelli|Cancro|Leone|Vergine|Bilancia|Scorpione|Sagittario|Capricorno|Acquario|Pesci",
   "year": "1 anno|%d anni",
   "month": "1 mese|%d mesi",
   "week": "1 settimana|%d settimane",

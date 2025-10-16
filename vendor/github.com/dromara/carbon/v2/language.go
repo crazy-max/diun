@@ -4,7 +4,6 @@ import (
 	"embed"
 	"encoding/json"
 	"fmt"
-	"slices"
 	"strconv"
 	"strings"
 	"sync"
@@ -13,10 +12,14 @@ import (
 //go:embed lang
 var fs embed.FS
 
-var validResourcesKey = []string{
-	"months", "short_months", "weeks", "short_weeks", "seasons", "constellations",
-	"year", "month", "week", "day", "hour", "minute", "second",
-	"now", "ago", "from_now", "before", "after",
+// localeCache caches parsed locale resources to avoid repeated file loading and JSON parsing
+var localeCache sync.Map
+
+// cachedResources holds the cached resources for each language.
+type cachedResources struct {
+	once      sync.Once
+	resources map[string]string
+	err       error
 }
 
 // Language defines a Language struct.
@@ -54,10 +57,11 @@ func (lang *Language) Copy() *Language {
 	}
 
 	lang.rw.RLock()
-	defer lang.rw.RUnlock()
+	resources := lang.resources
+	lang.rw.RUnlock()
 
-	newLang.resources = make(map[string]string)
-	for k, v := range lang.resources {
+	newLang.resources = make(map[string]string, len(resources))
+	for k, v := range resources {
 		newLang.resources[k] = v
 	}
 	return newLang
@@ -73,21 +77,47 @@ func (lang *Language) SetLocale(locale string) *Language {
 		return lang
 	}
 
+	// Early return if locale hasn't changed and resources are already loaded
+	lang.rw.RLock()
+	if lang.locale == locale && lang.resources != nil && len(lang.resources) > 0 {
+		lang.rw.RUnlock()
+		return lang
+	}
+	lang.rw.RUnlock()
+
 	fileName := fmt.Sprintf("%s/%s.json", lang.dir, locale)
-	bs, err := fs.ReadFile(fileName)
-	if err != nil {
-		lang.Error = fmt.Errorf("%w: %w", ErrNotExistLocale(fileName), err)
+	load, _ := localeCache.LoadOrStore(fileName, new(cachedResources))
+	entry := load.(*cachedResources)
+
+	entry.once.Do(func() {
+		bs, err := fs.ReadFile(fileName)
+		if err != nil {
+			entry.err = fmt.Errorf("%w: %w", ErrNotExistLocale(fileName), err)
+			return
+		}
+
+		var resources map[string]string
+		_ = json.Unmarshal(bs, &resources)
+		entry.resources = resources
+	})
+
+	if entry.err != nil {
+		lang.Error = entry.err
 		return lang
 	}
 
-	var resources map[string]string
-	_ = json.Unmarshal(bs, &resources)
+	// Create a copy of the cached resources to avoid modifying the cache
+	// Pre-allocate with exact capacity for better memory efficiency
+	newResources := make(map[string]string, len(entry.resources))
+	for k, v := range entry.resources {
+		newResources[k] = v
+	}
 
 	lang.rw.Lock()
-	defer lang.rw.Unlock()
-
 	lang.locale = locale
-	lang.resources = resources
+	lang.resources = newResources
+	lang.rw.Unlock()
+
 	return lang
 }
 
@@ -105,10 +135,6 @@ func (lang *Language) SetResources(resources map[string]string) *Language {
 	defer lang.rw.Unlock()
 
 	for k, v := range resources {
-		if !slices.Contains(validResourcesKey, k) {
-			lang.Error = ErrInvalidResourcesError(resources)
-			return lang
-		}
 		lang.resources[k] = v
 	}
 	return lang
@@ -120,25 +146,32 @@ func (lang *Language) translate(unit string, value int64) string {
 		return ""
 	}
 
-	lang.rw.Lock()
-	if len(lang.resources) == 0 {
-		lang.rw.Unlock()
-		lang.SetLocale(DefaultLocale)
-		lang.rw.Lock()
-	}
+	lang.rw.RLock()
 	resources := lang.resources
-	defer lang.rw.Unlock()
+	lang.rw.RUnlock()
 
-	slice := strings.Split(resources[unit], "|")
+	// If resources is empty, set default locale and retry
+	if len(resources) == 0 {
+		lang.SetLocale(DefaultLocale)
+		lang.rw.RLock()
+		resources = lang.resources
+		lang.rw.RUnlock()
+	}
+	resource, exists := resources[unit]
+	if !exists {
+		return ""
+	}
+	slice := strings.Split(resource, "|")
 	number := getAbsValue(value)
+	str := strconv.FormatInt(value, 10)
 	if len(slice) == 1 {
-		return strings.Replace(slice[0], "%d", strconv.FormatInt(value, 10), 1)
+		return strings.Replace(slice[0], "%d", str, 1)
 	}
 	if int64(len(slice)) <= number {
-		return strings.Replace(slice[len(slice)-1], "%d", strconv.FormatInt(value, 10), 1)
+		return strings.Replace(slice[len(slice)-1], "%d", str, 1)
 	}
 	if !strings.Contains(slice[number-1], "%d") && value < 0 {
 		return "-" + slice[number-1]
 	}
-	return strings.Replace(slice[number-1], "%d", strconv.FormatInt(value, 10), 1)
+	return strings.Replace(slice[number-1], "%d", str, 1)
 }
