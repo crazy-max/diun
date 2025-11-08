@@ -1,15 +1,17 @@
 package matrix
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/internal/msg"
 	"github.com/crazy-max/diun/v4/internal/notif/notifier"
 	"github.com/crazy-max/diun/v4/pkg/utl"
-	"github.com/matrix-org/gomatrix"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
+	"maunium.net/go/mautrix"
+	"maunium.net/go/mautrix/event"
 )
 
 // Client represents an active rocketchat notification object
@@ -36,12 +38,13 @@ func (c *Client) Name() string {
 
 // Send creates and sends a matrix notification with an entry
 func (c *Client) Send(entry model.NotifEntry) error {
-	m, err := gomatrix.NewClient(c.cfg.HomeserverURL, "", "")
+	ctx := context.Background()
+	m, err := mautrix.NewClient(c.cfg.HomeserverURL, "", "")
 	if err != nil {
 		return errors.Wrap(err, "failed to initialize Matrix client")
 	}
 	defer func() {
-		if _, err := m.Logout(); err != nil {
+		if _, err := m.Logout(ctx); err != nil {
 			log.Error().Err(err).Msg("Cannot logout")
 		}
 	}()
@@ -55,11 +58,11 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		return errors.Wrap(err, "cannot retrieve password secret for Matrix notifier")
 	}
 
-	r, err := m.Login(&gomatrix.ReqLogin{
+	_, err = m.Login(ctx, &mautrix.ReqLogin{
 		Type: "m.login.password",
-		Identifier: gomatrix.UserIdentifier{
-			IDType: "m.id.user",
-			User:   user,
+		Identifier: mautrix.UserIdentifier{
+			Type: "m.id.user",
+			User: user,
 		},
 		Password:                 password,
 		InitialDeviceDisplayName: c.meta.Name,
@@ -67,9 +70,8 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	if err != nil {
 		return errors.Wrap(err, "failed to authenticate Matrix user")
 	}
-	m.SetCredentials(r.UserID, r.AccessToken)
 
-	joined, err := m.JoinRoom(c.cfg.RoomID, "", nil)
+	joined, err := m.JoinRoom(ctx, c.cfg.RoomID, &mautrix.ReqJoinRoom{})
 	if err != nil {
 		return errors.Wrap(err, "failed to join room")
 	}
@@ -93,14 +95,25 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		return err
 	}
 
-	if _, err := m.SendMessageEvent(joined.RoomID, "m.room.message", gomatrix.HTMLMessage{
-		Body:          string(msgText),
+	type MatrixMessage struct {
+		Body          string `json:"body"`
+		MsgType       string `json:"msgtype"`
+		Format        string `json:"format"`
+		FormattedBody string `json:"formatted_body"`
+	}
+
+	eventType := event.Type{
+		Type:  "m.room.message",
+		Class: event.MessageEventType,
+	}
+
+	if _, err := m.SendMessageEvent(ctx, joined.RoomID, eventType, MatrixMessage{
 		MsgType:       fmt.Sprintf("m.%s", c.cfg.MsgType),
+		Body:          string(msgText),
 		Format:        "org.matrix.custom.html",
 		FormattedBody: string(msgHTML),
 	}); err != nil {
 		return errors.Wrap(err, "failed to submit message to Matrix")
 	}
-
 	return nil
 }
