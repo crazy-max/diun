@@ -86,7 +86,6 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	u.Path = path.Join(u.Path, "message")
 
 	q := u.Query()
-	q.Set("token", token)
 	u.RawQuery = q.Encode()
 
 	cancelCtx, cancel := context.WithCancelCause(context.Background())
@@ -110,6 +109,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Add("Content-Length", strconv.Itoa(len(string(jsonBody))))
 	req.Header.Set("User-Agent", c.meta.UserAgent)
+	req.Header.Set("X-Gotify-Key", token)
 
 	resp, err := hc.Do(req)
 	if err != nil {
