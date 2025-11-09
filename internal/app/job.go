@@ -51,11 +51,11 @@ func (di *Diun) createJob(job model.Job) {
 		reg = (&model.RegOpt{}).GetDefaults()
 	}
 
-	regUser, err := utl.GetSecret(reg.Username, reg.UsernameFile)
+	regUser, err := utl.GetValueOrFileContents(reg.Username, reg.UsernameFile)
 	if err != nil {
 		log.Warn().Err(err).Msgf("Cannot retrieve username secret for regopts %s", reg.Name)
 	}
-	regPassword, err := utl.GetSecret(reg.Password, reg.PasswordFile)
+	regPassword, err := utl.GetValueOrFileContents(reg.Password, reg.PasswordFile)
 	if err != nil {
 		log.Warn().Err(err).Msgf("Cannot retrieve password secret for regopts %s", reg.Name)
 	}

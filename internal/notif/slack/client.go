@@ -38,7 +38,7 @@ func (c *Client) Name() string {
 
 // Send creates and sends a slack notification with an entry
 func (c *Client) Send(entry model.NotifEntry) error {
-	webhookURL, err := utl.GetSecret(c.cfg.WebhookURL, c.cfg.WebhookURLFile)
+	webhookURL, err := utl.GetValueOrFileContents(c.cfg.WebhookURL, c.cfg.WebhookURLFile)
 	if err != nil {
 		return errors.Wrap(err, "cannot retrieve webhook URL for Slack notifier")
 	}
