@@ -444,24 +444,23 @@ func startComms(conn net.Conn, // Network connection (must be active)
 }
 
 // ackFunc acknowledges a packet
-// WARNING the function returned must not be called if the comms routine is shutting down or not running
-// (it needs outgoing comms in order to send the acknowledgement). Currently this is only called from
-// matchAndDispatch which will be shutdown before the comms are
-func ackFunc(oboundP chan *PacketAndToken, persist Store, packet *packets.PublishPacket) func() {
+// WARNING sendAck may be called at any time (even after the connection is dead). At the time of writing ACK sent after
+// connection loss will be dropped (this is not ideal)
+func ackFunc(sendAck func(*PacketAndToken), persist Store, packet *packets.PublishPacket) func() {
 	return func() {
 		switch packet.Qos {
 		case 2:
 			pr := packets.NewControlPacket(packets.Pubrec).(*packets.PubrecPacket)
 			pr.MessageID = packet.MessageID
 			DEBUG.Println(NET, "putting pubrec msg on obound")
-			oboundP <- &PacketAndToken{p: pr, t: nil}
+			sendAck(&PacketAndToken{p: pr, t: nil})
 			DEBUG.Println(NET, "done putting pubrec msg on obound")
 		case 1:
 			pa := packets.NewControlPacket(packets.Puback).(*packets.PubackPacket)
 			pa.MessageID = packet.MessageID
 			DEBUG.Println(NET, "putting puback msg on obound")
-			persistOutbound(persist, pa)
-			oboundP <- &PacketAndToken{p: pa, t: nil}
+			persistOutbound(persist, pa) // May fail if store has been closed
+			sendAck(&PacketAndToken{p: pa, t: nil})
 			DEBUG.Println(NET, "done putting puback msg on obound")
 		case 0:
 			// do nothing, since there is no need to send an ack packet back

@@ -62,93 +62,99 @@ type ConnectionAttemptHandler func(broker *url.URL, tlsCfg *tls.Config) *tls.Con
 // Does not carry out any MQTT specific handshakes.
 type OpenConnectionFunc func(uri *url.URL, options ClientOptions) (net.Conn, error)
 
+// ConnectionNotificationHandler is invoked for any type of connection event.
+type ConnectionNotificationHandler func(Client, ConnectionNotification)
+
 // ClientOptions contains configurable options for an Client. Note that these should be set using the
 // relevant methods (e.g. AddBroker) rather than directly. See those functions for information on usage.
 // WARNING: Create the below using NewClientOptions unless you have a compelling reason not to. It is easy
 // to create a configuration with difficult to trace issues (e.g. Mosquitto 2.0.12+ will reject connections
 // with KeepAlive=0 by default).
 type ClientOptions struct {
-	Servers                 []*url.URL
-	ClientID                string
-	Username                string
-	Password                string
-	CredentialsProvider     CredentialsProvider
-	CleanSession            bool
-	Order                   bool
-	WillEnabled             bool
-	WillTopic               string
-	WillPayload             []byte
-	WillQos                 byte
-	WillRetained            bool
-	ProtocolVersion         uint
-	protocolVersionExplicit bool
-	TLSConfig               *tls.Config
-	KeepAlive               int64 // Warning: Some brokers may reject connections with Keepalive = 0.
-	PingTimeout             time.Duration
-	ConnectTimeout          time.Duration
-	MaxReconnectInterval    time.Duration
-	AutoReconnect           bool
-	ConnectRetryInterval    time.Duration
-	ConnectRetry            bool
-	Store                   Store
-	DefaultPublishHandler   MessageHandler
-	OnConnect               OnConnectHandler
-	OnConnectionLost        ConnectionLostHandler
-	OnReconnecting          ReconnectHandler
-	OnConnectAttempt        ConnectionAttemptHandler
-	WriteTimeout            time.Duration
-	MessageChannelDepth     uint
-	ResumeSubs              bool
-	HTTPHeaders             http.Header
-	WebsocketOptions        *WebsocketOptions
-	MaxResumePubInFlight    int // // 0 = no limit; otherwise this is the maximum simultaneous messages sent while resuming
-	Dialer                  *net.Dialer
-	CustomOpenConnectionFn  OpenConnectionFunc
-	AutoAckDisabled         bool
+	Servers                  []*url.URL
+	ClientID                 string
+	Username                 string
+	Password                 string
+	CredentialsProvider      CredentialsProvider
+	CleanSession             bool
+	Order                    bool
+	WillEnabled              bool
+	WillTopic                string
+	WillPayload              []byte
+	WillQos                  byte
+	WillRetained             bool
+	ProtocolVersion          uint
+	protocolVersionExplicit  bool
+	TLSConfig                *tls.Config
+	KeepAlive                int64 // Warning: Some brokers may reject connections with Keepalive = 0.
+	PingTimeout              time.Duration
+	ConnectTimeout           time.Duration
+	MaxReconnectInterval     time.Duration
+	AutoReconnect            bool
+	ConnectRetryInterval     time.Duration
+	ConnectRetry             bool
+	Store                    Store
+	DefaultPublishHandler    MessageHandler
+	OnConnect                OnConnectHandler
+	OnConnectionLost         ConnectionLostHandler
+	OnReconnecting           ReconnectHandler
+	OnConnectAttempt         ConnectionAttemptHandler
+	OnConnectionNotification ConnectionNotificationHandler
+	WriteTimeout             time.Duration
+	MessageChannelDepth      uint
+	ResumeSubs               bool
+	HTTPHeaders              http.Header
+	WebsocketOptions         *WebsocketOptions
+	MaxResumePubInFlight     int // // 0 = no limit; otherwise this is the maximum simultaneous messages sent while resuming
+	Dialer                   *net.Dialer
+	CustomOpenConnectionFn   OpenConnectionFunc
+	AutoAckDisabled          bool
 }
 
 // NewClientOptions will create a new ClientClientOptions type with some
 // default values.
-//   Port: 1883
-//   CleanSession: True
-//   Order: True (note: it is recommended that this be set to FALSE unless order is important)
-//   KeepAlive: 30 (seconds)
-//   ConnectTimeout: 30 (seconds)
-//   MaxReconnectInterval 10 (minutes)
-//   AutoReconnect: True
+//
+//	Port: 1883
+//	CleanSession: True
+//	Order: True (note: it is recommended that this be set to FALSE unless order is important)
+//	KeepAlive: 30 (seconds)
+//	ConnectTimeout: 30 (seconds)
+//	MaxReconnectInterval 10 (minutes)
+//	AutoReconnect: True
 func NewClientOptions() *ClientOptions {
 	o := &ClientOptions{
-		Servers:                 nil,
-		ClientID:                "",
-		Username:                "",
-		Password:                "",
-		CleanSession:            true,
-		Order:                   true,
-		WillEnabled:             false,
-		WillTopic:               "",
-		WillPayload:             nil,
-		WillQos:                 0,
-		WillRetained:            false,
-		ProtocolVersion:         0,
-		protocolVersionExplicit: false,
-		KeepAlive:               30,
-		PingTimeout:             10 * time.Second,
-		ConnectTimeout:          30 * time.Second,
-		MaxReconnectInterval:    10 * time.Minute,
-		AutoReconnect:           true,
-		ConnectRetryInterval:    30 * time.Second,
-		ConnectRetry:            false,
-		Store:                   nil,
-		OnConnect:               nil,
-		OnConnectionLost:        DefaultConnectionLostHandler,
-		OnConnectAttempt:        nil,
-		WriteTimeout:            0, // 0 represents timeout disabled
-		ResumeSubs:              false,
-		HTTPHeaders:             make(map[string][]string),
-		WebsocketOptions:        &WebsocketOptions{},
-		Dialer:                  &net.Dialer{Timeout: 30 * time.Second},
-		CustomOpenConnectionFn:  nil,
-		AutoAckDisabled:         false,
+		Servers:                  nil,
+		ClientID:                 "",
+		Username:                 "",
+		Password:                 "",
+		CleanSession:             true,
+		Order:                    true,
+		WillEnabled:              false,
+		WillTopic:                "",
+		WillPayload:              nil,
+		WillQos:                  0,
+		WillRetained:             false,
+		ProtocolVersion:          0,
+		protocolVersionExplicit:  false,
+		KeepAlive:                30,
+		PingTimeout:              10 * time.Second,
+		ConnectTimeout:           30 * time.Second,
+		MaxReconnectInterval:     10 * time.Minute,
+		AutoReconnect:            true,
+		ConnectRetryInterval:     30 * time.Second,
+		ConnectRetry:             false,
+		Store:                    nil,
+		OnConnect:                nil,
+		OnConnectionLost:         DefaultConnectionLostHandler,
+		OnConnectAttempt:         nil,
+		OnConnectionNotification: nil,
+		WriteTimeout:             0, // 0 represents timeout disabled
+		ResumeSubs:               false,
+		HTTPHeaders:              make(map[string][]string),
+		WebsocketOptions:         &WebsocketOptions{},
+		Dialer:                   &net.Dialer{Timeout: 30 * time.Second},
+		CustomOpenConnectionFn:   nil,
+		AutoAckDisabled:          false,
 	}
 	return o
 }
@@ -355,6 +361,13 @@ func (o *ClientOptions) SetConnectionAttemptHandler(onConnectAttempt ConnectionA
 	return o
 }
 
+// SetConnectionNotificationHandler sets the ConnectionNotificationHandler callback to receive all types of connection
+// events.
+func (o *ClientOptions) SetConnectionNotificationHandler(onConnectionNotification ConnectionNotificationHandler) *ClientOptions {
+	o.OnConnectionNotification = onConnectionNotification
+	return o
+}
+
 // SetWriteTimeout puts a limit on how long a mqtt publish should block until it unblocks with a
 // timeout error. A duration of 0 never times out. Default never times out
 func (o *ClientOptions) SetWriteTimeout(t time.Duration) *ClientOptions {
@@ -450,6 +463,7 @@ func (o *ClientOptions) SetCustomOpenConnectionFn(customOpenConnectionFn OpenCon
 }
 
 // SetAutoAckDisabled enables or disables the Automated Acking of Messages received by the handler.
+//
 //	By default it is set to false. Setting it to true will disable the auto-ack globally.
 func (o *ClientOptions) SetAutoAckDisabled(autoAckDisabled bool) *ClientOptions {
 	o.AutoAckDisabled = autoAckDisabled

@@ -144,8 +144,8 @@ github.com/dromara/carbon/v2/calendar/hebrew
 github.com/dromara/carbon/v2/calendar/julian
 github.com/dromara/carbon/v2/calendar/lunar
 github.com/dromara/carbon/v2/calendar/persian
-# github.com/eclipse/paho.mqtt.golang v1.5.0
-## explicit; go 1.20
+# github.com/eclipse/paho.mqtt.golang v1.5.1
+## explicit; go 1.24.0
 github.com/eclipse/paho.mqtt.golang
 github.com/eclipse/paho.mqtt.golang/packets
 # github.com/emicklei/go-restful/v3 v3.11.0
