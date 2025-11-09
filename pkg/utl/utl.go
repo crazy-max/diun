@@ -4,6 +4,7 @@ import (
 	"os"
 	"regexp"
 	"time"
+	"strings"
 )
 
 // MatchString reports whether a string s
@@ -62,7 +63,8 @@ func GetSecret(plaintext, filename string) (string, error) {
 		if err != nil {
 			return "", err
 		}
-		return string(b), nil
+		// trim newlines, spaces and tabs. Solves #665
+		return strings.TrimSpace(string(b)), nil
 	}
 	return "", nil
 }
