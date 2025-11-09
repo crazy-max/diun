@@ -19,7 +19,7 @@ require (
 	github.com/dromara/carbon/v2 v2.6.14
 	github.com/eclipse/paho.mqtt.golang v1.5.0
 	github.com/go-gomail/gomail v0.0.0-20160411212932-81ebce5c23df
-	github.com/go-playground/validator/v10 v10.27.0
+	github.com/go-playground/validator/v10 v10.28.0
 	github.com/hashicorp/nomad/api v0.0.0-20250812204832-62b195aaa535 // v1.10.4
 	github.com/jedib0t/go-pretty/v6 v6.6.8
 	github.com/matcornic/hermes/v2 v2.1.0
@@ -76,7 +76,7 @@ require (
 	github.com/felixge/fgprof v0.9.5 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/fxamacker/cbor/v2 v2.7.0 // indirect
-	github.com/gabriel-vasile/mimetype v1.4.8 // indirect
+	github.com/gabriel-vasile/mimetype v1.4.10 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-openapi/jsonpointer v0.21.0 // indirect
