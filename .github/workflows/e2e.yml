@@ -56,6 +56,12 @@ jobs:
             loglevel: debug
           - folder: dockerfile2
             loglevel: debug
+          - folder: docker1
+            loglevel: debug
+            docker_version: v29.0.0
+          - folder: dockerfile1
+            loglevel: debug
+            docker_version: v29.0.0
     steps:
       -
         name: Checkout
@@ -63,8 +69,12 @@ jobs:
         with:
           fetch-depth: 0
       -
-        name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        name: Set up Docker
+        if: matrix.docker_version != ''
+        uses: docker/setup-docker-action@v4
+        with:
+          version: ${{ matrix.docker_version }}
+          set-host: true
       -
         name: Build
         uses: docker/bake-action@v6
