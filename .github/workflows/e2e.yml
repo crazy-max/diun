@@ -62,6 +62,14 @@ jobs:
           - folder: dockerfile1
             loglevel: debug
             docker_version: v29.0.0
+          - folder: docker1
+            loglevel: debug
+            docker_version: v29.0.0
+            image: crazymax/diun:latest
+          - folder: dockerfile1
+            loglevel: debug
+            docker_version: v29.0.0
+            image: crazymax/diun:latest
     steps:
       -
         name: Checkout
@@ -77,6 +85,7 @@ jobs:
           set-host: true
       -
         name: Build
+        if: matrix.image == ''
         uses: docker/bake-action@v6
         with:
           source: .
@@ -92,7 +101,7 @@ jobs:
           docker run -d --name ${{ env.CONTAINER_NAME }} ${volFlags} \
             -e "TZ=Europe/Paris" \
             -e "LOG_LEVEL=${{ matrix.loglevel }}" \
-            ${{ env.BUILD_TAG }}
+            ${{ matrix.image || env.BUILD_TAG }}
       -
         name: Check container logs
         uses: crazy-max/.github/.github/actions/container-logs-check@main
