@@ -230,88 +230,52 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  image:
+  image-prepare:
     runs-on: ubuntu-latest
+    outputs:
+      repo-slugs: |
+        ${{ env.DOCKERHUB_SLUG }}
+        ${{ env.GHCR_SLUG }}
+    steps:
+      # FIXME: can't use env object in reusable workflow inputs: https://github.com/orgs/community/discussions/26671
+      - run: echo "Exposing env vars for reusable workflow"
+
+  image:
+    uses: docker/github-builder-experimental/.github/workflows/bake.yml@8fc70909404a502fd0eca6601b99b32fa7192b03
     permissions:
-      # same as global permissions
-      contents: read
-      # required to push to GHCR
-      packages: write
+      contents: read # same as global permission
+      id-token: write # for signing attestation(s) with GitHub OIDC Token
     needs:
+      - image-prepare
       - artifact
       - test
-    steps:
-      -
-        name: Checkout
-        uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-      -
-        name: Docker meta
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: |
-            ${{ env.DOCKERHUB_SLUG }}
-            ${{ env.GHCR_SLUG }}
-          tags: |
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=semver,pattern={{major}}
-            type=ref,event=pr
-            type=edge
-          labels: |
-            org.opencontainers.image.title=Diun
-            org.opencontainers.image.description=Docker image update notifier
-            org.opencontainers.image.vendor=CrazyMax
-      -
-        name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-      -
-        name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-      -
-        name: Login to DockerHub
-        if: github.event_name != 'pull_request'
-        uses: docker/login-action@v3
-        with:
+    with:
+      runner: amd64
+      target: image-all
+      output: image
+      push: ${{ github.event_name != 'pull_request' }}
+      set-meta-labels: true
+      meta-images: |
+        ${{ needs.image-prepare.outputs.repo-slugs }}
+      meta-tags: |
+        type=semver,pattern={{version}}
+        type=semver,pattern={{major}}.{{minor}}
+        type=semver,pattern={{major}}
+        type=ref,event=pr
+        type=edge
+      meta-labels: |
+        org.opencontainers.image.title=Diun
+        org.opencontainers.image.description=Docker image update notifier
+        org.opencontainers.image.vendor=CrazyMax
+      bake-sbom: true
+    secrets:
+      registry-auths: |
+        - registry: docker.io
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-      -
-        name: Login to GHCR
-        if: github.event_name != 'pull_request'
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
+        - registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      -
-        name: Build
-        uses: docker/bake-action@v6
-        with:
-          source: .
-          files: |
-            ./docker-bake.hcl
-            ${{ steps.meta.outputs.bake-file }}
-          targets: image-all
-          provenance: mode=max
-          sbom: true
-          pull: true
-          push: ${{ github.event_name != 'pull_request' }}
-      -
-        name: Check manifest
-        if: github.event_name != 'pull_request'
-        run: |
-          docker buildx imagetools inspect ${{ env.DOCKERHUB_SLUG }}:${{ steps.meta.outputs.version }}
-          docker buildx imagetools inspect ${{ env.GHCR_SLUG }}:${{ steps.meta.outputs.version }}
-      -
-        name: Inspect image
-        if: github.event_name != 'pull_request'
-        run: |
-          docker pull ${{ env.DOCKERHUB_SLUG }}:${{ steps.meta.outputs.version }}
-          docker image inspect ${{ env.DOCKERHUB_SLUG }}:${{ steps.meta.outputs.version }}
-          docker pull ${{ env.GHCR_SLUG }}:${{ steps.meta.outputs.version }}
-          docker image inspect ${{ env.GHCR_SLUG }}:${{ steps.meta.outputs.version }}
 
   scout:
     runs-on: ubuntu-latest
