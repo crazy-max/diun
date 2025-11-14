@@ -6,7 +6,7 @@ require (
 	dario.cat/mergo v1.0.2
 	github.com/AlecAivazis/survey/v2 v2.3.7
 	github.com/PaulSonOfLars/gotgbot/v2 v2.0.0-rc.33
-	github.com/alecthomas/kong v1.12.1
+	github.com/alecthomas/kong v1.13.0
 	github.com/bmatcuk/doublestar/v3 v3.0.0
 	github.com/containerd/platforms v1.0.0-rc.1
 	github.com/crazy-max/cron/v3 v3.1.1
