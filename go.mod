@@ -21,7 +21,7 @@ require (
 	github.com/go-gomail/gomail v0.0.0-20160411212932-81ebce5c23df
 	github.com/go-playground/validator/v10 v10.28.0
 	github.com/hashicorp/nomad/api v0.0.0-20250812204832-62b195aaa535 // v1.10.4
-	github.com/jedib0t/go-pretty/v6 v6.6.8
+	github.com/jedib0t/go-pretty/v6 v6.7.2
 	github.com/matcornic/hermes/v2 v2.1.0
 	github.com/microcosm-cc/bluemonday v1.0.27
 	github.com/moby/buildkit v0.25.2
