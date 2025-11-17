@@ -13,11 +13,12 @@
 
 ## 项目简介
 
-`Carbon` 是一个轻量级、语义化、对开发者友好的 `golang` 时间处理库，不依赖于 `任何` 第三方库， `100%` 单元测试覆盖率，已被 [awesome-go](https://github.com/yinggaozhen/awesome-go-cn#日期和时间 "awesome-go-cn") 和 [hello-github](https://hellogithub.com/repository/dromara/carbon "hello-github") 收录，并获得
+`Carbon` 是一个轻量级、语义化、对开发者友好的 `golang` 时间处理库，不依赖于 `任何` 第三方库， `100%` 单元测试覆盖率，已被 [docker](https://github.com/docker/docker-language-server/blob/main/go.mod#L10 "docker") 组织使用以及被 [awesome-go](https://github.com/yinggaozhen/awesome-go-cn#日期和时间 "awesome-go-cn") 和 [hello-github](https://hellogithub.com/repository/dromara/carbon "hello-github") 收录，并获得
 `gitee` 2024 年最有价值项目（`GVP`）和 `gitcode` 2024 年度开源摘星计划 (`G-Star`) 项目
 
-<img src="https://carbon.go-pkg.com/gvp.jpg?v=2.6.x" width="100%" alt="gvp"/>
-<img src="https://carbon.go-pkg.com/gstar.jpg?v=2.6.x" width="100%" alt="g-star"/>
+<a href="https://github.com/docker/docker-language-server/blob/main/go.mod#L10" target="_blank"><img src="https://carbon.go-pkg.com/docker.jpg" width="100%" alt="docker"/></a>
+<a href="https://gitee.com/dromara/carbon" target="_blank"><img src="https://carbon.go-pkg.com/gvp.jpg" width="100%" alt="gvp"/></a>
+<a href="https://gitcode.com/dromara/carbon" target="_blank"><img src="https://carbon.go-pkg.com/gstar.jpg" width="100%" alt="g-star"/></a>
 
 ## 仓库地址
 
@@ -31,7 +32,7 @@
 
 ### 安装使用
 
-> go version >= 1.18
+> go version >= 1.19
 
 ```go
 // 使用 github 库
@@ -102,9 +103,12 @@ carbon.IsTestNow() // false
 
 <a href="https://github.com/dromara/carbon/graphs/contributors"><img src="https://contrib.rocks/image?repo=dromara/carbon&max=100&columns=16"/></a>
 
-[如何为 carbon 添加新的本地化语言支持](docs/CONTRIBUTING.cn.md)
-## 赞助
+## 翻译者
+欢迎帮助将 `Carbon` 翻译为更多本地化语言
 
+[如何为 carbon 添加新的本地化语言支持](https://carbon.go-pkg.com/zh/appendix/contribution-guide.html)
+
+## 赞助
 `Carbon` 是一个非商业开源项目, 如果你想支持 `Carbon`,
 你可以为开发者 [购买一杯咖啡](https://carbon.go-pkg.com/zh/sponsor.html)
 

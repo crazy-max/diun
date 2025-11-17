@@ -13,7 +13,9 @@
 
 ## イントロ
 
-`Carbon` は軽量、セマンティック、開発者に優しい `golang` 時間処理ライブラリ, `いかなる`第三者ライブラリにも依存せず、`100%`ユニットテストカバレッジ率は、[awesome-go](https://github.com/avelino/awesome-go#date-and-time "awesome-go") と [hello-github](https://hellogithub.com/en/repository/dromara/carbon "hello-github") 収録
+`Carbon` は軽量でセマンティックで開発者に優しい `golang` 時間処理ライブラリで、サードパーティ製ライブラリに依存せず、ユニットテストのカバー率は `100%` で、[docker](https://github.com/docker/docker-language-server/blob/main/go.mod#L10 "docker") に公式採用され、[awesome-go](https://github.com/yinggaozhen/awesome-go-cn#日期和时间 "awesome-go-cn") と [hello-github](https://hellogithub.com/repository/dromara/carbon "hello-github") にも収録されています。
+
+<a href="https://github.com/docker/docker-language-server/blob/main/go.mod#L10" target="_blank"><img src="https://carbon.go-pkg.com/docker.jpg" width="100%" alt="docker"/></a>
 
 ## リポジトリ
 
@@ -26,7 +28,7 @@
 ## クイックスタート
 
 ### インストール
-> go version >= 1.18
+> go version >= 1.19
 
 ```go
 // github から使う
@@ -39,13 +41,13 @@ import "gitee.com/dromara/carbon/v2"
 
 // gitcode から使う
 go get -u gitcode.com/dromara/carbon/v2
-import "gitcode.com/dromara/carbon/v2"
+import "gitcode.com/dromara/gitcode/v2"
 ```
 
 `Carbon` は [dromara](https://dromara.org/ "dromara") 組織に寄付されたためリポジトリのURLが変更されました。以前のリポジトリ `golang-module/carbon` を使用している場合は`go.mod`で新しいリポジトリURLに変更するか下記コマンドを実行します
 
 ```go
-go mod edit -replace github.com/golang-module/carbon/v2=github.com/dromara/carbon/v2
+go mod edit -replace github.com/golang-module/carbon/v2 = github.com/dromara/carbon/v2
 ```
 
 ### 使い方と例
@@ -71,14 +73,14 @@ carbon.CreateFromDateTime(2020, 8, 5, 13, 14, 15).ToString() // 2020-08-05 13:14
 carbon.CreateFromTimestamp(1596633255).ToString() // 2020-08-05 13:14:15 +0000 UTC
 
 carbon.Parse("2020-07-05 13:14:15").DiffForHumans() // 1 month before
-carbon.Parse("2020-07-05 13:14:15").SetLocale("jp").DiffForHumans() // 1 ヶ月前
+carbon.Parse("2020-07-05 13:14:15").SetLocale("zh-CN").DiffForHumans() // 1 月前
 
 carbon.ClearTestNow()
 carbon.IsTestNow() // false
 ```
-詳細については <a href="https://carbon.go-pkg.com/ja" target="_blank">公式ドキュメント</a>
+より多くの使用例については、<a href="https://carbon.go-pkg.com" target="_blank">公式ドキュメント</a>をご覧ください。
 
-より多くの使用例については、<a href="https://carbon.go-pkg.com/ja" target="_blank">公式ドキュメント</a>をご覧ください。性能テストレポートについては、[分析レポート](docs/BENCHMARK.ja.md)をご参照ください
+性能テストレポートについては、[ベンチマークレポート](docs/BENCHMARK.ja.md)をご参照ください
 
 ## リファレンス
 
@@ -96,7 +98,10 @@ carbon.IsTestNow() // false
 
 <a href="https://github.com/dromara/carbon/graphs/contributors"><img src="https://contrib.rocks/image?repo=dromara/carbon&max=100&columns=16"/></a>
 
-[Carbon に新しいローカライズ言語サポートを追加する方法](docs/CONTRIBUTING.ja.md)
+## 翻訳者
+`Carbon` を他のローカライズ言語に翻訳してくださる方を募集しています
+
+[Carbon に新しいローカライズ言語サポートを追加する方法](https://carbon.go-pkg.com/ja/appendix/contribution-guide.html)
 
 ## スポンサー
 
