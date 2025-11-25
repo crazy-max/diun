@@ -66,6 +66,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		},
 		Password:                 password,
 		InitialDeviceDisplayName: c.meta.Name,
+		StoreCredentials:         true,
 	})
 	if err != nil {
 		return errors.Wrap(err, "failed to authenticate Matrix user")
