@@ -28,7 +28,6 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       validate-includes: ${{ steps.validate.outputs.matrix }}
-      artifact-includes: ${{ steps.artifact.outputs.matrix }}
     steps:
       -
         name: Checkout
@@ -42,13 +41,6 @@ jobs:
           fields: platforms
         env:
           GOLANGCI_LINT_MULTIPLATFORM: 1
-      -
-        name: Artifact matrix
-        id: artifact
-        uses: docker/bake-action/subaction/matrix@v6
-        with:
-          target: artifact-all
-          fields: platforms
 
   validate:
     runs-on: ubuntu-latest
@@ -128,62 +120,65 @@ jobs:
         with:
           sarif_file: ${{ env.DESTDIR }}/govulncheck.out
 
-  artifact:
+  artifacts:
+    uses: docker/github-builder-experimental/.github/workflows/bake.yml@8fc70909404a502fd0eca6601b99b32fa7192b03
+    permissions:
+      contents: read # same as global permission
+      id-token: write # for signing attestation(s) with GitHub OIDC Token
+    with:
+      runner: amd64
+      target: artifact-all
+      output: local
+      push: ${{ github.event_name != 'pull_request' }}
+      artifact-name: diun
+      bake-sbom: true
+
+  artifacts-finalize:
     runs-on: ubuntu-latest
     needs:
-      - prepare
-      - validate
-    strategy:
-      fail-fast: false
-      matrix:
-        include: ${{ fromJson(needs.prepare.outputs.artifact-includes) }}
+      - artifacts
     steps:
       -
-        name: Prepare
-        run: |
-          platform=${{ matrix.platforms }}
-          echo "PLATFORM_PAIR=${platform//\//-}" >> $GITHUB_ENV
-      -
-        name: Checkout
-        uses: actions/checkout@v6
+        name: Download artifacts
+        uses: actions/download-artifact@v6
         with:
-          fetch-depth: 0
-      -
-        name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-      -
-        name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-      -
-        name: Build
-        uses: docker/bake-action@v6
-        with:
-          source: .
-          targets: artifact
-          provenance: mode=max
-          sbom: true
-          pull: true
-          set: |
-            *.platform=${{ matrix.platforms }}
+          path: /tmp/buildx-output
+          pattern: ${{ needs.artifacts.outputs.artifact-name }}*
+          merge-multiple: true
       -
         name: Rename provenance and sbom
-        working-directory: ${{ env.DESTDIR }}/artifact
         run: |
-          binname=$(find . -name 'diun_*')
-          filename=$(basename "$binname" | sed -E 's/\.(tar\.gz|zip)$//')
-          mv "provenance.json" "${filename}.provenance.json"
-          mv "sbom-binary.spdx.json" "${filename}.sbom.json"
-          find . -name 'sbom*.json' -exec rm {} \;
+          for pdir in /tmp/buildx-output/*/; do
+            (
+              cd "$pdir"
+              binname=$(find . -name 'diun_*')
+              filename=$(basename "$binname" | sed -E 's/\.(tar\.gz|zip)$//')
+              mv "provenance.json" "${filename}.provenance.json"
+              mv "sbom-binary.spdx.json" "${filename}.sbom.json"
+              find . -name 'sbom*.json' -exec rm {} \;
+              if [ -f "provenance.sigstore.json" ]; then
+                mv "provenance.sigstore.json" "${filename}.provenance.sigstore.json"
+              fi
+            )
+          done
+          mkdir -p "${{ env.DESTDIR }}"
+          mv /tmp/buildx-output/**/* "${{ env.DESTDIR }}/"
       -
         name: List artifacts
+        working-directory: ${{ env.DESTDIR }}
         run: |
-          tree -nh ${{ env.DESTDIR }}
+          tree -nh .
       -
-        name: Upload artifact
+        name: Check artifacts
+        working-directory: ${{ env.DESTDIR }}
+        run: |
+          find . -type f -exec file -e ascii -- {} +
+      -
+        name: Upload release binaries
         uses: actions/upload-artifact@v5
         with:
-          name: diun-${{ env.PLATFORM_PAIR }}
-          path: ${{ env.DESTDIR }}
+          name: release
+          path: ${{ env.DESTDIR }}/*
           if-no-files-found: error
 
   release:
@@ -192,23 +187,18 @@ jobs:
       # required to create GitHub release
       contents: write
     needs:
-      - artifact
+      - artifacts-finalize
       - test
     steps:
       -
         name: Checkout
         uses: actions/checkout@v6
       -
-        name: Download artifacts
+        name: Download release binaries
         uses: actions/download-artifact@v6
         with:
-          path: ${{ env.DESTDIR }}
-          pattern: diun-*
-          merge-multiple: true
-      -
-        name: List artifacts
-        run: |
-          tree -nh ${{ env.DESTDIR }}
+          path: ${{ env.DESTDIR }}/artifact
+          name: release
       -
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -219,6 +209,11 @@ jobs:
           source: .
           targets: release
           provenance: false
+      -
+        name: List artifacts
+        working-directory: ${{ env.DESTDIR }}/release
+        run: |
+          tree -nh .
       -
         name: GitHub Release
         uses: softprops/action-gh-release@v2
@@ -247,7 +242,7 @@ jobs:
       id-token: write # for signing attestation(s) with GitHub OIDC Token
     needs:
       - image-prepare
-      - artifact
+      - artifacts-finalize
       - test
     with:
       runner: amd64
