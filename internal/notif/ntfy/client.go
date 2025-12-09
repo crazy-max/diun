@@ -100,7 +100,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		return err
 	}
 
-	if token, err := utl.GetSecret(c.cfg.Token, c.cfg.TokenFile); err == nil && token != "" {
+	if token, err := utl.GetValueOrFileContents(c.cfg.Token, c.cfg.TokenFile); err == nil && token != "" {
 		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
 	}
 	req.Header.Set("Content-Type", "application/json")

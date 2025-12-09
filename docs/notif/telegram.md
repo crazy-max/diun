@@ -23,6 +23,17 @@ Multiple chat IDs can be provided in order to deliver notifications to multiple 
           Docker tag {{ .Entry.Image }} which you subscribed to through {{ .Entry.Provider }} provider has been released.
     ```
 
+!!! example "File with templateFile"
+    ```yaml
+    notif:
+      telegram:
+        token: aabbccdd:11223344
+        chatIDs:
+          - "123456789"
+          - "987654321"
+        templateFile: /path/to/telegram-template.txt
+    ```
+
 | Name                  | Default                            | Description                                                               |
 |-----------------------|------------------------------------|---------------------------------------------------------------------------|
 | `token`               |                                    | Telegram bot token                                                        |
@@ -30,6 +41,7 @@ Multiple chat IDs can be provided in order to deliver notifications to multiple 
 | `chatIDs`             |                                    | List of [chat IDs](#chatids-format) to send notifications to              |
 | `chatIDsFile`         |                                    | Use content of secret file as chat IDs if `chatIDs` not defined           |
 | `templateBody`[^1]    | See [below](#default-templatebody) | [Notification template](../faq.md#notification-template) for message body |
+| `templateFile`        |                                    | Use content of file as template body if `templateBody` not defined        |
 | `disableNotification` | `false`                            | Send silent message with no sound                                         |
 
 !!! abstract "Environment variables"
@@ -38,6 +50,7 @@ Multiple chat IDs can be provided in order to deliver notifications to multiple 
     * `DIUN_NOTIF_TELEGRAM_CHATIDS` (comma separated)
     * `DIUN_NOTIF_TELEGRAM_CHATIDSFILE`
     * `DIUN_NOTIF_TELEGRAM_TEMPLATEBODY`
+    * `DIUN_NOTIF_TELEGRAM_TEMPLATEFILE`
     * `DIUN_NOTIF_TELEGRAM_DISABLENOTIFICATION`
 
 !!! example "chat IDs secret file"

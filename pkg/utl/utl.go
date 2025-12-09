@@ -53,8 +53,10 @@ func GetEnv(key, fallback string) string {
 	return fallback
 }
 
-// GetSecret retrieves secret's value from plaintext or filename if defined
-func GetSecret(plaintext, filename string) (string, error) {
+// GetValueOrFileContents retrieves a value from plaintext or filename if defined.
+// This function can be used for secrets, templates, or any content that needs
+// to be loaded either from a direct value or from a file.
+func GetValueOrFileContents(plaintext, filename string) (string, error) {
 	if plaintext != "" {
 		return plaintext, nil
 	} else if filename != "" {

@@ -42,7 +42,7 @@ func (c *Client) Name() string {
 // Send creates and sends a rocketchat notification with an entry
 // https://rocket.chat/docs/developer-guides/rest-api/chat/postmessage/
 func (c *Client) Send(entry model.NotifEntry) error {
-	token, err := utl.GetSecret(c.cfg.Token, c.cfg.TokenFile)
+	token, err := utl.GetValueOrFileContents(c.cfg.Token, c.cfg.TokenFile)
 	if err != nil {
 		return errors.Wrap(err, "cannot retrieve token secret for RocketChat notifier")
 	}
