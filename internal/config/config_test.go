@@ -60,7 +60,7 @@ func TestLoadFile(t *testing.T) {
 					},
 				},
 				Defaults: &model.Defaults{
-					WatchRepo: utl.NewFalse(),
+					WatchRepo: model.WatchRepoNo,
 					NotifyOn:  []model.NotifyOn{model.NotifyOnNew},
 					MaxTags:   5,
 					SortTags:  registry.SortTagReverse,
