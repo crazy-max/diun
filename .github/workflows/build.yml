@@ -180,7 +180,7 @@ jobs:
           tree -nh ${{ env.DESTDIR }}
       -
         name: Upload artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: diun-${{ env.PLATFORM_PAIR }}
           path: ${{ env.DESTDIR }}
