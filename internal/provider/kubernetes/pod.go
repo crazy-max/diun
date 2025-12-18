@@ -18,7 +18,8 @@ func (c *Client) listPodImage() []model.Image {
 		TokenFile:        c.config.TokenFile,
 		CertAuthFilePath: c.config.CertAuthFilePath,
 		TLSInsecure:      c.config.TLSInsecure,
-		Namespaces:       c.config.Namespaces,
+		Namespaces:        c.config.Namespaces,
+		NamespacesExclude: c.config.NamespacesExclude,
 	})
 	if err != nil {
 		c.logger.Error().Err(err).Msg("Cannot create Kubernetes client")

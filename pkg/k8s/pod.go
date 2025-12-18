@@ -1,10 +1,10 @@
 package k8s
 
 import (
-	"sort"
+"sort"
 
-	v1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+v1 "k8s.io/api/core/v1"
+metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // PodList returns Kubernetes pods
@@ -17,12 +17,16 @@ func (c *Client) PodList(opts metav1.ListOptions) ([]v1.Pod, error) {
 			return nil, err
 		}
 		for _, pod := range pods.Items {
+			// Skip pods in excluded namespaces
+			if c.IsNamespaceExcluded(pod.Namespace) {
+				continue
+			}
 			podList = appendPod(podList, pod)
 		}
 	}
 
 	sort.Slice(podList, func(i, j int) bool {
-		return podList[i].Name < podList[j].Name
+return podList[i].Name < podList[j].Name
 	})
 
 	return podList, nil

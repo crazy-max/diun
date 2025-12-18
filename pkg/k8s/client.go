@@ -1,33 +1,35 @@
 package k8s
 
 import (
-	"context"
-	"os"
+"context"
+"os"
 
-	"github.com/crazy-max/diun/v4/pkg/utl"
-	"github.com/pkg/errors"
-	"github.com/rs/zerolog/log"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/rest"
-	"k8s.io/client-go/tools/clientcmd"
+"github.com/crazy-max/diun/v4/pkg/utl"
+"github.com/pkg/errors"
+"github.com/rs/zerolog/log"
+metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+"k8s.io/client-go/kubernetes"
+"k8s.io/client-go/rest"
+"k8s.io/client-go/tools/clientcmd"
 )
 
 // Client represents an active kubernetes object
 type Client struct {
-	ctx        context.Context
-	namespaces []string
-	API        *kubernetes.Clientset
+	ctx               context.Context
+	namespaces        []string
+	namespacesExclude []string
+	API               *kubernetes.Clientset
 }
 
 // Options holds kubernetes client object options
 type Options struct {
-	Endpoint         string
-	Token            string
-	TokenFile        string
-	CertAuthFilePath string
-	TLSInsecure      *bool
-	Namespaces       []string
+	Endpoint          string
+	Token             string
+	TokenFile         string
+	CertAuthFilePath  string
+	TLSInsecure       *bool
+	Namespaces        []string
+	NamespacesExclude []string
 }
 
 // New initializes a new Kubernetes client
@@ -52,10 +54,21 @@ func New(opts Options) (*Client, error) {
 	}
 
 	return &Client{
-		ctx:        context.Background(),
-		namespaces: opts.Namespaces,
-		API:        api,
+		ctx:               context.Background(),
+		namespaces:        opts.Namespaces,
+		namespacesExclude: opts.NamespacesExclude,
+		API:               api,
 	}, err
+}
+
+// IsNamespaceExcluded checks if a namespace is in the exclusion list
+func (c *Client) IsNamespaceExcluded(namespace string) bool {
+	for _, ns := range c.namespacesExclude {
+		if ns == namespace {
+			return true
+		}
+	}
+	return false
 }
 
 func newInClusterClient(opts Options) (*kubernetes.Clientset, error) {

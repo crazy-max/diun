@@ -263,6 +263,26 @@ Array of namespaces to watch (default all namespaces).
 !!! abstract "Environment variables"
     * `DIUN_PROVIDERS_KUBERNETES_NAMESPACES` (comma separated)
 
+
+### `namespacesExclude`
+
+Array of namespaces to exclude from watching. This is useful when you want to watch all namespaces
+except specific ones (e.g., system namespaces like kube-system, kube-public). Takes precedence over
+`namespaces` - if a namespace is in both lists, it will be excluded.
+
+!!! example "File"
+    ```yaml
+    providers:
+      kubernetes:
+        namespacesExclude:
+          - kube-system
+          - kube-public
+          - kube-node-lease
+    ```
+
+!!! abstract "Environment variables"
+    * `DIUN_PROVIDERS_KUBERNETES_NAMESPACESEXCLUDE` (comma separated)
+
 ### `watchByDefault`
 
 Enable watch by default. If false, pods that don't have `diun.enable: "true"` annotation will be ignored
