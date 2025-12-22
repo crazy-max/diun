@@ -13,7 +13,9 @@ English | [简体中文](README.cn.md) | [日本語](README.ja.md) | [한국어]
 
 ## Introduction
 
-`Carbon` is a simple, semantic and developer-friendly time package for `golang`, `100%` unit test coverage, doesn't depend on `any` third-party package and has been included by [awesome-go](https://github.com/avelino/awesome-go#date-and-time "awesome-go") and [hello-github](https://hellogithub.com/en/repository/dromara/carbon "hello-github")
+`Carbon` is a lightweight, semantic, and developer-friendly `golang` time package that doesn't depend on `any` third-party package, has `100%` unit test coverage, and has been used by [docker](https://github.com/docker/docker-language-server/blob/main/go.mod#L10 "docker") organization as well as included by [awesome-go](https://github.com/yinggaozhen/awesome-go-cn#日期和时间 "awesome-go-cn") and [hello-github](https://hellogithub.com/repository/dromara/carbon "hello-github").
+
+<a href="https://github.com/docker/docker-language-server/blob/main/go.mod#L10" target="_blank"><img src="https://carbon.go-pkg.com/docker.jpg" width="100%" alt="docker"/></a>
 
 ## Repository
 
@@ -26,20 +28,20 @@ English | [简体中文](README.cn.md) | [日本語](README.ja.md) | [한국어]
 ## Quick Start
 
 ### Installation
-> go version >= 1.18
+> go version >= 1.19
 
 ```go
-// By github
+// Via github
 go get -u github.com/dromara/carbon/v2
 import "github.com/dromara/carbon/v2"
 
-// By gitee
+// Via gitee
 go get -u gitee.com/dromara/carbon/v2
 import "gitee.com/dromara/carbon/v2"
 
-// By gitcode
+// Via gitcode
 go get -u gitcode.com/dromara/carbon/v2
-import "gitee.com/dromara/gitcode/v2"
+import "gitcode.com/dromara/gitcode/v2"
 ```
 
 `Carbon` was donated to the [dromara](https://dromara.org/ "dromara") organization, the repository URL has changed. If
@@ -100,7 +102,10 @@ Thanks to all the following who contributed to `Carbon`:
 
 <a href="https://github.com/dromara/carbon/graphs/contributors"><img src="https://contrib.rocks/image?repo=dromara/carbon&max=100&columns=16" /></a>
 
-[How to add new localized language support to carbon](docs/CONTRIBUTING.en.md)
+## Translators
+Ask for help to translate `Carbon` in other localized languages
+
+[How to add new localized language support to carbon](https://carbon.go-pkg.com/appendix/contribution-guide.html)
 
 ## Sponsors
 
