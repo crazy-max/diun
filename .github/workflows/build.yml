@@ -21,7 +21,7 @@ env:
   GHCR_SLUG: ghcr.io/crazy-max/diun
   DESTDIR: ./bin
   DOCKER_BUILD_SUMMARY: false
-  SCOUT_VERSION: "1.18.2"
+  SCOUT_VERSION: "1.19.0"
 
 jobs:
   prepare:
