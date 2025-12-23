@@ -1,9 +1,9 @@
 package k8s
 
 import (
+	"slices"
 	"sort"
 
-	"github.com/crazy-max/diun/v4/pkg/utl"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -18,7 +18,7 @@ func (c *Client) PodList(opts metav1.ListOptions) ([]v1.Pod, error) {
 			return nil, err
 		}
 		for _, pod := range pods.Items {
-			if utl.Contains(c.namespacesExcludes, pod.Namespace) {
+			if slices.Contains(c.namespacesExcludes, pod.Namespace) {
 				continue
 			}
 			podList = appendPod(podList, pod)
