@@ -69,44 +69,40 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	}
 	content.WriteString(string(body))
 
-	var fields []EmbedField
-	if *c.cfg.RenderFields {
-		fields = []EmbedField{
-			{
-				Name:  "Hostname",
-				Value: c.meta.Hostname,
-			},
-			{
-				Name:  "Provider",
-				Value: entry.Provider,
-			},
-			{
-				Name:  "Created",
-				Value: entry.Manifest.Created.Format("Jan 02, 2006 15:04:05 UTC"),
-			},
-			{
-				Name:  "Digest",
-				Value: entry.Manifest.Digest.String(),
-			},
-			{
-				Name:  "Platform",
-				Value: entry.Manifest.Platform,
-			},
+	var embeds []Embed
+	if *c.cfg.RenderEmbeds {
+		var fields []EmbedField
+		if *c.cfg.RenderFields {
+			fields = []EmbedField{
+				{
+					Name:  "Hostname",
+					Value: c.meta.Hostname,
+				},
+				{
+					Name:  "Provider",
+					Value: entry.Provider,
+				},
+				{
+					Name:  "Created",
+					Value: entry.Manifest.Created.Format("Jan 02, 2006 15:04:05 UTC"),
+				},
+				{
+					Name:  "Digest",
+					Value: entry.Manifest.Digest.String(),
+				},
+				{
+					Name:  "Platform",
+					Value: entry.Manifest.Platform,
+				},
+			}
+			if len(entry.Image.HubLink) > 0 {
+				fields = append(fields, EmbedField{
+					Name:  "HubLink",
+					Value: entry.Image.HubLink,
+				})
+			}
 		}
-		if len(entry.Image.HubLink) > 0 {
-			fields = append(fields, EmbedField{
-				Name:  "HubLink",
-				Value: entry.Image.HubLink,
-			})
-		}
-	}
-
-	dataBuf := new(bytes.Buffer)
-	if err := json.NewEncoder(dataBuf).Encode(Message{
-		Content:   content.String(),
-		Username:  c.meta.Name,
-		AvatarURL: c.meta.Logo,
-		Embeds: []Embed{
+		embeds = []Embed{
 			{
 				Author: EmbedAuthor{
 					Name:    c.meta.Name,
@@ -118,7 +114,15 @@ func (c *Client) Send(entry model.NotifEntry) error {
 					Text: fmt.Sprintf("%s © %d %s %s", c.meta.Author, time.Now().Year(), c.meta.Name, c.meta.Version),
 				},
 			},
-		},
+		}
+	}
+
+	dataBuf := new(bytes.Buffer)
+	if err := json.NewEncoder(dataBuf).Encode(Message{
+		Content:   content.String(),
+		Username:  c.meta.Name,
+		AvatarURL: c.meta.Logo,
+		Embeds:    embeds,
 	}); err != nil {
 		return err
 	}
