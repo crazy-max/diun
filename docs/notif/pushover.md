@@ -18,17 +18,17 @@ You can send notifications using [Pushover](https://pushover.net/).
           Docker tag {{ .Entry.Image }} which you subscribed to through {{ .Entry.Provider }} provider has been released.
     ```
 
-| Name                | Default                             | Description                                                                         |
-|---------------------|-------------------------------------|-------------------------------------------------------------------------------------|
-| `token`             |                                     | Pushover [application/API token](https://pushover.net/api#registration)             |
-| `tokenFile`         |                                     | Use content of secret file as Pushover application/API token if `token` not defined |
-| `recipient`         |                                     | User key to send notification to                                                    |
-| `recipientFile`     |                                     | Use content of secret file as User key if `recipient` not defined                   |
-| `priority`          |                                     | Priority of the notification                                                        |
-| `sound`             |                                     | Notification sound to be used                                                       |
-| `timeout`           | `10s`                               | Timeout specifies a time limit for the request to be made                           |
-| `templateTitle`[^1] | See [below](#default-templatetitle) | [Notification template](../faq.md#notification-template) for message title          |
-| `templateBody`[^1]  | See [below](#default-templatebody)  | [Notification template](../faq.md#notification-template) for message body           |
+| Name                | Default                             | Description                                                                                                                                      |
+|---------------------|-------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
+| `token`             |                                     | Pushover [application/API token](https://pushover.net/api#registration)                                                                          |
+| `tokenFile`         |                                     | Use content of [secret file](../faq.md#secrets-loaded-from-files-and-trailing-newlines) as Pushover application/API token if `token` not defined |
+| `recipient`         |                                     | User key to send notification to                                                                                                                 |
+| `recipientFile`     |                                     | Use content of [secret file](../faq.md#secrets-loaded-from-files-and-trailing-newlines) as User key if `recipient` not defined                   |
+| `priority`          |                                     | Priority of the notification                                                                                                                     |
+| `sound`             |                                     | Notification sound to be used                                                                                                                    |
+| `timeout`           | `10s`                               | Timeout specifies a time limit for the request to be made                                                                                        |
+| `templateTitle`[^1] | See [below](#default-templatetitle) | [Notification template](../faq.md#notification-template) for message title                                                                       |
+| `templateBody`[^1]  | See [below](#default-templatebody)  | [Notification template](../faq.md#notification-template) for message body                                                                        |
 
 !!! abstract "Environment variables"
     * `DIUN_NOTIF_PUSHOVER_TOKEN`

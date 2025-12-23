@@ -19,19 +19,19 @@ Allow sending notifications to your Rocket.Chat channel.
           Docker tag {{ .Entry.Image }} which you subscribed to through {{ .Entry.Provider }} provider has been released.
     ```
 
-| Name                | Default                             | Description                                                                                        |
-|---------------------|-------------------------------------|----------------------------------------------------------------------------------------------------|
-| `endpoint`[^1]      |                                     | Rocket.Chat base URL                                                                               |
-| `channel`[^1]       |                                     | Channel name with the prefix in front of it                                                        |
-| `userID`[^1]        |                                     | User ID                                                                                            |
-| `token`             |                                     | Authentication token                                                                               |
-| `tokenFile`         |                                     | Use content of secret file as authentication token if `token` not defined                          |
-| `renderAttachment`  | `true`                              | Render [attachment object](https://docs.rocket.chat/guides/user-guides/messaging#send-attachments) |
-| `timeout`           | `10s`                               | Timeout specifies a time limit for the request to be made                                          |
-| `tlsSkipVerify`     | `false`                             | Skip TLS certificate verification                                                                  |
-| `tlsCaCertFiles`    |                                     | List of paths to custom CA certificate files to use for TLS verification                           |
-| `templateTitle`[^1] | See [below](#default-templatetitle) | [Notification template](../faq.md#notification-template) for message title                         |
-| `templateBody`[^1]  | See [below](#default-templatebody)  | [Notification template](../faq.md#notification-template) for message body                          |
+| Name                | Default                             | Description                                                                                                                            |
+|---------------------|-------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------|
+| `endpoint`[^1]      |                                     | Rocket.Chat base URL                                                                                                                   |
+| `channel`[^1]       |                                     | Channel name with the prefix in front of it                                                                                            |
+| `userID`[^1]        |                                     | User ID                                                                                                                                |
+| `token`             |                                     | Authentication token                                                                                                                   |
+| `tokenFile`         |                                     | Use content of [secret file](../faq.md#secrets-loaded-from-files-and-trailing-newlines) as authentication token if `token` not defined |
+| `renderAttachment`  | `true`                              | Render [attachment object](https://docs.rocket.chat/guides/user-guides/messaging#send-attachments)                                     |
+| `timeout`           | `10s`                               | Timeout specifies a time limit for the request to be made                                                                              |
+| `tlsSkipVerify`     | `false`                             | Skip TLS certificate verification                                                                                                      |
+| `tlsCaCertFiles`    |                                     | List of paths to custom CA certificate files to use for TLS verification                                                               |
+| `templateTitle`[^1] | See [below](#default-templatetitle) | [Notification template](../faq.md#notification-template) for message title                                                             |
+| `templateBody`[^1]  | See [below](#default-templatebody)  | [Notification template](../faq.md#notification-template) for message body                                                              |
 
 !!! warning
     You must first create a _Personal Access Token_ through your account settings on your Rocket.Chat instance.

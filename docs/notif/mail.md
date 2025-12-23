@@ -21,21 +21,21 @@ Notifications can be sent through SMTP.
           Docker tag {{ .Entry.Image }} which you subscribed to through {{ .Entry.Provider }} provider has been released.
     ```
 
-| Name                 | Default                             | Description                                                                                                               |
-|----------------------|-------------------------------------|---------------------------------------------------------------------------------------------------------------------------|
-| `host`[^1]           | `localhost`                         | SMTP server host                                                                                                          |
-| `port`[^1]           | `25`                                | SMTP server port                                                                                                          |
-| `ssl`                | `false`                             | SSL defines whether an SSL connection is used. Should be false in most cases since the auth mechanism should use STARTTLS |
-| `insecureSkipVerify` | `false`                             | Controls whether a client verifies the server's certificate chain and hostname                                            |
-| `localName`          | `localhost`                         | Hostname sent to the SMTP server with the HELO command                                                                    |
-| `username`           |                                     | SMTP username                                                                                                             |
-| `usernameFile`       |                                     | Use content of secret file as SMTP username if `username` not defined                                                     |
-| `password`           |                                     | SMTP password                                                                                                             |
-| `passwordFile`       |                                     | Use content of secret file as SMTP password if `password` not defined                                                     |
-| `from`[^1]           |                                     | Sender email address                                                                                                      |
-| `to`[^1]             |                                     | List of recipients email addresses                                                                                        |
-| `templateTitle`[^1]  | See [below](#default-templatetitle) | [Notification template](../faq.md#notification-template) for message title                                                |
-| `templateBody`[^1]   | See [below](#default-templatebody)  | [Notification template](../faq.md#notification-template) for message body                                                 |
+| Name                 | Default                             | Description                                                                                                                        |
+|----------------------|-------------------------------------|------------------------------------------------------------------------------------------------------------------------------------|
+| `host`[^1]           | `localhost`                         | SMTP server host                                                                                                                   |
+| `port`[^1]           | `25`                                | SMTP server port                                                                                                                   |
+| `ssl`                | `false`                             | SSL defines whether an SSL connection is used. Should be false in most cases since the auth mechanism should use STARTTLS          |
+| `insecureSkipVerify` | `false`                             | Controls whether a client verifies the server's certificate chain and hostname                                                     |
+| `localName`          | `localhost`                         | Hostname sent to the SMTP server with the HELO command                                                                             |
+| `username`           |                                     | SMTP username                                                                                                                      |
+| `usernameFile`       |                                     | Use content of [secret file](../faq.md#secrets-loaded-from-files-and-trailing-newlines) as SMTP username if `username` not defined |
+| `password`           |                                     | SMTP password                                                                                                                      |
+| `passwordFile`       |                                     | Use content of [secret file](../faq.md#secrets-loaded-from-files-and-trailing-newlines) as SMTP password if `password` not defined |
+| `from`[^1]           |                                     | Sender email address                                                                                                               |
+| `to`[^1]             |                                     | List of recipients email addresses                                                                                                 |
+| `templateTitle`[^1]  | See [below](#default-templatetitle) | [Notification template](../faq.md#notification-template) for message title                                                         |
+| `templateBody`[^1]   | See [below](#default-templatebody)  | [Notification template](../faq.md#notification-template) for message body                                                          |
 
 !!! abstract "Environment variables"
     * `DIUN_NOTIF_MAIL_HOST`

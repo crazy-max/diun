@@ -17,12 +17,12 @@ You can send notifications to your Slack channel using an [incoming webhook URL]
           Docker tag {{ .Entry.Image }} which you subscribed to through {{ .Entry.Provider }} provider has been released.
     ```
 
-| Name               | Default                            | Description                                                                               |
-|--------------------|------------------------------------|-------------------------------------------------------------------------------------------|
-| `webhookURL`       |                                    | Slack [incoming webhook URL](https://api.slack.com/messaging/webhooks)                    |
-| `webhookURLFile`   |                                    | Use content of secret file as webhook URL if `webhookURL` is not defined                  |
-| `renderFields`     | `true`                             | Render [field objects](https://api.slack.com/messaging/composing/layouts#stack_of_blocks) |
-| `templateBody`[^1] | See [below](#default-templatebody) | [Notification template](../faq.md#notification-template) for message body                 |
+| Name               | Default                            | Description                                                                                                                           |
+|--------------------|------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------|
+| `webhookURL`       |                                    | Slack [incoming webhook URL](https://api.slack.com/messaging/webhooks)                                                                |
+| `webhookURLFile`   |                                    | Use content of [secret file](../faq.md#secrets-loaded-from-files-and-trailing-newlines) as webhook URL if `webhookURL` is not defined |
+| `renderFields`     | `true`                             | Render [field objects](https://api.slack.com/messaging/composing/layouts#stack_of_blocks)                                             |
+| `templateBody`[^1] | See [below](#default-templatebody) | [Notification template](../faq.md#notification-template) for message body                                                             |
 
 !!! abstract "Environment variables"
     * `DIUN_NOTIF_SLACK_WEBHOOKURL`
