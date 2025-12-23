@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-ARG GO_VERSION="1.24"
+ARG GO_VERSION="1.25"
 ARG PROTOC_VERSION="3.17.3"
 
 # protoc is dynamically linked to glibc so can't use alpine base
