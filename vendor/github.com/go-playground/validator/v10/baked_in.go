@@ -120,6 +120,7 @@ var (
 		"alpha":                         isAlpha,
 		"alphaspace":                    isAlphaSpace,
 		"alphanum":                      isAlphanum,
+		"alphanumspace":                 isAlphaNumericSpace,
 		"alphaunicode":                  isAlphaUnicode,
 		"alphanumunicode":               isAlphanumUnicode,
 		"boolean":                       isBoolean,
@@ -237,7 +238,8 @@ var (
 		"bcp47_language_tag":            isBCP47LanguageTag,
 		"postcode_iso3166_alpha2":       isPostcodeByIso3166Alpha2,
 		"postcode_iso3166_alpha2_field": isPostcodeByIso3166Alpha2Field,
-		"bic":                           isIsoBicFormat,
+		"bic_iso_9362_2014":             isIsoBic2014Format,
+		"bic":                           isIsoBic2022Format,
 		"semver":                        isSemverFormat,
 		"dns_rfc1035_label":             isDnsRFC1035LabelFormat,
 		"credit_card":                   isCreditCard,
@@ -533,12 +535,20 @@ func hasMultiByteCharacter(fl FieldLevel) bool {
 
 // isPrintableASCII is the validation function for validating if the field's value is a valid printable ASCII character.
 func isPrintableASCII(fl FieldLevel) bool {
-	return printableASCIIRegex().MatchString(fl.Field().String())
+	field := fl.Field()
+	if field.Kind() == reflect.String {
+		return printableASCIIRegex().MatchString(field.String())
+	}
+	return false
 }
 
 // isASCII is the validation function for validating if the field's value is a valid ASCII character.
 func isASCII(fl FieldLevel) bool {
-	return aSCIIRegex().MatchString(fl.Field().String())
+	field := fl.Field()
+	if field.Kind() == reflect.String {
+		return aSCIIRegex().MatchString(field.String())
+	}
+	return false
 }
 
 // isUUID5 is the validation function for validating if the field's value is a valid v5 UUID.
@@ -1773,6 +1783,11 @@ func isAlphaSpace(fl FieldLevel) bool {
 	return alphaSpaceRegex().MatchString(fl.Field().String())
 }
 
+// isAlphaNumericSpace is the validation function for validating if the current field's value is a valid alphanumeric value with spaces.
+func isAlphaNumericSpace(fl FieldLevel) bool {
+	return alphanNumericSpaceRegex().MatchString(fl.Field().String())
+}
+
 // isAlphaUnicode is the validation function for validating if the current field's value is a valid alpha unicode value.
 func isAlphaUnicode(fl FieldLevel) bool {
 	return alphaUnicodeRegex().MatchString(fl.Field().String())
@@ -1974,11 +1989,12 @@ func excludedUnless(fl FieldLevel) bool {
 		panic(fmt.Sprintf("Bad param number for excluded_unless %s", fl.FieldName()))
 	}
 	for i := 0; i < len(params); i += 2 {
-		if !requireCheckFieldValue(fl, params[i], params[i+1], false) {
-			return !hasValue(fl)
+		if requireCheckFieldValue(fl, params[i], params[i+1], false) {
+			return true
 		}
 	}
-	return true
+
+	return !hasValue(fl)
 }
 
 // excludedWith is the validation function
@@ -2943,11 +2959,18 @@ func isBCP47LanguageTag(fl FieldLevel) bool {
 	panic(fmt.Sprintf("Bad field type %s", field.Type()))
 }
 
-// isIsoBicFormat is the validation function for validating if the current field's value is a valid Business Identifier Code (SWIFT code), defined in ISO 9362
-func isIsoBicFormat(fl FieldLevel) bool {
+// isIsoBic2014Format is the validation function for validating if the current field's value is a valid Business Identifier Code (SWIFT code), defined in ISO 9362 2014
+func isIsoBic2014Format(fl FieldLevel) bool {
 	bicString := fl.Field().String()
 
-	return bicRegex().MatchString(bicString)
+	return bic2014Regex().MatchString(bicString)
+}
+
+// isIsoBic2022Format is the validation function for validating if the current field's value is a valid Business Identifier Code (SWIFT code), defined in ISO 9362 2022
+func isIsoBic2022Format(fl FieldLevel) bool {
+	bicString := fl.Field().String()
+
+	return bic2022Regex().MatchString(bicString)
 }
 
 // isSemverFormat is the validation function for validating if the current field's value is a valid semver version, defined in Semantic Versioning 2.0.0
