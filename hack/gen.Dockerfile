@@ -4,7 +4,7 @@ ARG GO_VERSION="1.24"
 ARG PROTOC_VERSION="3.17.3"
 
 # protoc is dynamically linked to glibc so can't use alpine base
-FROM golang:${GO_VERSION}-bullseye AS base
+FROM golang:${GO_VERSION}-trixie AS base
 ENV GOFLAGS="-mod=vendor"
 RUN apt-get update && apt-get --no-install-recommends install -y git unzip
 ARG PROTOC_VERSION
