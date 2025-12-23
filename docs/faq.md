@@ -383,3 +383,29 @@ You can still pin an image to a specific digest and analyze the image if the
 tag is specified using the `image:tag@digest` format. Taking the previous
 example if we specify `crazymax/diun:4.24.0@sha256:fa80af32a7c61128ffda667344547805b3c5e7721ecbbafd70e35bb7bb7c989f`,
 then `crazymax/diun:4.24.0` will be analyzed.
+
+## Secrets loaded from files and trailing newlines
+
+When Diun reads a secret from a file (e.g. Docker or Kubernetes secrets), the
+file content is used exactly as-is, including any trailing newline characters.
+
+This is intentional.
+
+A secret file is treated as an opaque value, not as a line of text.
+Automatically trimming or normalizing file content would silently modify the
+secret and could cause authentication or integration issues. Diun therefore
+does not attempt to guess whether a trailing newline was added intentionally or
+by tooling.
+
+This behavior aligns with common secret-management systems (such as Kubernetes
+and Vault), which model secrets as arbitrary data rather than text strings.
+
+If a trailing newline is not desired, ensure the file is created without one,
+for example:
+
+```shell
+printf '%s' 'mysecret' > secret.txt
+```
+
+Any future trimming or text-normalization behavior would be introduced
+explicitly and opt-in.

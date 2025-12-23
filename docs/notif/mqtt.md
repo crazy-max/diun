@@ -18,18 +18,18 @@ You can send notifications to any MQTT compatible server with the following sett
         qos: 0
     ```
 
-| Name           | Default     | Description                                                            |
-|----------------|-------------|------------------------------------------------------------------------|
-| `scheme`[^1]   | `mqtt`      | MQTT server scheme (`mqtt`, `mqtts`, `ws` or `wss`)                    |
-| `host`[^1]     | `localhost` | MQTT server host                                                       |
-| `port`[^1]     | `1883`      | MQTT server port                                                       |
-| `username`     |             | MQTT username                                                          |
-| `usernameFile` |             | Use content of secret file as MQTT username if `username` not defined  |
-| `password`     |             | MQTT password                                                          |
-| `passwordFile` |             | Use content of secret file as MQTT password if `password` not defined  |
-| `client`[^1]   |             | Client id to be used by this client when connecting to the MQTT broker |
-| `topic`[^1]    |             | Topic the message will be sent to                                      |
-| `qos`          | `0`         | Ensured message delivery at specified Quality of Service (QoS)         |
+| Name           | Default     | Description                                                                                                                        |
+|----------------|-------------|------------------------------------------------------------------------------------------------------------------------------------|
+| `scheme`[^1]   | `mqtt`      | MQTT server scheme (`mqtt`, `mqtts`, `ws` or `wss`)                                                                                |
+| `host`[^1]     | `localhost` | MQTT server host                                                                                                                   |
+| `port`[^1]     | `1883`      | MQTT server port                                                                                                                   |
+| `username`     |             | MQTT username                                                                                                                      |
+| `usernameFile` |             | Use content of [secret file](../faq.md#secrets-loaded-from-files-and-trailing-newlines) as MQTT username if `username` not defined |
+| `password`     |             | MQTT password                                                                                                                      |
+| `passwordFile` |             | Use content of [secret file](../faq.md#secrets-loaded-from-files-and-trailing-newlines) as MQTT password if `password` not defined |
+| `client`[^1]   |             | Client id to be used by this client when connecting to the MQTT broker                                                             |
+| `topic`[^1]    |             | Topic the message will be sent to                                                                                                  |
+| `qos`          | `0`         | Ensured message delivery at specified Quality of Service (QoS)                                                                     |
 
 !!! abstract "Environment variables"
     * `DIUN_NOTIF_MQTT_SCHEME`

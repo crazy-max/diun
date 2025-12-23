@@ -17,17 +17,17 @@ Notifications can be sent using a [Gotify](https://gotify.net/) instance.
           Docker tag {{ .Entry.Image }} which you subscribed to through {{ .Entry.Provider }} provider has been released.
     ```
 
-| Name                | Default                             | Description                                                                |
-|---------------------|-------------------------------------|----------------------------------------------------------------------------|
-| `endpoint`[^1]      |                                     | Gotify base URL                                                            |
-| `token`             |                                     | Application token                                                          |
-| `tokenFile`         |                                     | Use content of secret file as application token if `token` not defined     |
-| `priority`          | `1`                                 | The priority of the message                                                |
-| `timeout`           | `10s`                               | Timeout specifies a time limit for the request to be made                  |
-| `tlsSkipVerify`     | `false`                             | Skip TLS certificate verification                                          |
-| `tlsCaCertFiles`    |                                     | List of paths to custom CA certificate files to use for TLS verification   |
-| `templateTitle`[^1] | See [below](#default-templatetitle) | [Notification template](../faq.md#notification-template) for message title |
-| `templateBody`[^1]  | See [below](#default-templatebody)  | [Notification template](../faq.md#notification-template) for message body  |
+| Name                | Default                             | Description                                                                                                                         |
+|---------------------|-------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------|
+| `endpoint`[^1]      |                                     | Gotify base URL                                                                                                                     |
+| `token`             |                                     | Application token                                                                                                                   |
+| `tokenFile`         |                                     | Use content of [secret file](../faq.md#secrets-loaded-from-files-and-trailing-newlines) as application token if `token` not defined |
+| `priority`          | `1`                                 | The priority of the message                                                                                                         |
+| `timeout`           | `10s`                               | Timeout specifies a time limit for the request to be made                                                                           |
+| `tlsSkipVerify`     | `false`                             | Skip TLS certificate verification                                                                                                   |
+| `tlsCaCertFiles`    |                                     | List of paths to custom CA certificate files to use for TLS verification                                                            |
+| `templateTitle`[^1] | See [below](#default-templatetitle) | [Notification template](../faq.md#notification-template) for message title                                                          |
+| `templateBody`[^1]  | See [below](#default-templatebody)  | [Notification template](../faq.md#notification-template) for message body                                                           |
 
 !!! abstract "Environment variables"
     * `DIUN_NOTIF_GOTIFY_ENDPOINT`

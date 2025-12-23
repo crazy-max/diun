@@ -22,15 +22,15 @@ Allow sending notifications to your Discord channel.
           Docker tag {{ .Entry.Image }} which you subscribed to through {{ .Entry.Provider }} provider has been released.
     ```
 
-| Name               | Default                            | Description                                                                                               |
-|--------------------|------------------------------------|-----------------------------------------------------------------------------------------------------------|
-| `webhookURL`       |                                    | Discord [incoming webhook URL](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks) |
-| `webhookURLFile`   |                                    | Use content of secret file as webhook URL if `webhookURL` is not defined                                  |
-| `mentions`         |                                    | List of users or roles to notify                                                                          |
-| `renderEmbeds`     | `true`                             | Render [message embeds](https://discordjs.guide/legacy/popular-topics/embeds)                             |
-| `renderFields`     | `true`                             | Render [field objects](https://discordjs.guide/legacy/popular-topics/embeds) in message embeds            |
-| `timeout`          | `10s`                              | Timeout specifies a time limit for the request to be made                                                 |
-| `templateBody`[^1] | See [below](#default-templatebody) | [Notification template](../faq.md#notification-template) for message body                                 |
+| Name               | Default                            | Description                                                                                                                           |
+|--------------------|------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------|
+| `webhookURL`       |                                    | Discord [incoming webhook URL](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks)                             |
+| `webhookURLFile`   |                                    | Use content of [secret file](../faq.md#secrets-loaded-from-files-and-trailing-newlines) as webhook URL if `webhookURL` is not defined |
+| `mentions`         |                                    | List of users or roles to notify                                                                                                      |
+| `renderEmbeds`     | `true`                             | Render [message embeds](https://discordjs.guide/legacy/popular-topics/embeds)                                                         |
+| `renderFields`     | `true`                             | Render [field objects](https://discordjs.guide/legacy/popular-topics/embeds) in message embeds                                        |
+| `timeout`          | `10s`                              | Timeout specifies a time limit for the request to be made                                                                             |
+| `templateBody`[^1] | See [below](#default-templatebody) | [Notification template](../faq.md#notification-template) for message body                                                             |
 
 !!! abstract "Environment variables"
     * `DIUN_NOTIF_DISCORD_WEBHOOKURL`

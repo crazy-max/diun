@@ -19,19 +19,19 @@ Notifications can be sent using a [ntfy](https://ntfy.sh/) instance.
               Docker tag {{ .Entry.Image }} which you subscribed to through {{ .Entry.Provider }} provider has been released.
     ```
 
-| Name                | Default                             | Description                                                                |
-|---------------------|-------------------------------------|----------------------------------------------------------------------------|
-| `endpoint`[^1]      | `https://ntfy.sh`                   | Ntfy base URL                                                              |
-| `token`             |                                     | [Access token](https://docs.ntfy.sh/publish/#access-tokens)                |
-| `tokenFile`         |                                     | Use content of secret file as acess token if `token` not defined           |
-| `topic`             |                                     | Ntfy topic                                                                 |
-| `priority`          | 3                                   | The priority of the message                                                |
-| `tags`              | `["package"]`                       | Emoji to go in your notiication                                            |
-| `timeout`           | `10s`                               | Timeout specifies a time limit for the request to be made                  |
-| `tlsSkipVerify`     | `false`                             | Skip TLS certificate verification                                          |
-| `tlsCaCertFiles`    |                                     | List of paths to custom CA certificate files to use for TLS verification   |
-| `templateTitle`[^1] | See [below](#default-templatetitle) | [Notification template](../faq.md#notification-template) for message title |
-| `templateBody`[^1]  | See [below](#default-templatebody)  | [Notification template](../faq.md#notification-template) for message body  |
+| Name                | Default                             | Description                                                                                                                   |
+|---------------------|-------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|
+| `endpoint`[^1]      | `https://ntfy.sh`                   | Ntfy base URL                                                                                                                 |
+| `token`             |                                     | [Access token](https://docs.ntfy.sh/publish/#access-tokens)                                                                   |
+| `tokenFile`         |                                     | Use content of [secret file](../faq.md#secrets-loaded-from-files-and-trailing-newlines) as acess token if `token` not defined |
+| `topic`             |                                     | Ntfy topic                                                                                                                    |
+| `priority`          | 3                                   | The priority of the message                                                                                                   |
+| `tags`              | `["package"]`                       | Emoji to go in your notiication                                                                                               |
+| `timeout`           | `10s`                               | Timeout specifies a time limit for the request to be made                                                                     |
+| `tlsSkipVerify`     | `false`                             | Skip TLS certificate verification                                                                                             |
+| `tlsCaCertFiles`    |                                     | List of paths to custom CA certificate files to use for TLS verification                                                      |
+| `templateTitle`[^1] | See [below](#default-templatetitle) | [Notification template](../faq.md#notification-template) for message title                                                    |
+| `templateBody`[^1]  | See [below](#default-templatebody)  | [Notification template](../faq.md#notification-template) for message body                                                     |
 
 !!! abstract "Environment variables"
     * `DIUN_NOTIF_NTFY_ENDPOINT`
