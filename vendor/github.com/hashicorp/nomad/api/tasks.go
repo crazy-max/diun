@@ -202,6 +202,9 @@ func (r *ReschedulePolicy) Merge(rp *ReschedulePolicy) {
 }
 
 func (r *ReschedulePolicy) Canonicalize(jobType string) {
+	if r == nil {
+		return
+	}
 	dp := NewDefaultReschedulePolicy(jobType)
 	if r.Interval == nil {
 		r.Interval = dp.Interval
@@ -282,20 +285,12 @@ func NewDefaultReschedulePolicy(jobType string) *ReschedulePolicy {
 			Unlimited: pointerOf(false),
 		}
 
-	case "system":
-		dp = &ReschedulePolicy{
-			Attempts:      pointerOf(0),
-			Interval:      pointerOf(time.Duration(0)),
-			Delay:         pointerOf(time.Duration(0)),
-			DelayFunction: pointerOf(""),
-			MaxDelay:      pointerOf(time.Duration(0)),
-			Unlimited:     pointerOf(false),
-		}
-
 	default:
 		// GH-7203: it is possible an unknown job type is passed to this
 		// function and we need to ensure a non-nil object is returned so that
 		// the canonicalization runs without panicking.
+		// This also applies to batch/sysbatch jobs, which do not reschedule;
+		// we still want to return a safe object.
 		dp = &ReschedulePolicy{
 			Attempts:      pointerOf(0),
 			Interval:      pointerOf(time.Duration(0)),
@@ -583,13 +578,10 @@ func (g *TaskGroup) Canonicalize(job *Job) {
 		jobReschedule := job.Reschedule.Copy()
 		g.ReschedulePolicy = jobReschedule
 	}
-	// Only use default reschedule policy for non system jobs
-	if g.ReschedulePolicy == nil && *job.Type != "system" {
+	if g.ReschedulePolicy == nil && *job.Type != JobTypeSysbatch && *job.Type != JobTypeSystem {
 		g.ReschedulePolicy = NewDefaultReschedulePolicy(*job.Type)
 	}
-	if g.ReschedulePolicy != nil {
-		g.ReschedulePolicy.Canonicalize(*job.Type)
-	}
+	g.ReschedulePolicy.Canonicalize(*job.Type)
 
 	// Merge the migrate strategy from the job
 	if jm, tm := job.Migrate != nil, g.Migrate != nil; jm && tm {
@@ -794,6 +786,7 @@ type Task struct {
 	KillSignal      string                 `mapstructure:"kill_signal" hcl:"kill_signal,optional"`
 	Kind            string                 `hcl:"kind,optional"`
 	ScalingPolicies []*ScalingPolicy       `hcl:"scaling,block"`
+	Secrets         []*Secret              `hcl:"secret,block"`
 
 	// Identity is the default Nomad Workload Identity and will be added to
 	// Identities with the name "default"
@@ -832,6 +825,9 @@ func (t *Task) Canonicalize(tg *TaskGroup, job *Job) {
 	}
 	for _, tmpl := range t.Templates {
 		tmpl.Canonicalize()
+	}
+	for _, s := range t.Secrets {
+		s.Canonicalize()
 	}
 	for _, s := range t.Services {
 		s.Canonicalize(t, tg, job)
@@ -1047,6 +1043,24 @@ func (v *Vault) Canonicalize() {
 	}
 	if v.AllowTokenExpiration == nil {
 		v.AllowTokenExpiration = pointerOf(false)
+	}
+}
+
+type Secret struct {
+	Name     string            `hcl:"name,label"`
+	Provider string            `hcl:"provider,optional"`
+	Path     string            `hcl:"path,optional"`
+	Config   map[string]any    `hcl:"config,block"`
+	Env      map[string]string `hcl:"env,block"`
+}
+
+func (s *Secret) Canonicalize() {
+	if len(s.Config) == 0 {
+		s.Config = nil
+	}
+
+	if len(s.Env) == 0 {
+		s.Env = nil
 	}
 }
 
