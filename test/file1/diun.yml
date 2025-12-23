@@ -1,0 +1,7 @@
+watch:
+  workers: 20
+  schedule: "0 */6 * * *"
+
+providers:
+  file:
+    filename: /mount/config.yml

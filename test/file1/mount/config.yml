@@ -1,0 +1,5 @@
+- name: docker.io/alpine:latest
+- name: public.ecr.aws/q3b5f1u4/test-docker-action:build-ghbuilder-20340299640
+- name: docker.io/vaultwarden/server:testing-alpine
+- name: ghcr.io/dani-garcia/vaultwarden:testing-alpine
+- name: quay.io/vaultwarden/server:testing-alpine
