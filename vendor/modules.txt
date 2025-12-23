@@ -226,7 +226,7 @@ github.com/gorilla/mux
 # github.com/gorilla/websocket v1.5.4-0.20250319132907-e064f32e3674
 ## explicit; go 1.20
 github.com/gorilla/websocket
-# github.com/hashicorp/cronexpr v1.1.2
+# github.com/hashicorp/cronexpr v1.1.3
 ## explicit
 github.com/hashicorp/cronexpr
 # github.com/hashicorp/errwrap v1.1.0
@@ -241,7 +241,7 @@ github.com/hashicorp/go-multierror
 # github.com/hashicorp/go-rootcerts v1.0.2
 ## explicit; go 1.12
 github.com/hashicorp/go-rootcerts
-# github.com/hashicorp/nomad/api v0.0.0-20250812204832-62b195aaa535
+# github.com/hashicorp/nomad/api v0.0.0-20251209201056-5b76eb053561
 ## explicit; go 1.20
 github.com/hashicorp/nomad/api
 github.com/hashicorp/nomad/api/contexts
