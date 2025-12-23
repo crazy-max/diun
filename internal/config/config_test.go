@@ -90,6 +90,7 @@ func TestLoadFile(t *testing.T) {
 							"<@125>",
 							"<@&200>",
 						},
+						RenderEmbeds: utl.NewTrue(),
 						RenderFields: utl.NewTrue(),
 						Timeout:      utl.NewDuration(10 * time.Second),
 						TemplateBody: model.NotifDefaultTemplateBody,

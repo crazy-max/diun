@@ -15,6 +15,7 @@ Allow sending notifications to your Discord channel.
           - "<@124>"
           - "<@125>"
           - "<@&200>"
+        renderEmbeds: true
         renderFields: true
         timeout: 10s
         templateBody: |
@@ -26,7 +27,8 @@ Allow sending notifications to your Discord channel.
 | `webhookURL`       |                                    | Discord [incoming webhook URL](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks) |
 | `webhookURLFile`   |                                    | Use content of secret file as webhook URL if `webhookURL` is not defined                                  |
 | `mentions`         |                                    | List of users or roles to notify                                                                          |
-| `renderFields`     | `true`                             | Render [field objects](https://discordjs.guide/popular-topics/embeds.html)                                |
+| `renderEmbeds`     | `true`                             | Render [message embeds](https://discordjs.guide/legacy/popular-topics/embeds)                             |
+| `renderFields`     | `true`                             | Render [field objects](https://discordjs.guide/legacy/popular-topics/embeds) in message embeds            |
 | `timeout`          | `10s`                              | Timeout specifies a time limit for the request to be made                                                 |
 | `templateBody`[^1] | See [below](#default-templatebody) | [Notification template](../faq.md#notification-template) for message body                                 |
 
@@ -34,6 +36,7 @@ Allow sending notifications to your Discord channel.
     * `DIUN_NOTIF_DISCORD_WEBHOOKURL`
     * `DIUN_NOTIF_DISCORD_WEBHOOKURLFILE`
     * `DIUN_NOTIF_DISCORD_MENTIONS` (comma separated)
+    * `DIUN_NOTIF_DISCORD_RENDEREMBEDS`
     * `DIUN_NOTIF_DISCORD_RENDERFIELDS`
     * `DIUN_NOTIF_DISCORD_TIMEOUT`
     * `DIUN_NOTIF_DISCORD_TEMPLATEBODY`
