@@ -105,7 +105,7 @@ func (action *PushAction) UnmarshalJSON(raw []byte) error {
 		if ok {
 			action.Action = ActionSetTweak
 			action.Tweak = PushActionTweak(tweak)
-			action.Value, _ = val["value"]
+			action.Value = val["value"]
 		}
 	}
 	return nil

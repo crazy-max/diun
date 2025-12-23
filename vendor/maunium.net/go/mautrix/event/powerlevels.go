@@ -132,9 +132,19 @@ func (pl *PowerLevelsEventContent) GetUserLevel(userID id.UserID) int {
 	return level
 }
 
+const maxPL = 1<<53 - 1
+
 func (pl *PowerLevelsEventContent) SetUserLevel(userID id.UserID, level int) {
 	pl.usersLock.Lock()
 	defer pl.usersLock.Unlock()
+	if pl.isCreator(userID) {
+		return
+	}
+	if level == math.MaxInt && maxPL < math.MaxInt {
+		// Hack to avoid breaking on 32-bit systems (they're only slightly supported)
+		x := int64(maxPL)
+		level = int(x)
+	}
 	if level == pl.UsersDefault {
 		delete(pl.Users, userID)
 	} else {

@@ -111,6 +111,8 @@ type Client struct {
 	// Set to true to disable automatically sleeping on 429 errors.
 	IgnoreRateLimit bool
 
+	ResponseSizeLimit int64
+
 	txnID int32
 
 	// Should the ?user_id= query parameter be set in requests?
@@ -143,6 +145,8 @@ func DiscoverClientAPI(ctx context.Context, serverName string) (*ClientWellKnown
 	return DiscoverClientAPIWithClient(ctx, &http.Client{Timeout: 30 * time.Second}, serverName)
 }
 
+const WellKnownMaxSize = 64 * 1024
+
 func DiscoverClientAPIWithClient(ctx context.Context, client *http.Client, serverName string) (*ClientWellKnown, error) {
 	wellKnownURL := url.URL{
 		Scheme: "https",
@@ -168,11 +172,15 @@ func DiscoverClientAPIWithClient(ctx context.Context, client *http.Client, serve
 
 	if resp.StatusCode == http.StatusNotFound {
 		return nil, nil
+	} else if resp.ContentLength > WellKnownMaxSize {
+		return nil, errors.New(".well-known response too large")
 	}
 
-	data, err := io.ReadAll(resp.Body)
+	data, err := io.ReadAll(io.LimitReader(resp.Body, WellKnownMaxSize))
 	if err != nil {
 		return nil, err
+	} else if len(data) >= WellKnownMaxSize {
+		return nil, errors.New(".well-known response too large")
 	}
 
 	var wellKnown ClientWellKnown
@@ -395,24 +403,25 @@ func (cli *Client) MakeRequest(ctx context.Context, method string, httpURL strin
 	return cli.MakeFullRequest(ctx, FullRequest{Method: method, URL: httpURL, RequestJSON: reqBody, ResponseJSON: resBody})
 }
 
-type ClientResponseHandler = func(req *http.Request, res *http.Response, responseJSON interface{}) ([]byte, error)
+type ClientResponseHandler = func(req *http.Request, res *http.Response, responseJSON any, sizeLimit int64) ([]byte, error)
 
 type FullRequest struct {
-	Method           string
-	URL              string
-	Headers          http.Header
-	RequestJSON      interface{}
-	RequestBytes     []byte
-	RequestBody      io.Reader
-	RequestLength    int64
-	ResponseJSON     interface{}
-	MaxAttempts      int
-	BackoffDuration  time.Duration
-	SensitiveContent bool
-	Handler          ClientResponseHandler
-	DontReadResponse bool
-	Logger           *zerolog.Logger
-	Client           *http.Client
+	Method            string
+	URL               string
+	Headers           http.Header
+	RequestJSON       interface{}
+	RequestBytes      []byte
+	RequestBody       io.Reader
+	RequestLength     int64
+	ResponseJSON      interface{}
+	MaxAttempts       int
+	BackoffDuration   time.Duration
+	SensitiveContent  bool
+	Handler           ClientResponseHandler
+	DontReadResponse  bool
+	ResponseSizeLimit int64
+	Logger            *zerolog.Logger
+	Client            *http.Client
 }
 
 var requestID int32
@@ -537,10 +546,25 @@ func (cli *Client) MakeFullRequestWithResp(ctx context.Context, params FullReque
 	if len(cli.AccessToken) > 0 {
 		req.Header.Set("Authorization", "Bearer "+cli.AccessToken)
 	}
+	if params.ResponseSizeLimit == 0 {
+		params.ResponseSizeLimit = cli.ResponseSizeLimit
+	}
+	if params.ResponseSizeLimit == 0 {
+		params.ResponseSizeLimit = DefaultResponseSizeLimit
+	}
 	if params.Client == nil {
 		params.Client = cli.Client
 	}
-	return cli.executeCompiledRequest(req, params.MaxAttempts-1, params.BackoffDuration, params.ResponseJSON, params.Handler, params.DontReadResponse, params.Client)
+	return cli.executeCompiledRequest(
+		req,
+		params.MaxAttempts-1,
+		params.BackoffDuration,
+		params.ResponseJSON,
+		params.Handler,
+		params.DontReadResponse,
+		params.ResponseSizeLimit,
+		params.Client,
+	)
 }
 
 func (cli *Client) cliOrContextLog(ctx context.Context) *zerolog.Logger {
@@ -551,7 +575,17 @@ func (cli *Client) cliOrContextLog(ctx context.Context) *zerolog.Logger {
 	return log
 }
 
-func (cli *Client) doRetry(req *http.Request, cause error, retries int, backoff time.Duration, responseJSON any, handler ClientResponseHandler, dontReadResponse bool, client *http.Client) ([]byte, *http.Response, error) {
+func (cli *Client) doRetry(
+	req *http.Request,
+	cause error,
+	retries int,
+	backoff time.Duration,
+	responseJSON any,
+	handler ClientResponseHandler,
+	dontReadResponse bool,
+	sizeLimit int64,
+	client *http.Client,
+) ([]byte, *http.Response, error) {
 	log := zerolog.Ctx(req.Context())
 	if req.Body != nil {
 		var err error
@@ -580,16 +614,30 @@ func (cli *Client) doRetry(req *http.Request, cause error, retries int, backoff 
 	select {
 	case <-time.After(backoff):
 	case <-req.Context().Done():
-		return nil, nil, req.Context().Err()
+		if !errors.Is(context.Cause(req.Context()), ErrContextCancelRetry) {
+			return nil, nil, req.Context().Err()
+		}
 	}
 	if cli.UpdateRequestOnRetry != nil {
 		req = cli.UpdateRequestOnRetry(req, cause)
 	}
-	return cli.executeCompiledRequest(req, retries-1, backoff*2, responseJSON, handler, dontReadResponse, client)
+	return cli.executeCompiledRequest(req, retries-1, backoff*2, responseJSON, handler, dontReadResponse, sizeLimit, client)
 }
 
-func readResponseBody(req *http.Request, res *http.Response) ([]byte, error) {
-	contents, err := io.ReadAll(res.Body)
+func readResponseBody(req *http.Request, res *http.Response, limit int64) ([]byte, error) {
+	if res.ContentLength > limit {
+		return nil, HTTPError{
+			Request:  req,
+			Response: res,
+
+			Message:      "not reading response",
+			WrappedError: fmt.Errorf("%w (%.2f MiB)", ErrResponseTooLong, float64(res.ContentLength)/1024/1024),
+		}
+	}
+	contents, err := io.ReadAll(io.LimitReader(res.Body, limit+1))
+	if err == nil && len(contents) > int(limit) {
+		err = ErrBodyReadReachedLimit
+	}
 	if err != nil {
 		return nil, HTTPError{
 			Request:  req,
@@ -610,17 +658,20 @@ func closeTemp(log *zerolog.Logger, file *os.File) {
 	}
 }
 
-func streamResponse(req *http.Request, res *http.Response, responseJSON interface{}) ([]byte, error) {
+func streamResponse(req *http.Request, res *http.Response, responseJSON any, limit int64) ([]byte, error) {
 	log := zerolog.Ctx(req.Context())
 	file, err := os.CreateTemp("", "mautrix-response-")
 	if err != nil {
 		log.Warn().Err(err).Msg("Failed to create temporary file for streaming response")
-		_, err = handleNormalResponse(req, res, responseJSON)
+		_, err = handleNormalResponse(req, res, responseJSON, limit)
 		return nil, err
 	}
 	defer closeTemp(log, file)
-	if _, err = io.Copy(file, res.Body); err != nil {
+	var n int64
+	if n, err = io.Copy(file, io.LimitReader(res.Body, limit+1)); err != nil {
 		return nil, fmt.Errorf("failed to copy response to file: %w", err)
+	} else if n > limit {
+		return nil, ErrBodyReadReachedLimit
 	} else if _, err = file.Seek(0, 0); err != nil {
 		return nil, fmt.Errorf("failed to seek to beginning of response file: %w", err)
 	} else if err = json.NewDecoder(file).Decode(responseJSON); err != nil {
@@ -630,12 +681,12 @@ func streamResponse(req *http.Request, res *http.Response, responseJSON interfac
 	}
 }
 
-func noopHandleResponse(req *http.Request, res *http.Response, responseJSON interface{}) ([]byte, error) {
+func noopHandleResponse(req *http.Request, res *http.Response, responseJSON any, limit int64) ([]byte, error) {
 	return nil, nil
 }
 
-func handleNormalResponse(req *http.Request, res *http.Response, responseJSON interface{}) ([]byte, error) {
-	if contents, err := readResponseBody(req, res); err != nil {
+func handleNormalResponse(req *http.Request, res *http.Response, responseJSON any, limit int64) ([]byte, error) {
+	if contents, err := readResponseBody(req, res, limit); err != nil {
 		return nil, err
 	} else if responseJSON == nil {
 		return contents, nil
@@ -653,8 +704,13 @@ func handleNormalResponse(req *http.Request, res *http.Response, responseJSON in
 	}
 }
 
+const ErrorResponseSizeLimit = 512 * 1024
+
+var DefaultResponseSizeLimit int64 = 512 * 1024 * 1024
+
 func ParseErrorResponse(req *http.Request, res *http.Response) ([]byte, error) {
-	contents, err := readResponseBody(req, res)
+	defer res.Body.Close()
+	contents, err := readResponseBody(req, res, ErrorResponseSizeLimit)
 	if err != nil {
 		return contents, err
 	}
@@ -673,17 +729,31 @@ func ParseErrorResponse(req *http.Request, res *http.Response) ([]byte, error) {
 	}
 }
 
-func (cli *Client) executeCompiledRequest(req *http.Request, retries int, backoff time.Duration, responseJSON any, handler ClientResponseHandler, dontReadResponse bool, client *http.Client) ([]byte, *http.Response, error) {
+func (cli *Client) executeCompiledRequest(
+	req *http.Request,
+	retries int,
+	backoff time.Duration,
+	responseJSON any,
+	handler ClientResponseHandler,
+	dontReadResponse bool,
+	sizeLimit int64,
+	client *http.Client,
+) ([]byte, *http.Response, error) {
 	cli.RequestStart(req)
 	startTime := time.Now()
 	res, err := client.Do(req)
-	duration := time.Now().Sub(startTime)
+	duration := time.Since(startTime)
 	if res != nil && !dontReadResponse {
 		defer res.Body.Close()
 	}
 	if err != nil {
-		if retries > 0 && !errors.Is(err, context.Canceled) {
-			return cli.doRetry(req, err, retries, backoff, responseJSON, handler, dontReadResponse, client)
+		// Either error is *not* canceled or the underlying cause of cancelation explicitly asks to retry
+		canRetry := !errors.Is(err, context.Canceled) ||
+			errors.Is(context.Cause(req.Context()), ErrContextCancelRetry)
+		if retries > 0 && canRetry {
+			return cli.doRetry(
+				req, err, retries, backoff, responseJSON, handler, dontReadResponse, sizeLimit, client,
+			)
 		}
 		err = HTTPError{
 			Request:  req,
@@ -698,7 +768,9 @@ func (cli *Client) executeCompiledRequest(req *http.Request, retries int, backof
 
 	if retries > 0 && retryafter.Should(res.StatusCode, !cli.IgnoreRateLimit) {
 		backoff = retryafter.Parse(res.Header.Get("Retry-After"), backoff)
-		return cli.doRetry(req, fmt.Errorf("HTTP %d", res.StatusCode), retries, backoff, responseJSON, handler, dontReadResponse, client)
+		return cli.doRetry(
+			req, fmt.Errorf("HTTP %d", res.StatusCode), retries, backoff, responseJSON, handler, dontReadResponse, sizeLimit, client,
+		)
 	}
 
 	var body []byte
@@ -706,7 +778,7 @@ func (cli *Client) executeCompiledRequest(req *http.Request, retries int, backof
 		body, err = ParseErrorResponse(req, res)
 		cli.LogRequestDone(req, res, nil, nil, len(body), duration)
 	} else {
-		body, err = handler(req, res, responseJSON)
+		body, err = handler(req, res, responseJSON, sizeLimit)
 		cli.LogRequestDone(req, res, nil, err, len(body), duration)
 	}
 	return body, res, err
@@ -790,7 +862,7 @@ func (cli *Client) FullSyncRequest(ctx context.Context, req ReqSync) (resp *Resp
 	}
 	start := time.Now()
 	_, err = cli.MakeFullRequest(ctx, fullReq)
-	duration := time.Now().Sub(start)
+	duration := time.Since(start)
 	timeout := time.Duration(req.Timeout) * time.Millisecond
 	buffer := 10 * time.Second
 	if req.Since == "" {
@@ -894,7 +966,7 @@ func (cli *Client) RegisterGuest(ctx context.Context, req *ReqRegister) (*RespRe
 //	}
 //	token := res.AccessToken
 func (cli *Client) RegisterDummy(ctx context.Context, req *ReqRegister) (*RespRegister, error) {
-	res, uia, err := cli.Register(ctx, req)
+	_, uia, err := cli.Register(ctx, req)
 	if err != nil && uia == nil {
 		return nil, err
 	} else if uia == nil {
@@ -903,7 +975,7 @@ func (cli *Client) RegisterDummy(ctx context.Context, req *ReqRegister) (*RespRe
 		return nil, errors.New("server does not support m.login.dummy")
 	}
 	req.Auth = BaseAuthData{Type: AuthTypeDummy, Session: uia.Session}
-	res, _, err = cli.Register(ctx, req)
+	res, _, err := cli.Register(ctx, req)
 	if err != nil {
 		return nil, err
 	}
@@ -1275,9 +1347,9 @@ func (cli *Client) SendMessageEvent(ctx context.Context, roomID id.RoomID, event
 	return
 }
 
-// SendStateEvent sends a state event into a room. See https://spec.matrix.org/v1.2/client-server-api/#put_matrixclientv3roomsroomidstateeventtypestatekey
+// SendStateEvent sends a state event into a room. See https://spec.matrix.org/v1.16/client-server-api/#put_matrixclientv3roomsroomidstateeventtypestatekey
 // contentJSON should be a pointer to something that can be encoded as JSON using json.Marshal.
-func (cli *Client) SendStateEvent(ctx context.Context, roomID id.RoomID, eventType event.Type, stateKey string, contentJSON interface{}, extra ...ReqSendEvent) (resp *RespSendEvent, err error) {
+func (cli *Client) SendStateEvent(ctx context.Context, roomID id.RoomID, eventType event.Type, stateKey string, contentJSON any, extra ...ReqSendEvent) (resp *RespSendEvent, err error) {
 	var req ReqSendEvent
 	if len(extra) > 0 {
 		req = extra[0]
@@ -1287,8 +1359,14 @@ func (cli *Client) SendStateEvent(ctx context.Context, roomID id.RoomID, eventTy
 	if req.MeowEventID != "" {
 		queryParams["fi.mau.event_id"] = req.MeowEventID.String()
 	}
+	if req.TransactionID != "" {
+		queryParams["fi.mau.transaction_id"] = req.TransactionID
+	}
 	if req.UnstableDelay > 0 {
 		queryParams["org.matrix.msc4140.delay"] = strconv.FormatInt(req.UnstableDelay.Milliseconds(), 10)
+	}
+	if req.Timestamp > 0 {
+		queryParams["ts"] = strconv.FormatInt(req.Timestamp, 10)
 	}
 
 	urlData := ClientURLPath{"v3", "rooms", roomID, "state", eventType.String(), stateKey}
@@ -1302,14 +1380,12 @@ func (cli *Client) SendStateEvent(ctx context.Context, roomID id.RoomID, eventTy
 
 // SendMassagedStateEvent sends a state event into a room with a custom timestamp. See https://spec.matrix.org/v1.2/client-server-api/#put_matrixclientv3roomsroomidstateeventtypestatekey
 // contentJSON should be a pointer to something that can be encoded as JSON using json.Marshal.
+//
+// Deprecated: SendStateEvent accepts a timestamp via ReqSendEvent and should be used instead.
 func (cli *Client) SendMassagedStateEvent(ctx context.Context, roomID id.RoomID, eventType event.Type, stateKey string, contentJSON interface{}, ts int64) (resp *RespSendEvent, err error) {
-	urlPath := cli.BuildURLWithQuery(ClientURLPath{"v3", "rooms", roomID, "state", eventType.String(), stateKey}, map[string]string{
-		"ts": strconv.FormatInt(ts, 10),
+	resp, err = cli.SendStateEvent(ctx, roomID, eventType, stateKey, contentJSON, ReqSendEvent{
+		Timestamp: ts,
 	})
-	_, err = cli.MakeRequest(ctx, http.MethodPut, urlPath, contentJSON, &resp)
-	if err == nil && cli.StateStore != nil {
-		cli.updateStoreWithOutgoingEvent(ctx, roomID, eventType, stateKey, contentJSON)
-	}
 	return
 }
 
@@ -1628,11 +1704,20 @@ func (cli *Client) FullStateEvent(ctx context.Context, roomID id.RoomID, eventTy
 }
 
 // parseRoomStateArray parses a JSON array as a stream and stores the events inside it in a room state map.
-func parseRoomStateArray(_ *http.Request, res *http.Response, responseJSON interface{}) ([]byte, error) {
+func parseRoomStateArray(req *http.Request, res *http.Response, responseJSON any, limit int64) ([]byte, error) {
+	if res.ContentLength > limit {
+		return nil, HTTPError{
+			Request:  req,
+			Response: res,
+
+			Message:      "not reading response",
+			WrappedError: fmt.Errorf("%w (%.2f MiB)", ErrResponseTooLong, float64(res.ContentLength)/1024/1024),
+		}
+	}
 	response := make(RoomStateMap)
 	responsePtr := responseJSON.(*map[event.Type]map[string]*event.Event)
 	*responsePtr = response
-	dec := json.NewDecoder(res.Body)
+	dec := json.NewDecoder(io.LimitReader(res.Body, limit))
 
 	arrayStart, err := dec.Token()
 	if err != nil {
@@ -1665,6 +1750,8 @@ func parseRoomStateArray(_ *http.Request, res *http.Response, responseJSON inter
 	}
 	return nil, nil
 }
+
+type RoomStateMap = map[event.Type]map[string]*event.Event
 
 // State gets all state in a room.
 // See https://spec.matrix.org/v1.2/client-server-api/#get_matrixclientv3roomsroomidstate
@@ -1934,8 +2021,16 @@ func (cli *Client) uploadMediaToURL(ctx context.Context, data ReqUploadMedia) (*
 				Msg("Error uploading media to external URL, not retrying")
 			return nil, err
 		}
-		cli.Log.Warn().Str("url", data.UnstableUploadURL).Err(err).
+		backoff := time.Second * time.Duration(cli.DefaultHTTPRetries-retries)
+		cli.Log.Warn().Err(err).
+			Str("url", data.UnstableUploadURL).
+			Int("retry_in_seconds", int(backoff.Seconds())).
 			Msg("Error uploading media to external URL, retrying")
+		select {
+		case <-time.After(backoff):
+		case <-ctx.Done():
+			return nil, ctx.Err()
+		}
 		retries--
 		_, err = readerSeeker.Seek(0, io.SeekStart)
 		if err != nil {
@@ -2612,6 +2707,15 @@ func (cli *Client) ReportRoom(ctx context.Context, roomID id.RoomID, reason stri
 	urlPath := cli.BuildClientURL("v3", "rooms", roomID, "report")
 	_, err := cli.MakeRequest(ctx, http.MethodPost, urlPath, &ReqReport{Reason: reason, Score: -100}, nil)
 	return err
+}
+
+// AdminWhoIs fetches session information belonging to a specific user. Typically requires being a server admin.
+//
+// https://spec.matrix.org/v1.15/client-server-api/#get_matrixclientv3adminwhoisuserid
+func (cli *Client) AdminWhoIs(ctx context.Context, userID id.UserID) (resp RespWhoIs, err error) {
+	urlPath := cli.BuildClientURL("v3", "admin", "whois", userID)
+	_, err = cli.MakeRequest(ctx, http.MethodGet, urlPath, nil, &resp)
+	return
 }
 
 // UnstableGetSuspendedStatus uses MSC4323 to check if a user is suspended.
