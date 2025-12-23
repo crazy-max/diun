@@ -2,15 +2,16 @@
 
 ## About
 
-The Kubernetes provider allows you to analyze the pods of your Kubernetes cluster to extract images found and check
-for updates on the registry.
+The Kubernetes provider allows you to analyze the pods of your Kubernetes
+cluster to extract images found and check for updates on the registry.
 
 ## Quick start
 
-In this section we quickly go over a basic deployment using your local Kubernetes cluster.
+In this section, we quickly go over a basic deployment using your local
+Kubernetes cluster.
 
-Here we use our local Kubernetes provider with a minimum configuration to analyze annotated pods (watch by default
-disabled).
+Here we use our local Kubernetes provider with a minimum configuration to
+analyze annotated pods (watch by default disabled).
 
 Now let's create a simple pod for Diun:
 
@@ -127,8 +128,9 @@ spec:
             - containerPort: 80
 ```
 
-As an example we use [nginx](https://hub.docker.com/_/nginx/) Docker image. A few [annotations](#kubernetes-annotations)
-are added to configure the image analysis of this pod for Diun. We can now start these 2 pods:
+As an example we use [nginx](https://hub.docker.com/_/nginx/) Docker image. A
+few [annotations](#kubernetes-annotations) are added to configure the image
+analysis of this pod for Diun. We can now start these 2 pods:
 
 ```
 kubectl apply -f diun.yml
@@ -176,20 +178,22 @@ The Kubernetes server endpoint as URL.
 !!! abstract "Environment variables"
     * `DIUN_PROVIDERS_KUBERNETES_ENDPOINT`
 
-Kubernetes server endpoint as URL, which is only used when the behavior based on environment variables described below
-does not apply.
+Kubernetes server endpoint as URL, which is only used when the behavior based
+on environment variables described below does not apply.
 
-When deployed into Kubernetes, Diun reads the environment variables `KUBERNETES_SERVICE_HOST` and
-`KUBERNETES_SERVICE_PORT` or `KUBECONFIG` to create the endpoint.
+When deployed into Kubernetes, Diun reads the environment variables
+`KUBERNETES_SERVICE_HOST` and `KUBERNETES_SERVICE_PORT` or `KUBECONFIG` to
+create the endpoint.
 
-The access token is looked up in `/var/run/secrets/kubernetes.io/serviceaccount/token` and the SSL CA certificate
-in `/var/run/secrets/kubernetes.io/serviceaccount/ca.crt`. They are both provided automatically as mounts in the
-pod where Diun is deployed.
+The access token is looked up in `/var/run/secrets/kubernetes.io/serviceaccount/token`
+and the SSL CA certificate in `/var/run/secrets/kubernetes.io/serviceaccount/ca.crt`.
+They are both provided automatically as mounts in the pod where Diun is deployed.
 
-When the environment variables are not found, Diun tries to connect to the Kubernetes API server with an
-external-cluster client. In which case, the endpoint is required. Specifically, it may be set to the URL used
-by `kubectl proxy` to connect to a Kubernetes cluster using the granted authentication and authorization of the
-associated kubeconfig.
+When the environment variables are not found, Diun tries to connect to the
+Kubernetes API server with an external-cluster client. In which case, the
+endpoint is required. Specifically, it may be set to the URL used by
+`kubectl proxy` to connect to a Kubernetes cluster using the granted
+authentication and authorization of the associated kubeconfig.
 
 ### `token`
 
@@ -221,7 +225,8 @@ Use content of secret file as bearer token if `token` not defined.
 
 ### `certAuthFilePath`
 
-Path to the certificate authority file. Used for the Kubernetes client configuration.
+Path to the certificate authority file. Used for the Kubernetes client
+configuration.
 
 !!! example "File"
     ```yaml
@@ -235,7 +240,8 @@ Path to the certificate authority file. Used for the Kubernetes client configura
 
 ### `tlsInsecure`
 
-Controls whether client does not verify the server's certificate chain and hostname (default `false`).
+Controls whether client does not verify the server's certificate chain and
+hostname (default `false`).
 
 !!! example "File"
     ```yaml
@@ -249,7 +255,9 @@ Controls whether client does not verify the server's certificate chain and hostn
 
 ### `namespaces`
 
-Array of namespaces to watch (default all namespaces).
+Array of namespaces to watchBy default, it watches all namespaces. You can
+limit monitoring to specific namespaces by listing them. This helps reduce
+scope and focus on relevant pods only.
 
 !!! example "File"
     ```yaml
@@ -260,13 +268,26 @@ Array of namespaces to watch (default all namespaces).
           - production
     ```
 
+You can also negate namespaces by prefixing them with `!` if you want to watch
+all namespaces except specific ones:
+
+!!! example "File"
+    ```yaml
+    providers:
+      kubernetes:
+        namespaces:
+          - !kube-system
+          - !kube-public
+          - !kube-node-lease
+    ```
+
 !!! abstract "Environment variables"
     * `DIUN_PROVIDERS_KUBERNETES_NAMESPACES` (comma separated)
 
 ### `watchByDefault`
 
-Enable watch by default. If false, pods that don't have `diun.enable: "true"` annotation will be ignored
-(default `false`).
+Enable watch by default. If false, pods that don't have `diun.enable: "true"`
+annotation will be ignored (default `false`).
 
 !!! example "File"
     ```yaml
@@ -280,7 +301,8 @@ Enable watch by default. If false, pods that don't have `diun.enable: "true"` an
 
 ## Kubernetes annotations
 
-You can configure more finely the way to analyze the image of your pods through Kubernetes annotations:
+You can configure more finely the way to analyze the image of your pods through
+Kubernetes annotations:
 
 | Name                | Default                        | Description                                                                                                                                             |
 |---------------------|--------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
