@@ -29,7 +29,7 @@ func (c *Client) listServiceImage() []model.Image {
 		return []model.Image{}
 	}
 
-	var list []model.Image
+	var list model.ImageList
 	for _, svc := range svcs {
 		c.logger.Debug().
 			Str("svc_name", svc.Spec.Name).
@@ -57,7 +57,7 @@ func (c *Client) listServiceImage() []model.Image {
 		list = append(list, image)
 	}
 
-	return list
+	return list.Dedupe()
 }
 
 func metadata(svc swarm.Service) map[string]string {
