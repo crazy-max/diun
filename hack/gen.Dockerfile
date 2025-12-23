@@ -22,7 +22,7 @@ FROM base AS tools
 RUN --mount=type=bind,target=.,rw \
     --mount=type=cache,target=/root/.cache \
     --mount=type=cache,target=/go/pkg/mod \
-    go install \
+    go install tool \
       google.golang.org/grpc/cmd/protoc-gen-go-grpc \
       google.golang.org/protobuf/cmd/protoc-gen-go
 
