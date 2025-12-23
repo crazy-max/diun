@@ -32,12 +32,13 @@ func TrimReplyFallbackText(text string) string {
 }
 
 func (content *MessageEventContent) RemoveReplyFallback() {
-	if len(content.RelatesTo.GetReplyTo()) > 0 && !content.replyFallbackRemoved {
-		if content.Format == FormatHTML {
-			content.FormattedBody = TrimReplyFallbackHTML(content.FormattedBody)
+	if len(content.RelatesTo.GetReplyTo()) > 0 && !content.replyFallbackRemoved && content.Format == FormatHTML {
+		origHTML := content.FormattedBody
+		content.FormattedBody = TrimReplyFallbackHTML(content.FormattedBody)
+		if content.FormattedBody != origHTML {
+			content.Body = TrimReplyFallbackText(content.Body)
+			content.replyFallbackRemoved = true
 		}
-		content.Body = TrimReplyFallbackText(content.Body)
-		content.replyFallbackRemoved = true
 	}
 }
 

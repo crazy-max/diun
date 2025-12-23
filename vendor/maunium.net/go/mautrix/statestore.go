@@ -37,6 +37,9 @@ type StateStore interface {
 	SetCreate(ctx context.Context, evt *event.Event) error
 	GetCreate(ctx context.Context, roomID id.RoomID) (*event.Event, error)
 
+	GetJoinRules(ctx context.Context, roomID id.RoomID) (*event.JoinRulesEventContent, error)
+	SetJoinRules(ctx context.Context, roomID id.RoomID, content *event.JoinRulesEventContent) error
+
 	HasFetchedMembers(ctx context.Context, roomID id.RoomID) (bool, error)
 	MarkMembersFetched(ctx context.Context, roomID id.RoomID) error
 	GetAllMembers(ctx context.Context, roomID id.RoomID) (map[id.UserID]*event.MemberEventContent, error)
@@ -73,6 +76,8 @@ func UpdateStateStore(ctx context.Context, store StateStore, evt *event.Event) {
 		err = store.SetEncryptionEvent(ctx, evt.RoomID, content)
 	case *event.CreateEventContent:
 		err = store.SetCreate(ctx, evt)
+	case *event.JoinRulesEventContent:
+		err = store.SetJoinRules(ctx, evt.RoomID, content)
 	default:
 		switch evt.Type {
 		case event.StateMember, event.StatePowerLevels, event.StateEncryption, event.StateCreate:
@@ -107,11 +112,13 @@ type MemoryStateStore struct {
 	PowerLevels    map[id.RoomID]*event.PowerLevelsEventContent          `json:"power_levels"`
 	Encryption     map[id.RoomID]*event.EncryptionEventContent           `json:"encryption"`
 	Create         map[id.RoomID]*event.Event                            `json:"create"`
+	JoinRules      map[id.RoomID]*event.JoinRulesEventContent            `json:"join_rules"`
 
 	registrationsLock sync.RWMutex
 	membersLock       sync.RWMutex
 	powerLevelsLock   sync.RWMutex
 	encryptionLock    sync.RWMutex
+	joinRulesLock     sync.RWMutex
 }
 
 func NewMemoryStateStore() StateStore {
@@ -122,6 +129,7 @@ func NewMemoryStateStore() StateStore {
 		PowerLevels:    make(map[id.RoomID]*event.PowerLevelsEventContent),
 		Encryption:     make(map[id.RoomID]*event.EncryptionEventContent),
 		Create:         make(map[id.RoomID]*event.Event),
+		JoinRules:      make(map[id.RoomID]*event.JoinRulesEventContent),
 	}
 }
 
@@ -352,6 +360,19 @@ func (store *MemoryStateStore) GetEncryptionEvent(_ context.Context, roomID id.R
 	store.encryptionLock.RLock()
 	defer store.encryptionLock.RUnlock()
 	return store.Encryption[roomID], nil
+}
+
+func (store *MemoryStateStore) SetJoinRules(ctx context.Context, roomID id.RoomID, content *event.JoinRulesEventContent) error {
+	store.joinRulesLock.Lock()
+	store.JoinRules[roomID] = content
+	store.joinRulesLock.Unlock()
+	return nil
+}
+
+func (store *MemoryStateStore) GetJoinRules(ctx context.Context, roomID id.RoomID) (*event.JoinRulesEventContent, error) {
+	store.joinRulesLock.RLock()
+	defer store.joinRulesLock.RUnlock()
+	return store.JoinRules[roomID], nil
 }
 
 func (store *MemoryStateStore) IsEncrypted(ctx context.Context, roomID id.RoomID) (bool, error) {

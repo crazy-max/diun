@@ -96,6 +96,13 @@ type TombstoneEventContent struct {
 	ReplacementRoom id.RoomID `json:"replacement_room"`
 }
 
+func (tec *TombstoneEventContent) GetReplacementRoom() id.RoomID {
+	if tec == nil {
+		return ""
+	}
+	return tec.ReplacementRoom
+}
+
 type Predecessor struct {
 	RoomID  id.RoomID  `json:"room_id"`
 	EventID id.EventID `json:"event_id"`
@@ -133,6 +140,13 @@ type CreateEventContent struct {
 
 	// Deprecated: use the event sender instead
 	Creator id.UserID `json:"creator,omitempty"`
+}
+
+func (cec *CreateEventContent) GetPredecessor() (p Predecessor) {
+	if cec != nil && cec.Predecessor != nil {
+		p = *cec.Predecessor
+	}
+	return
 }
 
 func (cec *CreateEventContent) SupportsCreatorPower() bool {
@@ -217,7 +231,8 @@ type BridgeInfoSection struct {
 	AvatarURL   id.ContentURIString `json:"avatar_url,omitempty"`
 	ExternalURL string              `json:"external_url,omitempty"`
 
-	Receiver string `json:"fi.mau.receiver,omitempty"`
+	Receiver       string `json:"fi.mau.receiver,omitempty"`
+	MessageRequest bool   `json:"com.beeper.message_request,omitempty"`
 }
 
 // BridgeEventContent represents the content of a m.bridge state event.
@@ -232,7 +247,8 @@ type BridgeEventContent struct {
 	BeeperRoomType   string `json:"com.beeper.room_type,omitempty"`
 	BeeperRoomTypeV2 string `json:"com.beeper.room_type.v2,omitempty"`
 
-	TempSlackRemoteIDMigratedFlag bool `json:"com.beeper.slack_remote_id_migrated,omitempty"`
+	TempSlackRemoteIDMigratedFlag  bool `json:"com.beeper.slack_remote_id_migrated,omitempty"`
+	TempSlackRemoteIDMigratedFlag2 bool `json:"com.beeper.slack_remote_id_really_migrated,omitempty"`
 }
 
 // DisappearingType represents the type of a disappearing message timer.

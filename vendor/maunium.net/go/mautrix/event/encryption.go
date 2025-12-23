@@ -63,7 +63,7 @@ func (content *EncryptedEventContent) UnmarshalJSON(data []byte) error {
 		return json.Unmarshal(content.Ciphertext, &content.OlmCiphertext)
 	case id.AlgorithmMegolmV1:
 		if len(content.Ciphertext) == 0 || content.Ciphertext[0] != '"' || content.Ciphertext[len(content.Ciphertext)-1] != '"' {
-			return id.InputNotJSONString
+			return id.ErrInputNotJSONString
 		}
 		content.MegolmCiphertext = content.Ciphertext[1 : len(content.Ciphertext)-1]
 	}

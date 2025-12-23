@@ -50,7 +50,7 @@ func UnpickleAsJSON(object any, pickled, key []byte, pickleVersion byte) error {
 		}
 	}
 	if decrypted[0] != pickleVersion {
-		return fmt.Errorf("unpickle: %w", olm.ErrWrongPickleVersion)
+		return fmt.Errorf("unpickle: %w", olm.ErrUnknownJSONPickleVersion)
 	}
 	err = json.Unmarshal(decrypted[1:], object)
 	if err != nil {
