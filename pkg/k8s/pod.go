@@ -1,6 +1,7 @@
 package k8s
 
 import (
+	"slices"
 	"sort"
 
 	v1 "k8s.io/api/core/v1"
@@ -17,6 +18,9 @@ func (c *Client) PodList(opts metav1.ListOptions) ([]v1.Pod, error) {
 			return nil, err
 		}
 		for _, pod := range pods.Items {
+			if slices.Contains(c.namespacesExcludes, pod.Namespace) {
+				continue
+			}
 			podList = appendPod(podList, pod)
 		}
 	}

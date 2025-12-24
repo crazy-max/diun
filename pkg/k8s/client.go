@@ -15,9 +15,10 @@ import (
 
 // Client represents an active kubernetes object
 type Client struct {
-	ctx        context.Context
-	namespaces []string
-	API        *kubernetes.Clientset
+	ctx                context.Context
+	namespaces         []string
+	namespacesExcludes []string
+	API                *kubernetes.Clientset
 }
 
 // Options holds kubernetes client object options
@@ -47,14 +48,29 @@ func New(opts Options) (*Client, error) {
 		api, err = newExternalClusterClient(opts)
 	}
 
-	if len(opts.Namespaces) == 0 {
-		opts.Namespaces = []string{metav1.NamespaceAll}
+	var namespaces []string
+	var namespacesExcluded []string
+	for _, ns := range opts.Namespaces {
+		if ns == "" {
+			continue
+		}
+		if ns[0] == '!' {
+			if len(ns) > 1 {
+				namespacesExcluded = append(namespacesExcluded, ns[1:])
+			}
+		} else {
+			namespaces = append(namespaces, ns)
+		}
+	}
+	if len(namespaces) == 0 {
+		namespaces = []string{metav1.NamespaceAll}
 	}
 
 	return &Client{
-		ctx:        context.Background(),
-		namespaces: opts.Namespaces,
-		API:        api,
+		ctx:                context.Background(),
+		namespaces:         namespaces,
+		namespacesExcludes: namespacesExcluded,
+		API:                api,
 	}, err
 }
 

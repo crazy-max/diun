@@ -2,13 +2,13 @@ package dockerfile
 
 import (
 	"reflect"
+	"slices"
 	"strings"
 
 	"github.com/bmatcuk/doublestar/v3"
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/internal/provider"
 	"github.com/crazy-max/diun/v4/pkg/dockerfile"
-	"github.com/crazy-max/diun/v4/pkg/utl"
 )
 
 func (c *Client) listExtImage() (list []model.Image) {
@@ -67,7 +67,7 @@ func (c *Client) listDockerfiles(patterns []string) (dfiles []string) {
 			continue
 		}
 		for _, dfile := range matches {
-			if utl.Contains(dfiles, dfile) {
+			if slices.Contains(dfiles, dfile) {
 				continue
 			}
 			dfiles = append(dfiles, dfile)
