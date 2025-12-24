@@ -1,5 +1,32 @@
 # Changelog
 
+## 4.31.0 (2025/12/24)
+
+* Support for negating namespaces with Kubernetes provider (#1582)
+* Support new Matrix servers for Matrix notifications (#1529)
+* Use `X-Gotify-Key` header to send token for Gotify (#1530 #1551)
+* Add RFC 5322 compliant Message-ID header to email notifications (#1557)
+* Add `renderEmbeds` option for Discord notifications (#1580)
+* Go 1.25 (#1573)
+* Alpine Linux 3.23 (#1572)
+* MkDocs Material 9.6.20 (#1509)
+* Bump github.com/alecthomas/kong to 1.13.0 (#1545)
+* Bump github.com/containerd/platforms to 1.0.0-rc.2 (#1533)
+* Bump github.com/docker/docker to 28.5.2+incompatible (#1517)
+* Bump github.com/dromara/carbon/v2 to 2.6.15 (#1526 #1546)
+* Bump github.com/eclipse/paho.mqtt.golang to 1.5.1 (#1504)
+* Bump github.com/jedib0t/go-pretty/v6 to 6.7.8 (#1569 #1583)
+* Bump github.com/go-playground/validator/v10 to 10.30.0 (#1513 #1576)
+* Bump github.com/hashicorp/nomad/api to 1.11.1 (#1579)
+* Bump github.com/moby/buildkit to 0.25.3 (#1516 #1566)
+* Bump go.podman.io/image/v5 to 5.38.0 (#1502 #1535)
+* Bump golang.org/x/mod to 0.30.0 (#1540)
+* Bump google.golang.org/grpc to 1.78.0 (#1565 #1584)
+* Bump google.golang.org/grpc/cmd/protoc-gen-go-grpc to 1.6.0 (#1577)
+* Bump google.golang.org/protobuf to 1.36.11 (#1564)
+* Bump k8s.io/client-go to 0.34.1 (#1501)
+* Bump maunium.net/go/mautrix from 0.25.2 to 0.26.1 (#1567)
+
 ## 4.30.0 (2025/08/31)
 
 * Add TLS config options `tlsSkipVerify` and `tlsCaCertFiles` for all notifiers using an HTTP client (#1489)
