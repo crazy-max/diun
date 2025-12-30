@@ -79,8 +79,8 @@ github.com/containers/ocicrypt/spec
 # github.com/crazy-max/cron/v3 v3.1.1
 ## explicit; go 1.12
 github.com/crazy-max/cron/v3
-# github.com/crazy-max/gohealthchecks v0.5.0
-## explicit; go 1.13
+# github.com/crazy-max/gohealthchecks v0.6.0
+## explicit; go 1.23.0
 github.com/crazy-max/gohealthchecks
 # github.com/crazy-max/gonfig v0.7.1
 ## explicit; go 1.19

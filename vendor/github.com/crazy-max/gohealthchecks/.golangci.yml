@@ -1,8 +1,4 @@
-run:
-  timeout: 10m
-  # default uses Go version from the go.mod file, fallback on the env var
-  # `GOVERSION`, fallback on 1.17: https://golangci-lint.run/usage/configuration/#run-configuration
-  go: "1.23"
+version: "2"
 
 linters:
   enable:
@@ -10,10 +6,7 @@ linters:
     - depguard
     - forbidigo
     - gocritic
-    - gofmt
-    - goimports
     - gosec
-    - gosimple
     - govet
     - ineffassign
     - makezero
@@ -23,60 +16,74 @@ linters:
     - revive
     - staticcheck
     - testifylint
-    - typecheck
     - unused
     - whitespace
-  disable-all: true
-
-linters-settings:
-  gocritic:
-    disabled-checks:
-      - "ifElseChain"
-      - "assignOp"
-      - "appendAssign"
-      - "singleCaseSwitch"
-  govet:
-    enable:
-      - nilness
-      - unusedwrite
-  depguard:
+  settings:
+    gocritic:
+      disabled-checks:
+        - "ifElseChain"
+        - "assignOp"
+        - "appendAssign"
+        - "singleCaseSwitch"
+    govet:
+      enable:
+        - nilness
+        - unusedwrite
+    depguard:
+      rules:
+        main:
+          deny:
+            - pkg: "io/ioutil"
+              desc: The io/ioutil package has been deprecated.
+    gosec:
+      config:
+        G306: "0644"
+    testifylint:
+      disable:
+        - "empty"
+        - "bool-compare"
+        - "len"
+        - "negative-positive"
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
     rules:
-      main:
-        deny:
-          - pkg: "io/ioutil"
-            desc: The io/ioutil package has been deprecated.
-  gosec:
-    config:
-      G306: "0644"
-  testifylint:
-    disable:
-      # disable rules that reduce the test condition
-      - "empty"
-      - "bool-compare"
-      - "len"
-      - "negative-positive"
+      -
+        linters:
+          - revive
+        text: stutters
+      -
+        linters:
+          - revive
+        text: empty-block
+      -
+        linters:
+          - revive
+        text: superfluous-else
+      -
+        linters:
+          - revive
+        text: unused-parameter
+      -
+        linters:
+          - revive
+        text: redefines-builtin-id
+      -
+        linters:
+          - revive
+        text: if-return
+
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  exclusions:
+    generated: lax
 
 issues:
-  exclude-rules:
-    - linters:
-        - revive
-      text: "stutters"
-    - linters:
-        - revive
-      text: "empty-block"
-    - linters:
-        - revive
-      text: "superfluous-else"
-    - linters:
-        - revive
-      text: "unused-parameter"
-    - linters:
-        - revive
-      text: "redefines-builtin-id"
-    - linters:
-        - revive
-      text: "if-return"
-
-  # show all
   max-issues-per-linter: 0
   max-same-issues: 0
