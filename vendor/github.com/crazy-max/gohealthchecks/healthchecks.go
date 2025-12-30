@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	version        = "0.5.0"
+	version        = "0.6.0"
 	defaultBaseURL = "https://hc-ping.com/"
 )
 
@@ -54,7 +54,7 @@ func NewClient(o *ClientOptions) *Client {
 
 	c.Timeout = 10 * time.Second
 	c.Transport = roundTripperFunc(func(r *http.Request) (resp *http.Response, err error) {
-		r.Header.Set("User-Agent", fmt.Sprintf("gohealthchecks/%s go/%s %s", version, runtime.Version()[2:], strings.Title(runtime.GOOS)))
+		r.Header.Set("User-Agent", fmt.Sprintf("gohealthchecks/%s go/%s %s", version, runtime.Version()[2:], strings.Title(runtime.GOOS))) //nolint:staticcheck // ignoring "SA1019: strings.Title is deprecated", as for our use we don't need full unicode support
 		u, err := baseURL.Parse(r.URL.String())
 		if err != nil {
 			return nil, err

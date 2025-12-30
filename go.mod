@@ -10,7 +10,7 @@ require (
 	github.com/bmatcuk/doublestar/v3 v3.0.0
 	github.com/containerd/platforms v1.0.0-rc.2
 	github.com/crazy-max/cron/v3 v3.1.1
-	github.com/crazy-max/gohealthchecks v0.5.0
+	github.com/crazy-max/gohealthchecks v0.6.0
 	github.com/crazy-max/gonfig v0.7.1
 	github.com/distribution/reference v0.6.0
 	github.com/docker/docker v28.5.2+incompatible
