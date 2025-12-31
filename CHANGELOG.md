@@ -3,8 +3,8 @@
 ## 4.31.0 (2025/12/24)
 
 * Support for negating namespaces with Kubernetes provider (#1582)
-* Support new Matrix servers for Matrix notifications (#1529)
-* Use `X-Gotify-Key` header to send token for Gotify (#1530 #1551)
+* Support new Matrix servers for Matrix notifications (#1529 #1551)
+* Use `X-Gotify-Key` header to send token for Gotify (#1530)
 * Add RFC 5322 compliant Message-ID header to email notifications (#1557)
 * Add `renderEmbeds` option for Discord notifications (#1580)
 * Go 1.25 (#1573)
