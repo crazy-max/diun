@@ -40,7 +40,7 @@ require (
 	go.etcd.io/bbolt v1.4.3
 	go.podman.io/image/v5 v5.38.0
 	golang.org/x/mod v0.31.0
-	golang.org/x/sys v0.39.0
+	golang.org/x/sys v0.40.0
 	google.golang.org/grpc v1.78.0
 	google.golang.org/protobuf v1.36.11
 	gopkg.in/yaml.v2 v2.4.0
