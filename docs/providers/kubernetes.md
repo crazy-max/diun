@@ -159,6 +159,67 @@ Wed, 17 Jun 2020 10:50:03 CEST INF New image found image=docker.io/library/nginx
 ...
 ```
 
+### Alternative: Run as CronJob
+
+You don't need to continuously run Diun in the cluster. Instead, you can disable Diuns built-in scheduler and simply use a Kubernetes `CronJob`:
+
+```yaml
+# Still add ServiceAccount, ClusterRole and ClusterRoleBinding from the example above!
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  namespace: default
+  name: diun
+spec:
+  schedule: "0 */6 * * *"
+  jobTemplate:
+    metadata:
+      labels:
+        app: diun
+    spec:
+      template:
+        metadata:
+          labels:
+            app: diun
+          annotations:
+            diun.enable: "true"
+        spec:
+          serviceAccountName: diun
+          containers:
+            - name: diun
+              image: crazymax/diun:latest
+              imagePullPolicy: Always
+              args: ["serve"]
+              env:
+                - name: TZ
+                  value: "Europe/Paris"
+                - name: LOG_LEVEL
+                  value: "info"
+                - name: LOG_JSON
+                  value: "false"
+                - name: DIUN_WATCH_WORKERS
+                  value: "20"
+                - name: DIUN_PROVIDERS_KUBERNETES
+                  value: "true"
+                - name: DIUN_WATCH_SCHEDULE
+                  value: "" # NOTE: This is empty to disalbe built-in scheduling
+              volumeMounts:
+                - mountPath: "/data"
+                  name: "data"
+          restartPolicy: Always
+          volumes:
+            # Set up a data directory for diun
+            # For production usage, you should consider using PV/PVC instead(or simply using storage like NAS)
+            # For more details, please see https://kubernetes.io/docs/concepts/storage/volumes/
+            - name: "data"
+              hostPath:
+                path: "/data"
+                type: Directory
+```
+
+The key to this setup is setting `watch.schedule` (`DIUN_WATCH_SCHEDULE` via environment variable) to empty. If you're using the YAML/JSON config, you can explicitly set it to `null` as well. See the [schedule documentation](../config/watch.md#schedule) for more information.
+
 ## Configuration
 
 !!! hint
