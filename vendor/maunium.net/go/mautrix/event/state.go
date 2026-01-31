@@ -62,6 +62,13 @@ type ExtensibleTextContainer struct {
 	Text []ExtensibleText `json:"m.text"`
 }
 
+func (c *ExtensibleTextContainer) Equals(description *ExtensibleTextContainer) bool {
+	if c == nil || description == nil {
+		return c == description
+	}
+	return slices.Equal(c.Text, description.Text)
+}
+
 func MakeExtensibleText(text string) *ExtensibleTextContainer {
 	return &ExtensibleTextContainer{
 		Text: []ExtensibleText{{
