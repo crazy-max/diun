@@ -203,7 +203,7 @@ regopts:
 Or you can tweak the [`schedule` setting](config/watch.md#schedule) with something like `0 */6 * * *` (every 6 hours).
 
 !!! warning
-    Also be careful with the `watch_repo` setting as it will fetch manifest for **ALL** tags available for the image.
+    Also be careful with the `watch_repo` setting as it will fetch manifest for **ALL** tags available for the image if set to true. If using semver sorting, you can set `watch_repo` to semver and it will instead only watch images that are newer versions than the current image.
 
 ## Tags sorting when using `watch_repo`
 

@@ -22,11 +22,12 @@ type Tags struct {
 
 // TagsOptions holds docker tags image options
 type TagsOptions struct {
-	Image   Image
-	Max     int
-	Sort    SortTag
-	Include []string
-	Exclude []string
+	Image              Image
+	Max                int
+	Sort               SortTag
+	Include            []string
+	Exclude            []string
+	ExcludeOldVersions bool
 }
 
 // Tags returns tags of a Docker repository
@@ -53,6 +54,8 @@ func (c *Client) Tags(opts TagsOptions) (*Tags, error) {
 	// Sort tags
 	tags = SortTags(tags, opts.Sort)
 
+	foundCurrent := false
+
 	// Filter
 	for _, tag := range tags {
 		if !utl.IsIncluded(tag, opts.Include) {
@@ -61,6 +64,15 @@ func (c *Client) Tags(opts TagsOptions) (*Tags, error) {
 		} else if utl.IsExcluded(tag, opts.Exclude) {
 			res.Excluded++
 			continue
+		} else if opts.ExcludeOldVersions && opts.Sort == SortTagSemver {
+			if foundCurrent {
+				res.Excluded++
+				continue
+			}
+
+			if tag == opts.Image.Tag {
+				foundCurrent = true
+			}
 		}
 		res.List = append(res.List, tag)
 	}
