@@ -6,8 +6,8 @@ import (
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/internal/provider"
 	"github.com/crazy-max/diun/v4/pkg/docker"
-	"github.com/docker/docker/api/types/filters"
-	"github.com/docker/docker/api/types/swarm"
+	"github.com/moby/moby/api/types/swarm"
+	mobyclient "github.com/moby/moby/client"
 )
 
 func (c *Client) listServiceImage() []model.Image {
@@ -23,7 +23,7 @@ func (c *Client) listServiceImage() []model.Image {
 	}
 	defer cli.Close()
 
-	svcs, err := cli.ServiceList(filters.NewArgs())
+	svcs, err := cli.ServiceList(make(mobyclient.Filters))
 	if err != nil {
 		c.logger.Error().Err(err).Msg("Cannot list Swarm services")
 		return []model.Image{}
