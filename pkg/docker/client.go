@@ -5,15 +5,15 @@ import (
 	"net/http"
 	"path/filepath"
 
-	"github.com/docker/docker/client"
 	"github.com/docker/go-connections/tlsconfig"
+	mobyclient "github.com/moby/moby/client"
 	"github.com/pkg/errors"
 )
 
 // Client represents an active docker object
 type Client struct {
 	ctx context.Context
-	API *client.Client
+	API *mobyclient.Client
 }
 
 // Options holds docker client object options
@@ -26,14 +26,12 @@ type Options struct {
 
 // New initializes a new Docker API client with default values
 func New(opts Options) (*Client, error) {
-	var dockerOpts []client.Opt
+	var dockerOpts []mobyclient.Opt
 	if opts.Endpoint != "" {
-		dockerOpts = append(dockerOpts, client.WithHost(opts.Endpoint))
+		dockerOpts = append(dockerOpts, mobyclient.WithHost(opts.Endpoint))
 	}
 	if opts.APIVersion != "" {
-		dockerOpts = append(dockerOpts, client.WithVersion(opts.APIVersion))
-	} else {
-		dockerOpts = append(dockerOpts, client.WithAPIVersionNegotiation())
+		dockerOpts = append(dockerOpts, mobyclient.WithAPIVersion(opts.APIVersion))
 	}
 	if opts.TLSCertPath != "" {
 		options := tlsconfig.Options{
@@ -48,18 +46,18 @@ func New(opts Options) (*Client, error) {
 		}
 		httpCli := &http.Client{
 			Transport:     &http.Transport{TLSClientConfig: tlsc},
-			CheckRedirect: client.CheckRedirect,
+			CheckRedirect: mobyclient.CheckRedirect,
 		}
-		dockerOpts = append(dockerOpts, client.WithHTTPClient(httpCli))
+		dockerOpts = append(dockerOpts, mobyclient.WithHTTPClient(httpCli))
 	}
 
-	cli, err := client.NewClientWithOpts(dockerOpts...)
+	cli, err := mobyclient.New(dockerOpts...)
 	if err != nil {
 		return nil, err
 	}
 
 	ctx := context.Background()
-	_, err = cli.ServerVersion(ctx)
+	_, err = cli.ServerVersion(ctx, mobyclient.ServerVersionOptions{})
 	if err != nil {
 		return nil, err
 	}
