@@ -9,9 +9,9 @@ import (
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/internal/provider"
 	"github.com/crazy-max/diun/v4/pkg/docker"
-	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/go-units"
+	"github.com/moby/moby/api/types/container"
+	mobyclient "github.com/moby/moby/client"
 )
 
 func (c *Client) listContainerImage() []model.Image {
@@ -27,11 +27,11 @@ func (c *Client) listContainerImage() []model.Image {
 	}
 	defer cli.Close()
 
-	ctnFilter := filters.NewArgs()
-	ctnFilter.Add("status", "running")
+	ctnFilter := make(mobyclient.Filters)
+	ctnFilter = ctnFilter.Add("status", "running")
 	if *c.config.WatchStopped {
-		ctnFilter.Add("status", "created")
-		ctnFilter.Add("status", "exited")
+		ctnFilter = ctnFilter.Add("status", "created")
+		ctnFilter = ctnFilter.Add("status", "exited")
 	}
 
 	ctns, err := cli.ContainerList(ctnFilter)
@@ -121,7 +121,7 @@ func metadata(ctn container.Summary) map[string]string {
 		"ctn_names":     formatNames(ctn.Names),
 		"ctn_command":   ctn.Command,
 		"ctn_createdat": time.Unix(ctn.Created, 0).String(),
-		"ctn_state":     ctn.State,
+		"ctn_state":     string(ctn.State),
 		"ctn_status":    ctn.Status,
 		"ctn_size":      formatSize(ctn.SizeRw, ctn.SizeRootFs),
 	}
