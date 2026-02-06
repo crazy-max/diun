@@ -38,7 +38,7 @@ require (
 	github.com/stretchr/testify v1.11.1
 	github.com/tidwall/pretty v1.2.1
 	go.etcd.io/bbolt v1.4.3
-	go.podman.io/image/v5 v5.38.0
+	go.podman.io/image/v5 v5.39.1
 	golang.org/x/mod v0.31.0
 	golang.org/x/sys v0.40.0
 	google.golang.org/grpc v1.78.0
@@ -146,7 +146,7 @@ require (
 	go.opentelemetry.io/otel v1.38.0 // indirect
 	go.opentelemetry.io/otel/metric v1.38.0 // indirect
 	go.opentelemetry.io/otel/trace v1.38.0 // indirect
-	go.podman.io/storage v1.61.0 // indirect
+	go.podman.io/storage v1.62.0 // indirect
 	go.yaml.in/yaml/v2 v2.4.3 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
 	golang.org/x/crypto v0.46.0 // indirect
