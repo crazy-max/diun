@@ -1835,6 +1835,9 @@ func (cli *Client) UploadLink(ctx context.Context, link string) (*RespMediaUploa
 }
 
 func (cli *Client) Download(ctx context.Context, mxcURL id.ContentURI) (*http.Response, error) {
+	if mxcURL.IsEmpty() {
+		return nil, fmt.Errorf("empty mxc uri provided to Download")
+	}
 	_, resp, err := cli.MakeFullRequestWithResp(ctx, FullRequest{
 		Method:           http.MethodGet,
 		URL:              cli.BuildClientURL("v1", "media", "download", mxcURL.Homeserver, mxcURL.FileID),
@@ -1849,6 +1852,9 @@ type DownloadThumbnailExtra struct {
 }
 
 func (cli *Client) DownloadThumbnail(ctx context.Context, mxcURL id.ContentURI, height, width int, extras ...DownloadThumbnailExtra) (*http.Response, error) {
+	if mxcURL.IsEmpty() {
+		return nil, fmt.Errorf("empty mxc uri provided to DownloadThumbnail")
+	}
 	if len(extras) > 1 {
 		panic(fmt.Errorf("invalid number of arguments to DownloadThumbnail: %d", len(extras)))
 	}
@@ -2718,30 +2724,51 @@ func (cli *Client) AdminWhoIs(ctx context.Context, userID id.UserID) (resp RespW
 	return
 }
 
-// UnstableGetSuspendedStatus uses MSC4323 to check if a user is suspended.
-func (cli *Client) UnstableGetSuspendedStatus(ctx context.Context, userID id.UserID) (res *RespSuspended, err error) {
-	urlPath := cli.BuildClientURL("unstable", "uk.timedout.msc4323", "admin", "suspend", userID)
+func (cli *Client) makeMSC4323URL(action string, target id.UserID) string {
+	if cli.SpecVersions.Supports(FeatureUnstableAccountModeration) {
+		return cli.BuildClientURL("unstable", "uk.timedout.msc4323", "admin", action, target)
+	} else if cli.SpecVersions.Supports(FeatureStableAccountModeration) {
+		return cli.BuildClientURL("v1", "admin", action, target)
+	}
+	return ""
+}
+
+// GetSuspendedStatus uses MSC4323 to check if a user is suspended.
+func (cli *Client) GetSuspendedStatus(ctx context.Context, userID id.UserID) (res *RespSuspended, err error) {
+	urlPath := cli.makeMSC4323URL("suspend", userID)
+	if urlPath == "" {
+		return nil, MUnrecognized.WithMessage("Homeserver does not advertise MSC4323 support")
+	}
 	_, err = cli.MakeRequest(ctx, http.MethodGet, urlPath, nil, res)
 	return
 }
 
-// UnstableGetLockStatus uses MSC4323 to check if a user is locked.
-func (cli *Client) UnstableGetLockStatus(ctx context.Context, userID id.UserID) (res *RespLocked, err error) {
-	urlPath := cli.BuildClientURL("unstable", "uk.timedout.msc4323", "admin", "lock", userID)
+// GetLockStatus uses MSC4323 to check if a user is locked.
+func (cli *Client) GetLockStatus(ctx context.Context, userID id.UserID) (res *RespLocked, err error) {
+	urlPath := cli.makeMSC4323URL("lock", userID)
+	if urlPath == "" {
+		return nil, MUnrecognized.WithMessage("Homeserver does not advertise MSC4323 support")
+	}
 	_, err = cli.MakeRequest(ctx, http.MethodGet, urlPath, nil, res)
 	return
 }
 
-// UnstableSetSuspendedStatus uses MSC4323 to set whether a user account is suspended.
-func (cli *Client) UnstableSetSuspendedStatus(ctx context.Context, userID id.UserID, suspended bool) (res *RespSuspended, err error) {
-	urlPath := cli.BuildClientURL("unstable", "uk.timedout.msc4323", "admin", "suspend", userID)
+// SetSuspendedStatus uses MSC4323 to set whether a user account is suspended.
+func (cli *Client) SetSuspendedStatus(ctx context.Context, userID id.UserID, suspended bool) (res *RespSuspended, err error) {
+	urlPath := cli.makeMSC4323URL("suspend", userID)
+	if urlPath == "" {
+		return nil, MUnrecognized.WithMessage("Homeserver does not advertise MSC4323 support")
+	}
 	_, err = cli.MakeRequest(ctx, http.MethodPut, urlPath, &ReqSuspend{Suspended: suspended}, res)
 	return
 }
 
-// UnstableSetLockStatus uses MSC4323 to set whether a user account is locked.
-func (cli *Client) UnstableSetLockStatus(ctx context.Context, userID id.UserID, locked bool) (res *RespLocked, err error) {
-	urlPath := cli.BuildClientURL("unstable", "uk.timedout.msc4323", "admin", "lock", userID)
+// SetLockStatus uses MSC4323 to set whether a user account is locked.
+func (cli *Client) SetLockStatus(ctx context.Context, userID id.UserID, locked bool) (res *RespLocked, err error) {
+	urlPath := cli.makeMSC4323URL("lock", userID)
+	if urlPath == "" {
+		return nil, MUnrecognized.WithMessage("Homeserver does not advertise MSC4323 support")
+	}
 	_, err = cli.MakeRequest(ctx, http.MethodPut, urlPath, &ReqLocked{Locked: locked}, res)
 	return
 }

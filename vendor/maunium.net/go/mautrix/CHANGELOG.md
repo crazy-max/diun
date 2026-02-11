@@ -1,3 +1,27 @@
+## v0.26.2 (2026-01-16)
+
+* *(bridgev2)* Added chunked portal deletion to avoid database locks when
+  deleting large portals.
+* *(crypto,bridgev2)* Added option to encrypt reaction and reply metadata
+  as per [MSC4392].
+* *(bridgev2/login)* Added `default_value` for user input fields.
+* *(bridgev2)* Added interfaces to let the Matrix connector provide suggested
+  HTTP client settings and to reset active connections of the network connector.
+* *(bridgev2)* Added interface to let network connectors get the provisioning
+  API HTTP router and add new endpoints.
+* *(event)* Added blurhash field to Beeper link preview objects.
+* *(event)* Added [MSC4391] support for bot commands.
+* *(event)* Dropped [MSC4332] support for bot commands.
+* *(client)* Changed media download methods to return an error if the provided
+  MXC URI is empty.
+* *(client)* Stabilized support for [MSC4323].
+* *(bridgev2/matrix)* Fixed `GetEvent` panicking when trying to decrypt events.
+* *(bridgev2)* Fixed some deadlocks when room creation happens in parallel with
+  a portal re-ID call.
+
+[MSC4391]: https://github.com/matrix-org/matrix-spec-proposals/pull/4391
+[MSC4392]: https://github.com/matrix-org/matrix-spec-proposals/pull/4392
+
 ## v0.26.1 (2025-12-16)
 
 * **Breaking change *(mediaproxy)*** Changed `GetMediaResponseFile` to return
@@ -392,6 +416,7 @@
 [MSC4156]: https://github.com/matrix-org/matrix-spec-proposals/pull/4156
 [MSC4190]: https://github.com/matrix-org/matrix-spec-proposals/pull/4190
 [#288]: https://github.com/mautrix/go/pull/288
+[@onestacked]: https://github.com/onestacked
 
 ## v0.22.0 (2024-11-16)
 

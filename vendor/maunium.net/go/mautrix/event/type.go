@@ -113,7 +113,7 @@ func (et *Type) GuessClass() TypeClass {
 		StatePinnedEvents.Type, StateTombstone.Type, StateEncryption.Type, StateBridge.Type, StateHalfShotBridge.Type,
 		StateSpaceParent.Type, StateSpaceChild.Type, StatePolicyRoom.Type, StatePolicyServer.Type, StatePolicyUser.Type,
 		StateElementFunctionalMembers.Type, StateBeeperRoomFeatures.Type, StateBeeperDisappearingTimer.Type,
-		StateBotCommands.Type:
+		StateMSC4391BotCommand.Type:
 		return StateEventType
 	case EphemeralEventReceipt.Type, EphemeralEventTyping.Type, EphemeralEventPresence.Type:
 		return EphemeralEventType
@@ -205,7 +205,7 @@ var (
 	StateElementFunctionalMembers = Type{"io.element.functional_members", StateEventType}
 	StateBeeperRoomFeatures       = Type{"com.beeper.room_features", StateEventType}
 	StateBeeperDisappearingTimer  = Type{"com.beeper.disappearing_timer", StateEventType}
-	StateBotCommands              = Type{"org.matrix.msc4332.commands", StateEventType}
+	StateMSC4391BotCommand        = Type{"org.matrix.msc4391.command_description", StateEventType}
 )
 
 // Message events
