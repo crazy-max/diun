@@ -15,10 +15,11 @@ import (
 var (
 	version = "dev"
 	cli     struct {
-		Version kong.VersionFlag `name:"version" help:"Print version information."`
-		Serve   ServeCmd         `cmd:"" help:"Starts Diun server."`
-		Image   ImageCmd         `cmd:"" help:"Manage image manifests."`
-		Notif   NotifCmd         `cmd:"" help:"Manage notifications."`
+		Version     kong.VersionFlag `name:"version" help:"Print version information."`
+		Serve       ServeCmd         `cmd:"" help:"Starts Diun server."`
+		Image       ImageCmd         `cmd:"" help:"Manage image manifests."`
+		Notif       NotifCmd         `cmd:"" help:"Manage notifications."`
+		Healthcheck HealthcheckerCmd `cmd:"" help:"Verify that Diun is running."`
 	}
 )
 
