@@ -3,13 +3,18 @@ package docker
 import (
 	"regexp"
 
-	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/api/types/image"
+	"github.com/moby/moby/api/types/container"
+	"github.com/moby/moby/api/types/image"
+	mobyclient "github.com/moby/moby/client"
 )
 
 // ContainerInspect returns the container information.
 func (c *Client) ContainerInspect(containerID string) (container.InspectResponse, error) {
-	return c.API.ContainerInspect(c.ctx, containerID)
+	result, err := c.API.ContainerInspect(c.ctx, containerID, mobyclient.ContainerInspectOptions{})
+	if err != nil {
+		return container.InspectResponse{}, err
+	}
+	return result.Container, nil
 }
 
 // IsDigest determines image it looks like a digest based image reference.
@@ -19,7 +24,11 @@ func (c *Client) IsDigest(imageID string) bool {
 
 // ImageInspect returns the image information.
 func (c *Client) ImageInspect(imageID string) (image.InspectResponse, error) {
-	return c.API.ImageInspect(c.ctx, imageID)
+	result, err := c.API.ImageInspect(c.ctx, imageID)
+	if err != nil {
+		return image.InspectResponse{}, err
+	}
+	return result.InspectResponse, nil
 }
 
 // IsLocalImage checks if the image has been built locally
