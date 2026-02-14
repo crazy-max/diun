@@ -55,10 +55,12 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		Message    string   `json:"message"`
 		Number     string   `json:"number"`
 		Recipients []string `json:"recipients"`
+		TextMode   string   `json:"text_mode"`
 	}{
 		Message:    string(bodyrender),
 		Number:     c.cfg.Number,
 		Recipients: c.cfg.Recipients,
+		TextMode:   c.cfg.TextMode,
 	})
 	if err != nil {
 		return err

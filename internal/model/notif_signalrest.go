@@ -19,6 +19,7 @@ type NotifSignalRest struct {
 	TLSSkipVerify  bool              `yaml:"tlsSkipVerify,omitempty" json:"tlsSkipVerify,omitempty" validate:"omitempty"`
 	TLSCACertFiles []string          `yaml:"tlsCaCertFiles,omitempty" json:"tlsCaCertFiles,omitempty" validate:"omitempty"`
 	TemplateBody   string            `yaml:"templateBody,omitempty" json:"templateBody,omitempty" validate:"required"`
+	TextMode       string            `yaml:"textMode,omitempty" json:"textMode,omitempty" validate:"omitempty"`
 }
 
 // GetDefaults gets the default values
