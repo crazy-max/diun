@@ -11,7 +11,7 @@ import (
 	"github.com/crazy-max/diun/v4/pkg/dockerfile"
 )
 
-func (c *Client) listExtImage() (list []model.Image) {
+func (c *Client) listExtImage() (list model.ImageList) {
 	for _, filename := range c.listDockerfiles(c.config.Patterns) {
 		dfile, err := dockerfile.New(dockerfile.Options{
 			Filename: filename,
@@ -50,7 +50,9 @@ func (c *Client) listExtImage() (list []model.Image) {
 					Msg("Watch disabled")
 				continue
 			}
+
 			list = append(list, image)
+			list = list.Dedupe()
 		}
 	}
 	return
