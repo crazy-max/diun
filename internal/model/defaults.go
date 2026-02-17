@@ -2,12 +2,11 @@ package model
 
 import (
 	"github.com/crazy-max/diun/v4/pkg/registry"
-	"github.com/crazy-max/diun/v4/pkg/utl"
 )
 
 // Defaults holds data necessary for image defaults configuration
 type Defaults struct {
-	WatchRepo   *bool             `yaml:"watchRepo,omitempty" json:"watchRepo,omitempty"`
+	WatchRepo   WatchRepo         `yaml:"watchRepo,omitempty" json:"watchRepo,omitempty"`
 	NotifyOn    []NotifyOn        `yaml:"notifyOn,omitempty" json:"notifyOn,omitempty"`
 	MaxTags     int               `yaml:"maxTags,omitempty" json:"maxTags,omitempty"`
 	SortTags    registry.SortTag  `yaml:"sortTags,omitempty" json:"sortTags,omitempty"`
@@ -25,7 +24,7 @@ func (s *Defaults) GetDefaults() *Defaults {
 
 // SetDefaults sets the default values
 func (s *Defaults) SetDefaults() {
-	s.WatchRepo = utl.NewFalse()
+	s.WatchRepo = WatchRepoNo
 	s.NotifyOn = NotifyOnDefaults
 	s.SortTags = registry.SortTagReverse
 }

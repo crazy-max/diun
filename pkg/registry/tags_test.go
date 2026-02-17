@@ -8,46 +8,72 @@ import (
 
 func TestTags(t *testing.T) {
 	assert.NotNil(t, rc)
-
-	image, err := ParseImage(ParseImageOptions{
-		Name: "crazymax/diun:3.0.0",
-	})
-	if err != nil {
-		t.Error(err)
-	}
-
-	tags, err := rc.Tags(TagsOptions{
-		Image: image,
-	})
-	if err != nil {
-		t.Error(err)
-	}
-
-	assert.Greater(t, tags.Total, 0)
-	assert.Greater(t, len(tags.List), 0)
-}
-
-func TestTagsWithDigest(t *testing.T) {
 	t.Parallel()
 
-	assert.NotNil(t, rc)
-
-	image, err := ParseImage(ParseImageOptions{
-		Name: "crazymax/diun:latest@sha256:3fca3dd86c2710586208b0f92d1ec4ce25382f4cad4ae76a2275db8e8bb24031",
-	})
-	if err != nil {
-		t.Error(err)
+	cases := []struct {
+		name                string
+		imageName           string
+		excludeOldVersions  bool
+		expectedNotIncluded bool
+		expectedExcluded    bool
+		expectedContains    string
+	}{
+		{
+			"parse image and tag",
+			"crazymax/diun:3.0.0",
+			false,
+			false,
+			false,
+			"4.0.0",
+		},
+		{
+			"parse image digest",
+			"crazymax/diun:latest@sha256:3fca3dd86c2710586208b0f92d1ec4ce25382f4cad4ae76a2275db8e8bb24031",
+			false,
+			false,
+			false,
+			"4.0.0",
+		},
+		{
+			"exclude older semver",
+			"crazymax/diun:4.0.0",
+			true,
+			false,
+			true,
+			"4.20",
+		},
 	}
 
-	tags, err := rc.Tags(TagsOptions{
-		Image: image,
-	})
-	if err != nil {
-		t.Error(err)
-	}
+	for _, c := range cases {
+		c := c
 
-	assert.Greater(t, tags.Total, 0)
-	assert.Greater(t, len(tags.List), 0)
+		t.Run(c.name, func(t *testing.T) {
+			image, err := ParseImage(ParseImageOptions{
+				Name: c.imageName,
+			})
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			tags, err := rc.Tags(TagsOptions{
+				Image:              image,
+				Sort:               SortTagSemver,
+				ExcludeOldVersions: c.excludeOldVersions,
+			})
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			assert.Greater(t, tags.Total, 0)
+			assert.Greater(t, len(tags.List), 0)
+			// Make sure final list includes original tag and additional expected
+			assert.Contains(t, tags.List, image.Tag)
+			assert.Contains(t, tags.List, c.expectedContains)
+
+			assert.Equal(t, c.expectedExcluded, tags.Excluded > 0, "Unexpected excluded tags")
+			assert.Equal(t, c.expectedNotIncluded, tags.NotIncluded > 0, "Unexpected not included tags")
+		})
+	}
 }
 
 func TestTagsSort(t *testing.T) {

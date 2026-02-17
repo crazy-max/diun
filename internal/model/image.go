@@ -1,6 +1,8 @@
 package model
 
 import (
+	"slices"
+
 	"github.com/crazy-max/diun/v4/pkg/registry"
 )
 
@@ -9,7 +11,7 @@ type Image struct {
 	Name        string            `yaml:"name,omitempty" json:",omitempty"`
 	Platform    ImagePlatform     `yaml:"platform,omitempty" json:",omitempty"`
 	RegOpt      string            `yaml:"regopt,omitempty" json:",omitempty"`
-	WatchRepo   *bool             `yaml:"watch_repo,omitempty" json:",omitempty"`
+	WatchRepo   WatchRepo         `yaml:"watch_repo,omitempty" json:",omitempty"`
 	NotifyOn    []NotifyOn        `yaml:"notify_on,omitempty" json:",omitempty"`
 	MaxTags     int               `yaml:"max_tags,omitempty" json:",omitempty"`
 	SortTags    registry.SortTag  `yaml:"sort_tags,omitempty" json:",omitempty"`
@@ -26,6 +28,25 @@ type ImagePlatform struct {
 	Arch    string `yaml:"arch,omitempty" json:",omitempty"`
 	Variant string `yaml:"variant,omitempty" json:",omitempty"`
 }
+
+// WatchRepo constants
+const (
+	WatchRepoNo     = WatchRepo("false")
+	WatchRepoAll    = WatchRepo("true")
+	WatchRepoSemver = WatchRepo("semver")
+)
+
+// Valid checks watch repo is valid
+func (w WatchRepo) Valid() bool {
+	return slices.Contains([]WatchRepo{
+		WatchRepoNo,
+		WatchRepoAll,
+		WatchRepoSemver,
+	}, w)
+}
+
+// WatchRepo holds repo watching intent
+type WatchRepo string
 
 // ImageStatus constants
 const (
