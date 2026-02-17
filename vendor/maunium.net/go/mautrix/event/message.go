@@ -135,6 +135,7 @@ type MessageEventContent struct {
 	BeeperGalleryCaption     string                   `json:"com.beeper.gallery.caption,omitempty"`
 	BeeperGalleryCaptionHTML string                   `json:"com.beeper.gallery.caption_html,omitempty"`
 	BeeperPerMessageProfile  *BeeperPerMessageProfile `json:"com.beeper.per_message_profile,omitempty"`
+	BeeperActionMessage      *BeeperActionMessage     `json:"com.beeper.action_message,omitempty"`
 
 	BeeperLinkPreviews []*BeeperLinkPreview `json:"com.beeper.linkpreviews,omitempty"`
 
@@ -143,7 +144,7 @@ type MessageEventContent struct {
 	MSC1767Audio *MSC1767Audio `json:"org.matrix.msc1767.audio,omitempty"`
 	MSC3245Voice *MSC3245Voice `json:"org.matrix.msc3245.voice,omitempty"`
 
-	MSC4332BotCommand *BotCommandInput `json:"org.matrix.msc4332.command,omitempty"`
+	MSC4391BotCommand *MSC4391BotCommandInput `json:"org.matrix.msc4391.command,omitempty"`
 }
 
 func (content *MessageEventContent) GetCapMsgType() CapabilityMsgType {
@@ -286,6 +287,13 @@ func (m *Mentions) Merge(other *Mentions) *Mentions {
 		Room:    m.Room || other.Room,
 	}
 }
+
+type MSC4391BotCommandInputCustom[T any] struct {
+	Command   string `json:"command"`
+	Arguments T      `json:"arguments,omitempty"`
+}
+
+type MSC4391BotCommandInput = MSC4391BotCommandInputCustom[json.RawMessage]
 
 type EncryptedFileInfo struct {
 	attachment.EncryptedFile

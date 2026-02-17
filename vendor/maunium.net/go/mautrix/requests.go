@@ -367,13 +367,12 @@ type ReqSendToDevice struct {
 }
 
 type ReqSendEvent struct {
-	Timestamp     int64
-	TransactionID string
-	UnstableDelay time.Duration
-
-	DontEncrypt bool
-
-	MeowEventID id.EventID
+	Timestamp              int64
+	TransactionID          string
+	UnstableDelay          time.Duration
+	UnstableStickyDuration time.Duration
+	DontEncrypt            bool
+	MeowEventID            id.EventID
 }
 
 type ReqDelayedEvents struct {
