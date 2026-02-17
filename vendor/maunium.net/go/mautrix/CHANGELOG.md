@@ -1,3 +1,48 @@
+## v0.26.3 (2026-02-16)
+
+* Bumped minimum Go version to 1.25.
+* *(client)* Added fields for sending [MSC4354] sticky events.
+* *(bridgev2)* Added automatic message request accepting when sending message.
+* *(mediaproxy)* Added support for federation thumbnail endpoint.
+* *(crypto/ssss)* Improved support for recovery keys with slightly broken
+  metadata.
+* *(crypto)* Changed key import to call session received callback even for
+  sessions that already exist in the database.
+* *(appservice)* Fixed building websocket URL accidentally using file path
+  separators instead of always `/`.
+* *(crypto)* Fixed key exports not including the `sender_claimed_keys` field.
+* *(client)* Fixed incorrect context usage in async uploads.
+* *(crypto)* Fixed panic when passing invalid input to megolm message index
+  parser used for debugging.
+* *(bridgev2/provisioning)* Fixed completed or failed logins not being cleaned
+  up properly.
+
+[MSC4354]: https://github.com/matrix-org/matrix-spec-proposals/pull/4354
+
+## v0.26.2 (2026-01-16)
+
+* *(bridgev2)* Added chunked portal deletion to avoid database locks when
+  deleting large portals.
+* *(crypto,bridgev2)* Added option to encrypt reaction and reply metadata
+  as per [MSC4392].
+* *(bridgev2/login)* Added `default_value` for user input fields.
+* *(bridgev2)* Added interfaces to let the Matrix connector provide suggested
+  HTTP client settings and to reset active connections of the network connector.
+* *(bridgev2)* Added interface to let network connectors get the provisioning
+  API HTTP router and add new endpoints.
+* *(event)* Added blurhash field to Beeper link preview objects.
+* *(event)* Added [MSC4391] support for bot commands.
+* *(event)* Dropped [MSC4332] support for bot commands.
+* *(client)* Changed media download methods to return an error if the provided
+  MXC URI is empty.
+* *(client)* Stabilized support for [MSC4323].
+* *(bridgev2/matrix)* Fixed `GetEvent` panicking when trying to decrypt events.
+* *(bridgev2)* Fixed some deadlocks when room creation happens in parallel with
+  a portal re-ID call.
+
+[MSC4391]: https://github.com/matrix-org/matrix-spec-proposals/pull/4391
+[MSC4392]: https://github.com/matrix-org/matrix-spec-proposals/pull/4392
+
 ## v0.26.1 (2025-12-16)
 
 * **Breaking change *(mediaproxy)*** Changed `GetMediaResponseFile` to return
@@ -392,6 +437,7 @@
 [MSC4156]: https://github.com/matrix-org/matrix-spec-proposals/pull/4156
 [MSC4190]: https://github.com/matrix-org/matrix-spec-proposals/pull/4190
 [#288]: https://github.com/mautrix/go/pull/288
+[@onestacked]: https://github.com/onestacked
 
 ## v0.22.0 (2024-11-16)
 
