@@ -43,7 +43,7 @@ jobs:
           targets: docs
       -
         name: Check GitHub Pages status
-        uses: crazy-max/ghaction-github-status@v4
+        uses: crazy-max/ghaction-github-status@v5
         with:
           pages_threshold: major_outage
       -
