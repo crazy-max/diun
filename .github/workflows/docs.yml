@@ -36,7 +36,7 @@ jobs:
         uses: docker/setup-buildx-action@v3
       -
         name: Build docs
-        uses: docker/bake-action@v6
+        uses: docker/bake-action@v7
         with:
           source: .
           provenance: false
