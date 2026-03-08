@@ -63,7 +63,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		},
 	}
 
-	req, err := http.NewRequestWithContext(timeoutCtx, "POST", c.cfg.Endpoint, bytes.NewBuffer(body))
+	req, err := http.NewRequestWithContext(timeoutCtx, c.cfg.Method, c.cfg.Endpoint, bytes.NewBuffer(body))
 	if err != nil {
 		return err
 	}
