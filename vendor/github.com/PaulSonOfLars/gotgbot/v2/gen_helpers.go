@@ -3,92 +3,97 @@
 
 package gotgbot
 
-// Get Helper method for Bot.GetBusinessConnection.
+// Get is a helper method for Bot.GetBusinessConnection.
 func (bc BusinessConnection) Get(b *Bot, opts *GetBusinessConnectionOpts) (*BusinessConnection, error) {
 	return b.GetBusinessConnection(bc.Id, opts)
 }
 
-// Answer Helper method for Bot.AnswerCallbackQuery.
+// Answer is a helper method for Bot.AnswerCallbackQuery.
 func (cq CallbackQuery) Answer(b *Bot, opts *AnswerCallbackQueryOpts) (bool, error) {
 	return b.AnswerCallbackQuery(cq.Id, opts)
 }
 
-// ApproveJoinRequest Helper method for Bot.ApproveChatJoinRequest.
+// ApproveJoinRequest is a helper method for Bot.ApproveChatJoinRequest.
 func (c Chat) ApproveJoinRequest(b *Bot, userId int64, opts *ApproveChatJoinRequestOpts) (bool, error) {
 	return b.ApproveChatJoinRequest(c.Id, userId, opts)
 }
 
-// BanMember Helper method for Bot.BanChatMember.
+// BanMember is a helper method for Bot.BanChatMember.
 func (c Chat) BanMember(b *Bot, userId int64, opts *BanChatMemberOpts) (bool, error) {
 	return b.BanChatMember(c.Id, userId, opts)
 }
 
-// BanSenderChat Helper method for Bot.BanChatSenderChat.
+// BanSenderChat is a helper method for Bot.BanChatSenderChat.
 func (c Chat) BanSenderChat(b *Bot, senderChatId int64, opts *BanChatSenderChatOpts) (bool, error) {
 	return b.BanChatSenderChat(c.Id, senderChatId, opts)
 }
 
-// CreateInviteLink Helper method for Bot.CreateChatInviteLink.
+// CreateInviteLink is a helper method for Bot.CreateChatInviteLink.
 func (c Chat) CreateInviteLink(b *Bot, opts *CreateChatInviteLinkOpts) (*ChatInviteLink, error) {
 	return b.CreateChatInviteLink(c.Id, opts)
 }
 
-// CreateSubscriptionInviteLink Helper method for Bot.CreateChatSubscriptionInviteLink.
+// CreateSubscriptionInviteLink is a helper method for Bot.CreateChatSubscriptionInviteLink.
 func (c Chat) CreateSubscriptionInviteLink(b *Bot, subscriptionPeriod int64, subscriptionPrice int64, opts *CreateChatSubscriptionInviteLinkOpts) (*ChatInviteLink, error) {
 	return b.CreateChatSubscriptionInviteLink(c.Id, subscriptionPeriod, subscriptionPrice, opts)
 }
 
-// DeclineJoinRequest Helper method for Bot.DeclineChatJoinRequest.
+// DeclineJoinRequest is a helper method for Bot.DeclineChatJoinRequest.
 func (c Chat) DeclineJoinRequest(b *Bot, userId int64, opts *DeclineChatJoinRequestOpts) (bool, error) {
 	return b.DeclineChatJoinRequest(c.Id, userId, opts)
 }
 
-// DeletePhoto Helper method for Bot.DeleteChatPhoto.
+// DeletePhoto is a helper method for Bot.DeleteChatPhoto.
 func (c Chat) DeletePhoto(b *Bot, opts *DeleteChatPhotoOpts) (bool, error) {
 	return b.DeleteChatPhoto(c.Id, opts)
 }
 
-// DeleteStickerSet Helper method for Bot.DeleteChatStickerSet.
+// DeleteStickerSet is a helper method for Bot.DeleteChatStickerSet.
 func (c Chat) DeleteStickerSet(b *Bot, opts *DeleteChatStickerSetOpts) (bool, error) {
 	return b.DeleteChatStickerSet(c.Id, opts)
 }
 
-// EditInviteLink Helper method for Bot.EditChatInviteLink.
+// EditInviteLink is a helper method for Bot.EditChatInviteLink.
 func (c Chat) EditInviteLink(b *Bot, inviteLink string, opts *EditChatInviteLinkOpts) (*ChatInviteLink, error) {
 	return b.EditChatInviteLink(c.Id, inviteLink, opts)
 }
 
-// EditSubscriptionInviteLink Helper method for Bot.EditChatSubscriptionInviteLink.
+// EditSubscriptionInviteLink is a helper method for Bot.EditChatSubscriptionInviteLink.
 func (c Chat) EditSubscriptionInviteLink(b *Bot, inviteLink string, opts *EditChatSubscriptionInviteLinkOpts) (*ChatInviteLink, error) {
 	return b.EditChatSubscriptionInviteLink(c.Id, inviteLink, opts)
 }
 
-// ExportInviteLink Helper method for Bot.ExportChatInviteLink.
+// ExportInviteLink is a helper method for Bot.ExportChatInviteLink.
 func (c Chat) ExportInviteLink(b *Bot, opts *ExportChatInviteLinkOpts) (string, error) {
 	return b.ExportChatInviteLink(c.Id, opts)
 }
 
-// Get Helper method for Bot.GetChat.
+// Get is a helper method for Bot.GetChat.
 func (c Chat) Get(b *Bot, opts *GetChatOpts) (*ChatFullInfo, error) {
 	return b.GetChat(c.Id, opts)
 }
 
-// GetAdministrators Helper method for Bot.GetChatAdministrators.
+// GetAdministrators is a helper method for Bot.GetChatAdministrators.
 func (c Chat) GetAdministrators(b *Bot, opts *GetChatAdministratorsOpts) ([]ChatMember, error) {
 	return b.GetChatAdministrators(c.Id, opts)
 }
 
-// GetMember Helper method for Bot.GetChatMember.
+// GetGifts is a helper method for Bot.GetChatGifts.
+func (c Chat) GetGifts(b *Bot, opts *GetChatGiftsOpts) (*OwnedGifts, error) {
+	return b.GetChatGifts(c.Id, opts)
+}
+
+// GetMember is a helper method for Bot.GetChatMember.
 func (c Chat) GetMember(b *Bot, userId int64, opts *GetChatMemberOpts) (ChatMember, error) {
 	return b.GetChatMember(c.Id, userId, opts)
 }
 
-// GetMemberCount Helper method for Bot.GetChatMemberCount.
+// GetMemberCount is a helper method for Bot.GetChatMemberCount.
 func (c Chat) GetMemberCount(b *Bot, opts *GetChatMemberCountOpts) (int64, error) {
 	return b.GetChatMemberCount(c.Id, opts)
 }
 
-// GetMenuButton Helper method for Bot.GetChatMenuButton.
+// GetMenuButton is a helper method for Bot.GetChatMenuButton.
 func (c Chat) GetMenuButton(b *Bot, opts *GetChatMenuButtonOpts) (MenuButton, error) {
 	if opts == nil {
 		opts = &GetChatMenuButtonOpts{}
@@ -101,57 +106,57 @@ func (c Chat) GetMenuButton(b *Bot, opts *GetChatMenuButtonOpts) (MenuButton, er
 	return b.GetChatMenuButton(opts)
 }
 
-// GetUserBoosts Helper method for Bot.GetUserChatBoosts.
+// GetUserBoosts is a helper method for Bot.GetUserChatBoosts.
 func (c Chat) GetUserBoosts(b *Bot, userId int64, opts *GetUserChatBoostsOpts) (*UserChatBoosts, error) {
 	return b.GetUserChatBoosts(c.Id, userId, opts)
 }
 
-// Leave Helper method for Bot.LeaveChat.
+// Leave is a helper method for Bot.LeaveChat.
 func (c Chat) Leave(b *Bot, opts *LeaveChatOpts) (bool, error) {
 	return b.LeaveChat(c.Id, opts)
 }
 
-// PinMessage Helper method for Bot.PinChatMessage.
+// PinMessage is a helper method for Bot.PinChatMessage.
 func (c Chat) PinMessage(b *Bot, messageId int64, opts *PinChatMessageOpts) (bool, error) {
 	return b.PinChatMessage(c.Id, messageId, opts)
 }
 
-// PromoteMember Helper method for Bot.PromoteChatMember.
+// PromoteMember is a helper method for Bot.PromoteChatMember.
 func (c Chat) PromoteMember(b *Bot, userId int64, opts *PromoteChatMemberOpts) (bool, error) {
 	return b.PromoteChatMember(c.Id, userId, opts)
 }
 
-// RemoveVerification Helper method for Bot.RemoveChatVerification.
+// RemoveVerification is a helper method for Bot.RemoveChatVerification.
 func (c Chat) RemoveVerification(b *Bot, opts *RemoveChatVerificationOpts) (bool, error) {
 	return b.RemoveChatVerification(c.Id, opts)
 }
 
-// RestrictMember Helper method for Bot.RestrictChatMember.
+// RestrictMember is a helper method for Bot.RestrictChatMember.
 func (c Chat) RestrictMember(b *Bot, userId int64, permissions ChatPermissions, opts *RestrictChatMemberOpts) (bool, error) {
 	return b.RestrictChatMember(c.Id, userId, permissions, opts)
 }
 
-// RevokeInviteLink Helper method for Bot.RevokeChatInviteLink.
+// RevokeInviteLink is a helper method for Bot.RevokeChatInviteLink.
 func (c Chat) RevokeInviteLink(b *Bot, inviteLink string, opts *RevokeChatInviteLinkOpts) (*ChatInviteLink, error) {
 	return b.RevokeChatInviteLink(c.Id, inviteLink, opts)
 }
 
-// SendAction Helper method for Bot.SendChatAction.
+// SendAction is a helper method for Bot.SendChatAction.
 func (c Chat) SendAction(b *Bot, action string, opts *SendChatActionOpts) (bool, error) {
 	return b.SendChatAction(c.Id, action, opts)
 }
 
-// SetAdministratorCustomTitle Helper method for Bot.SetChatAdministratorCustomTitle.
+// SetAdministratorCustomTitle is a helper method for Bot.SetChatAdministratorCustomTitle.
 func (c Chat) SetAdministratorCustomTitle(b *Bot, userId int64, customTitle string, opts *SetChatAdministratorCustomTitleOpts) (bool, error) {
 	return b.SetChatAdministratorCustomTitle(c.Id, userId, customTitle, opts)
 }
 
-// SetDescription Helper method for Bot.SetChatDescription.
+// SetDescription is a helper method for Bot.SetChatDescription.
 func (c Chat) SetDescription(b *Bot, opts *SetChatDescriptionOpts) (bool, error) {
 	return b.SetChatDescription(c.Id, opts)
 }
 
-// SetMenuButton Helper method for Bot.SetChatMenuButton.
+// SetMenuButton is a helper method for Bot.SetChatMenuButton.
 func (c Chat) SetMenuButton(b *Bot, opts *SetChatMenuButtonOpts) (bool, error) {
 	if opts == nil {
 		opts = &SetChatMenuButtonOpts{}
@@ -164,67 +169,67 @@ func (c Chat) SetMenuButton(b *Bot, opts *SetChatMenuButtonOpts) (bool, error) {
 	return b.SetChatMenuButton(opts)
 }
 
-// SetPermissions Helper method for Bot.SetChatPermissions.
+// SetPermissions is a helper method for Bot.SetChatPermissions.
 func (c Chat) SetPermissions(b *Bot, permissions ChatPermissions, opts *SetChatPermissionsOpts) (bool, error) {
 	return b.SetChatPermissions(c.Id, permissions, opts)
 }
 
-// SetPhoto Helper method for Bot.SetChatPhoto.
+// SetPhoto is a helper method for Bot.SetChatPhoto.
 func (c Chat) SetPhoto(b *Bot, photo InputFile, opts *SetChatPhotoOpts) (bool, error) {
 	return b.SetChatPhoto(c.Id, photo, opts)
 }
 
-// SetStickerSet Helper method for Bot.SetChatStickerSet.
+// SetStickerSet is a helper method for Bot.SetChatStickerSet.
 func (c Chat) SetStickerSet(b *Bot, stickerSetName string, opts *SetChatStickerSetOpts) (bool, error) {
 	return b.SetChatStickerSet(c.Id, stickerSetName, opts)
 }
 
-// SetTitle Helper method for Bot.SetChatTitle.
+// SetTitle is a helper method for Bot.SetChatTitle.
 func (c Chat) SetTitle(b *Bot, title string, opts *SetChatTitleOpts) (bool, error) {
 	return b.SetChatTitle(c.Id, title, opts)
 }
 
-// UnbanMember Helper method for Bot.UnbanChatMember.
+// UnbanMember is a helper method for Bot.UnbanChatMember.
 func (c Chat) UnbanMember(b *Bot, userId int64, opts *UnbanChatMemberOpts) (bool, error) {
 	return b.UnbanChatMember(c.Id, userId, opts)
 }
 
-// UnbanSenderChat Helper method for Bot.UnbanChatSenderChat.
+// UnbanSenderChat is a helper method for Bot.UnbanChatSenderChat.
 func (c Chat) UnbanSenderChat(b *Bot, senderChatId int64, opts *UnbanChatSenderChatOpts) (bool, error) {
 	return b.UnbanChatSenderChat(c.Id, senderChatId, opts)
 }
 
-// UnpinAllMessages Helper method for Bot.UnpinAllChatMessages.
+// UnpinAllMessages is a helper method for Bot.UnpinAllChatMessages.
 func (c Chat) UnpinAllMessages(b *Bot, opts *UnpinAllChatMessagesOpts) (bool, error) {
 	return b.UnpinAllChatMessages(c.Id, opts)
 }
 
-// UnpinMessage Helper method for Bot.UnpinChatMessage.
+// UnpinMessage is a helper method for Bot.UnpinChatMessage.
 func (c Chat) UnpinMessage(b *Bot, opts *UnpinChatMessageOpts) (bool, error) {
 	return b.UnpinChatMessage(c.Id, opts)
 }
 
-// Verify Helper method for Bot.VerifyChat.
+// Verify is a helper method for Bot.VerifyChat.
 func (c Chat) Verify(b *Bot, opts *VerifyChatOpts) (bool, error) {
 	return b.VerifyChat(c.Id, opts)
 }
 
-// Send Helper method for Bot.SendGift.
+// Send is a helper method for Bot.SendGift.
 func (g Gift) Send(b *Bot, opts *SendGiftOpts) (bool, error) {
 	return b.SendGift(g.Id, opts)
 }
 
-// Copy Helper method for Bot.CopyMessage.
+// Copy is a helper method for Bot.CopyMessage.
 func (im InaccessibleMessage) Copy(b *Bot, chatId int64, opts *CopyMessageOpts) (*MessageId, error) {
 	return b.CopyMessage(chatId, im.Chat.Id, im.MessageId, opts)
 }
 
-// Delete Helper method for Bot.DeleteMessage.
+// Delete is a helper method for Bot.DeleteMessage.
 func (im InaccessibleMessage) Delete(b *Bot, opts *DeleteMessageOpts) (bool, error) {
 	return b.DeleteMessage(im.Chat.Id, im.MessageId, opts)
 }
 
-// EditCaption Helper method for Bot.EditMessageCaption.
+// EditCaption is a helper method for Bot.EditMessageCaption.
 func (im InaccessibleMessage) EditCaption(b *Bot, opts *EditMessageCaptionOpts) (*Message, bool, error) {
 	if opts == nil {
 		opts = &EditMessageCaptionOpts{}
@@ -240,12 +245,12 @@ func (im InaccessibleMessage) EditCaption(b *Bot, opts *EditMessageCaptionOpts) 
 	return b.EditMessageCaption(opts)
 }
 
-// EditChecklist Helper method for Bot.EditMessageChecklist.
+// EditChecklist is a helper method for Bot.EditMessageChecklist.
 func (im InaccessibleMessage) EditChecklist(b *Bot, businessConnectionId string, checklist InputChecklist, opts *EditMessageChecklistOpts) (*Message, error) {
 	return b.EditMessageChecklist(businessConnectionId, im.Chat.Id, im.MessageId, checklist, opts)
 }
 
-// EditLiveLocation Helper method for Bot.EditMessageLiveLocation.
+// EditLiveLocation is a helper method for Bot.EditMessageLiveLocation.
 func (im InaccessibleMessage) EditLiveLocation(b *Bot, latitude float64, longitude float64, opts *EditMessageLiveLocationOpts) (*Message, bool, error) {
 	if opts == nil {
 		opts = &EditMessageLiveLocationOpts{}
@@ -261,7 +266,7 @@ func (im InaccessibleMessage) EditLiveLocation(b *Bot, latitude float64, longitu
 	return b.EditMessageLiveLocation(latitude, longitude, opts)
 }
 
-// EditMedia Helper method for Bot.EditMessageMedia.
+// EditMedia is a helper method for Bot.EditMessageMedia.
 func (im InaccessibleMessage) EditMedia(b *Bot, media InputMedia, opts *EditMessageMediaOpts) (*Message, bool, error) {
 	if opts == nil {
 		opts = &EditMessageMediaOpts{}
@@ -277,7 +282,7 @@ func (im InaccessibleMessage) EditMedia(b *Bot, media InputMedia, opts *EditMess
 	return b.EditMessageMedia(media, opts)
 }
 
-// EditReplyMarkup Helper method for Bot.EditMessageReplyMarkup.
+// EditReplyMarkup is a helper method for Bot.EditMessageReplyMarkup.
 func (im InaccessibleMessage) EditReplyMarkup(b *Bot, opts *EditMessageReplyMarkupOpts) (*Message, bool, error) {
 	if opts == nil {
 		opts = &EditMessageReplyMarkupOpts{}
@@ -293,7 +298,7 @@ func (im InaccessibleMessage) EditReplyMarkup(b *Bot, opts *EditMessageReplyMark
 	return b.EditMessageReplyMarkup(opts)
 }
 
-// EditText Helper method for Bot.EditMessageText.
+// EditText is a helper method for Bot.EditMessageText.
 func (im InaccessibleMessage) EditText(b *Bot, text string, opts *EditMessageTextOpts) (*Message, bool, error) {
 	if opts == nil {
 		opts = &EditMessageTextOpts{}
@@ -309,27 +314,27 @@ func (im InaccessibleMessage) EditText(b *Bot, text string, opts *EditMessageTex
 	return b.EditMessageText(text, opts)
 }
 
-// Forward Helper method for Bot.ForwardMessage.
+// Forward is a helper method for Bot.ForwardMessage.
 func (im InaccessibleMessage) Forward(b *Bot, chatId int64, opts *ForwardMessageOpts) (*Message, error) {
 	return b.ForwardMessage(chatId, im.Chat.Id, im.MessageId, opts)
 }
 
-// Pin Helper method for Bot.PinChatMessage.
+// Pin is a helper method for Bot.PinChatMessage.
 func (im InaccessibleMessage) Pin(b *Bot, opts *PinChatMessageOpts) (bool, error) {
 	return b.PinChatMessage(im.Chat.Id, im.MessageId, opts)
 }
 
-// ReadBusiness Helper method for Bot.ReadBusinessMessage.
+// ReadBusiness is a helper method for Bot.ReadBusinessMessage.
 func (im InaccessibleMessage) ReadBusiness(b *Bot, businessConnectionId string, opts *ReadBusinessMessageOpts) (bool, error) {
 	return b.ReadBusinessMessage(businessConnectionId, im.Chat.Id, im.MessageId, opts)
 }
 
-// SetReaction Helper method for Bot.SetMessageReaction.
+// SetReaction is a helper method for Bot.SetMessageReaction.
 func (im InaccessibleMessage) SetReaction(b *Bot, opts *SetMessageReactionOpts) (bool, error) {
 	return b.SetMessageReaction(im.Chat.Id, im.MessageId, opts)
 }
 
-// StopLiveLocation Helper method for Bot.StopMessageLiveLocation.
+// StopLiveLocation is a helper method for Bot.StopMessageLiveLocation.
 func (im InaccessibleMessage) StopLiveLocation(b *Bot, opts *StopMessageLiveLocationOpts) (*Message, bool, error) {
 	if opts == nil {
 		opts = &StopMessageLiveLocationOpts{}
@@ -345,7 +350,7 @@ func (im InaccessibleMessage) StopLiveLocation(b *Bot, opts *StopMessageLiveLoca
 	return b.StopMessageLiveLocation(opts)
 }
 
-// Unpin Helper method for Bot.UnpinChatMessage.
+// Unpin is a helper method for Bot.UnpinChatMessage.
 func (im InaccessibleMessage) Unpin(b *Bot, opts *UnpinChatMessageOpts) (bool, error) {
 	if opts == nil {
 		opts = &UnpinChatMessageOpts{}
@@ -358,22 +363,22 @@ func (im InaccessibleMessage) Unpin(b *Bot, opts *UnpinChatMessageOpts) (bool, e
 	return b.UnpinChatMessage(im.Chat.Id, opts)
 }
 
-// Answer Helper method for Bot.AnswerInlineQuery.
+// Answer is a helper method for Bot.AnswerInlineQuery.
 func (iq InlineQuery) Answer(b *Bot, results []InlineQueryResult, opts *AnswerInlineQueryOpts) (bool, error) {
 	return b.AnswerInlineQuery(iq.Id, results, opts)
 }
 
-// Copy Helper method for Bot.CopyMessage.
+// Copy is a helper method for Bot.CopyMessage.
 func (m Message) Copy(b *Bot, chatId int64, opts *CopyMessageOpts) (*MessageId, error) {
 	return b.CopyMessage(chatId, m.Chat.Id, m.MessageId, opts)
 }
 
-// Delete Helper method for Bot.DeleteMessage.
+// Delete is a helper method for Bot.DeleteMessage.
 func (m Message) Delete(b *Bot, opts *DeleteMessageOpts) (bool, error) {
 	return b.DeleteMessage(m.Chat.Id, m.MessageId, opts)
 }
 
-// EditCaption Helper method for Bot.EditMessageCaption.
+// EditCaption is a helper method for Bot.EditMessageCaption.
 func (m Message) EditCaption(b *Bot, opts *EditMessageCaptionOpts) (*Message, bool, error) {
 	if opts == nil {
 		opts = &EditMessageCaptionOpts{}
@@ -389,12 +394,12 @@ func (m Message) EditCaption(b *Bot, opts *EditMessageCaptionOpts) (*Message, bo
 	return b.EditMessageCaption(opts)
 }
 
-// EditChecklist Helper method for Bot.EditMessageChecklist.
+// EditChecklist is a helper method for Bot.EditMessageChecklist.
 func (m Message) EditChecklist(b *Bot, businessConnectionId string, checklist InputChecklist, opts *EditMessageChecklistOpts) (*Message, error) {
 	return b.EditMessageChecklist(businessConnectionId, m.Chat.Id, m.MessageId, checklist, opts)
 }
 
-// EditLiveLocation Helper method for Bot.EditMessageLiveLocation.
+// EditLiveLocation is a helper method for Bot.EditMessageLiveLocation.
 func (m Message) EditLiveLocation(b *Bot, latitude float64, longitude float64, opts *EditMessageLiveLocationOpts) (*Message, bool, error) {
 	if opts == nil {
 		opts = &EditMessageLiveLocationOpts{}
@@ -410,7 +415,7 @@ func (m Message) EditLiveLocation(b *Bot, latitude float64, longitude float64, o
 	return b.EditMessageLiveLocation(latitude, longitude, opts)
 }
 
-// EditMedia Helper method for Bot.EditMessageMedia.
+// EditMedia is a helper method for Bot.EditMessageMedia.
 func (m Message) EditMedia(b *Bot, media InputMedia, opts *EditMessageMediaOpts) (*Message, bool, error) {
 	if opts == nil {
 		opts = &EditMessageMediaOpts{}
@@ -426,7 +431,7 @@ func (m Message) EditMedia(b *Bot, media InputMedia, opts *EditMessageMediaOpts)
 	return b.EditMessageMedia(media, opts)
 }
 
-// EditReplyMarkup Helper method for Bot.EditMessageReplyMarkup.
+// EditReplyMarkup is a helper method for Bot.EditMessageReplyMarkup.
 func (m Message) EditReplyMarkup(b *Bot, opts *EditMessageReplyMarkupOpts) (*Message, bool, error) {
 	if opts == nil {
 		opts = &EditMessageReplyMarkupOpts{}
@@ -442,7 +447,7 @@ func (m Message) EditReplyMarkup(b *Bot, opts *EditMessageReplyMarkupOpts) (*Mes
 	return b.EditMessageReplyMarkup(opts)
 }
 
-// EditText Helper method for Bot.EditMessageText.
+// EditText is a helper method for Bot.EditMessageText.
 func (m Message) EditText(b *Bot, text string, opts *EditMessageTextOpts) (*Message, bool, error) {
 	if opts == nil {
 		opts = &EditMessageTextOpts{}
@@ -458,27 +463,27 @@ func (m Message) EditText(b *Bot, text string, opts *EditMessageTextOpts) (*Mess
 	return b.EditMessageText(text, opts)
 }
 
-// Forward Helper method for Bot.ForwardMessage.
+// Forward is a helper method for Bot.ForwardMessage.
 func (m Message) Forward(b *Bot, chatId int64, opts *ForwardMessageOpts) (*Message, error) {
 	return b.ForwardMessage(chatId, m.Chat.Id, m.MessageId, opts)
 }
 
-// Pin Helper method for Bot.PinChatMessage.
+// Pin is a helper method for Bot.PinChatMessage.
 func (m Message) Pin(b *Bot, opts *PinChatMessageOpts) (bool, error) {
 	return b.PinChatMessage(m.Chat.Id, m.MessageId, opts)
 }
 
-// ReadBusiness Helper method for Bot.ReadBusinessMessage.
+// ReadBusiness is a helper method for Bot.ReadBusinessMessage.
 func (m Message) ReadBusiness(b *Bot, businessConnectionId string, opts *ReadBusinessMessageOpts) (bool, error) {
 	return b.ReadBusinessMessage(businessConnectionId, m.Chat.Id, m.MessageId, opts)
 }
 
-// SetReaction Helper method for Bot.SetMessageReaction.
+// SetReaction is a helper method for Bot.SetMessageReaction.
 func (m Message) SetReaction(b *Bot, opts *SetMessageReactionOpts) (bool, error) {
 	return b.SetMessageReaction(m.Chat.Id, m.MessageId, opts)
 }
 
-// StopLiveLocation Helper method for Bot.StopMessageLiveLocation.
+// StopLiveLocation is a helper method for Bot.StopMessageLiveLocation.
 func (m Message) StopLiveLocation(b *Bot, opts *StopMessageLiveLocationOpts) (*Message, bool, error) {
 	if opts == nil {
 		opts = &StopMessageLiveLocationOpts{}
@@ -494,7 +499,7 @@ func (m Message) StopLiveLocation(b *Bot, opts *StopMessageLiveLocationOpts) (*M
 	return b.StopMessageLiveLocation(opts)
 }
 
-// Unpin Helper method for Bot.UnpinChatMessage.
+// Unpin is a helper method for Bot.UnpinChatMessage.
 func (m Message) Unpin(b *Bot, opts *UnpinChatMessageOpts) (bool, error) {
 	if opts == nil {
 		opts = &UnpinChatMessageOpts{}
@@ -507,52 +512,282 @@ func (m Message) Unpin(b *Bot, opts *UnpinChatMessageOpts) (bool, error) {
 	return b.UnpinChatMessage(m.Chat.Id, opts)
 }
 
-// Answer Helper method for Bot.AnswerPreCheckoutQuery.
+// ReplyCopyMessage is a shortcut to reply to the current message with a specific message type.
+func (m Message) ReplyCopyMessage(b *Bot, fromChatId int64, messageId int64, opts *CopyMessageOpts) (*MessageId, error) {
+	if opts == nil {
+		opts = &CopyMessageOpts{}
+	}
+
+	opts.ReplyParameters = opts.ReplyParameters.replyTo(m)
+
+	return b.CopyMessage(m.Chat.Id, fromChatId, messageId, opts)
+}
+
+// ReplyAnimation is a shortcut to reply to the current message with a specific message type.
+func (m Message) ReplyAnimation(b *Bot, animation InputFileOrString, opts *SendAnimationOpts) (*Message, error) {
+	if opts == nil {
+		opts = &SendAnimationOpts{}
+	}
+
+	opts.ReplyParameters = opts.ReplyParameters.replyTo(m)
+
+	return b.SendAnimation(m.Chat.Id, animation, opts)
+}
+
+// ReplyAudio is a shortcut to reply to the current message with a specific message type.
+func (m Message) ReplyAudio(b *Bot, audio InputFileOrString, opts *SendAudioOpts) (*Message, error) {
+	if opts == nil {
+		opts = &SendAudioOpts{}
+	}
+
+	opts.ReplyParameters = opts.ReplyParameters.replyTo(m)
+
+	return b.SendAudio(m.Chat.Id, audio, opts)
+}
+
+// ReplyChecklist is a shortcut to reply to the current message with a specific message type.
+func (m Message) ReplyChecklist(b *Bot, businessConnectionId string, checklist InputChecklist, opts *SendChecklistOpts) (*Message, error) {
+	if opts == nil {
+		opts = &SendChecklistOpts{}
+	}
+
+	opts.ReplyParameters = opts.ReplyParameters.replyTo(m)
+
+	return b.SendChecklist(businessConnectionId, m.Chat.Id, checklist, opts)
+}
+
+// ReplyContact is a shortcut to reply to the current message with a specific message type.
+func (m Message) ReplyContact(b *Bot, phoneNumber string, firstName string, opts *SendContactOpts) (*Message, error) {
+	if opts == nil {
+		opts = &SendContactOpts{}
+	}
+
+	opts.ReplyParameters = opts.ReplyParameters.replyTo(m)
+
+	return b.SendContact(m.Chat.Id, phoneNumber, firstName, opts)
+}
+
+// ReplyDice is a shortcut to reply to the current message with a specific message type.
+func (m Message) ReplyDice(b *Bot, opts *SendDiceOpts) (*Message, error) {
+	if opts == nil {
+		opts = &SendDiceOpts{}
+	}
+
+	opts.ReplyParameters = opts.ReplyParameters.replyTo(m)
+
+	return b.SendDice(m.Chat.Id, opts)
+}
+
+// ReplyDocument is a shortcut to reply to the current message with a specific message type.
+func (m Message) ReplyDocument(b *Bot, document InputFileOrString, opts *SendDocumentOpts) (*Message, error) {
+	if opts == nil {
+		opts = &SendDocumentOpts{}
+	}
+
+	opts.ReplyParameters = opts.ReplyParameters.replyTo(m)
+
+	return b.SendDocument(m.Chat.Id, document, opts)
+}
+
+// ReplyGame is a shortcut to reply to the current message with a specific message type.
+func (m Message) ReplyGame(b *Bot, gameShortName string, opts *SendGameOpts) (*Message, error) {
+	if opts == nil {
+		opts = &SendGameOpts{}
+	}
+
+	opts.ReplyParameters = opts.ReplyParameters.replyTo(m)
+
+	return b.SendGame(m.Chat.Id, gameShortName, opts)
+}
+
+// ReplyInvoice is a shortcut to reply to the current message with a specific message type.
+func (m Message) ReplyInvoice(b *Bot, title string, description string, payload string, currency string, prices []LabeledPrice, opts *SendInvoiceOpts) (*Message, error) {
+	if opts == nil {
+		opts = &SendInvoiceOpts{}
+	}
+
+	opts.ReplyParameters = opts.ReplyParameters.replyTo(m)
+
+	return b.SendInvoice(m.Chat.Id, title, description, payload, currency, prices, opts)
+}
+
+// ReplyLocation is a shortcut to reply to the current message with a specific message type.
+func (m Message) ReplyLocation(b *Bot, latitude float64, longitude float64, opts *SendLocationOpts) (*Message, error) {
+	if opts == nil {
+		opts = &SendLocationOpts{}
+	}
+
+	opts.ReplyParameters = opts.ReplyParameters.replyTo(m)
+
+	return b.SendLocation(m.Chat.Id, latitude, longitude, opts)
+}
+
+// ReplyMediaGroup is a shortcut to reply to the current message with a specific message type.
+func (m Message) ReplyMediaGroup(b *Bot, media []InputMedia, opts *SendMediaGroupOpts) ([]Message, error) {
+	if opts == nil {
+		opts = &SendMediaGroupOpts{}
+	}
+
+	opts.ReplyParameters = opts.ReplyParameters.replyTo(m)
+
+	return b.SendMediaGroup(m.Chat.Id, media, opts)
+}
+
+// ReplyMessage is a shortcut to reply to the current message with a specific message type.
+func (m Message) ReplyMessage(b *Bot, text string, opts *SendMessageOpts) (*Message, error) {
+	if opts == nil {
+		opts = &SendMessageOpts{}
+	}
+
+	opts.ReplyParameters = opts.ReplyParameters.replyTo(m)
+
+	return b.SendMessage(m.Chat.Id, text, opts)
+}
+
+// ReplyPaidMedia is a shortcut to reply to the current message with a specific message type.
+func (m Message) ReplyPaidMedia(b *Bot, starCount int64, media []InputPaidMedia, opts *SendPaidMediaOpts) (*Message, error) {
+	if opts == nil {
+		opts = &SendPaidMediaOpts{}
+	}
+
+	opts.ReplyParameters = opts.ReplyParameters.replyTo(m)
+
+	return b.SendPaidMedia(m.Chat.Id, starCount, media, opts)
+}
+
+// ReplyPhoto is a shortcut to reply to the current message with a specific message type.
+func (m Message) ReplyPhoto(b *Bot, photo InputFileOrString, opts *SendPhotoOpts) (*Message, error) {
+	if opts == nil {
+		opts = &SendPhotoOpts{}
+	}
+
+	opts.ReplyParameters = opts.ReplyParameters.replyTo(m)
+
+	return b.SendPhoto(m.Chat.Id, photo, opts)
+}
+
+// ReplyPoll is a shortcut to reply to the current message with a specific message type.
+func (m Message) ReplyPoll(b *Bot, question string, options []InputPollOption, opts *SendPollOpts) (*Message, error) {
+	if opts == nil {
+		opts = &SendPollOpts{}
+	}
+
+	opts.ReplyParameters = opts.ReplyParameters.replyTo(m)
+
+	return b.SendPoll(m.Chat.Id, question, options, opts)
+}
+
+// ReplySticker is a shortcut to reply to the current message with a specific message type.
+func (m Message) ReplySticker(b *Bot, sticker InputFileOrString, opts *SendStickerOpts) (*Message, error) {
+	if opts == nil {
+		opts = &SendStickerOpts{}
+	}
+
+	opts.ReplyParameters = opts.ReplyParameters.replyTo(m)
+
+	return b.SendSticker(m.Chat.Id, sticker, opts)
+}
+
+// ReplyVenue is a shortcut to reply to the current message with a specific message type.
+func (m Message) ReplyVenue(b *Bot, latitude float64, longitude float64, title string, address string, opts *SendVenueOpts) (*Message, error) {
+	if opts == nil {
+		opts = &SendVenueOpts{}
+	}
+
+	opts.ReplyParameters = opts.ReplyParameters.replyTo(m)
+
+	return b.SendVenue(m.Chat.Id, latitude, longitude, title, address, opts)
+}
+
+// ReplyVideo is a shortcut to reply to the current message with a specific message type.
+func (m Message) ReplyVideo(b *Bot, video InputFileOrString, opts *SendVideoOpts) (*Message, error) {
+	if opts == nil {
+		opts = &SendVideoOpts{}
+	}
+
+	opts.ReplyParameters = opts.ReplyParameters.replyTo(m)
+
+	return b.SendVideo(m.Chat.Id, video, opts)
+}
+
+// ReplyVideoNote is a shortcut to reply to the current message with a specific message type.
+func (m Message) ReplyVideoNote(b *Bot, videoNote InputFileOrString, opts *SendVideoNoteOpts) (*Message, error) {
+	if opts == nil {
+		opts = &SendVideoNoteOpts{}
+	}
+
+	opts.ReplyParameters = opts.ReplyParameters.replyTo(m)
+
+	return b.SendVideoNote(m.Chat.Id, videoNote, opts)
+}
+
+// ReplyVoice is a shortcut to reply to the current message with a specific message type.
+func (m Message) ReplyVoice(b *Bot, voice InputFileOrString, opts *SendVoiceOpts) (*Message, error) {
+	if opts == nil {
+		opts = &SendVoiceOpts{}
+	}
+
+	opts.ReplyParameters = opts.ReplyParameters.replyTo(m)
+
+	return b.SendVoice(m.Chat.Id, voice, opts)
+}
+
+// Answer is a helper method for Bot.AnswerPreCheckoutQuery.
 func (pcq PreCheckoutQuery) Answer(b *Bot, ok bool, opts *AnswerPreCheckoutQueryOpts) (bool, error) {
 	return b.AnswerPreCheckoutQuery(pcq.Id, ok, opts)
 }
 
-// Answer Helper method for Bot.AnswerShippingQuery.
+// Answer is a helper method for Bot.AnswerShippingQuery.
 func (sq ShippingQuery) Answer(b *Bot, ok bool, opts *AnswerShippingQueryOpts) (bool, error) {
 	return b.AnswerShippingQuery(sq.Id, ok, opts)
 }
 
-// Delete Helper method for Bot.DeleteStory.
+// Delete is a helper method for Bot.DeleteStory.
 func (s Story) Delete(b *Bot, businessConnectionId string, opts *DeleteStoryOpts) (bool, error) {
 	return b.DeleteStory(businessConnectionId, s.Id, opts)
 }
 
-// Edit Helper method for Bot.EditStory.
+// Edit is a helper method for Bot.EditStory.
 func (s Story) Edit(b *Bot, businessConnectionId string, content InputStoryContent, opts *EditStoryOpts) (*Story, error) {
 	return b.EditStory(businessConnectionId, s.Id, content, opts)
 }
 
-// EditStarSubscription Helper method for Bot.EditUserStarSubscription.
+// EditStarSubscription is a helper method for Bot.EditUserStarSubscription.
 func (u User) EditStarSubscription(b *Bot, telegramPaymentChargeId string, isCanceled bool, opts *EditUserStarSubscriptionOpts) (bool, error) {
 	return b.EditUserStarSubscription(u.Id, telegramPaymentChargeId, isCanceled, opts)
 }
 
-// GetChatBoosts Helper method for Bot.GetUserChatBoosts.
+// GetChatBoosts is a helper method for Bot.GetUserChatBoosts.
 func (u User) GetChatBoosts(b *Bot, chatId int64, opts *GetUserChatBoostsOpts) (*UserChatBoosts, error) {
 	return b.GetUserChatBoosts(chatId, u.Id, opts)
 }
 
-// GetProfilePhotos Helper method for Bot.GetUserProfilePhotos.
+// GetGifts is a helper method for Bot.GetUserGifts.
+func (u User) GetGifts(b *Bot, opts *GetUserGiftsOpts) (*OwnedGifts, error) {
+	return b.GetUserGifts(u.Id, opts)
+}
+
+// GetProfileAudios is a helper method for Bot.GetUserProfileAudios.
+func (u User) GetProfileAudios(b *Bot, opts *GetUserProfileAudiosOpts) (*UserProfileAudios, error) {
+	return b.GetUserProfileAudios(u.Id, opts)
+}
+
+// GetProfilePhotos is a helper method for Bot.GetUserProfilePhotos.
 func (u User) GetProfilePhotos(b *Bot, opts *GetUserProfilePhotosOpts) (*UserProfilePhotos, error) {
 	return b.GetUserProfilePhotos(u.Id, opts)
 }
 
-// RemoveVerification Helper method for Bot.RemoveUserVerification.
+// RemoveVerification is a helper method for Bot.RemoveUserVerification.
 func (u User) RemoveVerification(b *Bot, opts *RemoveUserVerificationOpts) (bool, error) {
 	return b.RemoveUserVerification(u.Id, opts)
 }
 
-// SetEmojiStatus Helper method for Bot.SetUserEmojiStatus.
+// SetEmojiStatus is a helper method for Bot.SetUserEmojiStatus.
 func (u User) SetEmojiStatus(b *Bot, opts *SetUserEmojiStatusOpts) (bool, error) {
 	return b.SetUserEmojiStatus(u.Id, opts)
 }
 
-// Verify Helper method for Bot.VerifyUser.
+// Verify is a helper method for Bot.VerifyUser.
 func (u User) Verify(b *Bot, opts *VerifyUserOpts) (bool, error) {
 	return b.VerifyUser(u.Id, opts)
 }

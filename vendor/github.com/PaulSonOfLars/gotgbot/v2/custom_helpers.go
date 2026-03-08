@@ -36,20 +36,24 @@ func (m Message) GetEntities() []MessageEntity {
 	return m.Entities
 }
 
+// replyTo modifies a ReplyParameters by making it reply to a Message if it isn't reply to one yet.
+// In the event of the ReplyParameters being nil, it instantiates one.
+func (r *ReplyParameters) replyTo(m Message) *ReplyParameters {
+	if r == nil {
+		r = &ReplyParameters{}
+	}
+
+	if r.MessageId != 0 {
+		return r
+	}
+
+	r.MessageId = m.MessageId
+	return r
+}
+
 // Reply is a helper function to easily call Bot.SendMessage as a reply to an existing Message.
 func (m Message) Reply(b *Bot, text string, opts *SendMessageOpts) (*Message, error) {
-	if opts == nil {
-		opts = &SendMessageOpts{}
-	}
-
-	if opts.ReplyParameters == nil || opts.ReplyParameters.MessageId == 0 {
-		if opts.ReplyParameters == nil {
-			opts.ReplyParameters = &ReplyParameters{}
-		}
-		opts.ReplyParameters.MessageId = m.MessageId
-	}
-
-	return b.SendMessage(m.Chat.Id, text, opts)
+	return m.ReplyMessage(b, text, opts)
 }
 
 // Reply is a helper function to easily call Bot.SendMessage as a reply to an existing InaccessibleMessage.
@@ -149,4 +153,13 @@ func unmarshalMaybeInaccessibleMessage(d json.RawMessage) (MaybeInaccessibleMess
 		return nil, err
 	}
 	return s, nil
+}
+
+// addIfValueNotZero is a helper method to avoid having thousands of if checks for each optional value.
+func addIfValueNotZero[T any](m map[string]any, k string, v T, isZero bool) {
+	if isZero {
+		return
+	}
+
+	m[k] = v
 }

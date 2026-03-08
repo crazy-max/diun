@@ -114,14 +114,14 @@ func (bot *Bot) UseMiddleware(mw func(client BotClient) BotClient) *Bot {
 	return bot
 }
 
-func (bot *Bot) Request(method string, params map[string]string, data map[string]FileReader, opts *RequestOpts) (json.RawMessage, error) {
-	return bot.RequestWithContext(context.Background(), method, params, data, opts)
+func (bot *Bot) Request(method string, params map[string]any, opts *RequestOpts) (json.RawMessage, error) {
+	return bot.RequestWithContext(context.Background(), method, params, opts)
 }
 
-func (bot *Bot) RequestWithContext(ctx context.Context, method string, params map[string]string, data map[string]FileReader, opts *RequestOpts) (json.RawMessage, error) {
+func (bot *Bot) RequestWithContext(ctx context.Context, method string, params map[string]any, opts *RequestOpts) (json.RawMessage, error) {
 	if bot.BotClient == nil {
 		return nil, ErrNilBotClient
 	}
 
-	return bot.BotClient.RequestWithContext(ctx, bot.Token, method, params, data, opts)
+	return bot.BotClient.RequestWithContext(ctx, bot.Token, method, params, opts)
 }
