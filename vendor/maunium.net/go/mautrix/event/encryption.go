@@ -63,7 +63,7 @@ func (content *EncryptedEventContent) UnmarshalJSON(data []byte) error {
 		return json.Unmarshal(content.Ciphertext, &content.OlmCiphertext)
 	case id.AlgorithmMegolmV1:
 		if len(content.Ciphertext) == 0 || content.Ciphertext[0] != '"' || content.Ciphertext[len(content.Ciphertext)-1] != '"' {
-			return id.ErrInputNotJSONString
+			return fmt.Errorf("ciphertext %w", id.ErrInputNotJSONString)
 		}
 		content.MegolmCiphertext = content.Ciphertext[1 : len(content.Ciphertext)-1]
 	}
@@ -132,8 +132,9 @@ type RoomKeyRequestEventContent struct {
 type RequestedKeyInfo struct {
 	Algorithm id.Algorithm `json:"algorithm"`
 	RoomID    id.RoomID    `json:"room_id"`
-	SenderKey id.SenderKey `json:"sender_key"`
 	SessionID id.SessionID `json:"session_id"`
+	// Deprecated: Matrix v1.3
+	SenderKey id.SenderKey `json:"sender_key"`
 }
 
 type RoomKeyWithheldCode string

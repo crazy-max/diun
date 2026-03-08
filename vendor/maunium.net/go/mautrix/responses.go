@@ -341,6 +341,13 @@ type LazyLoadSummary struct {
 	InvitedMemberCount *int        `json:"m.invited_member_count,omitempty"`
 }
 
+func (lls *LazyLoadSummary) MemberCount() int {
+	if lls == nil {
+		return 0
+	}
+	return ptr.Val(lls.JoinedMemberCount) + ptr.Val(lls.InvitedMemberCount)
+}
+
 func (lls *LazyLoadSummary) Equal(other *LazyLoadSummary) bool {
 	if lls == other {
 		return true
