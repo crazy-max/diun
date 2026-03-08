@@ -2,6 +2,7 @@ package gotgbot
 
 import (
 	"html"
+	"slices"
 	"strconv"
 	"strings"
 	"unicode"
@@ -304,19 +305,10 @@ func splitEdgeWhitespace(text string, ent MessageEntity) (pre string, cntnt stri
 func escapeContainedMDV1(data []rune, mdType []rune) string {
 	out := strings.Builder{}
 	for _, x := range data {
-		if contains(x, mdType) {
+		if slices.Contains(mdType, x) {
 			out.WriteRune('\\')
 		}
 		out.WriteRune(x)
 	}
 	return out.String()
-}
-
-func contains(r rune, rs []rune) bool {
-	for _, rr := range rs {
-		if r == rr {
-			return true
-		}
-	}
-	return false
 }
