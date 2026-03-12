@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	dockerregistry "github.com/docker/docker/api/types/registry"
 	"github.com/pkg/errors"
 	"go.podman.io/image/v5/types"
 )
@@ -16,7 +17,7 @@ type Client struct {
 
 // Options holds docker registry object options
 type Options struct {
-	Auth          types.DockerAuthConfig
+	Auth          dockerregistry.AuthConfig
 	InsecureTLS   bool
 	Timeout       time.Duration
 	UserAgent     string
@@ -28,10 +29,19 @@ type Options struct {
 
 // New creates new docker registry client instance
 func New(opts Options) (*Client, error) {
+	var auth *types.DockerAuthConfig
+	if opts.Auth != (dockerregistry.AuthConfig{}) {
+		auth = &types.DockerAuthConfig{
+			Username:      opts.Auth.Username,
+			Password:      opts.Auth.Password,
+			IdentityToken: opts.Auth.IdentityToken,
+		}
+	}
+
 	return &Client{
 		opts: opts,
 		sysCtx: &types.SystemContext{
-			DockerAuthConfig:                  &opts.Auth,
+			DockerAuthConfig:                  auth,
 			DockerDaemonInsecureSkipTLSVerify: opts.InsecureTLS,
 			DockerInsecureSkipTLSVerify:       types.NewOptionalBool(opts.InsecureTLS),
 			DockerRegistryUserAgent:           opts.UserAgent,
