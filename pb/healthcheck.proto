@@ -1,0 +1,14 @@
+syntax = "proto3";
+option go_package = "github.com/crazy-max/diun/pb";
+
+package pb;
+
+message HealthcheckRequest {}
+
+message HealthcheckResponse {
+  string message = 1;
+}
+
+service HealthcheckService {
+  rpc Healthcheck(HealthcheckRequest) returns (HealthcheckResponse) {}
+}
