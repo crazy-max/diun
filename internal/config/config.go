@@ -70,7 +70,7 @@ func (cfg *Config) validate() error {
 		}
 	}
 
-	if cfg.Watch.Healthchecks != nil && len(cfg.Watch.Healthchecks.UUID) == 0 {
+	if cfg.Watch.Healthchecks != nil && len(cfg.Watch.Healthchecks.UUID) == 0 && len(cfg.Watch.Healthchecks.UUIDFile) == 0 {
 		return errors.New("healthchecks UUID is required")
 	}
 

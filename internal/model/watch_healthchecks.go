@@ -2,8 +2,9 @@ package model
 
 // Healthchecks holds data necessary for Healthchecks configuration
 type Healthchecks struct {
-	BaseURL string `yaml:"baseURL,omitempty" json:"baseURL,omitempty"`
-	UUID    string `yaml:"uuid,omitempty" json:"uuid,omitempty" validate:"required"`
+	BaseURL  string `yaml:"baseURL,omitempty" json:"baseURL,omitempty"`
+	UUID     string `yaml:"uuid,omitempty" json:"uuid,omitempty" validate:"omitempty"`
+	UUIDFile string `yaml:"uuidFile,omitempty" json:"uuidFile,omitempty" validate:"omitempty,file"`
 }
 
 // GetDefaults gets the default values
