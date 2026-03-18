@@ -6,12 +6,6 @@ variable "DESTDIR" {
   default = "./bin"
 }
 
-# GITHUB_REF is the actual ref that triggers the workflow and used as version
-# when tag is pushed: https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables
-variable "GITHUB_REF" {
-  default = ""
-}
-
 variable "GOLANGCI_LINT_MULTIPLATFORM" {
   default = null
 }
@@ -23,7 +17,8 @@ variable "GOLANGCI_FROM_SOURCE" {
 target "_common" {
   args = {
     GO_VERSION = GO_VERSION
-    GIT_REF = GITHUB_REF
+    BUILDKIT_CONTEXT_KEEP_GIT_DIR = 1
+    BUILDKIT_DEBUG_GIT_COMMANDS = 1
   }
 }
 
