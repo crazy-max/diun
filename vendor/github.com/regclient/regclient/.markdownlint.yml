@@ -1,0 +1,19 @@
+# all lists use a `-`
+MD004:
+  style: dash
+
+# allow tabs in code blocks (for Go)
+MD010:
+  code_blocks: false
+
+# disable line length, prefer one sentence per line for PRs
+MD013: false
+
+# emphasis with underscore (`_emphasis_`)
+MD049:
+  style: "underscore"
+
+# bold with asterisk (`**bold**`)
+MD050:
+  style: "asterisk"
+    

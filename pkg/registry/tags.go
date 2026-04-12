@@ -8,11 +8,9 @@ import (
 
 	"github.com/crazy-max/diun/v4/pkg/utl"
 	"github.com/pkg/errors"
-	"go.podman.io/image/v5/docker"
 	"golang.org/x/mod/semver"
 )
 
-// Tags holds information about image tags.
 type Tags struct {
 	List        []string
 	NotIncluded int
@@ -20,7 +18,6 @@ type Tags struct {
 	Total       int
 }
 
-// TagsOptions holds docker tags image options
 type TagsOptions struct {
 	Image   Image
 	Max     int
@@ -29,32 +26,31 @@ type TagsOptions struct {
 	Exclude []string
 }
 
-// Tags returns tags of a Docker repository
 func (c *Client) Tags(opts TagsOptions) (*Tags, error) {
 	ctx, cancel := c.timeoutContext()
 	defer cancel()
 
-	imgRef, err := ImageReference(opts.Image.String())
+	regRef, err := opts.Image.regRef()
 	if err != nil {
-		return nil, errors.Wrap(err, "cannot parse reference")
+		return nil, errors.Wrap(err, "cannot create regclient reference")
 	}
+	regRef = regRef.SetTag("")
 
-	tags, err := docker.GetRepositoryTags(ctx, c.sysCtx, imgRef)
+	tags, err := c.regctl.TagList(ctx, regRef)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "cannot list repository tags")
 	}
+	tagList := tags.Tags
 
 	res := &Tags{
 		NotIncluded: 0,
 		Excluded:    0,
-		Total:       len(tags),
+		Total:       len(tagList),
 	}
 
-	// Sort tags
-	tags = SortTags(tags, opts.Sort)
+	tagList = SortTags(tagList, opts.Sort)
 
-	// Filter
-	for _, tag := range tags {
+	for _, tag := range tagList {
 		if !utl.IsIncluded(tag, opts.Include) {
 			res.NotIncluded++
 			continue
@@ -72,7 +68,6 @@ func (c *Client) Tags(opts TagsOptions) (*Tags, error) {
 	return res, nil
 }
 
-// SortTags sorts tags list
 func SortTags(tags []string, sortTag SortTag) []string {
 	switch sortTag {
 	case SortTagReverse:
@@ -114,10 +109,8 @@ func SortTags(tags []string, sortTag SortTag) []string {
 	}
 }
 
-// SortTag holds sort tag type
 type SortTag string
 
-// SortTag constants
 const (
 	SortTagDefault         = SortTag("default")
 	SortTagReverse         = SortTag("reverse")
@@ -125,7 +118,6 @@ const (
 	SortTagSemver          = SortTag("semver")
 )
 
-// SortTagTypes is the list of available sort tag types
 var SortTagTypes = []SortTag{
 	SortTagDefault,
 	SortTagReverse,
@@ -133,12 +125,10 @@ var SortTagTypes = []SortTag{
 	SortTagSemver,
 }
 
-// Valid checks sort tag type is valid
 func (st *SortTag) Valid() bool {
 	return st.OneOf(SortTagTypes)
 }
 
-// OneOf checks if sort type is one of the values in the list
 func (st *SortTag) OneOf(stl []SortTag) bool {
 	for _, n := range stl {
 		if n == *st {

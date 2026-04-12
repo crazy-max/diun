@@ -3,8 +3,10 @@ package registry
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
+
+const sha256digest = "@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
 
 func TestParseImage(t *testing.T) {
 	testCases := []struct {
@@ -135,17 +137,13 @@ func TestParseImage(t *testing.T) {
 			},
 		},
 	}
-
 	for _, tt := range testCases {
-		tt := tt
 		t.Run(tt.desc, func(t *testing.T) {
 			img, err := ParseImage(tt.parseOpts)
-			if err != nil {
-				t.Error(err)
-			}
-			assert.Equal(t, tt.expected.Domain, img.Domain)
-			assert.Equal(t, tt.expected.Path, img.Path)
-			assert.Equal(t, tt.expected.Tag, img.Tag)
+			require.NoError(t, err)
+			require.Equal(t, tt.expected.Domain, img.Domain)
+			require.Equal(t, tt.expected.Path, img.Path)
+			require.Equal(t, tt.expected.Tag, img.Tag)
 		})
 	}
 }
@@ -249,15 +247,66 @@ func TestHubLink(t *testing.T) {
 			expected: "https://myregistry.example.com/ui/repos/an/image",
 		},
 	}
-
 	for _, tt := range testCases {
-		tt := tt
 		t.Run(tt.desc, func(t *testing.T) {
 			img, err := ParseImage(tt.parseOpts)
-			if err != nil {
-				t.Error(err)
+			require.NoError(t, err)
+			require.Equal(t, tt.expected, img.HubLink)
+		})
+	}
+}
+
+func TestImageRegRef(t *testing.T) {
+	testCases := []struct {
+		input    string
+		expected string
+		wantErr  bool
+	}{
+		{
+			input:    "busybox",
+			expected: "docker.io/library/busybox:latest",
+		},
+		{
+			input:    "docker.io/library/busybox",
+			expected: "docker.io/library/busybox:latest",
+		},
+		{
+			input:    "docker.io/library/busybox:latest",
+			expected: "docker.io/library/busybox:latest",
+		},
+		{
+			input:    "busybox:notlatest",
+			expected: "docker.io/library/busybox:notlatest",
+		},
+		{
+			input:    "busybox" + sha256digest,
+			expected: "docker.io/library/busybox:latest",
+		},
+		{
+			input:    "busybox:latest" + sha256digest,
+			expected: "docker.io/library/busybox:latest",
+		},
+		{
+			input:    "busybox:v1.0.0" + sha256digest,
+			expected: "docker.io/library/busybox:v1.0.0",
+		},
+		{
+			input:   "UPPERCASEISINVALID",
+			wantErr: true,
+		},
+	}
+	for _, tt := range testCases {
+		t.Run(tt.input, func(t *testing.T) {
+			image, err := ParseImage(ParseImageOptions{Name: tt.input})
+			if tt.wantErr {
+				require.Error(t, err)
+				return
 			}
-			assert.Equal(t, tt.expected, img.HubLink)
+			require.NoError(t, err)
+
+			regRef, err := image.regRef()
+			require.NoError(t, err)
+			require.Equal(t, tt.expected, regRef.CommonName())
 		})
 	}
 }

@@ -5,12 +5,12 @@ import (
 	"regexp"
 
 	"dario.cat/mergo"
+	"github.com/crazy-max/diun/v4/internal/logging"
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/pkg/registry"
 	"github.com/crazy-max/diun/v4/pkg/utl"
+	regconfig "github.com/regclient/regclient/config"
 	"github.com/rs/zerolog/log"
-	"go.podman.io/image/v5/pkg/docker/config"
-	"go.podman.io/image/v5/types"
 )
 
 func (di *Diun) createJob(job model.Job) {
@@ -84,33 +84,32 @@ func (di *Diun) createJob(job model.Job) {
 		}
 	}
 
-	var auth types.DockerAuthConfig
+	host := regconfig.HostNewName(job.RegImage.Domain)
+	if host.Name == regconfig.DockerRegistry {
+		host.ReqConcurrent = 1
+	}
+	if *reg.InsecureTLS {
+		host.TLS = regconfig.TLSInsecure
+	}
 	if len(regUser) > 0 {
-		auth = types.DockerAuthConfig{
-			Username: regUser,
-			Password: regPassword,
-		}
-	} else {
-		auth, err = config.GetCredentials(nil, job.RegImage.Domain)
-		if err != nil {
-			sublog.Warn().Err(err).Msg("Error seeking Docker credentials")
-		}
+		host.User = regUser
+		host.Pass = regPassword
 	}
 
-	job.Registry, err = registry.New(registry.Options{
-		Auth:          auth,
-		Timeout:       *reg.Timeout,
-		InsecureTLS:   *reg.InsecureTLS,
-		UserAgent:     di.meta.UserAgent,
-		CompareDigest: *di.cfg.Watch.CompareDigest,
-		ImageOs:       job.Image.Platform.OS,
-		ImageArch:     job.Image.Platform.Arch,
-		ImageVariant:  job.Image.Platform.Variant,
-	})
+	platform, err := registry.TargetPlatform(job.Image.Platform.OS, job.Image.Platform.Arch, job.Image.Platform.Variant)
 	if err != nil {
-		sublog.Error().Err(err).Msg("Cannot create registry client")
+		sublog.Error().Err(err).Msg("Cannot parse image platform")
 		return
 	}
+
+	job.Registry = registry.New(registry.Options{
+		Host:          host,
+		Platform:      platform,
+		Logger:        logging.NewRegclientLogger(sublog),
+		Timeout:       *reg.Timeout,
+		UserAgent:     di.meta.UserAgent,
+		CompareDigest: *di.cfg.Watch.CompareDigest,
+	})
 
 	di.wg.Add(1)
 	err = di.pool.Invoke(job)

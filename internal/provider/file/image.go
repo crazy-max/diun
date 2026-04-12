@@ -63,20 +63,16 @@ func (c *Client) listFileImage() []model.Image {
 
 			// Check Platform
 			if item.Platform != (model.ImagePlatform{}) {
-				_, err = platforms.Parse(platforms.Format(ocispecs.Platform{
+				platform := platforms.Format(ocispecs.Platform{
 					OS:           item.Platform.OS,
 					Architecture: item.Platform.Arch,
 					Variant:      item.Platform.Variant,
-				}))
-				if err != nil {
-					c.logger.Error().
+				})
+				if _, err = platforms.Parse(platform); err != nil {
+					c.logger.Error().Err(err).
 						Str("file", file).
 						Str("img_name", item.Name).
-						Msgf("cannot parse %s platform", platforms.Format(ocispecs.Platform{
-							OS:           item.Platform.OS,
-							Architecture: item.Platform.Arch,
-							Variant:      item.Platform.Variant,
-						}))
+						Msgf("cannot parse %s platform", platform)
 				}
 			}
 

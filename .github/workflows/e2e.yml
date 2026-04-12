@@ -38,6 +38,8 @@ jobs:
       matrix:
         include:
           - folder: docker1
+            loglevel: trace
+          - folder: docker1
             loglevel: debug
           - folder: docker2
             loglevel: info

@@ -1,0 +1,15 @@
+*
+!.git/
+!build/root.tgz
+!cmd/
+!config/
+!internal/
+!mod/
+!pkg/
+!regclient/
+!scheme/
+!types/
+!vendor/
+!go.*
+!*.go
+!Makefile

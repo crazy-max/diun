@@ -1,116 +1,174 @@
 package registry
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/opencontainers/go-digest"
-	imgspecv1 "github.com/opencontainers/image-spec/specs-go/v1"
 	"github.com/pkg/errors"
-	"go.podman.io/image/v5/docker"
-	"go.podman.io/image/v5/manifest"
+	"github.com/regclient/regclient"
+	regdescriptor "github.com/regclient/regclient/types/descriptor"
+	regmanifest "github.com/regclient/regclient/types/manifest"
+	regplatform "github.com/regclient/regclient/types/platform"
 )
 
-// Manifest is the Docker image manifest information
 type Manifest struct {
-	Name          string
-	Tag           string
-	MIMEType      string
-	Digest        digest.Digest
-	Created       *time.Time
-	DockerVersion string
-	Labels        map[string]string
-	Layers        []string
-	Platform      string
-	Raw           []byte
+	Name     string
+	Tag      string
+	MIMEType string
+	Digest   digest.Digest
+	Created  *time.Time
+	Labels   map[string]string
+	Layers   []string
+	Platform string
+	Raw      []byte
 }
 
-// Manifest returns the manifest for a specific image
 func (c *Client) Manifest(image Image, dbManifest Manifest) (Manifest, bool, error) {
 	ctx, cancel := c.timeoutContext()
 	defer cancel()
 
-	rmRef, err := ImageReference(image.String())
+	regRef, err := image.regRef()
 	if err != nil {
-		return Manifest{}, false, errors.Wrap(err, "cannot parse reference")
+		return Manifest{}, false, errors.Wrap(err, "cannot create regclient reference")
 	}
 
-	// Retrieve remote digest through HEAD request
-	rmDigest, err := docker.GetDigest(ctx, c.sysCtx, rmRef)
+	headManifest, err := c.regctl.ManifestHead(ctx, regRef)
 	if err != nil {
-		return Manifest{}, false, errors.Wrap(err, "cannot get image digest from HEAD request")
+		return Manifest{}, false, errors.Wrap(err, "cannot get manifest digest from HEAD request")
+	} else if headManifest == nil || headManifest.GetDescriptor().Digest == "" {
+		return Manifest{}, false, errors.New("manifest HEAD request returned no manifest or empty digest")
 	}
 
-	// Digest match, returns db manifest
-	if c.opts.CompareDigest && len(dbManifest.Digest) > 0 && dbManifest.Digest == rmDigest {
+	remoteDigest := headManifest.GetDescriptor().Digest
+	if c.opts.CompareDigest && len(dbManifest.Digest) > 0 && dbManifest.Digest == remoteDigest {
 		return dbManifest, false, nil
 	}
 
-	rmCloser, err := rmRef.NewImage(ctx, c.sysCtx)
+	topManifest, err := c.regctl.ManifestGet(ctx, regRef)
 	if err != nil {
-		return Manifest{}, false, errors.Wrap(err, "cannot create image closer")
+		return Manifest{}, false, errors.Wrap(err, "cannot get manifest")
 	}
-	defer rmCloser.Close()
+	remoteDigest = topManifest.GetDescriptor().Digest
 
-	rmRawManifest, rmManifestMimeType, err := rmCloser.Manifest(ctx)
+	remoteRawManifest, err := topManifest.RawBody()
 	if err != nil {
-		return Manifest{}, false, errors.Wrap(err, "cannot get raw manifest")
+		return Manifest{}, false, errors.Wrap(err, "cannot read raw manifest")
 	}
+	remoteManifestMediaType := topManifest.GetDescriptor().MediaType
 
-	// For manifests list compare also digest matching the platform
-	updated := dbManifest.Digest != rmDigest
-	if c.opts.CompareDigest && len(dbManifest.Raw) > 0 && dbManifest.isManifestList() && isManifestList(rmManifestMimeType) {
-		dbManifestList, err := manifest.ListFromBlob(dbManifest.Raw, dbManifest.MIMEType)
+	updated := dbManifest.Digest != remoteDigest
+	if c.opts.CompareDigest && len(dbManifest.Raw) > 0 && topManifest.IsList() {
+		dbManifestValue, err := parseManifest(dbManifest.Raw, dbManifest.MIMEType)
 		if err != nil {
-			return Manifest{}, false, errors.Wrap(err, "cannot parse manifest list")
+			return Manifest{}, false, errors.Wrap(err, "cannot parse stored manifest")
 		}
-		dbManifestPlatformDigest, err := dbManifestList.ChooseInstance(c.sysCtx)
-		if err != nil {
-			return Manifest{}, false, errors.Wrapf(err, "error choosing image instance")
+		if dbManifestValue.IsList() {
+			dbManifestPlatformDigest, err := manifestPlatformDigest(dbManifestValue, c.opts.Platform)
+			if err != nil {
+				return Manifest{}, false, errors.Wrap(err, "cannot choose platform digest from stored manifest list")
+			}
+			remoteManifestPlatformDigest, err := manifestPlatformDigest(topManifest, c.opts.Platform)
+			if err != nil {
+				return Manifest{}, false, errors.Wrap(err, "cannot choose platform digest from remote manifest list")
+			}
+			updated = dbManifestPlatformDigest != remoteManifestPlatformDigest
 		}
-		rmManifestList, err := manifest.ListFromBlob(rmRawManifest, rmManifestMimeType)
-		if err != nil {
-			return Manifest{}, false, errors.Wrap(err, "cannot parse manifest list")
-		}
-		rmManifestPlatformDigest, err := rmManifestList.ChooseInstance(c.sysCtx)
-		if err != nil {
-			return Manifest{}, false, errors.Wrapf(err, "error choosing image instance")
-		}
-		updated = dbManifestPlatformDigest != rmManifestPlatformDigest
 	}
 
-	// Metadata describing the Docker image
-	rmInspect, err := rmCloser.Inspect(ctx)
+	selectedManifest := topManifest
+	platform := c.opts.Platform
+
+	if topManifest.IsList() {
+		desc, err := manifestPlatformDescriptor(topManifest, platform)
+		if err != nil {
+			return Manifest{}, false, errors.Wrap(err, "error choosing image instance")
+		}
+		selectedManifest, err = c.regctl.ManifestGet(ctx, regRef, regclient.WithManifestDesc(desc))
+		if err != nil {
+			return Manifest{}, false, errors.Wrap(err, "cannot get selected platform manifest")
+		}
+		if desc.Platform != nil {
+			platform = *desc.Platform
+		}
+	}
+
+	imageManifest, ok := selectedManifest.(regmanifest.Imager)
+	if !ok {
+		return Manifest{}, false, errors.Errorf("manifest media type %q is not an image manifest", selectedManifest.GetDescriptor().MediaType)
+	}
+
+	layersDesc, err := imageManifest.GetLayers()
 	if err != nil {
-		return Manifest{}, false, errors.Wrap(err, "cannot inspect")
+		return Manifest{}, false, errors.Wrap(err, "cannot get image layers")
 	}
-	rmTag := rmInspect.Tag
-	if len(rmTag) == 0 {
-		rmTag = image.Tag
+
+	configDesc, err := imageManifest.GetConfig()
+	if err != nil {
+		return Manifest{}, false, errors.Wrap(err, "cannot get image config descriptor")
 	}
-	rmPlatform := fmt.Sprintf("%s/%s", rmInspect.Os, rmInspect.Architecture)
-	if rmInspect.Variant != "" {
-		rmPlatform = fmt.Sprintf("%s/%s", rmPlatform, rmInspect.Variant)
+
+	configData, err := c.regctl.BlobGetOCIConfig(ctx, regRef, configDesc)
+	if err != nil {
+		return Manifest{}, false, errors.Wrap(err, "cannot get image config")
+	}
+
+	layers := make([]string, 0, len(layersDesc))
+	for _, layer := range layersDesc {
+		layers = append(layers, layer.Digest.String())
+	}
+
+	imageConfig := configData.GetConfig()
+
+	remotePlatform := platform.String()
+	if imageConfig.OS != "" && imageConfig.Architecture != "" {
+		remotePlatform = regplatform.Platform{
+			OS:           imageConfig.OS,
+			Architecture: imageConfig.Architecture,
+			Variant:      imageConfig.Variant,
+		}.String()
 	}
 
 	return Manifest{
-		Name:          rmCloser.Reference().DockerReference().Name(),
-		Tag:           rmTag,
-		MIMEType:      rmManifestMimeType,
-		Digest:        rmDigest,
-		Created:       rmInspect.Created,
-		DockerVersion: rmInspect.DockerVersion,
-		Labels:        rmInspect.Labels,
-		Layers:        rmInspect.Layers,
-		Platform:      rmPlatform,
-		Raw:           rmRawManifest,
+		Name:     image.Name(),
+		Tag:      image.Tag,
+		MIMEType: remoteManifestMediaType,
+		Digest:   remoteDigest,
+		Created:  imageConfig.Created,
+		Labels:   imageConfig.Config.Labels,
+		Layers:   layers,
+		Platform: remotePlatform,
+		Raw:      remoteRawManifest,
 	}, updated, nil
 }
 
-func (m Manifest) isManifestList() bool {
-	return isManifestList(m.MIMEType)
+func platformDigestFromManifest(raw []byte, mimeType string, platform regplatform.Platform) (digest.Digest, error) {
+	manifest, err := parseManifest(raw, mimeType)
+	if err != nil {
+		return "", err
+	}
+	return manifestPlatformDigest(manifest, platform)
 }
 
-func isManifestList(mimeType string) bool {
-	return mimeType == manifest.DockerV2ListMediaType || mimeType == imgspecv1.MediaTypeImageIndex
+func manifestPlatformDigest(manifest regmanifest.Manifest, platform regplatform.Platform) (digest.Digest, error) {
+	desc, err := manifestPlatformDescriptor(manifest, platform)
+	if err != nil {
+		return "", err
+	}
+	return desc.Digest, nil
+}
+
+func manifestPlatformDescriptor(manifest regmanifest.Manifest, platform regplatform.Platform) (regdescriptor.Descriptor, error) {
+	desc, err := regmanifest.GetPlatformDesc(manifest, &platform)
+	if err != nil {
+		return regdescriptor.Descriptor{}, errors.Wrap(err, "cannot select platform descriptor")
+	}
+	return *desc, nil
+}
+
+func parseManifest(raw []byte, mimeType string) (regmanifest.Manifest, error) {
+	opts := []regmanifest.Opts{regmanifest.WithRaw(raw)}
+	if mimeType != "" {
+		opts = append(opts, regmanifest.WithDesc(regdescriptor.Descriptor{MediaType: mimeType}))
+	}
+	return regmanifest.New(opts...)
 }

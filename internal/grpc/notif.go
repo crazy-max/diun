@@ -23,12 +23,11 @@ func (c *Client) NotifTest(_ context.Context, _ *pb.NotifTestRequest) (*pb.Notif
 		Provider: "file",
 		Image:    image,
 		Manifest: registry.Manifest{
-			Name:          "diun/testnotif",
-			Tag:           "latest",
-			MIMEType:      "application/vnd.docker.distribution.manifest.list.v2+json",
-			Digest:        "sha256:216e3ae7de4ca8b553eb11ef7abda00651e79e537e85c46108284e5e91673e01",
-			Created:       &createdAt,
-			DockerVersion: "",
+			Name:     "diun/testnotif",
+			Tag:      "latest",
+			MIMEType: "application/vnd.docker.distribution.manifest.list.v2+json",
+			Digest:   "sha256:216e3ae7de4ca8b553eb11ef7abda00651e79e537e85c46108284e5e91673e01",
+			Created:  &createdAt,
 			Labels: map[string]string{
 				"maintainer":                      "CrazyMax",
 				"org.label-schema.build-date":     "2020-03-26T12:23:56Z",

@@ -7,12 +7,12 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/distribution/reference"
 	digest "github.com/opencontainers/go-digest"
 	"github.com/pkg/errors"
-	"go.podman.io/image/v5/docker/reference"
+	regref "github.com/regclient/regclient/types/ref"
 )
 
-// Image holds information about an image.
 type Image struct {
 	Domain  string
 	Path    string
@@ -24,19 +24,18 @@ type Image struct {
 	opts  ParseImageOptions
 }
 
-// ParseImageOptions holds image options for parsing.
 type ParseImageOptions struct {
 	Name   string
 	HubTpl string
 }
 
-// ParseImage returns an Image struct with all the values filled in for a given image.
 func ParseImage(parseOpts ParseImageOptions) (Image, error) {
 	// Parse the image name and tag.
 	named, err := reference.ParseNormalizedNamed(parseOpts.Name)
 	if err != nil {
 		return Image{}, errors.Wrapf(err, "parsing image %s failed", parseOpts.Name)
 	}
+
 	// Add the latest lag if they did not provide one.
 	named = reference.TagNameOnly(named)
 
@@ -66,23 +65,30 @@ func ParseImage(parseOpts ParseImageOptions) (Image, error) {
 	return i, nil
 }
 
-// Name returns the full name representation of an image.
 func (i Image) Name() string {
 	return i.named.Name()
 }
 
-// String returns the string representation of an image.
 func (i Image) String() string {
 	return i.named.String()
 }
 
-// Reference returns either the digest if it is non-empty or the tag for the image.
 func (i Image) Reference() string {
 	if len(i.Digest.String()) > 1 {
 		return i.Digest.String()
 	}
-
 	return i.Tag
+}
+
+func (i Image) regRef() (regref.Ref, error) {
+	ref, err := regref.New(i.Name())
+	if err != nil {
+		return regref.Ref{}, err
+	}
+	if i.Tag != "" {
+		ref = ref.SetTag(i.Tag)
+	}
+	return ref, nil
 }
 
 func (i Image) hubLink() (string, error) {

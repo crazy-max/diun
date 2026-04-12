@@ -1,36 +1,327 @@
 package registry
 
 import (
+	"fmt"
+	"net/http"
+	"net/http/httptest"
+	"strings"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/opencontainers/go-digest"
+	regconfig "github.com/regclient/regclient/config"
+	regplatform "github.com/regclient/regclient/types/platform"
 	"github.com/stretchr/testify/require"
 )
 
-func TestCompareDigest(t *testing.T) {
-	t.Parallel()
-	rc, err := New(Options{
-		CompareDigest: true,
-		ImageOs:       "linux",
-		ImageArch:     "amd64",
+func TestPlatformDigestFromManifest(t *testing.T) {
+	raw := []byte(`{
+		"schemaVersion": 2,
+		"mediaType": "application/vnd.oci.image.index.v1+json",
+		"manifests": [
+			{
+				"mediaType": "application/vnd.oci.image.manifest.v1+json",
+				"digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+				"size": 866,
+				"platform": {
+					"architecture": "arm64",
+					"os": "linux"
+				}
+			},
+			{
+				"mediaType": "application/vnd.oci.image.manifest.v1+json",
+				"digest": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+				"size": 866,
+				"platform": {
+					"architecture": "amd64",
+					"os": "linux"
+				}
+			}
+		]
+	}`)
+	got, err := platformDigestFromManifest(raw, "application/vnd.oci.image.index.v1+json", regplatform.Platform{
+		OS:           "linux",
+		Architecture: "amd64",
 	})
-	if err != nil {
-		t.Error(err)
+	require.NoError(t, err)
+	require.Equal(t, digest.Digest("sha256:2222222222222222222222222222222222222222222222222222222222222222"), got)
+}
+
+func TestManifestFromRegistryHTTP(t *testing.T) {
+	var manifestGetCount int
+
+	configBlob := `{
+		"created": "2024-01-02T03:04:05Z",
+		"architecture": "amd64",
+		"os": "linux",
+		"variant": "",
+		"docker_version": "27.0.0",
+		"config": {
+			"Labels": {
+				"org.opencontainers.image.url": "https://example.test/app"
+			}
+		}
+	}`
+	configDigest := digest.FromString(configBlob).String()
+
+	childManifest := fmt.Sprintf(`{
+		"schemaVersion": 2,
+		"mediaType": "application/vnd.oci.image.manifest.v1+json",
+		"config": {
+			"mediaType": "application/vnd.oci.image.config.v1+json",
+			"digest": "%s",
+			"size": %d
+		},
+		"layers": [
+			{
+				"mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+				"digest": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+				"size": 123
+			}
+		]
+	}`, configDigest, len(configBlob))
+	childDigest := digest.FromString(childManifest).String()
+
+	topManifest := fmt.Sprintf(`{
+		"schemaVersion": 2,
+		"mediaType": "application/vnd.oci.image.index.v1+json",
+		"manifests": [
+			{
+				"mediaType": "application/vnd.oci.image.manifest.v1+json",
+				"digest": "%s",
+				"size": %d,
+				"platform": {
+					"architecture": "amd64",
+					"os": "linux"
+				}
+			}
+		]
+	}`, childDigest, len(childManifest))
+	topDigest := digest.FromString(topManifest).String()
+
+	server := httptest.NewTLSServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		switch {
+		case req.URL.Path == "/v2/":
+			rw.WriteHeader(http.StatusOK)
+		case req.Method == http.MethodHead && req.URL.Path == "/v2/test/app/manifests/latest":
+			rw.Header().Set("Content-Type", "application/vnd.oci.image.index.v1+json")
+			rw.Header().Set("Docker-Content-Digest", topDigest)
+			rw.WriteHeader(http.StatusOK)
+		case req.Method == http.MethodGet && req.URL.Path == "/v2/test/app/manifests/latest":
+			manifestGetCount++
+			rw.Header().Set("Content-Type", "application/vnd.oci.image.index.v1+json")
+			rw.Header().Set("Docker-Content-Digest", topDigest)
+			_, _ = rw.Write([]byte(topManifest))
+		case req.Method == http.MethodGet && req.URL.Path == "/v2/test/app/manifests/"+childDigest:
+			manifestGetCount++
+			rw.Header().Set("Content-Type", "application/vnd.oci.image.manifest.v1+json")
+			rw.Header().Set("Docker-Content-Digest", childDigest)
+			_, _ = rw.Write([]byte(childManifest))
+		case req.Method == http.MethodGet && req.URL.Path == "/v2/test/app/blobs/"+configDigest:
+			rw.Header().Set("Content-Type", "application/vnd.oci.image.config.v1+json")
+			_, _ = rw.Write([]byte(configBlob))
+		default:
+			rw.WriteHeader(http.StatusNotFound)
+		}
+	}))
+	defer server.Close()
+
+	img, err := ParseImage(ParseImageOptions{Name: strings.TrimPrefix(server.URL, "https://") + "/test/app:latest"})
+	require.NoError(t, err)
+
+	client := New(Options{
+		Host: &regconfig.Host{
+			Name: img.Domain,
+			TLS:  regconfig.TLSInsecure,
+		},
+		Platform: regplatform.Platform{
+			OS:           "linux",
+			Architecture: "amd64",
+		},
+	})
+
+	manifest, updated, err := client.Manifest(img, Manifest{})
+	require.NoError(t, err)
+	require.True(t, updated)
+	require.Equal(t, strings.TrimPrefix(server.URL, "https://")+"/test/app", manifest.Name)
+	require.Equal(t, "latest", manifest.Tag)
+	require.Equal(t, "application/vnd.oci.image.index.v1+json", manifest.MIMEType)
+	require.Equal(t, digest.Digest(topDigest), manifest.Digest)
+	require.Equal(t, "linux/amd64", manifest.Platform)
+	require.Equal(t, []string{"sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"}, manifest.Layers)
+	require.Equal(t, "https://example.test/app", manifest.Labels["org.opencontainers.image.url"])
+	require.Equal(t, 2, manifestGetCount)
+}
+
+func TestManifestCompareDigestSkipsGet(t *testing.T) {
+	var getCalled bool
+	server := httptest.NewTLSServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		switch {
+		case req.URL.Path == "/v2/":
+			rw.WriteHeader(http.StatusOK)
+		case req.Method == http.MethodHead && req.URL.Path == "/v2/test/app/manifests/latest":
+			rw.Header().Set("Content-Type", "application/vnd.oci.image.manifest.v1+json")
+			rw.Header().Set("Docker-Content-Digest", "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+			rw.WriteHeader(http.StatusOK)
+		case req.Method == http.MethodGet && req.URL.Path == "/v2/test/app/manifests/latest":
+			getCalled = true
+			rw.WriteHeader(http.StatusInternalServerError)
+		default:
+			rw.WriteHeader(http.StatusNotFound)
+		}
+	}))
+	defer server.Close()
+
+	img, err := ParseImage(ParseImageOptions{Name: strings.TrimPrefix(server.URL, "https://") + "/test/app:latest"})
+	require.NoError(t, err)
+
+	client := New(Options{
+		Host: &regconfig.Host{
+			Name: img.Domain,
+			TLS:  regconfig.TLSInsecure,
+		},
+		CompareDigest: true,
+		Platform: regplatform.Platform{
+			OS:           "linux",
+			Architecture: "amd64",
+		},
+	})
+
+	dbManifest := Manifest{
+		Name:   strings.TrimPrefix(server.URL, "https://") + "/test/app",
+		Tag:    "latest",
+		Digest: "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
 	}
+
+	manifest, updated, err := client.Manifest(img, dbManifest)
+	require.NoError(t, err)
+	require.False(t, getCalled)
+	require.False(t, updated)
+	require.Equal(t, dbManifest, manifest)
+}
+
+func TestManifestCompareDigestHeadFailureReturnsError(t *testing.T) {
+	var getCalled bool
+	server := httptest.NewTLSServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		switch {
+		case req.URL.Path == "/v2/":
+			rw.WriteHeader(http.StatusOK)
+		case req.Method == http.MethodHead && req.URL.Path == "/v2/test/app/manifests/latest":
+			rw.WriteHeader(http.StatusInternalServerError)
+		case req.Method == http.MethodGet && req.URL.Path == "/v2/test/app/manifests/latest":
+			getCalled = true
+			rw.Header().Set("Content-Type", "application/vnd.oci.image.manifest.v1+json")
+			rw.WriteHeader(http.StatusOK)
+		default:
+			rw.WriteHeader(http.StatusNotFound)
+		}
+	}))
+	defer server.Close()
+
+	img, err := ParseImage(ParseImageOptions{Name: strings.TrimPrefix(server.URL, "https://") + "/test/app:latest"})
+	require.NoError(t, err)
+
+	client := New(Options{
+		Host: &regconfig.Host{
+			Name: img.Domain,
+			TLS:  regconfig.TLSInsecure,
+		},
+		CompareDigest: true,
+		Platform: regplatform.Platform{
+			OS:           "linux",
+			Architecture: "amd64",
+		},
+	})
+
+	_, _, err = client.Manifest(img, Manifest{
+		Digest: "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+	})
+	require.Error(t, err)
+	require.False(t, getCalled)
+}
+
+func TestManifestMissingPlatformReturnsError(t *testing.T) {
+	var childManifestGetCount int
+
+	topManifest := `{
+		"schemaVersion": 2,
+		"mediaType": "application/vnd.oci.image.index.v1+json",
+		"manifests": [
+			{
+				"mediaType": "application/vnd.oci.image.manifest.v1+json",
+				"digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+				"size": 866,
+				"platform": {
+					"architecture": "arm64",
+					"os": "linux"
+				}
+			}
+		]
+	}`
+	topDigest := digest.FromString(topManifest).String()
+
+	server := httptest.NewTLSServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		switch {
+		case req.URL.Path == "/v2/":
+			rw.WriteHeader(http.StatusOK)
+		case req.Method == http.MethodHead && req.URL.Path == "/v2/test/app/manifests/latest":
+			rw.Header().Set("Content-Type", "application/vnd.oci.image.index.v1+json")
+			rw.Header().Set("Docker-Content-Digest", topDigest)
+			rw.WriteHeader(http.StatusOK)
+		case req.Method == http.MethodGet && req.URL.Path == "/v2/test/app/manifests/latest":
+			rw.Header().Set("Content-Type", "application/vnd.oci.image.index.v1+json")
+			rw.Header().Set("Docker-Content-Digest", topDigest)
+			_, _ = rw.Write([]byte(topManifest))
+		case req.Method == http.MethodGet && strings.HasPrefix(req.URL.Path, "/v2/test/app/manifests/sha256:"):
+			childManifestGetCount++
+			rw.WriteHeader(http.StatusInternalServerError)
+		default:
+			rw.WriteHeader(http.StatusNotFound)
+		}
+	}))
+	defer server.Close()
+
+	img, err := ParseImage(ParseImageOptions{Name: strings.TrimPrefix(server.URL, "https://") + "/test/app:latest"})
+	require.NoError(t, err)
+
+	client := New(Options{
+		Host: &regconfig.Host{
+			Name: img.Domain,
+			TLS:  regconfig.TLSInsecure,
+		},
+		Platform: regplatform.Platform{
+			OS:           "linux",
+			Architecture: "amd64",
+		},
+	})
+
+	_, _, err = client.Manifest(img, Manifest{})
+	require.Error(t, err)
+	require.ErrorContains(t, err, "error choosing image instance")
+	require.ErrorContains(t, err, "cannot select platform descriptor")
+	require.Equal(t, 0, childManifestGetCount)
+}
+
+func TestCompareDigest(t *testing.T) {
+	client := New(Options{
+		Host:          regconfig.HostNewName("docker.io"),
+		CompareDigest: true,
+		Platform: regplatform.Platform{
+			OS:           "linux",
+			Architecture: "amd64",
+		},
+	})
 
 	img, err := ParseImage(ParseImageOptions{
 		Name: "crazymax/diun:2.5.0",
 	})
-	if err != nil {
-		t.Error(err)
-	}
+	require.NoError(t, err)
 
 	// download manifest
-	_, _, err = rc.Manifest(img, Manifest{})
+	_, _, err = client.Manifest(img, Manifest{})
 	require.NoError(t, err)
 
 	// check manifest
-	manifest, _, err := rc.Manifest(img, Manifest{
+	manifest, _, err := client.Manifest(img, Manifest{
 		Name:     "docker.io/crazymax/diun",
 		Tag:      "2.5.0",
 		MIMEType: "application/vnd.docker.distribution.manifest.list.v2+json",
@@ -38,37 +329,33 @@ func TestCompareDigest(t *testing.T) {
 		Platform: "linux/amd64",
 	})
 	require.NoError(t, err)
-	assert.Equal(t, "docker.io/crazymax/diun", manifest.Name)
-	assert.Equal(t, "2.5.0", manifest.Tag)
-	assert.Equal(t, "application/vnd.docker.distribution.manifest.list.v2+json", manifest.MIMEType)
-	assert.Equal(t, "linux/amd64", manifest.Platform)
-	assert.Empty(t, manifest.DockerVersion)
+	require.Equal(t, "docker.io/crazymax/diun", manifest.Name)
+	require.Equal(t, "2.5.0", manifest.Tag)
+	require.Equal(t, "application/vnd.docker.distribution.manifest.list.v2+json", manifest.MIMEType)
+	require.Equal(t, "linux/amd64", manifest.Platform)
 }
 
 func TestManifest(t *testing.T) {
-	t.Parallel()
-	rc, err := New(Options{
+	client := New(Options{
+		Host:          regconfig.HostNewName("docker.io"),
 		CompareDigest: true,
-		ImageOs:       "linux",
-		ImageArch:     "amd64",
+		Platform: regplatform.Platform{
+			OS:           "linux",
+			Architecture: "amd64",
+		},
 	})
-	if err != nil {
-		t.Error(err)
-	}
 
 	img, err := ParseImage(ParseImageOptions{
 		Name: "portainer/portainer-ce:linux-amd64-2.5.1",
 	})
-	if err != nil {
-		t.Error(err)
-	}
+	require.NoError(t, err)
 
 	// download manifest
-	_, _, err = rc.Manifest(img, Manifest{})
+	_, _, err = client.Manifest(img, Manifest{})
 	require.NoError(t, err)
 
 	// check manifest
-	manifest, updated, err := rc.Manifest(img, Manifest{
+	manifest, updated, err := client.Manifest(img, Manifest{
 		Name:     "docker.io/portainer/portainer-ce",
 		Tag:      "linux-amd64-2.5.1",
 		MIMEType: "application/vnd.docker.distribution.manifest.v2+json",
@@ -103,38 +390,35 @@ func TestManifest(t *testing.T) {
 	})
 
 	require.NoError(t, err)
-	assert.Equal(t, false, updated)
-	assert.Equal(t, "docker.io/portainer/portainer-ce", manifest.Name)
-	assert.Equal(t, "linux-amd64-2.5.1", manifest.Tag)
-	assert.Equal(t, "application/vnd.docker.distribution.manifest.v2+json", manifest.MIMEType)
-	assert.Equal(t, "sha256:653057af0d2d961f436c75deda1ca7fe3defc89664bed6bd3da8c91c88c1ce05", manifest.Digest.String())
-	assert.Equal(t, "linux/amd64", manifest.Platform)
+	require.Equal(t, false, updated)
+	require.Equal(t, "docker.io/portainer/portainer-ce", manifest.Name)
+	require.Equal(t, "linux-amd64-2.5.1", manifest.Tag)
+	require.Equal(t, "application/vnd.docker.distribution.manifest.v2+json", manifest.MIMEType)
+	require.Equal(t, "sha256:653057af0d2d961f436c75deda1ca7fe3defc89664bed6bd3da8c91c88c1ce05", manifest.Digest.String())
+	require.Equal(t, "linux/amd64", manifest.Platform)
 }
 
 func TestManifestMultiUpdatedPlatform(t *testing.T) {
-	t.Parallel()
-	rc, err := New(Options{
+	client := New(Options{
+		Host:          regconfig.HostNewName("docker.io"),
 		CompareDigest: true,
-		ImageOs:       "linux",
-		ImageArch:     "amd64",
+		Platform: regplatform.Platform{
+			OS:           "linux",
+			Architecture: "amd64",
+		},
 	})
-	if err != nil {
-		t.Error(err)
-	}
 
 	img, err := ParseImage(ParseImageOptions{
 		Name: "mongo:3.6.21",
 	})
-	if err != nil {
-		t.Error(err)
-	}
+	require.NoError(t, err)
 
 	// download manifest
-	_, _, err = rc.Manifest(img, Manifest{})
+	_, _, err = client.Manifest(img, Manifest{})
 	require.NoError(t, err)
 
 	// check manifest
-	manifest, updated, err := rc.Manifest(img, Manifest{
+	manifest, updated, err := client.Manifest(img, Manifest{
 		Name:     "docker.io/library/mongo",
 		Tag:      "3.6.21",
 		MIMEType: "application/vnd.docker.distribution.manifest.list.v2+json",
@@ -188,38 +472,35 @@ func TestManifestMultiUpdatedPlatform(t *testing.T) {
 	})
 
 	require.NoError(t, err)
-	assert.Equal(t, true, updated)
-	assert.Equal(t, "docker.io/library/mongo", manifest.Name)
-	assert.Equal(t, "3.6.21", manifest.Tag)
-	assert.Equal(t, "application/vnd.docker.distribution.manifest.list.v2+json", manifest.MIMEType)
-	assert.Equal(t, "sha256:3cff2069adb34a330552695659c261bca69148e325863763b78b0285dd1a25c9", manifest.Digest.String())
-	assert.Equal(t, "linux/amd64", manifest.Platform)
+	require.Equal(t, true, updated)
+	require.Equal(t, "docker.io/library/mongo", manifest.Name)
+	require.Equal(t, "3.6.21", manifest.Tag)
+	require.Equal(t, "application/vnd.docker.distribution.manifest.list.v2+json", manifest.MIMEType)
+	require.Equal(t, "sha256:3cff2069adb34a330552695659c261bca69148e325863763b78b0285dd1a25c9", manifest.Digest.String())
+	require.Equal(t, "linux/amd64", manifest.Platform)
 }
 
 func TestManifestMultiNotUpdatedPlatform(t *testing.T) {
-	t.Parallel()
-	rc, err := New(Options{
+	client := New(Options{
+		Host:          regconfig.HostNewName("docker.io"),
 		CompareDigest: true,
-		ImageOs:       "linux",
-		ImageArch:     "amd64",
+		Platform: regplatform.Platform{
+			OS:           "linux",
+			Architecture: "amd64",
+		},
 	})
-	if err != nil {
-		t.Error(err)
-	}
 
 	img, err := ParseImage(ParseImageOptions{
 		Name: "mongo:3.6.21",
 	})
-	if err != nil {
-		t.Error(err)
-	}
+	require.NoError(t, err)
 
 	// download manifest
-	_, _, err = rc.Manifest(img, Manifest{})
+	_, _, err = client.Manifest(img, Manifest{})
 	require.NoError(t, err)
 
 	// check manifest
-	manifest, updated, err := rc.Manifest(img, Manifest{
+	manifest, updated, err := client.Manifest(img, Manifest{
 		Name:     "docker.io/library/mongo",
 		Tag:      "3.6.21",
 		MIMEType: "application/vnd.docker.distribution.manifest.list.v2+json",
@@ -273,93 +554,83 @@ func TestManifestMultiNotUpdatedPlatform(t *testing.T) {
 	})
 
 	require.NoError(t, err)
-	assert.Equal(t, false, updated)
-	assert.Equal(t, "docker.io/library/mongo", manifest.Name)
-	assert.Equal(t, "3.6.21", manifest.Tag)
-	assert.Equal(t, "application/vnd.docker.distribution.manifest.list.v2+json", manifest.MIMEType)
-	assert.Equal(t, "sha256:3cff2069adb34a330552695659c261bca69148e325863763b78b0285dd1a25c9", manifest.Digest.String())
-	assert.Equal(t, "linux/amd64", manifest.Platform)
+	require.Equal(t, false, updated)
+	require.Equal(t, "docker.io/library/mongo", manifest.Name)
+	require.Equal(t, "3.6.21", manifest.Tag)
+	require.Equal(t, "application/vnd.docker.distribution.manifest.list.v2+json", manifest.MIMEType)
+	require.Equal(t, "sha256:3cff2069adb34a330552695659c261bca69148e325863763b78b0285dd1a25c9", manifest.Digest.String())
+	require.Equal(t, "linux/amd64", manifest.Platform)
 }
 
 func TestManifestVariant(t *testing.T) {
-	t.Parallel()
-	rc, err := New(Options{
-		ImageOs:      "linux",
-		ImageArch:    "arm",
-		ImageVariant: "v7",
+	client := New(Options{
+		Host: regconfig.HostNewName("docker.io"),
+		Platform: regplatform.Platform{
+			OS:           "linux",
+			Architecture: "arm",
+			Variant:      "v7",
+		},
 	})
-	if err != nil {
-		t.Error(err)
-	}
 
 	img, err := ParseImage(ParseImageOptions{
 		Name: "crazymax/diun:2.5.0",
 	})
-	if err != nil {
-		t.Error(err)
-	}
-
-	manifest, _, err := rc.Manifest(img, Manifest{})
 	require.NoError(t, err)
-	assert.Equal(t, "docker.io/crazymax/diun", manifest.Name)
-	assert.Equal(t, "2.5.0", manifest.Tag)
-	assert.Equal(t, "application/vnd.docker.distribution.manifest.list.v2+json", manifest.MIMEType)
-	assert.Equal(t, "linux/arm/v7", manifest.Platform)
-	assert.Empty(t, manifest.DockerVersion)
+
+	manifest, _, err := client.Manifest(img, Manifest{})
+	require.NoError(t, err)
+	require.Equal(t, "docker.io/crazymax/diun", manifest.Name)
+	require.Equal(t, "2.5.0", manifest.Tag)
+	require.Equal(t, "application/vnd.docker.distribution.manifest.list.v2+json", manifest.MIMEType)
+	require.Equal(t, "linux/arm/v7", manifest.Platform)
 }
 
 func TestManifestTaggedDigest(t *testing.T) {
-	t.Parallel()
-	rc, err := New(Options{
+	client := New(Options{
+		Host:          regconfig.HostNewName("docker.io"),
 		CompareDigest: true,
-		ImageOs:       "linux",
-		ImageArch:     "amd64",
+		Platform: regplatform.Platform{
+			OS:           "linux",
+			Architecture: "amd64",
+		},
 	})
-	if err != nil {
-		t.Error(err)
-	}
 
 	img, err := ParseImage(ParseImageOptions{
 		Name: "crazymax/diun:4.25.0@sha256:3fca3dd86c2710586208b0f92d1ec4ce25382f4cad4ae76a2275db8e8bb24031",
 	})
-	if err != nil {
-		t.Error(err)
-	}
+	require.NoError(t, err)
 
 	// download manifest
-	_, _, err = rc.Manifest(img, Manifest{})
+	_, _, err = client.Manifest(img, Manifest{})
 	require.NoError(t, err)
 
 	// check manifest
-	manifest, updated, err := rc.Manifest(img, manifestCrazymaxDiun4250)
+	manifest, updated, err := client.Manifest(img, manifestCrazymaxDiun4250)
 	require.NoError(t, err)
-	assert.Equal(t, false, updated)
-	assert.Equal(t, "docker.io/crazymax/diun", manifest.Name)
-	assert.Equal(t, "4.25.0", manifest.Tag)
-	assert.Equal(t, "application/vnd.oci.image.index.v1+json", manifest.MIMEType)
-	assert.Equal(t, "sha256:3fca3dd86c2710586208b0f92d1ec4ce25382f4cad4ae76a2275db8e8bb24031", manifest.Digest.String())
-	assert.Equal(t, "linux/amd64", manifest.Platform)
+	require.Equal(t, false, updated)
+	require.Equal(t, "docker.io/crazymax/diun", manifest.Name)
+	require.Equal(t, "4.25.0", manifest.Tag)
+	require.Equal(t, "application/vnd.oci.image.index.v1+json", manifest.MIMEType)
+	require.Equal(t, "sha256:3fca3dd86c2710586208b0f92d1ec4ce25382f4cad4ae76a2275db8e8bb24031", manifest.Digest.String())
+	require.Equal(t, "linux/amd64", manifest.Platform)
 }
 
 func TestManifestTaggedDigestUnknownTag(t *testing.T) {
-	t.Parallel()
-	rc, err := New(Options{
+	client := New(Options{
+		Host:          regconfig.HostNewName("docker.io"),
 		CompareDigest: true,
-		ImageOs:       "linux",
-		ImageArch:     "amd64",
+		Platform: regplatform.Platform{
+			OS:           "linux",
+			Architecture: "amd64",
+		},
 	})
-	if err != nil {
-		t.Error(err)
-	}
 
 	img, err := ParseImage(ParseImageOptions{
 		Name: "crazymax/diun:foo@sha256:3fca3dd86c2710586208b0f92d1ec4ce25382f4cad4ae76a2275db8e8bb24031",
 	})
-	if err != nil {
-		t.Error(err)
-	}
+	require.NoError(t, err)
 
-	_, _, err = rc.Manifest(img, Manifest{})
+	_, _, err = client.Manifest(img, Manifest{})
 	require.Error(t, err)
 }
 

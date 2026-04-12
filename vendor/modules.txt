@@ -10,8 +10,6 @@ filippo.io/edwards25519/field
 github.com/AlecAivazis/survey/v2
 github.com/AlecAivazis/survey/v2/core
 github.com/AlecAivazis/survey/v2/terminal
-# github.com/Azure/go-ansiterm v0.0.0-20230124172434-306776ec8161
-## explicit; go 1.16
 # github.com/BurntSushi/toml v1.5.0
 ## explicit; go 1.18
 github.com/BurntSushi/toml
@@ -70,12 +68,6 @@ github.com/containerd/platforms
 # github.com/containerd/typeurl/v2 v2.2.3
 ## explicit; go 1.21
 github.com/containerd/typeurl/v2
-# github.com/containers/libtrust v0.0.0-20230121012942-c1716e8a8d01
-## explicit
-github.com/containers/libtrust
-# github.com/containers/ocicrypt v1.2.1
-## explicit; go 1.22
-github.com/containers/ocicrypt/spec
 # github.com/crazy-max/cron/v3 v3.1.1
 ## explicit; go 1.12
 github.com/crazy-max/cron/v3
@@ -90,16 +82,14 @@ github.com/crazy-max/gonfig/file
 github.com/crazy-max/gonfig/flag
 github.com/crazy-max/gonfig/parser
 github.com/crazy-max/gonfig/types
+# github.com/creack/pty v1.1.18
+## explicit; go 1.13
 # github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc
 ## explicit
 github.com/davecgh/go-spew/spew
 # github.com/distribution/reference v0.6.0
 ## explicit; go 1.20
 github.com/distribution/reference
-# github.com/docker/distribution v2.8.3+incompatible
-## explicit
-github.com/docker/distribution/registry/api/errcode
-github.com/docker/distribution/registry/api/v2
 # github.com/docker/docker v28.5.2+incompatible
 ## explicit
 github.com/docker/docker/api
@@ -124,10 +114,6 @@ github.com/docker/docker/api/types/time
 github.com/docker/docker/api/types/versions
 github.com/docker/docker/api/types/volume
 github.com/docker/docker/client
-# github.com/docker/docker-credential-helpers v0.9.5
-## explicit; go 1.21
-github.com/docker/docker-credential-helpers/client
-github.com/docker/docker-credential-helpers/credentials
 # github.com/docker/go-connections v0.6.0
 ## explicit; go 1.18
 github.com/docker/go-connections/nat
@@ -136,6 +122,9 @@ github.com/docker/go-connections/tlsconfig
 # github.com/docker/go-units v0.5.0
 ## explicit
 github.com/docker/go-units
+# github.com/docker/libtrust v0.0.0-20160708172513-aabc10ec26b7
+## explicit
+github.com/docker/libtrust
 # github.com/dromara/carbon/v2 v2.6.16
 ## explicit; go 1.18
 github.com/dromara/carbon/v2
@@ -255,9 +244,6 @@ github.com/google/uuid
 # github.com/gorilla/css v1.0.1
 ## explicit; go 1.20
 github.com/gorilla/css/scanner
-# github.com/gorilla/mux v1.8.1
-## explicit; go 1.20
-github.com/gorilla/mux
 # github.com/gorilla/websocket v1.5.4-0.20250319132907-e064f32e3674
 ## explicit; go 1.20
 github.com/gorilla/websocket
@@ -299,6 +285,16 @@ github.com/json-iterator/go
 # github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51
 ## explicit
 github.com/kballard/go-shellquote
+# github.com/klauspost/compress v1.18.4
+## explicit; go 1.23
+github.com/klauspost/compress
+github.com/klauspost/compress/fse
+github.com/klauspost/compress/huff0
+github.com/klauspost/compress/internal/cpuinfo
+github.com/klauspost/compress/internal/le
+github.com/klauspost/compress/internal/snapref
+github.com/klauspost/compress/zstd
+github.com/klauspost/compress/zstd/internal/xxhash
 # github.com/leodido/go-urn v1.4.0
 ## explicit; go 1.18
 github.com/leodido/go-urn
@@ -342,15 +338,8 @@ github.com/moby/buildkit/util/suggest
 github.com/moby/docker-image-spec/specs-go/v1
 # github.com/moby/sys/atomicwriter v0.1.0
 ## explicit; go 1.18
-# github.com/moby/sys/capability v0.4.0
-## explicit; go 1.21
-github.com/moby/sys/capability
-# github.com/moby/sys/mountinfo v0.7.2
-## explicit; go 1.17
-github.com/moby/sys/mountinfo
-# github.com/moby/sys/user v0.4.0
-## explicit; go 1.17
-github.com/moby/sys/user
+# github.com/moby/term v0.5.2
+## explicit; go 1.18
 # github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd
 ## explicit
 github.com/modern-go/concurrent
@@ -376,9 +365,6 @@ github.com/opencontainers/go-digest
 ## explicit; go 1.18
 github.com/opencontainers/image-spec/specs-go
 github.com/opencontainers/image-spec/specs-go/v1
-# github.com/opencontainers/runtime-spec v1.3.0
-## explicit
-github.com/opencontainers/runtime-spec/specs-go
 # github.com/panjf2000/ants/v2 v2.11.5
 ## explicit; go 1.18
 github.com/panjf2000/ants/v2
@@ -398,6 +384,45 @@ github.com/pmezard/go-difflib/difflib
 # github.com/rabbitmq/amqp091-go v1.10.0
 ## explicit; go 1.20
 github.com/rabbitmq/amqp091-go
+# github.com/regclient/regclient v0.11.2
+## explicit; go 1.25.0
+github.com/regclient/regclient
+github.com/regclient/regclient/config
+github.com/regclient/regclient/internal/auth
+github.com/regclient/regclient/internal/cache
+github.com/regclient/regclient/internal/conffile
+github.com/regclient/regclient/internal/httplink
+github.com/regclient/regclient/internal/limitread
+github.com/regclient/regclient/internal/pqueue
+github.com/regclient/regclient/internal/reghttp
+github.com/regclient/regclient/internal/reqmeta
+github.com/regclient/regclient/internal/sloghandle
+github.com/regclient/regclient/internal/strparse
+github.com/regclient/regclient/internal/timejson
+github.com/regclient/regclient/internal/units
+github.com/regclient/regclient/internal/version
+github.com/regclient/regclient/pkg/archive
+github.com/regclient/regclient/scheme
+github.com/regclient/regclient/scheme/ocidir
+github.com/regclient/regclient/scheme/reg
+github.com/regclient/regclient/types
+github.com/regclient/regclient/types/blob
+github.com/regclient/regclient/types/descriptor
+github.com/regclient/regclient/types/docker
+github.com/regclient/regclient/types/docker/schema1
+github.com/regclient/regclient/types/docker/schema2
+github.com/regclient/regclient/types/errs
+github.com/regclient/regclient/types/manifest
+github.com/regclient/regclient/types/mediatype
+github.com/regclient/regclient/types/oci
+github.com/regclient/regclient/types/oci/v1
+github.com/regclient/regclient/types/ping
+github.com/regclient/regclient/types/platform
+github.com/regclient/regclient/types/ref
+github.com/regclient/regclient/types/referrer
+github.com/regclient/regclient/types/repo
+github.com/regclient/regclient/types/tag
+github.com/regclient/regclient/types/warning
 # github.com/rivo/uniseg v0.4.7
 ## explicit; go 1.18
 github.com/rivo/uniseg
@@ -413,7 +438,7 @@ github.com/russross/blackfriday/v2
 # github.com/sirupsen/logrus v1.9.4
 ## explicit; go 1.17
 github.com/sirupsen/logrus
-# github.com/spf13/pflag v1.0.9
+# github.com/spf13/pflag v1.0.10
 ## explicit; go 1.12
 github.com/spf13/pflag
 # github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf
@@ -439,6 +464,12 @@ github.com/tidwall/sjson
 # github.com/tonistiigi/go-csvvalue v0.0.0-20240814133006-030d3b2625d0
 ## explicit; go 1.16
 github.com/tonistiigi/go-csvvalue
+# github.com/ulikunitz/xz v0.5.15
+## explicit; go 1.12
+github.com/ulikunitz/xz
+github.com/ulikunitz/xz/internal/hash
+github.com/ulikunitz/xz/internal/xlog
+github.com/ulikunitz/xz/lzma
 # github.com/vanng822/css v0.0.0-20190504095207-a21e860bcd04
 ## explicit
 github.com/vanng822/css
@@ -500,56 +531,6 @@ go.opentelemetry.io/otel/trace
 go.opentelemetry.io/otel/trace/embedded
 go.opentelemetry.io/otel/trace/internal/telemetry
 go.opentelemetry.io/otel/trace/noop
-# go.podman.io/image/v5 v5.39.1
-## explicit; go 1.24.0
-go.podman.io/image/v5/docker
-go.podman.io/image/v5/docker/policyconfiguration
-go.podman.io/image/v5/docker/reference
-go.podman.io/image/v5/internal/blobinfocache
-go.podman.io/image/v5/internal/image
-go.podman.io/image/v5/internal/imagedestination/impl
-go.podman.io/image/v5/internal/imagedestination/stubs
-go.podman.io/image/v5/internal/imagesource
-go.podman.io/image/v5/internal/imagesource/impl
-go.podman.io/image/v5/internal/imagesource/stubs
-go.podman.io/image/v5/internal/iolimits
-go.podman.io/image/v5/internal/manifest
-go.podman.io/image/v5/internal/multierr
-go.podman.io/image/v5/internal/pkg/platform
-go.podman.io/image/v5/internal/private
-go.podman.io/image/v5/internal/putblobdigest
-go.podman.io/image/v5/internal/rootless
-go.podman.io/image/v5/internal/set
-go.podman.io/image/v5/internal/signature
-go.podman.io/image/v5/internal/streamdigest
-go.podman.io/image/v5/internal/tmpdir
-go.podman.io/image/v5/internal/uploadreader
-go.podman.io/image/v5/internal/useragent
-go.podman.io/image/v5/manifest
-go.podman.io/image/v5/pkg/blobinfocache/none
-go.podman.io/image/v5/pkg/compression/internal
-go.podman.io/image/v5/pkg/compression/types
-go.podman.io/image/v5/pkg/docker/config
-go.podman.io/image/v5/pkg/strslice
-go.podman.io/image/v5/pkg/sysregistriesv2
-go.podman.io/image/v5/pkg/tlsclientconfig
-go.podman.io/image/v5/transports
-go.podman.io/image/v5/types
-go.podman.io/image/v5/version
-# go.podman.io/storage v1.62.0
-## explicit; go 1.24.0
-go.podman.io/storage/internal/rawfilelock
-go.podman.io/storage/pkg/fileutils
-go.podman.io/storage/pkg/homedir
-go.podman.io/storage/pkg/idtools
-go.podman.io/storage/pkg/ioutils
-go.podman.io/storage/pkg/lockfile
-go.podman.io/storage/pkg/longpath
-go.podman.io/storage/pkg/mount
-go.podman.io/storage/pkg/reexec
-go.podman.io/storage/pkg/regexp
-go.podman.io/storage/pkg/system
-go.podman.io/storage/pkg/unshare
 # go.yaml.in/yaml/v2 v2.4.3
 ## explicit; go 1.15
 go.yaml.in/yaml/v2
@@ -749,6 +730,8 @@ gopkg.in/yaml.v2
 # gopkg.in/yaml.v3 v3.0.1
 ## explicit
 gopkg.in/yaml.v3
+# gotest.tools/v3 v3.5.2
+## explicit; go 1.17
 # k8s.io/api v0.35.2
 ## explicit; go 1.25.0
 k8s.io/api/admissionregistration/v1
@@ -1066,4 +1049,3 @@ sigs.k8s.io/structured-merge-diff/v6/value
 # sigs.k8s.io/yaml v1.6.0
 ## explicit; go 1.22
 sigs.k8s.io/yaml
-# google.golang.org/genproto => google.golang.org/genproto v0.0.0-20250324211829-b45e905df463

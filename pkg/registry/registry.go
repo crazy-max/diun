@@ -2,44 +2,48 @@ package registry
 
 import (
 	"context"
+	"log/slog"
 	"time"
 
 	"github.com/pkg/errors"
-	"go.podman.io/image/v5/types"
+	"github.com/regclient/regclient"
+	regconfig "github.com/regclient/regclient/config"
+	regscheme "github.com/regclient/regclient/scheme/reg"
+	regplatform "github.com/regclient/regclient/types/platform"
 )
 
-// Client represents an active docker registry object
 type Client struct {
 	opts   Options
-	sysCtx *types.SystemContext
+	regctl *regclient.RegClient
 }
 
-// Options holds docker registry object options
 type Options struct {
-	Auth          types.DockerAuthConfig
-	InsecureTLS   bool
+	Host          *regconfig.Host
+	Platform      regplatform.Platform
+	Logger        *slog.Logger
 	Timeout       time.Duration
 	UserAgent     string
 	CompareDigest bool
-	ImageOs       string
-	ImageArch     string
-	ImageVariant  string
 }
 
-// New creates new docker registry client instance
-func New(opts Options) (*Client, error) {
+func New(opts Options) *Client {
+	regctlOpts := []regclient.Opt{
+		regclient.WithDockerCreds(),
+		regclient.WithRegOpts(regscheme.WithDelay(2*time.Second, 60*time.Second)),
+	}
+	if opts.Host != nil {
+		regctlOpts = append(regctlOpts, regclient.WithConfigHost(*opts.Host))
+	}
+	if opts.Logger != nil {
+		regctlOpts = append(regctlOpts, regclient.WithSlog(opts.Logger))
+	}
+	if opts.UserAgent != "" {
+		regctlOpts = append(regctlOpts, regclient.WithUserAgent(opts.UserAgent))
+	}
 	return &Client{
-		opts: opts,
-		sysCtx: &types.SystemContext{
-			DockerAuthConfig:                  &opts.Auth,
-			DockerDaemonInsecureSkipTLSVerify: opts.InsecureTLS,
-			DockerInsecureSkipTLSVerify:       types.NewOptionalBool(opts.InsecureTLS),
-			DockerRegistryUserAgent:           opts.UserAgent,
-			OSChoice:                          opts.ImageOs,
-			ArchitectureChoice:                opts.ImageArch,
-			VariantChoice:                     opts.ImageVariant,
-		},
-	}, nil
+		opts:   opts,
+		regctl: regclient.New(regctlOpts...),
+	}
 }
 
 func (c *Client) timeoutContext() (context.Context, context.CancelFunc) {
@@ -47,7 +51,7 @@ func (c *Client) timeoutContext() (context.Context, context.CancelFunc) {
 	var cancelFunc context.CancelFunc = func() {}
 	if c.opts.Timeout > 0 {
 		cancelCtx, cancel := context.WithCancelCause(ctx)
-		ctx, _ = context.WithTimeoutCause(cancelCtx, c.opts.Timeout, errors.WithStack(context.DeadlineExceeded)) //nolint:govet // no need to manually cancel this context as we already rely on parent
+		ctx, _ = context.WithTimeoutCause(cancelCtx, c.opts.Timeout, errors.WithStack(context.DeadlineExceeded)) //nolint:govet // parent cancellation is enough
 		cancelFunc = func() { cancel(errors.WithStack(context.Canceled)) }
 	}
 	return ctx, cancelFunc
