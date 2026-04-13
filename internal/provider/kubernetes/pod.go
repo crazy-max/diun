@@ -31,7 +31,7 @@ func (c *Client) listPodImage() []model.Image {
 		return []model.Image{}
 	}
 
-	var list []model.Image
+	var list model.ImageList
 	for _, pod := range pods {
 		for _, ctn := range pod.Spec.Containers {
 			c.logger.Debug().
@@ -64,7 +64,7 @@ func (c *Client) listPodImage() []model.Image {
 		}
 	}
 
-	return list
+	return list.Dedupe()
 }
 
 func metadata(pod v1.Pod, ctn v1.Container) map[string]string {

@@ -50,7 +50,7 @@ func (c *Client) listTaskImages() []model.Image {
 		c.logger.Error().Err(err).Msg("Cannot list Nomad jobs")
 	}
 
-	var list []model.Image
+	var list model.ImageList
 
 	for _, job := range jobs {
 		jobInfo, _, err := client.Jobs().Info(job.ID, nil)
@@ -129,7 +129,7 @@ func (c *Client) listTaskImages() []model.Image {
 		}
 	}
 
-	return list
+	return list.Dedupe()
 }
 
 func metadata(job *nomad.JobListStub, taskGroup *nomad.TaskGroup, task *nomad.Task) map[string]string {
