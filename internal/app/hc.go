@@ -6,7 +6,6 @@ import (
 	"text/template"
 
 	"github.com/crazy-max/diun/v4/internal/model"
-	"github.com/crazy-max/diun/v4/pkg/utl"
 	"github.com/crazy-max/gohealthchecks"
 	"github.com/rs/zerolog/log"
 )
@@ -16,14 +15,8 @@ func (di *Diun) HealthchecksStart() {
 		return
 	}
 
-	uuid, err := utl.GetSecret(di.cfg.Watch.Healthchecks.UUID, di.cfg.Watch.Healthchecks.UUIDFile)
-	if err != nil {
-		log.Error().Err(err).Msgf("Cannot retrieve Healthchecks UUID")
-		return
-	}
-
 	if err := di.hc.Start(context.Background(), gohealthchecks.PingingOptions{
-		UUID: uuid,
+		UUID: di.hcUUID,
 	}); err != nil {
 		log.Error().Err(err).Msgf("Cannot send Healthchecks start event")
 	}
@@ -31,12 +24,6 @@ func (di *Diun) HealthchecksStart() {
 
 func (di *Diun) HealthchecksSuccess(entries *model.NotifEntries) {
 	if di.hc == nil {
-		return
-	}
-
-	uuid, err := utl.GetSecret(di.cfg.Watch.Healthchecks.UUID, di.cfg.Watch.Healthchecks.UUIDFile)
-	if err != nil {
-		log.Error().Err(err).Msgf("Cannot retrieve Healthchecks UUID")
 		return
 	}
 
@@ -53,7 +40,7 @@ func (di *Diun) HealthchecksSuccess(entries *model.NotifEntries) {
 	}
 
 	if err := di.hc.Success(context.Background(), gohealthchecks.PingingOptions{
-		UUID: uuid,
+		UUID: di.hcUUID,
 		Logs: logsBuf.String(),
 	}); err != nil {
 		log.Error().Err(err).Msgf("Cannot send Healthchecks success event")
@@ -65,14 +52,8 @@ func (di *Diun) HealthchecksFail(logs string) {
 		return
 	}
 
-	uuid, err := utl.GetSecret(di.cfg.Watch.Healthchecks.UUID, di.cfg.Watch.Healthchecks.UUIDFile)
-	if err != nil {
-		log.Error().Err(err).Msgf("Cannot retrieve Healthchecks UUID")
-		return
-	}
-
 	if err := di.hc.Fail(context.Background(), gohealthchecks.PingingOptions{
-		UUID: uuid,
+		UUID: di.hcUUID,
 		Logs: logs,
 	}); err != nil {
 		log.Error().Err(err).Msgf("Cannot send Healthchecks fail event")
