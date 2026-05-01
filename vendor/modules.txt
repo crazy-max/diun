@@ -404,7 +404,7 @@ github.com/rabbitmq/amqp091-go
 # github.com/rivo/uniseg v0.4.7
 ## explicit; go 1.18
 github.com/rivo/uniseg
-# github.com/rs/zerolog v1.35.0
+# github.com/rs/zerolog v1.35.1
 ## explicit; go 1.23
 github.com/rs/zerolog
 github.com/rs/zerolog/internal/cbor
