@@ -8,7 +8,7 @@ require (
 	github.com/PaulSonOfLars/gotgbot/v2 v2.0.0-rc.34
 	github.com/alecthomas/kong v1.15.0
 	github.com/bmatcuk/doublestar/v3 v3.0.0
-	github.com/containerd/platforms v1.0.0-rc.2
+	github.com/containerd/platforms v1.0.0-rc.4
 	github.com/crazy-max/cron/v3 v3.1.1
 	github.com/crazy-max/gohealthchecks v0.6.0
 	github.com/crazy-max/gonfig v0.8.0
