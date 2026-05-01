@@ -10,6 +10,8 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"go.mau.fi/util/jsonbytes"
+
 	"maunium.net/go/mautrix/id"
 )
 
@@ -35,11 +37,17 @@ type EncryptedEventContent struct {
 	DeviceID id.DeviceID `json:"device_id,omitempty"`
 	// Only present for Megolm events
 	SessionID id.SessionID `json:"session_id,omitempty"`
+	// Only present for beeper stream events
+	StreamID string `json:"stream_id,omitempty"`
+	// Only present for beeper stream events
+	IV jsonbytes.UnpaddedBytes `json:"iv,omitempty"`
 
 	Ciphertext json.RawMessage `json:"ciphertext"`
 
-	MegolmCiphertext []byte         `json:"-"`
-	OlmCiphertext    OlmCiphertexts `json:"-"`
+	MegolmCiphertext []byte `json:"-"`
+	// Only present for beeper stream events
+	BeeperStreamCiphertext jsonbytes.UnpaddedBytes `json:"-"`
+	OlmCiphertext          OlmCiphertexts          `json:"-"`
 
 	RelatesTo *RelatesTo `json:"m.relates_to,omitempty"`
 	Mentions  *Mentions  `json:"m.mentions,omitempty"`
@@ -66,6 +74,8 @@ func (content *EncryptedEventContent) UnmarshalJSON(data []byte) error {
 			return fmt.Errorf("ciphertext %w", id.ErrInputNotJSONString)
 		}
 		content.MegolmCiphertext = content.Ciphertext[1 : len(content.Ciphertext)-1]
+	case id.AlgorithmBeeperStreamV1:
+		return json.Unmarshal(content.Ciphertext, &content.BeeperStreamCiphertext)
 	}
 	return nil
 }
@@ -80,6 +90,8 @@ func (content *EncryptedEventContent) MarshalJSON() ([]byte, error) {
 		content.Ciphertext[0] = '"'
 		content.Ciphertext[len(content.Ciphertext)-1] = '"'
 		copy(content.Ciphertext[1:len(content.Ciphertext)-1], content.MegolmCiphertext)
+	case id.AlgorithmBeeperStreamV1:
+		content.Ciphertext, err = json.Marshal(content.BeeperStreamCiphertext)
 	}
 	if err != nil {
 		return nil, err

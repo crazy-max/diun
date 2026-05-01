@@ -138,6 +138,7 @@ type MessageEventContent struct {
 	BeeperActionMessage      *BeeperActionMessage     `json:"com.beeper.action_message,omitempty"`
 
 	BeeperLinkPreviews []*BeeperLinkPreview `json:"com.beeper.linkpreviews,omitempty"`
+	BeeperStream       *BeeperStreamInfo    `json:"com.beeper.stream,omitempty"`
 
 	BeeperDisappearingTimer *BeeperDisappearingTimer `json:"com.beeper.disappearing_timer,omitempty"`
 
@@ -241,6 +242,10 @@ func ReverseTextToHTML(input string) string {
 }
 
 func (content *MessageEventContent) EnsureHasHTML() {
+	if content.MsgType.IsMedia() && (content.FileName == "" || content.FileName == content.Body) {
+		content.FileName = content.Body
+		content.Body = ""
+	}
 	if len(content.FormattedBody) == 0 || content.Format != FormatHTML {
 		content.FormattedBody = TextToHTML(content.Body)
 		content.Format = FormatHTML
@@ -334,6 +339,21 @@ type serializableFileInfo struct {
 	Height   json.Number `json:"h,omitempty"`
 	Duration json.Number `json:"duration,omitempty"`
 	Size     json.Number `json:"size,omitempty"`
+}
+
+func (fileInfo *FileInfo) IsZero() bool {
+	return fileInfo.MimeType == "" &&
+		fileInfo.ThumbnailInfo == nil &&
+		fileInfo.ThumbnailURL == "" &&
+		fileInfo.ThumbnailFile == nil &&
+		fileInfo.Blurhash == "" &&
+		fileInfo.AnoaBlurhash == "" &&
+		!fileInfo.MauGIF &&
+		!fileInfo.IsAnimated &&
+		fileInfo.Width == 0 &&
+		fileInfo.Height == 0 &&
+		fileInfo.Duration == 0 &&
+		fileInfo.Size == 0
 }
 
 func (sfi *serializableFileInfo) CopyFrom(fileInfo *FileInfo) *serializableFileInfo {

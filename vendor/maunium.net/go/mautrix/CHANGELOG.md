@@ -1,3 +1,62 @@
+## v0.27.0 (2026-04-16)
+
+### Slightly breaking changes
+* *(crypto)* Changed `GetOwnCrossSigningPublicKeys` to return errors instead of
+  only logging them and returning nil.
+* *(event)* Removed automatic registrations of content structs to encoding/gob.
+  If you use mautrix types with gob, you'll have to register the structs yourself.
+* *(crypto)* Removed unused Olm PK encryption/decryption interface.
+* *(crypto/goolm)* Removed unused JSON pickling methods.
+
+### New features and non-breaking changes
+* *(client)* Added support for [MSC4446] for moving `m.fully_read` backwards.
+* *(appservice)* Added support for escaped paths in HTTP over websocket proxy.
+* *(synapseadmin)* Added wrapper for redacting all events from a specific user
+  (thanks to [@nexy7574] in [#466]).
+* *(event)* Added types for [MSC2545] image packs.
+* *(bridgev2)* Added option to block automatic portal creation for specific
+  chats and/or users.
+* *(bridgev2)* Added commands to bridge existing groups to existing rooms and
+  to create new portal rooms for existing groups.
+* *(bridgev2)* Added option to always prefer default relays for the `bridge`
+  and `set-relay` commands.
+* *(bridgev2)* Added support for using [MSC4437] for ghost profile updates.
+* *(bridgev2)* Added optional GetStateEvent method to `ASIntent` to get state
+  while respecting room membership.
+* *(bridgev2/mxmain)* Added environment variables to change global values like
+  the portal event buffer size.
+* *(event)* Changed `EnsureHasHTML` to also ensure the body is treated as a
+  caption for media messages.
+* *(bridgev2)* Changed relay mode to treat stickers as normal images.
+* *(bridgev2/matrix)* Changed various start methods to return ExitErrors instead
+  of calling `os.Exit` directly.
+* *(client)* Changed sync response structs to use `omitzero` instead of custom
+  JSON marshaling functions.
+
+### Bug fixes
+* *(crypto/goolm)* Fixed various issues.
+* *(crypto)* Fixed new Olm session handling to only delete one-time keys after
+  successfully decrypting a message.
+* *(crypto)* Fixed `ResolveTrust` not checking trust status of cross-signing
+  keys correctly.
+* *(crypto)* Fixed `m.relates_to` copying not working for some inputs with goolm.
+* *(event)* Fixed `Content.UnmarshalJSON` incorrectly keeping a reference to the
+  input data.
+* *(format)* Fixed math blocks not being routed to correct convert function.
+* *(bridgev2)* Fixed sending tombstone when redirecting a portal to another room.
+* *(bridgev2)* Fixed removed messages/reactions not being removed from database.
+* *(bridgev2)* Fixed race conditions where portal ID changes could result in a
+  duplicate room being created.
+* *(bridgev2/mxmain)* Fixed some types of config fields not being settable with
+  environment variables.
+* *(appservice)* Fixed redundant `mx_registrations` database query on every
+  request.
+
+[#466]: https://github.com/mautrix/go/pull/466
+[MSC2545]: https://github.com/matrix-org/matrix-spec-proposals/pull/2545
+[MSC4437]: https://github.com/matrix-org/matrix-spec-proposals/pull/4437
+[MSC4446]: https://github.com/matrix-org/matrix-spec-proposals/pull/4446
+
 ## v0.26.4 (2026-03-16)
 
 * **Breaking change *(client)*** Changed request structs that include UIA

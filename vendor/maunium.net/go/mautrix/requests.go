@@ -425,6 +425,8 @@ type ReqSetReadMarkers struct {
 	Read        id.EventID `json:"m.read,omitempty"`
 	ReadPrivate id.EventID `json:"m.read.private,omitempty"`
 	FullyRead   id.EventID `json:"m.fully_read,omitempty"`
+	// Allow moving m.fully_read backwards via MSC4446.
+	AllowBackward bool `json:"com.beeper.allow_backward,omitempty"`
 
 	BeeperReadExtra        interface{} `json:"com.beeper.read.extra,omitempty"`
 	BeeperReadPrivateExtra interface{} `json:"com.beeper.read.private.extra,omitempty"`
@@ -444,6 +446,8 @@ type ReqSetBeeperInboxState struct {
 
 type ReqSendReceipt struct {
 	ThreadID string `json:"thread_id,omitempty"`
+	// Allow moving m.fully_read backwards via MSC4446.
+	AllowBackward bool `json:"com.beeper.allow_backward,omitempty"`
 }
 
 type ReqPublicRooms struct {

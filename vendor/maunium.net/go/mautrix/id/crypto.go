@@ -27,8 +27,9 @@ const (
 type Algorithm string
 
 const (
-	AlgorithmOlmV1    Algorithm = "m.olm.v1.curve25519-aes-sha2"
-	AlgorithmMegolmV1 Algorithm = "m.megolm.v1.aes-sha2"
+	AlgorithmOlmV1          Algorithm = "m.olm.v1.curve25519-aes-sha2"
+	AlgorithmMegolmV1       Algorithm = "m.megolm.v1.aes-sha2"
+	AlgorithmBeeperStreamV1 Algorithm = "com.beeper.stream.v1.aes-gcm"
 )
 
 type KeyAlgorithm string

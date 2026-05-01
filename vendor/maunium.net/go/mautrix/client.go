@@ -1277,6 +1277,16 @@ func (cli *Client) BeeperUpdateProfile(ctx context.Context, data any) (err error
 	return
 }
 
+// UnstableOverwriteProfile replaces the user's entire profile
+func (cli *Client) UnstableOverwriteProfile(ctx context.Context, data any) (err error) {
+	urlPath := cli.BuildClientURL("v3", "profile", cli.UserID)
+	if cli.SpecVersions.Supports(FeatureUnstableReplaceProfile) && !cli.SpecVersions.Supports(FeatureStableReplaceProfile) {
+		urlPath = cli.BuildClientURL("unstable", "com.beeper.msc4437", "profile", cli.UserID)
+	}
+	_, err = cli.MakeRequest(ctx, http.MethodPut, urlPath, data, nil)
+	return
+}
+
 // GetAccountData gets the user's account data of this type. See https://spec.matrix.org/v1.2/client-server-api/#get_matrixclientv3useruseridaccount_datatype
 func (cli *Client) GetAccountData(ctx context.Context, name string, output interface{}) (err error) {
 	urlPath := cli.BuildClientURL("v3", "user", cli.UserID, "account_data", name)
@@ -1359,48 +1369,6 @@ func (cli *Client) SendMessageEvent(ctx context.Context, roomID id.RoomID, event
 	}
 
 	urlData := ClientURLPath{"v3", "rooms", roomID, "send", eventType.String(), txnID}
-	urlPath := cli.BuildURLWithQuery(urlData, queryParams)
-	_, err = cli.MakeRequest(ctx, http.MethodPut, urlPath, contentJSON, &resp)
-	return
-}
-
-// BeeperSendEphemeralEvent sends an ephemeral event into a room using Beeper's unstable endpoint.
-// contentJSON should be a value that can be encoded as JSON using json.Marshal.
-func (cli *Client) BeeperSendEphemeralEvent(ctx context.Context, roomID id.RoomID, eventType event.Type, contentJSON any, extra ...ReqSendEvent) (resp *RespSendEvent, err error) {
-	var req ReqSendEvent
-	if len(extra) > 0 {
-		req = extra[0]
-	}
-
-	var txnID string
-	if len(req.TransactionID) > 0 {
-		txnID = req.TransactionID
-	} else {
-		txnID = cli.TxnID()
-	}
-
-	queryParams := map[string]string{}
-	if req.Timestamp > 0 {
-		queryParams["ts"] = strconv.FormatInt(req.Timestamp, 10)
-	}
-
-	if !req.DontEncrypt && cli != nil && cli.Crypto != nil && eventType != event.EventEncrypted {
-		var isEncrypted bool
-		isEncrypted, err = cli.StateStore.IsEncrypted(ctx, roomID)
-		if err != nil {
-			err = fmt.Errorf("failed to check if room is encrypted: %w", err)
-			return
-		}
-		if isEncrypted {
-			if contentJSON, err = cli.Crypto.Encrypt(ctx, roomID, eventType, contentJSON); err != nil {
-				err = fmt.Errorf("failed to encrypt event: %w", err)
-				return
-			}
-			eventType = event.EventEncrypted
-		}
-	}
-
-	urlData := ClientURLPath{"unstable", "com.beeper.ephemeral", "rooms", roomID, "ephemeral", eventType.String(), txnID}
 	urlPath := cli.BuildURLWithQuery(urlData, queryParams)
 	_, err = cli.MakeRequest(ctx, http.MethodPut, urlPath, contentJSON, &resp)
 	return
