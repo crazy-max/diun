@@ -51,9 +51,14 @@ func ValidateImage(image string, metadata, labels map[string]string, watchByDef 
 			img.RegOpt = value
 		case key == "diun.watch_repo":
 			if watchRepo, err := strconv.ParseBool(value); err == nil {
-				img.WatchRepo = &watchRepo
+				// If boolean value, coerce it into true/false
+				img.WatchRepo = model.WatchRepo(strconv.FormatBool(watchRepo))
 			} else {
-				return img, errors.Wrapf(err, "cannot parse %q value of label %s", value, key)
+				// Otherwise use it directly
+				img.WatchRepo = model.WatchRepo(value)
+			}
+			if !img.WatchRepo.Valid() {
+				return img, errors.Errorf(`invalid value of watch_repo %q`, value)
 			}
 		case key == "diun.notify_on":
 			if len(value) == 0 {

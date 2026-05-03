@@ -5,7 +5,6 @@ import (
 
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/pkg/registry"
-	"github.com/crazy-max/diun/v4/pkg/utl"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
 )
@@ -111,11 +110,11 @@ func TestValidateImage(t *testing.T) {
 			image:      "myimg",
 			watchByDef: true,
 			defaults: &model.Defaults{
-				WatchRepo: utl.NewTrue(),
+				WatchRepo: model.WatchRepoAll,
 			},
 			expectedImage: model.Image{
 				Name:      "myimg",
-				WatchRepo: utl.NewTrue(),
+				WatchRepo: model.WatchRepoAll,
 			},
 			expectedErr: nil,
 		},
@@ -130,7 +129,7 @@ func TestValidateImage(t *testing.T) {
 			expectedImage: model.Image{
 				Name: "myimg",
 			},
-			expectedErr: errors.New(`cannot parse "chickens" value of label diun.watch_repo`),
+			expectedErr: errors.New(`invalid value of watch_repo "chickens"`),
 		},
 		{
 			name:       "Override default image values with labels (true > false)",
@@ -140,27 +139,43 @@ func TestValidateImage(t *testing.T) {
 				"diun.watch_repo": "false",
 			},
 			defaults: &model.Defaults{
-				WatchRepo: utl.NewTrue(),
+				WatchRepo: model.WatchRepoAll,
 			},
 			expectedImage: model.Image{
 				Name:      "myimg",
-				WatchRepo: utl.NewFalse(),
+				WatchRepo: model.WatchRepoNo,
 			},
 			expectedErr: nil,
 		},
 		{
-			name:       "Override default image values with labels (false > true): invalid label error",
+			name:       "Override default image values with labels (false > true)",
 			image:      "myimg",
 			watchByDef: true,
 			labels: map[string]string{
 				"diun.watch_repo": "true",
 			},
 			defaults: &model.Defaults{
-				WatchRepo: utl.NewFalse(),
+				WatchRepo: model.WatchRepoNo,
 			},
 			expectedImage: model.Image{
 				Name:      "myimg",
-				WatchRepo: utl.NewTrue(),
+				WatchRepo: model.WatchRepoAll,
+			},
+			expectedErr: nil,
+		},
+		{
+			name:       "Override default image values with labels (false > semver)",
+			image:      "myimg",
+			watchByDef: true,
+			labels: map[string]string{
+				"diun.watch_repo": "semver",
+			},
+			defaults: &model.Defaults{
+				WatchRepo: model.WatchRepoNo,
+			},
+			expectedImage: model.Image{
+				Name:      "myimg",
+				WatchRepo: model.WatchRepoSemver,
 			},
 			expectedErr: nil,
 		},
