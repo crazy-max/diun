@@ -194,10 +194,20 @@ func (di *Diun) runJob(job model.Job) (entry model.NotifEntry) {
 	}
 
 	var updated bool
-	entry.Manifest, updated, err = job.Registry.Manifest(job.RegImage, dbManifest)
-	if err != nil {
-		sublog.Warn().Err(err).Msg("Cannot get remote manifest")
-		return
+
+	// If we care about updated models, go check for an update
+	if model.NotifyOnUpdate.OneOf(job.Image.NotifyOn) {
+		entry.Manifest, updated, err = job.Registry.Manifest(job.RegImage, dbManifest)
+		if err != nil {
+			sublog.Warn().Err(err).Msg("Cannot get remote manifest")
+			return
+		}
+	} else {
+		// Otherwise use a stub
+		entry.Manifest = registry.Manifest{
+			Name: job.RegImage.Name(),
+			Tag:  job.RegImage.Tag,
+		}
 	}
 
 	if v, ok := entry.Manifest.Labels["org.opencontainers.image.url"]; ok {
