@@ -22,6 +22,7 @@ type Client struct {
 	notif     *notif.Client
 	pb.UnimplementedImageServiceServer
 	pb.UnimplementedNotifServiceServer
+	pb.UnimplementedHealthcheckServiceServer
 }
 
 // New creates a new grpc instance
@@ -37,6 +38,7 @@ func New(authority string, db *db.Client, notif *notif.Client) (*Client, error) 
 	c.server = grpc.NewServer()
 	pb.RegisterImageServiceServer(c.server, c)
 	pb.RegisterNotifServiceServer(c.server, c)
+	pb.RegisterHealthcheckServiceServer(c.server, c)
 
 	return c, nil
 }
