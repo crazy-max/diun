@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 	"time"
@@ -134,27 +135,49 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	}
 
 	cancelCtx, cancel := context.WithCancelCause(context.Background())
-	timeoutCtx, _ := context.WithTimeoutCause(cancelCtx, *c.cfg.Timeout, errors.WithStack(context.DeadlineExceeded)) //nolint:govet // no need to manually cancel this context as we already rely on parent
 	defer func() { cancel(errors.WithStack(context.Canceled)) }()
 
-	hc := http.Client{}
-	req, err := http.NewRequestWithContext(timeoutCtx, "POST", u.String(), dataBuf)
-	if err != nil {
-		return err
+	max_retries := 3
+	for range max_retries {
+		timeoutCtx, _ := context.WithTimeoutCause(cancelCtx, *c.cfg.Timeout, errors.WithStack(context.DeadlineExceeded)) //nolint:govet // no need to manually cancel this context as we already rely on parent
+
+		hc := http.Client{}
+		req, err := http.NewRequestWithContext(timeoutCtx, "POST", u.String(), bytes.NewReader(dataBuf.Bytes()))
+		if err != nil {
+			return err
+		}
+
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("User-Agent", c.meta.UserAgent)
+
+		resp, err := hc.Do(req)
+		if err != nil {
+			return err
+		}
+
+		if resp.StatusCode == http.StatusTooManyRequests {
+			bodyBytes, _ := io.ReadAll(resp.Body)
+			resp.Body.Close()
+			var retryData struct {
+				RetryAfter float64 `json:"retry_after"`
+			}
+			if err := json.Unmarshal(bodyBytes, &retryData); err == nil && retryData.RetryAfter > 0 {
+				time.Sleep(time.Duration(retryData.RetryAfter * float64(time.Second)))
+				continue
+			}
+			time.Sleep(5 * time.Second)
+			continue
+		}
+
+		if resp.StatusCode != http.StatusNoContent {
+			bodyBytes, _ := io.ReadAll(resp.Body)
+			resp.Body.Close()
+			return errors.Errorf("unexpected HTTP status %d: %s", resp.StatusCode, string(bodyBytes))
+		}
+
+		resp.Body.Close()
+		return nil
 	}
 
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("User-Agent", c.meta.UserAgent)
-
-	resp, err := hc.Do(req)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusNoContent {
-		return errors.Errorf("unexpected HTTP status %d: %s", resp.StatusCode, resp.Body)
-	}
-
-	return nil
+	return errors.New("max retries exceeded for Discord rate limit")
 }
