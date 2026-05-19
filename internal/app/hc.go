@@ -16,7 +16,7 @@ func (di *Diun) HealthchecksStart() {
 	}
 
 	if err := di.hc.Start(context.Background(), gohealthchecks.PingingOptions{
-		UUID: di.cfg.Watch.Healthchecks.UUID,
+		UUID: di.hcUUID,
 	}); err != nil {
 		log.Error().Err(err).Msgf("Cannot send Healthchecks start event")
 	}
@@ -40,7 +40,7 @@ func (di *Diun) HealthchecksSuccess(entries *model.NotifEntries) {
 	}
 
 	if err := di.hc.Success(context.Background(), gohealthchecks.PingingOptions{
-		UUID: di.cfg.Watch.Healthchecks.UUID,
+		UUID: di.hcUUID,
 		Logs: logsBuf.String(),
 	}); err != nil {
 		log.Error().Err(err).Msgf("Cannot send Healthchecks success event")
@@ -53,7 +53,7 @@ func (di *Diun) HealthchecksFail(logs string) {
 	}
 
 	if err := di.hc.Fail(context.Background(), gohealthchecks.PingingOptions{
-		UUID: di.cfg.Watch.Healthchecks.UUID,
+		UUID: di.hcUUID,
 		Logs: logs,
 	}); err != nil {
 		log.Error().Err(err).Msgf("Cannot send Healthchecks fail event")

@@ -18,6 +18,7 @@ import (
 	kubernetesPrd "github.com/crazy-max/diun/v4/internal/provider/kubernetes"
 	nomadPrd "github.com/crazy-max/diun/v4/internal/provider/nomad"
 	swarmPrd "github.com/crazy-max/diun/v4/internal/provider/swarm"
+	"github.com/crazy-max/diun/v4/pkg/utl"
 	"github.com/crazy-max/gohealthchecks"
 	"github.com/dromara/carbon/v2"
 	"github.com/panjf2000/ants/v2"
@@ -30,10 +31,11 @@ type Diun struct {
 	meta model.Meta
 	cfg  *config.Config
 
-	db    *db.Client
-	grpc  *grpc.Client
-	hc    *gohealthchecks.Client
-	notif *notif.Client
+	db     *db.Client
+	grpc   *grpc.Client
+	hc     *gohealthchecks.Client
+	hcUUID string
+	notif  *notif.Client
 
 	cron   *cron.Cron
 	jobID  cron.EntryID
@@ -76,6 +78,10 @@ func New(meta model.Meta, cfg *config.Config, grpcAuthority string) (*Diun, erro
 			if err != nil {
 				return nil, errors.Wrap(err, "cannot parse Healthchecks base URL")
 			}
+		}
+		diun.hcUUID, err = utl.GetSecret(cfg.Watch.Healthchecks.UUID, cfg.Watch.Healthchecks.UUIDFile)
+		if err != nil {
+			return nil, errors.Wrap(err, "cannot retrieve Healthchecks UUID")
 		}
 		diun.hc = gohealthchecks.NewClient(&gohealthchecks.ClientOptions{
 			BaseURL: hcBaseURL,
