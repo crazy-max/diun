@@ -60,7 +60,7 @@ func ValidateImage(image string, metadata, labels map[string]string, watchByDef 
 				break
 			}
 			img.NotifyOn = []model.NotifyOn{}
-			for _, no := range strings.Split(value, ";") {
+			for no := range strings.SplitSeq(value, ";") {
 				notifyOn := model.NotifyOn(no)
 				if !notifyOn.Valid() {
 					return img, errors.Errorf("unknown notify status %q", value)

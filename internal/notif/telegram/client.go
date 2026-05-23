@@ -11,7 +11,7 @@ import (
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/internal/msg"
 	"github.com/crazy-max/diun/v4/internal/notif/notifier"
-	"github.com/crazy-max/diun/v4/pkg/utl"
+	"github.com/crazy-max/diun/v4/internal/secret"
 	"github.com/pkg/errors"
 )
 
@@ -44,13 +44,13 @@ func (c *Client) Name() string {
 
 // Send creates and sends a Telegram notification with an entry
 func (c *Client) Send(entry model.NotifEntry) error {
-	token, err := utl.GetSecret(c.cfg.Token, c.cfg.TokenFile)
+	token, err := secret.GetSecret(c.cfg.Token, c.cfg.TokenFile)
 	if err != nil {
 		return errors.Wrap(err, "cannot retrieve token secret for Telegram notifier")
 	}
 
 	cids := c.cfg.ChatIDs
-	cidsRaw, err := utl.GetSecret("", c.cfg.ChatIDsFile)
+	cidsRaw, err := secret.GetSecret("", c.cfg.ChatIDsFile)
 	if err != nil {
 		return errors.Wrap(err, "cannot retrieve chat IDs secret for Telegram notifier")
 	}
@@ -134,8 +134,7 @@ func parseChatIDs(entries []string) ([]chatID, error) {
 		}
 		var topics []int64
 		if len(parts) == 2 {
-			topicParts := strings.Split(parts[1], ";")
-			for _, topicPart := range topicParts {
+			for topicPart := range strings.SplitSeq(parts[1], ";") {
 				topic, err := strconv.ParseInt(topicPart, 10, 64)
 				if err != nil {
 					return nil, errors.Wrapf(err, "invalid topic %q for chat ID %d", topicPart, id)

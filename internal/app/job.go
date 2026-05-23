@@ -5,9 +5,10 @@ import (
 	"regexp"
 
 	"dario.cat/mergo"
+	"github.com/crazy-max/diun/v4/internal/matcher"
 	"github.com/crazy-max/diun/v4/internal/model"
+	"github.com/crazy-max/diun/v4/internal/secret"
 	"github.com/crazy-max/diun/v4/pkg/registry"
-	"github.com/crazy-max/diun/v4/pkg/utl"
 	"github.com/rs/zerolog/log"
 	"go.podman.io/image/v5/pkg/docker/config"
 	"go.podman.io/image/v5/types"
@@ -51,11 +52,11 @@ func (di *Diun) createJob(job model.Job) {
 		reg = (&model.RegOpt{}).GetDefaults()
 	}
 
-	regUser, err := utl.GetSecret(reg.Username, reg.UsernameFile)
+	regUser, err := secret.GetSecret(reg.Username, reg.UsernameFile)
 	if err != nil {
 		log.Warn().Err(err).Msgf("Cannot retrieve username secret for regopts %s", reg.Name)
 	}
-	regPassword, err := utl.GetSecret(reg.Password, reg.PasswordFile)
+	regPassword, err := secret.GetSecret(reg.Password, reg.PasswordFile)
 	if err != nil {
 		log.Warn().Err(err).Msgf("Cannot retrieve password secret for regopts %s", reg.Name)
 	}
@@ -63,7 +64,7 @@ func (di *Diun) createJob(job model.Job) {
 	// Set defaults
 	if err := mergo.Merge(&job.Image, model.Image{
 		Platform:  model.ImagePlatform{},
-		WatchRepo: utl.NewFalse(),
+		WatchRepo: new(false),
 		MaxTags:   0,
 	}); err != nil {
 		sublog.Error().Err(err).Msg("Cannot set default values")
@@ -177,11 +178,11 @@ func (di *Diun) runJob(job model.Job) (entry model.NotifEntry) {
 		Str("image", job.RegImage.String()).
 		Logger()
 
-	if !utl.IsIncluded(job.RegImage.Tag, job.Image.IncludeTags) {
+	if !matcher.IsIncluded(job.RegImage.Tag, job.Image.IncludeTags) {
 		entry.Status = model.ImageStatusSkip
 		sublog.Debug().Msg("Tag not included")
 		return
-	} else if utl.IsExcluded(job.RegImage.Tag, job.Image.ExcludeTags) {
+	} else if matcher.IsExcluded(job.RegImage.Tag, job.Image.ExcludeTags) {
 		entry.Status = model.ImageStatusSkip
 		sublog.Debug().Msg("Tag excluded")
 		return

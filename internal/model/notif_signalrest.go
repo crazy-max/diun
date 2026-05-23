@@ -2,8 +2,6 @@ package model
 
 import (
 	"time"
-
-	"github.com/crazy-max/diun/v4/pkg/utl"
 )
 
 // NotifSignalRestDefaultTemplateBody ...
@@ -31,7 +29,7 @@ func (s *NotifSignalRest) GetDefaults() *NotifSignalRest {
 
 // SetDefaults sets the default values
 func (s *NotifSignalRest) SetDefaults() {
-	s.Timeout = utl.NewDuration(10 * time.Second)
+	s.Timeout = new(10 * time.Second)
 	s.Endpoint = "http://localhost:8080/v2/send"
 	s.TemplateBody = NotifSignalRestDefaultTemplateBody
 }

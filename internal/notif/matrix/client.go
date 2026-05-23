@@ -7,7 +7,7 @@ import (
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/internal/msg"
 	"github.com/crazy-max/diun/v4/internal/notif/notifier"
-	"github.com/crazy-max/diun/v4/pkg/utl"
+	"github.com/crazy-max/diun/v4/internal/secret"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 	"maunium.net/go/mautrix"
@@ -49,11 +49,11 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		}
 	}()
 
-	user, err := utl.GetSecret(c.cfg.User, c.cfg.UserFile)
+	user, err := secret.GetSecret(c.cfg.User, c.cfg.UserFile)
 	if err != nil {
 		return errors.Wrap(err, "cannot retrieve username secret for Matrix notifier")
 	}
-	password, err := utl.GetSecret(c.cfg.Password, c.cfg.PasswordFile)
+	password, err := secret.GetSecret(c.cfg.Password, c.cfg.PasswordFile)
 	if err != nil {
 		return errors.Wrap(err, "cannot retrieve password secret for Matrix notifier")
 	}

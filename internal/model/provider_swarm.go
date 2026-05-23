@@ -1,9 +1,5 @@
 package model
 
-import (
-	"github.com/crazy-max/diun/v4/pkg/utl"
-)
-
 // PrdSwarm holds swarm provider configuration
 type PrdSwarm struct {
 	Endpoint       string `yaml:"endpoint,omitempty" json:"endpoint,omitempty" validate:"omitempty"`
@@ -22,6 +18,6 @@ func (s *PrdSwarm) GetDefaults() *PrdSwarm {
 
 // SetDefaults sets the default values
 func (s *PrdSwarm) SetDefaults() {
-	s.TLSVerify = utl.NewTrue()
-	s.WatchByDefault = utl.NewFalse()
+	s.TLSVerify = new(true)
+	s.WatchByDefault = new(false)
 }

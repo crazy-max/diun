@@ -219,7 +219,6 @@ func TestTagsSort(t *testing.T) {
 	}
 
 	for _, tt := range testCases {
-		tt := tt
 		repotags := []string{
 			"0.1.0",
 			"0.4.0",

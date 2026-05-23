@@ -2,7 +2,6 @@ package model
 
 import (
 	"github.com/PaulSonOfLars/gotgbot/v2"
-	"github.com/crazy-max/diun/v4/pkg/utl"
 )
 
 // NotifTelegramDefaultTemplateBody ...
@@ -30,5 +29,5 @@ func (s *NotifTelegram) GetDefaults() *NotifTelegram {
 func (s *NotifTelegram) SetDefaults() {
 	s.APIURL = gotgbot.DefaultAPIURL
 	s.TemplateBody = NotifTelegramDefaultTemplateBody
-	s.DisableNotification = utl.NewFalse()
+	s.DisableNotification = new(false)
 }

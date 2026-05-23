@@ -1,9 +1,5 @@
 package model
 
-import (
-	"github.com/crazy-max/diun/v4/pkg/utl"
-)
-
 // PrdKubernetes holds kubernetes provider configuration
 type PrdKubernetes struct {
 	Endpoint         string   `yaml:"endpoint" json:"endpoint,omitempty" validate:"omitempty"`
@@ -24,6 +20,6 @@ func (s *PrdKubernetes) GetDefaults() *PrdKubernetes {
 
 // SetDefaults sets the default values
 func (s *PrdKubernetes) SetDefaults() {
-	s.TLSInsecure = utl.NewFalse()
-	s.WatchByDefault = utl.NewFalse()
+	s.TLSInsecure = new(false)
+	s.WatchByDefault = new(false)
 }

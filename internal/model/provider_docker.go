@@ -1,9 +1,5 @@
 package model
 
-import (
-	"github.com/crazy-max/diun/v4/pkg/utl"
-)
-
 // PrdDocker holds docker provider configuration
 type PrdDocker struct {
 	Endpoint       string `yaml:"endpoint" json:"endpoint,omitempty" validate:"omitempty"`
@@ -23,7 +19,7 @@ func (s *PrdDocker) GetDefaults() *PrdDocker {
 
 // SetDefaults sets the default values
 func (s *PrdDocker) SetDefaults() {
-	s.TLSVerify = utl.NewTrue()
-	s.WatchByDefault = utl.NewFalse()
-	s.WatchStopped = utl.NewFalse()
+	s.TLSVerify = new(true)
+	s.WatchByDefault = new(false)
+	s.WatchStopped = new(false)
 }

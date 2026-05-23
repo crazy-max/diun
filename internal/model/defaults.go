@@ -2,7 +2,6 @@ package model
 
 import (
 	"github.com/crazy-max/diun/v4/pkg/registry"
-	"github.com/crazy-max/diun/v4/pkg/utl"
 )
 
 // Defaults holds data necessary for image defaults configuration
@@ -25,7 +24,7 @@ func (s *Defaults) GetDefaults() *Defaults {
 
 // SetDefaults sets the default values
 func (s *Defaults) SetDefaults() {
-	s.WatchRepo = utl.NewFalse()
+	s.WatchRepo = new(false)
 	s.NotifyOn = NotifyOnDefaults
 	s.SortTags = registry.SortTagReverse
 }

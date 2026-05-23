@@ -5,7 +5,6 @@ import (
 
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/pkg/registry"
-	"github.com/crazy-max/diun/v4/pkg/utl"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
 )
@@ -111,11 +110,11 @@ func TestValidateImage(t *testing.T) {
 			image:      "myimg",
 			watchByDef: true,
 			defaults: &model.Defaults{
-				WatchRepo: utl.NewTrue(),
+				WatchRepo: new(true),
 			},
 			expectedImage: model.Image{
 				Name:      "myimg",
-				WatchRepo: utl.NewTrue(),
+				WatchRepo: new(true),
 			},
 			expectedErr: nil,
 		},
@@ -140,11 +139,11 @@ func TestValidateImage(t *testing.T) {
 				"diun.watch_repo": "false",
 			},
 			defaults: &model.Defaults{
-				WatchRepo: utl.NewTrue(),
+				WatchRepo: new(true),
 			},
 			expectedImage: model.Image{
 				Name:      "myimg",
-				WatchRepo: utl.NewFalse(),
+				WatchRepo: new(false),
 			},
 			expectedErr: nil,
 		},
@@ -156,11 +155,11 @@ func TestValidateImage(t *testing.T) {
 				"diun.watch_repo": "true",
 			},
 			defaults: &model.Defaults{
-				WatchRepo: utl.NewFalse(),
+				WatchRepo: new(false),
 			},
 			expectedImage: model.Image{
 				Name:      "myimg",
-				WatchRepo: utl.NewTrue(),
+				WatchRepo: new(true),
 			},
 			expectedErr: nil,
 		},
@@ -683,7 +682,6 @@ func TestValidateImage(t *testing.T) {
 	}
 
 	for _, tt := range cases {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			img, err := ValidateImage(
 				tt.image,

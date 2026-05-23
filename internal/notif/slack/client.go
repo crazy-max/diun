@@ -9,7 +9,7 @@ import (
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/internal/msg"
 	"github.com/crazy-max/diun/v4/internal/notif/notifier"
-	"github.com/crazy-max/diun/v4/pkg/utl"
+	"github.com/crazy-max/diun/v4/internal/secret"
 	"github.com/nlopes/slack"
 	"github.com/pkg/errors"
 )
@@ -38,7 +38,7 @@ func (c *Client) Name() string {
 
 // Send creates and sends a slack notification with an entry
 func (c *Client) Send(entry model.NotifEntry) error {
-	webhookURL, err := utl.GetSecret(c.cfg.WebhookURL, c.cfg.WebhookURLFile)
+	webhookURL, err := secret.GetSecret(c.cfg.WebhookURL, c.cfg.WebhookURLFile)
 	if err != nil {
 		return errors.Wrap(err, "cannot retrieve webhook URL for Slack notifier")
 	}

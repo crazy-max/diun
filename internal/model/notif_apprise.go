@@ -2,8 +2,6 @@ package model
 
 import (
 	"time"
-
-	"github.com/crazy-max/diun/v4/pkg/utl"
 )
 
 // NotifApprise holds apprise notification configuration details
@@ -29,7 +27,7 @@ func (s *NotifApprise) GetDefaults() *NotifApprise {
 
 // SetDefaults sets the default values
 func (s *NotifApprise) SetDefaults() {
-	s.Timeout = utl.NewDuration(10 * time.Second)
+	s.Timeout = new(10 * time.Second)
 	s.TemplateTitle = NotifDefaultTemplateTitle
 	s.TemplateBody = NotifDefaultTemplateBody
 }

@@ -2,8 +2,6 @@ package model
 
 import (
 	"time"
-
-	"github.com/crazy-max/diun/v4/pkg/utl"
 )
 
 // NotifDiscord holds Discord notification configuration details
@@ -26,8 +24,8 @@ func (s *NotifDiscord) GetDefaults() *NotifDiscord {
 
 // SetDefaults sets the default values
 func (s *NotifDiscord) SetDefaults() {
-	s.RenderEmbeds = utl.NewTrue()
-	s.RenderFields = utl.NewTrue()
-	s.Timeout = utl.NewDuration(10 * time.Second)
+	s.RenderEmbeds = new(true)
+	s.RenderFields = new(true)
+	s.Timeout = new(10 * time.Second)
 	s.TemplateBody = NotifDefaultTemplateBody
 }

@@ -2,8 +2,6 @@ package model
 
 import (
 	"time"
-
-	"github.com/crazy-max/diun/v4/pkg/utl"
 )
 
 // NotifTeamsDefaultTemplateBody ...
@@ -29,7 +27,7 @@ func (s *NotifTeams) GetDefaults() *NotifTeams {
 
 // SetDefaults sets the default values
 func (s *NotifTeams) SetDefaults() {
-	s.Timeout = utl.NewDuration(10 * time.Second)
-	s.RenderFacts = utl.NewTrue()
+	s.Timeout = new(10 * time.Second)
+	s.RenderFacts = new(true)
 	s.TemplateBody = NotifTeamsDefaultTemplateBody
 }

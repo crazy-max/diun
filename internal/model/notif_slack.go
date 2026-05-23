@@ -1,7 +1,5 @@
 package model
 
-import "github.com/crazy-max/diun/v4/pkg/utl"
-
 // NotifSlackDefaultTemplateBody ...
 const NotifSlackDefaultTemplateBody = "<!channel> Docker tag {{ if .Entry.Image.HubLink }}<{{ .Entry.Image.HubLink }}|`{{ .Entry.Image }}`>{{ else }}`{{ .Entry.Image }}`{{ end }}  {{ if (eq .Entry.Status \"new\") }}available{{ else }}updated{{ end }}."
 
@@ -22,6 +20,6 @@ func (s *NotifSlack) GetDefaults() *NotifSlack {
 
 // SetDefaults sets the default values
 func (s *NotifSlack) SetDefaults() {
-	s.RenderFields = utl.NewTrue()
+	s.RenderFields = new(true)
 	s.TemplateBody = NotifSlackDefaultTemplateBody
 }
