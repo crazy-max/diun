@@ -13,6 +13,7 @@ import (
 	"github.com/crazy-max/diun/v4/internal/logging"
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/internal/notif"
+	"github.com/crazy-max/diun/v4/internal/provider"
 	dockerPrd "github.com/crazy-max/diun/v4/internal/provider/docker"
 	dockerfilePrd "github.com/crazy-max/diun/v4/internal/provider/dockerfile"
 	filePrd "github.com/crazy-max/diun/v4/internal/provider/file"
@@ -172,35 +173,14 @@ func (di *Diun) Run() {
 	}, ants.WithLogger(new(logging.AntsLogger)))
 	defer di.pool.Release()
 
-	// Docker provider
-	for _, job := range dockerPrd.New(di.cfg.Providers.Docker, di.cfg.Defaults).ListJob() {
-		di.createJob(job)
-	}
-
-	// Swarm provider
-	for _, job := range swarmPrd.New(di.cfg.Providers.Swarm, di.cfg.Defaults).ListJob() {
-		di.createJob(job)
-	}
-
-	// Kubernetes provider
-	for _, job := range kubernetesPrd.New(di.cfg.Providers.Kubernetes, di.cfg.Defaults).ListJob() {
-		di.createJob(job)
-	}
-
-	// File provider
-	for _, job := range filePrd.New(di.cfg.Providers.File, di.cfg.Defaults).ListJob() {
-		di.createJob(job)
-	}
-
-	// Dockerfile provider
-	for _, job := range dockerfilePrd.New(di.cfg.Providers.Dockerfile, di.cfg.Defaults).ListJob() {
-		di.createJob(job)
-	}
-
-	// Nomad provider
-	for _, job := range nomadPrd.New(di.cfg.Providers.Nomad, di.cfg.Defaults).ListJob() {
-		di.createJob(job)
-	}
+	provider.WalkJobs(di.createJob,
+		dockerPrd.New(di.cfg.Providers.Docker, di.cfg.Defaults),
+		swarmPrd.New(di.cfg.Providers.Swarm, di.cfg.Defaults),
+		kubernetesPrd.New(di.cfg.Providers.Kubernetes, di.cfg.Defaults),
+		filePrd.New(di.cfg.Providers.File, di.cfg.Defaults),
+		dockerfilePrd.New(di.cfg.Providers.Dockerfile, di.cfg.Defaults),
+		nomadPrd.New(di.cfg.Providers.Nomad, di.cfg.Defaults),
+	)
 
 	di.wg.Wait()
 	log.Info().
