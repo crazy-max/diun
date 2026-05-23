@@ -17,6 +17,7 @@ type AbstractSet[T comparable] interface {
 	Has(item T) bool
 	Pop(item T) bool
 	Remove(item T)
+	Clear()
 	Size() int
 	AsList() []T
 	Iter() iter.Seq[T]
@@ -60,6 +61,10 @@ func (s Set[T]) AddSeq(seq iter.Seq[T]) {
 
 func (s Set[T]) Remove(item T) {
 	delete(s, item)
+}
+
+func (s Set[T]) Clear() {
+	clear(s)
 }
 
 func (s Set[T]) Pop(item T) bool {

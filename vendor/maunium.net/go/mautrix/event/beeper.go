@@ -16,6 +16,8 @@ import (
 	"strconv"
 	"strings"
 
+	"go.mau.fi/util/jsonbytes"
+
 	"maunium.net/go/mautrix/id"
 )
 
@@ -214,13 +216,63 @@ func (content *MessageEventContent) RemovePerMessageProfileFallback() {
 	}
 }
 
-type BeeperAIStreamEventContent struct {
-	TurnID      string         `json:"turn_id"`
-	Seq         int            `json:"seq"`
-	Part        map[string]any `json:"part"`
-	TargetEvent id.EventID     `json:"target_event,omitempty"`
-	AgentID     string         `json:"agent_id,omitempty"`
-	RelatesTo   *RelatesTo     `json:"m.relates_to,omitempty"`
+type BeeperStreamInfo struct {
+	UserID             id.UserID                   `json:"user_id"`
+	DeviceID           id.DeviceID                 `json:"device_id,omitempty"`
+	Type               string                      `json:"type"`
+	ExpiryMS           int64                       `json:"expiry_ms,omitempty"`
+	MaxBufferedUpdates int                         `json:"max_buffered_updates,omitempty"`
+	Encryption         *BeeperStreamEncryptionInfo `json:"encryption,omitempty"`
+}
+
+func (info *BeeperStreamInfo) Clone() *BeeperStreamInfo {
+	if info == nil {
+		return nil
+	}
+	cloned := *info
+	if info.Encryption != nil {
+		enc := *info.Encryption
+		enc.Key = append(jsonbytes.UnpaddedBytes(nil), info.Encryption.Key...)
+		cloned.Encryption = &enc
+	}
+	return &cloned
+}
+
+func (info *BeeperStreamInfo) Validate() error {
+	if info == nil {
+		return fmt.Errorf("missing beeper stream descriptor")
+	} else if info.UserID == "" || info.Type == "" {
+		return fmt.Errorf("missing beeper stream descriptor fields")
+	} else if info.MaxBufferedUpdates < 0 {
+		return fmt.Errorf("invalid beeper stream max buffered updates %d", info.MaxBufferedUpdates)
+	}
+	if info.Encryption == nil {
+		return nil
+	}
+	if info.Encryption.Algorithm != id.AlgorithmBeeperStreamV1 {
+		return fmt.Errorf("unsupported beeper stream encryption algorithm %q", info.Encryption.Algorithm)
+	} else if len(info.Encryption.Key) == 0 {
+		return fmt.Errorf("missing beeper stream encryption key")
+	}
+	return nil
+}
+
+type BeeperStreamEncryptionInfo struct {
+	Algorithm id.Algorithm            `json:"algorithm"`
+	Key       jsonbytes.UnpaddedBytes `json:"key"`
+}
+
+type BeeperStreamSubscribeEventContent struct {
+	RoomID   id.RoomID   `json:"room_id"`
+	EventID  id.EventID  `json:"event_id"`
+	DeviceID id.DeviceID `json:"device_id"`
+	ExpiryMS int64       `json:"expiry_ms"`
+}
+
+type BeeperStreamUpdateEventContent struct {
+	RoomID  id.RoomID        `json:"room_id"`
+	EventID id.EventID       `json:"event_id"`
+	Updates []map[string]any `json:"updates,omitempty"`
 }
 
 type BeeperEncodedOrder struct {

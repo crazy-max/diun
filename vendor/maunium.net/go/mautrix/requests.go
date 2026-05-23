@@ -298,12 +298,45 @@ type ReqKeysSignatures struct {
 type ReqUploadSignatures map[id.UserID]map[string]ReqKeysSignatures
 
 type DeviceKeys struct {
-	UserID     id.UserID              `json:"user_id"`
-	DeviceID   id.DeviceID            `json:"device_id"`
-	Algorithms []id.Algorithm         `json:"algorithms"`
-	Keys       KeyMap                 `json:"keys"`
-	Signatures signatures.Signatures  `json:"signatures"`
-	Unsigned   map[string]interface{} `json:"unsigned,omitempty"`
+	UserID     id.UserID             `json:"user_id"`
+	DeviceID   id.DeviceID           `json:"device_id"`
+	Algorithms []id.Algorithm        `json:"algorithms"`
+	Keys       KeyMap                `json:"keys"`
+	Signatures signatures.Signatures `json:"signatures"`
+	Dehydrated bool                  `json:"dehydrated,omitempty"`
+	Unsigned   map[string]any        `json:"unsigned,omitempty"`
+	Extra      map[string]any        `json:"-"`
+}
+
+type serializableDeviceKeys DeviceKeys
+
+func (dk *DeviceKeys) deleteStandardExtraFields() {
+	if len(dk.Extra) == 0 {
+		return
+	}
+	delete(dk.Extra, "user_id")
+	delete(dk.Extra, "device_id")
+	delete(dk.Extra, "algorithms")
+	delete(dk.Extra, "keys")
+	delete(dk.Extra, "signatures")
+	delete(dk.Extra, "dehydrated")
+	delete(dk.Extra, "unsigned")
+}
+
+func (dk *DeviceKeys) MarshalJSON() ([]byte, error) {
+	dk.deleteStandardExtraFields()
+	return event.MarshalMerge((*serializableDeviceKeys)(dk), dk.Extra)
+}
+
+func (dk *DeviceKeys) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, (*serializableDeviceKeys)(dk)); err != nil {
+		return err
+	}
+	if err := json.Unmarshal(data, &dk.Extra); err != nil {
+		return err
+	}
+	dk.deleteStandardExtraFields()
+	return nil
 }
 
 type CrossSigningKeys struct {
@@ -425,6 +458,8 @@ type ReqSetReadMarkers struct {
 	Read        id.EventID `json:"m.read,omitempty"`
 	ReadPrivate id.EventID `json:"m.read.private,omitempty"`
 	FullyRead   id.EventID `json:"m.fully_read,omitempty"`
+	// Allow moving m.fully_read backwards via MSC4446.
+	AllowBackward bool `json:"com.beeper.allow_backward,omitempty"`
 
 	BeeperReadExtra        interface{} `json:"com.beeper.read.extra,omitempty"`
 	BeeperReadPrivateExtra interface{} `json:"com.beeper.read.private.extra,omitempty"`
@@ -444,6 +479,8 @@ type ReqSetBeeperInboxState struct {
 
 type ReqSendReceipt struct {
 	ThreadID string `json:"thread_id,omitempty"`
+	// Allow moving m.fully_read backwards via MSC4446.
+	AllowBackward bool `json:"com.beeper.allow_backward,omitempty"`
 }
 
 type ReqPublicRooms struct {
@@ -451,6 +488,7 @@ type ReqPublicRooms struct {
 	Limit                int
 	Since                string
 	ThirdPartyInstanceID string
+	Server               string
 }
 
 func (req *ReqPublicRooms) Query() map[string]string {
@@ -469,6 +507,9 @@ func (req *ReqPublicRooms) Query() map[string]string {
 	}
 	if req.ThirdPartyInstanceID != "" {
 		query["third_party_instance_id"] = req.ThirdPartyInstanceID
+	}
+	if req.Server != "" {
+		query["server"] = req.Server
 	}
 	return query
 }
