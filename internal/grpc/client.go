@@ -43,14 +43,28 @@ func New(authority string, db *db.Client, notif *notif.Client) (*Client, error) 
 
 // Start runs the grpc server
 func (c *Client) Start() error {
-	var err error
+	lis, err := c.Listen()
+	if err != nil {
+		return err
+	}
+	return c.Serve(lis)
+}
 
+// Listen creates the gRPC listener
+func (c *Client) Listen() (net.Listener, error) {
 	lis, err := (&net.ListenConfig{}).Listen(context.Background(), "tcp", c.authority)
 	if err != nil {
-		return errors.Wrap(err, "cannot create gRPC listener")
+		return nil, errors.Wrap(err, "cannot create gRPC listener")
 	}
+	return lis, nil
+}
 
-	return c.server.Serve(lis)
+// Serve serves gRPC requests on listener
+func (c *Client) Serve(lis net.Listener) error {
+	if err := c.server.Serve(lis); err != nil && !errors.Is(err, grpc.ErrServerStopped) {
+		return err
+	}
+	return nil
 }
 
 // Stop stops the grpc server
