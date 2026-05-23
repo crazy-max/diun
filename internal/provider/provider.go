@@ -7,10 +7,18 @@ import (
 // Handler is a provider interface
 type Handler interface {
 	ListJob() []model.Job
-	Close() error
 }
 
 // Client represents an active provider object
 type Client struct {
 	Handler
+}
+
+// WalkJobs calls fn for every job returned by providers.
+func WalkJobs(fn func(model.Job), providers ...*Client) {
+	for _, prd := range providers {
+		for _, job := range prd.ListJob() {
+			fn(job)
+		}
+	}
 }
