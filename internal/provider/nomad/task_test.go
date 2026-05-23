@@ -44,7 +44,6 @@ func TestParseServiceTags(t *testing.T) {
 	}
 
 	for _, tt := range testCases {
-		tt := tt
 		t.Run(tt.input[0], func(t *testing.T) {
 			result := parseServiceTags(tt.input)
 			assert.Equal(t, tt.expected, result)

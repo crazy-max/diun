@@ -12,7 +12,7 @@ import (
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/internal/msg"
 	"github.com/crazy-max/diun/v4/internal/notif/notifier"
-	"github.com/crazy-max/diun/v4/pkg/utl"
+	"github.com/crazy-max/diun/v4/internal/secret"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 )
@@ -43,14 +43,14 @@ func (c *Client) Name() string {
 
 // Send creates and sends a Pushover notification with an entry
 func (c *Client) Send(entry model.NotifEntry) error {
-	token, err := utl.GetSecret(c.cfg.Token, c.cfg.TokenFile)
+	token, err := secret.GetSecret(c.cfg.Token, c.cfg.TokenFile)
 	if err != nil {
 		return errors.Wrap(err, "cannot retrieve token secret for Pushover notifier")
 	} else if token == "" {
 		return errors.New("Pushover API token cannot be empty")
 	}
 
-	recipient, err := utl.GetSecret(c.cfg.Recipient, c.cfg.RecipientFile)
+	recipient, err := secret.GetSecret(c.cfg.Recipient, c.cfg.RecipientFile)
 	if err != nil {
 		return errors.Wrap(err, "cannot retrieve recipient secret for Pushover notifier")
 	} else if recipient == "" {

@@ -2,8 +2,6 @@ package model
 
 import (
 	"time"
-
-	"github.com/crazy-max/diun/v4/pkg/utl"
 )
 
 // NotifNtfy holds ntfy notification configuration details
@@ -33,7 +31,7 @@ func (s *NotifNtfy) SetDefaults() {
 	s.Endpoint = "https://ntfy.sh"
 	s.Priority = 3
 	s.Tags = []string{"package"}
-	s.Timeout = utl.NewDuration(10 * time.Second)
+	s.Timeout = new(10 * time.Second)
 	s.TemplateTitle = NotifDefaultTemplateTitle
 	s.TemplateBody = NotifDefaultTemplateBody
 }

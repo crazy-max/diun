@@ -8,7 +8,6 @@ import (
 	"github.com/PaulSonOfLars/gotgbot/v2"
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/pkg/registry"
-	"github.com/crazy-max/diun/v4/pkg/utl"
 	"github.com/crazy-max/gonfig/env"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -51,17 +50,17 @@ func TestLoadFile(t *testing.T) {
 				Watch: &model.Watch{
 					Workers:         100,
 					Schedule:        "*/30 * * * *",
-					Jitter:          utl.NewDuration(30 * time.Second),
-					FirstCheckNotif: utl.NewTrue(),
-					RunOnStartup:    utl.NewFalse(),
-					CompareDigest:   utl.NewTrue(),
+					Jitter:          new(30 * time.Second),
+					FirstCheckNotif: new(true),
+					RunOnStartup:    new(false),
+					CompareDigest:   new(true),
 					Healthchecks: &model.Healthchecks{
 						BaseURL: "https://hc-ping.com/",
 						UUID:    "5bf66975-d4c7-4bf5-bcc8-b8d8a82ea278",
 					},
 				},
 				Defaults: &model.Defaults{
-					WatchRepo: utl.NewFalse(),
+					WatchRepo: new(false),
 					NotifyOn:  []model.NotifyOn{model.NotifyOnNew},
 					MaxTags:   5,
 					SortTags:  registry.SortTagReverse,
@@ -78,7 +77,7 @@ func TestLoadFile(t *testing.T) {
 						Endpoint:      "http://apprise:8000",
 						Token:         "abc",
 						Tags:          []string{"diun"},
-						Timeout:       utl.NewDuration(10 * time.Second),
+						Timeout:       new(10 * time.Second),
 						TemplateTitle: model.NotifDefaultTemplateTitle,
 						TemplateBody:  model.NotifDefaultTemplateBody,
 					},
@@ -91,9 +90,9 @@ func TestLoadFile(t *testing.T) {
 							"<@125>",
 							"<@&200>",
 						},
-						RenderEmbeds: utl.NewTrue(),
-						RenderFields: utl.NewTrue(),
-						Timeout:      utl.NewDuration(10 * time.Second),
+						RenderEmbeds: new(true),
+						RenderFields: new(true),
+						Timeout:      new(10 * time.Second),
 						TemplateBody: model.NotifDefaultTemplateBody,
 					},
 					Elasticsearch: &model.NotifElasticsearch{
@@ -102,21 +101,21 @@ func TestLoadFile(t *testing.T) {
 						Password: "password",
 						Client:   "diun",
 						Index:    "diun-notifications",
-						Timeout:  utl.NewDuration(10 * time.Second),
+						Timeout:  new(10 * time.Second),
 					},
 					Gotify: &model.NotifGotify{
 						Endpoint:      "http://gotify.foo.com",
 						Token:         "Token123456",
 						Priority:      1,
-						Timeout:       utl.NewDuration(10 * time.Second),
+						Timeout:       new(10 * time.Second),
 						TemplateTitle: model.NotifDefaultTemplateTitle,
 						TemplateBody:  model.NotifDefaultTemplateBody,
 					},
 					Mail: &model.NotifMail{
 						Host:               "localhost",
 						Port:               25,
-						SSL:                utl.NewFalse(),
-						InsecureSkipVerify: utl.NewFalse(),
+						SSL:                new(false),
+						InsecureSkipVerify: new(false),
 						LocalName:          "localhost",
 						From:               "diun@example.com",
 						To: []string{
@@ -155,14 +154,14 @@ for <code>{{ .Entry.Manifest.Platform }}</code> platform.
 						Topic:         "diun-acce65a0-b777-46f9-9a11-58c67d1579c4",
 						Priority:      3,
 						Tags:          []string{"package"},
-						Timeout:       utl.NewDuration(10 * time.Second),
+						Timeout:       new(10 * time.Second),
 						TemplateTitle: model.NotifDefaultTemplateTitle,
 						TemplateBody:  model.NotifDefaultTemplateBody,
 					},
 					Pushover: &model.NotifPushover{ //nolint:gosec // fixture values are test data.
 						Token:         "uQiRzpo4DXghDmr9QzzfQu27cmVRsG",
 						Recipient:     "gznej3rKEVAvPUxu9vvNnqpmZpokzF",
-						Timeout:       utl.NewDuration(10 * time.Second),
+						Timeout:       new(10 * time.Second),
 						TemplateTitle: model.NotifDefaultTemplateTitle,
 						TemplateBody:  model.NotifDefaultTemplateBody,
 					},
@@ -171,8 +170,8 @@ for <code>{{ .Entry.Manifest.Platform }}</code> platform.
 						Channel:          "#general",
 						UserID:           "abcdEFGH012345678",
 						Token:            "Token123456",
-						RenderAttachment: utl.NewTrue(),
-						Timeout:          utl.NewDuration(10 * time.Second),
+						RenderAttachment: new(true),
+						Timeout:          new(10 * time.Second),
 						TemplateTitle:    model.NotifDefaultTemplateTitle,
 						TemplateBody:     model.NotifRocketChatDefaultTemplateBody,
 					},
@@ -184,13 +183,13 @@ for <code>{{ .Entry.Manifest.Platform }}</code> platform.
 					},
 					Slack: &model.NotifSlack{
 						WebhookURL:   "https://hooks.slack.com/services/ABCD12EFG/HIJK34LMN/01234567890abcdefghij",
-						RenderFields: utl.NewFalse(),
+						RenderFields: new(false),
 						TemplateBody: model.NotifSlackDefaultTemplateBody,
 					},
 					Teams: &model.NotifTeams{
 						WebhookURL:   "https://outlook.office.com/webhook/ABCD12EFG/HIJK34LMN/01234567890abcdefghij",
-						RenderFacts:  utl.NewFalse(),
-						Timeout:      utl.NewDuration(10 * time.Second),
+						RenderFacts:  new(false),
+						Timeout:      new(10 * time.Second),
 						TemplateBody: model.NotifTeamsDefaultTemplateBody,
 					},
 					Telegram: &model.NotifTelegram{
@@ -203,7 +202,7 @@ for <code>{{ .Entry.Manifest.Platform }}</code> platform.
 							"891256734:25;12",
 						},
 						TemplateBody:        model.NotifTelegramDefaultTemplateBody,
-						DisableNotification: utl.NewFalse(),
+						DisableNotification: new(false),
 					},
 					Webhook: &model.NotifWebhook{
 						Endpoint: "http://webhook.foo.com/sd54qad89azd5a",
@@ -212,7 +211,7 @@ for <code>{{ .Entry.Manifest.Platform }}</code> platform.
 							"content-type":  "application/json",
 							"authorization": "Token123456",
 						},
-						Timeout: utl.NewDuration(10 * time.Second),
+						Timeout: new(10 * time.Second),
 					},
 				},
 				RegOpts: model.RegOpts{
@@ -221,39 +220,39 @@ for <code>{{ .Entry.Manifest.Platform }}</code> platform.
 						Selector:    model.RegOptSelectorName,
 						Username:    "fii",
 						Password:    "bor",
-						InsecureTLS: utl.NewFalse(),
-						Timeout:     utl.NewDuration(5 * time.Second),
+						InsecureTLS: new(false),
+						Timeout:     new(5 * time.Second),
 					},
 					model.RegOpt{
 						Name:        "docker.io",
 						Selector:    model.RegOptSelectorImage,
 						Username:    "foo",
 						Password:    "bar",
-						InsecureTLS: utl.NewFalse(),
-						Timeout:     utl.NewDuration(0),
+						InsecureTLS: new(false),
+						Timeout:     new(time.Duration(0)),
 					},
 					model.RegOpt{ //nolint:gosec // fixture paths are test data.
 						Name:         "docker.io/crazymax",
 						Selector:     model.RegOptSelectorImage,
 						UsernameFile: "./fixtures/run_secrets_username",
 						PasswordFile: "./fixtures/run_secrets_password",
-						InsecureTLS:  utl.NewFalse(),
-						Timeout:      utl.NewDuration(0),
+						InsecureTLS:  new(false),
+						Timeout:      new(time.Duration(0)),
 					},
 				},
 				Providers: &model.Providers{
 					Docker: &model.PrdDocker{
-						TLSVerify:      utl.NewTrue(),
-						WatchByDefault: utl.NewTrue(),
-						WatchStopped:   utl.NewTrue(),
+						TLSVerify:      new(true),
+						WatchByDefault: new(true),
+						WatchStopped:   new(true),
 					},
 					Swarm: &model.PrdSwarm{
-						TLSVerify:      utl.NewTrue(),
-						WatchByDefault: utl.NewFalse(),
+						TLSVerify:      new(true),
+						WatchByDefault: new(false),
 					},
 					Kubernetes: &model.PrdKubernetes{
-						TLSInsecure:    utl.NewFalse(),
-						WatchByDefault: utl.NewTrue(),
+						TLSInsecure:    new(false),
+						WatchByDefault: new(true),
 					},
 					File: &model.PrdFile{
 						Filename: "./fixtures/file.yml",
@@ -280,7 +279,7 @@ func TestLoadEnv(t *testing.T) {
 		desc     string
 		cfg      string
 		environ  []string
-		expected interface{}
+		expected any
 		wantErr  bool
 	}{
 		{
@@ -302,9 +301,9 @@ func TestLoadEnv(t *testing.T) {
 				RegOpts:  nil,
 				Providers: &model.Providers{
 					Docker: &model.PrdDocker{
-						TLSVerify:      utl.NewTrue(),
-						WatchByDefault: utl.NewFalse(),
-						WatchStopped:   utl.NewFalse(),
+						TLSVerify:      new(true),
+						WatchByDefault: new(false),
+						WatchStopped:   new(false),
 					},
 				},
 			},
@@ -330,15 +329,15 @@ func TestLoadEnv(t *testing.T) {
 						Selector:     model.RegOptSelectorImage,
 						UsernameFile: "./fixtures/run_secrets_username",
 						PasswordFile: "./fixtures/run_secrets_password",
-						InsecureTLS:  utl.NewFalse(),
-						Timeout:      utl.NewDuration(30 * time.Second),
+						InsecureTLS:  new(false),
+						Timeout:      new(30 * time.Second),
 					},
 				},
 				Providers: &model.Providers{
 					Docker: &model.PrdDocker{
-						TLSVerify:      utl.NewTrue(),
-						WatchByDefault: utl.NewFalse(),
-						WatchStopped:   utl.NewFalse(),
+						TLSVerify:      new(true),
+						WatchByDefault: new(false),
+						WatchStopped:   new(false),
 					},
 				},
 			},
@@ -364,14 +363,14 @@ func TestLoadEnv(t *testing.T) {
 							"1234567",
 						},
 						TemplateBody:        model.NotifTelegramDefaultTemplateBody,
-						DisableNotification: utl.NewFalse(),
+						DisableNotification: new(false),
 						APIURL:              "http://telegram-bot-api:8081",
 					},
 				},
 				Providers: &model.Providers{
 					Swarm: &model.PrdSwarm{
-						TLSVerify:      utl.NewTrue(),
-						WatchByDefault: utl.NewFalse(),
+						TLSVerify:      new(true),
+						WatchByDefault: new(false),
 					},
 				},
 			},
@@ -407,7 +406,6 @@ func TestLoadEnv(t *testing.T) {
 	}
 
 	for _, tt := range testCases {
-		tt := tt
 		t.Run(tt.desc, func(t *testing.T) {
 			if tt.environ != nil {
 				for _, environ := range tt.environ {
@@ -433,7 +431,7 @@ func TestLoadMixed(t *testing.T) {
 		desc     string
 		cfg      string
 		environ  []string
-		expected interface{}
+		expected any
 		wantErr  bool
 	}{
 		{
@@ -465,8 +463,8 @@ func TestLoadMixed(t *testing.T) {
 					Mail: &model.NotifMail{
 						Host:               "127.0.0.1",
 						Port:               25,
-						SSL:                utl.NewFalse(),
-						InsecureSkipVerify: utl.NewTrue(),
+						SSL:                new(false),
+						InsecureSkipVerify: new(true),
 						LocalName:          "foo.com",
 						From:               "diun@foo.com",
 						To: []string{
@@ -485,9 +483,9 @@ for <code>{{ .Entry.Manifest.Platform }}</code> platform.
 				RegOpts: nil,
 				Providers: &model.Providers{
 					Docker: &model.PrdDocker{
-						TLSVerify:      utl.NewTrue(),
-						WatchByDefault: utl.NewFalse(),
-						WatchStopped:   utl.NewFalse(),
+						TLSVerify:      new(true),
+						WatchByDefault: new(false),
+						WatchStopped:   new(false),
 					},
 				},
 			},
@@ -515,7 +513,7 @@ for <code>{{ .Entry.Manifest.Platform }}</code> platform.
 							"content-type":  "text/plain",
 							"authorization": "Token78910",
 						},
-						Timeout: utl.NewDuration(1 * time.Minute),
+						Timeout: new(1 * time.Minute),
 					},
 				},
 				RegOpts: nil,
@@ -530,7 +528,6 @@ for <code>{{ .Entry.Manifest.Platform }}</code> platform.
 	}
 
 	for _, tt := range testCases {
-		tt := tt
 		t.Run(tt.desc, func(t *testing.T) {
 			if tt.environ != nil {
 				for _, environ := range tt.environ {

@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/crazy-max/diun/v4/pkg/registry"
-	"github.com/crazy-max/diun/v4/pkg/utl"
 	"github.com/pkg/errors"
 )
 
@@ -43,8 +42,8 @@ func (s *RegOpt) GetDefaults() *RegOpt {
 // SetDefaults sets the default values
 func (s *RegOpt) SetDefaults() {
 	s.Selector = RegOptSelectorName
-	s.InsecureTLS = utl.NewFalse()
-	s.Timeout = utl.NewDuration(0)
+	s.InsecureTLS = new(false)
+	s.Timeout = new(time.Duration(0))
 }
 
 // Select returns a registry based on its selector

@@ -2,8 +2,6 @@ package model
 
 import (
 	"time"
-
-	"github.com/crazy-max/diun/v4/pkg/utl"
 )
 
 // NotifRocketChatDefaultTemplateBody ...
@@ -33,8 +31,8 @@ func (s *NotifRocketChat) GetDefaults() *NotifRocketChat {
 
 // SetDefaults sets the default values
 func (s *NotifRocketChat) SetDefaults() {
-	s.RenderAttachment = utl.NewTrue()
-	s.Timeout = utl.NewDuration(10 * time.Second)
+	s.RenderAttachment = new(true)
+	s.Timeout = new(10 * time.Second)
 	s.TemplateTitle = NotifDefaultTemplateTitle
 	s.TemplateBody = NotifRocketChatDefaultTemplateBody
 }

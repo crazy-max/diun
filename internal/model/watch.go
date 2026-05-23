@@ -2,8 +2,6 @@ package model
 
 import (
 	"time"
-
-	"github.com/crazy-max/diun/v4/pkg/utl"
 )
 
 // Watch holds data necessary for watch configuration
@@ -27,8 +25,8 @@ func (s *Watch) GetDefaults() *Watch {
 // SetDefaults sets the default values
 func (s *Watch) SetDefaults() {
 	s.Workers = 10
-	s.Jitter = utl.NewDuration(30 * time.Second)
-	s.FirstCheckNotif = utl.NewFalse()
-	s.RunOnStartup = utl.NewTrue()
-	s.CompareDigest = utl.NewTrue()
+	s.Jitter = new(30 * time.Second)
+	s.FirstCheckNotif = new(false)
+	s.RunOnStartup = new(true)
+	s.CompareDigest = new(true)
 }

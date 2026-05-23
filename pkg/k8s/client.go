@@ -4,7 +4,7 @@ import (
 	"context"
 	"os"
 
-	"github.com/crazy-max/diun/v4/pkg/utl"
+	"github.com/crazy-max/diun/v4/internal/secret"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -109,7 +109,7 @@ func newExternalClusterClient(opts Options) (*kubernetes.Clientset, error) {
 		return nil, errors.New("endpoint missing for external cluster client")
 	}
 
-	opts.Token, err = utl.GetSecret(opts.Token, opts.TokenFile)
+	opts.Token, err = secret.GetSecret(opts.Token, opts.TokenFile)
 	if err != nil {
 		return nil, errors.Wrap(err, "cannot retrieve bearer token")
 	}

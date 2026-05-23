@@ -54,7 +54,6 @@ func TestImageReference(t *testing.T) {
 	}
 
 	for _, tt := range testCases {
-		tt := tt
 		t.Run(tt.input, func(t *testing.T) {
 			ref, err := ImageReference(tt.input)
 			if tt.wantErr {

@@ -2,8 +2,6 @@ package model
 
 import (
 	"time"
-
-	"github.com/crazy-max/diun/v4/pkg/utl"
 )
 
 type NotifElasticsearch struct {
@@ -31,5 +29,5 @@ func (s *NotifElasticsearch) SetDefaults() {
 	s.Address = "http://localhost:9200"
 	s.Client = "diun"
 	s.Index = "diun-notifications"
-	s.Timeout = utl.NewDuration(10 * time.Second)
+	s.Timeout = new(10 * time.Second)
 }

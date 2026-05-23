@@ -1,9 +1,5 @@
 package model
 
-import (
-	"github.com/crazy-max/diun/v4/pkg/utl"
-)
-
 // NotifMailDefaultTemplateBody ...
 const NotifMailDefaultTemplateBody = `Docker tag {{ if .Entry.Image.HubLink }}[**{{ .Entry.Image }}**]({{ .Entry.Image.HubLink }}){{ else }}**{{ .Entry.Image }}**{{ end }}
 which you subscribed to through {{ .Entry.Provider }} provider {{ if (eq .Entry.Status "new") }}is available{{ else }}has been updated{{ end }}
@@ -43,8 +39,8 @@ func (s *NotifMail) GetDefaults() *NotifMail {
 func (s *NotifMail) SetDefaults() {
 	s.Host = "localhost"
 	s.Port = 25
-	s.SSL = utl.NewFalse()
-	s.InsecureSkipVerify = utl.NewFalse()
+	s.SSL = new(false)
+	s.InsecureSkipVerify = new(false)
 	s.LocalName = "localhost"
 	s.TemplateTitle = NotifDefaultTemplateTitle
 	s.TemplateBody = NotifMailDefaultTemplateBody

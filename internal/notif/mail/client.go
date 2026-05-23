@@ -12,7 +12,7 @@ import (
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/internal/msg"
 	"github.com/crazy-max/diun/v4/internal/notif/notifier"
-	"github.com/crazy-max/diun/v4/pkg/utl"
+	"github.com/crazy-max/diun/v4/internal/secret"
 	"github.com/go-gomail/gomail"
 	hermes "github.com/matcornic/hermes/v2"
 	"github.com/pkg/errors"
@@ -147,11 +147,11 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		}
 	}
 
-	username, err := utl.GetSecret(c.cfg.Username, c.cfg.UsernameFile)
+	username, err := secret.GetSecret(c.cfg.Username, c.cfg.UsernameFile)
 	if err != nil {
 		log.Warn().Err(err).Msg("Cannot retrieve username secret for mail notifier")
 	}
-	password, err := utl.GetSecret(c.cfg.Password, c.cfg.PasswordFile)
+	password, err := secret.GetSecret(c.cfg.Password, c.cfg.PasswordFile)
 	if err != nil {
 		log.Warn().Err(err).Msg("Cannot retrieve password secret for mail notifier")
 	}

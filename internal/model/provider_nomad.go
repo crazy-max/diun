@@ -1,9 +1,5 @@
 package model
 
-import (
-	"github.com/crazy-max/diun/v4/pkg/utl"
-)
-
 // PrdNomad holds nomad provider configuration
 type PrdNomad struct {
 	Address        string `yaml:"address" json:"address,omitempty" validate:"omitempty"`
@@ -23,6 +19,6 @@ func (s *PrdNomad) GetDefaults() *PrdNomad {
 
 // SetDefaults sets the default values
 func (s *PrdNomad) SetDefaults() {
-	s.TLSInsecure = utl.NewFalse()
-	s.WatchByDefault = utl.NewFalse()
+	s.TLSInsecure = new(false)
+	s.WatchByDefault = new(false)
 }

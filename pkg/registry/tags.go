@@ -6,7 +6,7 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/crazy-max/diun/v4/pkg/utl"
+	"github.com/crazy-max/diun/v4/internal/matcher"
 	"github.com/pkg/errors"
 	"go.podman.io/image/v5/docker"
 	"golang.org/x/mod/semver"
@@ -55,10 +55,10 @@ func (c *Client) Tags(opts TagsOptions) (*Tags, error) {
 
 	// Filter
 	for _, tag := range tags {
-		if !utl.IsIncluded(tag, opts.Include) {
+		if !matcher.IsIncluded(tag, opts.Include) {
 			res.NotIncluded++
 			continue
-		} else if utl.IsExcluded(tag, opts.Exclude) {
+		} else if matcher.IsExcluded(tag, opts.Exclude) {
 			res.Excluded++
 			continue
 		}

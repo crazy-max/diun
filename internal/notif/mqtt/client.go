@@ -6,7 +6,7 @@ import (
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/internal/msg"
 	"github.com/crazy-max/diun/v4/internal/notif/notifier"
-	"github.com/crazy-max/diun/v4/pkg/utl"
+	"github.com/crazy-max/diun/v4/internal/secret"
 	MQTT "github.com/eclipse/paho.mqtt.golang"
 )
 
@@ -35,12 +35,12 @@ func (c *Client) Name() string {
 
 // Send creates and sends a mqtt notification with an entry
 func (c *Client) Send(entry model.NotifEntry) error {
-	username, err := utl.GetSecret(c.cfg.Username, c.cfg.UsernameFile)
+	username, err := secret.GetSecret(c.cfg.Username, c.cfg.UsernameFile)
 	if err != nil {
 		return err
 	}
 
-	password, err := utl.GetSecret(c.cfg.Password, c.cfg.PasswordFile)
+	password, err := secret.GetSecret(c.cfg.Password, c.cfg.PasswordFile)
 	if err != nil {
 		return err
 	}

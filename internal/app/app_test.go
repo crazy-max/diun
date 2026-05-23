@@ -8,7 +8,6 @@ import (
 
 	"github.com/crazy-max/diun/v4/internal/config"
 	"github.com/crazy-max/diun/v4/internal/model"
-	"github.com/crazy-max/diun/v4/pkg/utl"
 	"github.com/stretchr/testify/require"
 )
 
@@ -70,7 +69,7 @@ func newTestDiun(t *testing.T, schedule string) *Diun {
 	t.Helper()
 
 	watch := (&model.Watch{}).GetDefaults()
-	watch.RunOnStartup = utl.NewFalse()
+	watch.RunOnStartup = new(false)
 	watch.Schedule = schedule
 
 	diun, err := New(model.Meta{

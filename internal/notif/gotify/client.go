@@ -9,10 +9,11 @@ import (
 	"path"
 	"strconv"
 
+	"github.com/crazy-max/diun/v4/internal/httputil"
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/internal/msg"
 	"github.com/crazy-max/diun/v4/internal/notif/notifier"
-	"github.com/crazy-max/diun/v4/pkg/utl"
+	"github.com/crazy-max/diun/v4/internal/secret"
 	"github.com/pkg/errors"
 )
 
@@ -40,7 +41,7 @@ func (c *Client) Name() string {
 
 // Send creates and sends a gotify notification with an entry
 func (c *Client) Send(entry model.NotifEntry) error {
-	token, err := utl.GetSecret(c.cfg.Token, c.cfg.TokenFile)
+	token, err := secret.GetSecret(c.cfg.Token, c.cfg.TokenFile)
 	if err != nil {
 		return errors.Wrap(err, "cannot retrieve token secret for Gotify notifier")
 	}
@@ -92,7 +93,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	timeoutCtx, _ := context.WithTimeoutCause(cancelCtx, *c.cfg.Timeout, errors.WithStack(context.DeadlineExceeded)) //nolint:govet // no need to manually cancel this context as we already rely on parent
 	defer func() { cancel(errors.WithStack(context.Canceled)) }()
 
-	tlsConfig, err := utl.LoadTLSConfig(c.cfg.TLSSkipVerify, c.cfg.TLSCACertFiles)
+	tlsConfig, err := httputil.LoadTLSConfig(c.cfg.TLSSkipVerify, c.cfg.TLSCACertFiles)
 	if err != nil {
 		return errors.Wrap(err, "cannot load TLS configuration for Gotify notifier")
 	}

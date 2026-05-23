@@ -2,8 +2,6 @@ package model
 
 import (
 	"time"
-
-	"github.com/crazy-max/diun/v4/pkg/utl"
 )
 
 // NotifWebhook holds webhook notification configuration details
@@ -26,5 +24,5 @@ func (s *NotifWebhook) GetDefaults() *NotifWebhook {
 // SetDefaults sets the default values
 func (s *NotifWebhook) SetDefaults() {
 	s.Method = "GET"
-	s.Timeout = utl.NewDuration(10 * time.Second)
+	s.Timeout = new(10 * time.Second)
 }
