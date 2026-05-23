@@ -1,6 +1,7 @@
 package app
 
 import (
+	"context"
 	"net/url"
 	"sync"
 	"sync/atomic"
@@ -86,27 +87,41 @@ func New(meta model.Meta, cfg *config.Config, grpcAuthority string) (*Diun, erro
 }
 
 // Start starts diun
-func (di *Diun) Start() error {
-	var err error
+func (di *Diun) Start(ctx context.Context) error {
+	select {
+	case <-ctx.Done():
+		return nil
+	default:
+	}
 
-	// Migrate db
-	err = di.db.Migrate()
+	if err := di.db.Migrate(); err != nil {
+		return err
+	}
+
+	lis, err := di.grpc.Listen()
 	if err != nil {
 		return err
 	}
 
-	// Start GRPC server
-	go func() {
-		if err := di.grpc.Start(); err != nil {
-			log.Fatal().Err(err).Msg("Failed to start GRPC server")
+	defer func() {
+		if di.cron != nil {
+			<-di.cron.Stop().Done()
 		}
+		di.grpc.Stop()
+		if err := di.db.Close(); err != nil {
+			log.Warn().Err(err).Msg("Cannot close database")
+		}
+	}()
+
+	grpcErrCh := make(chan error, 1)
+	go func() {
+		grpcErrCh <- di.grpc.Serve(lis)
 	}()
 
 	if *di.cfg.Watch.RunOnStartup {
 		di.Run()
 	}
 
-	// Init scheduler if defined
 	if len(di.cfg.Watch.Schedule) == 0 {
 		return nil
 	}
@@ -116,13 +131,19 @@ func (di *Diun) Start() error {
 	}
 	log.Info().Msgf("Cron initialized with schedule %s", di.cfg.Watch.Schedule)
 
-	// Start scheduler
 	di.cron.Start()
 	log.Info().Msgf("Next run in %s (%s)",
 		carbon.CreateFromStdTime(di.cron.Entry(di.jobID).Next).DiffAbsInString(),
 		di.cron.Entry(di.jobID).Next)
 
-	select {}
+	select {
+	case <-ctx.Done():
+		di.HealthchecksFail("Application closed")
+		return nil
+	case err := <-grpcErrCh:
+		di.HealthchecksFail("Application closed")
+		return errors.Wrap(err, "gRPC server failed")
+	}
 }
 
 // Run starts diun
@@ -189,16 +210,4 @@ func (di *Diun) Run() {
 		Int("skipped", entries.CountSkip).
 		Int("failed", entries.CountError).
 		Msg("Jobs completed")
-}
-
-// Close closes diun
-func (di *Diun) Close() {
-	di.HealthchecksFail("Application closed")
-	if di.cron != nil {
-		di.cron.Stop()
-	}
-	di.grpc.Stop()
-	if err := di.db.Close(); err != nil {
-		log.Warn().Err(err).Msg("Cannot close database")
-	}
 }

@@ -1,14 +1,17 @@
 package main
 
 import (
+	"context"
 	"os"
 	"os/signal"
 	"path"
+	"strings"
+	"syscall"
 
 	"github.com/crazy-max/diun/v4/internal/app"
 	"github.com/crazy-max/diun/v4/internal/config"
 	"github.com/crazy-max/diun/v4/internal/logging"
-	"github.com/crazy-max/diun/v4/pkg/utl"
+	"github.com/pkg/errors"
 	"github.com/pkg/profile"
 	"github.com/rs/zerolog/log"
 )
@@ -26,9 +29,9 @@ type ServeCmd struct {
 }
 
 func (s *ServeCmd) Run(ctx *Context) error {
-	var diun *app.Diun
+	runCtx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
 
-	// Logging
 	logging.Configure(logging.Options{
 		LogLevel:   s.LogLevel,
 		LogJSON:    s.LogJSON,
@@ -37,28 +40,16 @@ func (s *ServeCmd) Run(ctx *Context) error {
 	})
 	log.Info().Str("version", version).Msgf("Starting %s", ctx.Meta.Name)
 
-	// Handle os signals
-	channel := make(chan os.Signal, 1)
-	signal.Notify(channel, os.Interrupt, utl.SIGTERM)
-	go func() {
-		sig := <-channel
-		diun.Close()
-		log.Warn().Msgf("Caught signal %v", sig)
-		os.Exit(0)
-	}()
-
-	// Load configuration
 	cfg, err := config.Load(s.Cfgfile)
 	if err != nil {
-		log.Fatal().Err(err).Msg("Cannot load configuration")
+		return errors.Wrap(err, "cannot load configuration")
 	}
 	log.Debug().Interface("config", cfg).Msg("Configuration")
 
-	// Profiler
 	if len(s.Profiler) > 0 && len(s.ProfilerPath) > 0 {
 		profilerPath := path.Clean(s.ProfilerPath)
 		if err = os.MkdirAll(profilerPath, os.ModePerm); err != nil {
-			log.Fatal().Err(err).Msg("Cannot create profiler folder")
+			return errors.Wrap(err, "cannot create profiler folder")
 		}
 		profilePath := profile.ProfilePath(profilerPath)
 		switch s.Profiler {
@@ -79,20 +70,21 @@ func (s *ServeCmd) Run(ctx *Context) error {
 		case "block":
 			defer profile.Start(profile.BlockProfile, profilePath).Stop()
 		default:
-			log.Fatal().Msgf("Unknown profiler: %s", s.Profiler) //nolint:gocritic // defer not set if profiler is unknown
+			return errors.Errorf("unknown profiler: %s", s.Profiler)
 		}
 	}
 
-	// Init
-	diun, err = app.New(ctx.Meta, cfg, s.GRPCAuthority)
+	diun, err := app.New(ctx.Meta, cfg, s.GRPCAuthority)
 	if err != nil {
-		log.Fatal().Err(err).Msgf("Cannot initialize %s", ctx.Meta.Name)
+		return errors.Wrapf(err, "cannot initialize %s", ctx.Meta.Name)
 	}
 
-	// Start
-	err = diun.Start()
-	if err != nil {
-		log.Fatal().Err(err).Msgf("Cannot start %s", ctx.Meta.Name)
+	if err = diun.Start(runCtx); err != nil {
+		return errors.Wrapf(err, "cannot start %s", ctx.Meta.Name)
+	}
+
+	if cause := context.Cause(runCtx); cause != nil {
+		log.Warn().Msg(strings.Title(cause.Error())) //nolint:staticcheck // ignoring "SA1019: strings.Title is deprecated", as for our use we don't need full unicode support
 	}
 
 	return nil
