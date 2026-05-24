@@ -123,10 +123,11 @@ target "docs" {
   output = ["${DESTDIR}/site"]
 }
 
-target "gomod-outdated" {
+target "gomod-updates" {
   inherits = ["_common"]
   dockerfile = "./hack/vendor.Dockerfile"
-  target = "outdated"
+  target = "gomod-updates"
+  no-cache-filter = ["gomod-updates"]
   output = ["type=cacheonly"]
 }
 
