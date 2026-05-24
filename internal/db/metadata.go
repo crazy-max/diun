@@ -29,8 +29,12 @@ func (c *Client) ReadMetadata() error {
 // WriteMetadata writes db metadata
 func (c *Client) WriteMetadata(metadata Metadata) error {
 	entryBytes, _ := json.Marshal(metadata)
-	return c.Update(func(tx *bolt.Tx) error {
+	if err := c.Update(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(bucketMetadata))
 		return b.Put([]byte(metadataKey), entryBytes)
-	})
+	}); err != nil {
+		return err
+	}
+	c.metadata = metadata
+	return nil
 }

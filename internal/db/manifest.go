@@ -15,7 +15,7 @@ func (c *Client) First(image registry.Image) (bool, error) {
 
 	err := c.View(func(tx *bolt.Tx) error {
 		c := tx.Bucket([]byte(bucketManifest)).Cursor()
-		name := []byte(image.Name())
+		name := []byte(image.Name() + ":")
 		for k, _ := c.Seek(name); k != nil && bytes.HasPrefix(k, name); k, _ = c.Next() {
 			found = true
 			return nil
@@ -72,7 +72,19 @@ func (c *Client) PutManifest(image registry.Image, manifest registry.Manifest) e
 // DeleteManifest deletes a Docker image manifest
 func (c *Client) DeleteManifest(manifest registry.Manifest) error {
 	return c.Update(func(tx *bolt.Tx) error {
-		return tx.Bucket([]byte(bucketManifest)).Delete([]byte(fmt.Sprintf("%s:%s", manifest.Name, manifest.Tag)))
+		b := tx.Bucket([]byte(bucketManifest))
+		keys := [][]byte{
+			[]byte(fmt.Sprintf("%s:%s", manifest.Name, manifest.Tag)),
+		}
+		if manifest.Digest != "" {
+			keys = append(keys, []byte(fmt.Sprintf("%s:%s@%s", manifest.Name, manifest.Tag, manifest.Digest)))
+		}
+		for _, key := range keys {
+			if err := b.Delete(key); err != nil {
+				return err
+			}
+		}
+		return nil
 	})
 }
 
