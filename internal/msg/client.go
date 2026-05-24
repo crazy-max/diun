@@ -80,11 +80,12 @@ func (c *Client) RenderHTML() (title []byte, body []byte, err error) {
 		return title, body, err
 	}
 
-	body = []byte(bluemonday.UGCPolicy().Sanitize(
-		// Dirty way to remove wrapped <p></p> and newline
-		// https://github.com/russross/blackfriday/issues/237
-		strings.TrimRight(strings.TrimLeft(strings.TrimSpace(string(blackfriday.Run(body))), "<p>"), "</p>"),
-	))
+	htmlBody := strings.TrimSpace(string(blackfriday.Run(body)))
+	// Dirty way to remove wrapped <p></p> and newline
+	// https://github.com/russross/blackfriday/issues/237
+	htmlBody = strings.TrimPrefix(htmlBody, "<p>")
+	htmlBody = strings.TrimSuffix(htmlBody, "</p>")
+	body = []byte(bluemonday.UGCPolicy().Sanitize(htmlBody))
 	return
 }
 
