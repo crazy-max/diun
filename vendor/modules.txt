@@ -166,10 +166,10 @@ github.com/go-openapi/jsonpointer
 ## explicit; go 1.24.0
 github.com/go-openapi/jsonreference
 github.com/go-openapi/jsonreference/internal
-# github.com/go-openapi/swag v0.25.4
+# github.com/go-openapi/swag v0.25.5
 ## explicit; go 1.24.0
 github.com/go-openapi/swag
-# github.com/go-openapi/swag/cmdutils v0.25.4
+# github.com/go-openapi/swag/cmdutils v0.25.5
 ## explicit; go 1.24.0
 github.com/go-openapi/swag/cmdutils
 # github.com/go-openapi/swag/conv v0.25.5
@@ -193,7 +193,7 @@ github.com/go-openapi/swag/loading
 # github.com/go-openapi/swag/mangling v0.25.5
 ## explicit; go 1.24.0
 github.com/go-openapi/swag/mangling
-# github.com/go-openapi/swag/netutils v0.25.4
+# github.com/go-openapi/swag/netutils v0.25.5
 ## explicit; go 1.24.0
 github.com/go-openapi/swag/netutils
 # github.com/go-openapi/swag/stringutils v0.25.5
@@ -307,7 +307,7 @@ github.com/mitchellh/go-homedir
 # github.com/mitchellh/mapstructure v1.5.0
 ## explicit; go 1.14
 github.com/mitchellh/mapstructure
-# github.com/moby/buildkit v0.29.0
+# github.com/moby/buildkit v0.30.0
 ## explicit; go 1.25.5
 github.com/moby/buildkit/frontend/dockerfile/command
 github.com/moby/buildkit/frontend/dockerfile/instructions
@@ -621,10 +621,10 @@ golang.org/x/text/transform
 golang.org/x/text/unicode/bidi
 golang.org/x/text/unicode/norm
 golang.org/x/text/width
-# golang.org/x/time v0.14.0
-## explicit; go 1.24.0
+# golang.org/x/time v0.15.0
+## explicit; go 1.25.0
 golang.org/x/time/rate
-# google.golang.org/genproto/googleapis/rpc v0.0.0-20260401024825-9d38bb4040a9
+# google.golang.org/genproto/googleapis/rpc v0.0.0-20260406210006-6f92a3bedf2d
 ## explicit; go 1.25.0
 google.golang.org/genproto/googleapis/rpc/status
 # google.golang.org/grpc v1.80.0
