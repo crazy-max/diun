@@ -5,7 +5,7 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/bmatcuk/doublestar/v3"
+	"github.com/bmatcuk/doublestar/v4"
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/internal/provider"
 	"github.com/crazy-max/diun/v4/pkg/dockerfile"
@@ -61,7 +61,7 @@ func (c *Client) listDockerfiles(patterns []string) (dfiles []string) {
 		patterns = []string{"./Dockerfile"}
 	}
 	for _, pattern := range patterns {
-		matches, err := doublestar.Glob(pattern)
+		matches, err := doublestar.FilepathGlob(pattern)
 		if err != nil {
 			c.logger.Warn().Err(err).Msgf("No Dockerfile found for %s", pattern)
 			continue
