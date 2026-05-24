@@ -1,3 +1,116 @@
+## v0.28.0 (2026-05-16)
+
+* **Breaking change *(federation)*** Changed `NewClient` to take HTTP client
+  settings as an extra parameter.
+* *(federation)* Changed client to block requests to private IPs by default.
+  * The `AllowIP` method can be changed to adjust the blocking behavior.
+* *(federation)* Added `DownloadMedia` method.
+* *(event)* Added `Extra` field to `FileInfo` to allow easily adding custom
+  fields.
+* *(event)* Added sticker source info to events (both [MSC4459] and a custom
+  format for bridges).
+* *(client)* Added support for `server` parameter in `/publicRooms`
+  (thanks to [@zluudg] in [#497]).
+* *(client)* Added `RequestRetryTrigger` event, which can be used to force all
+  in-flight requests to be interrupted and retried (e.g. in case the network
+  connection changed).
+* *(crypto)* Added support for bundled device keys in Olm messages introduced
+  in Matrix v1.15.
+* *(crypto/canonicaljson)* Added jsonv2-based implementation, which replaces
+  the old gjson/sjson-based implementation when jsonv2 is enabled.
+* *(bridgev2)* Added interface for importing image packs from remote networks.
+* *(bridgev2)* Added more detail to "not logged in" error messages.
+* *(bridgev2)* Expanded `bridge_matrix_leave` option to cover invite rejections
+  in addition to actual leaves.
+* *(bridgev2)* Changed group creation error messages to be clearer when there
+  aren't enough members to create a group.
+* *(bridgev2/matrix)* Changed message sending to never send unencrypted messages
+  if `encryption.require` is set `true` even if the room is unencrypted.
+* *(crypto)* Changed trust resolution to not trust own cross-signing master key
+  unless the private key is available or the public key is signed by the device
+  key.
+* *(bridgev2)* Fixed event power levels being set incorrectly in some cases if
+  `events_default` or `state_default` is changed in the same event.
+* *(bridgev2)* Fixed portal deletion always failing due to context cancellation.
+* *(bridgev2)* Fixed per-message profile fallbacks being added for events that
+  shouldn't have it, like stickers.
+* *(bridgev2)* Fixed some cases where backfill would start from a non-latest
+  message.
+* *(crypto)* Fixed dehydrated devices not passing device key validation.
+* *(federation/pdu)* Fixed canonicalizing JSON which contains keys with code
+  points between `\uF000` and `\uFFFF` by switching to the crypto/canonicaljson
+  package instead of jsonv2's standard RFC 8785 canonicalization.
+* *(federation/eventauth)* Fixed restricted join checks
+  (thanks to [@timedoutuk] in [#491]).
+* *(federation/eventauth)* Fixed creator join check in v10 rooms
+  (thanks to [@timedoutuk] in [#496]).
+* *(crypto/goolm)* Fixed various small issues.
+
+[MSC445]: https://github.com/matrix-org/matrix-spec-proposals/pull/4459
+[#491]: https://github.com/mautrix/go/pull/491
+[#496]: https://github.com/mautrix/go/pull/496
+[#497]: https://github.com/mautrix/go/pull/497
+[@zluudg]: https://github.com/zluudg
+
+## v0.27.0 (2026-04-16)
+
+### Slightly breaking changes
+* *(crypto)* Changed `GetOwnCrossSigningPublicKeys` to return errors instead of
+  only logging them and returning nil.
+* *(event)* Removed automatic registrations of content structs to encoding/gob.
+  If you use mautrix types with gob, you'll have to register the structs yourself.
+* *(crypto)* Removed unused Olm PK encryption/decryption interface.
+* *(crypto/goolm)* Removed unused JSON pickling methods.
+
+### New features and non-breaking changes
+* *(client)* Added support for [MSC4446] for moving `m.fully_read` backwards.
+* *(appservice)* Added support for escaped paths in HTTP over websocket proxy.
+* *(synapseadmin)* Added wrapper for redacting all events from a specific user
+  (thanks to [@timedoutuk] in [#466]).
+* *(event)* Added types for [MSC2545] image packs.
+* *(bridgev2)* Added option to block automatic portal creation for specific
+  chats and/or users.
+* *(bridgev2)* Added commands to bridge existing groups to existing rooms and
+  to create new portal rooms for existing groups.
+* *(bridgev2)* Added option to always prefer default relays for the `bridge`
+  and `set-relay` commands.
+* *(bridgev2)* Added support for using [MSC4437] for ghost profile updates.
+* *(bridgev2)* Added optional GetStateEvent method to `ASIntent` to get state
+  while respecting room membership.
+* *(bridgev2/mxmain)* Added environment variables to change global values like
+  the portal event buffer size.
+* *(event)* Changed `EnsureHasHTML` to also ensure the body is treated as a
+  caption for media messages.
+* *(bridgev2)* Changed relay mode to treat stickers as normal images.
+* *(bridgev2/matrix)* Changed various start methods to return ExitErrors instead
+  of calling `os.Exit` directly.
+* *(client)* Changed sync response structs to use `omitzero` instead of custom
+  JSON marshaling functions.
+
+### Bug fixes
+* *(crypto/goolm)* Fixed various issues.
+* *(crypto)* Fixed new Olm session handling to only delete one-time keys after
+  successfully decrypting a message.
+* *(crypto)* Fixed `ResolveTrust` not checking trust status of cross-signing
+  keys correctly.
+* *(crypto)* Fixed `m.relates_to` copying not working for some inputs with goolm.
+* *(event)* Fixed `Content.UnmarshalJSON` incorrectly keeping a reference to the
+  input data.
+* *(format)* Fixed math blocks not being routed to correct convert function.
+* *(bridgev2)* Fixed sending tombstone when redirecting a portal to another room.
+* *(bridgev2)* Fixed removed messages/reactions not being removed from database.
+* *(bridgev2)* Fixed race conditions where portal ID changes could result in a
+  duplicate room being created.
+* *(bridgev2/mxmain)* Fixed some types of config fields not being settable with
+  environment variables.
+* *(appservice)* Fixed redundant `mx_registrations` database query on every
+  request.
+
+[#466]: https://github.com/mautrix/go/pull/466
+[MSC2545]: https://github.com/matrix-org/matrix-spec-proposals/pull/2545
+[MSC4437]: https://github.com/matrix-org/matrix-spec-proposals/pull/4437
+[MSC4446]: https://github.com/matrix-org/matrix-spec-proposals/pull/4446
+
 ## v0.26.4 (2026-03-16)
 
 * **Breaking change *(client)*** Changed request structs that include UIA
@@ -24,7 +137,7 @@
 * *(format/htmlparser)* Fixed generating markdown for code blocks containing
   backticks.
 * *(federation/eventauth)* Fixed inverted check in ban membership authorization
-  (thanks to [@nexy7574] in [#464]).
+  (thanks to [@timedoutuk] in [#464]).
 
 [#464]: https://github.com/mautrix/go/pull/464
 
@@ -79,7 +192,7 @@
   the mime type from the callback rather than in the return get media return
   value. The callback can now also redirect the caller to a different file.
 * *(federation)* Added join/knock/leave functions
-  (thanks to [@nexy7574] in [#422]).
+  (thanks to [@timedoutuk] in [#422]).
 * *(federation/eventauth)* Fixed various incorrect checks.
 * *(client)* Added backoff for retrying media uploads to external URLs
   (with MSC3870).
@@ -112,9 +225,9 @@
 * *(client,federation)* Added size limits for responses to make it safer to send
   requests to untrusted servers.
 * *(client)* Added wrapper for `/admin/whois` client API
-  (thanks to [@nexy7574] in [#411]).
+  (thanks to [@timedoutuk] in [#411]).
 * *(synapseadmin)* Added `force_purge` option to DeleteRoom
-  (thanks to [@nexy7574] in [#420]).
+  (thanks to [@timedoutuk] in [#420]).
 * *(statestore)* Added saving join rules for rooms.
 * *(bridgev2)* Added optional automatic rollback of room state if bridging the
   change to the remote network fails.
@@ -144,7 +257,7 @@
 * *(bridgev2/matrix)* Fixed unnecessary sleep after registering bot on first run.
 * *(crypto/goolm)* Fixed panic when processing certain malformed Olm messages.
 * *(federation)* Fixed HTTP method for sending transactions
-  (thanks to [@nexy7574] in [#426]).
+  (thanks to [@timedoutuk] in [#426]).
 * *(federation)* Fixed response body being closed even when using `DontReadBody`
   parameter.
 * *(federation)* Fixed validating auth for requests with query params.
@@ -188,7 +301,7 @@
 * *(client)* Fixed HTTP method of delete devices API call
   (thanks to [@fmseals] in [#393]).
 * *(client)* Added wrappers for [MSC4323]: User suspension & locking endpoints
-  (thanks to [@nexy7574] in [#407]).
+  (thanks to [@timedoutuk] in [#407]).
 * *(client)* Stabilized support for extensible profiles.
 * *(client)* Stabilized support for `state_after` in sync.
 * *(client)* Removed deprecated MSC2716 requests.
@@ -347,7 +460,7 @@
 
 * *(commands)* Added generic command processing framework for bots.
 * *(client)* Added `allowed_room_ids` field to room summary responses
-  (thanks to [@nexy7574] in [#367]).
+  (thanks to [@timedoutuk] in [#367]).
 * *(bridgev2)* Added support for custom timeouts on outgoing messages which have
   to wait for a remote echo.
 * *(bridgev2)* Added automatic typing stop event if the ghost user had sent a
@@ -421,7 +534,7 @@
     `com.beeper.room_features` state event.
 * *(client)* Added `GetRoomSummary` to implement [MSC3266].
 * *(client)* Added support for arbitrary profile fields to implement [MSC4133]
-  (thanks to [@nexy7574] in [#337]).
+  (thanks to [@timedoutuk] in [#337]).
 * *(crypto)* Started storing olm message hashes to prevent decryption errors
   if messages are repeated (e.g. if the app crashes right after decrypting).
 * *(crypto)* Improved olm session unwedging to check when the last session was
@@ -442,7 +555,7 @@
 
 [MSC3266]: https://github.com/matrix-org/matrix-spec-proposals/pull/3266
 [MSC4133]: https://github.com/matrix-org/matrix-spec-proposals/pull/4133
-[@nexy7574]: https://github.com/nexy7574
+[@timedoutuk]: https://github.com/timedoutuk
 [#337]: https://github.com/mautrix/go/pull/337
 
 ## v0.22.1 (2024-12-16)

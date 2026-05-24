@@ -8,6 +8,7 @@ package event
 
 import (
 	"encoding/json"
+	"fmt"
 	"html"
 	"slices"
 	"strconv"
@@ -130,16 +131,18 @@ type MessageEventContent struct {
 
 	replyFallbackRemoved bool
 
+	ImageSourcePacks map[id.ContentURIString]*ImageSource    `json:"com.beeper.msc4459.image_source_packs,omitempty"`
+	BridgedEmojis    map[id.ContentURIString]*BridgedSticker `json:"com.beeper.bridged_emojis,omitempty"`
+
 	MessageSendRetry         *BeeperRetryMetadata     `json:"com.beeper.message_send_retry,omitempty"`
 	BeeperGalleryImages      []*MessageEventContent   `json:"com.beeper.gallery.images,omitempty"`
 	BeeperGalleryCaption     string                   `json:"com.beeper.gallery.caption,omitempty"`
 	BeeperGalleryCaptionHTML string                   `json:"com.beeper.gallery.caption_html,omitempty"`
 	BeeperPerMessageProfile  *BeeperPerMessageProfile `json:"com.beeper.per_message_profile,omitempty"`
 	BeeperActionMessage      *BeeperActionMessage     `json:"com.beeper.action_message,omitempty"`
-
-	BeeperLinkPreviews []*BeeperLinkPreview `json:"com.beeper.linkpreviews,omitempty"`
-
-	BeeperDisappearingTimer *BeeperDisappearingTimer `json:"com.beeper.disappearing_timer,omitempty"`
+	BeeperLinkPreviews       []*BeeperLinkPreview     `json:"com.beeper.linkpreviews,omitempty"`
+	BeeperStream             *BeeperStreamInfo        `json:"com.beeper.stream,omitempty"`
+	BeeperDisappearingTimer  *BeeperDisappearingTimer `json:"com.beeper.disappearing_timer,omitempty"`
 
 	MSC1767Audio *MSC1767Audio `json:"org.matrix.msc1767.audio,omitempty"`
 	MSC3245Voice *MSC3245Voice `json:"org.matrix.msc3245.voice,omitempty"`
@@ -241,6 +244,10 @@ func ReverseTextToHTML(input string) string {
 }
 
 func (content *MessageEventContent) EnsureHasHTML() {
+	if content.MsgType.IsMedia() && (content.FileName == "" || content.FileName == content.Body) {
+		content.FileName = content.Body
+		content.Body = ""
+	}
 	if len(content.FormattedBody) == 0 || content.Format != FormatHTML {
 		content.FormattedBody = TextToHTML(content.Body)
 		content.Format = FormatHTML
@@ -316,6 +323,10 @@ type FileInfo struct {
 	Height   int
 	Duration int
 	Size     int
+
+	BridgedSticker *BridgedSticker
+
+	Extra map[string]any
 }
 
 type serializableFileInfo struct {
@@ -334,6 +345,25 @@ type serializableFileInfo struct {
 	Height   json.Number `json:"h,omitempty"`
 	Duration json.Number `json:"duration,omitempty"`
 	Size     json.Number `json:"size,omitempty"`
+
+	BridgedSticker *BridgedSticker `json:"fi.mau.bridged_sticker,omitempty"`
+}
+
+func (fileInfo *FileInfo) IsZero() bool {
+	return fileInfo.MimeType == "" &&
+		fileInfo.ThumbnailInfo == nil &&
+		fileInfo.ThumbnailURL == "" &&
+		fileInfo.ThumbnailFile == nil &&
+		fileInfo.Blurhash == "" &&
+		fileInfo.AnoaBlurhash == "" &&
+		!fileInfo.MauGIF &&
+		!fileInfo.IsAnimated &&
+		fileInfo.Width == 0 &&
+		fileInfo.Height == 0 &&
+		fileInfo.Duration == 0 &&
+		fileInfo.Size == 0 &&
+		fileInfo.BridgedSticker == nil &&
+		len(fileInfo.Extra) == 0
 }
 
 func (sfi *serializableFileInfo) CopyFrom(fileInfo *FileInfo) *serializableFileInfo {
@@ -351,6 +381,8 @@ func (sfi *serializableFileInfo) CopyFrom(fileInfo *FileInfo) *serializableFileI
 
 		Blurhash:     fileInfo.Blurhash,
 		AnoaBlurhash: fileInfo.AnoaBlurhash,
+
+		BridgedSticker: fileInfo.BridgedSticker,
 	}
 	if fileInfo.Width > 0 {
 		sfi.Width = json.Number(strconv.Itoa(fileInfo.Width))
@@ -370,22 +402,42 @@ func (sfi *serializableFileInfo) CopyFrom(fileInfo *FileInfo) *serializableFileI
 
 func (sfi *serializableFileInfo) CopyTo(fileInfo *FileInfo) {
 	*fileInfo = FileInfo{
-		Width:         numberToInt(sfi.Width),
-		Height:        numberToInt(sfi.Height),
-		Size:          numberToInt(sfi.Size),
-		Duration:      numberToInt(sfi.Duration),
-		MimeType:      sfi.MimeType,
-		ThumbnailURL:  sfi.ThumbnailURL,
-		ThumbnailFile: sfi.ThumbnailFile,
-		MauGIF:        sfi.MauGIF,
-		IsAnimated:    sfi.IsAnimated,
-		Blurhash:      sfi.Blurhash,
-		AnoaBlurhash:  sfi.AnoaBlurhash,
+		Width:          numberToInt(sfi.Width),
+		Height:         numberToInt(sfi.Height),
+		Size:           numberToInt(sfi.Size),
+		Duration:       numberToInt(sfi.Duration),
+		MimeType:       sfi.MimeType,
+		ThumbnailURL:   sfi.ThumbnailURL,
+		ThumbnailFile:  sfi.ThumbnailFile,
+		MauGIF:         sfi.MauGIF,
+		IsAnimated:     sfi.IsAnimated,
+		Blurhash:       sfi.Blurhash,
+		AnoaBlurhash:   sfi.AnoaBlurhash,
+		BridgedSticker: sfi.BridgedSticker,
 	}
 	if sfi.ThumbnailInfo != nil {
 		fileInfo.ThumbnailInfo = &FileInfo{}
 		sfi.ThumbnailInfo.CopyTo(fileInfo.ThumbnailInfo)
 	}
+}
+
+func (fileInfo *FileInfo) deleteStandardExtraFields() {
+	if len(fileInfo.Extra) == 0 {
+		return
+	}
+	delete(fileInfo.Extra, "mimetype")
+	delete(fileInfo.Extra, "thumbnail_info")
+	delete(fileInfo.Extra, "thumbnail_url")
+	delete(fileInfo.Extra, "thumbnail_file")
+	delete(fileInfo.Extra, "blurhash")
+	delete(fileInfo.Extra, "xyz.amorgan.blurhash")
+	delete(fileInfo.Extra, "fi.mau.gif")
+	delete(fileInfo.Extra, "is_animated")
+	delete(fileInfo.Extra, "w")
+	delete(fileInfo.Extra, "h")
+	delete(fileInfo.Extra, "duration")
+	delete(fileInfo.Extra, "size")
+	delete(fileInfo.Extra, "fi.mau.bridged_sticker")
 }
 
 func (fileInfo *FileInfo) UnmarshalJSON(data []byte) error {
@@ -394,11 +446,41 @@ func (fileInfo *FileInfo) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	sfi.CopyTo(fileInfo)
+	if err := json.Unmarshal(data, &fileInfo.Extra); err != nil {
+		return err
+	}
+	fileInfo.deleteStandardExtraFields()
 	return nil
 }
 
+func MarshalMerge(base any, extraMap map[string]any) (json.RawMessage, error) {
+	// TODO replace all uses of this method with jsonv2's extra field once jsonv2 is available
+	baseSerialized, err := json.Marshal(base)
+	if len(extraMap) == 0 || err != nil {
+		return baseSerialized, err
+	}
+	extraSerialized, err := json.Marshal(extraMap)
+	if err != nil {
+		return nil, err
+	}
+	if len(baseSerialized) <= 4 || baseSerialized[0] != '{' {
+		return extraSerialized, nil
+	} else if len(extraSerialized) <= 4 || extraSerialized[0] != '{' {
+		return baseSerialized, nil
+	}
+	output := make([]byte, 0, len(baseSerialized)+len(extraSerialized)-1)
+	output = append(output, baseSerialized[:len(baseSerialized)-1]...)
+	output = append(output, ',')
+	output = append(output, extraSerialized[1:]...)
+	if !json.Valid(output) {
+		return nil, fmt.Errorf("failed to merge extra: %s", output)
+	}
+	return output, nil
+}
+
 func (fileInfo *FileInfo) MarshalJSON() ([]byte, error) {
-	return json.Marshal((&serializableFileInfo{}).CopyFrom(fileInfo))
+	fileInfo.deleteStandardExtraFields()
+	return MarshalMerge((&serializableFileInfo{}).CopyFrom(fileInfo), fileInfo.Extra)
 }
 
 func numberToInt(val json.Number) int {

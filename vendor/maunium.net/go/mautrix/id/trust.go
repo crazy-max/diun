@@ -20,6 +20,7 @@ const (
 	TrustStateUnset                TrustState = 0
 	TrustStateUnknownDevice        TrustState = 10
 	TrustStateForwarded            TrustState = 20
+	TrustStateBackup               TrustState = 30
 	TrustStateCrossSignedUntrusted TrustState = 50
 	TrustStateCrossSignedTOFU      TrustState = 100
 	TrustStateCrossSignedVerified  TrustState = 200
@@ -55,6 +56,8 @@ func ParseTrustState(val string) TrustState {
 		return TrustStateUnknownDevice
 	case "forwarded":
 		return TrustStateForwarded
+	case "backup":
+		return TrustStateBackup
 	case "cross-signed-tofu", "cross-signed":
 		return TrustStateCrossSignedTOFU
 	case "cross-signed-verified", "cross-signed-trusted":
@@ -80,6 +83,8 @@ func (ts TrustState) String() string {
 		return "unknown-device"
 	case TrustStateForwarded:
 		return "forwarded"
+	case TrustStateBackup:
+		return "backup"
 	case TrustStateCrossSignedTOFU:
 		return "cross-signed-tofu"
 	case TrustStateCrossSignedVerified:

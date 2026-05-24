@@ -10,6 +10,8 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"go.mau.fi/util/jsonbytes"
+
 	"maunium.net/go/mautrix/id"
 )
 
@@ -35,11 +37,17 @@ type EncryptedEventContent struct {
 	DeviceID id.DeviceID `json:"device_id,omitempty"`
 	// Only present for Megolm events
 	SessionID id.SessionID `json:"session_id,omitempty"`
+	// Only present for beeper stream events
+	StreamID string `json:"stream_id,omitempty"`
+	// Only present for beeper stream events
+	IV jsonbytes.UnpaddedBytes `json:"iv,omitempty"`
 
 	Ciphertext json.RawMessage `json:"ciphertext"`
 
-	MegolmCiphertext []byte         `json:"-"`
-	OlmCiphertext    OlmCiphertexts `json:"-"`
+	MegolmCiphertext []byte `json:"-"`
+	// Only present for beeper stream events
+	BeeperStreamCiphertext jsonbytes.UnpaddedBytes `json:"-"`
+	OlmCiphertext          OlmCiphertexts          `json:"-"`
 
 	RelatesTo *RelatesTo `json:"m.relates_to,omitempty"`
 	Mentions  *Mentions  `json:"m.mentions,omitempty"`
@@ -66,6 +74,8 @@ func (content *EncryptedEventContent) UnmarshalJSON(data []byte) error {
 			return fmt.Errorf("ciphertext %w", id.ErrInputNotJSONString)
 		}
 		content.MegolmCiphertext = content.Ciphertext[1 : len(content.Ciphertext)-1]
+	case id.AlgorithmBeeperStreamV1:
+		return json.Unmarshal(content.Ciphertext, &content.BeeperStreamCiphertext)
 	}
 	return nil
 }
@@ -80,6 +90,8 @@ func (content *EncryptedEventContent) MarshalJSON() ([]byte, error) {
 		content.Ciphertext[0] = '"'
 		content.Ciphertext[len(content.Ciphertext)-1] = '"'
 		copy(content.Ciphertext[1:len(content.Ciphertext)-1], content.MegolmCiphertext)
+	case id.AlgorithmBeeperStreamV1:
+		content.Ciphertext, err = json.Marshal(content.BeeperStreamCiphertext)
 	}
 	if err != nil {
 		return nil, err
@@ -95,9 +107,9 @@ type RoomKeyEventContent struct {
 	SessionID  id.SessionID `json:"session_id"`
 	SessionKey string       `json:"session_key"`
 
-	MaxAge      int64 `json:"com.beeper.max_age_ms"`
-	MaxMessages int   `json:"com.beeper.max_messages"`
-	IsScheduled bool  `json:"com.beeper.is_scheduled"`
+	MaxAge      int64 `json:"com.beeper.max_age_ms,omitempty"`
+	MaxMessages int   `json:"com.beeper.max_messages,omitempty"`
+	IsScheduled bool  `json:"com.beeper.is_scheduled,omitempty"`
 }
 
 // ForwardedRoomKeyEventContent represents the content of a m.forwarded_room_key to_device event.
@@ -107,10 +119,6 @@ type ForwardedRoomKeyEventContent struct {
 	SenderKey          id.SenderKey `json:"sender_key"`
 	SenderClaimedKey   id.Ed25519   `json:"sender_claimed_ed25519_key"`
 	ForwardingKeyChain []string     `json:"forwarding_curve25519_key_chain"`
-
-	MaxAge      int64 `json:"com.beeper.max_age_ms"`
-	MaxMessages int   `json:"com.beeper.max_messages"`
-	IsScheduled bool  `json:"com.beeper.is_scheduled"`
 }
 
 type KeyRequestAction string

@@ -23,6 +23,7 @@ func (df DialerFunc) DialContext(ctx context.Context, network, addr string) (net
 }
 
 type ClientSettings struct {
+	DialTimeout  time.Duration
 	Dial         DialerFunc
 	innerDialer  DialerFunc
 	HTTPProxy    func(*http.Request) (*url.URL, error)
@@ -57,6 +58,7 @@ func (cs ClientSettings) WithDial(dial DialerFunc) ClientSettings {
 
 // WithDialTimeout sets a TCP dial timeout for the HTTP client. Resets any custom dialer.
 func (cs ClientSettings) WithDialTimeout(timeout time.Duration) ClientSettings {
+	cs.DialTimeout = timeout
 	return cs.WithDial((&net.Dialer{Timeout: timeout}).DialContext)
 }
 

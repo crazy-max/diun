@@ -80,7 +80,7 @@ func UpdateStateStore(ctx context.Context, store StateStore, evt *event.Event) {
 		err = store.SetJoinRules(ctx, evt.RoomID, content)
 	default:
 		switch evt.Type {
-		case event.StateMember, event.StatePowerLevels, event.StateEncryption, event.StateCreate:
+		case event.StateMember, event.StatePowerLevels, event.StateEncryption, event.StateCreate, event.StateJoinRules:
 			zerolog.Ctx(ctx).Warn().
 				Stringer("event_id", evt.ID).
 				Str("event_type", evt.Type.Type).
