@@ -1,6 +1,7 @@
 package file
 
 import (
+	"bytes"
 	"os"
 	"path/filepath"
 	"strings"
@@ -8,7 +9,7 @@ import (
 	"github.com/containerd/platforms"
 	"github.com/crazy-max/diun/v4/internal/model"
 	ocispecs "github.com/opencontainers/image-spec/specs-go/v1"
-	yaml "gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 )
 
 func (c *Client) listFileImage() []model.Image {
@@ -21,12 +22,14 @@ func (c *Client) listFileImage() []model.Image {
 
 	for _, file := range files {
 		var items []model.Image
-		bytes, err := os.ReadFile(file)
+		fileBytes, err := os.ReadFile(file)
 		if err != nil {
 			c.logger.Error().Err(err).Msgf("Unable to read config file %s", file)
 			continue
 		}
-		if err := yaml.UnmarshalStrict(bytes, &items); err != nil {
+		dec := yaml.NewDecoder(bytes.NewReader(fileBytes))
+		dec.KnownFields(true)
+		if err := dec.Decode(&items); err != nil {
 			c.logger.Error().Err(err).Msgf("Unable to decode into struct %s", file)
 			continue
 		}
