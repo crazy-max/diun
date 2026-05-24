@@ -1,11 +1,14 @@
 package file
 
 import (
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/pkg/registry"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 var (
@@ -266,4 +269,15 @@ func TestDefaultImageOptions(t *testing.T) {
 	for _, job := range fc.ListJob() {
 		assert.True(t, *job.Image.WatchRepo)
 	}
+}
+
+func TestListJobRejectsUnknownFields(t *testing.T) {
+	filename := filepath.Join(t.TempDir(), "images.yml")
+	require.NoError(t, os.WriteFile(filename, []byte("- name: alpine\n  unknown: value\n"), 0o600))
+
+	fc := New(&model.PrdFile{
+		Filename: filename,
+	}, &defaults)
+
+	assert.Empty(t, fc.ListJob())
 }
