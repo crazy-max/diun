@@ -55,6 +55,11 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		return err
 	}
 
+	icon := c.cfg.Icon
+	if icon == "" {
+		icon = c.meta.Logo
+	}
+
 	dataBuf := new(bytes.Buffer)
 	if err := json.NewEncoder(dataBuf).Encode(struct {
 		Topic    string   `json:"topic"`
@@ -62,6 +67,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		Title    string   `json:"title"`
 		Priority int      `json:"priority"`
 		Tags     []string `json:"tags"`
+		Icon     string   `json:"icon,omitempty"`
 		Markdown bool     `json:"markdown"`
 	}{
 		Topic:    c.cfg.Topic,
@@ -69,6 +75,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		Title:    string(title),
 		Priority: c.cfg.Priority,
 		Tags:     c.cfg.Tags,
+		Icon:     icon,
 		Markdown: true,
 	}); err != nil {
 		return err

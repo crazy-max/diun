@@ -87,6 +87,7 @@ notif:
     priority: 3
     tags:
       - package
+    icon: https://example.com/diun.png
     timeout: 10s
   pushover:
     token: uQiRzpo4DXghDmr9QzzfQu27cmVRsG
