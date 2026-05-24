@@ -31,7 +31,7 @@ func New(opts Options) (*Client, error) {
 	return &Client{
 		opts: opts,
 		sysCtx: &types.SystemContext{
-			DockerAuthConfig:                  &opts.Auth,
+			DockerAuthConfig:                  new(opts.Auth),
 			DockerDaemonInsecureSkipTLSVerify: opts.InsecureTLS,
 			DockerInsecureSkipTLSVerify:       types.NewOptionalBool(opts.InsecureTLS),
 			DockerRegistryUserAgent:           opts.UserAgent,

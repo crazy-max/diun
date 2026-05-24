@@ -12,7 +12,6 @@ import (
 )
 
 func (c *Client) NotifTest(_ context.Context, _ *pb.NotifTestRequest) (*pb.NotifTestResponse, error) {
-	createdAt, _ := time.Parse("2006-01-02T15:04:05Z", "2020-03-26T12:23:56Z")
 	image, _ := registry.ParseImage(registry.ParseImageOptions{
 		Name: "diun/testnotif:latest",
 	})
@@ -27,7 +26,7 @@ func (c *Client) NotifTest(_ context.Context, _ *pb.NotifTestRequest) (*pb.Notif
 			Tag:           "latest",
 			MIMEType:      "application/vnd.docker.distribution.manifest.list.v2+json",
 			Digest:        "sha256:216e3ae7de4ca8b553eb11ef7abda00651e79e537e85c46108284e5e91673e01",
-			Created:       &createdAt,
+			Created:       new(time.Date(2020, 3, 26, 12, 23, 56, 0, time.UTC)),
 			DockerVersion: "",
 			Labels: map[string]string{
 				"maintainer":                      "CrazyMax",

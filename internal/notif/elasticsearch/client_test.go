@@ -76,7 +76,6 @@ func TestSendReturnsElasticsearchError(t *testing.T) {
 }
 
 func newTestClient(address string) *Client {
-	timeout := 2 * time.Second
 	return &Client{
 		cfg: &model.NotifElasticsearch{
 			Address:  address,
@@ -84,7 +83,7 @@ func newTestClient(address string) *Client {
 			Password: "elastic-password",
 			Client:   "diun-test-client",
 			Index:    "diun-events",
-			Timeout:  &timeout,
+			Timeout:  new(2 * time.Second),
 		},
 		meta: model.Meta{
 			UserAgent: "diun-test",

@@ -118,7 +118,6 @@ func newTestClient(t *testing.T, overrides Options) *Client {
 	require.NoError(t, err)
 	image.HubLink = "https://hub.docker.com/r/crazymax/diun"
 
-	created := time.Date(2026, 5, 24, 12, 34, 56, 0, time.UTC)
 	opts := Options{
 		Meta: model.Meta{
 			Version:  "4.0.0",
@@ -131,7 +130,7 @@ func newTestClient(t *testing.T, overrides Options) *Client {
 			Manifest: registry.Manifest{
 				MIMEType: "application/vnd.docker.distribution.manifest.v2+json",
 				Digest:   "sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
-				Created:  &created,
+				Created:  new(time.Date(2026, 5, 24, 12, 34, 56, 0, time.UTC)),
 				Platform: "linux/amd64",
 			},
 			Metadata: map[string]string{

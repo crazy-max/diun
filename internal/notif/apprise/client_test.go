@@ -70,14 +70,13 @@ func TestSendReturnsAppriseError(t *testing.T) {
 }
 
 func newTestClient(endpoint string) *Client {
-	timeout := 2 * time.Second
 	return &Client{
 		cfg: &model.NotifApprise{
 			Endpoint:      endpoint,
 			Token:         "apprise-token",
 			Tags:          []string{"ops", "registry"},
 			URLs:          []string{"mailto://ops@example.com"},
-			Timeout:       &timeout,
+			Timeout:       new(2 * time.Second),
 			TemplateTitle: "{{ .Entry.Image }}",
 			TemplateBody:  "{{ .Entry.Provider }} {{ .Entry.Status }}",
 		},

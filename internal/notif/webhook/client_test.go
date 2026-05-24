@@ -32,7 +32,6 @@ func TestSendUsesConfiguredMethod(t *testing.T) {
 	image, err := registry.ParseImage(registry.ParseImageOptions{Name: "docker.io/library/alpine:latest"})
 	require.NoError(t, err)
 
-	timeout := 2 * time.Second
 	c := Client{
 		cfg: &model.NotifWebhook{
 			Endpoint: ts.URL,
@@ -40,7 +39,7 @@ func TestSendUsesConfiguredMethod(t *testing.T) {
 			Headers: map[string]string{
 				"X-Test": "ok",
 			},
-			Timeout: &timeout,
+			Timeout: new(2 * time.Second),
 		},
 		meta: model.Meta{UserAgent: "diun-test"},
 	}

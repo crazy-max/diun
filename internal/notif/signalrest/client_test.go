@@ -51,7 +51,6 @@ func TestSendPostsSignalMessage(t *testing.T) {
 }
 
 func newTestClient(endpoint string) *Client {
-	timeout := 2 * time.Second
 	return &Client{
 		cfg: &model.NotifSignalRest{
 			Endpoint:   endpoint,
@@ -60,7 +59,7 @@ func newTestClient(endpoint string) *Client {
 			Headers: map[string]string{
 				"X-Test": "ok",
 			},
-			Timeout:      &timeout,
+			Timeout:      new(2 * time.Second),
 			TemplateBody: "{{ .Entry.Provider }} {{ .Entry.Status }}",
 			TextMode:     "styled",
 		},

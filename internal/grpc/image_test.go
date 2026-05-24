@@ -143,7 +143,7 @@ func seedManifest(t *testing.T, client *Client, imageName string, created time.T
 		Tag:      image.Tag,
 		MIMEType: "application/vnd.docker.distribution.manifest.v2+json",
 		Digest:   digest.FromString(image.String()),
-		Created:  &created,
+		Created:  new(created),
 		Labels: map[string]string{
 			"org.opencontainers.image.title": image.Name(),
 		},

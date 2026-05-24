@@ -82,16 +82,14 @@ func TestSendReturnsRocketChatError(t *testing.T) {
 }
 
 func newTestClient(endpoint string) *Client {
-	renderAttachment := true
-	timeout := 2 * time.Second
 	return &Client{
 		cfg: &model.NotifRocketChat{
 			Endpoint:         endpoint,
 			Channel:          "#ops",
 			UserID:           "rocket-user",
 			Token:            "rocket-token",
-			RenderAttachment: &renderAttachment,
-			Timeout:          &timeout,
+			RenderAttachment: new(true),
+			Timeout:          new(2 * time.Second),
 			TemplateTitle:    "{{ .Entry.Image }}",
 			TemplateBody:     "{{ .Entry.Provider }} {{ .Entry.Status }}",
 		},
@@ -113,14 +111,13 @@ func testEntry(t *testing.T) model.NotifEntry {
 	require.NoError(t, err)
 	image.HubLink = "https://hub.docker.com/r/library/alpine"
 
-	created := time.Date(2026, 5, 24, 12, 34, 56, 0, time.UTC)
 	return model.NotifEntry{
 		Status:   model.ImageStatusUpdate,
 		Provider: "file",
 		Image:    image,
 		Manifest: registry.Manifest{
 			Digest:   digest.Digest("sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"),
-			Created:  &created,
+			Created:  new(time.Date(2026, 5, 24, 12, 34, 56, 0, time.UTC)),
 			Platform: "linux/amd64",
 		},
 	}
