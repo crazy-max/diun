@@ -49,9 +49,9 @@ github.com/aokoli/goutils
 ## explicit
 github.com/aymerick/douceur/css
 github.com/aymerick/douceur/parser
-# github.com/bmatcuk/doublestar/v3 v3.0.0
-## explicit; go 1.12
-github.com/bmatcuk/doublestar/v3
+# github.com/bmatcuk/doublestar/v4 v4.10.0
+## explicit; go 1.16
+github.com/bmatcuk/doublestar/v4
 # github.com/cespare/xxhash/v2 v2.3.0
 ## explicit; go 1.11
 github.com/cespare/xxhash/v2
