@@ -58,18 +58,20 @@ func TestSendPostsMessage(t *testing.T) {
 }
 
 func TestSendReturnsGotifyError(t *testing.T) {
+	var encodeErr error
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
-		require.NoError(t, json.NewEncoder(w).Encode(map[string]any{
+		encodeErr = json.NewEncoder(w).Encode(map[string]any{
 			"error":            "bad request",
 			"errorCode":        400,
 			"errorDescription": "invalid application token",
-		}))
+		})
 	}))
 	defer ts.Close()
 
 	err := newTestClient(ts.URL).Send(testEntry(t))
 
+	require.NoError(t, encodeErr)
 	require.EqualError(t, err, "400 bad request: invalid application token")
 }
 

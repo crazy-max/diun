@@ -128,10 +128,12 @@ func (r *testRegistry) handleTags(w http.ResponseWriter, req *http.Request) {
 		w.Header().Set("Link", link)
 	}
 	w.Header().Set("Content-Type", "application/json")
-	require.NoError(r.t, json.NewEncoder(w).Encode(map[string]any{
+	if err := json.NewEncoder(w).Encode(map[string]any{
 		"name": r.repo,
 		"tags": tags,
-	}))
+	}); err != nil {
+		r.t.Errorf("cannot encode tags response: %v", err)
+	}
 }
 
 func (r *testRegistry) handleManifest(w http.ResponseWriter, req *http.Request) {
@@ -152,8 +154,9 @@ func (r *testRegistry) handleManifest(w http.ResponseWriter, req *http.Request) 
 	if req.Method == http.MethodHead {
 		return
 	}
-	_, err := w.Write(manifest.body)
-	require.NoError(r.t, err)
+	if _, err := w.Write(manifest.body); err != nil {
+		r.t.Errorf("cannot write manifest response: %v", err)
+	}
 }
 
 func (r *testRegistry) handleBlob(w http.ResponseWriter, req *http.Request) {
@@ -164,8 +167,9 @@ func (r *testRegistry) handleBlob(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	w.Header().Set("Content-Type", "application/octet-stream")
-	_, err := w.Write(blob)
-	require.NoError(r.t, err)
+	if _, err := w.Write(blob); err != nil {
+		r.t.Errorf("cannot write blob response: %v", err)
+	}
 }
 
 func newTestRegistryClient(t *testing.T, opts Options) *Client {

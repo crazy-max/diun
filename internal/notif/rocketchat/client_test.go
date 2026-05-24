@@ -23,6 +23,7 @@ func TestSendPostsChatMessage(t *testing.T) {
 	var gotContentType string
 	var gotPayload Message
 	var gotPayloadErr error
+	var encodeErr error
 
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		gotMethod = r.Method
@@ -32,13 +33,14 @@ func TestSendPostsChatMessage(t *testing.T) {
 		gotUserAgent = r.Header.Get("User-Agent")
 		gotContentType = r.Header.Get("Content-Type")
 		gotPayloadErr = json.NewDecoder(r.Body).Decode(&gotPayload)
-		require.NoError(t, json.NewEncoder(w).Encode(map[string]any{"success": true}))
+		encodeErr = json.NewEncoder(w).Encode(map[string]any{"success": true})
 	}))
 	defer ts.Close()
 
 	err := newTestClient(ts.URL + "/root").Send(testEntry(t))
 	require.NoError(t, err)
 	require.NoError(t, gotPayloadErr)
+	require.NoError(t, encodeErr)
 
 	assert.Equal(t, http.MethodPost, gotMethod)
 	assert.Equal(t, "/root/api/v1/chat.postMessage", gotPath)
@@ -66,18 +68,20 @@ func TestSendPostsChatMessage(t *testing.T) {
 }
 
 func TestSendReturnsRocketChatError(t *testing.T) {
+	var encodeErr error
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
-		require.NoError(t, json.NewEncoder(w).Encode(map[string]any{
+		encodeErr = json.NewEncoder(w).Encode(map[string]any{
 			"success":   false,
 			"error":     "invalid room",
 			"errorType": "error-invalid-room",
-		}))
+		})
 	}))
 	defer ts.Close()
 
 	err := newTestClient(ts.URL).Send(testEntry(t))
 
+	require.NoError(t, encodeErr)
 	require.EqualError(t, err, "unexpected HTTP error 400: error-invalid-room")
 }
 

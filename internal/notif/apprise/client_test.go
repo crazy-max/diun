@@ -54,24 +54,26 @@ func TestSendPostsNotifyPayload(t *testing.T) {
 }
 
 func TestSendReturnsAppriseError(t *testing.T) {
+	var encodeErr error
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
-		require.NoError(t, json.NewEncoder(w).Encode(map[string]any{
+		encodeErr = json.NewEncoder(w).Encode(map[string]any{
 			"error":            "bad request",
 			"errorCode":        400,
 			"errorDescription": "invalid notification URL",
-		}))
+		})
 	}))
 	defer ts.Close()
 
 	err := newTestClient(ts.URL).Send(testEntry(t))
 
+	require.NoError(t, encodeErr)
 	require.EqualError(t, err, "400 bad request: invalid notification URL")
 }
 
 func newTestClient(endpoint string) *Client {
 	return &Client{
-		cfg: &model.NotifApprise{
+		cfg: &model.NotifApprise{ //nolint:gosec // fixture token is test data.
 			Endpoint:      endpoint,
 			Token:         "apprise-token",
 			Tags:          []string{"ops", "registry"},

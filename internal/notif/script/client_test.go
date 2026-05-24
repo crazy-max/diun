@@ -63,23 +63,27 @@ func TestHelperProcess(t *testing.T) {
 		return
 	}
 
+	os.Exit(runHelperProcess())
+}
+
+func runHelperProcess() int {
 	if os.Getenv("DIUN_SCRIPT_MODE") == "fail" {
 		fmt.Fprintln(os.Stderr, "script failed")
-		os.Exit(42)
+		return 42
 	}
 
 	workDir, err := os.Getwd()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
-		os.Exit(2)
+		return 2
 	}
 
+	//nolint:gosec // test helper receives a t.TempDir capture path from the parent test.
 	file, err := os.Create(os.Getenv("DIUN_SCRIPT_CAPTURE"))
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
-		os.Exit(2)
+		return 2
 	}
-	defer file.Close()
 
 	err = json.NewEncoder(file).Encode(map[string]string{
 		"PWD":                       workDir,
@@ -94,10 +98,16 @@ func TestHelperProcess(t *testing.T) {
 	})
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
-		os.Exit(2)
+		_ = file.Close()
+		return 2
 	}
 
-	os.Exit(0)
+	if err := file.Close(); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		return 2
+	}
+
+	return 0
 }
 
 func newTestClient(cmd, dir string) *Client {

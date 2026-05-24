@@ -58,20 +58,22 @@ func TestSendIndexesNotificationDocument(t *testing.T) {
 }
 
 func TestSendReturnsElasticsearchError(t *testing.T) {
+	var encodeErr error
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusConflict)
-		require.NoError(t, json.NewEncoder(w).Encode(map[string]any{
+		encodeErr = json.NewEncoder(w).Encode(map[string]any{
 			"status": 409,
 			"error": map[string]any{
 				"type":   "version_conflict_engine_exception",
 				"reason": "document already exists",
 			},
-		}))
+		})
 	}))
 	defer ts.Close()
 
 	err := newTestClient(ts.URL).Send(testEntry(t))
 
+	require.NoError(t, encodeErr)
 	require.EqualError(t, err, "409 version_conflict_engine_exception: document already exists")
 }
 
