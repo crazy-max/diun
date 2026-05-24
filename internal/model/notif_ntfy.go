@@ -12,6 +12,7 @@ type NotifNtfy struct {
 	Topic          string         `yaml:"topic,omitempty" json:"topic,omitempty" validate:"required"`
 	Priority       int            `yaml:"priority,omitempty" json:"priority,omitempty" validate:"omitempty,min=0"`
 	Tags           []string       `yaml:"tags,omitempty" json:"tags,omitempty" validate:"required"`
+	Icon           string         `yaml:"icon,omitempty" json:"icon,omitempty" validate:"omitempty"`
 	Timeout        *time.Duration `yaml:"timeout,omitempty" json:"timeout,omitempty" validate:"required"`
 	TLSSkipVerify  bool           `yaml:"tlsSkipVerify,omitempty" json:"tlsSkipVerify,omitempty" validate:"omitempty"`
 	TLSCACertFiles []string       `yaml:"tlsCaCertFiles,omitempty" json:"tlsCaCertFiles,omitempty" validate:"omitempty"`
