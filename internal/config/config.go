@@ -59,7 +59,7 @@ func Load(config string) (*Config, error) {
 		return nil, err
 	}
 
-	return &cfg, nil
+	return new(cfg), nil
 }
 
 func (cfg *Config) validate() error {

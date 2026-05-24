@@ -56,7 +56,6 @@ func TestSendSetsIcon(t *testing.T) {
 			image, err := registry.ParseImage(registry.ParseImageOptions{Name: "docker.io/library/alpine:latest"})
 			require.NoError(t, err)
 
-			timeout := 2 * time.Second
 			c := Client{
 				cfg: &model.NotifNtfy{
 					Endpoint:      ts.URL,
@@ -64,7 +63,7 @@ func TestSendSetsIcon(t *testing.T) {
 					Priority:      3,
 					Tags:          []string{"package"},
 					Icon:          tt.icon,
-					Timeout:       &timeout,
+					Timeout:       new(2 * time.Second),
 					TemplateTitle: "{{ .Entry.Image }}",
 					TemplateBody:  "body",
 				},

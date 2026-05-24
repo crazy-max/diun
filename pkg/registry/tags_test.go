@@ -4,50 +4,58 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestTags(t *testing.T) {
-	assert.NotNil(t, rc)
+	registry := newTestRegistry(t, "acme/diun")
+	registry.addTagsPage("", []string{"latest", "1.0.0", "1.1.0", "1.1.1-beta"}, `</v2/acme/diun/tags/list?page=2>; rel="next"`)
+	registry.addTagsPage("2", []string{"dev", "2.0.0", "nightly"}, "")
 
 	image, err := ParseImage(ParseImageOptions{
-		Name: "crazymax/diun:3.0.0",
+		Name: registry.imageName("1.0.0"),
 	})
-	if err != nil {
-		t.Error(err)
-	}
+	require.NoError(t, err)
 
-	tags, err := rc.Tags(TagsOptions{
-		Image: image,
+	client := newTestRegistryClient(t, Options{})
+	tags, err := client.Tags(TagsOptions{
+		Image:   image,
+		Max:     2,
+		Sort:    SortTagSemver,
+		Include: []string{`^\d+\.\d+\.\d+$`, `^latest$`},
+		Exclude: []string{`^1\.0\.0$`},
 	})
-	if err != nil {
-		t.Error(err)
-	}
+	require.NoError(t, err)
 
-	assert.Greater(t, tags.Total, 0)
-	assert.Greater(t, len(tags.List), 0)
+	assert.Equal(t, &Tags{
+		List:        []string{"2.0.0", "1.1.0"},
+		NotIncluded: 3,
+		Excluded:    1,
+		Total:       7,
+	}, tags)
 }
 
 func TestTagsWithDigest(t *testing.T) {
 	t.Parallel()
 
-	assert.NotNil(t, rc)
+	registry := newTestRegistry(t, "acme/diun")
+	registry.addTagsPage("", []string{"latest"}, "")
 
 	image, err := ParseImage(ParseImageOptions{
-		Name: "crazymax/diun:latest@sha256:3fca3dd86c2710586208b0f92d1ec4ce25382f4cad4ae76a2275db8e8bb24031",
+		Name: registry.imageName("latest") + "@sha256:3fca3dd86c2710586208b0f92d1ec4ce25382f4cad4ae76a2275db8e8bb24031",
 	})
-	if err != nil {
-		t.Error(err)
-	}
+	require.NoError(t, err)
 
-	tags, err := rc.Tags(TagsOptions{
+	client := newTestRegistryClient(t, Options{})
+	tags, err := client.Tags(TagsOptions{
 		Image: image,
 	})
-	if err != nil {
-		t.Error(err)
-	}
+	require.NoError(t, err)
 
-	assert.Greater(t, tags.Total, 0)
-	assert.Greater(t, len(tags.List), 0)
+	assert.Equal(t, &Tags{
+		List:  []string{"latest"},
+		Total: 1,
+	}, tags)
 }
 
 func TestTagsSort(t *testing.T) {

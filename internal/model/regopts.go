@@ -50,10 +50,10 @@ func (s *RegOpt) SetDefaults() {
 func (s *RegOpts) Select(name string, image registry.Image) (*RegOpt, error) {
 	for _, regOpt := range *s {
 		if regOpt.Selector == RegOptSelectorName && name == regOpt.Name {
-			return &regOpt, nil
+			return new(regOpt), nil
 		}
 		if regOpt.Selector == RegOptSelectorImage && strings.HasPrefix(image.Name(), regOpt.Name) {
-			return &regOpt, nil
+			return new(regOpt), nil
 		}
 	}
 	if len(name) == 0 {

@@ -46,7 +46,7 @@ func New(opts Options) (*Client, error) {
 		for _, metaArg := range cmd.Args {
 			if metaArg.Value != nil {
 				if name, _, err := shlex.ProcessWord(*metaArg.Value, shell.EnvsFromSlice(kvpoArgs)); err == nil {
-					metaArg.Value = &name
+					metaArg.Value = new(name)
 				}
 			}
 			kvpoArgs = append(kvpoArgs, metaArg.String())

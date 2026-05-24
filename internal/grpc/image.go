@@ -22,9 +22,8 @@ func (c *Client) ImageList(_ context.Context, _ *pb.ImageListRequest) (*pb.Image
 		mfsts := mfsts
 		var latest *registry.Manifest
 		for _, mfst := range mfsts {
-			mfst := mfst
 			if latest == nil || mfst.Created.After(*latest.Created) {
-				latest = &mfst
+				latest = new(mfst)
 			}
 		}
 		ilr = append(ilr, &pb.ImageListResponse_Image{
