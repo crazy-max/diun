@@ -57,3 +57,31 @@ func TestSendUsesConfiguredMethod(t *testing.T) {
 	require.NotEmpty(t, gotBody)
 	require.True(t, json.Valid(gotBody))
 }
+
+func TestSendReturnsErrorOnUnexpectedStatus(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+		_, _ = w.Write([]byte("failed"))
+	}))
+	defer ts.Close()
+
+	image, err := registry.ParseImage(registry.ParseImageOptions{Name: "docker.io/library/alpine:latest"})
+	require.NoError(t, err)
+
+	c := Client{
+		cfg: &model.NotifWebhook{
+			Endpoint: ts.URL,
+			Method:   http.MethodPost,
+			Timeout:  new(2 * time.Second),
+		},
+		meta: model.Meta{UserAgent: "diun-test"},
+	}
+
+	err = c.Send(model.NotifEntry{
+		Status:   model.ImageStatusUpdate,
+		Provider: "docker",
+		Image:    image,
+	})
+
+	require.ErrorContains(t, err, "unexpected HTTP status 500: failed")
+}
