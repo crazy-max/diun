@@ -2,10 +2,12 @@ package telegram
 
 import (
 	"encoding/json"
+	stderrors "errors"
 	"net/http"
 	"strconv"
 	"strings"
 	"text/template"
+	"time"
 
 	"github.com/PaulSonOfLars/gotgbot/v2"
 	"github.com/crazy-max/diun/v4/internal/model"
@@ -14,6 +16,8 @@ import (
 	"github.com/crazy-max/diun/v4/internal/secret"
 	"github.com/pkg/errors"
 )
+
+const telegramMaxRateLimitAttempts = 3
 
 // Client represents an active Telegram notification object
 type Client struct {
@@ -151,11 +155,34 @@ func parseChatIDs(entries []string) ([]chatID, error) {
 }
 
 func sendTelegramMessage(bot *gotgbot.Bot, chatID int64, threadID int64, message string, disableNotification bool) error {
-	_, err := bot.SendMessage(chatID, message, &gotgbot.SendMessageOpts{
+	opts := &gotgbot.SendMessageOpts{
 		MessageThreadId:     threadID,
 		ParseMode:           gotgbot.ParseModeMarkdown,
 		LinkPreviewOptions:  &gotgbot.LinkPreviewOptions{IsDisabled: true},
 		DisableNotification: disableNotification,
-	})
-	return err
+	}
+
+	for attempt := 1; attempt <= telegramMaxRateLimitAttempts; attempt++ {
+		_, err := bot.SendMessage(chatID, message, opts)
+		if err == nil {
+			return nil
+		}
+
+		retryAfter, ok := telegramRetryAfter(err)
+		if !ok || attempt == telegramMaxRateLimitAttempts {
+			return err
+		}
+
+		time.Sleep(retryAfter)
+	}
+
+	return nil
+}
+
+func telegramRetryAfter(err error) (time.Duration, bool) {
+	telegramErr, ok := stderrors.AsType[*gotgbot.TelegramError](err)
+	if !ok || telegramErr.Code != http.StatusTooManyRequests || telegramErr.ResponseParams == nil || telegramErr.ResponseParams.RetryAfter < 0 {
+		return 0, false
+	}
+	return time.Duration(telegramErr.ResponseParams.RetryAfter) * time.Second, true
 }
