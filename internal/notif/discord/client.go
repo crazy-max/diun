@@ -5,8 +5,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
+	"strconv"
 	"time"
 
 	"github.com/crazy-max/diun/v4/internal/model"
@@ -15,6 +17,8 @@ import (
 	"github.com/crazy-max/diun/v4/internal/secret"
 	"github.com/pkg/errors"
 )
+
+const discordMaxRateLimitAttempts = 3
 
 // Client represents an active discord notification object
 type Client struct {
@@ -127,34 +131,83 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	}); err != nil {
 		return err
 	}
+	payload := dataBuf.Bytes()
 
 	u, err := url.Parse(webhookURL)
 	if err != nil {
 		return err
 	}
 
-	cancelCtx, cancel := context.WithCancelCause(context.Background())
-	timeoutCtx, _ := context.WithTimeoutCause(cancelCtx, *c.cfg.Timeout, errors.WithStack(context.DeadlineExceeded)) //nolint:govet // no need to manually cancel this context as we already rely on parent
-	defer func() { cancel(errors.WithStack(context.Canceled)) }()
-
 	hc := http.Client{}
-	req, err := http.NewRequestWithContext(timeoutCtx, "POST", u.String(), dataBuf)
-	if err != nil {
-		return err
-	}
+	for attempt := 1; attempt <= discordMaxRateLimitAttempts; attempt++ {
+		cancelCtx, cancel := context.WithCancelCause(context.Background())
+		timeoutCtx, _ := context.WithTimeoutCause(cancelCtx, *c.cfg.Timeout, errors.WithStack(context.DeadlineExceeded)) //nolint:govet // no need to manually cancel this context as we already rely on parent
 
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("User-Agent", c.meta.UserAgent)
+		req, err := http.NewRequestWithContext(timeoutCtx, "POST", u.String(), bytes.NewReader(payload))
+		if err != nil {
+			cancel(errors.WithStack(context.Canceled))
+			return err
+		}
 
-	resp, err := hc.Do(req)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("User-Agent", c.meta.UserAgent)
 
-	if resp.StatusCode != http.StatusNoContent {
-		return errors.Errorf("unexpected HTTP status %d: %s", resp.StatusCode, resp.Body)
+		resp, err := hc.Do(req)
+		if err != nil {
+			cancel(errors.WithStack(context.Canceled))
+			return err
+		}
+
+		dt, err := io.ReadAll(resp.Body)
+		if closeErr := resp.Body.Close(); err == nil {
+			err = closeErr
+		}
+		cancel(errors.WithStack(context.Canceled))
+		if err != nil {
+			return errors.Wrap(err, "cannot read Discord response")
+		}
+
+		if resp.StatusCode == http.StatusNoContent {
+			return nil
+		}
+
+		err = errors.Errorf("unexpected HTTP status %d: %s", resp.StatusCode, string(dt))
+		if resp.StatusCode != http.StatusTooManyRequests || attempt == discordMaxRateLimitAttempts {
+			return err
+		}
+
+		time.Sleep(discordRetryAfter(resp, dt))
 	}
 
 	return nil
+}
+
+// https://docs.discord.com/developers/topics/rate-limits
+func discordRetryAfter(resp *http.Response, body []byte) time.Duration {
+	if value := resp.Header.Get("Retry-After"); value != "" {
+		if seconds, err := strconv.ParseFloat(value, 64); err == nil && seconds > 0 {
+			return time.Duration(seconds * float64(time.Second))
+		}
+		if retryAt, err := http.ParseTime(value); err == nil {
+			delay := time.Until(retryAt)
+			if delay > 0 {
+				return delay
+			}
+		}
+	}
+
+	var errBody struct {
+		RetryAfter float64 `json:"retry_after"`
+	}
+	if err := json.Unmarshal(body, &errBody); err == nil && errBody.RetryAfter > 0 {
+		return time.Duration(errBody.RetryAfter * float64(time.Second))
+	}
+
+	if value := resp.Header.Get("X-RateLimit-Reset-After"); value != "" {
+		if seconds, err := strconv.ParseFloat(value, 64); err == nil && seconds > 0 {
+			return time.Duration(seconds * float64(time.Second))
+		}
+	}
+
+	return 5 * time.Second
 }
