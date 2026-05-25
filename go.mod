@@ -17,7 +17,6 @@ require (
 	github.com/docker/go-units v0.5.0
 	github.com/dromara/carbon/v2 v2.6.16
 	github.com/eclipse/paho.mqtt.golang v1.5.1
-	github.com/go-gomail/gomail v0.0.0-20160411212932-81ebce5c23df
 	github.com/go-playground/validator/v10 v10.30.2
 	github.com/hashicorp/nomad/api v0.0.0-20260522124601-26ed559e8bc8 // v2.0.2
 	github.com/jedib0t/go-pretty/v6 v6.7.10
@@ -38,6 +37,7 @@ require (
 	github.com/sirupsen/logrus v1.9.4
 	github.com/stretchr/testify v1.11.1
 	github.com/tidwall/pretty v1.2.1
+	github.com/wneessen/go-mail v0.7.3
 	go.etcd.io/bbolt v1.4.3
 	go.podman.io/image/v5 v5.40.0
 	golang.org/x/mod v0.36.0
@@ -159,9 +159,7 @@ require (
 	golang.org/x/time v0.15.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20260406210006-6f92a3bedf2d // indirect
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.6.0 // indirect
-	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/evanphx/json-patch.v4 v4.13.0 // indirect
-	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	k8s.io/klog/v2 v2.130.1 // indirect
 	k8s.io/kube-openapi v0.0.0-20250910181357-589584f1c912 // indirect

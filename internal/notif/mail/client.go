@@ -13,10 +13,10 @@ import (
 	"github.com/crazy-max/diun/v4/internal/msg"
 	"github.com/crazy-max/diun/v4/internal/notif/notifier"
 	"github.com/crazy-max/diun/v4/internal/secret"
-	"github.com/go-gomail/gomail"
 	hermes "github.com/matcornic/hermes/v2"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
+	email "github.com/wneessen/go-mail"
 )
 
 // Client represents an active mail notification object
@@ -106,7 +106,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		return err
 	}
 
-	email := hermes.Email{
+	hermesEmail := hermes.Email{
 		Body: hermes.Body{
 			Title:        fmt.Sprintf("%s 🔔 notification", c.meta.Name),
 			FreeMarkdown: hermes.Markdown(body),
@@ -115,13 +115,13 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	}
 
 	// Generate an HTML email with the provided contents (for modern clients)
-	htmlpart, err := h.GenerateHTML(email)
+	htmlpart, err := h.GenerateHTML(hermesEmail)
 	if err != nil {
 		return errors.Wrap(err, "cannot generate HTML email")
 	}
 
 	// Generate the plaintext version of the e-mail (for clients that do not support xHTML)
-	textpart, err := h.GeneratePlainText(email)
+	textpart, err := h.GeneratePlainText(hermesEmail)
 	if err != nil {
 		return errors.Wrap(err, "cannot generate plaintext email")
 	}
@@ -132,20 +132,17 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		return errors.Wrap(err, "cannot generate Message-ID")
 	}
 
-	mailMessage := gomail.NewMessage()
-	mailMessage.SetHeader("From", fmt.Sprintf("%s <%s>", c.meta.Name, c.cfg.From))
-	mailMessage.SetHeader("To", c.cfg.To...)
-	mailMessage.SetHeader("Subject", string(title))
-	mailMessage.SetHeader("Message-ID", messageID)
-	mailMessage.SetBody("text/plain", textpart)
-	mailMessage.AddAlternative("text/html", htmlpart)
-
-	var tlsConfig *tls.Config
-	if *c.cfg.InsecureSkipVerify {
-		tlsConfig = &tls.Config{
-			InsecureSkipVerify: *c.cfg.InsecureSkipVerify,
-		}
+	mailMessage := email.NewMsg()
+	if err = mailMessage.FromFormat(c.meta.Name, c.cfg.From); err != nil {
+		return errors.Wrap(err, "cannot set mail FROM address")
 	}
+	if err = mailMessage.To(c.cfg.To...); err != nil {
+		return errors.Wrap(err, "cannot set mail TO address(es)")
+	}
+	mailMessage.Subject(string(title))
+	mailMessage.SetGenHeader(email.HeaderMessageID, messageID)
+	mailMessage.SetBodyString(email.TypeTextPlain, textpart)
+	mailMessage.AddAlternativeString(email.TypeTextHTML, htmlpart)
 
 	username, err := secret.GetSecret(c.cfg.Username, c.cfg.UsernameFile)
 	if err != nil {
@@ -156,15 +153,40 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		log.Warn().Err(err).Msg("Cannot retrieve password secret for mail notifier")
 	}
 
-	dialer := &gomail.Dialer{
-		Host:      c.cfg.Host,
-		Port:      c.cfg.Port,
-		Username:  username,
-		Password:  password,
-		SSL:       *c.cfg.SSL,
-		TLSConfig: tlsConfig,
-		LocalName: c.cfg.LocalName,
+	client, err := c.mailClient(username, password)
+	if err != nil {
+		return errors.Wrap(err, "cannot create mail client")
 	}
 
-	return dialer.DialAndSend(mailMessage)
+	return client.DialAndSend(mailMessage)
+}
+
+func (c *Client) mailClient(username, password string) (*email.Client, error) {
+	localName := c.cfg.LocalName
+	if localName == "" {
+		localName = "localhost"
+	}
+	opts := []email.Option{
+		email.WithPort(c.cfg.Port),
+		email.WithTLSPolicy(email.TLSOpportunistic),
+		email.WithHELO(localName),
+	}
+	if *c.cfg.SSL {
+		opts = append(opts, email.WithSSL())
+	}
+	if *c.cfg.InsecureSkipVerify {
+		opts = append(opts, email.WithTLSConfig(&tls.Config{
+			ServerName:         c.cfg.Host,
+			MinVersion:         email.DefaultTLSMinVersion,
+			InsecureSkipVerify: true,
+		}))
+	}
+	if username != "" {
+		opts = append(opts,
+			email.WithUsername(username),
+			email.WithPassword(password),
+			email.WithSMTPAuth(email.SMTPAuthAutoDiscover),
+		)
+	}
+	return email.NewClient(c.cfg.Host, opts...)
 }
