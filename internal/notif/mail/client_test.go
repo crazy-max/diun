@@ -4,6 +4,7 @@ import (
 	"context"
 	"net"
 	"net/textproto"
+	"os"
 	"strconv"
 	"strings"
 	"testing"
@@ -16,6 +17,9 @@ import (
 )
 
 func TestSendSMTPRegression(t *testing.T) {
+	hostname, err := os.Hostname()
+	require.NoError(t, err)
+
 	tests := []struct {
 		name          string
 		localName     string
@@ -28,10 +32,10 @@ func TestSendSMTPRegression(t *testing.T) {
 			wantHelo:  "mail.example.com",
 		},
 		{
-			name:          "empty localName falls back to localhost without forcing auth",
+			name:          "empty localName uses go-mail default without forcing auth",
 			localName:     "",
 			advertiseAuth: true,
-			wantHelo:      "localhost",
+			wantHelo:      hostname,
 		},
 	}
 

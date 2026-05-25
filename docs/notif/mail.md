@@ -27,7 +27,7 @@ Notifications can be sent through SMTP.
 | `port`[^1]           | `25`                                | SMTP server port                                                                                                                   |
 | `ssl`                | `false`                             | SSL defines whether an SSL connection is used. Should be false in most cases since the auth mechanism should use STARTTLS          |
 | `insecureSkipVerify` | `false`                             | Controls whether a client verifies the server's certificate chain and hostname                                                     |
-| `localName`          | `localhost`                         | Hostname sent to the SMTP server with the HELO command                                                                             |
+| `localName`          |                                     | Hostname sent to the SMTP server with the HELO command. If unset, uses the OS hostname                                             |
 | `username`           |                                     | SMTP username                                                                                                                      |
 | `usernameFile`       |                                     | Use content of [secret file](../faq.md#secrets-loaded-from-files-and-trailing-newlines) as SMTP username if `username` not defined |
 | `password`           |                                     | SMTP password                                                                                                                      |

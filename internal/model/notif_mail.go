@@ -41,7 +41,6 @@ func (s *NotifMail) SetDefaults() {
 	s.Port = 25
 	s.SSL = new(false)
 	s.InsecureSkipVerify = new(false)
-	s.LocalName = "localhost"
 	s.TemplateTitle = NotifDefaultTemplateTitle
 	s.TemplateBody = NotifMailDefaultTemplateBody
 }
