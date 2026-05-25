@@ -2,6 +2,7 @@ package slack
 
 import (
 	"encoding/json"
+	stderrors "errors"
 	"fmt"
 	"strconv"
 	"time"
@@ -13,6 +14,8 @@ import (
 	"github.com/nlopes/slack"
 	"github.com/pkg/errors"
 )
+
+const slackMaxRateLimitAttempts = 3
 
 // Client represents an active slack notification object
 type Client struct {
@@ -100,7 +103,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		color = "#0054ca"
 	}
 
-	return slack.PostWebhook(webhookURL, &slack.WebhookMessage{
+	payload := &slack.WebhookMessage{
 		Attachments: []slack.Attachment{
 			{
 				Color:         color,
@@ -114,5 +117,21 @@ func (c *Client) Send(entry model.NotifEntry) error {
 				Ts:            json.Number(strconv.FormatInt(time.Now().Unix(), 10)),
 			},
 		},
-	})
+	}
+
+	for attempt := 1; attempt <= slackMaxRateLimitAttempts; attempt++ {
+		err = slack.PostWebhook(webhookURL, payload)
+		if err == nil {
+			return nil
+		}
+
+		rateLimitErr, ok := stderrors.AsType[*slack.RateLimitedError](err)
+		if !ok || attempt == slackMaxRateLimitAttempts {
+			return err
+		}
+
+		time.Sleep(rateLimitErr.RetryAfter)
+	}
+
+	return nil
 }
