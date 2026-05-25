@@ -14,6 +14,8 @@ import (
 	"maunium.net/go/mautrix/event"
 )
 
+const matrixMaxRateLimitAttempts = 3
+
 // Client represents an active rocketchat notification object
 type Client struct {
 	*notifier.Notifier
@@ -43,6 +45,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	if err != nil {
 		return errors.Wrap(err, "failed to initialize Matrix client")
 	}
+	m.DefaultHTTPRetries = matrixMaxRateLimitAttempts - 1
 	defer func() {
 		if _, err := m.Logout(ctx); err != nil {
 			log.Error().Err(err).Msg("Cannot logout")
