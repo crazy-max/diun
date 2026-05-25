@@ -116,7 +116,6 @@ func TestLoadFile(t *testing.T) {
 						Port:               25,
 						SSL:                new(false),
 						InsecureSkipVerify: new(false),
-						LocalName:          "localhost",
 						From:               "diun@example.com",
 						To: []string{
 							"webmaster@example.com",

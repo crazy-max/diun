@@ -131,14 +131,12 @@ func (c *Client) Send(entry model.NotifEntry) error {
 }
 
 func (c *Client) mailClient(username, password string) (*email.Client, error) {
-	localName := c.cfg.LocalName
-	if localName == "" {
-		localName = "localhost"
-	}
 	opts := []email.Option{
 		email.WithPort(c.cfg.Port),
 		email.WithTLSPolicy(email.TLSOpportunistic),
-		email.WithHELO(localName),
+	}
+	if c.cfg.LocalName != "" {
+		opts = append(opts, email.WithHELO(c.cfg.LocalName))
 	}
 	if *c.cfg.SSL {
 		opts = append(opts, email.WithSSL())
