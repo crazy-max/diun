@@ -76,6 +76,52 @@ func TestSendPostsWebhookAttachment(t *testing.T) {
 	}, attachment.Fields)
 }
 
+func TestSendRetriesAfterSlackRateLimit(t *testing.T) {
+	var requestCount int
+	var gotPayloads []map[string]interface{}
+	var gotPayloadErr error
+
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		requestCount++
+		var payload map[string]interface{}
+		if err := json.NewDecoder(r.Body).Decode(&payload); err != nil && gotPayloadErr == nil {
+			gotPayloadErr = err
+		}
+		gotPayloads = append(gotPayloads, payload)
+
+		if requestCount == 1 {
+			w.Header().Set("Retry-After", "0")
+			w.WriteHeader(http.StatusTooManyRequests)
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer ts.Close()
+
+	err := newTestClient(ts.URL).Send(testEntry(t))
+
+	require.NoError(t, err)
+	require.NoError(t, gotPayloadErr)
+	assert.Equal(t, 2, requestCount)
+	require.Len(t, gotPayloads, 2)
+	assert.Equal(t, gotPayloads[0], gotPayloads[1])
+}
+
+func TestSendStopsAfterSlackRateLimitAttempts(t *testing.T) {
+	var requestCount int
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		requestCount++
+		w.Header().Set("Retry-After", "0")
+		w.WriteHeader(http.StatusTooManyRequests)
+	}))
+	defer ts.Close()
+
+	err := newTestClient(ts.URL).Send(testEntry(t))
+
+	require.ErrorContains(t, err, "slack rate limit exceeded")
+	assert.Equal(t, slackMaxRateLimitAttempts, requestCount)
+}
+
 func newTestClient(webhookURL string) *Client {
 	return &Client{
 		cfg: &model.NotifSlack{
