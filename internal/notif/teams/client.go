@@ -5,7 +5,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/crazy-max/diun/v4/internal/httputil"
@@ -14,6 +17,11 @@ import (
 	"github.com/crazy-max/diun/v4/internal/notif/notifier"
 	"github.com/crazy-max/diun/v4/internal/secret"
 	"github.com/pkg/errors"
+)
+
+const (
+	teamsMaxRateLimitAttempts = 3
+	teamsRateLimitMessage     = "Microsoft Teams endpoint returned HTTP error 429" // https://learn.microsoft.com/en-gb/microsoftteams/platform/webhooks-and-connectors/how-to/connectors-using?tabs=cURL%2Ctext1#rate-limiting-for-connectors
 )
 
 // Client represents an active webhook notification object
@@ -111,10 +119,6 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		return err
 	}
 
-	cancelCtx, cancel := context.WithCancelCause(context.Background())
-	timeoutCtx, _ := context.WithTimeoutCause(cancelCtx, *c.cfg.Timeout, errors.WithStack(context.DeadlineExceeded)) //nolint:govet // no need to manually cancel this context as we already rely on parent
-	defer func() { cancel(errors.WithStack(context.Canceled)) }()
-
 	tlsConfig, err := httputil.LoadTLSConfig(c.cfg.TLSSkipVerify, c.cfg.TLSCACertFiles)
 	if err != nil {
 		return errors.Wrap(err, "cannot load TLS configuration for Teams notifier")
@@ -125,19 +129,74 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		},
 	}
 
-	req, err := http.NewRequestWithContext(timeoutCtx, "POST", webhookURL, bytes.NewBuffer(jsonBody))
-	if err != nil {
-		return err
-	}
+	for attempt := 1; attempt <= teamsMaxRateLimitAttempts; attempt++ {
+		cancelCtx, cancel := context.WithCancelCause(context.Background())
+		timeoutCtx, _ := context.WithTimeoutCause(cancelCtx, *c.cfg.Timeout, errors.WithStack(context.DeadlineExceeded)) //nolint:govet // no need to manually cancel this context as we already rely on parent
 
-	req.Header.Add("Content-Type", "application/json")
-	req.Header.Set("User-Agent", c.meta.UserAgent)
+		req, err := http.NewRequestWithContext(timeoutCtx, "POST", webhookURL, bytes.NewBuffer(jsonBody))
+		if err != nil {
+			cancel(errors.WithStack(context.Canceled))
+			return err
+		}
 
-	resp, err := hc.Do(req)
-	if err != nil {
-		return err
+		req.Header.Add("Content-Type", "application/json")
+		req.Header.Set("User-Agent", c.meta.UserAgent)
+
+		resp, err := hc.Do(req)
+		if err != nil {
+			cancel(errors.WithStack(context.Canceled))
+			return err
+		}
+
+		body, err := io.ReadAll(resp.Body)
+		if closeErr := resp.Body.Close(); err == nil {
+			err = closeErr
+		}
+		cancel(errors.WithStack(context.Canceled))
+		if err != nil {
+			return errors.Wrap(err, "cannot read Teams response")
+		}
+
+		if resp.StatusCode >= http.StatusOK && resp.StatusCode < http.StatusMultipleChoices && !teamsRateLimited(resp, body) {
+			return nil
+		}
+
+		err = teamsResponseError(resp, body)
+		if !teamsRateLimited(resp, body) || attempt == teamsMaxRateLimitAttempts {
+			return err
+		}
+
+		time.Sleep(teamsRetryAfter(resp, attempt))
 	}
-	defer resp.Body.Close()
 
 	return nil
+}
+
+func teamsRateLimited(resp *http.Response, body []byte) bool {
+	return resp.StatusCode == http.StatusTooManyRequests || strings.Contains(string(body), teamsRateLimitMessage)
+}
+
+func teamsResponseError(resp *http.Response, body []byte) error {
+	if resp.StatusCode >= http.StatusOK && resp.StatusCode < http.StatusMultipleChoices {
+		return errors.Errorf("unexpected Teams response: %s", string(body))
+	}
+	return errors.Errorf("unexpected HTTP status %d: %s", resp.StatusCode, string(body))
+}
+
+// https://learn.microsoft.com/en-us/microsoftteams/platform/bots/build-conversational-capability?tabs=dotnet%2Capp-manifest-v112-or-later%2Cdotnet2%2Cdotnet3%2Cdotnet4%2Cdotnet5%2Ccsharp2%2Cdotnet6%2Ccsharp1#status-codes-from-bot-conversational-apis
+func teamsRetryAfter(resp *http.Response, attempt int) time.Duration {
+	if value := resp.Header.Get("Retry-After"); value != "" {
+		if seconds, err := strconv.Atoi(value); err == nil && seconds >= 0 {
+			return time.Duration(seconds) * time.Second
+		}
+		if retryAt, err := http.ParseTime(value); err == nil {
+			delay := time.Until(retryAt)
+			if delay > 0 {
+				return delay
+			}
+			return 0
+		}
+	}
+
+	return time.Duration(1<<uint(attempt-1)) * time.Second
 }

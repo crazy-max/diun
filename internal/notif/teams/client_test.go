@@ -62,6 +62,66 @@ func TestSendPostsMessageCard(t *testing.T) {
 	}, section.Facts)
 }
 
+func TestSendReturnsTeamsErrorResponse(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+		_, _ = w.Write([]byte("failed to deliver message"))
+	}))
+	defer ts.Close()
+
+	err := newTestClient(ts.URL).Send(testEntry(t))
+
+	require.ErrorContains(t, err, "unexpected HTTP status 500: failed to deliver message")
+}
+
+func TestSendRetriesAfterTeamsRateLimit(t *testing.T) {
+	var requestCount int
+	var gotPayloads []map[string]interface{}
+	var gotPayloadErr error
+
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		requestCount++
+		var payload map[string]interface{}
+		if err := json.NewDecoder(http.MaxBytesReader(w, r.Body, 1<<20)).Decode(&payload); err != nil && gotPayloadErr == nil {
+			gotPayloadErr = err
+		}
+		gotPayloads = append(gotPayloads, payload)
+
+		if requestCount == 1 {
+			w.Header().Set("Retry-After", "0")
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(teamsRateLimitMessage))
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer ts.Close()
+
+	err := newTestClient(ts.URL).Send(testEntry(t))
+
+	require.NoError(t, err)
+	require.NoError(t, gotPayloadErr)
+	assert.Equal(t, 2, requestCount)
+	require.Len(t, gotPayloads, 2)
+	assert.Equal(t, gotPayloads[0], gotPayloads[1])
+}
+
+func TestSendStopsAfterTeamsRateLimitAttempts(t *testing.T) {
+	var requestCount int
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		requestCount++
+		w.Header().Set("Retry-After", "0")
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte(teamsRateLimitMessage))
+	}))
+	defer ts.Close()
+
+	err := newTestClient(ts.URL).Send(testEntry(t))
+
+	require.ErrorContains(t, err, "unexpected Teams response: Microsoft Teams endpoint returned HTTP error 429")
+	assert.Equal(t, teamsMaxRateLimitAttempts, requestCount)
+}
+
 func newTestClient(webhookURL string) *Client {
 	return &Client{
 		cfg: &model.NotifTeams{
