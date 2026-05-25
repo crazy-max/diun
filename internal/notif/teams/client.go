@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"time"
 
@@ -138,6 +139,14 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		return err
 	}
 	defer resp.Body.Close()
+
+	if resp.StatusCode < http.StatusOK || resp.StatusCode >= http.StatusMultipleChoices {
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return errors.Wrap(err, "cannot read Teams error response")
+		}
+		return errors.Errorf("unexpected HTTP status %d: %s", resp.StatusCode, string(body))
+	}
 
 	return nil
 }

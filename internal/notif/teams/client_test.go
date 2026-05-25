@@ -62,6 +62,18 @@ func TestSendPostsMessageCard(t *testing.T) {
 	}, section.Facts)
 }
 
+func TestSendReturnsTeamsErrorResponse(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+		_, _ = w.Write([]byte("failed to deliver message"))
+	}))
+	defer ts.Close()
+
+	err := newTestClient(ts.URL).Send(testEntry(t))
+
+	require.ErrorContains(t, err, "unexpected HTTP status 500: failed to deliver message")
+}
+
 func newTestClient(webhookURL string) *Client {
 	return &Client{
 		cfg: &model.NotifTeams{
