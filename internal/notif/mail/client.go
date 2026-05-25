@@ -1,9 +1,7 @@
 package mail
 
 import (
-	"crypto/rand"
 	"crypto/tls"
-	"encoding/hex"
 	"fmt"
 	"strings"
 	"text/template"
@@ -39,31 +37,6 @@ func New(config *model.NotifMail, meta model.Meta) notifier.Notifier {
 // Name returns notifier's name
 func (c *Client) Name() string {
 	return "mail"
-}
-
-// generateMessageID creates a unique Message-ID header value according to RFC 5322.
-// Format: <timestamp.randomhex@domain>
-// The domain is taken from the LocalName config if set, otherwise falls back to Host.
-func (c *Client) generateMessageID() (string, error) {
-	// Use nanosecond timestamp for high resolution uniqueness
-	timestamp := time.Now().UnixNano()
-
-	// Generate 8 bytes of cryptographically secure random data
-	randomBytes := make([]byte, 8)
-	if _, err := rand.Read(randomBytes); err != nil {
-		return "", errors.Wrap(err, "failed to generate random bytes for Message-ID")
-	}
-	randomHex := hex.EncodeToString(randomBytes)
-
-	// Use LocalName if set, otherwise fall back to Host
-	domain := c.cfg.LocalName
-	if domain == "" {
-		domain = c.cfg.Host
-	}
-
-	// RFC 5322 format: <local-part@domain>
-	messageID := fmt.Sprintf("<%d.%s@%s>", timestamp, randomHex, domain)
-	return messageID, nil
 }
 
 // Send creates and sends an email notification with an entry
@@ -126,12 +99,6 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		return errors.Wrap(err, "cannot generate plaintext email")
 	}
 
-	// Generate RFC 5322 compliant Message-ID
-	messageID, err := c.generateMessageID()
-	if err != nil {
-		return errors.Wrap(err, "cannot generate Message-ID")
-	}
-
 	mailMessage := email.NewMsg()
 	if err = mailMessage.FromFormat(c.meta.Name, c.cfg.From); err != nil {
 		return errors.Wrap(err, "cannot set mail FROM address")
@@ -140,7 +107,6 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		return errors.Wrap(err, "cannot set mail TO address(es)")
 	}
 	mailMessage.Subject(string(title))
-	mailMessage.SetGenHeader(email.HeaderMessageID, messageID)
 	mailMessage.SetBodyString(email.TypeTextPlain, textpart)
 	mailMessage.AddAlternativeString(email.TypeTextHTML, htmlpart)
 
