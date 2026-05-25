@@ -1,0 +1,14 @@
+# SPDX-FileCopyrightText: Copyright (c) The go-mail Authors
+#
+# SPDX-License-Identifier: MIT
+
+version = 1
+SPDX-PackageName = "go-mail"
+SPDX-PackageSupplier = "The go-mail Authors"
+SPDX-PackageDownloadLocation = "https://github.com/wneessen/go-mail"
+
+[[annotations]]
+path = ["testdata/**"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "The go-mail Authors"
+SPDX-License-Identifier = "MIT"

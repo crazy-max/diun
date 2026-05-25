@@ -1,0 +1,61 @@
+# SPDX-FileCopyrightText: The go-mail Authors
+#
+# SPDX-License-Identifier: MIT
+
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+
+# Dependency directories (remove the comment below to include it)
+# vendor/
+
+# Local testfiles and auth data
+.auth
+examples/*
+
+# SonarQube
+.scannerwork/
+
+# IDEA specific ignores
+# Source: https://github.com/github/gitignore/blob/main/Global/JetBrains.gitignore
+.idea/
+
+# CMake
+cmake-build-*/
+
+# File-based project format
+*.iws
+
+# IntelliJ
+out/
+
+# mpeltonen/sbt-idea plugin
+.idea_modules/
+
+# JIRA plugin
+atlassian-ide-plugin.xml
+
+# Cursive Clojure plugin
+.idea/replstate.xml
+
+# SonarLint plugin
+.idea/sonarlint/
+
+# Crashlytics plugin (for Android Studio and IntelliJ)
+com_crashlytics_export_strings.xml
+crashlytics.properties
+crashlytics-build.properties
+fabric.properties
+
+## Coverage data
+coverage.coverprofile
+coverage.html

@@ -149,9 +149,6 @@ github.com/gabriel-vasile/mimetype/internal/json
 github.com/gabriel-vasile/mimetype/internal/magic
 github.com/gabriel-vasile/mimetype/internal/markup
 github.com/gabriel-vasile/mimetype/internal/scan
-# github.com/go-gomail/gomail v0.0.0-20160411212932-81ebce5c23df
-## explicit
-github.com/go-gomail/gomail
 # github.com/go-logr/logr v1.4.3
 ## explicit; go 1.18
 github.com/go-logr/logr
@@ -446,6 +443,12 @@ github.com/vanng822/css
 # github.com/vanng822/go-premailer v0.0.0-20191214114701-be27abe028fe
 ## explicit
 github.com/vanng822/go-premailer/premailer
+# github.com/wneessen/go-mail v0.7.3
+## explicit; go 1.25.0
+github.com/wneessen/go-mail
+github.com/wneessen/go-mail/internal/pkcs7
+github.com/wneessen/go-mail/log
+github.com/wneessen/go-mail/smtp
 # github.com/x448/float16 v0.8.4
 ## explicit; go 1.11
 github.com/x448/float16
@@ -617,7 +620,9 @@ golang.org/x/text/internal/language
 golang.org/x/text/internal/language/compact
 golang.org/x/text/internal/tag
 golang.org/x/text/language
+golang.org/x/text/runes
 golang.org/x/text/secure/bidirule
+golang.org/x/text/secure/precis
 golang.org/x/text/transform
 golang.org/x/text/unicode/bidi
 golang.org/x/text/unicode/norm
@@ -743,14 +748,9 @@ google.golang.org/protobuf/types/known/anypb
 google.golang.org/protobuf/types/known/durationpb
 google.golang.org/protobuf/types/known/timestamppb
 google.golang.org/protobuf/types/pluginpb
-# gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc
-## explicit
-gopkg.in/alexcesaro/quotedprintable.v3
 # gopkg.in/evanphx/json-patch.v4 v4.13.0
 ## explicit
 gopkg.in/evanphx/json-patch.v4
-# gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
-## explicit
 # gopkg.in/inf.v0 v0.9.1
 ## explicit
 gopkg.in/inf.v0

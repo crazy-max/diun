@@ -1,0 +1,22 @@
+# SPDX-FileCopyrightText: The go-mail Authors
+#
+# SPDX-License-Identifier: MIT
+
+coverage:
+  status:
+    project:
+      default:
+        target: 95%
+        threshold: 2%
+        base: auto 
+        if_ci_failed: error
+        only_pulls: false
+    patch:
+      default:
+        target: 95%
+        base: auto
+        if_ci_failed: error
+        threshold: 2%
+
+comment:
+  require_changes: true
