@@ -173,6 +173,24 @@ func TestSendSMTPRegression(t *testing.T) {
 	}
 }
 
+func TestSendWrapsDeliveryError(t *testing.T) {
+	addr := freeTCPAddr(t)
+	cfg := testMailConfig(t, addr)
+	cfg.TemplateTitle = "title"
+	cfg.TemplateBody = "body"
+
+	client := &Client{
+		cfg: cfg,
+		meta: model.Meta{
+			Name: "Diun",
+		},
+	}
+
+	err := client.Send(model.NotifEntry{})
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "cannot send mail notification")
+}
+
 type smtpServerResult struct {
 	err      error
 	helo     string
@@ -257,6 +275,16 @@ func startSMTPServer(t *testing.T, advertiseAuth bool) (string, <-chan smtpServe
 	})
 
 	return listener.Addr().String(), done
+}
+
+func freeTCPAddr(t *testing.T) string {
+	t.Helper()
+
+	listener, err := (&net.ListenConfig{}).Listen(context.Background(), "tcp", "127.0.0.1:0")
+	require.NoError(t, err)
+	addr := listener.Addr().String()
+	require.NoError(t, listener.Close())
+	return addr
 }
 
 func waitSMTPServer(t *testing.T, done <-chan smtpServerResult) smtpServerResult {
