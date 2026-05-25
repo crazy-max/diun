@@ -158,7 +158,10 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		return errors.Wrap(err, "cannot create mail client")
 	}
 
-	return client.DialAndSend(mailMessage)
+	if err = client.DialAndSend(mailMessage); err != nil {
+		return errors.Wrap(err, "cannot send mail notification")
+	}
+	return nil
 }
 
 func (c *Client) mailClient(username, password string) (*email.Client, error) {
