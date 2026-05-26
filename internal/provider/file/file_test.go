@@ -85,6 +85,7 @@ var (
 				SortTags:  registry.SortTagSemver,
 				MaxTags:   25,
 				IncludeTags: []string{
+					`^(0|[1-9]\d*)\..*`,
 					`^1\.2\..*`,
 				},
 				ExcludeTags: []string{
@@ -120,6 +121,7 @@ var (
 					`^(0|[1-9]\d*)\..*`,
 				},
 				ExcludeTags: []string{
+					`^0\.0\..*`,
 					`latest`,
 				},
 			},
@@ -183,6 +185,7 @@ var (
 				SortTags:  registry.SortTagReverse,
 				MaxTags:   25,
 				IncludeTags: []string{
+					`^(0|[1-9]\d*)\..*`,
 					`^1\..*`,
 				},
 				ExcludeTags: []string{
