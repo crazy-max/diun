@@ -1,0 +1,7 @@
+watch:
+  healthchecks:
+    baseURL: https://hc-ping.com/
+    uuidFile: ./fixtures/run_secrets_uuid
+
+providers:
+  docker: {}
