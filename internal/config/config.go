@@ -68,14 +68,11 @@ func (cfg *Config) validate() error {
 			return errors.Wrap(err, "cannot create database destination folder")
 		}
 	}
-
-	if cfg.Watch.Healthchecks != nil && len(cfg.Watch.Healthchecks.UUID) == 0 {
+	if cfg.Watch.Healthchecks != nil && len(cfg.Watch.Healthchecks.UUID) == 0 && len(cfg.Watch.Healthchecks.UUIDFile) == 0 {
 		return errors.New("healthchecks UUID is required")
 	}
-
 	if cfg.Providers == nil {
 		return errors.New("at least one provider is required")
 	}
-
 	return validator.New().Struct(cfg)
 }

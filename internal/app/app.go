@@ -2,7 +2,6 @@ package app
 
 import (
 	"context"
-	"net/url"
 	"sync"
 	"sync/atomic"
 
@@ -20,21 +19,19 @@ import (
 	kubernetesPrd "github.com/crazy-max/diun/v4/internal/provider/kubernetes"
 	nomadPrd "github.com/crazy-max/diun/v4/internal/provider/nomad"
 	swarmPrd "github.com/crazy-max/diun/v4/internal/provider/swarm"
-	"github.com/crazy-max/gohealthchecks"
 	"github.com/dromara/carbon/v2"
 	"github.com/panjf2000/ants/v2"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 )
 
-// Diun represents an active diun object
 type Diun struct {
 	meta model.Meta
 	cfg  *config.Config
 
 	db    *db.Client
 	grpc  *grpc.Client
-	hc    *gohealthchecks.Client
+	hc    *healthchecksClient
 	notif *notif.Client
 
 	cron   *cron.Cron
@@ -44,7 +41,6 @@ type Diun struct {
 	wg     *sync.WaitGroup
 }
 
-// New creates new diun instance
 func New(meta model.Meta, cfg *config.Config, grpcAuthority string) (*Diun, error) {
 	var err error
 
@@ -72,22 +68,15 @@ func New(meta model.Meta, cfg *config.Config, grpcAuthority string) (*Diun, erro
 	}
 
 	if cfg.Watch.Healthchecks != nil {
-		var hcBaseURL *url.URL
-		if len(cfg.Watch.Healthchecks.BaseURL) > 0 {
-			hcBaseURL, err = url.Parse(cfg.Watch.Healthchecks.BaseURL)
-			if err != nil {
-				return nil, errors.Wrap(err, "cannot parse Healthchecks base URL")
-			}
+		diun.hc, err = newHealthchecksClient(cfg.Watch.Healthchecks)
+		if err != nil {
+			return nil, err
 		}
-		diun.hc = gohealthchecks.NewClient(&gohealthchecks.ClientOptions{
-			BaseURL: hcBaseURL,
-		})
 	}
 
 	return diun, nil
 }
 
-// Start starts diun
 func (di *Diun) Start(ctx context.Context) error {
 	select {
 	case <-ctx.Done():
@@ -147,7 +136,6 @@ func (di *Diun) Start(ctx context.Context) error {
 	}
 }
 
-// Run starts diun
 func (di *Diun) Run() {
 	if !atomic.CompareAndSwapUint32(&di.locker, 0, 1) {
 		log.Warn().Msg("Already running")

@@ -36,6 +36,32 @@ func TestLoadFile(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "Success with healthchecks uuidFile",
+			cfg:  "./fixtures/config.hc.uuidfile.yml",
+			wantData: &Config{
+				Db: (&model.Db{}).GetDefaults(),
+				Watch: &model.Watch{
+					Workers:         10,
+					Jitter:          new(30 * time.Second),
+					FirstCheckNotif: new(false),
+					RunOnStartup:    new(true),
+					CompareDigest:   new(true),
+					Healthchecks: &model.Healthchecks{
+						BaseURL:  "https://hc-ping.com/",
+						UUIDFile: "./fixtures/run_secrets_uuid",
+					},
+				},
+				Defaults: (&model.Defaults{}).GetDefaults(),
+				Providers: &model.Providers{
+					Docker: &model.PrdDocker{
+						TLSVerify:      new(true),
+						WatchByDefault: new(false),
+						WatchStopped:   new(false),
+					},
+				},
+			},
+		},
+		{
 			name:    "Fail on no provider",
 			cfg:     "./fixtures/config.err.provider.yml",
 			wantErr: true,
@@ -287,6 +313,35 @@ func TestLoadEnv(t *testing.T) {
 			environ:  nil,
 			expected: nil,
 			wantErr:  true,
+		},
+		{
+			desc: "healthchecks with UUIDFILE env var",
+			environ: []string{
+				"DIUN_WATCH_HEALTHCHECKS_UUIDFILE=./fixtures/run_secrets_uuid",
+				"DIUN_PROVIDERS_DOCKER=true",
+			},
+			expected: &Config{
+				Db: (&model.Db{}).GetDefaults(),
+				Watch: &model.Watch{
+					Workers:         10,
+					Jitter:          new(30 * time.Second),
+					FirstCheckNotif: new(false),
+					RunOnStartup:    new(true),
+					CompareDigest:   new(true),
+					Healthchecks: &model.Healthchecks{
+						UUIDFile: "./fixtures/run_secrets_uuid",
+					},
+				},
+				Defaults: (&model.Defaults{}).GetDefaults(),
+				Providers: &model.Providers{
+					Docker: &model.PrdDocker{
+						TLSVerify:      new(true),
+						WatchByDefault: new(false),
+						WatchStopped:   new(false),
+					},
+				},
+			},
+			wantErr: false,
 		},
 		{
 			desc: "docker provider",

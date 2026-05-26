@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"os"
 	"path/filepath"
 	"testing"
 	"time"
@@ -10,6 +11,21 @@ import (
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/stretchr/testify/require"
 )
+
+func TestNewHealthchecksClientResolvesUUIDFile(t *testing.T) {
+	const uuid = "5bf66975-d4c7-4bf5-bcc8-b8d8a82ea278"
+
+	uuidFile := filepath.Join(t.TempDir(), "uuid")
+	require.NoError(t, os.WriteFile(uuidFile, []byte(uuid), 0o600))
+
+	hc, err := newHealthchecksClient(&model.Healthchecks{
+		UUIDFile: uuidFile,
+	})
+
+	require.NoError(t, err)
+	require.NotNil(t, hc.Client)
+	require.Equal(t, uuid, hc.UUID)
+}
 
 func TestStartReturnsImmediatelyWithoutSchedule(t *testing.T) {
 	diun := newTestDiun(t, "")
@@ -71,6 +87,12 @@ func newTestDiun(t *testing.T, schedule string) *Diun {
 	watch := (&model.Watch{}).GetDefaults()
 	watch.RunOnStartup = new(false)
 	watch.Schedule = schedule
+
+	return newTestDiunWithWatch(t, watch)
+}
+
+func newTestDiunWithWatch(t *testing.T, watch *model.Watch) *Diun {
+	t.Helper()
 
 	diun, err := New(model.Meta{
 		ID:      "diun",

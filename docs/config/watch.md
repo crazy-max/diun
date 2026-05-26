@@ -127,6 +127,8 @@ events to [healthchecks.io](https://healthchecks.io/).
 !!! abstract "Environment variables"
     * `DIUN_WATCH_HEALTHCHECKS_BASEURL`
     * `DIUN_WATCH_HEALTHCHECKS_UUID`
+    * `DIUN_WATCH_HEALTHCHECKS_UUIDFILE`
 
 * `baseURL`: Base URL for the Healthchecks Ping API (default `https://hc-ping.com/`).
-* `uuid`: UUID of an existing healthcheck (required).
+* `uuid`: UUID of an existing healthcheck (required if `uuidFile` is empty).
+* `uuidFile`: Path to a file containing the UUID of an existing healthcheck (required if `uuid` is empty).
