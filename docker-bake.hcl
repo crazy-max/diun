@@ -24,6 +24,7 @@ target "_common" {
   args = {
     GO_VERSION = GO_VERSION
     GIT_REF = GITHUB_REF
+    BUILDKIT_CONTEXT_KEEP_GIT_DIR = 1
   }
 }
 
