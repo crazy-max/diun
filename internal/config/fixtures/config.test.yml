@@ -88,6 +88,7 @@ notif:
     tags:
       - package
     icon: https://example.com/diun.png
+    click: "https://dock.example.com/compose/{{ .Entry.Metadata.stack }}"
     timeout: 10s
   pushover:
     token: uQiRzpo4DXghDmr9QzzfQu27cmVRsG

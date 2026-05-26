@@ -41,6 +41,7 @@ func TestSendSetsIcon(t *testing.T) {
 				Priority int      `json:"priority"`
 				Tags     []string `json:"tags"`
 				Icon     string   `json:"icon"`
+				Click    string   `json:"click"`
 				Markdown bool     `json:"markdown"`
 			}
 			var gotPayloadErr error
@@ -63,6 +64,7 @@ func TestSendSetsIcon(t *testing.T) {
 					Priority:      3,
 					Tags:          []string{"package"},
 					Icon:          tt.icon,
+					Click:         "https://dock.example.com/compose/{{ .Entry.Metadata.stack }}",
 					Timeout:       new(2 * time.Second),
 					TemplateTitle: "{{ .Entry.Image }}",
 					TemplateBody:  "body",
@@ -77,6 +79,9 @@ func TestSendSetsIcon(t *testing.T) {
 				Status:   model.ImageStatusUpdate,
 				Provider: "docker",
 				Image:    image,
+				Metadata: map[string]string{
+					"stack": "alpine",
+				},
 			})
 			require.NoError(t, err)
 			require.NoError(t, gotPayloadErr)
@@ -86,6 +91,7 @@ func TestSendSetsIcon(t *testing.T) {
 			require.Equal(t, 3, gotPayload.Priority)
 			require.Equal(t, []string{"package"}, gotPayload.Tags)
 			require.Equal(t, tt.wantIcon, gotPayload.Icon)
+			require.Equal(t, "https://dock.example.com/compose/alpine", gotPayload.Click)
 			require.True(t, gotPayload.Markdown)
 		})
 	}

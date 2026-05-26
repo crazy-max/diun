@@ -60,6 +60,15 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		icon = c.meta.Logo
 	}
 
+	var click string
+	if c.cfg.Click != "" {
+		clickRender, err := message.RenderTemplate("click", c.cfg.Click)
+		if err != nil {
+			return err
+		}
+		click = string(clickRender)
+	}
+
 	dataBuf := new(bytes.Buffer)
 	if err := json.NewEncoder(dataBuf).Encode(struct {
 		Topic    string   `json:"topic"`
@@ -68,6 +77,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		Priority int      `json:"priority"`
 		Tags     []string `json:"tags"`
 		Icon     string   `json:"icon,omitempty"`
+		Click    string   `json:"click,omitempty"`
 		Markdown bool     `json:"markdown"`
 	}{
 		Topic:    c.cfg.Topic,
@@ -76,6 +86,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		Priority: c.cfg.Priority,
 		Tags:     c.cfg.Tags,
 		Icon:     icon,
+		Click:    click,
 		Markdown: true,
 	}); err != nil {
 		return err
