@@ -4,7 +4,9 @@
 
 Defaults allow specifying default values for any configuration that is
 typically set at the image level using labels or annotations depending on the
-provider. Any of them will take precedence or be merged over defaults.
+provider. Image-level values usually replace defaults when set. Metadata values
+are merged with defaults, and provider-specific documentation calls out any
+other fields that merge instead of replacing defaults.
 
 ```yaml
 defaults:
