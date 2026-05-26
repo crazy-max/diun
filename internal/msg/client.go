@@ -38,39 +38,39 @@ func New(opts Options) (*Client, error) {
 
 // RenderMarkdown returns a notification message as markdown
 func (c *Client) RenderMarkdown() (title []byte, body []byte, _ error) {
-	var titleBuf bytes.Buffer
-	titleTpl, err := template.New("title").Funcs(c.opts.TemplateFuncs).Parse(strings.TrimSuffix(strings.TrimSpace(c.opts.TemplateTitle), "\n"))
-	if err != nil {
-		return title, body, errors.Wrap(err, "cannot parse title template")
-	}
-	if err = titleTpl.Execute(&titleBuf, struct {
-		Meta  model.Meta
-		Entry model.NotifEntry
-	}{
-		Meta:  c.opts.Meta,
-		Entry: c.opts.Entry,
-	}); err != nil {
-		return title, body, errors.Wrap(err, "cannot render notif title")
-	}
-	title = titleBuf.Bytes()
+	var err error
 
-	var bodyBuf bytes.Buffer
-	bodyTpl, err := template.New("body").Funcs(c.opts.TemplateFuncs).Parse(strings.TrimSuffix(strings.TrimSpace(c.opts.TemplateBody), "\n"))
+	title, err = c.RenderTemplate("title", c.opts.TemplateTitle)
 	if err != nil {
-		return title, body, errors.Wrap(err, "cannot parse body template")
+		return title, body, err
 	}
-	if err = bodyTpl.Execute(&bodyBuf, struct {
-		Meta  model.Meta
-		Entry model.NotifEntry
-	}{
-		Meta:  c.opts.Meta,
-		Entry: c.opts.Entry,
-	}); err != nil {
-		return title, body, errors.Wrap(err, "cannot render notif body")
+
+	body, err = c.RenderTemplate("body", c.opts.TemplateBody)
+	if err != nil {
+		return title, body, err
 	}
-	body = bodyBuf.Bytes()
 
 	return
+}
+
+// RenderTemplate renders a notification template with the entry context.
+func (c *Client) RenderTemplate(name, text string) ([]byte, error) {
+	var buf bytes.Buffer
+	tpl, err := template.New(name).Funcs(c.opts.TemplateFuncs).Parse(strings.TrimSuffix(strings.TrimSpace(text), "\n"))
+	if err != nil {
+		return nil, errors.Wrapf(err, "cannot parse %s template", name)
+	}
+	if err = tpl.Execute(&buf, struct {
+		Meta  model.Meta
+		Entry model.NotifEntry
+	}{
+		Meta:  c.opts.Meta,
+		Entry: c.opts.Entry,
+	}); err != nil {
+		return nil, errors.Wrapf(err, "cannot render notif %s", name)
+	}
+
+	return buf.Bytes(), nil
 }
 
 // RenderHTML returns a notification message as html

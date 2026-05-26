@@ -180,6 +180,7 @@ for <code>{{ .Entry.Manifest.Platform }}</code> platform.
 						Priority:      3,
 						Tags:          []string{"package"},
 						Icon:          "https://example.com/diun.png",
+						Click:         "https://dock.example.com/compose/{{ .Entry.Metadata.stack }}",
 						Timeout:       new(10 * time.Second),
 						TemplateTitle: model.NotifDefaultTemplateTitle,
 						TemplateBody:  model.NotifDefaultTemplateBody,
