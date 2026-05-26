@@ -109,6 +109,10 @@ enabled.
 List of regular expressions to exclude tags. Can be useful if watch repo is
 enabled.
 
+The [file provider](../providers/file.md) merges image-level `exclude_tags`
+with these defaults. Default patterns come first, followed by image patterns,
+with duplicates removed. Image-level `include_tags` still replace defaults.
+
 !!! example "Config file"
     ```yaml
     defaults:

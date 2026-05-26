@@ -9,6 +9,7 @@ import (
 	"github.com/crazy-max/diun/v4/pkg/registry"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"gopkg.in/yaml.v3"
 )
 
 var (
@@ -120,6 +121,7 @@ var (
 					`^(0|[1-9]\d*)\..*`,
 				},
 				ExcludeTags: []string{
+					`^0\.0\..*`,
 					`latest`,
 				},
 			},
@@ -280,4 +282,92 @@ func TestListJobRejectsUnknownFields(t *testing.T) {
 	}, &defaults)
 
 	assert.Empty(t, fc.ListJob())
+}
+
+func TestListJobTagFilters(t *testing.T) {
+	tests := []struct {
+		name        string
+		defaultTags []string
+		imageTags   []string
+		expected    []string
+	}{
+		{
+			name: "no excludes",
+		},
+		{
+			name:        "empty excludes",
+			defaultTags: []string{},
+			imageTags:   []string{},
+		},
+		{
+			name:        "default excludes only",
+			defaultTags: []string{"SNAPSHOT"},
+			expected:    []string{"SNAPSHOT"},
+		},
+		{
+			name:      "image excludes only",
+			imageTags: []string{"^8\\.0\\..*"},
+			expected:  []string{"^8\\.0\\..*"},
+		},
+		{
+			name:        "defaults precede image excludes",
+			defaultTags: []string{"SNAPSHOT", "beta"},
+			imageTags:   []string{"^8\\.0\\..*", "latest"},
+			expected:    []string{"SNAPSHOT", "beta", "^8\\.0\\..*", "latest"},
+		},
+		{
+			name:        "duplicate excludes keep first occurrence",
+			defaultTags: []string{"SNAPSHOT", "beta", "SNAPSHOT"},
+			imageTags:   []string{"beta", "latest", "latest", "SNAPSHOT"},
+			expected:    []string{"SNAPSHOT", "beta", "latest"},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			filename := filepath.Join(t.TempDir(), "images.yml")
+			data, err := yaml.Marshal([]model.Image{
+				{
+					Name:        "alpine",
+					IncludeTags: []string{`^1\.2\..*`},
+					ExcludeTags: tt.imageTags,
+				},
+				{
+					Name: "traefik",
+				},
+			})
+			require.NoError(t, err)
+			require.NoError(t, os.WriteFile(filename, data, 0o600))
+
+			// Spare capacity exposes accidental appends into the defaults' backing array.
+			var defaultTags []string
+			if tt.defaultTags != nil {
+				defaultTags = make([]string, len(tt.defaultTags), len(tt.defaultTags)+len(tt.imageTags)+1)
+				copy(defaultTags, tt.defaultTags)
+			}
+			imageDefaults := model.Defaults{
+				SortTags:    registry.SortTagReverse,
+				IncludeTags: []string{`^\d+\.\d+\.\d+$`},
+				ExcludeTags: defaultTags,
+			}
+			fc := New(&model.PrdFile{Filename: filename}, &imageDefaults)
+
+			jobs := fc.ListJob()
+			require.Len(t, jobs, 2)
+			assert.Equal(t, tt.expected, jobs[0].Image.ExcludeTags)
+			assert.Equal(t, []string{`^1\.2\..*`}, jobs[0].Image.IncludeTags)
+			assert.Equal(t, imageDefaults.IncludeTags, jobs[1].Image.IncludeTags)
+			assert.Equal(t, tt.defaultTags, imageDefaults.ExcludeTags)
+
+			// Changing one job must not affect another job, defaults, or a later read.
+			if len(jobs[0].Image.ExcludeTags) > 0 {
+				jobs[0].Image.ExcludeTags[0] = "changed"
+			}
+			assert.Equal(t, tt.defaultTags, imageDefaults.ExcludeTags)
+			nextJobs := fc.ListJob()
+			require.Len(t, nextJobs, 2)
+			assert.Equal(t, tt.expected, nextJobs[0].Image.ExcludeTags)
+			assert.Equal(t, nextJobs[1].Image.ExcludeTags, jobs[1].Image.ExcludeTags)
+		})
+	}
 }

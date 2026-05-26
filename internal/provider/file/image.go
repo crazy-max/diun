@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 
 	"github.com/containerd/platforms"
@@ -93,10 +94,7 @@ func (c *Client) listFileImage() []model.Image {
 				item.IncludeTags = c.defaults.IncludeTags
 			}
 
-			// Set default ExcludeTags
-			if len(item.ExcludeTags) == 0 {
-				item.ExcludeTags = c.defaults.ExcludeTags
-			}
+			item.ExcludeTags = mergeTags(c.defaults.ExcludeTags, item.ExcludeTags)
 
 			images = append(images, item)
 		}
@@ -132,4 +130,16 @@ func (c *Client) getFiles() []string {
 	}
 
 	return files
+}
+
+func mergeTags(defaultTags, imageTags []string) []string {
+	tags := slices.Concat(defaultTags, imageTags)
+	seen := make(map[string]struct{}, len(tags))
+	return slices.DeleteFunc(tags, func(tag string) bool {
+		if _, ok := seen[tag]; ok {
+			return true
+		}
+		seen[tag] = struct{}{}
+		return false
+	})
 }
