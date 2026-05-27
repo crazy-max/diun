@@ -2,14 +2,17 @@ package app
 
 import (
 	"context"
+	"net"
 	"sync"
 	"sync/atomic"
+	"time"
 
 	"github.com/crazy-max/cron/v3"
 	"github.com/crazy-max/diun/v4/internal/config"
 	"github.com/crazy-max/diun/v4/internal/db"
 	"github.com/crazy-max/diun/v4/internal/grpc"
 	"github.com/crazy-max/diun/v4/internal/logging"
+	"github.com/crazy-max/diun/v4/internal/metrics"
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/internal/notif"
 	"github.com/crazy-max/diun/v4/internal/provider"
@@ -29,10 +32,12 @@ type Diun struct {
 	meta model.Meta
 	cfg  *config.Config
 
-	db    *db.Client
-	grpc  *grpc.Client
-	hc    *healthchecksClient
-	notif *notif.Client
+	db            *db.Client
+	grpc          *grpc.Client
+	hc            *healthchecksClient
+	metrics       *metrics.Recorder
+	metricsServer *metrics.Server
+	notif         *notif.Client
 
 	cron   *cron.Cron
 	jobID  cron.EntryID
@@ -73,6 +78,14 @@ func New(meta model.Meta, cfg *config.Config, grpcAuthority string) (*Diun, erro
 			return nil, err
 		}
 	}
+	if cfg.Metrics != nil && cfg.Metrics.Enabled != nil && *cfg.Metrics.Enabled {
+		recorder, registry := metrics.NewRecorder(meta.Version)
+		diun.metrics = recorder
+		diun.metricsServer, err = metrics.NewServer(cfg.Metrics, registry)
+		if err != nil {
+			return nil, err
+		}
+	}
 
 	return diun, nil
 }
@@ -93,9 +106,27 @@ func (di *Diun) Start(ctx context.Context) error {
 		return err
 	}
 
+	var metricsLis net.Listener
+	if di.metricsServer != nil {
+		metricsLis, err = di.metricsServer.Listen()
+		if err != nil {
+			if closeErr := lis.Close(); closeErr != nil {
+				log.Warn().Err(closeErr).Msg("Cannot close gRPC listener")
+			}
+			return err
+		}
+	}
+
 	defer func() {
 		if di.cron != nil {
 			<-di.cron.Stop().Done()
+		}
+		if di.metricsServer != nil {
+			shutdownCtx, cancel := context.WithTimeoutCause(context.Background(), 5*time.Second, errors.New("Prometheus metrics server shutdown timed out"))
+			defer cancel()
+			if err := di.metricsServer.Shutdown(shutdownCtx); err != nil {
+				log.Warn().Err(err).Msg("Cannot stop Prometheus metrics server")
+			}
 		}
 		di.grpc.Stop()
 		if err := di.db.Close(); err != nil {
@@ -103,10 +134,15 @@ func (di *Diun) Start(ctx context.Context) error {
 		}
 	}()
 
-	grpcErrCh := make(chan error, 1)
+	serverErrCh := make(chan error, 2)
 	go func() {
-		grpcErrCh <- di.grpc.Serve(lis)
+		serverErrCh <- errors.Wrap(di.grpc.Serve(lis), "gRPC server failed")
 	}()
+	if di.metricsServer != nil {
+		go func() {
+			serverErrCh <- errors.Wrap(di.metricsServer.Serve(metricsLis), "Prometheus metrics server failed")
+		}()
+	}
 
 	if *di.cfg.Watch.RunOnStartup {
 		di.Run()
@@ -130,17 +166,21 @@ func (di *Diun) Start(ctx context.Context) error {
 	case <-ctx.Done():
 		di.HealthchecksFail("Application closed")
 		return nil
-	case err := <-grpcErrCh:
+	case err := <-serverErrCh:
 		di.HealthchecksFail("Application closed")
-		return errors.Wrap(err, "gRPC server failed")
+		return err
 	}
 }
 
 func (di *Diun) Run() {
 	if !atomic.CompareAndSwapUint32(&di.locker, 0, 1) {
+		if di.metrics != nil {
+			di.metrics.RecordSkippedRun()
+		}
 		log.Warn().Msg("Already running")
 		return
 	}
+	startedAt := time.Now()
 	defer atomic.StoreUint32(&di.locker, 0)
 	if di.jobID > 0 {
 		defer log.Info().Msgf("Next run in %s (%s)",
@@ -171,6 +211,10 @@ func (di *Diun) Run() {
 	)
 
 	di.wg.Wait()
+	completedAt := time.Now()
+	if di.metrics != nil {
+		di.metrics.RecordRun(entries, completedAt.Sub(startedAt), completedAt)
+	}
 	log.Info().
 		Int("added", entries.CountNew).
 		Int("updated", entries.CountUpdate).

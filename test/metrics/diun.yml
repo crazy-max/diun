@@ -1,0 +1,13 @@
+watch:
+  workers: 20
+  schedule: "0 */6 * * *"
+
+metrics:
+  enabled: true
+  addr: ":9090"
+  path: /metrics
+  token: diun-metrics-e2e-token
+
+providers:
+  file:
+    filename: /mount/config.yml
