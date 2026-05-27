@@ -114,8 +114,8 @@ The following annotations can be added as comments before the target instruction
 | `diun.notify_on`    | `new;update` | Semicolon separated list of status to be notified: `new`, `update`                                                                                      |
 | `diun.sort_tags`    | `reverse`    | [Sort tags method](../faq.md#tags-sorting-when-using-watch_repo) if `diun.watch_repo` enabled. One of `default`, `reverse`, `semver`, `lexicographical` |
 | `diun.max_tags`     | `0`          | Maximum number of tags to watch if `watch_repo` enabled. `0` means all of them                                                                          |
-| `diun.include_tags` |              | Semicolon separated list of regular expressions to include tags. Can be useful if you enable `diun.watch_repo`                                          |
-| `diun.exclude_tags` |              | Semicolon separated list of regular expressions to exclude tags. Can be useful if you enable `diun.watch_repo`                                          |
+| `diun.include_tags` |              | Semicolon separated list of regular expressions to include tags. If set, replaces `defaults.includeTags` for this image. Can be useful if you enable `diun.watch_repo` |
+| `diun.exclude_tags` |              | Semicolon separated list of regular expressions to exclude tags. If set, replaces `defaults.excludeTags` for this image. Can be useful if you enable `diun.watch_repo` |
 | `diun.hub_link`     | _automatic_  | Set registry hub link for this image                                                                                                                    |
 | `diun.platform`     | _automatic_  | Platform to use (e.g. `linux/amd64`)                                                                                                                    |
 | `diun.metadata.*`   |              | Additional metadata that can be used in [notification template](../faq.md#notification-template) (e.g. `metadata.foo=bar`)                              |
