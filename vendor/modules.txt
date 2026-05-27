@@ -380,7 +380,7 @@ github.com/opencontainers/image-spec/specs-go/v1
 # github.com/opencontainers/runtime-spec v1.3.0
 ## explicit
 github.com/opencontainers/runtime-spec/specs-go
-# github.com/panjf2000/ants/v2 v2.12.0
+# github.com/panjf2000/ants/v2 v2.12.1
 ## explicit; go 1.19
 github.com/panjf2000/ants/v2
 github.com/panjf2000/ants/v2/pkg/sync
