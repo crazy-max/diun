@@ -30,6 +30,35 @@ func TestRenderMarkdown(t *testing.T) {
 	assert.Equal(t, "node-1 saw docker.io/crazymax/diun:1.2.3 from file", string(body))
 }
 
+func TestRenderMarkdownUsesDefaultTemplateFuncs(t *testing.T) {
+	client := newTestClient(t, Options{
+		TemplateTitle: `{{ replace "." "-" .Entry.Image.Tag }}`,
+		TemplateBody:  `{{ trim "  Padded Value  " }} {{ trimPrefix "v" "v1.2.3" }} {{ trimSuffix "-alpine" "1.2.3-alpine" }} {{ regexReplaceAll "[^0-9]+" "-" .Entry.Image.Tag }} {{ lower "DIUN" }} {{ upper "diun" }}`,
+	})
+
+	title, body, err := client.RenderMarkdown()
+	require.NoError(t, err)
+
+	assert.Equal(t, "1-2-3", string(title))
+	assert.Equal(t, "Padded Value 1.2.3 1.2.3 1-2-3 diun DIUN", string(body))
+}
+
+func TestRenderMarkdownAllowsTemplateFuncOverrides(t *testing.T) {
+	client := newTestClient(t, Options{
+		TemplateTitle: `{{ upper .Entry.Image.Tag }} {{ lower "DIUN" }}`,
+		TemplateFuncs: template.FuncMap{
+			"upper": func(string) string {
+				return "custom"
+			},
+		},
+	})
+
+	title, _, err := client.RenderMarkdown()
+	require.NoError(t, err)
+
+	assert.Equal(t, "custom diun", string(title))
+}
+
 func TestRenderMarkdownReturnsTemplateErrors(t *testing.T) {
 	client := newTestClient(t, Options{
 		TemplateTitle: "{{ unknown .Entry.Image }}",
@@ -39,6 +68,18 @@ func TestRenderMarkdownReturnsTemplateErrors(t *testing.T) {
 	_, _, err := client.RenderMarkdown()
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "cannot parse title template")
+}
+
+func TestRenderMarkdownReturnsTemplateFuncErrors(t *testing.T) {
+	client := newTestClient(t, Options{
+		TemplateTitle: `{{ regexReplaceAll "[" "-" .Entry.Image.Tag }}`,
+		TemplateBody:  "body",
+	})
+
+	_, _, err := client.RenderMarkdown()
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "cannot render notif title")
+	assert.Contains(t, err.Error(), "error calling regexReplaceAll")
 }
 
 func TestRenderHTMLPreservesLeadingPAndSanitizesBody(t *testing.T) {

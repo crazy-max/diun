@@ -83,6 +83,26 @@ Templating is supported with the following fields:
 | `.Entry.Manifest.Platform`      | Platform that the image is runs on. e.g. `linux/amd64`                                |
 | `.Entry.Metadata`               | Key-value pair of image metadata specific to each provider                            |
 
+The following helper functions are also available in notification templates.
+Helpers that operate on a string take the target string as their last argument,
+so they can be used directly or in a pipeline.
+
+| Function          | Description                             | Example                                                      |
+|-------------------|-----------------------------------------|--------------------------------------------------------------|
+| `lower`           | Converts a string to lower case         | `{{ lower .Entry.Image.Tag }}`                               |
+| `upper`           | Converts a string to upper case         | `{{ upper .Entry.Image.Tag }}`                               |
+| `replace`         | Replaces all occurrences of a substring | `{{ replace "/" "-" .Entry.Image.Path }}`                    |
+| `trim`            | Removes leading and trailing whitespace | `{{ trim .Entry.Metadata.foo }}`                             |
+| `trimPrefix`      | Removes a prefix if present             | `{{ trimPrefix "v" .Entry.Image.Tag }}`                      |
+| `trimSuffix`      | Removes a suffix if present             | `{{ trimSuffix "-alpine" .Entry.Image.Tag }}`                |
+| `regexReplaceAll` | Replaces all regular expression matches | `{{ regexReplaceAll "[^a-zA-Z0-9]+" "-" .Entry.Image.Tag }}` |
+
+For example, this normalizes an image path with a pipeline:
+
+```gotemplate
+{{ .Entry.Image.Path | replace "/" "-" | lower }}
+```
+
 ## Authentication against the registry
 
 You can authenticate against the registry through the [`regopts` settings](config/regopts.md) or you can mount
