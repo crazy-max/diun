@@ -26,6 +26,89 @@ Or within a container:
 docker compose exec diun diun notif test
 ```
 
+## Docker Compose with Prometheus metrics
+
+You can run Diun and Prometheus in the same Compose project and scrape Diun
+over the internal Compose network. This avoids publishing the Diun metrics
+port on the host.
+
+Create the metrics token file without a trailing newline:
+
+```shell
+mkdir -p secrets prometheus
+printf '%s' 'change-me' > secrets/diun_metrics_token
+```
+
+Create `prometheus/prometheus.yml`:
+
+```yaml
+global:
+  scrape_interval: 30s
+
+scrape_configs:
+  - job_name: diun
+    metrics_path: /metrics
+    authorization:
+      type: Bearer
+      credentials_file: /run/secrets/diun_metrics_token
+    static_configs:
+      - targets:
+          - diun:9090
+```
+
+Then use the following Compose file:
+
+```yaml
+name: diun
+
+services:
+  diun:
+    image: crazymax/diun:latest
+    container_name: diun
+    command: serve
+    volumes:
+      - "./data:/data"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    environment:
+      - "TZ=Europe/Paris"
+      - "DIUN_WATCH_SCHEDULE=0 */6 * * *"
+      - "DIUN_PROVIDERS_DOCKER=true"
+      - "DIUN_METRICS_ENABLED=true"
+      - "DIUN_METRICS_ADDR=:9090"
+      - "DIUN_METRICS_PATH=/metrics"
+      - "DIUN_METRICS_TOKENFILE=/run/secrets/diun_metrics_token"
+    secrets:
+      - diun_metrics_token
+    labels:
+      - "diun.enable=true"
+    restart: always
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+    volumes:
+      - "./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro"
+      - "prometheus-data:/prometheus"
+    ports:
+      - "127.0.0.1:9091:9090"
+    secrets:
+      - diun_metrics_token
+    restart: always
+
+secrets:
+  diun_metrics_token:
+    file: ./secrets/diun_metrics_token
+
+volumes:
+  prometheus-data:
+```
+
+Prometheus will scrape Diun at `diun:9090`, and the Prometheus UI will be
+available on `http://127.0.0.1:9091`.
+
 ## Customize the hostname
 
 The hostname that appears in your notifications is the one associated with the

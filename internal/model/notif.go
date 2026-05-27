@@ -28,6 +28,11 @@ type NotifEntry struct {
 	Image    registry.Image    `json:"image,omitempty"`
 	Manifest registry.Manifest `json:"manifest,omitempty"`
 	Metadata map[string]string `json:"metadata,omitempty"`
+
+	// updateAvailable records whether this result is an actionable image update.
+	// It is intentionally kept out of serialized notification payloads because
+	// Status already represents the public notification contract.
+	updateAvailable bool
 }
 
 // Notif holds data necessary for notification configuration
@@ -81,4 +86,14 @@ func (s *NotifEntries) Add(entry NotifEntry) {
 		s.CountError++
 		s.CountTotal++
 	}
+}
+
+// MarkUpdateAvailable marks the entry as an actionable image update.
+func (s *NotifEntry) MarkUpdateAvailable() {
+	s.updateAvailable = true
+}
+
+// UpdateAvailable reports whether the entry is an actionable image update.
+func (s NotifEntry) UpdateAvailable() bool {
+	return s.updateAvailable
 }

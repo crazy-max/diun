@@ -16,6 +16,7 @@ type Config struct {
 	Db        *model.Db        `yaml:"db,omitempty" json:"db,omitempty"`
 	Watch     *model.Watch     `yaml:"watch,omitempty" json:"watch,omitempty"`
 	Defaults  *model.Defaults  `yaml:"defaults,omitempty" json:"defaults,omitempty"`
+	Metrics   *model.Metrics   `yaml:"metrics,omitempty" json:"metrics,omitempty"`
 	Notif     *model.Notif     `yaml:"notif,omitempty" json:"notif,omitempty"`
 	RegOpts   model.RegOpts    `yaml:"regopts,omitempty" json:"regopts,omitempty" validate:"unique=Name,dive"`
 	Providers *model.Providers `yaml:"providers,omitempty" json:"providers,omitempty"`
@@ -27,6 +28,7 @@ func Load(config string) (*Config, error) {
 		Db:       (&model.Db{}).GetDefaults(),
 		Watch:    (&model.Watch{}).GetDefaults(),
 		Defaults: (&model.Defaults{}).GetDefaults(),
+		Metrics:  (&model.Metrics{}).GetDefaults(),
 	}
 
 	fileLoader := gonfig.NewFileLoader(gonfig.FileLoaderConfig{

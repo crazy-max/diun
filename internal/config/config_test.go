@@ -52,6 +52,7 @@ func TestLoadFile(t *testing.T) {
 					},
 				},
 				Defaults: (&model.Defaults{}).GetDefaults(),
+				Metrics:  (&model.Metrics{}).GetDefaults(),
 				Providers: &model.Providers{
 					Docker: &model.PrdDocker{
 						TLSVerify:      new(true),
@@ -91,6 +92,7 @@ func TestLoadFile(t *testing.T) {
 					MaxTags:   5,
 					SortTags:  registry.SortTagReverse,
 				},
+				Metrics: (&model.Metrics{}).GetDefaults(),
 				Notif: &model.Notif{
 					Amqp: &model.NotifAmqp{
 						Host:     "localhost",
@@ -334,6 +336,7 @@ func TestLoadEnv(t *testing.T) {
 					},
 				},
 				Defaults: (&model.Defaults{}).GetDefaults(),
+				Metrics:  (&model.Metrics{}).GetDefaults(),
 				Providers: &model.Providers{
 					Docker: &model.PrdDocker{
 						TLSVerify:      new(true),
@@ -353,8 +356,40 @@ func TestLoadEnv(t *testing.T) {
 				Db:       (&model.Db{}).GetDefaults(),
 				Watch:    (&model.Watch{}).GetDefaults(),
 				Defaults: (&model.Defaults{}).GetDefaults(),
+				Metrics:  (&model.Metrics{}).GetDefaults(),
 				Notif:    nil,
 				RegOpts:  nil,
+				Providers: &model.Providers{
+					Docker: &model.PrdDocker{
+						TLSVerify:      new(true),
+						WatchByDefault: new(false),
+						WatchStopped:   new(false),
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			desc: "metrics and docker provider",
+			environ: []string{
+				"DIUN_METRICS_ENABLED=true",
+				"DIUN_METRICS_ADDR=127.0.0.1:9090",
+				"DIUN_METRICS_PATH=/prometheus",
+				"DIUN_METRICS_TOKENFILE=./fixtures/run_secrets_username",
+				"DIUN_PROVIDERS_DOCKER=true",
+			},
+			expected: &Config{
+				Db:       (&model.Db{}).GetDefaults(),
+				Watch:    (&model.Watch{}).GetDefaults(),
+				Defaults: (&model.Defaults{}).GetDefaults(),
+				Metrics: &model.Metrics{ //nolint:gosec // fixture path is test data.
+					Enabled:   new(true),
+					Addr:      "127.0.0.1:9090",
+					Path:      "/prometheus",
+					TokenFile: "./fixtures/run_secrets_username",
+				},
+				Notif:   nil,
+				RegOpts: nil,
 				Providers: &model.Providers{
 					Docker: &model.PrdDocker{
 						TLSVerify:      new(true),
@@ -379,6 +414,7 @@ func TestLoadEnv(t *testing.T) {
 				Db:       (&model.Db{}).GetDefaults(),
 				Watch:    (&model.Watch{}).GetDefaults(),
 				Defaults: (&model.Defaults{}).GetDefaults(),
+				Metrics:  (&model.Metrics{}).GetDefaults(),
 				RegOpts: model.RegOpts{
 					model.RegOpt{ //nolint:gosec // fixture paths are test data.
 						Name:         "docker.io",
@@ -411,6 +447,7 @@ func TestLoadEnv(t *testing.T) {
 				Db:       (&model.Db{}).GetDefaults(),
 				Watch:    (&model.Watch{}).GetDefaults(),
 				Defaults: (&model.Defaults{}).GetDefaults(),
+				Metrics:  (&model.Metrics{}).GetDefaults(),
 				Notif: &model.Notif{
 					Telegram: &model.NotifTelegram{
 						Token: "abcdef123456",
@@ -443,6 +480,7 @@ func TestLoadEnv(t *testing.T) {
 				Db:       (&model.Db{}).GetDefaults(),
 				Watch:    (&model.Watch{}).GetDefaults(),
 				Defaults: (&model.Defaults{}).GetDefaults(),
+				Metrics:  (&model.Metrics{}).GetDefaults(),
 				Notif: &model.Notif{
 					Script: &model.NotifScript{
 						Cmd: "uname",
@@ -515,6 +553,7 @@ func TestLoadMixed(t *testing.T) {
 				Db:       (&model.Db{}).GetDefaults(),
 				Watch:    (&model.Watch{}).GetDefaults(),
 				Defaults: (&model.Defaults{}).GetDefaults(),
+				Metrics:  (&model.Metrics{}).GetDefaults(),
 				Notif: &model.Notif{
 					Mail: &model.NotifMail{
 						Host:               "127.0.0.1",
@@ -561,6 +600,7 @@ for <code>{{ .Entry.Manifest.Platform }}</code> platform.
 				Db:       (&model.Db{}).GetDefaults(),
 				Watch:    (&model.Watch{}).GetDefaults(),
 				Defaults: (&model.Defaults{}).GetDefaults(),
+				Metrics:  (&model.Metrics{}).GetDefaults(),
 				Notif: &model.Notif{
 					Webhook: &model.NotifWebhook{
 						Endpoint: "http://webhook.foo.com/sd54qad89azd5a",

@@ -43,6 +43,11 @@ You can override this using the [`--config` flag or `CONFIG` env var with `serve
         - update
       sortTags: reverse
 
+    metrics:
+      enabled: false
+      addr: ":9090"
+      path: /metrics
+
     notif:
       amqp:
         host: localhost
@@ -148,6 +153,11 @@ All configuration from file can be transposed into environment variables. As an 
         - update
       sortTags: reverse
 
+    metrics:
+      enabled: false
+      addr: ":9090"
+      path: /metrics
+
     notif:
       gotify:
         endpoint: http://gotify.foo.com
@@ -209,6 +219,10 @@ Can be transposed to:
     DIUN_DEFAULTS_NOTIFYON=new,update
     DIUN_DEFAULTS_SORTTAGS=reverse
 
+    DIUN_METRICS_ENABLED=false
+    DIUN_METRICS_ADDR=:9090
+    DIUN_METRICS_PATH=/metrics
+
     DIUN_NOTIF_GOTIFY_ENDPOINT=http://gotify.foo.com
     DIUN_NOTIF_GOTIFY_TOKEN=Token123456
     DIUN_NOTIF_GOTIFY_PRIORITY=1
@@ -249,6 +263,7 @@ Can be transposed to:
 * [db](db.md)
 * [watch](watch.md)
 * [defaults](defaults.md)
+* [metrics](metrics.md)
 * notif
     * [amqp](../notif/amqp.md)
     * [apprise](../notif/apprise.md)

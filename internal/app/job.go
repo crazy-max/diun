@@ -218,6 +218,9 @@ func (di *Diun) runJob(job model.Job) (entry model.NotifEntry) {
 		entry.Status = model.ImageStatusUnchange
 		sublog.Debug().Msg("No changes")
 	}
+	if entry.Status == model.ImageStatusUpdate || (entry.Status == model.ImageStatusNew && !job.FirstCheck) {
+		entry.MarkUpdateAvailable()
+	}
 
 	if err := di.db.PutManifest(job.RegImage, entry.Manifest); err != nil {
 		sublog.Error().Err(err).Msg("Cannot write manifest to db")

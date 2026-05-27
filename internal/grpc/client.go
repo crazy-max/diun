@@ -61,6 +61,8 @@ func (c *Client) Listen() (net.Listener, error) {
 
 // Serve serves gRPC requests on listener
 func (c *Client) Serve(lis net.Listener) error {
+	log.Info().Str("addr", lis.Addr().String()).Msg("gRPC server listening")
+
 	if err := c.server.Serve(lis); err != nil && !errors.Is(err, grpc.ErrServerStopped) {
 		return err
 	}

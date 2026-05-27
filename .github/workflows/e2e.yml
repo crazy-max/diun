@@ -57,8 +57,6 @@ jobs:
       -
         name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-        with:
-          fetch-depth: 0
       -
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@d7f5e7f509e45cec5c76c4d5afdd7de93d0b3df5 # v4.1.0
@@ -87,6 +85,58 @@ jobs:
           container_name: ${{ env.CONTAINER_NAME }}
           log_check: "Next run in"
           timeout: 240
+      -
+        name: List images in db
+        run: |
+          docker exec -t ${{ env.CONTAINER_NAME }} diun image list
+      -
+        name: Container logs
+        if: always()
+        run: |
+          docker logs ${{ env.CONTAINER_NAME }}
+          docker rm -f ${{ env.CONTAINER_NAME }} > /dev/null 2>&1 || true
+
+  metrics:
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@d7f5e7f509e45cec5c76c4d5afdd7de93d0b3df5 # v4.1.0
+      -
+        name: Build
+        uses: docker/bake-action@6614cfa25eff9a0b2b2697efb0b6159e7680d584 # v7.2.0
+        with:
+          source: .
+          targets: image-local
+      -
+        name: Start container
+        run: |
+          docker run -d --name ${{ env.CONTAINER_NAME }} \
+            -p 127.0.0.1:9090:9090 \
+            -v $(pwd)/test/metrics/diun.yml:/diun.yml:ro \
+            -v $(pwd)/test/metrics/mount:/mount:ro \
+            -e "TZ=Europe/Paris" \
+            -e "LOG_LEVEL=debug" \
+            ${{ env.BUILD_TAG }}
+      -
+        name: Check container logs
+        uses: crazy-max/.github/.github/actions/container-logs-check@bbd31df64ee0f097a02f12495f541f9236f18c46 # v1.2.0
+        with:
+          container_name: ${{ env.CONTAINER_NAME }}
+          log_check: "Next run in"
+          timeout: 240
+      -
+        name: Check metrics endpoint
+        run: |
+          status="$(curl -sS -o /tmp/diun-metrics-unauthorized.out -w "%{http_code}" http://127.0.0.1:9090/metrics)"
+          test "$status" = "401"
+          curl -fsS -H "Authorization: Bearer diun-metrics-e2e-token" http://127.0.0.1:9090/metrics | tee /tmp/diun-metrics.out
+          grep -q '^diun_build_info{version=' /tmp/diun-metrics.out
+          grep -q '^diun_watch_runs_total 1' /tmp/diun-metrics.out
+          grep -q '^diun_watch_last_run_timestamp_seconds ' /tmp/diun-metrics.out
       -
         name: List images in db
         run: |
