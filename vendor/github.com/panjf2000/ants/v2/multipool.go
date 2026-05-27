@@ -108,6 +108,10 @@ func NewMultiPool(size, sizePerPool int, lbs LoadBalancingStrategy, options ...O
 	for i := 0; i < size; i++ {
 		pool, err := NewPool(sizePerPool, options...)
 		if err != nil {
+			// Release all previously created pools to avoid resource leak
+			for j := 0; j < i; j++ {
+				pools[j].Release()
+			}
 			return nil, err
 		}
 		pools[i] = pool
@@ -120,7 +124,7 @@ func (mp *MultiPool) next(lbs LoadBalancingStrategy) (idx int) {
 	case RoundRobin:
 		return int(atomic.AddUint32(&mp.index, 1) % uint32(len(mp.pools)))
 	case LeastTasks:
-		leastTasks := 1<<31 - 1
+		leastTasks := math.MaxInt32
 		for i, pool := range mp.pools {
 			if n := pool.Running(); n < leastTasks {
 				leastTasks = n
