@@ -56,7 +56,7 @@ func (c *Client) RenderMarkdown() (title []byte, body []byte, _ error) {
 // RenderTemplate renders a notification template with the entry context.
 func (c *Client) RenderTemplate(name, text string) ([]byte, error) {
 	var buf bytes.Buffer
-	tpl, err := template.New(name).Funcs(c.opts.TemplateFuncs).Parse(strings.TrimSuffix(strings.TrimSpace(text), "\n"))
+	tpl, err := template.New(name).Funcs(templateFuncs(c.opts.TemplateFuncs)).Parse(strings.TrimSuffix(strings.TrimSpace(text), "\n"))
 	if err != nil {
 		return nil, errors.Wrapf(err, "cannot parse %s template", name)
 	}
