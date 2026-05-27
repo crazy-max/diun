@@ -45,6 +45,18 @@ func (pa PollAnswer) GetSender() *Sender {
 	}
 }
 
+func (m Message) GetGuestBotCallerSender() *Sender {
+	if m.GuestBotCallerUser == nil && m.GuestBotCallerChat == nil {
+		return nil
+	}
+
+	return &Sender{
+		User:   m.GuestBotCallerUser,
+		Chat:   m.GuestBotCallerChat,
+		ChatId: m.Chat.Id,
+	}
+}
+
 // Id determines the sender ID.
 // When a message is being sent by a chat/channel, telegram usually populates the User field with dummy values.
 // For this reason, we prefer to return the Chat.Id if it is available, rather than a dummy User.Id.

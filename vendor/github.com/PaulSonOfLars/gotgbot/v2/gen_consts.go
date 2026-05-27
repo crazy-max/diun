@@ -13,6 +13,7 @@ const (
 	UpdateTypeBusinessMessage         = "business_message"
 	UpdateTypeEditedBusinessMessage   = "edited_business_message"
 	UpdateTypeDeletedBusinessMessages = "deleted_business_messages"
+	UpdateTypeGuestMessage            = "guest_message"
 	UpdateTypeMessageReaction         = "message_reaction"
 	UpdateTypeMessageReactionCount    = "message_reaction_count"
 	UpdateTypeInlineQuery             = "inline_query"
@@ -28,6 +29,7 @@ const (
 	UpdateTypeChatJoinRequest         = "chat_join_request"
 	UpdateTypeChatBoost               = "chat_boost"
 	UpdateTypeRemovedChatBoost        = "removed_chat_boost"
+	UpdateTypeManagedBot              = "managed_bot"
 )
 
 // GetType is a helper method to easily identify the type of update that is being received.
@@ -56,6 +58,9 @@ func (u Update) GetType() string {
 
 	case u.DeletedBusinessMessages != nil:
 		return UpdateTypeDeletedBusinessMessages
+
+	case u.GuestMessage != nil:
+		return UpdateTypeGuestMessage
 
 	case u.MessageReaction != nil:
 		return UpdateTypeMessageReaction
@@ -101,6 +106,9 @@ func (u Update) GetType() string {
 
 	case u.RemovedChatBoost != nil:
 		return UpdateTypeRemovedChatBoost
+
+	case u.ManagedBot != nil:
+		return UpdateTypeManagedBot
 
 	default:
 		return "unknown"
