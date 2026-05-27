@@ -69,6 +69,21 @@ func (m Message) OriginalCaptionHTML() string {
 	return getOrigMsgHTML(utf16.Encode([]rune(m.Caption)), m.CaptionEntities)
 }
 
+// OriginalTextMD gets the original markdown formatting of a message text or caption.
+func (m Message) OriginalTextMD() string {
+	return getOrigMsgMD(utf16.Encode([]rune(m.GetText())), m.GetEntities())
+}
+
+// OriginalTextMDV2 gets the original markdownV2 formatting of a message text or caption.
+func (m Message) OriginalTextMDV2() string {
+	return getOrigMsgMDV2(utf16.Encode([]rune(m.GetText())), m.GetEntities())
+}
+
+// OriginalTextHTML gets the original HTML formatting of a message text caption.
+func (m Message) OriginalTextHTML() string {
+	return getOrigMsgHTML(utf16.Encode([]rune(m.GetText())), m.GetEntities())
+}
+
 // Does not support nesting. only look at upper entities.
 func getOrigMsgMD(utf16Data []uint16, ents []MessageEntity) string {
 	out := strings.Builder{}
@@ -196,8 +211,18 @@ func writeFinalHTML(data []uint16, ent MessageEntity, start int64, cntnt string)
 	prevText := html.EscapeString(string(utf16.Decode(data[start:ent.Offset])))
 	switch ent.Type {
 	case "bold", "italic", "code", "underline", "strikethrough", "spoiler":
+		// <b>bold</b>, <strong>bold</strong>
+		// <i>italic</i>, <em>italic</em>
+		// <u>underline</u>, <ins>underline</ins>
+		// <s>strikethrough</s>, <strike>strikethrough</strike>, <del>strikethrough</del>
+		// <span class="tg-spoiler">spoiler</span>, <tg-spoiler>spoiler</tg-spoiler>
+		// <b>bold <i>italic bold <s>italic bold strikethrough <span class="tg-spoiler">italic bold strikethrough spoiler</span></s> <u>underline italic bold</u></i> bold</b>
+		// <code>inline fixed-width code</code>
 		return prevText + "<" + htmlMap[ent.Type] + ">" + cntnt + "</" + closeHTMLTag(htmlMap[ent.Type]) + ">"
 	case "pre":
+		// <pre>pre-formatted fixed-width code block</pre>
+		// <pre><code class="language-python">pre-formatted fixed-width code block written in the Python programming language</code></pre>
+
 		// <pre>text</pre>
 		if ent.Language == "" {
 			return prevText + "<pre>" + cntnt + "</pre>"
@@ -205,14 +230,28 @@ func writeFinalHTML(data []uint16, ent MessageEntity, start int64, cntnt string)
 		// <pre><code class="lang">text</code></pre>
 		return prevText + `<pre><code class="` + ent.Language + `">` + cntnt + "</code></pre>"
 	case "custom_emoji":
+		// <tg-emoji emoji-id="5368324170671202286">👍</tg-emoji>
 		return prevText + `<tg-emoji emoji-id="` + ent.CustomEmojiId + `">` + cntnt + "</tg-emoji>"
+	case "date_time":
+		// <tg-time unix="1647531900" format="wDT">22:45 tomorrow</tg-time>
+		// <tg-time unix="1647531900" format="t">22:45 tomorrow</tg-time>
+		// <tg-time unix="1647531900" format="r">22:45 tomorrow</tg-time>
+		// <tg-time unix="1647531900">22:45 tomorrow</tg-time>
+		if ent.DateTimeFormat != "" {
+			return prevText + `<tg-time unix="` + strconv.FormatInt(ent.UnixTime, 10) + `" format="` + ent.DateTimeFormat + `">` + cntnt + "</tg-time>"
+		}
+		return prevText + `<tg-time unix="` + strconv.FormatInt(ent.UnixTime, 10) + `">` + cntnt + "</tg-time>"
 	case "text_mention":
+		// <a href="tg://user?id=123456789">inline mention of a user</a>
 		return prevText + `<a href="tg://user?id=` + strconv.FormatInt(ent.User.Id, 10) + `">` + cntnt + "</a>"
 	case "text_link":
+		// <a href="http://www.example.com/">inline URL</a>
 		return prevText + `<a href="` + ent.Url + `">` + cntnt + "</a>"
 	case "blockquote":
+		// <blockquote>Block quotation started\nBlock quotation continued\nThe last line of the block quotation</blockquote>
 		return prevText + `<blockquote>` + cntnt + "</blockquote>"
 	case "expandable_blockquote":
+		// <blockquote expandable>Expandable block quotation started\nExpandable block quotation continued\nExpandable block quotation continued\nHidden by default part of the block quotation started\nExpandable block quotation continued\nThe last line of the block quotation</blockquote>
 		return prevText + `<blockquote expandable>` + cntnt + "</blockquote>"
 	default:
 		return prevText + cntnt
@@ -232,8 +271,21 @@ func writeFinalMarkdownV2(data []uint16, ent MessageEntity, start int64, cntnt s
 	pre, cleanCntnt, post := splitEdgeWhitespace(cntnt, ent)
 	switch ent.Type {
 	case "bold", "italic", "code", "underline", "strikethrough", "spoiler":
+		// *bold \*text*
+		// _italic \*text_
+		// __underline__
+		// ~strikethrough~
+		// ||spoiler||
+		// *bold _italic bold ~italic bold strikethrough ||italic bold strikethrough spoiler||~ __underline italic bold___ bold*
+		// `inline fixed-width code`
 		return prevText + pre + mdV2Map[ent.Type] + cleanCntnt + mdV2Map[ent.Type] + post
 	case "pre":
+		// ```
+		// pre-formatted fixed-width code block
+		// ```
+		// ```python
+		// pre-formatted fixed-width code block written in the Python programming language
+		// ```
 		if ent.Language == "" {
 			return prevText + pre + "```\n" + cleanCntnt + "```" + post
 		}
@@ -241,14 +293,37 @@ func writeFinalMarkdownV2(data []uint16, ent MessageEntity, start int64, cntnt s
 	case "custom_emoji":
 		// Yes, custom emoji have a weird little ! at the front
 		// https://core.telegram.org/bots/api#markdownv2-style
+		// ![👍](tg://emoji?id=5368324170671202286)
 		return prevText + pre + "![" + cleanCntnt + "](tg://emoji?id=" + ent.CustomEmojiId + ")" + post
+	case "date_time":
+		// ![22:45 tomorrow](tg://time?unix=1647531900&format=wDT)
+		// ![22:45 tomorrow](tg://time?unix=1647531900&format=t)
+		// ![22:45 tomorrow](tg://time?unix=1647531900&format=r)
+		// ![22:45 tomorrow](tg://time?unix=1647531900)
+		if ent.DateTimeFormat != "" {
+			return prevText + pre + "![" + cleanCntnt + "](tg://time?unix=" + strconv.FormatInt(ent.UnixTime, 10) + "&format=" + ent.DateTimeFormat + ")" + post
+		}
+		return prevText + pre + "![" + cleanCntnt + "](tg://time?unix=" + strconv.FormatInt(ent.UnixTime, 10) + ")" + post
 	case "text_mention":
+		// [inline mention of a user](tg://user?id=123456789)
 		return prevText + pre + "[" + cleanCntnt + "](tg://user?id=" + strconv.FormatInt(ent.User.Id, 10) + ")" + post
 	case "text_link":
+		// [inline URL](http://www.example.com/)
 		return prevText + pre + "[" + cleanCntnt + "](" + ent.Url + ")" + post
 	case "blockquote":
+		// >Block quotation started
+		// >Block quotation continued
+		// >Block quotation continued
+		// >Block quotation continued
+		// >The last line of the block quotation
 		return prevText + pre + ">" + strings.Join(strings.Split(cleanCntnt, "\n"), "\n>") + post
 	case "expandable_blockquote":
+		// **>The expandable block quotation started right after the previous block quotation
+		// >It is separated from the previous block quotation by an empty bold entity
+		// >Expandable block quotation continued
+		// >Hidden by default part of the expandable block quotation started
+		// >Expandable block quotation continued
+		// >The last line of the expandable block quotation with the expandability mark||
 		return prevText + pre + "**>" + strings.Join(strings.Split(cleanCntnt, "\n"), "\n>") + "||" + post
 	default:
 		return prevText + cntnt

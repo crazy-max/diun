@@ -1,7 +1,6 @@
 package gotgbot
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -11,7 +10,6 @@ import (
 	"mime/multipart"
 	"net/http"
 	"net/url"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -106,7 +104,7 @@ func (bot *BaseBotClient) getTimeoutContext(parentCtx context.Context, opts *Req
 		}
 	}
 
-	return context.WithTimeout(parentCtx, DefaultTimeout)
+	return context.WithTimeout(parentCtx, DefaultTimeout) //nolint:gosec
 }
 
 func timeoutFromOpts(parentCtx context.Context, opts *RequestOpts) (context.Context, context.CancelFunc) {
@@ -120,7 +118,7 @@ func timeoutFromOpts(parentCtx context.Context, opts *RequestOpts) (context.Cont
 	}
 
 	if opts.Timeout > 0 {
-		return context.WithTimeout(parentCtx, opts.Timeout)
+		return context.WithTimeout(parentCtx, opts.Timeout) //nolint:gosec
 
 	} else if opts.Timeout < 0 {
 		// < 0  no timeout; infinite.
@@ -144,23 +142,9 @@ func (bot *BaseBotClient) RequestWithContext(parentCtx context.Context, token st
 		maps.Copy(params, opts.OverrideParams)
 	}
 
-	buf := bytes.NewBuffer(nil)
-	contentType, err := fillBuffer(buf, params)
+	req, err := bot.buildRequest(ctx, params, token, method, opts)
 	if err != nil {
 		return nil, err
-	}
-	bodyData := buf.Bytes()
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, bot.methodEndpoint(token, method, opts), bytes.NewReader(bodyData))
-	if err != nil {
-		return nil, fmt.Errorf("failed to build POST request to %s: %w", method, err)
-	}
-
-	req.Header.Set("Content-Type", contentType)
-	// Setup GetBody such that the request can be replayed and automatically retried by the HTTP client if necessary.
-	// This should handle HTTP2 GO_AWAY errors.
-	req.GetBody = func() (io.ReadCloser, error) {
-		return io.NopCloser(bytes.NewReader(bodyData)), nil
 	}
 
 	resp, err := bot.Client.Do(req)
@@ -187,6 +171,88 @@ func (bot *BaseBotClient) RequestWithContext(parentCtx context.Context, token st
 	return r.Result, nil
 }
 
+func allFilesSeekable(params map[string]any) bool {
+	for _, v := range params {
+		if f, ok := v.(*FileReader); ok && f.Data != nil {
+			if _, ok := f.Data.(io.Seeker); !ok {
+				return false
+			}
+		}
+	}
+	return true
+}
+
+func (bot *BaseBotClient) buildRequest(ctx context.Context, params map[string]any, token string, method string, opts *RequestOpts) (*http.Request, error) {
+	body, contentType := buildMultipart(ctx, params)
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, bot.methodEndpoint(token, method, opts), body)
+	if err != nil {
+		return nil, fmt.Errorf("failed to build POST request to %s: %w", method, err)
+	}
+
+	req.Header.Set("Content-Type", contentType)
+
+	if allFilesSeekable(params) {
+		req.GetBody = func() (io.ReadCloser, error) {
+			retryBody, contentType := buildMultipart(ctx, params)
+			req.Header.Set("Content-Type", contentType)
+			return io.NopCloser(retryBody), nil
+		}
+	}
+	return req, nil
+}
+
+// buildMultipart creates a lazy multipart reader/writer which only writes while it gets read.
+// If the ctx gets closed, so does this.
+func buildMultipart(ctx context.Context, params map[string]any) (io.Reader, string) {
+	pr, pw := io.Pipe()
+	w := multipart.NewWriter(pw)
+
+	go func() {
+		done := make(chan struct{})
+
+		go func() {
+			select {
+			case <-ctx.Done():
+				// If the context is done before we finish writing, abort the pipe.
+				// This unblocks any pw.Write() call and lets the goroutine exit.
+				pw.CloseWithError(ctx.Err())
+			case <-done:
+				// writer finished cleanly, nothing to do
+			}
+		}()
+		defer close(done)
+
+		if len(params) == 0 {
+			if err := w.WriteField("_empty", ""); err != nil {
+				pw.CloseWithError(fmt.Errorf("failed to write empty multipart field: %w", err))
+				return
+			}
+		}
+
+		for k, v := range params {
+			contents, err := getFieldContents(v, k, w)
+			if err != nil {
+				pw.CloseWithError(err)
+				return
+			}
+
+			if err := w.WriteField(k, contents); err != nil {
+				pw.CloseWithError(fmt.Errorf("failed to write multipart field %s with value %v: %w", k, v, err))
+				return
+			}
+		}
+
+		if err := w.Close(); err != nil {
+			pw.CloseWithError(fmt.Errorf("failed to close multipart form writer: %w", err))
+			return
+		}
+		pw.Close()
+	}()
+
+	return pr, w.FormDataContentType()
+}
+
 // Sanitize the error to avoid token leak.
 func sanitizeError(token string, err error) error {
 	var urlErr *url.Error
@@ -196,34 +262,6 @@ func sanitizeError(token string, err error) error {
 	}
 
 	return err
-}
-
-// fillBuffer fills a byte buffer with the multipart writer data which is going to be sent.
-func fillBuffer(buf *bytes.Buffer, params map[string]any) (string, error) {
-	w := multipart.NewWriter(buf)
-
-	if len(params) == 0 {
-		if err := w.WriteField("_empty", ""); err != nil {
-			return "", fmt.Errorf("failed to write empty multipart field: %w", err)
-		}
-	}
-
-	for k, v := range params {
-		contents, err := getFieldContents(v, k, w)
-		if err != nil {
-			return "", err
-		}
-
-		if err := w.WriteField(k, contents); err != nil {
-			return "", fmt.Errorf("failed to write multipart field %s with value %v: %w", k, v, err)
-		}
-	}
-
-	if err := w.Close(); err != nil {
-		return "", fmt.Errorf("failed to close multipart form writer: %w", err)
-	}
-
-	return w.FormDataContentType(), nil
 }
 
 func getFieldContents(v any, k string, w *multipart.Writer) (string, error) {
@@ -241,38 +279,23 @@ func getFieldContents(v any, k string, w *multipart.Writer) (string, error) {
 	case int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64, float32, float64, bool:
 		return fmt.Sprint(val), nil
 
-	case InputMedia:
-		err := val.InputParams(k, w)
+	case Attach:
+		err := val.Attach(k, w)
 		if err != nil {
 			return "", fmt.Errorf("failed to read input multipart field: %w", err)
 		}
 
+		// In case of a simple inputfile attachment, rely on files
+		if inputFile, ok := val.(InputFile); ok {
+			return inputFile.getValue(), nil
+		}
+
+		// For complex types (structs, maps, slices, etc.), marshal as JSON
 		bs, err := json.Marshal(val)
 		if err != nil {
 			return "", fmt.Errorf("failed to marshal field %s to JSON: %w", k, err)
 		}
 		return string(bs), nil
-
-	case []InputMedia:
-		for idx, item := range val {
-			err := item.InputParams(k+"_"+strconv.Itoa(idx), w)
-			if err != nil {
-				return "", fmt.Errorf("failed to read input multipart field: %w", err)
-			}
-		}
-
-		bs, err := json.Marshal(val)
-		if err != nil {
-			return "", fmt.Errorf("failed to marshal field %s to JSON: %w", k, err)
-		}
-		return string(bs), nil
-
-	case InputFile:
-		err := val.Attach(k, w)
-		if err != nil {
-			return "", fmt.Errorf("failed to attach field %s: %w", k, err)
-		}
-		return val.getValue(), nil
 
 	default:
 		// For complex types (structs, maps, slices, etc.), marshal as JSON

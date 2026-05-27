@@ -21,8 +21,13 @@ type InputFile interface {
 // This object represents the contents of a file to be uploaded, or a publicly accessible URL to be reused.
 // Files must be posted using multipart/form-data in the usual way that files are uploaded via the browser.
 type InputFileOrString interface {
-	Attach(name string, w *multipart.Writer) error
+	Attach
 	getValue() string
+}
+
+// Attach is the core interface to attach items to a multipart writer. It gets reused across InputFile, InputMedia, etc.
+type Attach interface {
+	Attach(name string, w *multipart.Writer) error
 }
 
 var (

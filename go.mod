@@ -5,7 +5,7 @@ go 1.26.0
 require (
 	dario.cat/mergo v1.0.2
 	github.com/AlecAivazis/survey/v2 v2.3.7
-	github.com/PaulSonOfLars/gotgbot/v2 v2.0.0-rc.34
+	github.com/PaulSonOfLars/gotgbot/v2 v2.0.0-rc.35
 	github.com/alecthomas/kong v1.15.0
 	github.com/bmatcuk/doublestar/v4 v4.10.0
 	github.com/containerd/platforms v1.0.0-rc.2
