@@ -1,6 +1,7 @@
 package app
 
 import (
+	stderrors "errors"
 	"fmt"
 	"regexp"
 
@@ -10,6 +11,7 @@ import (
 	"github.com/crazy-max/diun/v4/internal/secret"
 	"github.com/crazy-max/diun/v4/pkg/registry"
 	"github.com/rs/zerolog/log"
+	podmanmanifest "go.podman.io/image/v5/manifest"
 	"go.podman.io/image/v5/pkg/docker/config"
 	"go.podman.io/image/v5/types"
 )
@@ -198,6 +200,11 @@ func (di *Diun) runJob(job model.Job) (entry model.NotifEntry) {
 	var updated bool
 	entry.Manifest, updated, err = job.Registry.Manifest(job.RegImage, dbManifest)
 	if err != nil {
+		if _, ok := stderrors.AsType[podmanmanifest.NonImageArtifactError](err); ok {
+			entry.Status = model.ImageStatusSkip
+			sublog.Debug().Err(err).Msg("Skipping non-image artifact")
+			return
+		}
 		sublog.Warn().Err(err).Msg("Cannot get remote manifest")
 		return
 	}

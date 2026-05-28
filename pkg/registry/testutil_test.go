@@ -292,6 +292,44 @@ func newTestManifestList(t *testing.T, instances ...testManifestListInstance) te
 	}
 }
 
+func newTestOCIArtifactManifest(t *testing.T, artifactType string) testRegistryBlob {
+	t.Helper()
+
+	emptyConfig := []byte("{}")
+	artifactLayer := []byte(`{"mediaType":"` + artifactType + `"}`)
+
+	body, err := json.Marshal(struct {
+		SchemaVersion int                      `json:"schemaVersion"`
+		MediaType     string                   `json:"mediaType"`
+		ArtifactType  string                   `json:"artifactType"`
+		Config        testRegistryDescriptor   `json:"config"`
+		Layers        []testRegistryDescriptor `json:"layers"`
+	}{
+		SchemaVersion: 2,
+		MediaType:     imgspecv1.MediaTypeImageManifest,
+		ArtifactType:  artifactType,
+		Config: testRegistryDescriptor{
+			MediaType: imgspecv1.MediaTypeEmptyJSON,
+			Size:      int64(len(emptyConfig)),
+			Digest:    digest.FromBytes(emptyConfig),
+		},
+		Layers: []testRegistryDescriptor{
+			{
+				MediaType: artifactType,
+				Size:      int64(len(artifactLayer)),
+				Digest:    digest.FromBytes(artifactLayer),
+			},
+		},
+	})
+	require.NoError(t, err)
+
+	return testRegistryBlob{
+		mediaType: imgspecv1.MediaTypeImageManifest,
+		body:      body,
+		digest:    digest.FromBytes(body),
+	}
+}
+
 type testManifestListInstance struct {
 	manifest testRegistryBlob
 	platform imgspecv1.Platform
