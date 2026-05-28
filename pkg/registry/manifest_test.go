@@ -1,7 +1,9 @@
 package registry
 
 import (
+	stderrors "errors"
 	"net/http"
+	"strconv"
 	"testing"
 
 	digest "github.com/opencontainers/go-digest"
@@ -184,6 +186,27 @@ func TestManifestVariant(t *testing.T) {
 	assert.Equal(t, registry.host()+"/acme/diun", manifest.Name)
 	assert.Equal(t, "multi", manifest.Tag)
 	assert.Equal(t, "linux/arm/v7", manifest.Platform)
+}
+
+func TestManifestNonImageArtifact(t *testing.T) {
+	const sigstoreBundleType = "application/vnd.dev.sigstore.bundle.v0.3+json"
+
+	registry := newTestRegistry(t, "acme/diun")
+	artifact := newTestOCIArtifactManifest(t, sigstoreBundleType)
+	registry.addManifest("sha256-64677ff7a877079df86d4a12e80e67a9548ea0facb2acb8c6719e79088e64526", artifact)
+
+	image, err := ParseImage(ParseImageOptions{
+		Name: registry.imageName("sha256-64677ff7a877079df86d4a12e80e67a9548ea0facb2acb8c6719e79088e64526"),
+	})
+	require.NoError(t, err)
+
+	client := newTestRegistryClient(t, Options{CompareDigest: true})
+	_, _, err = client.Manifest(image, Manifest{})
+	require.Error(t, err)
+
+	_, ok := stderrors.AsType[podmanmanifest.NonImageArtifactError](err)
+	assert.True(t, ok)
+	assert.Contains(t, err.Error(), "unsupported image-specific operation on artifact with type "+strconv.Quote(sigstoreBundleType))
 }
 
 func TestManifestTaggedDigestUnknownTag(t *testing.T) {
