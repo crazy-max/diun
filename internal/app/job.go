@@ -135,12 +135,13 @@ func (di *Diun) createJob(job model.Job) {
 		return
 	}
 
-	log.Debug().Str("image", job.RegImage.String()).Msgf("%d tag(s) found in repository. %d will be analyzed (%d max, %d not included, %d excluded).",
+	log.Debug().Str("image", job.RegImage.String()).Msgf("%d tag(s) found in repository. %d will be analyzed (%d max, %d not included, %d excluded, %d artifact tags).",
 		tags.Total,
 		len(tags.List),
 		job.Image.MaxTags,
 		tags.NotIncluded,
 		tags.Excluded,
+		tags.Artifacts,
 	)
 
 	for _, tag := range tags.List {

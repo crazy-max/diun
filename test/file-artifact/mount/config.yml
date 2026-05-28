@@ -1,0 +1,5 @@
+- name: ghcr.io/crazy-max/7zip:edge
+  watch_repo: true
+  include_tags:
+    - ^17
+    - ^sha256-c77e456

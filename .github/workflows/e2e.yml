@@ -53,6 +53,8 @@ jobs:
             loglevel: debug
           - folder: file1
             loglevel: debug
+          - folder: file-artifact
+            loglevel: debug
     steps:
       -
         name: Checkout
