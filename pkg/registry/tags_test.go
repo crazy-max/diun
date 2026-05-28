@@ -58,6 +58,35 @@ func TestTagsWithDigest(t *testing.T) {
 	}, tags)
 }
 
+func TestTagsSkipsGeneratedArtifactTags(t *testing.T) {
+	registry := newTestRegistry(t, "acme/diun")
+	registry.addTagsPage("", []string{
+		"1.0.0",
+		"sha256-64677ff7a877079df86d4a12e80e67a9548ea0facb2acb8c6719e79088e64526",
+		"sha256-64677ff7a877079df86d4a12e80e67a9548ea0facb2acb8c6719e79088e64526.att",
+		"sha256-64677ff7a877079df86d4a12e80e67a9548ea0facb2acb8c6719e79088e64526.sbom",
+		"sha256-64677ff7a877079df86d4a12e80e67a9548ea0facb2acb8c6719e79088e64526.sig",
+		"sha256-not-a-digest",
+	}, "")
+
+	image, err := ParseImage(ParseImageOptions{
+		Name: registry.imageName("1.0.0"),
+	})
+	require.NoError(t, err)
+
+	client := newTestRegistryClient(t, Options{})
+	tags, err := client.Tags(TagsOptions{
+		Image: image,
+	})
+	require.NoError(t, err)
+
+	assert.Equal(t, &Tags{
+		List:      []string{"1.0.0", "sha256-not-a-digest"},
+		Artifacts: 4,
+		Total:     6,
+	}, tags)
+}
+
 func TestTagsSort(t *testing.T) {
 	testCases := []struct {
 		name     string

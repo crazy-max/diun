@@ -2,6 +2,7 @@ package registry
 
 import (
 	"fmt"
+	"regexp"
 	"sort"
 	"strings"
 	"unicode"
@@ -12,11 +13,14 @@ import (
 	"golang.org/x/mod/semver"
 )
 
+var generatedArtifactTagRe = regexp.MustCompile(`^sha256-[a-f0-9]{64}(?:\.(?:att|sbom|sig))?$`)
+
 // Tags holds information about image tags.
 type Tags struct {
 	List        []string
 	NotIncluded int
 	Excluded    int
+	Artifacts   int
 	Total       int
 }
 
@@ -55,7 +59,10 @@ func (c *Client) Tags(opts TagsOptions) (*Tags, error) {
 
 	// Filter
 	for _, tag := range tags {
-		if !matcher.IsIncluded(tag, opts.Include) {
+		if generatedArtifactTagRe.MatchString(tag) {
+			res.Artifacts++
+			continue
+		} else if !matcher.IsIncluded(tag, opts.Include) {
 			res.NotIncluded++
 			continue
 		} else if matcher.IsExcluded(tag, opts.Exclude) {
