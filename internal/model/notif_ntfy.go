@@ -15,6 +15,7 @@ type NotifNtfy struct {
 	Icon           string         `yaml:"icon,omitempty" json:"icon,omitempty" validate:"omitempty"`
 	Click          string         `yaml:"click,omitempty" json:"click,omitempty" validate:"omitempty"`
 	Timeout        *time.Duration `yaml:"timeout,omitempty" json:"timeout,omitempty" validate:"required"`
+	Proxy          string         `yaml:"proxy,omitempty" json:"proxy,omitempty" validate:"omitempty,url"`
 	TLSSkipVerify  bool           `yaml:"tlsSkipVerify,omitempty" json:"tlsSkipVerify,omitempty" validate:"omitempty"`
 	TLSCACertFiles []string       `yaml:"tlsCaCertFiles,omitempty" json:"tlsCaCertFiles,omitempty" validate:"omitempty"`
 	TemplateTitle  string         `yaml:"templateTitle,omitempty" json:"templateTitle,omitempty" validate:"required"`

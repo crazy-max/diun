@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/crazy-max/diun/v4/internal/httputil"
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/internal/msg"
 	"github.com/crazy-max/diun/v4/internal/notif/notifier"
@@ -94,7 +95,10 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	form.Add("timestamp", strconv.FormatInt(time.Now().Unix(), 10))
 	form.Add("html", "1")
 
-	hc := http.Client{}
+	hc, err := httputil.NewClient(c.cfg.Proxy, false, nil)
+	if err != nil {
+		return errors.Wrap(err, "cannot create HTTP client for Pushover notifier")
+	}
 	req, err := http.NewRequestWithContext(timeoutCtx, "POST", pushoverAPIURL, strings.NewReader(form.Encode()))
 	if err != nil {
 		return err

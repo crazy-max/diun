@@ -26,6 +26,7 @@ Notifications can be sent using an apprise api instance.
 | `tags`           |                                     | List of Tags in your config file you want to notify                                                                                 |
 | `urls`[^2]       |                                     | List of [URLs](https://github.com/caronc/apprise/wiki/URLBasics) to notify                                                          |
 | `timeout`        | `10s`                               | Timeout specifies a time limit for the request to be made                                                                           |
+| `proxy`          |                                     | HTTP proxy URL to use for requests                                                                                                  |
 | `tlsSkipVerify`  | `false`                             | Skip TLS certificate verification                                                                                                   |
 | `tlsCaCertFiles` |                                     | List of paths to custom CA certificate files to use for TLS verification                                                            |
 | `templateTitle`  | See [below](#default-templatetitle) | [Notification template](../faq.md#notification-template) for message title                                                          |
@@ -37,6 +38,7 @@ Notifications can be sent using an apprise api instance.
     * `DIUN_NOTIF_APPRISE_TAGS`
     * `DIUN_NOTIF_APPRISE_URLS`
     * `DIUN_NOTIF_APPRISE_TIMEOUT`
+    * `DIUN_NOTIF_APPRISE_PROXY`
     * `DIUN_NOTIF_APPRISE_TLSSKIPVERIFY`
     * `DIUN_NOTIF_APPRISE_TLSCACERTFILES`
     * `DIUN_NOTIF_APPRISE_TEMPLATETITLE`

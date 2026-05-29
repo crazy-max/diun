@@ -26,6 +26,7 @@ Send notifications to your Elasticsearch cluster as structured documents.
 | `client`[^1]     | `diun`                  | Client name to identify the source of notifications                                                                              |
 | `index`[^1]      | `diun-notifications`    | Elasticsearch index name where notifications will be stored                                                                      |
 | `timeout`        | `10s`                   | Timeout specifies a time limit for the request to be made                                                                        |
+| `proxy`          |                         | HTTP proxy URL to use for requests                                                                                               |
 | `tlsSkipVerify`  | `false`                 | Skip TLS certificate verification                                                                                                |
 | `tlsCaCertFiles` |                         | List of paths to custom CA certificate files to use for TLS verification                                                         |
 
@@ -38,6 +39,7 @@ Send notifications to your Elasticsearch cluster as structured documents.
     * `DIUN_NOTIF_ELASTICSEARCH_CLIENT`
     * `DIUN_NOTIF_ELASTICSEARCH_INDEX`
     * `DIUN_NOTIF_ELASTICSEARCH_TIMEOUT`
+    * `DIUN_NOTIF_ELASTICSEARCH_PROXY`
     * `DIUN_NOTIF_ELASTICSEARCH_TLSSKIPVERIFY`
     * `DIUN_NOTIF_ELASTICSEARCH_TLSCACERTFILES`
 

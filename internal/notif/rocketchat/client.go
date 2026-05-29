@@ -127,14 +127,9 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	timeoutCtx, _ := context.WithTimeoutCause(cancelCtx, *c.cfg.Timeout, errors.WithStack(context.DeadlineExceeded)) //nolint:govet // no need to manually cancel this context as we already rely on parent
 	defer func() { cancel(errors.WithStack(context.Canceled)) }()
 
-	tlsConfig, err := httputil.LoadTLSConfig(c.cfg.TLSSkipVerify, c.cfg.TLSCACertFiles)
+	hc, err := httputil.NewClient(c.cfg.Proxy, c.cfg.TLSSkipVerify, c.cfg.TLSCACertFiles)
 	if err != nil {
-		return errors.Wrap(err, "cannot load TLS configuration for Rocket.Chat notifier")
-	}
-	hc := http.Client{
-		Transport: &http.Transport{
-			TLSClientConfig: tlsConfig,
-		},
+		return errors.Wrap(err, "cannot create HTTP client for Rocket.Chat notifier")
 	}
 
 	req, err := http.NewRequestWithContext(timeoutCtx, "POST", u.String(), dataBuf)

@@ -32,6 +32,7 @@ Notifications can be sent using a [ntfy](https://ntfy.sh/) instance.
 | `icon`              | Diun logo                           | URL to use as notification icon                                                                                               |
 | `click`             |                                     | [URL to open](https://docs.ntfy.sh/publish/#click-action) when the notification is clicked. Supports notification templates   |
 | `timeout`           | `10s`                               | Timeout specifies a time limit for the request to be made                                                                     |
+| `proxy`             |                                     | HTTP proxy URL to use for requests                                                                                            |
 | `tlsSkipVerify`     | `false`                             | Skip TLS certificate verification                                                                                             |
 | `tlsCaCertFiles`    |                                     | List of paths to custom CA certificate files to use for TLS verification                                                      |
 | `templateTitle`[^1] | See [below](#default-templatetitle) | [Notification template](../faq.md#notification-template) for message title                                                    |
@@ -47,6 +48,7 @@ Notifications can be sent using a [ntfy](https://ntfy.sh/) instance.
     * `DIUN_NOTIF_NTFY_ICON`
     * `DIUN_NOTIF_NTFY_CLICK`
     * `DIUN_NOTIF_NTFY_TIMEOUT`
+    * `DIUN_NOTIF_NTFY_PROXY`
     * `DIUN_NOTIF_NTFY_TLSSKIPVERIFY`
     * `DIUN_NOTIF_NTFY_TLSCACERTFILES`
     * `DIUN_NOTIF_NTFY_TEMPLATETITLE`

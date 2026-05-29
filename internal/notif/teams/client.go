@@ -119,14 +119,9 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		return err
 	}
 
-	tlsConfig, err := httputil.LoadTLSConfig(c.cfg.TLSSkipVerify, c.cfg.TLSCACertFiles)
+	hc, err := httputil.NewClient(c.cfg.Proxy, c.cfg.TLSSkipVerify, c.cfg.TLSCACertFiles)
 	if err != nil {
-		return errors.Wrap(err, "cannot load TLS configuration for Teams notifier")
-	}
-	hc := http.Client{
-		Transport: &http.Transport{
-			TLSClientConfig: tlsConfig,
-		},
+		return errors.Wrap(err, "cannot create HTTP client for Teams notifier")
 	}
 
 	for attempt := 1; attempt <= teamsMaxRateLimitAttempts; attempt++ {

@@ -11,6 +11,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/crazy-max/diun/v4/internal/httputil"
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/internal/msg"
 	"github.com/crazy-max/diun/v4/internal/notif/notifier"
@@ -138,7 +139,10 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		return err
 	}
 
-	hc := http.Client{}
+	hc, err := httputil.NewClient(c.cfg.Proxy, false, nil)
+	if err != nil {
+		return errors.Wrap(err, "cannot create HTTP client for Discord notifier")
+	}
 	for attempt := 1; attempt <= discordMaxRateLimitAttempts; attempt++ {
 		cancelCtx, cancel := context.WithCancelCause(context.Background())
 		timeoutCtx, _ := context.WithTimeoutCause(cancelCtx, *c.cfg.Timeout, errors.WithStack(context.DeadlineExceeded)) //nolint:govet // no need to manually cancel this context as we already rely on parent

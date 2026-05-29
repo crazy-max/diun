@@ -28,6 +28,7 @@ Allow sending notifications to your Rocket.Chat channel.
 | `tokenFile`         |                                     | Use content of [secret file](../faq.md#secrets-loaded-from-files-and-trailing-newlines) as authentication token if `token` not defined |
 | `renderAttachment`  | `true`                              | Render [attachment object](https://docs.rocket.chat/guides/user-guides/messaging#send-attachments)                                     |
 | `timeout`           | `10s`                               | Timeout specifies a time limit for the request to be made                                                                              |
+| `proxy`             |                                     | HTTP proxy URL to use for requests                                                                                                     |
 | `tlsSkipVerify`     | `false`                             | Skip TLS certificate verification                                                                                                      |
 | `tlsCaCertFiles`    |                                     | List of paths to custom CA certificate files to use for TLS verification                                                               |
 | `templateTitle`[^1] | See [below](#default-templatetitle) | [Notification template](../faq.md#notification-template) for message title                                                             |
@@ -46,6 +47,7 @@ Allow sending notifications to your Rocket.Chat channel.
     * `DIUN_NOTIF_ROCKETCHAT_TOKENFILE`
     * `DIUN_NOTIF_ROCKETCHAT_RENDERATTACHMENT`
     * `DIUN_NOTIF_ROCKETCHAT_TIMEOUT`
+    * `DIUN_NOTIF_ROCKETCHAT_PROXY`
     * `DIUN_NOTIF_ROCKETCHAT_TLSSKIPVERIFY`
     * `DIUN_NOTIF_ROCKETCHAT_TLSCACERTFILES`
     * `DIUN_NOTIF_ROCKETCHAT_TEMPLATETITLE`

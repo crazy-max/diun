@@ -27,6 +27,7 @@ You can send Signal notifications via the Signal REST API with the following set
 | `recipients`[^1]   |                                    | A list of recipients, either phone numbers or group ID's                  |
 | `timeout`          | `10s`                              | Timeout specifies a time limit for the request to be made                 |
 | `textMode`         |                                    | Sets the text mode for messages. Use `styled` for formatted text.         |
+| `proxy`            |                                    | HTTP proxy URL to use for requests                                        |
 | `tlsSkipVerify`    | `false`                            | Skip TLS certificate verification                                         |
 | `tlsCaCertFiles`   |                                    | List of paths to custom CA certificate files to use for TLS verification  |
 | `templateBody`[^1] | See [below](#default-templatebody) | [Notification template](../faq.md#notification-template) for message body |
@@ -35,6 +36,7 @@ You can send Signal notifications via the Signal REST API with the following set
     * `DIUN_NOTIF_SIGNALREST_ENDPOINT`
     * `DIUN_NOTIF_SIGNALREST_NUMBER`
     * `DIUN_NOTIF_SIGNALREST_RECIPIENTS_<KEY>`
+    * `DIUN_NOTIF_SIGNALREST_PROXY`
     * `DIUN_NOTIF_SIGNALREST_TLSSKIPVERIFY`
     * `DIUN_NOTIF_SIGNALREST_TLSCACERTFILES`
     * `DIUN_NOTIF_SIGNALREST_TIMEOUT`

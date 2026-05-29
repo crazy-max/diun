@@ -11,6 +11,7 @@ type NotifGotify struct {
 	TokenFile      string         `yaml:"tokenFile,omitempty" json:"tokenFile,omitempty" validate:"omitempty,file"`
 	Priority       int            `yaml:"priority,omitempty" json:"priority,omitempty" validate:"omitempty,min=0"`
 	Timeout        *time.Duration `yaml:"timeout,omitempty" json:"timeout,omitempty" validate:"required"`
+	Proxy          string         `yaml:"proxy,omitempty" json:"proxy,omitempty" validate:"omitempty,url"`
 	TLSSkipVerify  bool           `yaml:"tlsSkipVerify,omitempty" json:"tlsSkipVerify,omitempty" validate:"omitempty"`
 	TLSCACertFiles []string       `yaml:"tlsCaCertFiles,omitempty" json:"tlsCaCertFiles,omitempty" validate:"omitempty"`
 	TemplateTitle  string         `yaml:"templateTitle,omitempty" json:"templateTitle,omitempty" validate:"required"`

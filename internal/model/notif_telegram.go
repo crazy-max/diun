@@ -10,6 +10,7 @@ const NotifTelegramDefaultTemplateBody = `Docker tag {{ if .Entry.Image.HubLink 
 // NotifTelegram holds Telegram notification configuration details
 type NotifTelegram struct {
 	APIURL              string   `yaml:"apiURL,omitempty" json:"apiURL,omitempty" validate:"omitempty,url"`
+	Proxy               string   `yaml:"proxy,omitempty" json:"proxy,omitempty" validate:"omitempty,url"`
 	Token               string   `yaml:"token,omitempty" json:"token,omitempty" validate:"omitempty"`
 	TokenFile           string   `yaml:"tokenFile,omitempty" json:"tokenFile,omitempty" validate:"omitempty,file"`
 	ChatIDs             []string `yaml:"chatIDs,omitempty" json:"chatIDs,omitempty" validate:"omitempty"`

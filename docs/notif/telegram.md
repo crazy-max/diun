@@ -26,6 +26,7 @@ Multiple chat IDs can be provided in order to deliver notifications to multiple 
 | Name                  | Default                            | Description                                                                                                                          |
 |-----------------------|------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------|
 | `apiURL`              | `https://api.telegram.org`         | Custom Telegram bot API base URL, for proxies or self-hosted bot API servers                                                         |
+| `proxy`               |                                    | HTTP proxy URL to use for requests                                                                                                   |
 | `token`               |                                    | Telegram bot token                                                                                                                   |
 | `tokenFile`           |                                    | Use content of [secret file](../faq.md#secrets-loaded-from-files-and-trailing-newlines) as Telegram bot token if `token` not defined |
 | `chatIDs`             |                                    | List of [chat IDs](#chatids-format) to send notifications to                                                                         |
@@ -35,6 +36,7 @@ Multiple chat IDs can be provided in order to deliver notifications to multiple 
 
 !!! abstract "Environment variables"
     * `DIUN_NOTIF_TELEGRAM_APIURL`
+    * `DIUN_NOTIF_TELEGRAM_PROXY`
     * `DIUN_NOTIF_TELEGRAM_TOKEN`
     * `DIUN_NOTIF_TELEGRAM_TOKENFILE`
     * `DIUN_NOTIF_TELEGRAM_CHATIDS` (comma separated)

@@ -27,6 +27,7 @@ You can send notifications using [Pushover](https://pushover.net/).
 | `priority`          |                                     | Priority of the notification                                                                                                                     |
 | `sound`             |                                     | Notification sound to be used                                                                                                                    |
 | `timeout`           | `10s`                               | Timeout specifies a time limit for the request to be made                                                                                        |
+| `proxy`             |                                     | HTTP proxy URL to use for requests                                                                                                               |
 | `templateTitle`[^1] | See [below](#default-templatetitle) | [Notification template](../faq.md#notification-template) for message title                                                                       |
 | `templateBody`[^1]  | See [below](#default-templatebody)  | [Notification template](../faq.md#notification-template) for message body                                                                        |
 
@@ -38,6 +39,7 @@ You can send notifications using [Pushover](https://pushover.net/).
     * `DIUN_NOTIF_PUSHOVER_PRIORITY`
     * `DIUN_NOTIF_PUSHOVER_SOUND`
     * `DIUN_NOTIF_PUSHOVER_TIMEOUT`
+    * `DIUN_NOTIF_PUSHOVER_PROXY`
     * `DIUN_NOTIF_PUSHOVER_TEMPLATETITLE`
     * `DIUN_NOTIF_PUSHOVER_TEMPLATEBODY`
 
