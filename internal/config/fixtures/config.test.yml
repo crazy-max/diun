@@ -112,6 +112,7 @@ notif:
     renderFacts: false
   telegram:
     token: abcdef123456
+    proxy: http://proxy.foo.com:3128
     chatIDs:
       - "8547439"
       - "1234567"

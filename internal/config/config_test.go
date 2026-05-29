@@ -224,6 +224,7 @@ for <code>{{ .Entry.Manifest.Platform }}</code> platform.
 					Telegram: &model.NotifTelegram{
 						APIURL: gotgbot.DefaultAPIURL,
 						Token:  "abcdef123456",
+						Proxy:  "http://proxy.foo.com:3128",
 						ChatIDs: []string{
 							"8547439",
 							"1234567",
@@ -441,6 +442,7 @@ func TestLoadEnv(t *testing.T) {
 				"DIUN_NOTIF_TELEGRAM_TOKEN=abcdef123456",
 				"DIUN_NOTIF_TELEGRAM_CHATIDS=8547439,1234567",
 				"DIUN_NOTIF_TELEGRAM_APIURL=http://telegram-bot-api:8081",
+				"DIUN_NOTIF_TELEGRAM_PROXY=http://proxy.foo.com:3128",
 				"DIUN_PROVIDERS_SWARM=true",
 			},
 			expected: &Config{
@@ -458,6 +460,7 @@ func TestLoadEnv(t *testing.T) {
 						TemplateBody:        model.NotifTelegramDefaultTemplateBody,
 						DisableNotification: new(false),
 						APIURL:              "http://telegram-bot-api:8081",
+						Proxy:               "http://proxy.foo.com:3128",
 					},
 				},
 				Providers: &model.Providers{

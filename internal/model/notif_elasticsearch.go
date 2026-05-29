@@ -13,6 +13,7 @@ type NotifElasticsearch struct {
 	Client         string         `yaml:"client,omitempty" json:"client,omitempty" validate:"required"`
 	Index          string         `yaml:"index,omitempty" json:"index,omitempty" validate:"required"`
 	Timeout        *time.Duration `yaml:"timeout,omitempty" json:"timeout,omitempty" validate:"required"`
+	Proxy          string         `yaml:"proxy,omitempty" json:"proxy,omitempty" validate:"omitempty,url"`
 	TLSSkipVerify  bool           `yaml:"tlsSkipVerify,omitempty" json:"tlsSkipVerify,omitempty" validate:"omitempty"`
 	TLSCACertFiles []string       `yaml:"tlsCaCertFiles,omitempty" json:"tlsCaCertFiles,omitempty" validate:"omitempty"`
 }

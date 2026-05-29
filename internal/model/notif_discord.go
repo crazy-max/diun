@@ -12,6 +12,7 @@ type NotifDiscord struct {
 	RenderEmbeds   *bool          `yaml:"renderEmbeds,omitempty" json:"renderEmbeds,omitempty" validate:"required"`
 	RenderFields   *bool          `yaml:"renderFields,omitempty" json:"renderFields,omitempty" validate:"required"`
 	Timeout        *time.Duration `yaml:"timeout,omitempty" json:"timeout,omitempty" validate:"required"`
+	Proxy          string         `yaml:"proxy,omitempty" json:"proxy,omitempty" validate:"omitempty,url"`
 	TemplateBody   string         `yaml:"templateBody,omitempty" json:"templateBody,omitempty" validate:"required"`
 }
 

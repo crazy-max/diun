@@ -8,6 +8,7 @@ type NotifSlack struct {
 	WebhookURL     string `yaml:"webhookURL,omitempty" json:"webhookURL,omitempty" validate:"omitempty"`
 	WebhookURLFile string `yaml:"webhookURLFile,omitempty" json:"webhookURLFile,omitempty" validate:"omitempty,file"`
 	RenderFields   *bool  `yaml:"renderFields,omitempty" json:"renderFields,omitempty" validate:"required"`
+	Proxy          string `yaml:"proxy,omitempty" json:"proxy,omitempty" validate:"omitempty,url"`
 	TemplateBody   string `yaml:"templateBody,omitempty" json:"templateBody,omitempty" validate:"required"`
 }
 

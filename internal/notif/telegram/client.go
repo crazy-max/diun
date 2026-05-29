@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/PaulSonOfLars/gotgbot/v2"
+	"github.com/crazy-max/diun/v4/internal/httputil"
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/internal/msg"
 	"github.com/crazy-max/diun/v4/internal/notif/notifier"
@@ -72,9 +73,14 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		return errors.Wrap(err, "cannot parse chat IDs for Telegram notifier")
 	}
 
+	hc, err := httputil.NewClient(c.cfg.Proxy, false, nil)
+	if err != nil {
+		return errors.Wrap(err, "cannot create HTTP client for Telegram notifier")
+	}
+
 	bot, err := gotgbot.NewBot(token, &gotgbot.BotOpts{
 		BotClient: &gotgbot.BaseBotClient{
-			Client: http.Client{},
+			Client: hc,
 			DefaultRequestOpts: &gotgbot.RequestOpts{
 				Timeout: gotgbot.DefaultTimeout,
 				APIURL:  c.cfg.APIURL,

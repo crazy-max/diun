@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/crazy-max/diun/v4/internal/httputil"
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/internal/msg"
 	"github.com/crazy-max/diun/v4/internal/notif/notifier"
@@ -119,8 +120,12 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		},
 	}
 
+	hc, err := httputil.NewClient(c.cfg.Proxy, false, nil)
+	if err != nil {
+		return errors.Wrap(err, "cannot create HTTP client for Slack notifier")
+	}
 	for attempt := 1; attempt <= slackMaxRateLimitAttempts; attempt++ {
-		err = slack.PostWebhook(webhookURL, payload)
+		err = slack.PostWebhookCustomHTTP(webhookURL, &hc, payload)
 		if err == nil {
 			return nil
 		}

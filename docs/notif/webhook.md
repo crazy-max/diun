@@ -22,6 +22,7 @@ You can send webhook notifications with the following settings.
 | `method`[^1]     | `GET`   | HTTP method                                                              |
 | `headers`        |         | Map of additional headers to be sent (key is case insensitive)           |
 | `timeout`        | `10s`   | Timeout specifies a time limit for the request to be made                |
+| `proxy`          |         | HTTP proxy URL to use for requests                                       |
 | `tlsSkipVerify`  | `false` | Skip TLS certificate verification                                        |
 | `tlsCaCertFiles` |         | List of paths to custom CA certificate files to use for TLS verification |
 
@@ -30,6 +31,7 @@ You can send webhook notifications with the following settings.
     * `DIUN_NOTIF_WEBHOOK_METHOD`
     * `DIUN_NOTIF_WEBHOOK_HEADERS_<KEY>`
     * `DIUN_NOTIF_WEBHOOK_TIMEOUT`
+    * `DIUN_NOTIF_WEBHOOK_PROXY`
     * `DIUN_NOTIF_WEBHOOK_TLSSKIPVERIFY`
     * `DIUN_NOTIF_WEBHOOK_TLSCACERTFILES`
 

@@ -30,6 +30,7 @@ Allow sending notifications to your Discord channel.
 | `renderEmbeds`     | `true`                             | Render [message embeds](https://discordjs.guide/legacy/popular-topics/embeds)                                                         |
 | `renderFields`     | `true`                             | Render [field objects](https://discordjs.guide/legacy/popular-topics/embeds) in message embeds                                        |
 | `timeout`          | `10s`                              | Timeout specifies a time limit for the request to be made                                                                             |
+| `proxy`            |                                    | HTTP proxy URL to use for requests                                                                                                    |
 | `templateBody`[^1] | See [below](#default-templatebody) | [Notification template](../faq.md#notification-template) for message body                                                             |
 
 !!! abstract "Environment variables"
@@ -39,6 +40,7 @@ Allow sending notifications to your Discord channel.
     * `DIUN_NOTIF_DISCORD_RENDEREMBEDS`
     * `DIUN_NOTIF_DISCORD_RENDERFIELDS`
     * `DIUN_NOTIF_DISCORD_TIMEOUT`
+    * `DIUN_NOTIF_DISCORD_PROXY`
     * `DIUN_NOTIF_DISCORD_TEMPLATEBODY`
 
 ### Default `templateBody`

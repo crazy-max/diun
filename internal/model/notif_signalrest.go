@@ -14,6 +14,7 @@ type NotifSignalRest struct {
 	Recipients     []string          `yaml:"recipients,omitempty" json:"recipients,omitempty" validate:"omitempty"`
 	Headers        map[string]string `yaml:"headers,omitempty" json:"headers,omitempty" validate:"omitempty"`
 	Timeout        *time.Duration    `yaml:"timeout,omitempty" json:"timeout,omitempty" validate:"required"`
+	Proxy          string            `yaml:"proxy,omitempty" json:"proxy,omitempty" validate:"omitempty,url"`
 	TLSSkipVerify  bool              `yaml:"tlsSkipVerify,omitempty" json:"tlsSkipVerify,omitempty" validate:"omitempty"`
 	TLSCACertFiles []string          `yaml:"tlsCaCertFiles,omitempty" json:"tlsCaCertFiles,omitempty" validate:"omitempty"`
 	TemplateBody   string            `yaml:"templateBody,omitempty" json:"templateBody,omitempty" validate:"required"`

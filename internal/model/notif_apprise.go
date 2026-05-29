@@ -12,6 +12,7 @@ type NotifApprise struct {
 	Tags           []string       `yaml:"tags,omitempty" json:"tags,omitempty" validate:"omitempty"`
 	URLs           []string       `yaml:"urls,omitempty" json:"urls,omitempty" validate:"omitempty"`
 	Timeout        *time.Duration `yaml:"timeout,omitempty" json:"timeout,omitempty" validate:"required"`
+	Proxy          string         `yaml:"proxy,omitempty" json:"proxy,omitempty" validate:"omitempty,url"`
 	TLSSkipVerify  bool           `yaml:"tlsSkipVerify,omitempty" json:"tlsSkipVerify,omitempty" validate:"omitempty"`
 	TLSCACertFiles []string       `yaml:"tlsCaCertFiles,omitempty" json:"tlsCaCertFiles,omitempty" validate:"omitempty"`
 	TemplateTitle  string         `yaml:"templateTitle,omitempty" json:"templateTitle,omitempty" validate:"required"`

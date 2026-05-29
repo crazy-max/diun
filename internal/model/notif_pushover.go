@@ -13,6 +13,7 @@ type NotifPushover struct {
 	Priority      int            `yaml:"priority,omitempty" json:"priority,omitempty" validate:"omitempty,min=-2,max=2"`
 	Sound         string         `yaml:"sound,omitempty" json:"sound,omitempty" validate:"omitempty"`
 	Timeout       *time.Duration `yaml:"timeout,omitempty" json:"timeout,omitempty" validate:"required"`
+	Proxy         string         `yaml:"proxy,omitempty" json:"proxy,omitempty" validate:"omitempty,url"`
 	TemplateTitle string         `yaml:"templateTitle,omitempty" json:"templateTitle,omitempty" validate:"required"`
 	TemplateBody  string         `yaml:"templateBody,omitempty" json:"templateBody,omitempty" validate:"required"`
 }
