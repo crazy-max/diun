@@ -211,6 +211,49 @@ services:
     restart: always
 ```
 
+## Run Diun behind an HTTP proxy
+
+If Diun must reach registries or notification endpoints through a network
+proxy such as Squid, configure the proxy in the Diun container environment with
+the standard `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` variables.
+
+Host operating system proxy settings and Docker daemon proxy settings are not
+automatically inherited by the Diun container. Docker daemon proxy settings
+help Docker pull images, while Diun's own registry checks are made by the Diun
+process running inside the container.
+
+For example:
+
+```yaml
+name: diun
+
+services:
+  diun:
+    image: crazymax/diun:latest
+    container_name: diun
+    command: serve
+    volumes:
+      - "./data:/data"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    environment:
+      - "TZ=Europe/Paris"
+      - "DIUN_WATCH_SCHEDULE=0 */6 * * *"
+      - "DIUN_PROVIDERS_DOCKER=true"
+      - "DIUN_PROVIDERS_DOCKER_WATCHBYDEFAULT=true"
+      - "HTTP_PROXY=http://squid.local:3128"
+      - "HTTPS_PROXY=http://squid.local:3128"
+      - "NO_PROXY=localhost,127.0.0.1,::1"
+    restart: always
+```
+
+Use `NO_PROXY` for endpoints that should be contacted directly, such as local
+services, private registries available on the same network, or the Docker
+daemon if it is reached over TCP.
+
+This is different from a Docker registry caching proxy such as Nexus or Harbor.
+In that case the proxy is a registry endpoint, so images should be configured
+with the registry name that Diun should check.
+
 ## field docker|swarm uses unsupported type: invalid
 
 If you have the error `failed to decode configuration from file: field docker uses unsupported type: invalid` that's
