@@ -27,10 +27,9 @@ func parseServiceTags(tags []string) map[string]string {
 
 func (c *Client) listTaskImages() []model.Image {
 	config := &nomad.Config{
-		Address:   c.config.Address,
-		Region:    c.config.Region,
-		SecretID:  c.config.SecretID,
-		Namespace: c.config.Namespace,
+		Address:  c.config.Address,
+		Region:   c.config.Region,
+		SecretID: c.config.SecretID,
 	}
 
 	if *c.config.TLSInsecure {
@@ -45,17 +44,12 @@ func (c *Client) listTaskImages() []model.Image {
 		return []model.Image{}
 	}
 
-	jobs, _, err := client.Jobs().List(nil)
-	if err != nil {
-		c.logger.Error().Err(err).Msg("Cannot list Nomad jobs")
-	}
-
 	var list []model.Image
-
-	for _, job := range jobs {
-		jobInfo, _, err := client.Jobs().Info(job.ID, nil)
+	for _, job := range c.listJobs(client) {
+		jobInfo, _, err := client.Jobs().Info(job.ID, queryOptions(job.Namespace))
 		if err != nil {
-			c.logger.Error().Err(err).Msg("Cannot get info for job")
+			c.logger.Error().Err(err).Str("job_id", job.ID).Str("namespace", job.Namespace).Msg("Cannot get info for job")
+			continue
 		}
 
 		for _, taskGroup := range jobInfo.TaskGroups {
@@ -130,6 +124,78 @@ func (c *Client) listTaskImages() []model.Image {
 	}
 
 	return list
+}
+
+func (c *Client) listJobs(client *nomad.Client) []*nomad.JobListStub {
+	var list []*nomad.JobListStub
+
+	if namespace, ok := c.deprecatedNamespace(); ok {
+		c.logger.Warn().Str("namespace", namespace).Msg("Nomad provider namespace option is deprecated; use namespaces instead")
+	}
+
+	for _, namespace := range c.namespaces() {
+		jobs, _, err := client.Jobs().List(queryOptions(namespace))
+		if err != nil {
+			c.logger.Error().Err(err).Str("namespace", namespace).Msg("Cannot list Nomad jobs")
+			continue
+		}
+		for _, job := range jobs {
+			if job.Namespace == "" {
+				job.Namespace = jobNamespace(job, namespace)
+			}
+			list = append(list, job)
+		}
+	}
+
+	return list
+}
+
+//nolint:staticcheck // Namespace is deprecated for users but still supported for backward compatibility.
+func (c *Client) deprecatedNamespace() (string, bool) {
+	if c.config.Namespace == "" || len(compactNamespaces(c.config.Namespaces)) > 0 {
+		return "", false
+	}
+	return c.config.Namespace, true
+}
+
+func (c *Client) namespaces() []string {
+	namespaces := compactNamespaces(c.config.Namespaces)
+	if len(namespaces) > 0 {
+		return namespaces
+	}
+	if namespace, ok := c.deprecatedNamespace(); ok {
+		return []string{namespace}
+	}
+	return []string{nomad.AllNamespacesNamespace}
+}
+
+func compactNamespaces(namespaces []string) []string {
+	var compacted []string
+	for _, namespace := range namespaces {
+		namespace = strings.TrimSpace(namespace)
+		if namespace == "" {
+			continue
+		}
+		compacted = append(compacted, namespace)
+	}
+	return compacted
+}
+
+func queryOptions(namespace string) *nomad.QueryOptions {
+	if namespace == "" {
+		return nil
+	}
+	return &nomad.QueryOptions{Namespace: namespace}
+}
+
+func jobNamespace(job *nomad.JobListStub, fallback string) string {
+	if job.Namespace != "" {
+		return job.Namespace
+	}
+	if fallback == nomad.AllNamespacesNamespace {
+		return nomad.DefaultNamespace
+	}
+	return fallback
 }
 
 func metadata(job *nomad.JobListStub, taskGroup *nomad.TaskGroup, task *nomad.Task) map[string]string {

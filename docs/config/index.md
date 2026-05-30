@@ -130,6 +130,8 @@ You can override this using the [`--config` flag or `CONFIG` env var with `serve
       file:
         directory: ./imagesdir
       nomad:
+        namespaces:
+          - default
         watchByDefault: true
     ```
 
