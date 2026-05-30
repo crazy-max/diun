@@ -393,6 +393,31 @@ func TestLoadEnv(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			desc: "nomad provider namespaces",
+			environ: []string{
+				"DIUN_PROVIDERS_NOMAD=true",
+				"DIUN_PROVIDERS_NOMAD_NAMESPACE=legacy",
+				"DIUN_PROVIDERS_NOMAD_NAMESPACES=dev,prod",
+			},
+			expected: &Config{
+				Db:       (&model.Db{}).GetDefaults(),
+				Watch:    (&model.Watch{}).GetDefaults(),
+				Defaults: (&model.Defaults{}).GetDefaults(),
+				Metrics:  (&model.Metrics{}).GetDefaults(),
+				Notif:    nil,
+				RegOpts:  nil,
+				Providers: &model.Providers{
+					Nomad: &model.PrdNomad{
+						Namespace:      "legacy",
+						Namespaces:     []string{"dev", "prod"},
+						TLSInsecure:    new(false),
+						WatchByDefault: new(false),
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
 			desc: "metrics and docker provider",
 			environ: []string{
 				"DIUN_METRICS_ENABLED=true",

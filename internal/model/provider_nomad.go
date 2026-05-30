@@ -2,12 +2,14 @@ package model
 
 // PrdNomad holds nomad provider configuration
 type PrdNomad struct {
-	Address        string `yaml:"address" json:"address,omitempty" validate:"omitempty"`
-	Region         string `yaml:"region,omitempty" json:"region,omitempty" validate:"omitempty"`
-	SecretID       string `yaml:"secretID,omitempty" json:"secretID,omitempty" validate:"omitempty"`
-	Namespace      string `yaml:"namespace,omitempty" json:"namespace,omitempty" validate:"omitempty"`
-	TLSInsecure    *bool  `yaml:"tlsInsecure" json:"tlsInsecure,omitempty" validate:"required"`
-	WatchByDefault *bool  `yaml:"watchByDefault" json:"watchByDefault,omitempty" validate:"required"`
+	Address  string `yaml:"address" json:"address,omitempty" validate:"omitempty"`
+	Region   string `yaml:"region,omitempty" json:"region,omitempty" validate:"omitempty"`
+	SecretID string `yaml:"secretID,omitempty" json:"secretID,omitempty" validate:"omitempty"`
+	// Deprecated: use Namespaces.
+	Namespace      string   `yaml:"namespace,omitempty" json:"namespace,omitempty" validate:"omitempty"`
+	Namespaces     []string `yaml:"namespaces,omitempty" json:"namespaces,omitempty" validate:"omitempty"`
+	TLSInsecure    *bool    `yaml:"tlsInsecure" json:"tlsInsecure,omitempty" validate:"required"`
+	WatchByDefault *bool    `yaml:"watchByDefault" json:"watchByDefault,omitempty" validate:"required"`
 }
 
 // GetDefaults gets the default values
