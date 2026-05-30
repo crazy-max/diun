@@ -1,6 +1,6 @@
 # Teams notifications
 
-You can send notifications to your Teams team-channel using an [incoming webhook URL](https://docs.microsoft.com/en-us/microsoftteams/platform/webhooks-and-connectors/what-are-webhooks-and-connectors).
+You can send notifications to your Teams team-channel using an [incoming webhook URL](https://docs.microsoft.com/en-us/microsoftteams/platform/webhooks-and-connectors/what-are-webhooks-and-connectors) or a Microsoft Teams Workflows webhook URL.
 
 ## Configuration
 
@@ -9,6 +9,7 @@ You can send notifications to your Teams team-channel using an [incoming webhook
     notif:
       teams:
         webhookURL: https://outlook.office.com/webhook/ABCD12EFG/HIJK34LMN/01234567890abcdefghij
+        cardType: messageCard
         renderFacts: true
         templateBody: |
           Docker tag {{ .Entry.Image }} which you subscribed to through {{ .Entry.Provider }} provider has been released.
@@ -16,8 +17,9 @@ You can send notifications to your Teams team-channel using an [incoming webhook
 
 | Name               | Default                            | Description                                                                                                                                     |
 |--------------------|------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
-| `webhookURL`       |                                    | Teams [incoming webhook URL](https://docs.microsoft.com/en-us/microsoftteams/platform/webhooks-and-connectors/what-are-webhooks-and-connectors) |
+| `webhookURL`       |                                    | Teams [incoming webhook URL](https://docs.microsoft.com/en-us/microsoftteams/platform/webhooks-and-connectors/what-are-webhooks-and-connectors) or Workflows webhook URL              |
 | `webhookURLFile`   |                                    | Use content of [secret file](../faq.md#secrets-loaded-from-files-and-trailing-newlines) as webhook URL if `webhookURL` is not defined           |
+| `cardType`         | `messageCard`                      | Card payload type. Can be `messageCard` or `adaptiveCard`. Use `adaptiveCard` for Teams Workflows webhooks                                    |
 | `renderFacts`      | `true`                             | Render fact objects                                                                                                                             |
 | `timeout`          | `10s`                              | Timeout specifies a time limit for the request to be made                                                                                       |
 | `proxy`            |                                    | HTTP proxy URL to use for requests                                                                                                              |
@@ -28,6 +30,7 @@ You can send notifications to your Teams team-channel using an [incoming webhook
 !!! abstract "Environment variables"
     * `DIUN_NOTIF_TEAMS_WEBHOOKURL`
     * `DIUN_NOTIF_TEAMS_WEBHOOKURLFILE`
+    * `DIUN_NOTIF_TEAMS_CARDTYPE`
     * `DIUN_NOTIF_TEAMS_RENDERFACTS`
     * `DIUN_NOTIF_TEAMS_TIMEOUT`
     * `DIUN_NOTIF_TEAMS_PROXY`
@@ -38,7 +41,18 @@ You can send notifications to your Teams team-channel using an [incoming webhook
 ### Default `templateBody`
 
 ```
-Docker tag {{ if .Entry.Image.HubLink }}[`{{ .Entry.Image }}`]({{ .Entry.Image.HubLink }}){{ else }}`{{ .Entry.Image }}`{{ end }}{{ if (eq .Entry.Status "new") }}newly added{{ else }}updated{{ end }}.
+Docker tag {{ if .Entry.Image.HubLink }}[`{{ .Entry.Image }}`]({{ .Entry.Image.HubLink }}){{ else }}`{{ .Entry.Image }}`{{ end }} {{ if (eq .Entry.Status "new") }}available{{ else }}updated{{ end }}.
+```
+
+### Microsoft Teams Workflows
+
+Microsoft Teams Workflows webhooks can receive Adaptive Card payloads. To use a workflow URL created from the Teams Workflows app, set:
+
+```yaml
+notif:
+  teams:
+    webhookURL: https://prod-00.westeurope.logic.azure.com/workflows/...
+    cardType: adaptiveCard
 ```
 
 ## Sample

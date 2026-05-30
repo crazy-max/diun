@@ -19,13 +19,7 @@ func TestSendPostsMessageCard(t *testing.T) {
 	var gotMethod string
 	var gotUserAgent string
 	var gotContentType string
-	var gotPayload struct {
-		Type       string     `json:"@type"`
-		Context    string     `json:"@context"`
-		ThemeColor string     `json:"themeColor"`
-		Summary    string     `json:"summary"`
-		Sections   []Sections `json:"sections"`
-	}
+	var gotPayload messageCardPayload
 	var gotPayloadErr error
 
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -60,6 +54,66 @@ func TestSendPostsMessageCard(t *testing.T) {
 		{Name: "Digest", Value: "sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"},
 		{Name: "Platform", Value: "linux/amd64"},
 	}, section.Facts)
+}
+
+func TestSendPostsAdaptiveCard(t *testing.T) {
+	var gotMethod string
+	var gotUserAgent string
+	var gotContentType string
+	var gotPayload adaptiveCardPayload
+	var gotPayloadErr error
+
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		gotMethod = r.Method
+		gotUserAgent = r.Header.Get("User-Agent")
+		gotContentType = r.Header.Get("Content-Type")
+		gotPayloadErr = json.NewDecoder(r.Body).Decode(&gotPayload)
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer ts.Close()
+
+	err := newTestClientWithCardType(ts.URL, model.NotifTeamsCardTypeAdaptiveCard).Send(testEntry(t))
+	require.NoError(t, err)
+	require.NoError(t, gotPayloadErr)
+
+	assert.Equal(t, http.MethodPost, gotMethod)
+	assert.Equal(t, "diun-test", gotUserAgent)
+	assert.Equal(t, "application/json", gotContentType)
+	assert.Equal(t, "message", gotPayload.Type)
+	require.Len(t, gotPayload.Attachments, 1)
+
+	attachment := gotPayload.Attachments[0]
+	assert.Equal(t, "application/vnd.microsoft.card.adaptive", attachment.ContentType)
+	assert.Equal(t, "http://adaptivecards.io/schemas/adaptive-card.json", attachment.Content.Schema)
+	assert.Equal(t, "AdaptiveCard", attachment.Content.Type)
+	assert.Equal(t, "1.2", attachment.Content.Version)
+	require.Len(t, attachment.Content.Body, 3)
+
+	assert.Equal(t, adaptiveCardElement{
+		Type:   "TextBlock",
+		Text:   "file update",
+		Wrap:   true,
+		Weight: "Bolder",
+		Color:  "Accent",
+	}, attachment.Content.Body[0])
+	assert.Equal(t, adaptiveCardElement{
+		Type: "FactSet",
+		Facts: []adaptiveCardFact{
+			{Title: "Hostname", Value: "node-1"},
+			{Title: "Provider", Value: "file"},
+			{Title: "Created", Value: "May 24, 2026 12:34:56 UTC"},
+			{Title: "Digest", Value: "sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"},
+			{Title: "Platform", Value: "linux/amd64"},
+		},
+	}, attachment.Content.Body[1])
+	assert.Equal(t, adaptiveCardElement{
+		Type:     "TextBlock",
+		Text:     fmt.Sprintf("CrazyMax © %d Diun 4.0.0", time.Now().Year()),
+		Wrap:     true,
+		Size:     "Small",
+		IsSubtle: true,
+		Spacing:  "Small",
+	}, attachment.Content.Body[2])
 }
 
 func TestSendReturnsTeamsErrorResponse(t *testing.T) {
@@ -123,9 +177,14 @@ func TestSendStopsAfterTeamsRateLimitAttempts(t *testing.T) {
 }
 
 func newTestClient(webhookURL string) *Client {
+	return newTestClientWithCardType(webhookURL, model.NotifTeamsCardTypeMessageCard)
+}
+
+func newTestClientWithCardType(webhookURL string, cardType model.NotifTeamsCardType) *Client {
 	return &Client{
 		cfg: &model.NotifTeams{
 			WebhookURL:   webhookURL,
+			CardType:     cardType,
 			RenderFacts:  new(true),
 			Timeout:      new(2 * time.Second),
 			TemplateBody: "{{ .Entry.Provider }} {{ .Entry.Status }}",
