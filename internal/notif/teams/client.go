@@ -59,6 +59,48 @@ type Fact struct {
 	Value string `json:"Value"`
 }
 
+type messageCardPayload struct {
+	Type       string     `json:"@type"`
+	Context    string     `json:"@context"`
+	ThemeColor string     `json:"themeColor"`
+	Summary    string     `json:"summary"`
+	Sections   []Sections `json:"sections"`
+}
+
+type adaptiveCardPayload struct {
+	Type        string                   `json:"type"`
+	Attachments []adaptiveCardAttachment `json:"attachments"`
+}
+
+type adaptiveCardAttachment struct {
+	ContentType string              `json:"contentType"`
+	Content     adaptiveCardContent `json:"content"`
+}
+
+type adaptiveCardContent struct {
+	Schema  string                `json:"$schema"`
+	Type    string                `json:"type"`
+	Version string                `json:"version"`
+	Body    []adaptiveCardElement `json:"body"`
+}
+
+type adaptiveCardElement struct {
+	Type     string             `json:"type"`
+	Text     string             `json:"text,omitempty"`
+	Wrap     bool               `json:"wrap,omitempty"`
+	Size     string             `json:"size,omitempty"`
+	Weight   string             `json:"weight,omitempty"`
+	Color    string             `json:"color,omitempty"`
+	IsSubtle bool               `json:"isSubtle,omitempty"`
+	Spacing  string             `json:"spacing,omitempty"`
+	Facts    []adaptiveCardFact `json:"facts,omitempty"`
+}
+
+type adaptiveCardFact struct {
+	Title string `json:"title"`
+	Value string `json:"value"`
+}
+
 // Send creates and sends a webhook notification with an entry
 func (c *Client) Send(entry model.NotifEntry) error {
 	webhookURL, err := secret.GetSecret(c.cfg.WebhookURL, c.cfg.WebhookURLFile)
@@ -80,41 +122,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		return err
 	}
 
-	themeColor := "68CA00"
-	if entry.Status == model.ImageStatusUpdate {
-		themeColor = "0076D7"
-	}
-
-	var facts []Fact
-	if *c.cfg.RenderFacts {
-		facts = []Fact{
-			{"Hostname", c.meta.Hostname},
-			{"Provider", entry.Provider},
-			{"Created", entry.Manifest.Created.Format("Jan 02, 2006 15:04:05 UTC")},
-			{"Digest", entry.Manifest.Digest.String()},
-			{"Platform", entry.Manifest.Platform},
-		}
-	}
-
-	jsonBody, err := json.Marshal(struct {
-		Type       string     `json:"@type"`
-		Context    string     `json:"@context"`
-		ThemeColor string     `json:"themeColor"`
-		Summary    string     `json:"summary"`
-		Sections   []Sections `json:"sections"`
-	}{
-		Type:       "MessageCard",
-		Context:    "https://schema.org/extensions",
-		ThemeColor: themeColor,
-		Summary:    string(body),
-		Sections: []Sections{
-			{
-				ActivityTitle:    string(body),
-				ActivitySubtitle: fmt.Sprintf("%s © %d %s %s", c.meta.Author, time.Now().Year(), c.meta.Name, c.meta.Version),
-				Facts:            facts,
-			},
-		},
-	})
+	jsonBody, err := c.payload(entry, string(body))
 	if err != nil {
 		return err
 	}
@@ -165,6 +173,102 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	}
 
 	return nil
+}
+
+func (c *Client) payload(entry model.NotifEntry, body string) ([]byte, error) {
+	facts := c.facts(entry)
+	if c.cfg.CardType == model.NotifTeamsCardTypeAdaptiveCard {
+		return json.Marshal(c.adaptiveCardPayload(entry, body, facts))
+	}
+	return json.Marshal(c.messageCardPayload(entry, body, facts))
+}
+
+func (c *Client) facts(entry model.NotifEntry) []Fact {
+	if !*c.cfg.RenderFacts {
+		return nil
+	}
+
+	return []Fact{
+		{"Hostname", c.meta.Hostname},
+		{"Provider", entry.Provider},
+		{"Created", entry.Manifest.Created.Format("Jan 02, 2006 15:04:05 UTC")},
+		{"Digest", entry.Manifest.Digest.String()},
+		{"Platform", entry.Manifest.Platform},
+	}
+}
+
+func (c *Client) messageCardPayload(entry model.NotifEntry, body string, facts []Fact) messageCardPayload {
+	themeColor := "68CA00"
+	if entry.Status == model.ImageStatusUpdate {
+		themeColor = "0076D7"
+	}
+
+	return messageCardPayload{
+		Type:       "MessageCard",
+		Context:    "https://schema.org/extensions",
+		ThemeColor: themeColor,
+		Summary:    body,
+		Sections: []Sections{
+			{
+				ActivityTitle:    body,
+				ActivitySubtitle: fmt.Sprintf("%s © %d %s %s", c.meta.Author, time.Now().Year(), c.meta.Name, c.meta.Version),
+				Facts:            facts,
+			},
+		},
+	}
+}
+
+func (c *Client) adaptiveCardPayload(entry model.NotifEntry, body string, facts []Fact) adaptiveCardPayload {
+	color := "Good"
+	if entry.Status == model.ImageStatusUpdate {
+		color = "Accent"
+	}
+
+	elements := []adaptiveCardElement{
+		{
+			Type:   "TextBlock",
+			Text:   body,
+			Wrap:   true,
+			Weight: "Bolder",
+			Color:  color,
+		},
+	}
+	if len(facts) > 0 {
+		adaptiveFacts := make([]adaptiveCardFact, 0, len(facts))
+		for _, fact := range facts {
+			adaptiveFacts = append(adaptiveFacts, adaptiveCardFact{
+				Title: fact.Name,
+				Value: fact.Value,
+			})
+		}
+		elements = append(elements, adaptiveCardElement{
+			Type:  "FactSet",
+			Facts: adaptiveFacts,
+		})
+	}
+	elements = append(elements, adaptiveCardElement{
+		Type:     "TextBlock",
+		Text:     fmt.Sprintf("%s © %d %s %s", c.meta.Author, time.Now().Year(), c.meta.Name, c.meta.Version),
+		Wrap:     true,
+		Size:     "Small",
+		IsSubtle: true,
+		Spacing:  "Small",
+	})
+
+	return adaptiveCardPayload{
+		Type: "message",
+		Attachments: []adaptiveCardAttachment{
+			{
+				ContentType: "application/vnd.microsoft.card.adaptive",
+				Content: adaptiveCardContent{
+					Schema:  "http://adaptivecards.io/schemas/adaptive-card.json",
+					Type:    "AdaptiveCard",
+					Version: "1.2",
+					Body:    elements,
+				},
+			},
+		},
+	}
 }
 
 func teamsRateLimited(resp *http.Response, body []byte) bool {

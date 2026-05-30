@@ -91,6 +91,7 @@ You can override this using the [`--config` flag or `CONFIG` env var with `serve
         webhookURL: https://hooks.slack.com/services/ABCD12EFG/HIJK34LMN/01234567890abcdefghij
       teams:
         webhookURL: https://outlook.office.com/webhook/ABCD12EFG/HIJK34LMN/01234567890abcdefghij
+        cardType: messageCard
       telegram:
         token: aabbccdd:11223344
         chatIDs:

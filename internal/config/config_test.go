@@ -217,6 +217,7 @@ for <code>{{ .Entry.Manifest.Platform }}</code> platform.
 					},
 					Teams: &model.NotifTeams{
 						WebhookURL:   "https://outlook.office.com/webhook/ABCD12EFG/HIJK34LMN/01234567890abcdefghij",
+						CardType:     model.NotifTeamsCardTypeMessageCard,
 						RenderFacts:  new(false),
 						Timeout:      new(10 * time.Second),
 						TemplateBody: model.NotifTeamsDefaultTemplateBody,

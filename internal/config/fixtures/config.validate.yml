@@ -94,6 +94,7 @@ notif:
     renderFields: false
   teams:
     webhookURL: https://outlook.office.com/webhook/ABCD12EFG/HIJK34LMN/01234567890abcdefghij
+    cardType: adaptiveCard
     renderFacts: true
   telegram:
     token: abcdef123456
