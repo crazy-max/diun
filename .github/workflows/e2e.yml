@@ -98,6 +98,67 @@ jobs:
           docker logs ${{ env.CONTAINER_NAME }}
           docker rm -f ${{ env.CONTAINER_NAME }} > /dev/null 2>&1 || true
 
+  containerd:
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@d7f5e7f509e45cec5c76c4d5afdd7de93d0b3df5 # v4.1.0
+      -
+        name: Build
+        uses: docker/bake-action@6614cfa25eff9a0b2b2697efb0b6159e7680d584 # v7.2.0
+        with:
+          source: .
+          targets: image-local
+      -
+        name: Start containerd fixture
+        run: |
+          if ! command -v ctr > /dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install -y containerd
+          fi
+          sudo systemctl is-active --quiet containerd || sudo systemctl start containerd
+          sudo ctr version
+          sudo ctr --namespace diun-e2e image pull docker.io/library/busybox:1.36.1
+          sudo ctr --namespace diun-e2e run --detach --label diun.enable=true docker.io/library/busybox:1.36.1 diun-e2e-busybox sleep 300
+          sudo ctr --namespace diun-e2e containers list
+          sudo ctr --namespace diun-e2e tasks list
+      -
+        name: Start container
+        run: |
+          docker run -d --name ${{ env.CONTAINER_NAME }} \
+            -v /run/containerd/containerd.sock:/run/containerd/containerd.sock \
+            -v $(pwd)/test/containerd1/diun.yml:/diun.yml:ro \
+            -e "TZ=Europe/Paris" \
+            -e "LOG_LEVEL=debug" \
+            ${{ env.BUILD_TAG }}
+      -
+        name: Check container logs
+        uses: crazy-max/.github/.github/actions/container-logs-check@bbd31df64ee0f097a02f12495f541f9236f18c46 # v1.2.0
+        with:
+          container_name: ${{ env.CONTAINER_NAME }}
+          log_check: "Next run in"
+          timeout: 240
+      -
+        name: List images in db
+        run: |
+          docker exec ${{ env.CONTAINER_NAME }} diun image list --raw | tee /tmp/diun-containerd-images.json
+          jq -e '.images[] | select(.name == "docker.io/library/busybox" and .latest.tag == "1.36.1")' /tmp/diun-containerd-images.json
+      -
+        name: Container logs
+        if: always()
+        run: |
+          docker logs ${{ env.CONTAINER_NAME }}
+          docker rm -f ${{ env.CONTAINER_NAME }} > /dev/null 2>&1 || true
+          if command -v ctr > /dev/null 2>&1; then
+            sudo ctr --namespace diun-e2e tasks kill diun-e2e-busybox > /dev/null 2>&1 || true
+            sudo ctr --namespace diun-e2e tasks rm --force diun-e2e-busybox > /dev/null 2>&1 || true
+            sudo ctr --namespace diun-e2e containers rm diun-e2e-busybox > /dev/null 2>&1 || true
+          fi
+
   metrics:
     runs-on: ubuntu-latest
     steps:

@@ -16,6 +16,7 @@ import (
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/internal/notif"
 	"github.com/crazy-max/diun/v4/internal/provider"
+	containerdPrd "github.com/crazy-max/diun/v4/internal/provider/containerd"
 	dockerPrd "github.com/crazy-max/diun/v4/internal/provider/docker"
 	dockerfilePrd "github.com/crazy-max/diun/v4/internal/provider/dockerfile"
 	filePrd "github.com/crazy-max/diun/v4/internal/provider/file"
@@ -204,6 +205,7 @@ func (di *Diun) Run() {
 	provider.WalkJobs(di.createJob,
 		dockerPrd.New(di.cfg.Providers.Docker, di.cfg.Defaults),
 		swarmPrd.New(di.cfg.Providers.Swarm, di.cfg.Defaults),
+		containerdPrd.New(di.cfg.Providers.Containerd, di.cfg.Defaults),
 		kubernetesPrd.New(di.cfg.Providers.Kubernetes, di.cfg.Defaults),
 		filePrd.New(di.cfg.Providers.File, di.cfg.Defaults),
 		dockerfilePrd.New(di.cfg.Providers.Dockerfile, di.cfg.Defaults),

@@ -34,9 +34,9 @@ uses.
 * Watch container images and report when tags or digests change
 * Track repositories with include and exclude filters for tags
 * Run checks on a schedule without needing an external cron job
-* Discover images from [Docker](providers/docker.md), [Kubernetes](providers/kubernetes.md),
-  [Swarm](providers/swarm.md), [Nomad](providers/nomad.md), [Dockerfile](providers/dockerfile.md),
-  and [File](providers/file.md) providers
+* Discover images from [Docker](providers/docker.md), [Containerd](providers/containerd.md),
+  [Kubernetes](providers/kubernetes.md), [Swarm](providers/swarm.md), [Nomad](providers/nomad.md),
+  [Dockerfile](providers/dockerfile.md), and [File](providers/file.md) providers
 * Override target image OS and architecture when needed
 * Send notifications through Gotify, Mail, Slack, Telegram, and [more](config/index.md#reference)
 * Integrate with [Healthchecks](config/watch.md#healthchecks) to monitor the watcher itself

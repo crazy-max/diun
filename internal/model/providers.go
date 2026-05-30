@@ -4,6 +4,7 @@ package model
 type Providers struct {
 	Docker     *PrdDocker     `yaml:"docker,omitempty" json:"docker,omitempty" label:"allowEmpty" file:"allowEmpty"`
 	Swarm      *PrdSwarm      `yaml:"swarm,omitempty" json:"swarm,omitempty" label:"allowEmpty" file:"allowEmpty"`
+	Containerd *PrdContainerd `yaml:"containerd,omitempty" json:"containerd,omitempty" label:"allowEmpty" file:"allowEmpty"`
 	Kubernetes *PrdKubernetes `yaml:"kubernetes,omitempty" json:"kubernetes,omitempty" label:"allowEmpty" file:"allowEmpty"`
 	File       *PrdFile       `yaml:"file,omitempty" json:"file,omitempty"`
 	Dockerfile *PrdDockerfile `yaml:"dockerfile,omitempty" json:"dockerfile,omitempty"`
