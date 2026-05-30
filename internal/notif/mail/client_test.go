@@ -41,7 +41,7 @@ func TestSendSMTPRegression(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			addr, done := startSMTPServer(t, tt.advertiseAuth)
+			addr, done := startSMTPServer(t, tt.advertiseAuth, false, false)
 			cfg := testMailConfig(t, addr)
 			cfg.LocalName = tt.localName
 
@@ -58,6 +58,43 @@ func TestSendSMTPRegression(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestSendSkipsNoopConnectionCheck(t *testing.T) {
+	addr, done := startSMTPServer(t, false, false, true)
+	cfg := testMailConfig(t, addr)
+	cfg.TemplateTitle = "title"
+	cfg.TemplateBody = "body"
+
+	client := &Client{
+		cfg: cfg,
+		meta: model.Meta{
+			Name: "Diun",
+		},
+	}
+
+	require.NoError(t, client.Send(model.NotifEntry{}))
+	result := waitSMTPServer(t, done)
+	assert.False(t, result.noopSeen)
+	assert.True(t, result.dataSeen)
+}
+
+func TestSendIgnoresCleanupErrorAfterDelivery(t *testing.T) {
+	addr, done := startSMTPServer(t, false, true, false)
+	cfg := testMailConfig(t, addr)
+	cfg.TemplateTitle = "title"
+	cfg.TemplateBody = "body"
+
+	client := &Client{
+		cfg: cfg,
+		meta: model.Meta{
+			Name: "Diun",
+		},
+	}
+
+	require.NoError(t, client.Send(model.NotifEntry{}))
+	result := waitSMTPServer(t, done)
+	assert.True(t, result.dataSeen)
 }
 
 func TestSendWrapsDeliveryError(t *testing.T) {
@@ -82,9 +119,11 @@ type smtpServerResult struct {
 	err      error
 	helo     string
 	authSeen bool
+	dataSeen bool
+	noopSeen bool
 }
 
-func startSMTPServer(t *testing.T, advertiseAuth bool) (string, <-chan smtpServerResult) {
+func startSMTPServer(t *testing.T, advertiseAuth, closeAfterData, closeOnNoop bool) (string, <-chan smtpServerResult) {
 	t.Helper()
 
 	listener, err := (&net.ListenConfig{}).Listen(context.Background(), "tcp", "127.0.0.1:0")
@@ -130,6 +169,10 @@ func startSMTPServer(t *testing.T, advertiseAuth bool) (string, <-chan smtpServe
 				}
 				write("250 localhost")
 			case upperLine == "NOOP":
+				result.noopSeen = true
+				if closeOnNoop {
+					return
+				}
 				write("250 OK")
 			case strings.HasPrefix(upperLine, "AUTH "):
 				result.authSeen = true
@@ -145,7 +188,11 @@ func startSMTPServer(t *testing.T, advertiseAuth bool) (string, <-chan smtpServe
 					result.err = err
 					return
 				}
+				result.dataSeen = true
 				write("250 OK")
+				if closeAfterData {
+					return
+				}
 			case upperLine == "RSET":
 				write("250 OK")
 			case upperLine == "QUIT":

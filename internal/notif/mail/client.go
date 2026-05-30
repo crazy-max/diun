@@ -125,6 +125,9 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	}
 
 	if err = client.DialAndSend(mailMessage); err != nil {
+		if mailMessage.IsDelivered() {
+			return nil
+		}
 		return errors.Wrap(err, "cannot send mail notification")
 	}
 	return nil
@@ -134,6 +137,7 @@ func (c *Client) mailClient(username, password string) (*email.Client, error) {
 	opts := []email.Option{
 		email.WithPort(c.cfg.Port),
 		email.WithTLSPolicy(email.TLSOpportunistic),
+		email.WithoutNoop(),
 	}
 	if c.cfg.LocalName != "" {
 		opts = append(opts, email.WithHELO(c.cfg.LocalName))
