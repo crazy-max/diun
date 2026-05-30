@@ -150,6 +150,7 @@ nav:
     - Webhook: notif/webhook.md
   - Providers:
     - Docker: providers/docker.md
+    - Containerd: providers/containerd.md
     - Kubernetes: providers/kubernetes.md
     - Swarm: providers/swarm.md
     - Nomad: providers/nomad.md

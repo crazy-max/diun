@@ -1,6 +1,7 @@
 # Providers configuration
 
 * [`docker`](../providers/docker.md)
+* [`containerd`](../providers/containerd.md)
 * [`kubernetes`](../providers/kubernetes.md)
 * [`swarm`](../providers/swarm.md)
 * [`nomad`](../providers/nomad.md)

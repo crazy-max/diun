@@ -118,6 +118,9 @@ You can override this using the [`--config` flag or `CONFIG` env var with `serve
     providers:
       docker:
         watchStopped: true
+      containerd:
+        namespaces:
+          - default
       swarm:
         watchByDefault: true
       kubernetes:
@@ -285,6 +288,7 @@ Can be transposed to:
 * [regopts](regopts.md)
 * providers
     * [docker](../providers/docker.md)
+    * [containerd](../providers/containerd.md)
     * [kubernetes](../providers/kubernetes.md)
     * [swarm](../providers/swarm.md)
     * [nomad](../providers/nomad.md)

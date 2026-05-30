@@ -371,6 +371,28 @@ func TestLoadEnv(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			desc: "containerd provider",
+			environ: []string{
+				"DIUN_PROVIDERS_CONTAINERD=true",
+			},
+			expected: &Config{
+				Db:       (&model.Db{}).GetDefaults(),
+				Watch:    (&model.Watch{}).GetDefaults(),
+				Defaults: (&model.Defaults{}).GetDefaults(),
+				Metrics:  (&model.Metrics{}).GetDefaults(),
+				Notif:    nil,
+				RegOpts:  nil,
+				Providers: &model.Providers{
+					Containerd: &model.PrdContainerd{
+						Namespaces:     []string{"default"},
+						WatchByDefault: new(false),
+						WatchStopped:   new(false),
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
 			desc: "metrics and docker provider",
 			environ: []string{
 				"DIUN_METRICS_ENABLED=true",

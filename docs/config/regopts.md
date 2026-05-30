@@ -32,7 +32,7 @@ this registry options will be selected if not referenced as a `regopt` name.
 ### `name`
 
 Unique name for registry options. This name can be used through `diun.regopt`
-[Docker](../providers/docker.md#docker-labels) / [Swarm](../providers/swarm.md#docker-labels)
+[Docker](../providers/docker.md#docker-labels) / [Containerd](../providers/containerd.md#containerd-labels) / [Swarm](../providers/swarm.md#docker-labels)
 label or [Kubernetes](../providers/kubernetes.md#kubernetes-annotations) / [Nomad](../providers/nomad.md#nomad-annotations)
 annotation and also as `regopt` for the [Dockerfile](../providers/dockerfile.md)
 and [File](../providers/file.md) providers.
