@@ -14,6 +14,7 @@ import (
 	"github.com/opencontainers/go-digest"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 )
 
 func TestImageListAndInspect(t *testing.T) {
@@ -113,6 +114,20 @@ func TestNotifTestWithoutNotifier(t *testing.T) {
 	resp, err := client.NotifTest(context.Background(), &pb.NotifTestRequest{})
 	require.NoError(t, err)
 	assert.Equal(t, "No notifier available", resp.Message)
+}
+
+func TestHealthServiceDefaults(t *testing.T) {
+	client, _ := newTestClient(t)
+
+	overall, err := client.health.Check(context.Background(), &healthpb.HealthCheckRequest{})
+	require.NoError(t, err)
+	assert.Equal(t, healthpb.HealthCheckResponse_NOT_SERVING, overall.Status)
+
+	scheduler, err := client.health.Check(context.Background(), &healthpb.HealthCheckRequest{
+		Service: HealthServiceScheduler,
+	})
+	require.NoError(t, err)
+	assert.Equal(t, healthpb.HealthCheckResponse_SERVICE_UNKNOWN, scheduler.Status)
 }
 
 func newTestClient(t *testing.T) (*Client, *db.Client) {

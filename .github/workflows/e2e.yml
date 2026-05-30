@@ -78,6 +78,11 @@ jobs:
             volFlags="-v $(pwd)/test/${{ matrix.folder }}/mount:/mount ${volFlags}"
           fi
           docker run -d --name ${{ env.CONTAINER_NAME }} ${volFlags} \
+            --health-cmd "diun healthcheck" \
+            --health-interval 30s \
+            --health-timeout 5s \
+            --health-retries 3 \
+            --health-start-period 60s \
             -e "TZ=Europe/Paris" \
             -e "LOG_LEVEL=${{ matrix.loglevel }}" \
             ${{ env.BUILD_TAG }}
@@ -92,6 +97,10 @@ jobs:
         name: List images in db
         run: |
           docker exec -t ${{ env.CONTAINER_NAME }} diun image list
+      -
+        name: Healthcheck
+        run: |
+          docker exec -t ${{ env.CONTAINER_NAME }} diun healthcheck
       -
         name: Container logs
         if: always()
@@ -131,6 +140,11 @@ jobs:
         name: Start container
         run: |
           docker run -d --name ${{ env.CONTAINER_NAME }} \
+            --health-cmd "diun healthcheck" \
+            --health-interval 30s \
+            --health-timeout 5s \
+            --health-retries 3 \
+            --health-start-period 60s \
             -v /run/containerd/containerd.sock:/run/containerd/containerd.sock \
             -v $(pwd)/test/containerd1/diun.yml:/diun.yml:ro \
             -e "TZ=Europe/Paris" \
@@ -148,6 +162,10 @@ jobs:
         run: |
           docker exec ${{ env.CONTAINER_NAME }} diun image list --raw | tee /tmp/diun-containerd-images.json
           jq -e '.images[] | select(.name == "docker.io/library/busybox" and .latest.tag == "1.36.1")' /tmp/diun-containerd-images.json
+      -
+        name: Healthcheck
+        run: |
+          docker exec -t ${{ env.CONTAINER_NAME }} diun healthcheck --raw
       -
         name: Container logs
         if: always()
@@ -203,6 +221,11 @@ jobs:
         run: |
           docker run -d --name ${{ env.CONTAINER_NAME }} \
             --network diun-e2e-nomad \
+            --health-cmd "diun healthcheck" \
+            --health-interval 30s \
+            --health-timeout 5s \
+            --health-retries 3 \
+            --health-start-period 60s \
             -v $(pwd)/test/nomad1/diun.yml:/diun.yml:ro \
             -e "TZ=Europe/Paris" \
             -e "LOG_LEVEL=debug" \
@@ -219,6 +242,10 @@ jobs:
         run: |
           docker exec ${{ env.CONTAINER_NAME }} diun image list --raw | tee /tmp/diun-nomad-images.json
           jq -e '.images[] | select(.name == "docker.io/library/busybox" and .latest.tag == "1.36.1")' /tmp/diun-nomad-images.json
+      -
+        name: Healthcheck
+        run: |
+          docker exec -t ${{ env.CONTAINER_NAME }} diun healthcheck --raw
       -
         name: Container logs
         if: always()
@@ -247,6 +274,11 @@ jobs:
         name: Start container
         run: |
           docker run -d --name ${{ env.CONTAINER_NAME }} \
+            --health-cmd "diun healthcheck" \
+            --health-interval 30s \
+            --health-timeout 5s \
+            --health-retries 3 \
+            --health-start-period 60s \
             -p 127.0.0.1:9090:9090 \
             -v $(pwd)/test/metrics/diun.yml:/diun.yml:ro \
             -v $(pwd)/test/metrics/mount:/mount:ro \
@@ -273,6 +305,10 @@ jobs:
         name: List images in db
         run: |
           docker exec -t ${{ env.CONTAINER_NAME }} diun image list
+      -
+        name: Healthcheck
+        run: |
+          docker exec -t ${{ env.CONTAINER_NAME }} diun healthcheck --raw
       -
         name: Container logs
         if: always()

@@ -16,10 +16,11 @@ import (
 var version = "dev"
 
 type cli struct {
-	Version kong.VersionFlag `name:"version" help:"Print version information."`
-	Serve   ServeCmd         `cmd:"" help:"Starts Diun server."`
-	Image   ImageCmd         `cmd:"" help:"Manage image manifests."`
-	Notif   NotifCmd         `cmd:"" help:"Manage notifications."`
+	Version     kong.VersionFlag `name:"version" help:"Print version information."`
+	Serve       ServeCmd         `cmd:"" help:"Starts Diun server."`
+	Healthcheck HealthcheckCmd   `cmd:"" help:"Check Diun health."`
+	Image       ImageCmd         `cmd:"" help:"Manage image manifests."`
+	Notif       NotifCmd         `cmd:"" help:"Manage notifications."`
 }
 
 type Context struct {
@@ -28,6 +29,9 @@ type Context struct {
 
 func main() {
 	if err := run(); err != nil {
+		if errors.Is(err, errHealthcheckFailed) {
+			os.Exit(1)
+		}
 		log.Fatal().Err(err).Send()
 	}
 }

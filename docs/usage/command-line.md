@@ -47,6 +47,27 @@ Following environment variables can also be used in place:
 | `LOG_NOCOLOR`    | `false`  | Disables the colorized output                                        |
 | `GRPC_AUTHORITY` | `:42286` | Address used to expose the gRPC server                               |
 
+### `healthcheck`
+
+!!! note
+    Diun needs to be started through [`serve`](#serve) command to be able to use this command.
+
+Checks the health of the running Diun server. Returns exit code `0` only when
+Diun reports healthy.
+
+* `--raw`: JSON output
+* `--timeout <duration>`: Timeout for healthcheck requests (default `3s`)
+* `--grpc-authority <string>`: Link to Diun gRPC API (default `127.0.0.1:42286`)
+
+Examples:
+
+```shell
+diun healthcheck
+```
+```shell
+diun healthcheck --raw
+```
+
 ### `image list`
 
 !!! note

@@ -59,6 +59,12 @@ services:
       - "DIUN_WATCH_SCHEDULE=0 */6 * * *"
       - "DIUN_WATCH_JITTER=30s"
       - "DIUN_PROVIDERS_DOCKER=true"
+    healthcheck:
+      test: ["CMD", "diun", "healthcheck"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
     labels:
       - "diun.enable=true"
     restart: always
@@ -75,6 +81,11 @@ Or use the following command:
 
 ```shell
 docker run -d --name diun \
+  --health-cmd "diun healthcheck" \
+  --health-interval 30s \
+  --health-timeout 5s \
+  --health-retries 3 \
+  --health-start-period 60s \
   -e "TZ=Europe/Paris" \
   -e "DIUN_WATCH_WORKERS=20" \
   -e "DIUN_WATCH_SCHEDULE=0 */6 * * *" \

@@ -27,6 +27,7 @@ import (
 	"github.com/panjf2000/ants/v2"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
+	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 )
 
 type Diun struct {
@@ -102,10 +103,24 @@ func (di *Diun) Start(ctx context.Context) error {
 		return err
 	}
 
+	di.grpc.SetHealthStatus("", healthpb.HealthCheckResponse_NOT_SERVING)
+	di.grpc.SetHealthStatus(grpc.HealthServiceGRPC, healthpb.HealthCheckResponse_NOT_SERVING)
+	if len(di.cfg.Watch.Schedule) == 0 {
+		di.grpc.SetHealthStatus(grpc.HealthServiceScheduler, healthpb.HealthCheckResponse_SERVICE_UNKNOWN)
+	} else {
+		di.grpc.SetHealthStatus(grpc.HealthServiceScheduler, healthpb.HealthCheckResponse_NOT_SERVING)
+	}
+	if di.metricsServer == nil {
+		di.grpc.SetHealthStatus(grpc.HealthServiceMetrics, healthpb.HealthCheckResponse_SERVICE_UNKNOWN)
+	} else {
+		di.grpc.SetHealthStatus(grpc.HealthServiceMetrics, healthpb.HealthCheckResponse_NOT_SERVING)
+	}
+
 	lis, err := di.grpc.Listen()
 	if err != nil {
 		return err
 	}
+	di.grpc.SetHealthStatus(grpc.HealthServiceGRPC, healthpb.HealthCheckResponse_SERVING)
 
 	var metricsLis net.Listener
 	if di.metricsServer != nil {
@@ -116,9 +131,13 @@ func (di *Diun) Start(ctx context.Context) error {
 			}
 			return err
 		}
+		di.grpc.SetHealthStatus(grpc.HealthServiceMetrics, healthpb.HealthCheckResponse_SERVING)
 	}
 
 	defer func() {
+		di.grpc.SetHealthStatus("", healthpb.HealthCheckResponse_NOT_SERVING)
+		di.grpc.SetHealthStatus(grpc.HealthServiceScheduler, healthpb.HealthCheckResponse_NOT_SERVING)
+		di.grpc.SetHealthStatus(grpc.HealthServiceMetrics, healthpb.HealthCheckResponse_NOT_SERVING)
 		if di.cron != nil {
 			<-di.cron.Stop().Done()
 		}
@@ -150,6 +169,7 @@ func (di *Diun) Start(ctx context.Context) error {
 	}
 
 	if len(di.cfg.Watch.Schedule) == 0 {
+		di.grpc.SetHealthStatus("", healthpb.HealthCheckResponse_SERVING)
 		return nil
 	}
 	di.jobID, err = di.cron.AddJobWithJitter(di.cfg.Watch.Schedule, di, *di.cfg.Watch.Jitter)
@@ -159,6 +179,8 @@ func (di *Diun) Start(ctx context.Context) error {
 	log.Info().Msgf("Cron initialized with schedule %s", di.cfg.Watch.Schedule)
 
 	di.cron.Start()
+	di.grpc.SetHealthStatus(grpc.HealthServiceScheduler, healthpb.HealthCheckResponse_SERVING)
+	di.grpc.SetHealthStatus("", healthpb.HealthCheckResponse_SERVING)
 	log.Info().Msgf("Next run in %s (%s)",
 		carbon.CreateFromStdTime(di.cron.Entry(di.jobID).Next).DiffAbsInString(),
 		di.cron.Entry(di.jobID).Next)
