@@ -124,6 +124,8 @@ jobs:
           sudo ctr version
           sudo ctr --namespace diun-e2e image pull docker.io/library/busybox:1.36.1
           sudo ctr --namespace diun-e2e run --detach --label diun.enable=true docker.io/library/busybox:1.36.1 diun-e2e-busybox sleep 300
+          sudo ctr --namespace diun-e2e containers list
+          sudo ctr --namespace diun-e2e tasks list
       -
         name: Start container
         run: |

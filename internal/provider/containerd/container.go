@@ -106,15 +106,23 @@ func (c *Client) listTaskStatuses(cli *ctd.Client, namespace string) (map[string
 func taskStatuses(tasks []*tasktypes.Process) map[string]tasktypes.Status {
 	statuses := map[string]tasktypes.Status{}
 	for _, task := range tasks {
-		if task.ContainerID == "" {
+		containerID := taskContainerID(task)
+		if containerID == "" {
 			continue
 		}
-		current := statuses[task.ContainerID]
+		current := statuses[containerID]
 		if !isRunningStatus(current) || isRunningStatus(task.Status) {
-			statuses[task.ContainerID] = task.Status
+			statuses[containerID] = task.Status
 		}
 	}
 	return statuses
+}
+
+func taskContainerID(task *tasktypes.Process) string {
+	if task.ContainerID != "" {
+		return task.ContainerID
+	}
+	return task.ID
 }
 
 func isRunningStatus(status tasktypes.Status) bool {

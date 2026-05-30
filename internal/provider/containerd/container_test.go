@@ -54,10 +54,22 @@ func TestTaskStatusesPrefersRunningStatus(t *testing.T) {
 	got := taskStatuses([]*tasktypes.Process{
 		{ContainerID: "container-id", Status: tasktypes.Status_STOPPED},
 		{ContainerID: "container-id", Status: tasktypes.Status_RUNNING},
+		{ID: "fallback-id", Status: tasktypes.Status_RUNNING},
 		{ContainerID: "", Status: tasktypes.Status_RUNNING},
 	})
 
 	assert.Equal(t, map[string]tasktypes.Status{
 		"container-id": tasktypes.Status_RUNNING,
+		"fallback-id":  tasktypes.Status_RUNNING,
 	}, got)
+}
+
+func TestTaskContainerIDFallsBackToProcessID(t *testing.T) {
+	assert.Equal(t, "container-id", taskContainerID(&tasktypes.Process{
+		ContainerID: "container-id",
+		ID:          "process-id",
+	}))
+	assert.Equal(t, "process-id", taskContainerID(&tasktypes.Process{
+		ID: "process-id",
+	}))
 }
