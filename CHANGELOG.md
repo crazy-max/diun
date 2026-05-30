@@ -1,5 +1,20 @@
 # Changelog
 
+## 4.33.0 (2026/05/30)
+
+* Diun now exposes a container `healthcheck` command by @crazy-max in #1758 #1759
+* New containerd provider by @crazy-max in #1754
+* Support multiple Nomad namespaces by @crazy-max in #1755
+* Added proxy support for HTTP notifiers by @crazy-max in #1751
+* Added Teams workflow webhook card support by @crazy-max in #1757
+* Skip generated artifact tags during registry checks by @crazy-max in #1745
+* Skip non-image artifacts during registry checks by @crazy-max in #1746
+* Fix mail notifications with strict SMTP relays by @crazy-max in #1753
+* Document global proxy configuration by @crazy-max in #1752
+* Preserve logrus fields in zerolog output by @crazy-max in #1749
+
+**Full Changelog**: https://github.com/crazy-max/diun/compare/v4.32.0...v4.33.0
+
 ## 4.32.0 (2026/05/28)
 
 * Added an optional Prometheus metrics endpoint by @crazy-max in #1744
