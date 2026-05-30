@@ -21,6 +21,7 @@ env:
   BUILD_TAG: 'diun:local'
   CONTAINER_NAME: 'diun'
   DOCKER_BUILD_SUMMARY: false
+  NOMAD_IMAGE: 'hashicorp/nomad:2.0.2@sha256:5eed30ce9cdde08f8761eb05a71e1aa3d81413f1e9e24bd088ec92cf8b8c61ba'
 
 jobs:
   e2e:
@@ -158,6 +159,74 @@ jobs:
             sudo ctr --namespace diun-e2e tasks rm --force diun-e2e-busybox > /dev/null 2>&1 || true
             sudo ctr --namespace diun-e2e containers rm diun-e2e-busybox > /dev/null 2>&1 || true
           fi
+
+  nomad:
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@d7f5e7f509e45cec5c76c4d5afdd7de93d0b3df5 # v4.1.0
+      -
+        name: Build
+        uses: docker/bake-action@6614cfa25eff9a0b2b2697efb0b6159e7680d584 # v7.2.0
+        with:
+          source: .
+          targets: image-local
+      -
+        name: Start Nomad fixture
+        run: |
+          docker network create diun-e2e-nomad
+          docker run -d --name nomad \
+            --network diun-e2e-nomad \
+            --network-alias nomad \
+            -v $(pwd)/test/nomad1:/fixtures:ro \
+            -e "NOMAD_SKIP_DOCKER_IMAGE_WARN=1" \
+            ${{ env.NOMAD_IMAGE }} \
+            agent "-config=/fixtures/nomad.hcl"
+          for i in {1..30}; do
+            if docker exec nomad nomad status > /dev/null 2>&1; then
+              break
+            fi
+            if [ "$i" -eq 30 ]; then
+              docker logs nomad
+              exit 1
+            fi
+            sleep 2
+          done
+          docker exec nomad nomad job run -detach /fixtures/job.nomad.hcl
+          docker exec nomad nomad job status diun-e2e
+      -
+        name: Start container
+        run: |
+          docker run -d --name ${{ env.CONTAINER_NAME }} \
+            --network diun-e2e-nomad \
+            -v $(pwd)/test/nomad1/diun.yml:/diun.yml:ro \
+            -e "TZ=Europe/Paris" \
+            -e "LOG_LEVEL=debug" \
+            ${{ env.BUILD_TAG }}
+      -
+        name: Check container logs
+        uses: crazy-max/.github/.github/actions/container-logs-check@bbd31df64ee0f097a02f12495f541f9236f18c46 # v1.2.0
+        with:
+          container_name: ${{ env.CONTAINER_NAME }}
+          log_check: "Next run in"
+          timeout: 240
+      -
+        name: List images in db
+        run: |
+          docker exec ${{ env.CONTAINER_NAME }} diun image list --raw | tee /tmp/diun-nomad-images.json
+          jq -e '.images[] | select(.name == "docker.io/library/busybox" and .latest.tag == "1.36.1")' /tmp/diun-nomad-images.json
+      -
+        name: Container logs
+        if: always()
+        run: |
+          docker logs ${{ env.CONTAINER_NAME }}
+          docker logs nomad
+          docker rm -f ${{ env.CONTAINER_NAME }} nomad > /dev/null 2>&1 || true
+          docker network rm diun-e2e-nomad > /dev/null 2>&1 || true
 
   metrics:
     runs-on: ubuntu-latest
