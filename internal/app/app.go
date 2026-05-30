@@ -164,12 +164,16 @@ func (di *Diun) Start(ctx context.Context) error {
 		}()
 	}
 
+	if len(di.cfg.Watch.Schedule) > 0 {
+		di.grpc.SetHealthStatus(grpc.HealthServiceScheduler, healthpb.HealthCheckResponse_SERVING)
+	}
+	di.grpc.SetHealthStatus("", healthpb.HealthCheckResponse_SERVING)
+
 	if *di.cfg.Watch.RunOnStartup {
 		di.Run()
 	}
 
 	if len(di.cfg.Watch.Schedule) == 0 {
-		di.grpc.SetHealthStatus("", healthpb.HealthCheckResponse_SERVING)
 		return nil
 	}
 	di.jobID, err = di.cron.AddJobWithJitter(di.cfg.Watch.Schedule, di, *di.cfg.Watch.Jitter)
@@ -179,8 +183,6 @@ func (di *Diun) Start(ctx context.Context) error {
 	log.Info().Msgf("Cron initialized with schedule %s", di.cfg.Watch.Schedule)
 
 	di.cron.Start()
-	di.grpc.SetHealthStatus(grpc.HealthServiceScheduler, healthpb.HealthCheckResponse_SERVING)
-	di.grpc.SetHealthStatus("", healthpb.HealthCheckResponse_SERVING)
 	log.Info().Msgf("Next run in %s (%s)",
 		carbon.CreateFromStdTime(di.cron.Entry(di.jobID).Next).DiffAbsInString(),
 		di.cron.Entry(di.jobID).Next)
