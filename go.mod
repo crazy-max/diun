@@ -19,7 +19,7 @@ require (
 	github.com/docker/go-units v0.5.0
 	github.com/dromara/carbon/v2 v2.6.16
 	github.com/eclipse/paho.mqtt.golang v1.5.1
-	github.com/go-playground/validator/v10 v10.30.2
+	github.com/go-playground/validator/v10 v10.30.3
 	github.com/hashicorp/nomad/api v0.0.0-20260522124601-26ed559e8bc8 // v2.0.2
 	github.com/jedib0t/go-pretty/v6 v6.7.10
 	github.com/matcornic/hermes/v2 v2.1.0
@@ -157,7 +157,7 @@ require (
 	go.podman.io/storage v1.63.0 // indirect
 	go.yaml.in/yaml/v2 v2.4.3 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
-	golang.org/x/crypto v0.51.0 // indirect
+	golang.org/x/crypto v0.52.0 // indirect
 	golang.org/x/exp v0.0.0-20260508232706-74f9aab9d74a // indirect
 	golang.org/x/net v0.54.0 // indirect
 	golang.org/x/oauth2 v0.36.0 // indirect
