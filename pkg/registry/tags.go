@@ -13,15 +13,29 @@ import (
 	"golang.org/x/mod/semver"
 )
 
+// normalizeSemver strips non-numeric leading characters and returns a valid
+// semver string (with "v" prefix), or an empty string if the tag cannot be
+// interpreted as semver.
+func normalizeSemver(tag string) string {
+	s := strings.TrimLeftFunc(tag, func(r rune) bool {
+		return !unicode.IsNumber(r)
+	})
+	if vt := fmt.Sprintf("v%s", s); semver.IsValid(vt) {
+		return vt
+	}
+	return ""
+}
+
 var generatedArtifactTagRe = regexp.MustCompile(`^sha256-[a-f0-9]{64}(?:\.(?:att|sbom|sig))?$`)
 
 // Tags holds information about image tags.
 type Tags struct {
-	List        []string
-	NotIncluded int
-	Excluded    int
-	Artifacts   int
-	Total       int
+	List         []string
+	NotIncluded  int
+	Excluded     int
+	Artifacts    int
+	OlderOrEqual int
+	Total        int
 }
 
 // TagsOptions holds docker tags image options
@@ -31,6 +45,12 @@ type TagsOptions struct {
 	Sort    SortTag
 	Include []string
 	Exclude []string
+	// MinSemver, when non-empty, restricts the list to tags whose semver is
+	// strictly greater than this value.  Non-semver tags are silently dropped.
+	MinSemver string
+	// IncludePrereleases controls whether pre-release tags (e.g. -rc.1, -alpha)
+	// are kept when MinSemver filtering is active.
+	IncludePrereleases bool
 }
 
 // Tags returns tags of a Docker repository
@@ -57,6 +77,9 @@ func (c *Client) Tags(opts TagsOptions) (*Tags, error) {
 	// Sort tags
 	tags = SortTags(tags, opts.Sort)
 
+	// Resolve minimum semver once (empty string means no filtering)
+	minSemver := normalizeSemver(opts.MinSemver)
+
 	// Filter
 	for _, tag := range tags {
 		if generatedArtifactTagRe.MatchString(tag) {
@@ -69,6 +92,24 @@ func (c *Client) Tags(opts TagsOptions) (*Tags, error) {
 			res.Excluded++
 			continue
 		}
+
+		if minSemver != "" {
+			tagSemver := normalizeSemver(tag)
+			if tagSemver == "" {
+				// Not a semver tag — skip when newer-only mode is active
+				res.OlderOrEqual++
+				continue
+			}
+			if !opts.IncludePrereleases && semver.Prerelease(tagSemver) != "" {
+				res.OlderOrEqual++
+				continue
+			}
+			if semver.Compare(tagSemver, minSemver) <= 0 {
+				res.OlderOrEqual++
+				continue
+			}
+		}
+
 		res.List = append(res.List, tag)
 	}
 
