@@ -1,5 +1,34 @@
 # Changelog
 
+## [v1.12.0](https://github.com/rabbitmq/amqp091-go/tree/v1.12.0) (2026-06-16)
+
+[Full Changelog](https://github.com/rabbitmq/amqp091-go/compare/v1.11.0...v1.12.0)
+
+**Implemented enhancements:**
+
+- Feature: implement automatic connection and channel recovery with state change notifications [\#339](https://github.com/rabbitmq/amqp091-go/pull/339) ([suchitd](https://github.com/suchitd))
+- Add integration test for publish with immediate flag [\#338](https://github.com/rabbitmq/amqp091-go/pull/338) ([suchitd](https://github.com/suchitd))
+- Add integration tests for QueueUnbind and QueuePurge [\#337](https://github.com/rabbitmq/amqp091-go/pull/337) ([suchitd](https://github.com/suchitd))
+- Add integration test for exchange-to-exchange binding and unbinding [\#336](https://github.com/rabbitmq/amqp091-go/pull/336) ([suchitd](https://github.com/suchitd))
+
+**Fixed bugs:**
+
+- Fix Client example to work with RabbitMQ 4.3 [\#341](https://github.com/rabbitmq/amqp091-go/pull/341) ([suchitd](https://github.com/suchitd))
+- Update CONTRIBUTING.md and .gitignore files [\#335](https://github.com/rabbitmq/amqp091-go/pull/335) ([suchitd](https://github.com/suchitd))
+- Fix inconsistencies in the Makefile [\#334](https://github.com/rabbitmq/amqp091-go/pull/334) ([suchitd](https://github.com/suchitd))
+- Fix integration tests for RabbitMQ 4.3 [\#331](https://github.com/rabbitmq/amqp091-go/pull/331) ([suchitd](https://github.com/suchitd))
+
+**Closed issues:**
+
+- PublishWithContext does not respect context cancellation [\#329](https://github.com/rabbitmq/amqp091-go/issues/329)
+
+**Merged pull requests:**
+
+- doc: remove auto-reconnect from non-goals in README [\#343](https://github.com/rabbitmq/amqp091-go/pull/343) ([suchitd](https://github.com/suchitd))
+- Add CLAUDE.md to repo [\#342](https://github.com/rabbitmq/amqp091-go/pull/342) ([Zerpet](https://github.com/Zerpet))
+- Bump CI windows workflow RabbitMQ and Erlang versions [\#333](https://github.com/rabbitmq/amqp091-go/pull/333) ([suchitd](https://github.com/suchitd))
+- Add pull request template [\#332](https://github.com/rabbitmq/amqp091-go/pull/332) ([suchitd](https://github.com/suchitd))
+
 ## [v1.11.0](https://github.com/rabbitmq/amqp091-go/tree/v1.11.0) (2026-04-21)
 
 [Full Changelog](https://github.com/rabbitmq/amqp091-go/compare/v1.10.0...v1.11.0)
