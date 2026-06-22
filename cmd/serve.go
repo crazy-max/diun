@@ -25,6 +25,7 @@ type ServeCmd struct {
 	LogJSON       bool   `name:"log-json" env:"LOG_JSON" default:"false" help:"Enable JSON logging output.'"`
 	LogCaller     bool   `name:"log-caller" env:"LOG_CALLER" default:"false" help:"Add file:line of the caller to log output."`
 	LogNoColor    bool   `name:"log-nocolor" env:"LOG_NOCOLOR" default:"false" help:"Disables the colorized output."`
+	LogTimestamp  bool   `name:"log-timestamp" env:"LOG_TIMESTAMP" default:"true" help:"Logs the timestamp in log output"`
 	GRPCAuthority string `name:"grpc-authority" env:"GRPC_AUTHORITY" default:":42286" help:"Address used to expose the gRPC server."`
 }
 
@@ -33,10 +34,11 @@ func (s *ServeCmd) Run(ctx *Context) error {
 	defer stop()
 
 	logging.Configure(logging.Options{
-		LogLevel:   s.LogLevel,
-		LogJSON:    s.LogJSON,
-		LogCaller:  s.LogCaller,
-		LogNoColor: s.LogNoColor,
+		LogLevel:     s.LogLevel,
+		LogJSON:      s.LogJSON,
+		LogCaller:    s.LogCaller,
+		LogNoColor:   s.LogNoColor,
+		LogTimestamp: s.LogTimestamp,
 	})
 	log.Info().Str("version", version).Msgf("Starting %s", ctx.Meta.Name)
 

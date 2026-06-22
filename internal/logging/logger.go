@@ -12,10 +12,11 @@ import (
 )
 
 type Options struct {
-	LogLevel   string
-	LogJSON    bool
-	LogCaller  bool
-	LogNoColor bool
+	LogLevel     string
+	LogJSON      bool
+	LogCaller    bool
+	LogNoColor   bool
+	LogTimestamp bool
 }
 
 // Configure configures logger
@@ -36,7 +37,12 @@ func Configure(opts Options) {
 		w = os.Stdout
 	}
 
-	ctx := zerolog.New(w).With().Timestamp()
+	var ctx zerolog.Context
+	if opts.LogTimestamp {
+		ctx = zerolog.New(w).With().Timestamp()
+	} else {
+		ctx = zerolog.New(w).With()
+	}
 	if opts.LogCaller {
 		ctx = ctx.Caller()
 	}
