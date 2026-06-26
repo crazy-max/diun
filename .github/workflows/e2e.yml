@@ -88,7 +88,7 @@ jobs:
             ${{ env.BUILD_TAG }}
       -
         name: Check container logs
-        uses: crazy-max/.github/.github/actions/container-logs-check@bbd31df64ee0f097a02f12495f541f9236f18c46 # v1.2.0
+        uses: crazy-max/.github/.github/actions/container-logs-check@46267a6e61cd56aac2fc79943df180152f4c89d6 # v1.10.1
         with:
           container_name: ${{ env.CONTAINER_NAME }}
           log_check: "Next run in"
@@ -152,7 +152,7 @@ jobs:
             ${{ env.BUILD_TAG }}
       -
         name: Check container logs
-        uses: crazy-max/.github/.github/actions/container-logs-check@bbd31df64ee0f097a02f12495f541f9236f18c46 # v1.2.0
+        uses: crazy-max/.github/.github/actions/container-logs-check@46267a6e61cd56aac2fc79943df180152f4c89d6 # v1.10.1
         with:
           container_name: ${{ env.CONTAINER_NAME }}
           log_check: "Next run in"
@@ -232,7 +232,7 @@ jobs:
             ${{ env.BUILD_TAG }}
       -
         name: Check container logs
-        uses: crazy-max/.github/.github/actions/container-logs-check@bbd31df64ee0f097a02f12495f541f9236f18c46 # v1.2.0
+        uses: crazy-max/.github/.github/actions/container-logs-check@46267a6e61cd56aac2fc79943df180152f4c89d6 # v1.10.1
         with:
           container_name: ${{ env.CONTAINER_NAME }}
           log_check: "Next run in"
@@ -287,7 +287,7 @@ jobs:
             ${{ env.BUILD_TAG }}
       -
         name: Check container logs
-        uses: crazy-max/.github/.github/actions/container-logs-check@bbd31df64ee0f097a02f12495f541f9236f18c46 # v1.2.0
+        uses: crazy-max/.github/.github/actions/container-logs-check@46267a6e61cd56aac2fc79943df180152f4c89d6 # v1.10.1
         with:
           container_name: ${{ env.CONTAINER_NAME }}
           log_check: "Next run in"
