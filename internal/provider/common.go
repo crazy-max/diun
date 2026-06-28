@@ -2,6 +2,7 @@ package provider
 
 import (
 	"regexp"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -17,6 +18,19 @@ var (
 	metadataKeyRegexp = regexp.MustCompile(`^[` + metadataKeyChars + `]+$`)
 )
 
+// MergeTags merges image-level tag filters over default tag filters.
+func MergeTags(defaultTags, imageTags []string) []string {
+	tags := slices.Concat(defaultTags, imageTags)
+	seen := make(map[string]struct{}, len(tags))
+	return slices.DeleteFunc(tags, func(tag string) bool {
+		if _, ok := seen[tag]; ok {
+			return true
+		}
+		seen[tag] = struct{}{}
+		return false
+	})
+}
+
 // ValidateImage returns a standard image through Docker labels
 func ValidateImage(image string, metadata, labels map[string]string, watchByDef bool, defaults *model.Defaults) (img model.Image, err error) {
 	img = model.Image{
@@ -28,8 +42,8 @@ func ValidateImage(image string, metadata, labels map[string]string, watchByDef 
 		img.NotifyOn = defaults.NotifyOn
 		img.MaxTags = defaults.MaxTags
 		img.SortTags = defaults.SortTags
-		img.IncludeTags = defaults.IncludeTags
-		img.ExcludeTags = defaults.ExcludeTags
+		img.IncludeTags = MergeTags(defaults.IncludeTags, nil)
+		img.ExcludeTags = MergeTags(defaults.ExcludeTags, nil)
 		img.Metadata = defaults.Metadata
 	}
 
@@ -81,9 +95,9 @@ func ValidateImage(image string, metadata, labels map[string]string, watchByDef 
 				return img, errors.Wrapf(err, "cannot parse %q value of label %s", value, key)
 			}
 		case key == "diun.include_tags":
-			img.IncludeTags = strings.Split(value, ";")
+			img.IncludeTags = MergeTags(img.IncludeTags, strings.Split(value, ";"))
 		case key == "diun.exclude_tags":
-			img.ExcludeTags = strings.Split(value, ";")
+			img.ExcludeTags = MergeTags(img.ExcludeTags, strings.Split(value, ";"))
 		case key == "diun.hub_tpl":
 			img.HubTpl = value
 		case key == "diun.hub_link":
