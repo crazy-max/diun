@@ -263,6 +263,15 @@ func StringWidth(str string) int {
 //	StringWidthWithoutEscSequences("Ghost 生命"): 10
 //	StringWidthWithoutEscSequences("\x1b[33mGhost 生命\x1b[0m"): 10
 func StringWidthWithoutEscSequences(str string) int {
+	// fast-path the common case of a string without escape sequences
+	if !strings.ContainsRune(str, EscapeStartRune) {
+		count := 0
+		for _, c := range str {
+			count += RuneWidth(c)
+		}
+		return count
+	}
+
 	count, esp := 0, EscSeqParser{}
 	for _, c := range str {
 		if esp.InSequence() {

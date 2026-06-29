@@ -812,6 +812,13 @@ func (t *Table) isIndexColumn(colIdx int, hint renderHint) bool {
 	return t.indexColumn == colIdx+1 || hint.isAutoIndexColumn
 }
 
+// estimatedRenderLength approximates the rendered output size, to pre-size
+// the output builder and avoid repeated re-allocations while rendering.
+func (t *Table) estimatedRenderLength() int {
+	numRows := len(t.rows) + len(t.rowsHeader) + len(t.rowsFooter) + 1
+	return numRows * (t.maxRowLength + 1)
+}
+
 func (t *Table) render(out *strings.Builder) string {
 	outStr := out.String()
 	if t.suppressTrailingSpaces {
