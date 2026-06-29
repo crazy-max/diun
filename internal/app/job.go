@@ -65,9 +65,11 @@ func (di *Diun) createJob(job model.Job) {
 
 	// Set defaults
 	if err := mergo.Merge(&job.Image, model.Image{
-		Platform:  model.ImagePlatform{},
-		WatchRepo: new(false),
-		MaxTags:   0,
+		Platform:           model.ImagePlatform{},
+		WatchRepo:          new(false),
+		WatchNewerOnly:     new(false),
+		IncludePrereleases: new(false),
+		MaxTags:            0,
 	}); err != nil {
 		sublog.Error().Err(err).Msg("Cannot set default values")
 		return
@@ -125,25 +127,31 @@ func (di *Diun) createJob(job model.Job) {
 		return
 	}
 
-	tags, err := job.Registry.Tags(registry.TagsOptions{
+	tagsOpts := registry.TagsOptions{
 		Image:   job.RegImage,
 		Max:     job.Image.MaxTags,
 		Sort:    job.Image.SortTags,
 		Include: job.Image.IncludeTags,
 		Exclude: job.Image.ExcludeTags,
-	})
+	}
+	if *job.Image.WatchNewerOnly {
+		tagsOpts.MinSemver = prvImage.Tag
+		tagsOpts.IncludePrereleases = *job.Image.IncludePrereleases
+	}
+	tags, err := job.Registry.Tags(tagsOpts)
 	if err != nil {
 		sublog.Error().Err(err).Msg("Cannot list tags from registry")
 		return
 	}
 
-	log.Debug().Str("image", job.RegImage.String()).Msgf("%d tag(s) found in repository. %d will be analyzed (%d max, %d not included, %d excluded, %d artifact tags).",
+	log.Debug().Str("image", job.RegImage.String()).Msgf("%d tag(s) found in repository. %d will be analyzed (%d max, %d not included, %d excluded, %d artifact tags, %d older-or-equal).",
 		tags.Total,
 		len(tags.List),
 		job.Image.MaxTags,
 		tags.NotIncluded,
 		tags.Excluded,
 		tags.Artifacts,
+		tags.OlderOrEqual,
 	)
 
 	for _, tag := range tags.List {
