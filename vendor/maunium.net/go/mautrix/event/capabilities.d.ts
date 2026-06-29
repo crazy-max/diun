@@ -58,6 +58,12 @@ export interface RoomFeatures {
 	delete_max_age?: seconds
 	/** Whether deleting messages just for yourself is supported. No message age limit. */
 	delete_for_me?: boolean
+	/**
+	 * Whether outgoing redactions should set the `com.beeper.dont_render_redacted_placeholder` field to indicate
+	 * clients shouldn't render them in the timeline. Incoming redactions can just read the field and don't need to
+	 * care about this capability flag.
+	 */
+	delete_hide_placeholder?: boolean
 	/** Allowed configuration options for disappearing timers. */
 	disappearing_timer?: DisappearingTimerCapability
 
