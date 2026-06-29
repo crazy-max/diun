@@ -12,6 +12,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"math/rand"
 	"net"
 	"os"
 	"reflect"
@@ -28,7 +29,7 @@ const (
 	defaultHeartbeat         = 10 * time.Second
 	defaultConnectionTimeout = 30 * time.Second
 	defaultProduct           = "AMQP 0.9.1 Client"
-	buildVersion             = "1.11.0"
+	buildVersion             = "1.12.0"
 	platform                 = "golang"
 	// Safer default that makes channel leaks a lot easier to spot
 	// before they create operational headaches. See https://github.com/rabbitmq/rabbitmq-server/issues/1593.
@@ -74,6 +75,23 @@ type Config struct {
 	// If Dial is nil, net.DialTimeout with a 30s connection and 30s deadline is
 	// used during TLS and AMQP handshaking.
 	Dial func(network, addr string) (net.Conn, error)
+
+	// Recovery configuration for automatic reconnection.
+	//
+	// Experimental: This is an experimental feature and may be subject to API or
+	// behavioral changes in future releases.
+	//
+	// When a network failure occurs, the connection and all its channels will automatically
+	// attempt to reconnect based on the parameters specified in the Recovery configuration.
+	//
+	// If Recovery is nil, automatic reconnection is disabled.
+	// If Recovery.ReconnectionConfig is nil, a default reconnection configuration (DefaultReconnectionConfig) is used.
+	// If Recovery.ConnectionRecovery is nil, a default connection recovery implementation (DefaultConnectionRecovery) is used.
+	//
+	// During the recovery process, applications can monitor state changes (such as reconnecting
+	// or closed) by registering a listener using `Connection.NotifyStateChange` and
+	// `Channel.NotifyStateChange`.
+	Recovery *Recovery
 }
 
 // NewConnectionProperties creates an amqp.Table to be used as amqp.Config.Properties.
@@ -93,10 +111,13 @@ func NewConnectionProperties() Table {
 // multiplexed on this channel.  There must always be active receivers for
 // every asynchronous message on this connection.
 type Connection struct {
-	destructor sync.Once  // teardown: notify listeners, close channels and the socket
-	closeOnce  sync.Once  // handshake: send one `connection.close` frame
-	sendM      sync.Mutex // conn writer mutex
-	m          sync.Mutex // struct field mutex
+	destructorM         sync.Mutex // Mutex for connection teardown: notifying close/block listeners, closing channels, and closing the underlying socket
+	destructed          bool       // true when the connection has been destructed (teardown is initiated or completed)
+	closeM              sync.Mutex // Mutex for connection close handshake: sending a single connection.close frame to the broker
+	closeInit           bool       // true when a connection close has been initiated (connection.close frame has been or is being sent)
+	sendM               sync.Mutex // conn writer mutex
+	m                   sync.Mutex // struct field mutex
+	recoveryErrorCodesM sync.Mutex // Mutex for protecting RecoverableErrorCodes updates and reads
 
 	conn io.ReadWriteCloser
 
@@ -118,12 +139,19 @@ type Connection struct {
 
 	Config Config // The negotiated Config after connection.open
 
+	url string // Connection URL stored for recovery
+
 	Major      int      // Server's major version
 	Minor      int      // Server's minor version
 	Properties Table    // Server properties
 	Locales    []string // Server locales
 
 	closed atomic.Bool // Will be true if the connection is closed, false otherwise.
+
+	reconnecting sync.Mutex // Mutex for protecting reconnect/recovery operations to ensure serialization and prevent race conditions.
+	lifeCycle    *lifeCycle // The current state of the connection.
+
+	recoveryCancels []chan struct{} // listeners for connection recovery cancellation
 }
 
 type readDeadliner interface {
@@ -205,6 +233,10 @@ func DialConfig(url string, config Config) (*Connection, error) {
 		return nil, err
 	}
 
+	if config.Locale == "" {
+		config.Locale = defaultLocale
+	}
+
 	if config.SASL == nil {
 		if uri.AuthMechanism != nil {
 			for _, identifier := range uri.AuthMechanism {
@@ -281,7 +313,24 @@ func DialConfig(url string, config Config) (*Connection, error) {
 		conn = client
 	}
 
-	return Open(conn, config)
+	if config.Recovery != nil {
+		if config.Recovery.ReconnectionConfig == nil {
+			config.Recovery.ReconnectionConfig = DefaultReconnectionConfig.Clone()
+		} else if config.Recovery.ReconnectionConfig.RecoverableErrorCodes == nil {
+			config.Recovery.ReconnectionConfig.RecoverableErrorCodes = cloneRecoverableErrorCodes(defaultRecoverableErrorCodes)
+		}
+		if config.Recovery.ConnectionRecovery == nil {
+			config.Recovery.ConnectionRecovery = &DefaultConnectionRecovery{}
+		}
+	}
+
+	c, err := Open(conn, config)
+	if c != nil && c.IsRecoveryEnabled() {
+		c.url = url
+		c.watchConnection()
+	}
+
+	return c, err
 }
 
 /*
@@ -299,9 +348,15 @@ func Open(conn io.ReadWriteCloser, config Config) (*Connection, error) {
 		errors:    make(chan *Error, 1),
 		close:     make(chan struct{}),
 		deadlines: make(chan readDeadliner, 1),
+		Config:    config,
+		lifeCycle: newLifeCycle(),
 	}
 	go c.reader(conn)
-	return c, c.open(config)
+	err := c.open(config)
+	if err == nil {
+		c.lifeCycle.SetState(StateOpen, nil)
+	}
+	return c, err
 }
 
 /*
@@ -357,6 +412,14 @@ func (c *Connection) ConnectionState() tls.ConnectionState {
 	return tls.ConnectionState{}
 }
 
+// NotifyStateChange registers a listener for state changes.
+//
+// It is necessary to continuously consume from the channel passed to NotifyStateChange
+// to avoid blocking internal state dispatch routines and leaking goroutines.
+func (c *Connection) NotifyStateChange(ch chan *StateChanged) {
+	c.lifeCycle.notifyStateChange(ch)
+}
+
 /*
 NotifyClose registers a listener for close events either initiated by an error
 accompanying a connection.close method or by a normal shutdown.
@@ -381,6 +444,40 @@ func (c *Connection) NotifyClose(receiver chan *Error) chan *Error {
 	}
 
 	return receiver
+}
+
+/*
+NotifyRecoveryCancel registers a listener that is notified (via a channel close)
+when connection recovery has been canceled or aborted (for example, when Close()
+or CloseDeadline() is called during an active reconnect process).
+
+The returned channel will be closed immediately if the connection is already closing
+or closed, or when Close() is called.
+*/
+func (c *Connection) NotifyRecoveryCancel(receiver chan struct{}) chan struct{} {
+	c.m.Lock()
+	defer c.m.Unlock()
+
+	state := c.lifeCycle.State()
+	if state == StateClosing || state == StateClosed {
+		close(receiver)
+	} else {
+		c.recoveryCancels = append(c.recoveryCancels, receiver)
+	}
+
+	return receiver
+}
+
+// closeRecovery stops any active connection recovery process by notifying
+// and closing all recovery cancellation listeners.
+func (c *Connection) closeRecovery() {
+	c.m.Lock()
+	defer c.m.Unlock()
+
+	for _, listener := range c.recoveryCancels {
+		close(listener)
+	}
+	c.recoveryCancels = nil
 }
 
 /*
@@ -420,14 +517,25 @@ including the underlying io, Channels, Notify listeners and Channel consumers
 will also be closed.
 */
 func (c *Connection) Close() error {
+	c.closeRecovery() // Stop any active recovery process
+
 	if c.IsClosed() {
 		return ErrClosed
 	}
 
+	c.lifeCycle.SetState(StateClosing, nil)
+
 	var handshakeErr error
 	var initiated bool
-	c.closeOnce.Do(func() {
+
+	c.closeM.Lock()
+	if !c.closeInit {
+		c.closeInit = true
 		initiated = true
+	}
+	c.closeM.Unlock()
+
+	if initiated {
 		defer c.shutdown(nil)
 		handshakeErr = c.call(
 			&connectionClose{
@@ -436,7 +544,7 @@ func (c *Connection) Close() error {
 			},
 			&connectionCloseOk{},
 		)
-	})
+	}
 	if !initiated {
 		return ErrClosed
 	}
@@ -457,18 +565,26 @@ func (c *Connection) Close() error {
 // including the underlying io, Channels, Notify listeners and Channel consumers
 // will also be closed.
 func (c *Connection) CloseDeadline(deadline time.Time) error {
+	c.closeRecovery() // Stop any active recovery process
+
 	if c.IsClosed() {
 		return ErrClosed
 	}
 
 	var handshakeErr error
 	var initiated bool
-	c.closeOnce.Do(func() {
+
+	c.closeM.Lock()
+	if !c.closeInit {
+		c.closeInit = true
 		initiated = true
+	}
+	c.closeM.Unlock()
+
+	if initiated {
 		defer c.shutdown(nil)
 		if err := c.setDeadline(deadline); err != nil {
-			handshakeErr = err
-			return
+			return err
 		}
 		handshakeErr = c.call(
 			&connectionClose{
@@ -477,7 +593,7 @@ func (c *Connection) CloseDeadline(deadline time.Time) error {
 			},
 			&connectionCloseOk{},
 		)
-	})
+	}
 	if !initiated {
 		return ErrClosed
 	}
@@ -491,8 +607,15 @@ func (c *Connection) closeWith(err *Error) error {
 
 	var handshakeErr error
 	var initiated bool
-	c.closeOnce.Do(func() {
+
+	c.closeM.Lock()
+	if !c.closeInit {
+		c.closeInit = true
 		initiated = true
+	}
+	c.closeM.Unlock()
+
+	if initiated {
 		defer c.shutdown(err)
 		handshakeErr = c.call(
 			&connectionClose{
@@ -501,7 +624,7 @@ func (c *Connection) closeWith(err *Error) error {
 			},
 			&connectionCloseOk{},
 		)
-	})
+	}
 	if !initiated {
 		return ErrClosed
 	}
@@ -625,44 +748,79 @@ func (c *Connection) flush() (err error) {
 func (c *Connection) shutdown(err *Error) {
 	c.closed.Store(true)
 
-	c.destructor.Do(func() {
-		c.m.Lock()
-		defer c.m.Unlock()
+	c.destructorM.Lock()
+	if c.destructed {
+		c.destructorM.Unlock()
+		return
+	}
+	c.destructed = true
+	defer c.destructorM.Unlock()
 
-		if err != nil {
-			for _, c := range c.closes {
-				c <- err
+	c.m.Lock()
+	defer c.m.Unlock()
+
+	if err != nil {
+		for _, listener := range c.closes {
+			select {
+			case listener <- err:
+			default:
+				// If blocked/full, send in a goroutine so we never deadlock the shutdown sequence
+				go func(listener chan *Error, err *Error) {
+					defer func() {
+						_ = recover() // Gracefully ignore panics if the channel is closed concurrently
+					}()
+					select {
+					case listener <- err:
+					case <-time.After(5 * time.Second):
+						// Give up to avoid leaking the goroutine permanently
+					}
+				}(listener, err)
 			}
-			c.errors <- err
-		}
-		// Shutdown handler goroutine can still receive the result.
-		close(c.errors)
-
-		for _, c := range c.closes {
-			close(c)
 		}
 
-		for _, c := range c.blocks {
-			close(c)
+		select {
+		case c.errors <- err:
+		default:
+		}
+	}
+
+	// Shutdown handler goroutine can still receive the result.
+	close(c.errors)
+
+	if err == nil || !c.IsRecoveryEnabled() || !c.isRecoverable(err) {
+		for _, listener := range c.closes {
+			close(listener)
 		}
 
-		// Shutdown the channel, but do not use closeChannel() as it calls
-		// releaseChannel() which requires the connection lock.
-		//
-		// Ranging over c.channels and calling releaseChannel() that mutates
-		// c.channels is racy - see commit 6063341 for an example.
-		for _, ch := range c.channels {
-			ch.shutdown(err)
+		for _, block := range c.blocks {
+			close(block)
 		}
+	}
 
-		c.conn.Close()
-		// reader exit
-		close(c.close)
+	// Shutdown the channel, but do not use closeChannel() as it calls
+	// releaseChannel() which requires the connection lock.
+	//
+	// Ranging over c.channels and calling releaseChannel() that mutates
+	// c.channels is racy - see commit 6063341 for an example.
+	for _, ch := range c.channels {
+		ch.shutdown(err)
+	}
 
+	c.conn.Close()
+	// reader exit
+	close(c.close)
+
+	if err == nil || !c.IsRecoveryEnabled() || !c.isRecoverable(err) {
 		c.channels = nil
 		c.allocator = nil
 		c.noNotify = true
-	})
+
+		var e error
+		if err != nil {
+			e = fmt.Errorf("%w", err) // preserve the original error type for assertions
+		}
+		c.lifeCycle.SetState(StateClosed, e)
+	}
 }
 
 // All methods sent to the connection channel should be synchronous so we
@@ -799,7 +957,7 @@ func (c *Connection) reader(r io.Reader) {
 
 // Ensures that at least one frame is being sent at the tuned interval with a
 // jitter tolerance of 1s
-func (c *Connection) heartbeater(interval time.Duration, done chan *Error) {
+func (c *Connection) heartbeater(interval time.Duration, done chan struct{}) {
 	const maxServerHeartbeatsInFlight = 3
 
 	var sendTicks <-chan time.Time
@@ -907,6 +1065,13 @@ func (c *Connection) openChannel() (*Channel, error) {
 		c.releaseChannel(ch)
 		return nil, err
 	}
+
+	ch.lifeCycle.SetState(StateOpen, nil)
+
+	if c.IsRecoveryEnabled() {
+		ch.watchChannel()
+	}
+
 	return ch, nil
 }
 
@@ -1056,6 +1221,11 @@ func (c *Connection) openTune(config Config, auth Authentication) error {
 	c.Config.ChannelMax = minUInt16(c.Config.ChannelMax, maxChannelMax)
 
 	c.allocator = newAllocator(1, int(c.Config.ChannelMax))
+	// Reserve all the channels that are already open
+	// This is to avoid allocating the same channel ID after a reconnection
+	for id := range c.channels {
+		c.allocator.reserve(int(id))
+	}
 
 	c.m.Unlock()
 
@@ -1071,7 +1241,7 @@ func (c *Connection) openTune(config Config, auth Authentication) error {
 
 	// "The client should start sending heartbeats after receiving a
 	// Connection.Tune method"
-	go c.heartbeater(c.Config.Heartbeat/2, c.NotifyClose(make(chan *Error, 1)))
+	go c.heartbeater(c.Config.Heartbeat/2, c.close)
 
 	if err := c.send(&methodFrame{
 		ChannelId: 0,
@@ -1196,4 +1366,279 @@ func pick(client, server int) int {
 		return max(client, server)
 	}
 	return min(client, server)
+}
+
+// cleanup releases registered resources and performs final teardown of the connection.
+func (c *Connection) cleanup() {
+	c.m.Lock()
+	defer c.m.Unlock()
+
+	for _, listener := range c.closes {
+		close(listener)
+	}
+
+	for _, block := range c.blocks {
+		close(block)
+	}
+
+	for _, ch := range c.channels {
+		ch.cleanup()
+	}
+
+	for _, listener := range c.recoveryCancels {
+		close(listener)
+	}
+
+	c.recoveryCancels = nil
+	c.channels = nil
+	c.allocator = nil
+	c.noNotify = true
+}
+
+// watchConnection watches the connection for close events and triggers recovery if needed.
+func (c *Connection) watchConnection() {
+	errCh := c.NotifyClose(make(chan *Error, 1))
+	go func() {
+		for err := range errCh {
+			if err != nil {
+				Logger.Printf("Connection closed unexpectedly: %v", err)
+				if c.Config.Recovery != nil && c.Config.Recovery.ConnectionRecovery != nil {
+					c.Config.Recovery.ConnectionRecovery.OnConnectionClose(c, err)
+				}
+			}
+		}
+	}()
+}
+
+// Reconnect establishes a new socket connection, replaces the existing closed/closing connection,
+// and recovers both connection and channel states.
+// It performs a retry loop to dial the broker, negotiate the AMQP handshake, and recover all
+// active channels and their registered consumers sequentially.
+func (c *Connection) Reconnect() error {
+	if !c.IsRecoveryEnabled() {
+		return ErrClosed
+	}
+
+	c.reconnecting.Lock()
+	defer c.reconnecting.Unlock()
+
+	if !c.IsClosed() {
+		return nil
+	}
+
+	c.lifeCycle.SetState(StateReconnecting, nil)
+
+	cancelCh := c.NotifyRecoveryCancel(make(chan struct{}))
+
+	var err error
+	for i := 0; i < c.MaxRetryCount(); i++ {
+		Logger.Printf("Connection recovery attempt %d of %d", i+1, c.MaxRetryCount())
+		jitter := time.Duration(rand.Intn(500)) * time.Millisecond // Random 500ms jitter to avoid thundering herd
+
+		// Wait with select to allow immediate interruption of sleep
+		select {
+		case <-cancelCh:
+			Logger.Printf("Connection recovery aborted: connection closed during backoff.")
+			return ErrClosed
+		case <-time.After(c.RetryInterval() + jitter):
+		}
+
+		// Re-dial
+		var conn net.Conn
+		dialer := c.Config.Dial
+		if dialer == nil {
+			dialer = DefaultDial(defaultConnectionTimeout)
+		}
+
+		// We need to parse URL to get addr
+		var uri URI
+		uri, err = ParseURI(c.url)
+		if err != nil {
+			Logger.Printf("Connection recovery failed to parse URI: %v", err)
+			return err
+		}
+		addr := net.JoinHostPort(uri.Host, strconv.FormatInt(int64(uri.Port), 10))
+
+		conn, err = dialer("tcp", addr)
+		if err != nil {
+			Logger.Printf("Connection recovery dial error: %v", err)
+			continue
+		}
+
+		// TLS handshake if needed
+		if uri.Scheme == "amqps" {
+			client := tls.Client(conn, c.Config.TLSClientConfig)
+			if err = client.Handshake(); err != nil {
+				Logger.Printf("Connection recovery TLS handshake error: %v", err)
+				conn.Close()
+				continue
+			}
+			conn = client
+		}
+
+		// Reset state and swap connection under locks to ensure atomicity
+		// and prevent data races with concurrent readers/writers.
+		// Acquiring destructorM -> closeM -> m avoids any lock ordering deadlocks.
+		c.destructorM.Lock()
+		c.closeM.Lock()
+		c.m.Lock()
+
+		// Swap the connection
+		c.conn = conn
+		c.writer = &writer{bufio.NewWriter(conn)}
+
+		c.resetState()
+
+		c.m.Unlock()
+		c.closeM.Unlock()
+		c.destructorM.Unlock()
+
+		go c.reader(conn)
+
+		if err = c.open(c.Config); err != nil {
+			Logger.Printf("Connection recovery open error: %v", err)
+			conn.Close()
+			continue
+		}
+
+		// Reconnect channels
+		c.m.Lock()
+		channels := make([]*Channel, 0, len(c.channels))
+		for _, ch := range c.channels {
+			channels = append(channels, ch)
+		}
+		c.m.Unlock()
+
+		for _, ch := range channels {
+			if err = ch.Reconnect(); err != nil {
+				Logger.Printf("Connection recovery failed to reconnect channel %d: %v", ch.id, err)
+				conn.Close()
+				break
+			}
+		}
+
+		// This error check is for retrying when the channels are not able to reconnect
+		if err != nil {
+			continue
+		}
+
+		Logger.Printf("Connection recovery successful")
+		c.lifeCycle.SetState(StateOpen, nil)
+		return nil
+	}
+
+	Logger.Printf("Connection recovery exhausted all %d retries", c.MaxRetryCount())
+	if c.conn != nil {
+		c.conn.Close()
+	}
+	c.closed.Store(true)
+	c.lifeCycle.SetState(StateClosed, err)
+
+	return err
+}
+
+// resetState clears the shutdown and close flags and re-initializes the internal
+// channels so the connection can be reused after a successful reconnection.
+// The caller must hold c.destructorM, c.closeM and c.m.
+func (c *Connection) resetState() {
+	c.closed.Store(false)
+	c.destructed = false
+	c.closeInit = false
+
+	c.errors = make(chan *Error, 1)
+	c.close = make(chan struct{})
+
+	// Re-create the rpc channel so we don't read stale messages from the previous connection
+	c.rpc = make(chan message)
+}
+
+// IsRecoveryEnabled checks if the recovery is enabled.
+func (c *Connection) IsRecoveryEnabled() bool {
+	if c == nil {
+		return false
+	}
+	c.closeM.Lock()
+	closedOrClosing := c.closeInit
+	c.closeM.Unlock()
+	if closedOrClosing {
+		return false
+	}
+	return c.Config.Recovery != nil &&
+		c.Config.Recovery.ReconnectionConfig != nil &&
+		c.Config.Recovery.ReconnectionConfig.MaxRetryCount > 0 &&
+		len(c.GetRecoverableErrorCodes()) > 0
+}
+
+// isRecoverable returns true if the given error is recoverable based on RecoverableErrorCodes.
+func (c *Connection) isRecoverable(err *Error) bool {
+	if !c.IsRecoveryEnabled() {
+		return false
+	}
+	if err == nil {
+		return true
+	}
+	for _, code := range c.GetRecoverableErrorCodes() {
+		if err.Code == code {
+			return true
+		}
+	}
+	return false
+}
+
+// GetRecoverableErrorCodes returns a copy of the recoverable error codes.
+func (c *Connection) GetRecoverableErrorCodes() []int {
+	if c == nil {
+		return nil
+	}
+	c.recoveryErrorCodesM.Lock()
+	defer c.recoveryErrorCodesM.Unlock()
+	if c.Config.Recovery == nil || c.Config.Recovery.ReconnectionConfig == nil {
+		return nil
+	}
+
+	return cloneRecoverableErrorCodes(c.Config.Recovery.ReconnectionConfig.RecoverableErrorCodes)
+}
+
+// MaxRetryCount returns the maximum number of retries if recovery is enabled, otherwise returns 0.
+func (c *Connection) MaxRetryCount() int {
+	if c.IsRecoveryEnabled() {
+		return c.Config.Recovery.ReconnectionConfig.MaxRetryCount
+	}
+	return 0
+}
+
+// RetryInterval returns the interval between retries if recovery is enabled, otherwise returns 0.
+func (c *Connection) RetryInterval() time.Duration {
+	if c.IsRecoveryEnabled() {
+		return c.Config.Recovery.ReconnectionConfig.RetryInterval
+	}
+	return 0
+}
+
+// SetRecoverableErrorCodes sets the list of error codes that trigger recovery.
+func (c *Connection) SetRecoverableErrorCodes(codes []int) error {
+	if c == nil {
+		return ErrClosed
+	}
+	if c.Config.Recovery == nil || c.Config.Recovery.ReconnectionConfig == nil {
+		return ErrRecoveryNotEnabled
+	}
+	c.recoveryErrorCodesM.Lock()
+	defer c.recoveryErrorCodesM.Unlock()
+	c.Config.Recovery.ReconnectionConfig.RecoverableErrorCodes = codes
+	return nil
+}
+
+// AddRecoverableErrorCodes adds one or more error codes to the list of recoverable error codes.
+func (c *Connection) AddRecoverableErrorCodes(codes ...int) error {
+	if c == nil {
+		return ErrClosed
+	}
+	if c.Config.Recovery == nil || c.Config.Recovery.ReconnectionConfig == nil {
+		return ErrRecoveryNotEnabled
+	}
+	c.recoveryErrorCodesM.Lock()
+	defer c.recoveryErrorCodesM.Unlock()
+	c.Config.Recovery.ReconnectionConfig.RecoverableErrorCodes = append(c.Config.Recovery.ReconnectionConfig.RecoverableErrorCodes, codes...)
+	return nil
 }
