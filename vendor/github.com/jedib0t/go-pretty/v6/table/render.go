@@ -107,7 +107,9 @@ func (t *Table) renderColumn(out *strings.Builder, row rowStr, colIdx int, maxCo
 
 func (t *Table) renderColumnAutoIndex(out *strings.Builder, hint renderHint) {
 	var outAutoIndex strings.Builder
-	outAutoIndex.Grow(t.maxColumnLengths[0])
+	if len(t.maxColumnLengths) > 0 {
+		outAutoIndex.Grow(t.maxColumnLengths[0])
+	}
 
 	if hint.isSeparatorRow {
 		numChars := t.autoIndexVIndexMaxLength + utf8.RuneCountInString(t.style.Box.PaddingLeft) +
