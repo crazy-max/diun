@@ -237,6 +237,9 @@ func (di *Diun) Run() {
 	)
 
 	di.wg.Wait()
+	if di.notif.IsDigest() {
+		di.notif.SendBatch(entries)
+	}
 	completedAt := time.Now()
 	if di.metrics != nil {
 		di.metrics.RecordRun(entries, completedAt.Sub(startedAt), completedAt)

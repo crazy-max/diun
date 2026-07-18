@@ -250,6 +250,9 @@ func (di *Diun) runJob(job model.Job) (entry model.NotifEntry) {
 		return
 	}
 
-	di.notif.Send(entry)
+	entry.MarkPendingNotify()
+	if !di.notif.IsDigest() {
+		di.notif.Send(entry)
+	}
 	return
 }

@@ -5,6 +5,7 @@ import (
 	stderrors "errors"
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/crazy-max/diun/v4/internal/httputil"
@@ -15,6 +16,9 @@ import (
 	"github.com/nlopes/slack"
 	"github.com/pkg/errors"
 )
+
+// Ensure Client implements BatchHandler so digest mode sends a single summary message.
+var _ notifier.BatchHandler = (*Client)(nil)
 
 const slackMaxRateLimitAttempts = 3
 
@@ -118,6 +122,88 @@ func (c *Client) Send(entry model.NotifEntry) error {
 				Ts:            json.Number(strconv.FormatInt(time.Now().Unix(), 10)),
 			},
 		},
+	}
+
+	hc, err := httputil.NewClient(c.cfg.Proxy, false, nil)
+	if err != nil {
+		return errors.Wrap(err, "cannot create HTTP client for Slack notifier")
+	}
+	for attempt := 1; attempt <= slackMaxRateLimitAttempts; attempt++ {
+		err = slack.PostWebhookCustomHTTP(webhookURL, &hc, payload)
+		if err == nil {
+			return nil
+		}
+
+		rateLimitErr, ok := stderrors.AsType[*slack.RateLimitedError](err)
+		if !ok || attempt == slackMaxRateLimitAttempts {
+			return err
+		}
+
+		time.Sleep(rateLimitErr.RetryAfter)
+	}
+
+	return nil
+}
+
+// SendBatch sends a single compact Slack message listing all pending notification entries.
+func (c *Client) SendBatch(entries *model.NotifEntries) error {
+	webhookURL, err := secret.GetSecret(c.cfg.WebhookURL, c.cfg.WebhookURLFile)
+	if err != nil {
+		return errors.Wrap(err, "cannot retrieve webhook URL for Slack notifier")
+	}
+
+	var lines []string
+	var countNew, countUpdate int
+	for _, entry := range entries.Entries {
+		if !entry.PendingNotify() {
+			continue
+		}
+		status := "new"
+		if entry.Status == model.ImageStatusUpdate {
+			status = "updated"
+			countUpdate++
+		} else {
+			countNew++
+		}
+		imgPath := entry.Image.Path
+		if parts := strings.Split(imgPath, "/"); len(parts) > 2 {
+			imgPath = strings.Join(parts[len(parts)-2:], "/")
+		}
+		if entry.Image.Tag != "" {
+			imgPath += ":" + entry.Image.Tag
+		}
+		var imgDisplay string
+		if entry.Image.HubLink != "" {
+			imgDisplay = fmt.Sprintf("<%s|%s>", entry.Image.HubLink, imgPath)
+		} else {
+			imgDisplay = "`" + imgPath + "`"
+		}
+		line := fmt.Sprintf("• %s _%s_", imgDisplay, status)
+		if !entry.Manifest.Created.IsZero() {
+			line += " · " + entry.Manifest.Created.Format("Jan 02")
+		}
+		if d := entry.Manifest.Digest.String(); len(d) > 7 {
+			if len(d) > 15 {
+				d = d[:15]
+			}
+			line += " · `" + d + "`"
+		}
+		lines = append(lines, line)
+	}
+
+	if len(lines) == 0 {
+		return nil
+	}
+
+	hostname := strings.TrimPrefix(c.meta.Hostname, "diun__")
+	text := fmt.Sprintf("*%d image(s) need attention* — %d new, %d updated (host: %s)\n%s",
+		countNew+countUpdate,
+		countNew, countUpdate,
+		hostname,
+		strings.Join(lines, "\n"))
+
+	payload := &slack.WebhookMessage{
+		Text: text,
 	}
 
 	hc, err := httputil.NewClient(c.cfg.Proxy, false, nil)

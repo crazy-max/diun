@@ -11,13 +11,15 @@ on:
   push:
     branches:
       - 'master'
+      - 'feat/**'
     tags:
       - 'v*'
   pull_request:
+  workflow_dispatch:
 
 env:
   DOCKERHUB_SLUG: crazymax/diun
-  GHCR_SLUG: ghcr.io/crazy-max/diun
+  GHCR_SLUG: ghcr.io/slmingol/diun
   DESTDIR: ./bin
   DOCKER_BUILD_SUMMARY: false
   SCOUT_VERSION: "1.19.0"
@@ -246,13 +248,13 @@ jobs:
         uses: docker/metadata-action@80c7e94dd9b9319bd5eb7a0e0fe9291e23a2a2e9 # v6.1.0
         with:
           images: |
-            ${{ env.DOCKERHUB_SLUG }}
             ${{ env.GHCR_SLUG }}
           tags: |
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
             type=ref,event=pr
+            type=ref,event=branch
             type=edge
           labels: |
             org.opencontainers.image.title=Diun
@@ -264,13 +266,6 @@ jobs:
       -
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@d7f5e7f509e45cec5c76c4d5afdd7de93d0b3df5 # v4.1.0
-      -
-        name: Login to DockerHub
-        if: github.event_name != 'pull_request'
-        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee # v4.2.0
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
       -
         name: Login to GHCR
         if: github.event_name != 'pull_request'
@@ -288,50 +283,19 @@ jobs:
             ./docker-bake.hcl
             ${{ steps.meta.outputs.bake-file }}
           targets: image-all
-          provenance: mode=max
-          sbom: true
+          provenance: false
+          sbom: false
           pull: true
           push: ${{ github.event_name != 'pull_request' }}
       -
         name: Check manifest
         if: github.event_name != 'pull_request'
         run: |
-          docker buildx imagetools inspect ${{ env.DOCKERHUB_SLUG }}:${{ steps.meta.outputs.version }}
           docker buildx imagetools inspect ${{ env.GHCR_SLUG }}:${{ steps.meta.outputs.version }}
       -
         name: Inspect image
         if: github.event_name != 'pull_request'
         run: |
-          docker pull ${{ env.DOCKERHUB_SLUG }}:${{ steps.meta.outputs.version }}
-          docker image inspect ${{ env.DOCKERHUB_SLUG }}:${{ steps.meta.outputs.version }}
           docker pull ${{ env.GHCR_SLUG }}:${{ steps.meta.outputs.version }}
           docker image inspect ${{ env.GHCR_SLUG }}:${{ steps.meta.outputs.version }}
 
-  scout:
-    runs-on: ubuntu-latest
-    if: ${{ github.ref == 'refs/heads/master' }}
-    permissions:
-      contents: read # same as global permission
-      security-events: write # required to write sarif report
-    needs:
-      - image
-    steps:
-      -
-        name: Login to DockerHub
-        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee # v4.2.0
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-      -
-        name: Scout
-        id: scout
-        uses: crazy-max/.github/.github/actions/docker-scout@@46267a6e61cd56aac2fc79943df180152f4c89d6 # v1.10.1
-        with:
-          version: ${{ env.SCOUT_VERSION }}
-          format: sarif
-          image: registry://${{ env.DOCKERHUB_SLUG }}:edge
-      -
-        name: Upload SARIF report
-        uses: github/codeql-action/upload-sarif@99df26d4f13ea111d4ec1a7dddef6063f76b97e9 # v4.37.0
-        with:
-          sarif_file: ${{ steps.scout.outputs.result-file }}

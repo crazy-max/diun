@@ -1,6 +1,8 @@
 package model
 
 import (
+	"sync"
+
 	"github.com/crazy-max/diun/v4/pkg/registry"
 )
 
@@ -12,6 +14,7 @@ const (
 
 // NotifEntries represents a list of notification entries
 type NotifEntries struct {
+	mu            sync.Mutex
 	Entries       []NotifEntry
 	CountNew      int
 	CountUpdate   int
@@ -33,10 +36,15 @@ type NotifEntry struct {
 	// It is intentionally kept out of serialized notification payloads because
 	// Status already represents the public notification contract.
 	updateAvailable bool
+
+	// pendingNotify marks entries that passed all notification filters and should
+	// be dispatched — used in digest mode to batch-send at end of run.
+	pendingNotify bool
 }
 
 // Notif holds data necessary for notification configuration
 type Notif struct {
+	Digest        bool                `yaml:"digest,omitempty" json:"digest,omitempty"`
 	Amqp          *NotifAmqp          `yaml:"amqp,omitempty" json:"amqp,omitempty"`
 	Apprise       *NotifApprise       `yaml:"apprise,omitempty" json:"apprise,omitempty"`
 	Discord       *NotifDiscord       `yaml:"discord,omitempty" json:"discord,omitempty"`
@@ -66,8 +74,10 @@ func (s *Notif) SetDefaults() {
 	// noop
 }
 
-// Add adds a new notif entry
+// Add adds a new notif entry (safe for concurrent use).
 func (s *NotifEntries) Add(entry NotifEntry) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	s.Entries = append(s.Entries, entry)
 	switch entry.Status {
 	case ImageStatusNew:
@@ -96,4 +106,14 @@ func (s *NotifEntry) MarkUpdateAvailable() {
 // UpdateAvailable reports whether the entry is an actionable image update.
 func (s NotifEntry) UpdateAvailable() bool {
 	return s.updateAvailable
+}
+
+// MarkPendingNotify marks the entry as one that passed all notification filters.
+func (s *NotifEntry) MarkPendingNotify() {
+	s.pendingNotify = true
+}
+
+// PendingNotify reports whether the entry should be dispatched as a notification.
+func (s NotifEntry) PendingNotify() bool {
+	return s.pendingNotify
 }

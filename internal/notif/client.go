@@ -102,12 +102,41 @@ func New(config *model.Notif, meta model.Meta) (*Client, error) {
 	return c, nil
 }
 
+// IsDigest reports whether digest mode is enabled.
+func (c *Client) IsDigest() bool {
+	return c.cfg != nil && c.cfg.Digest
+}
+
 // Send creates and sends notifications to notifiers
 func (c *Client) Send(entry model.NotifEntry) {
 	for _, n := range c.notifiers {
 		log.Debug().Str("image", entry.Image.String()).Msgf("Sending %s notification...", n.Name())
 		if err := n.Send(entry); err != nil {
 			log.Error().Err(err).Str("image", entry.Image.String()).Msgf("%s notification failed", strings.Title(n.Name())) //nolint:staticcheck // ignoring "SA1019: strings.Title is deprecated", as for our use we don't need full unicode support
+		}
+	}
+}
+
+// SendBatch sends a digest of all pending entries to each notifier.
+// Notifiers implementing BatchHandler receive a single SendBatch call;
+// others fall back to individual Send calls per pending entry.
+func (c *Client) SendBatch(entries *model.NotifEntries) {
+	for _, n := range c.notifiers {
+		if bh, ok := n.Handler.(notifier.BatchHandler); ok {
+			log.Debug().Msgf("Sending %s batch notification...", n.Name())
+			if err := bh.SendBatch(entries); err != nil {
+				log.Error().Err(err).Msgf("%s batch notification failed", strings.Title(n.Name())) //nolint:staticcheck
+			}
+			continue
+		}
+		for _, entry := range entries.Entries {
+			if !entry.PendingNotify() {
+				continue
+			}
+			log.Debug().Str("image", entry.Image.String()).Msgf("Sending %s notification (digest fallback)...", n.Name())
+			if err := n.Send(entry); err != nil {
+				log.Error().Err(err).Str("image", entry.Image.String()).Msgf("%s notification failed", strings.Title(n.Name())) //nolint:staticcheck
+			}
 		}
 	}
 }
