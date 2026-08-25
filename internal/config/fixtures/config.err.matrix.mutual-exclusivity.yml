@@ -1,0 +1,13 @@
+db:
+  path: /dev/null/diun.db
+providers:
+  docker: {}
+notif:
+  matrix:
+    homeserverURL: https://matrix.org
+    user: "@foo:matrix.org"
+    password: bar
+    accessToken: token
+    roomID: "!abcdefGHIjklmno:matrix.org"
+    msgType: notice
+    templateBody: "{{ .Entry.Provider }}"

@@ -76,5 +76,20 @@ func (cfg *Config) validate() error {
 	if cfg.Providers == nil {
 		return errors.New("at least one provider is required")
 	}
+	if cfg.Notif != nil && cfg.Notif.Matrix != nil {
+		if hasAny(cfg.Notif.Matrix.Password, cfg.Notif.Matrix.PasswordFile) &&
+			hasAny(cfg.Notif.Matrix.AccessToken, cfg.Notif.Matrix.AccessTokenFile) {
+			return errors.New("notif.matrix: password and accessToken are mutually exclusive")
+		}
+	}
 	return validator.New().Struct(cfg)
+}
+
+func hasAny(values ...string) bool {
+	for _, v := range values {
+		if v != "" {
+			return true
+		}
+	}
+	return false
 }

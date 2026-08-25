@@ -12,6 +12,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"maunium.net/go/mautrix"
 	"maunium.net/go/mautrix/event"
+	"maunium.net/go/mautrix/id"
 )
 
 const matrixMaxRateLimitAttempts = 3
@@ -46,33 +47,49 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		return errors.Wrap(err, "failed to initialize Matrix client")
 	}
 	m.DefaultHTTPRetries = matrixMaxRateLimitAttempts - 1
-	defer func() {
-		if _, err := m.Logout(ctx); err != nil {
-			log.Error().Err(err).Msg("Cannot logout")
-		}
-	}()
 
 	user, err := secret.GetSecret(c.cfg.User, c.cfg.UserFile)
 	if err != nil {
 		return errors.Wrap(err, "cannot retrieve username secret for Matrix notifier")
 	}
+	accessToken, err := secret.GetSecret(c.cfg.AccessToken, c.cfg.AccessTokenFile)
+	if err != nil {
+		return errors.Wrap(err, "cannot retrieve access token secret for Matrix notifier")
+	}
 	password, err := secret.GetSecret(c.cfg.Password, c.cfg.PasswordFile)
 	if err != nil {
 		return errors.Wrap(err, "cannot retrieve password secret for Matrix notifier")
 	}
+	if accessToken != "" && password != "" {
+		return errors.New("Matrix notifier: password and accessToken are mutually exclusive")
+	}
+	if user == "" {
+		return errors.New("Matrix notifier: user is required")
+	}
 
-	_, err = m.Login(ctx, &mautrix.ReqLogin{
-		Type: "m.login.password",
-		Identifier: mautrix.UserIdentifier{
-			Type: "m.id.user",
-			User: user,
-		},
-		Password:                 password,
-		InitialDeviceDisplayName: c.meta.Name,
-		StoreCredentials:         true,
-	})
-	if err != nil {
-		return errors.Wrap(err, "failed to authenticate Matrix user")
+	if accessToken != "" {
+		m.AccessToken = accessToken
+		m.UserID = id.UserID(user)
+	} else {
+		defer func() {
+			if _, err := m.Logout(ctx); err != nil {
+				log.Error().Err(err).Msg("Cannot logout")
+			}
+		}()
+
+		_, err = m.Login(ctx, &mautrix.ReqLogin{
+			Type: "m.login.password",
+			Identifier: mautrix.UserIdentifier{
+				Type: "m.id.user",
+				User: user,
+			},
+			Password:                 password,
+			InitialDeviceDisplayName: c.meta.Name,
+			StoreCredentials:         true,
+		})
+		if err != nil {
+			return errors.Wrap(err, "failed to authenticate Matrix user")
+		}
 	}
 
 	joined, err := m.JoinRoom(ctx, c.cfg.RoomID, &mautrix.ReqJoinRoom{})
