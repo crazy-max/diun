@@ -14,7 +14,7 @@ import (
 
 func TestRecorderRecordRun(t *testing.T) {
 	registry := prometheus.NewRegistry()
-	recorder := newRecorder("1.2.3")
+	recorder := newRecorder("1.2.3", nil)
 	registry.MustRegister(recorder)
 
 	alpine, err := regpkg.ParseImage(regpkg.ParseImageOptions{Name: "alpine:3.19"})
@@ -115,6 +115,126 @@ diun_watch_skipped_runs_total 1
 		"diun_watch_last_run_timestamp_seconds",
 		"diun_watch_runs_total",
 		"diun_watch_skipped_runs_total",
+	)
+	require.NoError(t, err)
+}
+
+func TestRecorderMetadataLabels(t *testing.T) {
+	registry := prometheus.NewRegistry()
+	recorder := newRecorder("1.2.3", []string{"channel", "environment"})
+	registry.MustRegister(recorder)
+
+	alpine, err := regpkg.ParseImage(regpkg.ParseImageOptions{Name: "alpine:3.19"})
+	require.NoError(t, err)
+	busybox, err := regpkg.ParseImage(regpkg.ParseImageOptions{Name: "busybox:latest"})
+	require.NoError(t, err)
+
+	created := time.Unix(1000, 0).UTC()
+	metadata := map[string]string{
+		"channel": "newest",
+		"foo":     "bar",
+	}
+	recorder.RecordRun(&model.NotifEntries{
+		Entries: []model.NotifEntry{
+			{
+				Status:   model.ImageStatusUpdate,
+				Provider: "docker",
+				Image:    alpine,
+				Manifest: regpkg.Manifest{Created: &created},
+				Metadata: metadata,
+			},
+			{
+				Status:   model.ImageStatusNew,
+				Provider: "file",
+				Image:    busybox,
+				Manifest: regpkg.Manifest{Created: &created},
+				Metadata: map[string]string{
+					"environment": "production",
+				},
+			},
+		},
+	}, time.Second, time.Unix(2000, 0).UTC())
+
+	// the recorder must not observe later writes to provider-owned metadata
+	metadata["channel"] = "mutated"
+
+	metricFamilies, err := registry.Gather()
+	require.NoError(t, err)
+	imageMetricFamilies := map[string]bool{
+		"diun_image_created_timestamp_seconds":    false,
+		"diun_image_last_check_status":            false,
+		"diun_image_last_check_timestamp_seconds": false,
+		"diun_image_update_available":             false,
+	}
+	for _, family := range metricFamilies {
+		if _, ok := imageMetricFamilies[family.GetName()]; !ok {
+			continue
+		}
+		imageMetricFamilies[family.GetName()] = true
+		for _, metric := range family.GetMetric() {
+			labels := make(map[string]string, len(metric.GetLabel()))
+			for _, label := range metric.GetLabel() {
+				labels[label.GetName()] = label.GetValue()
+			}
+
+			require.NotContains(t, labels, "metadata_foo")
+			require.Contains(t, labels, "metadata_channel")
+			require.Contains(t, labels, "metadata_environment")
+			switch labels["image"] {
+			case "docker.io/library/alpine:3.19":
+				require.Equal(t, "newest", labels["metadata_channel"])
+				require.Equal(t, "", labels["metadata_environment"])
+			case "docker.io/library/busybox:latest":
+				require.Equal(t, "", labels["metadata_channel"])
+				require.Equal(t, "production", labels["metadata_environment"])
+			default:
+				t.Fatalf("unexpected image label %q", labels["image"])
+			}
+		}
+	}
+	for family, found := range imageMetricFamilies {
+		require.True(t, found, "metric family %s was not gathered", family)
+	}
+}
+
+func TestRecorderMetadataSeriesIdentity(t *testing.T) {
+	registry := prometheus.NewRegistry()
+	recorder := newRecorder("1.2.3", []string{"ctn_id"})
+	registry.MustRegister(recorder)
+
+	alpine, err := regpkg.ParseImage(regpkg.ParseImageOptions{Name: "alpine:3.19"})
+	require.NoError(t, err)
+
+	// Two containers running the same image, told apart only by their metadata.
+	first := model.NotifEntry{
+		Status:   model.ImageStatusUpdate,
+		Provider: "docker",
+		Image:    alpine,
+		Metadata: map[string]string{"ctn_id": "aaa"},
+	}
+	first.MarkUpdateAvailable()
+	second := model.NotifEntry{
+		Status:   model.ImageStatusUnchange,
+		Provider: "docker",
+		Image:    alpine,
+		Metadata: map[string]string{"ctn_id": "bbb"},
+	}
+	recorder.RecordRun(&model.NotifEntries{
+		Entries: []model.NotifEntry{first, second},
+	}, time.Second, time.Unix(2000, 0).UTC())
+
+	err = testutil.GatherAndCompare(registry, strings.NewReader(`
+# HELP diun_image_last_check_timestamp_seconds Unix timestamp of the last completed check for the image.
+# TYPE diun_image_last_check_timestamp_seconds gauge
+diun_image_last_check_timestamp_seconds{image="docker.io/library/alpine:3.19",metadata_ctn_id="aaa",provider="docker"} 2000
+diun_image_last_check_timestamp_seconds{image="docker.io/library/alpine:3.19",metadata_ctn_id="bbb",provider="docker"} 2000
+# HELP diun_image_update_available Whether the last check found an actionable update for the image.
+# TYPE diun_image_update_available gauge
+diun_image_update_available{image="docker.io/library/alpine:3.19",metadata_ctn_id="aaa",provider="docker"} 1
+diun_image_update_available{image="docker.io/library/alpine:3.19",metadata_ctn_id="bbb",provider="docker"} 0
+`),
+		"diun_image_last_check_timestamp_seconds",
+		"diun_image_update_available",
 	)
 	require.NoError(t, err)
 }

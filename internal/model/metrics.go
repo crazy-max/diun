@@ -2,11 +2,12 @@ package model
 
 // Metrics holds data necessary for Prometheus metrics configuration.
 type Metrics struct {
-	Enabled   *bool  `yaml:"enabled,omitempty" json:"enabled,omitempty" validate:"required"`
-	Addr      string `yaml:"addr,omitempty" json:"addr,omitempty" validate:"required"`
-	Path      string `yaml:"path,omitempty" json:"path,omitempty" validate:"required,startswith=/"`
-	Token     string `yaml:"token,omitempty" json:"token,omitempty"`
-	TokenFile string `yaml:"tokenFile,omitempty" json:"tokenFile,omitempty" validate:"omitempty,file"`
+	Enabled        *bool    `yaml:"enabled,omitempty" json:"enabled,omitempty" validate:"required"`
+	Addr           string   `yaml:"addr,omitempty" json:"addr,omitempty" validate:"required"`
+	Path           string   `yaml:"path,omitempty" json:"path,omitempty" validate:"required,startswith=/"`
+	Token          string   `yaml:"token,omitempty" json:"token,omitempty"`
+	TokenFile      string   `yaml:"tokenFile,omitempty" json:"tokenFile,omitempty" validate:"omitempty,file"`
+	MetadataLabels []string `yaml:"metadataLabels,omitempty" json:"metadataLabels,omitempty" validate:"omitempty,unique,dive,required"`
 }
 
 // GetDefaults gets the default values.
