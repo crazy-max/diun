@@ -35,3 +35,21 @@ func TestFromImages(t *testing.T) {
 	assert.Equal(t, 21, img[3].Line)
 	assert.Equal(t, []string{"diun.platform=linux/amd64", "diun.metadata.foo=bar"}, img[3].Comments)
 }
+
+func TestFromImagesMultiStage(t *testing.T) {
+	c, err := New(Options{
+		Filename: "./fixtures/multistage.Dockerfile",
+	})
+	require.NoError(t, err)
+	require.NotNil(t, c)
+
+	img, err := c.FromImages()
+	require.NoError(t, err)
+	require.Equal(t, 2, len(img))
+
+	assert.Equal(t, "alpine:3.14", img[0].Name)
+	assert.Equal(t, 1, img[0].Line)
+
+	assert.Equal(t, "crazymax/yasu", img[1].Name)
+	assert.Equal(t, 5, img[1].Line)
+}
