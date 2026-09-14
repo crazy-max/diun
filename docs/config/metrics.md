@@ -129,10 +129,19 @@ the following application metrics:
 | `diun_image_last_check_timestamp_seconds` | Gauge | `provider`, `image` | Unix timestamp of the last completed check for the image. |
 | `diun_image_last_check_status` | Gauge | `provider`, `image`, `status` | Last check status for the image. The active status has value `1`. |
 | `diun_image_created_timestamp_seconds` | Gauge | `provider`, `image` | Unix timestamp of the image manifest creation time reported by the registry. This metric is omitted if the registry does not provide a creation timestamp. |
+| `diun_image_local_outdated` | Gauge | `provider`, `image` | `1` when the container currently backing the image no longer matches the digest Diun last recorded from the registry. Docker provider only, and resolved from the local Docker daemon at scrape time - no registry call, so it's not bound to `watch.schedule`. Omitted if the local digest can't be resolved (e.g. the container has been removed since the last watch run). |
 
 The per-image metrics intentionally use only the `provider`, `image`, and
 `status` labels to keep cardinality predictable across Docker, Swarm,
 Kubernetes, Nomad, Dockerfile, and file providers.
+
+`diun_image_local_outdated` exists alongside `diun_image_update_available`
+rather than folding into it, on purpose: `update_available` answers "did a
+new tag land upstream", `local_outdated` answers "does the container
+currently running match what Diun already knows about" - a pull + recreate
+can resolve the second without a new registry check ever happening. See
+[#1833](https://github.com/crazy-max/diun/issues/1833) for the reasoning
+and the staleness this closes.
 
 See [Docker Compose with Prometheus metrics](../faq.md#docker-compose-with-prometheus-metrics)
 for a complete Compose example.
