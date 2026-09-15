@@ -27,14 +27,7 @@ func (c *Client) listContainerImage() []model.Image {
 	}
 	defer cli.Close()
 
-	ctnFilter := make(mobyclient.Filters)
-	ctnFilter = ctnFilter.Add("status", "running")
-	if *c.config.WatchStopped {
-		ctnFilter = ctnFilter.Add("status", "created")
-		ctnFilter = ctnFilter.Add("status", "exited")
-	}
-
-	ctns, err := cli.ContainerList(ctnFilter)
+	ctns, err := cli.ContainerList(c.containerFilter())
 	if err != nil {
 		c.logger.Error().Err(err).Msg("Cannot list Docker containers")
 		return []model.Image{}
@@ -113,6 +106,19 @@ func (c *Client) listContainerImage() []model.Image {
 	}
 
 	return list
+}
+
+// containerFilter is the set of containers this provider watches. Shared
+// with LocalDigests so the scrape-time digest lookup covers exactly the
+// containers the watch job does.
+func (c *Client) containerFilter() mobyclient.Filters {
+	ctnFilter := make(mobyclient.Filters)
+	ctnFilter = ctnFilter.Add("status", "running")
+	if *c.config.WatchStopped {
+		ctnFilter = ctnFilter.Add("status", "created")
+		ctnFilter = ctnFilter.Add("status", "exited")
+	}
+	return ctnFilter
 }
 
 func metadata(ctn container.Summary) map[string]string {
