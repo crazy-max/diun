@@ -177,6 +177,19 @@ func TestValidateImage(t *testing.T) {
 			expectedErr: nil,
 		},
 		{
+			name:  "Set valid notify_on (all options)",
+			image: "myimg",
+			labels: map[string]string{
+				"diun.notify_on": "new;update;unchange",
+			},
+			watchByDef: true,
+			expectedImage: model.Image{
+				Name:     "myimg",
+				NotifyOn: []model.NotifyOn{model.NotifyOnNew, model.NotifyOnUpdate, model.NotifyOnUnchange},
+			},
+			expectedErr: nil,
+		},
+		{
 			name:       "Set invalid notify_on",
 			image:      "myimg",
 			watchByDef: true,
