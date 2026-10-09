@@ -60,7 +60,7 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		Message string   `json:"body"`
 		Title   string   `json:"title"`
 		Tags    []string `json:"tags"`
-		URLs    []string `json:"urls"`
+		URLs    []string `json:"urls,omitempty"`
 	}{
 		Message: string(body),
 		Title:   string(title),
