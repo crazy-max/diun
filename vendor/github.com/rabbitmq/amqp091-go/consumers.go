@@ -32,7 +32,25 @@ func commandNameBasedUniqueConsumerTag(commandName string) string {
 	return tagPrefix + tagInfix + tagSuffix
 }
 
+// consumerConfig stores the configuration parameters used when a consumer is registered.
+// This is required during automatic connection and channel recovery. When a network connection
+// drops and is restored, the library uses these stored parameters to automatically re-register
+// and resume all consumers on the recovered channels seamlessly, preserving the subscriber topology.
+type consumerConfig struct {
+	Queue     string
+	Consumer  string
+	AutoAck   bool
+	Exclusive bool
+	NoLocal   bool
+	NoWait    bool
+	Args      Table
+}
+
 type consumerBuffers map[string]chan *Delivery
+
+// consumerConfigs maps unique consumer tags to their respective consumerConfig parameters,
+// facilitating the automatic re-registration of all consumers during channel recovery.
+type consumerConfigs map[string]consumerConfig
 
 // Concurrent type that manages the consumerTag ->
 // ingress consumerBuffer mapping
@@ -42,12 +60,14 @@ type consumers struct {
 
 	sync.Mutex // protects below
 	chans      consumerBuffers
+	configs    consumerConfigs
 }
 
 func makeConsumers() *consumers {
 	return &consumers{
-		closed: make(chan struct{}),
-		chans:  make(consumerBuffers),
+		closed:  make(chan struct{}),
+		chans:   make(consumerBuffers),
+		configs: make(consumerConfigs),
 	}
 }
 
@@ -109,7 +129,7 @@ func (subs *consumers) buffer(in chan *Delivery, out chan Delivery) {
 }
 
 // On key conflict, close the previous channel.
-func (subs *consumers) add(tag string, consumer chan Delivery) {
+func (subs *consumers) add(tag string, consumer chan Delivery, config consumerConfig) {
 	subs.Lock()
 	defer subs.Unlock()
 
@@ -119,6 +139,7 @@ func (subs *consumers) add(tag string, consumer chan Delivery) {
 
 	in := make(chan *Delivery)
 	subs.chans[tag] = in
+	subs.configs[tag] = config
 
 	subs.Add(1)
 	go subs.buffer(in, consumer)
@@ -132,6 +153,7 @@ func (subs *consumers) cancel(tag string) (found bool) {
 
 	if found {
 		delete(subs.chans, tag)
+		delete(subs.configs, tag)
 		close(ch)
 	}
 
@@ -146,6 +168,7 @@ func (subs *consumers) close() {
 
 	for tag, ch := range subs.chans {
 		delete(subs.chans, tag)
+		delete(subs.configs, tag)
 		close(ch)
 	}
 

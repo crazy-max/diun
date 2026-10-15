@@ -123,6 +123,21 @@ func (c *confirms) Close() error {
 	return nil
 }
 
+// reset clears any pending deferred confirmations and resets the sequencer
+// state for recovery, while keeping the listeners intact.
+func (c *confirms) reset() {
+	c.m.Lock()
+	defer c.m.Unlock()
+
+	c.publishedMut.Lock()
+	defer c.publishedMut.Unlock()
+
+	c.published = 0
+	c.expecting = 1
+	c.deferredConfirmations.Close()
+	c.sequencer = map[uint64]Confirmation{}
+}
+
 type deferredConfirmations struct {
 	m             sync.Mutex
 	confirmations map[uint64]*DeferredConfirmation

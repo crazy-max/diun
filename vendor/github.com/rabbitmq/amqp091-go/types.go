@@ -78,6 +78,9 @@ var (
 
 	// ErrFieldType is returned when writing a message containing a Go type unsupported by AMQP.
 	ErrFieldType = &Error{Code: SyntaxError, Reason: "unsupported table field type"}
+
+	// ErrRecoveryNotEnabled is returned when recovery operations are attempted but recovery is not enabled.
+	ErrRecoveryNotEnabled = &Error{Code: ChannelError, Reason: "recovery is not enabled on this connection"}
 )
 
 // internal errors used inside the library
