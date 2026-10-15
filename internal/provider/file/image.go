@@ -8,6 +8,7 @@ import (
 
 	"github.com/containerd/platforms"
 	"github.com/crazy-max/diun/v4/internal/model"
+	"github.com/crazy-max/diun/v4/internal/provider"
 	ocispecs "github.com/opencontainers/image-spec/specs-go/v1"
 	"gopkg.in/yaml.v3"
 )
@@ -88,15 +89,8 @@ func (c *Client) listFileImage() []model.Image {
 				item.MaxTags = c.defaults.MaxTags
 			}
 
-			// Set default IncludeTags
-			if len(item.IncludeTags) == 0 {
-				item.IncludeTags = c.defaults.IncludeTags
-			}
-
-			// Set default ExcludeTags
-			if len(item.ExcludeTags) == 0 {
-				item.ExcludeTags = c.defaults.ExcludeTags
-			}
+			item.IncludeTags = provider.MergeTags(c.defaults.IncludeTags, item.IncludeTags)
+			item.ExcludeTags = provider.MergeTags(c.defaults.ExcludeTags, item.ExcludeTags)
 
 			images = append(images, item)
 		}

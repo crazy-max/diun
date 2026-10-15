@@ -406,7 +406,7 @@ func TestValidateImage(t *testing.T) {
 			expectedErr: nil,
 		},
 		{
-			name:       "Override default include_tags",
+			name:       "Merge default include_tags",
 			image:      "myimg",
 			watchByDef: true,
 			labels: map[string]string{
@@ -417,7 +417,7 @@ func TestValidateImage(t *testing.T) {
 			},
 			expectedImage: model.Image{
 				Name:        "myimg",
-				IncludeTags: []string{"ubuntu"},
+				IncludeTags: []string{"alpine", "ubuntu"},
 			},
 			expectedErr: nil,
 		},
@@ -462,7 +462,7 @@ func TestValidateImage(t *testing.T) {
 			expectedErr: nil,
 		},
 		{
-			name:       "Override default exclude_tags",
+			name:       "Merge default exclude_tags",
 			image:      "myimg",
 			watchByDef: true,
 			labels: map[string]string{
@@ -473,7 +473,7 @@ func TestValidateImage(t *testing.T) {
 			},
 			expectedImage: model.Image{
 				Name:        "myimg",
-				ExcludeTags: []string{"ubuntu"},
+				ExcludeTags: []string{"alpine", "ubuntu"},
 			},
 			expectedErr: nil,
 		},
