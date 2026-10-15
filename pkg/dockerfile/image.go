@@ -58,7 +58,7 @@ func (c *Client) FromImages() (Images, error) {
 			if err != nil {
 				return nil, errors.Wrapf(err, "cannot parse command")
 			}
-			if copyFrom := cmd.(*instructions.CopyCommand).From; copyFrom != "null" {
+			if copyFrom := cmd.(*instructions.CopyCommand).From; copyFrom != "" {
 				name, _, err := c.shlex.ProcessWord(copyFrom, c.metaArgs)
 				if err != nil {
 					return nil, err
