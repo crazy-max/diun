@@ -61,6 +61,73 @@ func TestDeleteManifestRemovesTaggedDigestEntry(t *testing.T) {
 	assert.Empty(t, manifests)
 }
 
+func TestManifestStoreDigestReference(t *testing.T) {
+	client := newTestClient(t)
+	dgst := digest.Digest("sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef")
+	alpine := parseTestImage(t, "alpine@"+dgst.String())
+	alpine2 := parseTestImage(t, "alpine2@"+dgst.String())
+	alpineManifest := testManifest("docker.io/library/alpine", "")
+	alpineManifest.Digest = dgst
+	alpine2Manifest := testManifest("docker.io/library/alpine2", "")
+	alpine2Manifest.Digest = dgst
+
+	first, err := client.First(alpine)
+	require.NoError(t, err)
+	assert.True(t, first)
+
+	// another repository sharing the same prefix must not be seen as a match
+	require.NoError(t, client.PutManifest(alpine2, alpine2Manifest))
+	first, err = client.First(alpine)
+	require.NoError(t, err)
+	assert.True(t, first)
+
+	require.NoError(t, client.PutManifest(alpine, alpineManifest))
+	first, err = client.First(alpine)
+	require.NoError(t, err)
+	assert.False(t, first)
+
+	stored, err := client.GetManifest(alpine)
+	require.NoError(t, err)
+	assert.Equal(t, alpineManifest, stored)
+}
+
+func TestFirstMatchesTagAndDigestReferences(t *testing.T) {
+	client := newTestClient(t)
+	dgst := digest.Digest("sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef")
+	tagged := parseTestImage(t, "alpine:3.20")
+	digested := parseTestImage(t, "alpine@"+dgst.String())
+	manifest := testManifest("docker.io/library/alpine", "3.20")
+	manifest.Digest = dgst
+
+	// an image already analyzed through its tag is not a first check when
+	// referenced by digest, and the other way around
+	require.NoError(t, client.PutManifest(tagged, manifest))
+	first, err := client.First(digested)
+	require.NoError(t, err)
+	assert.False(t, first)
+
+	client2 := newTestClient(t)
+	require.NoError(t, client2.PutManifest(digested, manifest))
+	first, err = client2.First(tagged)
+	require.NoError(t, err)
+	assert.False(t, first)
+}
+
+func TestDeleteManifestRemovesDigestOnlyEntry(t *testing.T) {
+	client := newTestClient(t)
+	dgst := digest.Digest("sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef")
+	image := parseTestImage(t, "alpine@"+dgst.String())
+	manifest := testManifest("docker.io/library/alpine", "")
+	manifest.Digest = dgst
+
+	require.NoError(t, client.PutManifest(image, manifest))
+	require.NoError(t, client.DeleteManifest(manifest))
+
+	manifests, err := client.ListManifest()
+	require.NoError(t, err)
+	assert.Empty(t, manifests)
+}
+
 func parseTestImage(t *testing.T, name string) registry.Image {
 	t.Helper()
 	image, err := registry.ParseImage(registry.ParseImageOptions{Name: name})

@@ -15,8 +15,18 @@ func (c *Client) First(image registry.Image) (bool, error) {
 
 	err := c.View(func(tx *bolt.Tx) error {
 		c := tx.Bucket([]byte(bucketManifest)).Cursor()
-		name := []byte(image.Name() + ":")
+		name := []byte(image.Name())
 		for k, _ := c.Seek(name); k != nil && bytes.HasPrefix(k, name); k, _ = c.Next() {
+			// manifests are stored with the image reference as key, so the
+			// repository name is either followed by a tag (":") or a digest
+			// ("@"). Checking the separator avoids matching a different
+			// repository sharing the same prefix (e.g. "alpine" / "alpine2").
+			if len(k) <= len(name) {
+				continue
+			}
+			if sep := k[len(name)]; sep != ':' && sep != '@' {
+				continue
+			}
 			found = true
 			return nil
 		}
@@ -73,11 +83,16 @@ func (c *Client) PutManifest(image registry.Image, manifest registry.Manifest) e
 func (c *Client) DeleteManifest(manifest registry.Manifest) error {
 	return c.Update(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(bucketManifest))
-		keys := [][]byte{
-			[]byte(fmt.Sprintf("%s:%s", manifest.Name, manifest.Tag)),
+		var keys [][]byte
+		if manifest.Tag != "" {
+			keys = append(keys, []byte(fmt.Sprintf("%s:%s", manifest.Name, manifest.Tag)))
+			if manifest.Digest != "" {
+				keys = append(keys, []byte(fmt.Sprintf("%s:%s@%s", manifest.Name, manifest.Tag, manifest.Digest)))
+			}
 		}
 		if manifest.Digest != "" {
-			keys = append(keys, []byte(fmt.Sprintf("%s:%s@%s", manifest.Name, manifest.Tag, manifest.Digest)))
+			// an image referenced by digest only is stored as "name@digest"
+			keys = append(keys, []byte(fmt.Sprintf("%s@%s", manifest.Name, manifest.Digest)))
 		}
 		for _, key := range keys {
 			if err := b.Delete(key); err != nil {
