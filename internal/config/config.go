@@ -3,6 +3,7 @@ package config
 import (
 	"os"
 	"path"
+	"regexp"
 
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/gonfig"
@@ -75,6 +76,12 @@ func (cfg *Config) validate() error {
 	}
 	if cfg.Providers == nil {
 		return errors.New("at least one provider is required")
+	}
+	metadataKeyRegexp := regexp.MustCompile(`^[a-zA-Z0-9_]+$`)
+	for _, key := range cfg.Metrics.MetadataLabels {
+		if !metadataKeyRegexp.MatchString(key) {
+			return errors.Errorf("invalid metrics metadata label key %q: only letters, digits, and underscores are allowed", key)
+		}
 	}
 	return validator.New().Struct(cfg)
 }

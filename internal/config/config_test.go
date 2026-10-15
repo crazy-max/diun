@@ -68,6 +68,11 @@ func TestLoadFile(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name:    "Fail on invalid metrics metadata label",
+			cfg:     "./fixtures/config.err.metrics.yml",
+			wantErr: true,
+		},
+		{
 			name: "Success",
 			cfg:  "./fixtures/config.test.yml",
 			wantData: &Config{
@@ -425,6 +430,7 @@ func TestLoadEnv(t *testing.T) {
 				"DIUN_METRICS_ADDR=127.0.0.1:9090",
 				"DIUN_METRICS_PATH=/prometheus",
 				"DIUN_METRICS_TOKENFILE=./fixtures/run_secrets_username",
+				"DIUN_METRICS_METADATALABELS=channel,environment",
 				"DIUN_PROVIDERS_DOCKER=true",
 			},
 			expected: &Config{
@@ -436,6 +442,10 @@ func TestLoadEnv(t *testing.T) {
 					Addr:      "127.0.0.1:9090",
 					Path:      "/prometheus",
 					TokenFile: "./fixtures/run_secrets_username",
+					MetadataLabels: []string{
+						"channel",
+						"environment",
+					},
 				},
 				Notif:   nil,
 				RegOpts: nil,

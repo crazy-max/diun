@@ -87,6 +87,39 @@ endpoint. If `token` is also set, `token` takes precedence.
 !!! abstract "Environment variables"
     * `DIUN_METRICS_TOKENFILE`
 
+### `metadataLabels`
+
+Entry metadata keys to expose as additional labels on all per-image metrics.
+Empty by default: only explicitly listed keys are exposed, each prefixed with
+`metadata_` to avoid collisions with native Diun labels.
+
+!!! example "Config file"
+    ```yaml
+    metrics:
+      enabled: true
+      metadataLabels:
+        - channel
+    ```
+
+    With `metadata.channel: newest` on an image entry, per-image metrics include
+    the label `metadata_channel="newest"`:
+
+    ```text
+    diun_image_created_timestamp_seconds{provider="file",image="docker.io/example/image:v1.2.3",metadata_channel="newest"}
+    ```
+
+    Entries without the selected metadata key expose an empty label value, such
+    as `metadata_channel=""`, so the label schema stays consistent.
+
+!!! abstract "Environment variables"
+    * `DIUN_METRICS_METADATALABELS` (comma-separated list)
+
+!!! warning
+    Additional labels increase metric cardinality, and the selected values are
+    part of the series identity: entries sharing a `provider` and `image` but
+    differing in the selected metadata are exposed as separate series. Only
+    select metadata keys with a small, bounded set of values.
+
 ## Prometheus scrape configuration
 
 ```yaml
@@ -130,9 +163,11 @@ the following application metrics:
 | `diun_image_last_check_status` | Gauge | `provider`, `image`, `status` | Last check status for the image. The active status has value `1`. |
 | `diun_image_created_timestamp_seconds` | Gauge | `provider`, `image` | Unix timestamp of the image manifest creation time reported by the registry. This metric is omitted if the registry does not provide a creation timestamp. |
 
-The per-image metrics intentionally use only the `provider`, `image`, and
-`status` labels to keep cardinality predictable across Docker, Swarm,
-Kubernetes, Nomad, Dockerfile, and file providers.
+By default, the per-image metrics intentionally use only the `provider`,
+`image`, and `status` labels to keep cardinality predictable across Docker,
+Swarm, Kubernetes, Nomad, Dockerfile, and file providers.
+[`metadataLabels`](#metadatalabels) adds the selected prefixed labels to all
+per-image metrics.
 
 See [Docker Compose with Prometheus metrics](../faq.md#docker-compose-with-prometheus-metrics)
 for a complete Compose example.

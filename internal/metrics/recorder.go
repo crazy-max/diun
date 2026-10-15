@@ -1,6 +1,7 @@
 package metrics
 
 import (
+	"fmt"
 	"sync"
 	"time"
 
@@ -23,7 +24,8 @@ var imageStatuses = []model.ImageStatus{
 type Recorder struct {
 	mu sync.RWMutex
 
-	version string
+	version      string
+	metadataKeys []string
 
 	watchRunsTotal        uint64
 	watchSkippedRunsTotal uint64
@@ -47,11 +49,13 @@ type Recorder struct {
 type imageKey struct {
 	provider string
 	image    string
+	metadata string
 }
 
 type imageState struct {
 	provider        string
 	image           string
+	metadataValues  []string
 	status          model.ImageStatus
 	updateAvailable bool
 	lastCheck       time.Time
@@ -59,9 +63,9 @@ type imageState struct {
 }
 
 // NewRecorder creates a Prometheus registry and recorder for Diun metrics.
-func NewRecorder(version string) (*Recorder, *prometheus.Registry) {
+func NewRecorder(version string, metadataKeys []string) (*Recorder, *prometheus.Registry) {
 	registry := prometheus.NewRegistry()
-	recorder := newRecorder(version)
+	recorder := newRecorder(version, metadataKeys)
 
 	registry.MustRegister(
 		collectors.NewGoCollector(),
@@ -72,9 +76,18 @@ func NewRecorder(version string) (*Recorder, *prometheus.Registry) {
 	return recorder, registry
 }
 
-func newRecorder(version string) *Recorder {
+func newRecorder(version string, metadataKeys []string) *Recorder {
+	imageLabels := []string{"provider", "image"}
+	imageStatusLabels := []string{"provider", "image", "status"}
+	for _, key := range metadataKeys {
+		labelName := "metadata_" + key
+		imageLabels = append(imageLabels, labelName)
+		imageStatusLabels = append(imageStatusLabels, labelName)
+	}
+
 	return &Recorder{
 		version:       version,
+		metadataKeys:  append([]string(nil), metadataKeys...),
 		lastRunImages: make(map[model.ImageStatus]int, len(imageStatuses)),
 		images:        make(map[imageKey]imageState),
 
@@ -117,25 +130,25 @@ func newRecorder(version string) *Recorder {
 		imageUpdateAvailableDesc: prometheus.NewDesc(
 			prometheus.BuildFQName(namespace, "image", "update_available"),
 			"Whether the last check found an actionable update for the image.",
-			[]string{"provider", "image"},
+			imageLabels,
 			nil,
 		),
 		imageLastCheckTimestampDesc: prometheus.NewDesc(
 			prometheus.BuildFQName(namespace, "image", "last_check_timestamp_seconds"),
 			"Unix timestamp of the last completed check for the image.",
-			[]string{"provider", "image"},
+			imageLabels,
 			nil,
 		),
 		imageLastCheckStatusDesc: prometheus.NewDesc(
 			prometheus.BuildFQName(namespace, "image", "last_check_status"),
 			"Last check status for the image. The active status has value 1.",
-			[]string{"provider", "image", "status"},
+			imageStatusLabels,
 			nil,
 		),
 		imageCreatedTimestampDesc: prometheus.NewDesc(
 			prometheus.BuildFQName(namespace, "image", "created_timestamp_seconds"),
 			"Unix timestamp of the image manifest creation time reported by the registry.",
-			[]string{"provider", "image"},
+			imageLabels,
 			nil,
 		),
 	}
@@ -173,21 +186,24 @@ func (r *Recorder) Collect(ch chan<- prometheus.Metric) {
 	}
 
 	for _, image := range r.images {
+		labelValues := append([]string{image.provider, image.image}, image.metadataValues...)
+
 		updateAvailable := 0.0
 		if image.updateAvailable {
 			updateAvailable = 1
 		}
-		ch <- prometheus.MustNewConstMetric(r.imageUpdateAvailableDesc, prometheus.GaugeValue, updateAvailable, image.provider, image.image)
-		ch <- prometheus.MustNewConstMetric(r.imageLastCheckTimestampDesc, prometheus.GaugeValue, float64(image.lastCheck.Unix()), image.provider, image.image)
+		ch <- prometheus.MustNewConstMetric(r.imageUpdateAvailableDesc, prometheus.GaugeValue, updateAvailable, labelValues...)
+		ch <- prometheus.MustNewConstMetric(r.imageLastCheckTimestampDesc, prometheus.GaugeValue, float64(image.lastCheck.Unix()), labelValues...)
 		for _, status := range imageStatuses {
 			value := 0.0
 			if status == image.status {
 				value = 1
 			}
-			ch <- prometheus.MustNewConstMetric(r.imageLastCheckStatusDesc, prometheus.GaugeValue, value, image.provider, image.image, string(status))
+			statusLabelValues := append([]string{image.provider, image.image, string(status)}, image.metadataValues...)
+			ch <- prometheus.MustNewConstMetric(r.imageLastCheckStatusDesc, prometheus.GaugeValue, value, statusLabelValues...)
 		}
 		if image.created != nil && !image.created.IsZero() {
-			ch <- prometheus.MustNewConstMetric(r.imageCreatedTimestampDesc, prometheus.GaugeValue, float64(image.created.Unix()), image.provider, image.image)
+			ch <- prometheus.MustNewConstMetric(r.imageCreatedTimestampDesc, prometheus.GaugeValue, float64(image.created.Unix()), labelValues...)
 		}
 	}
 }
@@ -211,13 +227,22 @@ func (r *Recorder) RecordRun(entries *model.NotifEntries, duration time.Duration
 			if imageName == "" {
 				continue
 			}
+			// Snapshot the configured values so the recorder does not retain
+			// provider-owned metadata maps.
+			metadataValues := make([]string, len(r.metadataKeys))
+			for i, mkey := range r.metadataKeys {
+				metadataValues[i] = entry.Metadata[mkey]
+			}
 			key := imageKey{
 				provider: entry.Provider,
 				image:    imageName,
+				// Selected metadata values are part of the Prometheus series identity.
+				metadata: fmt.Sprintf("%q", metadataValues),
 			}
 			images[key] = imageState{
 				provider:        entry.Provider,
 				image:           imageName,
+				metadataValues:  metadataValues,
 				status:          entry.Status,
 				updateAvailable: entry.UpdateAvailable(),
 				lastCheck:       completedAt,
