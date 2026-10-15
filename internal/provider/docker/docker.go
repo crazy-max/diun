@@ -18,11 +18,19 @@ type Client struct {
 // New creates new docker provider instance
 func New(config *model.PrdDocker, defaults *model.Defaults) *provider.Client {
 	return &provider.Client{
-		Handler: &Client{
-			config:   config,
-			logger:   log.With().Str("provider", "docker").Logger(),
-			defaults: defaults,
-		},
+		Handler: NewClient(config, defaults),
+	}
+}
+
+// NewClient creates a docker provider client. It's exposed separately from
+// New so callers that need docker-specific behavior beyond the generic
+// provider.Handler interface (currently, the Prometheus local digest
+// source, see LocalDigests) can hold on to the concrete type.
+func NewClient(config *model.PrdDocker, defaults *model.Defaults) *Client {
+	return &Client{
+		config:   config,
+		logger:   log.With().Str("provider", "docker").Logger(),
+		defaults: defaults,
 	}
 }
 

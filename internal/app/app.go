@@ -87,6 +87,13 @@ func New(meta model.Meta, cfg *config.Config, grpcAuthority string) (*Diun, erro
 		if err != nil {
 			return nil, err
 		}
+		if cfg.Providers.Docker != nil {
+			// Registered once here, kept for the process lifetime, and used
+			// only for local (no registry call) digest lookups on scrape -
+			// separate from the short-lived docker provider client created
+			// on every watch run in Run().
+			recorder.RegisterLocalDigestSource("docker", dockerPrd.NewClient(cfg.Providers.Docker, cfg.Defaults))
+		}
 	}
 
 	return diun, nil

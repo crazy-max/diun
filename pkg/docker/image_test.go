@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/moby/moby/api/types/image"
+	"github.com/opencontainers/go-digest"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -71,4 +72,17 @@ func TestIsDanglingImage(t *testing.T) {
 		RepoTags:    []string{"alpine:latest"},
 		RepoDigests: []string{"alpine@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"},
 	}))
+}
+
+func TestImageDigest(t *testing.T) {
+	c := &Client{}
+
+	dgst, err := c.ImageDigest(image.InspectResponse{
+		RepoDigests: []string{"alpine@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"},
+	})
+	assert.NoError(t, err)
+	assert.Equal(t, digest.Digest("sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"), dgst)
+
+	_, err = c.ImageDigest(image.InspectResponse{})
+	assert.Error(t, err)
 }

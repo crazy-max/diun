@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/crazy-max/diun/v4/internal/model"
+	"github.com/opencontainers/go-digest"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/collectors"
 )
@@ -17,6 +18,23 @@ var imageStatuses = []model.ImageStatus{
 	model.ImageStatusUnchange,
 	model.ImageStatusSkip,
 	model.ImageStatusError,
+}
+
+// LocalDigestSource reports the digests its containers are currently
+// running, keyed by normalized image reference, using only the local
+// container/image store - no registry calls. A reference maps to every
+// distinct digest in use for it, since several containers can share one
+// image reference and be updated at different times. Providers that can
+// answer this register themselves with RegisterLocalDigestSource so
+// diun_image_local_outdated can be recomputed at scrape time, independent
+// of the watch schedule.
+//
+// Resolution is keyed by image reference rather than by the container IDs
+// seen during the last watch run precisely because applying an update
+// replaces the container: the IDs go stale at the one moment the answer
+// matters.
+type LocalDigestSource interface {
+	LocalDigests() map[string][]digest.Digest
 }
 
 // Recorder records Diun watcher state for Prometheus.
@@ -32,6 +50,9 @@ type Recorder struct {
 	lastRunImages         map[model.ImageStatus]int
 	images                map[imageKey]imageState
 
+	sourcesMu          sync.RWMutex
+	localDigestSources map[string]LocalDigestSource
+
 	buildInfoDesc               *prometheus.Desc
 	watchRunsTotalDesc          *prometheus.Desc
 	watchSkippedRunsTotalDesc   *prometheus.Desc
@@ -42,6 +63,7 @@ type Recorder struct {
 	imageLastCheckTimestampDesc *prometheus.Desc
 	imageLastCheckStatusDesc    *prometheus.Desc
 	imageCreatedTimestampDesc   *prometheus.Desc
+	imageLocalOutdatedDesc      *prometheus.Desc
 }
 
 type imageKey struct {
@@ -56,6 +78,7 @@ type imageState struct {
 	updateAvailable bool
 	lastCheck       time.Time
 	created         *time.Time
+	lastDigest      digest.Digest
 }
 
 // NewRecorder creates a Prometheus registry and recorder for Diun metrics.
@@ -138,6 +161,12 @@ func newRecorder(version string) *Recorder {
 			[]string{"provider", "image"},
 			nil,
 		),
+		imageLocalOutdatedDesc: prometheus.NewDesc(
+			prometheus.BuildFQName(namespace, "image", "local_outdated"),
+			"Whether the update Diun last found for the image is still unapplied, i.e. a container is running a digest other than the one Diun recorded. Resolved against the local Docker daemon on every scrape, so it drops to 0 as soon as the image is pulled and the container recreated, without waiting for the next watch run. Omitted when no local container can be resolved for the image.",
+			[]string{"provider", "image"},
+			nil,
+		),
 	}
 }
 
@@ -153,26 +182,43 @@ func (r *Recorder) Describe(ch chan<- *prometheus.Desc) {
 	ch <- r.imageLastCheckTimestampDesc
 	ch <- r.imageLastCheckStatusDesc
 	ch <- r.imageCreatedTimestampDesc
+	ch <- r.imageLocalOutdatedDesc
 }
 
 // Collect sends metric values to Prometheus.
 func (r *Recorder) Collect(ch chan<- prometheus.Metric) {
+	// Snapshot everything under the lock first, then do the (potentially
+	// slow, I/O-bound) local digest resolution and metric emission outside
+	// of it - a slow or unreachable Docker daemon during a scrape must not
+	// stall a concurrent RecordRun.
 	r.mu.RLock()
-	defer r.mu.RUnlock()
+	version := r.version
+	watchRunsTotal := r.watchRunsTotal
+	watchSkippedRunsTotal := r.watchSkippedRunsTotal
+	lastRunTimestamp := r.lastRunTimestamp
+	lastRunDuration := r.lastRunDuration
+	lastRunImages := r.lastRunImages
+	images := make(map[imageKey]imageState, len(r.images))
+	for k, v := range r.images {
+		images[k] = v
+	}
+	r.mu.RUnlock()
 
-	ch <- prometheus.MustNewConstMetric(r.buildInfoDesc, prometheus.GaugeValue, 1, r.version)
-	ch <- prometheus.MustNewConstMetric(r.watchRunsTotalDesc, prometheus.CounterValue, float64(r.watchRunsTotal))
-	ch <- prometheus.MustNewConstMetric(r.watchSkippedRunsTotalDesc, prometheus.CounterValue, float64(r.watchSkippedRunsTotal))
+	ch <- prometheus.MustNewConstMetric(r.buildInfoDesc, prometheus.GaugeValue, 1, version)
+	ch <- prometheus.MustNewConstMetric(r.watchRunsTotalDesc, prometheus.CounterValue, float64(watchRunsTotal))
+	ch <- prometheus.MustNewConstMetric(r.watchSkippedRunsTotalDesc, prometheus.CounterValue, float64(watchSkippedRunsTotal))
 
-	if !r.lastRunTimestamp.IsZero() {
-		ch <- prometheus.MustNewConstMetric(r.watchLastRunTimestampDesc, prometheus.GaugeValue, float64(r.lastRunTimestamp.Unix()))
-		ch <- prometheus.MustNewConstMetric(r.watchLastRunDurationDesc, prometheus.GaugeValue, r.lastRunDuration.Seconds())
+	if !lastRunTimestamp.IsZero() {
+		ch <- prometheus.MustNewConstMetric(r.watchLastRunTimestampDesc, prometheus.GaugeValue, float64(lastRunTimestamp.Unix()))
+		ch <- prometheus.MustNewConstMetric(r.watchLastRunDurationDesc, prometheus.GaugeValue, lastRunDuration.Seconds())
 		for _, status := range imageStatuses {
-			ch <- prometheus.MustNewConstMetric(r.watchLastRunImagesDesc, prometheus.GaugeValue, float64(r.lastRunImages[status]), string(status))
+			ch <- prometheus.MustNewConstMetric(r.watchLastRunImagesDesc, prometheus.GaugeValue, float64(lastRunImages[status]), string(status))
 		}
 	}
 
-	for _, image := range r.images {
+	localDigests := r.resolveLocalDigests(images)
+
+	for key, image := range images {
 		updateAvailable := 0.0
 		if image.updateAvailable {
 			updateAvailable = 1
@@ -189,7 +235,84 @@ func (r *Recorder) Collect(ch chan<- prometheus.Metric) {
 		if image.created != nil && !image.created.IsZero() {
 			ch <- prometheus.MustNewConstMetric(r.imageCreatedTimestampDesc, prometheus.GaugeValue, float64(image.created.Unix()), image.provider, image.image)
 		}
+		// Only meaningful when there's a recorded registry digest to
+		// compare against; without one we haven't checked, which is not
+		// the same as "up to date", so the series is omitted.
+		if dgsts, ok := localDigests[key]; ok && len(dgsts) > 0 && len(image.lastDigest) > 0 {
+			outdated := 0.0
+			// Gated on updateAvailable so that pulling before Diun's next
+			// registry poll reads as up to date rather than outdated: if
+			// the last poll found nothing actionable, a local digest that
+			// differs from the recorded one is ahead of Diun, not behind
+			// it. When the poll did flag an update, any container still
+			// off the recorded digest hasn't had it applied yet.
+			if image.updateAvailable {
+				for _, dgst := range dgsts {
+					if dgst != image.lastDigest {
+						outdated = 1
+						break
+					}
+				}
+			}
+			ch <- prometheus.MustNewConstMetric(r.imageLocalOutdatedDesc, prometheus.GaugeValue, outdated, image.provider, image.image)
+		}
 	}
+}
+
+// resolveLocalDigests asks each registered LocalDigestSource what its
+// containers are running right now, and keeps the answers that match an
+// image Diun currently knows about. It performs no registry calls itself;
+// each source talks to its own local daemon only. Images whose provider
+// has no registered source, or that no local container is running, are
+// left out of the result.
+func (r *Recorder) resolveLocalDigests(images map[imageKey]imageState) map[imageKey][]digest.Digest {
+	providers := make(map[string]struct{})
+	for _, img := range images {
+		providers[img.provider] = struct{}{}
+	}
+	if len(providers) == 0 {
+		return nil
+	}
+
+	r.sourcesMu.RLock()
+	sources := make(map[string]LocalDigestSource, len(r.localDigestSources))
+	for k, v := range r.localDigestSources {
+		sources[k] = v
+	}
+	r.sourcesMu.RUnlock()
+
+	result := make(map[imageKey][]digest.Digest)
+	for provider := range providers {
+		source, ok := sources[provider]
+		if !ok {
+			continue
+		}
+		for image, digests := range source.LocalDigests() {
+			key := imageKey{provider: provider, image: image}
+			if _, watched := images[key]; !watched {
+				continue
+			}
+			result[key] = digests
+		}
+	}
+	return result
+}
+
+// RegisterLocalDigestSource wires a provider-specific LocalDigestSource
+// into the recorder, keyed by provider name (e.g. "docker"). Safe to call
+// before or after the metrics server starts serving.
+func (r *Recorder) RegisterLocalDigestSource(provider string, source LocalDigestSource) {
+	if r == nil || source == nil {
+		return
+	}
+
+	r.sourcesMu.Lock()
+	defer r.sourcesMu.Unlock()
+
+	if r.localDigestSources == nil {
+		r.localDigestSources = make(map[string]LocalDigestSource)
+	}
+	r.localDigestSources[provider] = source
 }
 
 // RecordRun records a completed Diun watch run.
@@ -222,6 +345,7 @@ func (r *Recorder) RecordRun(entries *model.NotifEntries, duration time.Duration
 				updateAvailable: entry.UpdateAvailable(),
 				lastCheck:       completedAt,
 				created:         entry.Manifest.Created,
+				lastDigest:      entry.Manifest.Digest,
 			}
 		}
 	}
