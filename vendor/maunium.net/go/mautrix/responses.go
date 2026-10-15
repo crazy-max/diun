@@ -779,3 +779,32 @@ type RespWhoIs struct {
 	UserID  id.UserID                  `json:"user_id,omitempty"`
 	Devices map[id.DeviceID]DeviceInfo `json:"devices,omitempty"`
 }
+
+type RespSearchWrapper struct {
+	SearchCategories RespSearchCategoryWrapper `json:"search_categories"`
+}
+
+type RespSearchCategoryWrapper struct {
+	RoomEvents *RespSearch `json:"room_events"`
+}
+
+type RespSearch struct {
+	Count      int                                     `json:"count"`
+	Highlights []string                                `json:"highlights,omitempty"`
+	NextBatch  string                                  `json:"next_batch,omitempty"`
+	Groups     map[string]map[string]SearchResultGroup `json:"groups,omitempty"`
+	Results    []*SearchResult                         `json:"results,omitempty"`
+	State      map[id.RoomID][]*event.Event            `json:"state,omitempty"`
+}
+
+type SearchResultGroup struct {
+	NextBatch string   `json:"next_batch,omitempty"`
+	Order     int      `json:"order"`
+	Results   []string `json:"results"`
+}
+
+type SearchResult struct {
+	Rank    float64      `json:"rank"`
+	Event   *event.Event `json:"result"`
+	Context *RespContext `json:"context,omitempty"`
+}

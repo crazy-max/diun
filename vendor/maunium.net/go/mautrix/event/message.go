@@ -73,6 +73,8 @@ type RedactionEventContent struct {
 
 	// The event ID is here as of room v11. In old servers it may only be at the top level.
 	Redacts id.EventID `json:"redacts,omitempty"`
+
+	DontRenderPlaceholder bool `json:"com.beeper.dont_render_redacted_placeholder,omitempty"`
 }
 
 // ReactionEventContent represents the content of a m.reaction message event.

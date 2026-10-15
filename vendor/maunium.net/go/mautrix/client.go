@@ -110,6 +110,9 @@ type Client struct {
 	DefaultHTTPRetries int
 	// Amount of time to wait between HTTP retries, defaults to 4 seconds
 	DefaultHTTPBackoff time.Duration
+	// Maximum time to wait between HTTP retries, defaults to 10 minutes.
+	// This applies to both the exponential backoff from gateway/network errors and to 429 errors.
+	MaxHTTPBackoff time.Duration
 	// Set to true to disable automatically sleeping on 429 errors.
 	IgnoreRateLimit bool
 
@@ -617,6 +620,11 @@ func (cli *Client) doRetry(
 			return nil, nil, cause
 		}
 	}
+	maxBackoff := cli.MaxHTTPBackoff
+	if maxBackoff <= 0 {
+		maxBackoff = 10 * time.Minute
+	}
+	backoff = min(backoff, maxBackoff)
 	log.Warn().Err(cause).
 		Str("method", req.Method).
 		Str("url", req.URL.String()).
@@ -748,10 +756,15 @@ func (cli *Client) prepareRequestAttempt(req *http.Request) (*http.Request, func
 
 	attemptCtx, cancel := context.WithCancelCause(req.Context())
 
+	// Register as a waiter synchronously so we're waiting by the time this method returns, avoid
+	// race on trigger notify and the goroutine below.
+	resetCh := cli.RequestRetryTrigger.GetChan()
+
 	go func() {
-		// If we hear of a reset, cancel the request context with a retry message
-		if cli.RequestRetryTrigger.Wait(attemptCtx) == nil {
+		select {
+		case <-resetCh:
 			cancel(ErrContextCancelRetry)
+		case <-attemptCtx.Done():
 		}
 	}()
 
@@ -2149,6 +2162,7 @@ func (cli *Client) uploadMediaToURL(ctx context.Context, data ReqUploadMedia) (*
 				Msg("Error uploading media to external URL, not retrying")
 			return nil, err
 		}
+		// TODO change to exponential like normal retries?
 		backoff := time.Second * time.Duration(cli.DefaultHTTPRetries-retries)
 		cli.Log.Warn().Err(err).
 			Str("url", data.UnstableUploadURL).
@@ -2412,6 +2426,14 @@ func (cli *Client) Context(ctx context.Context, roomID id.RoomID, eventID id.Eve
 	urlPath := cli.BuildURLWithQuery(ClientURLPath{"v3", "rooms", roomID, "context", eventID}, query)
 	_, err = cli.MakeRequest(ctx, http.MethodGet, urlPath, nil, &resp)
 	return
+}
+
+func (cli *Client) Search(ctx context.Context, req *ReqSearch) (*RespSearch, error) {
+	urlPath := cli.BuildURLWithQuery(ClientURLPath{"v3", "search"}, req.Query())
+	wrappedReq := &ReqSearchWrapper{SearchCategories: ReqSearchCategoryWrapper{RoomEvents: req}}
+	var wrappedResp RespSearchWrapper
+	_, err := cli.MakeRequest(ctx, http.MethodPost, urlPath, wrappedReq, &wrappedResp)
+	return wrappedResp.SearchCategories.RoomEvents, err
 }
 
 func (cli *Client) GetEvent(ctx context.Context, roomID id.RoomID, eventID id.EventID) (resp *event.Event, err error) {
@@ -2812,6 +2834,14 @@ func (cli *Client) DeletePushRule(ctx context.Context, scope string, kind pushru
 	return err
 }
 
+func (cli *Client) SetPushRuleEnabled(ctx context.Context, scope string, kind pushrules.PushRuleType, ruleID string, enabled bool) error {
+	urlPath := cli.BuildClientURL("v3", "pushrules", scope, kind, ruleID, "enabled")
+	_, err := cli.MakeRequest(ctx, http.MethodPut, urlPath, map[string]any{
+		"enabled": enabled,
+	}, nil)
+	return err
+}
+
 func (cli *Client) PutPushRule(ctx context.Context, scope string, kind pushrules.PushRuleType, ruleID string, req *ReqPutPushRule) error {
 	query := make(map[string]string)
 	if len(req.After) > 0 {
@@ -2822,6 +2852,14 @@ func (cli *Client) PutPushRule(ctx context.Context, scope string, kind pushrules
 	}
 	urlPath := cli.BuildURLWithQuery(ClientURLPath{"v3", "pushrules", scope, kind, ruleID}, query)
 	_, err := cli.MakeRequest(ctx, http.MethodPut, urlPath, req, nil)
+	return err
+}
+
+func (cli *Client) PutPushRuleActions(ctx context.Context, scope string, kind pushrules.PushRuleType, ruleID string, actions []*pushrules.PushAction) error {
+	urlPath := cli.BuildClientURL("v3", "pushrules", scope, kind, ruleID, "actions")
+	_, err := cli.MakeRequest(ctx, http.MethodPut, urlPath, &ReqPutPushRule{
+		Actions: actions,
+	}, nil)
 	return err
 }
 

@@ -1,3 +1,25 @@
+## v0.28.1 (2026-06-16)
+
+* *(pushrules)* Removed deprecated `NotifySpecified` field in `Should()`.
+* *(pushrules)* Deprecated `ActionDontNotify` and `ActionCoalesce` constants.
+* *(client)* Added wrapper for `/search` endpoint.
+* *(client)* Added wrappers for the `/enabled` and `/actions` sub-endpoints
+  for modifying push rules.
+* *(bridgev2/commands)* Added warning when using the login command in a
+  non-management room.
+* *(bridgev2/matrix)* Added `ParseContentURI` method for parsing a `mxc://` URI
+  previously generated for direct media.
+* *(bridgev2/provisioning)* Changed request handling to allow retrying requests.
+  * Requests can be retried as long as the next step hasn't been completed.
+  * Cancellation is now done with a separate API call.
+* *(bridgev2/provisioning)* Changed group creation to ignore self in participants
+  list instead of rejecting the request.
+* *(bridgev2/provisioning)* Changed error responses to include internal error in
+  a separate field.
+* *(bridgev2)* Fixed `m.bridge` event in child portals not being updated when
+  the parent portal name or avatar changes.
+* *(client)* Fixed request retry trigger not working correctly in some cases.
+
 ## v0.28.0 (2026-05-16)
 
 * **Breaking change *(federation)*** Changed `NewClient` to take HTTP client

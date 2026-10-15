@@ -46,6 +46,7 @@ type RoomFeatures struct {
 	Delete       CapabilitySupportLevel `json:"delete,omitempty"`
 	DeleteForMe  bool                   `json:"delete_for_me,omitempty"`
 	DeleteMaxAge *jsontime.Seconds      `json:"delete_max_age,omitempty"`
+	DeleteHide   bool                   `json:"delete_hide_placeholder,omitempty"`
 
 	DisappearingTimer *DisappearingTimerCapability `json:"disappearing_timer,omitempty"`
 
@@ -353,6 +354,7 @@ func (rf *RoomFeatures) Hash() []byte {
 	hashValue(hasher, "delete", rf.Delete)
 	hashBool(hasher, "delete_for_me", rf.DeleteForMe)
 	hashInt(hasher, "delete_max_age", rf.DeleteMaxAge.Get())
+	hashBool(hasher, "delete_hide_placeholder", rf.DeleteHide)
 	hashValue(hasher, "disappearing_timer", rf.DisappearingTimer)
 
 	hashValue(hasher, "reaction", rf.Reaction)
