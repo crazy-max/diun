@@ -40,6 +40,40 @@ with this setting). (default `false`)
 !!! abstract "Environment variables"
     * `DIUN_DEFAULTS_WATCHREPO`
 
+### `watchNewerOnly`
+
+When `watchRepo` is enabled, only notify for tags whose semantic version is
+**strictly greater** than the current image tag. Tags that cannot be parsed as a
+semantic version (e.g. `latest`, `edge`, date-based tags) are silently ignored.
+(default `false`)
+
+!!! warning
+    Only works if `watchRepo` is enabled and the current image tag is a valid
+    semantic version (e.g. `1.5.0`, `v2.3.1`).
+
+!!! example "Config file"
+    ```yaml
+    defaults:
+      watchNewerOnly: true
+    ```
+
+!!! abstract "Environment variables"
+    * `DIUN_DEFAULTS_WATCHNEWERONLY`
+
+### `includePrereleases`
+
+When `watchNewerOnly` is enabled, also include pre-release tags (e.g. `-rc.1`,
+`-alpha`, `-beta`) that are newer than the current version. (default `false`)
+
+!!! example "Config file"
+    ```yaml
+    defaults:
+      includePrereleases: false
+    ```
+
+!!! abstract "Environment variables"
+    * `DIUN_DEFAULTS_INCLUDEPRERELEASES`
+
 ### `notifyOn`
 
 List of status to be notified. Can be one of `new` or `update`.

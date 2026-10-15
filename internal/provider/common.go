@@ -25,6 +25,8 @@ func ValidateImage(image string, metadata, labels map[string]string, watchByDef 
 
 	if defaults != nil {
 		img.WatchRepo = defaults.WatchRepo
+		img.WatchNewerOnly = defaults.WatchNewerOnly
+		img.IncludePrereleases = defaults.IncludePrereleases
 		img.NotifyOn = defaults.NotifyOn
 		img.MaxTags = defaults.MaxTags
 		img.SortTags = defaults.SortTags
@@ -52,6 +54,18 @@ func ValidateImage(image string, metadata, labels map[string]string, watchByDef 
 		case key == "diun.watch_repo":
 			if watchRepo, err := strconv.ParseBool(value); err == nil {
 				img.WatchRepo = new(watchRepo)
+			} else {
+				return img, errors.Wrapf(err, "cannot parse %q value of label %s", value, key)
+			}
+		case key == "diun.watch_newer_only":
+			if v, err := strconv.ParseBool(value); err == nil {
+				img.WatchNewerOnly = new(v)
+			} else {
+				return img, errors.Wrapf(err, "cannot parse %q value of label %s", value, key)
+			}
+		case key == "diun.include_prereleases":
+			if v, err := strconv.ParseBool(value); err == nil {
+				img.IncludePrereleases = new(v)
 			} else {
 				return img, errors.Wrapf(err, "cannot parse %q value of label %s", value, key)
 			}

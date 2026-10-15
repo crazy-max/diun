@@ -87,6 +87,95 @@ func TestTagsSkipsGeneratedArtifactTags(t *testing.T) {
 	}, tags)
 }
 
+func TestNormalizeSemver(t *testing.T) {
+	cases := []struct {
+		tag      string
+		expected string
+	}{
+		{"1.5.0", "v1.5.0"},
+		{"v1.5.0", "v1.5.0"},
+		{"1.5.0-rc.1", "v1.5.0-rc.1"},
+		{"v2.0.0-alpha", "v2.0.0-alpha"},
+		{"latest", ""},
+		{"edge", ""},
+		{"", ""},
+		{"4", "v4"},
+		{"ubuntu-5.0", "v5.0"},
+	}
+	for _, tc := range cases {
+		t.Run(tc.tag, func(t *testing.T) {
+			assert.Equal(t, tc.expected, normalizeSemver(tc.tag))
+		})
+	}
+}
+
+func TestTagsMinSemver(t *testing.T) {
+	registry := newTestRegistry(t, "acme/myapp")
+	registry.addTagsPage("", []string{
+		"latest",
+		"edge",
+		"1.4.0",
+		"1.5.0",
+		"1.5.1",
+		"1.6.0",
+		"2.0.0",
+		"2.0.0-rc.1",
+		"2.0.0-beta",
+	}, "")
+
+	image, err := ParseImage(ParseImageOptions{
+		Name: registry.imageName("1.5.0"),
+	})
+	require.NoError(t, err)
+	client := newTestRegistryClient(t, Options{})
+
+	t.Run("stable only, no prereleases", func(t *testing.T) {
+		tags, err := client.Tags(TagsOptions{
+			Image:              image,
+			MinSemver:          "1.5.0",
+			IncludePrereleases: false,
+		})
+		require.NoError(t, err)
+		assert.Equal(t, []string{"1.5.1", "1.6.0", "2.0.0"}, tags.List)
+		// latest, edge, 1.4.0, 1.5.0, 2.0.0-rc.1, 2.0.0-beta all filtered
+		assert.Equal(t, 6, tags.OlderOrEqual)
+		assert.Equal(t, 9, tags.Total)
+	})
+
+	t.Run("include prereleases", func(t *testing.T) {
+		tags, err := client.Tags(TagsOptions{
+			Image:              image,
+			MinSemver:          "1.5.0",
+			IncludePrereleases: true,
+		})
+		require.NoError(t, err)
+		assert.Equal(t, []string{"1.5.1", "1.6.0", "2.0.0", "2.0.0-rc.1", "2.0.0-beta"}, tags.List)
+		assert.Equal(t, 4, tags.OlderOrEqual) // latest, edge, 1.4.0, 1.5.0
+		assert.Equal(t, 9, tags.Total)
+	})
+
+	t.Run("min semver with v prefix", func(t *testing.T) {
+		tags, err := client.Tags(TagsOptions{
+			Image:              image,
+			MinSemver:          "v1.5.0",
+			IncludePrereleases: false,
+		})
+		require.NoError(t, err)
+		assert.Equal(t, []string{"1.5.1", "1.6.0", "2.0.0"}, tags.List)
+	})
+
+	t.Run("non-semver min version disables filtering", func(t *testing.T) {
+		tags, err := client.Tags(TagsOptions{
+			Image:     image,
+			MinSemver: "latest",
+		})
+		require.NoError(t, err)
+		// "latest" can't be parsed as semver → no filtering applied
+		assert.Equal(t, 9, len(tags.List))
+		assert.Equal(t, 0, tags.OlderOrEqual)
+	})
+}
+
 func TestTagsSort(t *testing.T) {
 	testCases := []struct {
 		name     string
