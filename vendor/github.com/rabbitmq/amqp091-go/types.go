@@ -8,6 +8,7 @@ package amqp091
 import (
 	"fmt"
 	"io"
+	"sync/atomic"
 	"time"
 )
 
@@ -66,6 +67,10 @@ var (
 	// ErrFrame is returned when the protocol frame cannot be read from the
 	// server, indicating an unsupported protocol or unsupported frame type.
 	ErrFrame = &Error{Code: FrameError, Reason: "frame could not be parsed"}
+
+	// ErrFrameTooLarge is returned when the server sends a frame whose
+	// declared size exceeds the frame_max negotiated during connection.tune.
+	ErrFrameTooLarge = &Error{Code: FrameError, Reason: "frame size exceeds negotiated frame_max"}
 
 	// ErrCommandInvalid is returned when the server sends an unexpected response
 	// to this requested message type. This indicates a bug in this client.
@@ -502,6 +507,12 @@ func updateChannel(f frame, channel *Channel) {
 
 type reader struct {
 	r io.Reader
+
+	// maxFrameSize, when non-nil, points at the connection's negotiated
+	// frame_max (total frame length, including header and frame-end byte).
+	// A nil pointer or a stored value of 0 means no limit is enforced,
+	// matching the pre-negotiation and explicitly-unlimited cases.
+	maxFrameSize *atomic.Uint32
 }
 
 type writer struct {

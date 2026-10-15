@@ -23,6 +23,11 @@ type PlainAuth struct {
 	Password string
 }
 
+// String returns a redacted representation of PlainAuth.
+func (auth PlainAuth) String() string {
+	return fmt.Sprintf("PlainAuth{Username: %q, Password: [REDACTED]}", auth.Username)
+}
+
 // Mechanism returns "PLAIN"
 func (auth *PlainAuth) Mechanism() string {
 	return "PLAIN"
@@ -37,6 +42,11 @@ func (auth *PlainAuth) Response() string {
 type AMQPlainAuth struct {
 	Username string
 	Password string
+}
+
+// String returns a redacted representation of AMQPlainAuth.
+func (auth AMQPlainAuth) String() string {
+	return fmt.Sprintf("AMQPlainAuth{Username: %q, Password: [REDACTED]}", auth.Username)
 }
 
 // Mechanism returns "AMQPLAIN"
