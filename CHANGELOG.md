@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+* Matrix notification now supports access token authentication via `accessToken`/`accessTokenFile`
+
 ## 4.33.0 (2026/05/30)
 
 * Diun now exposes a container `healthcheck` command by @crazy-max in #1758 #1759

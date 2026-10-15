@@ -68,6 +68,11 @@ func TestLoadFile(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name:    "Fail on matrix notif with both password and access token",
+			cfg:     "./fixtures/config.err.matrix.mutual-exclusivity.yml",
+			wantErr: true,
+		},
+		{
 			name: "Success",
 			cfg:  "./fixtures/config.test.yml",
 			wantData: &Config{
@@ -547,6 +552,52 @@ func TestLoadEnv(t *testing.T) {
 				},
 			},
 			wantErr: false,
+		},
+		{
+			desc: "notif matrix with access token",
+			environ: []string{
+				"DIUN_PROVIDERS_DOCKER=true",
+				"DIUN_NOTIF_MATRIX_HOMESERVERURL=https://matrix.org",
+				"DIUN_NOTIF_MATRIX_USER=@diun:matrix.org",
+				"DIUN_NOTIF_MATRIX_ACCESSTOKEN=diun-token",
+				"DIUN_NOTIF_MATRIX_ROOMID=!abcdefGHIjklmno:matrix.org",
+			},
+			expected: &Config{
+				Db:       (&model.Db{}).GetDefaults(),
+				Watch:    (&model.Watch{}).GetDefaults(),
+				Defaults: (&model.Defaults{}).GetDefaults(),
+				Metrics:  (&model.Metrics{}).GetDefaults(),
+				Notif: &model.Notif{
+					Matrix: &model.NotifMatrix{
+						HomeserverURL: "https://matrix.org",
+						User:          "@diun:matrix.org",
+						AccessToken:   "diun-token",
+						RoomID:        "!abcdefGHIjklmno:matrix.org",
+						MsgType:       model.NotifMatrixMsgTypeNotice,
+						TemplateBody:  model.NotifDefaultTemplateBody,
+					},
+				},
+				Providers: &model.Providers{
+					Docker: &model.PrdDocker{
+						TLSVerify:      new(true),
+						WatchByDefault: new(false),
+						WatchStopped:   new(false),
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			desc: "notif matrix with both password and access token fails",
+			environ: []string{
+				"DIUN_PROVIDERS_DOCKER=true",
+				"DIUN_NOTIF_MATRIX_HOMESERVERURL=https://matrix.org",
+				"DIUN_NOTIF_MATRIX_USER=@diun:matrix.org",
+				"DIUN_NOTIF_MATRIX_PASSWORD=password",
+				"DIUN_NOTIF_MATRIX_ACCESSTOKEN=diun-token",
+				"DIUN_NOTIF_MATRIX_ROOMID=!abcdefGHIjklmno:matrix.org",
+			},
+			wantErr: true,
 		},
 	}
 

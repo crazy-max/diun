@@ -136,6 +136,112 @@ func TestSendStopsAfterMatrixRateLimitAttempts(t *testing.T) {
 	assert.Equal(t, matrixMaxRateLimitAttempts, sendCount)
 }
 
+func TestSendWithAccessToken(t *testing.T) {
+	const token = "diun-token"
+
+	var gotAuthHeaders []string
+	var gotDecodeErr error
+	var gotEncodeErr error
+	var gotPayloads []matrixMessagePayload
+
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+
+		switch {
+		case strings.HasSuffix(r.URL.Path, "/login"):
+			if err := writeMatrixResponse(w, http.StatusOK, map[string]any{
+				"access_token": "should-not-be-used",
+				"device_id":    "DEVICE",
+				"user_id":      "@diun:example.com",
+			}); err != nil && gotEncodeErr == nil {
+				gotEncodeErr = err
+			}
+		case strings.Contains(r.URL.Path, "/join/"):
+			gotAuthHeaders = append(gotAuthHeaders, r.Header.Get("Authorization"))
+			if err := writeMatrixResponse(w, http.StatusOK, map[string]any{
+				"room_id": "!alerts:example.com",
+			}); err != nil && gotEncodeErr == nil {
+				gotEncodeErr = err
+			}
+		case strings.Contains(r.URL.Path, "/send/m.room.message/"):
+			gotAuthHeaders = append(gotAuthHeaders, r.Header.Get("Authorization"))
+			r.Body = http.MaxBytesReader(w, r.Body, 1<<20)
+
+			var payload matrixMessagePayload
+			if err := json.NewDecoder(r.Body).Decode(&payload); err != nil && gotDecodeErr == nil {
+				gotDecodeErr = err
+			}
+			gotPayloads = append(gotPayloads, payload)
+
+			if err := writeMatrixResponse(w, http.StatusOK, map[string]any{
+				"event_id": "$event",
+			}); err != nil && gotEncodeErr == nil {
+				gotEncodeErr = err
+			}
+		case strings.HasSuffix(r.URL.Path, "/logout"):
+			if err := writeMatrixResponse(w, http.StatusOK, map[string]any{}); err != nil && gotEncodeErr == nil {
+				gotEncodeErr = err
+			}
+		default:
+			http.NotFound(w, r)
+		}
+	}))
+	defer ts.Close()
+
+	err := newTestClientWithToken(ts.URL, token).Send(testEntry(t))
+
+	require.NoError(t, err)
+	require.NoError(t, gotDecodeErr)
+	require.NoError(t, gotEncodeErr)
+	assert.NotEmpty(t, gotAuthHeaders, "expected at least one request to the homeserver")
+	for _, h := range gotAuthHeaders {
+		assert.Equal(t, "Bearer "+token, h)
+	}
+	require.Len(t, gotPayloads, 1)
+	assert.Equal(t, matrixMessagePayload{
+		Body:          "file update",
+		MsgType:       "m.notice",
+		Format:        "org.matrix.custom.html",
+		FormattedBody: "file update",
+	}, gotPayloads[0])
+}
+
+func TestSendRejectsMutuallyExclusiveCredentials(t *testing.T) {
+	c := &Client{
+		cfg: &model.NotifMatrix{
+			HomeserverURL: "https://matrix.example",
+			User:          "@diun:example.com",
+			Password:      "password",
+			AccessToken:   "diun-token",
+			RoomID:        "!alerts:example.com",
+			MsgType:       model.NotifMatrixMsgTypeNotice,
+			TemplateBody:  "{{ .Entry.Provider }}",
+		},
+		meta: model.Meta{Name: "Diun", Hostname: "node-1"},
+	}
+
+	err := c.Send(testEntry(t))
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "mutually exclusive")
+}
+
+func TestSendRejectsAccessTokenWithoutUser(t *testing.T) {
+	c := &Client{
+		cfg: &model.NotifMatrix{
+			HomeserverURL: "https://matrix.example",
+			AccessToken:   "diun-token",
+			RoomID:        "!alerts:example.com",
+			MsgType:       model.NotifMatrixMsgTypeNotice,
+			TemplateBody:  "{{ .Entry.Provider }}",
+		},
+		meta: model.Meta{Name: "Diun", Hostname: "node-1"},
+	}
+
+	err := c.Send(testEntry(t))
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "user is required")
+}
+
 type matrixMessagePayload struct {
 	Body          string `json:"body"`
 	MsgType       string `json:"msgtype"`
@@ -149,6 +255,23 @@ func newTestClient(homeserverURL string) *Client {
 			HomeserverURL: homeserverURL,
 			User:          "@diun:example.com",
 			Password:      "password",
+			RoomID:        "!alerts:example.com",
+			MsgType:       model.NotifMatrixMsgTypeNotice,
+			TemplateBody:  "{{ .Entry.Provider }} {{ .Entry.Status }}",
+		},
+		meta: model.Meta{
+			Name:     "Diun",
+			Hostname: "node-1",
+		},
+	}
+}
+
+func newTestClientWithToken(homeserverURL, accessToken string) *Client {
+	return &Client{
+		cfg: &model.NotifMatrix{
+			HomeserverURL: homeserverURL,
+			User:          "@diun:example.com",
+			AccessToken:   accessToken,
 			RoomID:        "!alerts:example.com",
 			MsgType:       model.NotifMatrixMsgTypeNotice,
 			TemplateBody:  "{{ .Entry.Provider }} {{ .Entry.Status }}",

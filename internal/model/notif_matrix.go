@@ -2,14 +2,16 @@ package model
 
 // NotifMatrix holds Matrix notification configuration details
 type NotifMatrix struct {
-	HomeserverURL string             `yaml:"homeserverURL,omitempty" json:"homeserverURL,omitempty" validate:"required"`
-	User          string             `yaml:"user,omitempty" json:"user,omitempty" validate:"omitempty"`
-	UserFile      string             `yaml:"userFile,omitempty" json:"userFile,omitempty" validate:"omitempty,file"`
-	Password      string             `yaml:"password,omitempty" json:"password,omitempty" validate:"omitempty"`
-	PasswordFile  string             `yaml:"passwordFile,omitempty" json:"passwordFile,omitempty" validate:"omitempty,file"`
-	RoomID        string             `yaml:"roomID,omitempty" json:"roomID,omitempty" validate:"required"`
-	MsgType       NotifMatrixMsgType `yaml:"msgType,omitempty" json:"msgType,omitempty" validate:"required,oneof=notice text"`
-	TemplateBody  string             `yaml:"templateBody,omitempty" json:"templateBody,omitempty" validate:"required"`
+	HomeserverURL   string             `yaml:"homeserverURL,omitempty" json:"homeserverURL,omitempty" validate:"required"`
+	User            string             `yaml:"user,omitempty" json:"user,omitempty" validate:"omitempty"`
+	UserFile        string             `yaml:"userFile,omitempty" json:"userFile,omitempty" validate:"omitempty,file"`
+	AccessToken     string             `yaml:"accessToken,omitempty" json:"accessToken,omitempty" validate:"omitempty"`
+	AccessTokenFile string             `yaml:"accessTokenFile,omitempty" json:"accessTokenFile,omitempty" validate:"omitempty,file"`
+	Password        string             `yaml:"password,omitempty" json:"password,omitempty" validate:"omitempty"`
+	PasswordFile    string             `yaml:"passwordFile,omitempty" json:"passwordFile,omitempty" validate:"omitempty,file"`
+	RoomID          string             `yaml:"roomID,omitempty" json:"roomID,omitempty" validate:"required"`
+	MsgType         NotifMatrixMsgType `yaml:"msgType,omitempty" json:"msgType,omitempty" validate:"required,oneof=notice text"`
+	TemplateBody    string             `yaml:"templateBody,omitempty" json:"templateBody,omitempty" validate:"required"`
 }
 
 // NotifMatrix message type constants
