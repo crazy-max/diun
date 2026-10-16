@@ -35,7 +35,7 @@ jobs:
       -
         name: Validate matrix
         id: validate
-        uses: docker/bake-action/subaction/matrix@6614cfa25eff9a0b2b2697efb0b6159e7680d584 # v7.2.0
+        uses: docker/bake-action/subaction/matrix@59cb1203cd42bcefd40a1b6d73b589e48c86040e # v7.5.0
         with:
           target: validate
           fields: platforms
@@ -44,7 +44,7 @@ jobs:
       -
         name: Artifact matrix
         id: artifact
-        uses: docker/bake-action/subaction/matrix@6614cfa25eff9a0b2b2697efb0b6159e7680d584 # v7.2.0
+        uses: docker/bake-action/subaction/matrix@59cb1203cd42bcefd40a1b6d73b589e48c86040e # v7.5.0
         with:
           target: artifact-all
           fields: platforms
