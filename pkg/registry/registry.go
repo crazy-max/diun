@@ -47,8 +47,12 @@ func (c *Client) timeoutContext() (context.Context, context.CancelFunc) {
 	var cancelFunc context.CancelFunc = func() {}
 	if c.opts.Timeout > 0 {
 		cancelCtx, cancel := context.WithCancelCause(ctx)
-		ctx, _ = context.WithTimeoutCause(cancelCtx, c.opts.Timeout, errors.WithStack(context.DeadlineExceeded)) //nolint:govet // no need to manually cancel this context as we already rely on parent
-		cancelFunc = func() { cancel(errors.WithStack(context.Canceled)) }
+		var cancelTimeout context.CancelFunc
+		ctx, cancelTimeout = context.WithTimeoutCause(cancelCtx, c.opts.Timeout, errors.WithStack(context.DeadlineExceeded))
+		cancelFunc = func() {
+			cancelTimeout()
+			cancel(errors.WithStack(context.Canceled))
+		}
 	}
 	return ctx, cancelFunc
 }
