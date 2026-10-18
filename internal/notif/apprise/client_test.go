@@ -2,6 +2,7 @@ package apprise
 
 import (
 	"encoding/json"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -69,6 +70,55 @@ func TestSendReturnsAppriseError(t *testing.T) {
 
 	require.NoError(t, encodeErr)
 	require.EqualError(t, err, "400 bad request: invalid notification URL")
+}
+
+func TestSendOmitsEmptyTagsAndURLs(t *testing.T) {
+	testCases := []struct {
+		name string
+		tags []string
+		urls []string
+	}{
+		{
+			name: "nil slices",
+			tags: nil,
+			urls: nil,
+		},
+		{
+			name: "empty slices",
+			tags: []string{},
+			urls: []string{},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			var rawBody string
+			var gotPayload map[string]any
+
+			ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				bodyBytes, readErr := io.ReadAll(r.Body)
+				require.NoError(t, readErr)
+				rawBody = string(bodyBytes)
+				require.NoError(t, json.Unmarshal(bodyBytes, &gotPayload))
+				w.WriteHeader(http.StatusOK)
+			}))
+			defer ts.Close()
+
+			client := newTestClient(ts.URL)
+			client.cfg.Tags = tc.tags
+			client.cfg.URLs = tc.urls
+
+			err := client.Send(testEntry(t))
+			require.NoError(t, err)
+
+			assert.Equal(t, "file update", gotPayload["body"])
+			assert.Equal(t, "docker.io/library/alpine:latest", gotPayload["title"])
+			assert.NotContains(t, rawBody, `"urls"`)
+			assert.NotContains(t, rawBody, `"tags"`)
+			assert.NotContains(t, gotPayload, "urls")
+			assert.NotContains(t, gotPayload, "tags")
+		})
+	}
 }
 
 func newTestClient(endpoint string) *Client {
