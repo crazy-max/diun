@@ -59,8 +59,8 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	if err := json.NewEncoder(dataBuf).Encode(struct {
 		Message string   `json:"body"`
 		Title   string   `json:"title"`
-		Tags    []string `json:"tags"`
-		URLs    []string `json:"urls"`
+		Tags    []string `json:"tags,omitempty"`
+		URLs    []string `json:"urls,omitempty"`
 	}{
 		Message: string(body),
 		Title:   string(title),
@@ -89,8 +89,9 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	u.RawQuery = q.Encode()
 
 	cancelCtx, cancel := context.WithCancelCause(context.Background())
-	timeoutCtx, _ := context.WithTimeoutCause(cancelCtx, *c.cfg.Timeout, errors.WithStack(context.DeadlineExceeded)) //nolint:govet // no need to manually cancel this context as we already rely on parent
 	defer func() { cancel(errors.WithStack(context.Canceled)) }()
+	timeoutCtx, cancelTimeout := context.WithTimeoutCause(cancelCtx, *c.cfg.Timeout, errors.WithStack(context.DeadlineExceeded))
+	defer cancelTimeout()
 
 	hc, err := httputil.NewClient(c.cfg.Proxy, c.cfg.TLSSkipVerify, c.cfg.TLSCACertFiles)
 	if err != nil {
