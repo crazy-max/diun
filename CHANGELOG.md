@@ -1,5 +1,26 @@
 # Changelog
 
+## 4.33.1 (2026/10/24)
+
+This release is built with Go 1.26.10 to address [CVE-2026-111943](https://go.dev/issue/82345).
+Certificate verification now rejects chains containing eight revoked eMudhra
+intermediate certificates whose private keys were compromised.
+
+The blocked intermediates are:
+
+* Domain-validated TLS: `EM DV TLS CA - G3B` and `EM DV TLS CA - G3C`
+* Organization-validated TLS: `EM OV TLS CA - G3B` and `EM OV TLS CA - G3C`
+* Extended-validation TLS: `EM EV TLS CA - G3B` and `EM EV TLS CA - G3C`
+* Code signing: `EM OV CS CA - G3B` and `EM OV CS CA - G3C`
+
+The G3B intermediates belong to eMudhra BV, and the G3C intermediates belong to
+eMudhra Inc. See the [eMudhra Intermediate CA Compromise](https://emudhra.we-have-a-problem.com/)
+for more details.
+
+There are no functional changes in Diun itself compared to v4.33.0.
+
+**Full Changelog**: [`v4.33.0...v4.33.1`](https://github.com/crazy-max/diun/compare/v4.33.0...v4.33.1)
+
 ## 4.33.0 (2026/05/30)
 
 * Diun now exposes a container `healthcheck` command by @crazy-max in #1758 #1759
@@ -13,7 +34,7 @@
 * Document global proxy configuration by @crazy-max in #1752
 * Preserve logrus fields in zerolog output by @crazy-max in #1749
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v4.32.0...v4.33.0
+**Full Changelog**: [`v4.32.0...v4.33.0`](https://github.com/crazy-max/diun/compare/v4.32.0...v4.33.0)
 
 ## 4.32.0 (2026/05/28)
 
@@ -65,7 +86,7 @@
 * Bump k8s.io/client-go to 0.35.3 in #1607 #1631 #1644
 * Bump maunium.net/go/mautrix to 0.28.0 in #1613 #1641 #1710
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v4.31.0...v4.32.0
+**Full Changelog**: [`v4.31.0...v4.32.0`](https://github.com/crazy-max/diun/compare/v4.31.0...v4.32.0)
 
 ## 4.31.0 (2025/12/24)
 
@@ -94,7 +115,7 @@
 * Bump k8s.io/client-go to 0.34.1 in #1501
 * Bump maunium.net/go/mautrix to 0.26.1 in #1567
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v4.30.0...v4.31.0
+**Full Changelog**: [`v4.30.0...v4.31.0`](https://github.com/crazy-max/diun/compare/v4.30.0...v4.31.0)
 
 ## 4.30.0 (2025/08/31)
 
@@ -133,7 +154,7 @@
 * Bump google.golang.org/protobuf to 1.36.8 in #1389 #1471 #1479
 * Bump k8s.io/client-go to 0.32.1 in #1338 #1453
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v4.29.0...v4.30.0
+**Full Changelog**: [`v4.29.0...v4.30.0`](https://github.com/crazy-max/diun/compare/v4.29.0...v4.30.0)
 
 ## 4.29.0 (2024/12/19)
 
@@ -172,7 +193,7 @@
 * Bump google.golang.org/protobuf to 1.35.2 in #1277
 * Bump k8s.io/client-go to 0.32.0 in #1280
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v4.28.0...v4.29.0
+**Full Changelog**: [`v4.28.0...v4.29.0`](https://github.com/crazy-max/diun/compare/v4.28.0...v4.29.0)
 
 ## 4.28.0 (2024/04/06)
 
@@ -184,7 +205,7 @@
 * Bump golang.org/x/sys to 0.19.0 in #1142
 * Bump google.golang.org/grpc to 1.63.0 in #1141
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v4.27.0...v4.28.0
+**Full Changelog**: [`v4.27.0...v4.28.0`](https://github.com/crazy-max/diun/compare/v4.27.0...v4.28.0)
 
 ## 4.27.0 (2024/03/23)
 
@@ -216,7 +237,7 @@
 * Bump google.golang.org/protobuf to 1.33.0 in #1064 #1119
 * Bump k8s.io/client-go to 0.29.3 in #1045 #1051 #1098 #1127
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v4.26.0...v4.27.0
+**Full Changelog**: [`v4.26.0...v4.27.0`](https://github.com/crazy-max/diun/compare/v4.26.0...v4.27.0)
 
 ## 4.26.0 (2023/09/23)
 
@@ -247,7 +268,7 @@
 * Bump google.golang.org/protobuf to 1.31.0 in #908
 * Bump k8s.io/client-go to 0.28.2 in #960
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v4.25.0...v4.26.0
+**Full Changelog**: [`v4.25.0...v4.26.0`](https://github.com/crazy-max/diun/compare/v4.25.0...v4.26.0)
 
 ## 4.25.0 (2023/06/12)
 
@@ -281,7 +302,7 @@
 * Bump google.golang.org/grpc/cmd/protoc-gen-go-grpc to 1.3.0 in #806
 * Bump google.golang.org/protobuf to 1.30.0 in #818
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v4.24.0...v4.25.0
+**Full Changelog**: [`v4.24.0...v4.25.0`](https://github.com/crazy-max/diun/compare/v4.24.0...v4.25.0)
 
 ## 4.24.0 (2022/12/29)
 
@@ -289,13 +310,13 @@
 * Jitter watch option by @crazy-max in #746
 * Allow customizing Signal notification message by @crazy-max in #748
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v4.23.1...v4.24.0
+**Full Changelog**: [`v4.23.1...v4.24.0`](https://github.com/crazy-max/diun/compare/v4.23.1...v4.24.0)
 
 ## 4.23.1 (2022/12/28)
 
 * Fix release file extension by @suzuki-shunsuke in #743
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v4.23.0...v4.23.1
+**Full Changelog**: [`v4.23.0...v4.23.1`](https://github.com/crazy-max/diun/compare/v4.23.0...v4.23.1)
 
 ## 4.23.0 (2022/12/28)
 
@@ -336,7 +357,7 @@
 * Bump google.golang.org/protobuf to 1.28.1 in #661
 * Bump k8s.io/client-go to 0.25.4 in #689 #717
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v4.22.0...v4.23.0
+**Full Changelog**: [`v4.22.0...v4.23.0`](https://github.com/crazy-max/diun/compare/v4.22.0...v4.23.0)
 
 ## 4.22.0 (2022/07/17)
 
@@ -365,7 +386,7 @@
 * Bump google.golang.org/protobuf to 1.28.0 in #582
 * Bump k8s.io/client-go to 0.24.3 in #561 #580 #604 #640
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v4.21.0...v4.22.0
+**Full Changelog**: [`v4.21.0...v4.22.0`](https://github.com/crazy-max/diun/compare/v4.21.0...v4.22.0)
 
 ## 4.21.0 (2022/01/26)
 
@@ -394,13 +415,13 @@
 * Bump google.golang.org/grpc/cmd/protoc-gen-go-grpc to 1.2.0 in #533
 * Bump k8s.io/client-go to 0.22.4 in #490 #511
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v4.20.1...v4.21.0
+**Full Changelog**: [`v4.20.1...v4.21.0`](https://github.com/crazy-max/diun/compare/v4.20.1...v4.21.0)
 
 ## 4.20.1 (2021/09/06)
 
 * Fix notification title by @crazy-max in #483
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v4.20.0...v4.20.1
+**Full Changelog**: [`v4.20.0...v4.20.1`](https://github.com/crazy-max/diun/compare/v4.20.0...v4.20.1)
 
 ## 4.20.0 (2021/09/05)
 
@@ -437,7 +458,7 @@
 * Bump google.golang.org/protobuf to 1.27.1 in #420
 * Bump k8s.io/client-go to 0.22.1 in #466
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v4.19.0...v4.20.0
+**Full Changelog**: [`v4.19.0...v4.20.0`](https://github.com/crazy-max/diun/compare/v4.19.0...v4.20.0)
 
 ## 4.19.0 (2021/06/26)
 
@@ -447,7 +468,7 @@
 * Bump github.com/panjf2000/ants/v2 to 2.4.6 in #416
 * Bump k8s.io/client-go to 0.21.2 in #414
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v4.18.0...v4.19.0
+**Full Changelog**: [`v4.18.0...v4.19.0`](https://github.com/crazy-max/diun/compare/v4.18.0...v4.19.0)
 
 ## 4.18.0 (2021/06/18)
 
@@ -469,7 +490,7 @@
 * Define serve command by @crazy-max in #393
 * Save raw manifest in db by @crazy-max in #391
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v4.17.0...v4.18.0
+**Full Changelog**: [`v4.17.0...v4.18.0`](https://github.com/crazy-max/diun/compare/v4.17.0...v4.18.0)
 
 ## 4.17.0 (2021/05/26)
 
@@ -498,13 +519,13 @@
 * Move to docker/metadata-action by @crazy-max in #366
 * Add blog posts by @crazy-max in #355 #385
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v4.16.1...v4.17.0
+**Full Changelog**: [`v4.16.1...v4.17.0`](https://github.com/crazy-max/diun/compare/v4.16.1...v4.17.0)
 
 ## 4.16.1 (2021/04/30)
 
 * Fix Swarm Provider by @crazy-max in #351
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v4.16.0...v4.16.1
+**Full Changelog**: [`v4.16.0...v4.16.1`](https://github.com/crazy-max/diun/compare/v4.16.0...v4.16.1)
 
 ## 4.16.0 (2021/04/29)
 
@@ -514,19 +535,19 @@
 * Update docs for Podman support by @signed-log in #345
 * Optional profiler volume by @crazy-max in #344
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v4.15.2...v4.16.0
+**Full Changelog**: [`v4.15.2...v4.16.0`](https://github.com/crazy-max/diun/compare/v4.15.2...v4.16.0)
 
 ## 4.15.2 (2021/04/25)
 
 * Make profiler optional by @crazy-max in #341
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v4.15.1...v4.15.2
+**Full Changelog**: [`v4.15.1...v4.15.2`](https://github.com/crazy-max/diun/compare/v4.15.1...v4.15.2)
 
 ## 4.15.1 (2021/04/25)
 
 * Fix profiler path by @crazy-max in #339
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v4.15.0...v4.15.1
+**Full Changelog**: [`v4.15.0...v4.15.1`](https://github.com/crazy-max/diun/compare/v4.15.0...v4.15.1)
 
 ## 4.15.0 (2021/04/25)
 
@@ -543,7 +564,7 @@
 * Bump github.com/rs/zerolog to 1.21.0 in #309
 * Deploy docs on workflow dispatch or tag by @crazy-max in #305
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v4.14.0...v4.15.0
+**Full Changelog**: [`v4.14.0...v4.15.0`](https://github.com/crazy-max/diun/compare/v4.14.0...v4.15.0)
 
 ## 4.14.0 (2021/03/15)
 
@@ -559,7 +580,7 @@
 * Allow configuring scheme for MQTT broker by @fblackburn1 in #292
 * Switch to [goreleaser-xx](https://github.com/crazy-max/goreleaser-xx) by @crazy-max in #291
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v4.13.0...v4.14.0
+**Full Changelog**: [`v4.13.0...v4.14.0`](https://github.com/crazy-max/diun/compare/v4.13.0...v4.14.0)
 
 ## 4.13.0 (2021/03/01)
 
@@ -572,7 +593,7 @@
 * Fix markdown renderer by @crazy-max in #275
 * Add message client for notifiers by @crazy-max in #273
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v4.12.0...v4.13.0
+**Full Changelog**: [`v4.12.0...v4.13.0`](https://github.com/crazy-max/diun/compare/v4.12.0...v4.13.0)
 
 ## 4.12.0 (2021/02/09)
 
@@ -584,7 +605,7 @@
 * Typo in documentation by @TheCatLady in #258
 * Log image validation
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v4.11.0...v4.12.0
+**Full Changelog**: [`v4.11.0...v4.12.0`](https://github.com/crazy-max/diun/compare/v4.11.0...v4.12.0)
 
 ## 4.11.0 (2021/01/04)
 
@@ -595,7 +616,7 @@
 * Bump github.com/eclipse/paho.mqtt.golang to 1.3.1 in #249
 * Handle exclusions as a distinct status by @crazy-max in #248
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v4.10.0...v4.11.0
+**Full Changelog**: [`v4.10.0...v4.11.0`](https://github.com/crazy-max/diun/compare/v4.10.0...v4.11.0)
 
 ## 4.10.0 (2020/12/26)
 
@@ -612,7 +633,7 @@
 * Bump github.com/eclipse/paho.mqtt.golang to 1.3.0 in #235
 * Bump gopkg.in/yaml.v2 to 2.4.0 in #228
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v4.9.0...v4.10.0
+**Full Changelog**: [`v4.9.0...v4.10.0`](https://github.com/crazy-max/diun/compare/v4.9.0...v4.10.0)
 
 ## 4.9.0 (2020/11/16)
 
@@ -622,14 +643,14 @@
 * Bump github.com/containers/image/v5 to 5.8.0
 * Bump k8s.io/client-go to 0.19.4 in #224
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v4.8.1...v4.9.0
+**Full Changelog**: [`v4.8.1...v4.9.0`](https://github.com/crazy-max/diun/compare/v4.8.1...v4.9.0)
 
 ## 4.8.1 (2020/11/14)
 
 * Fix registry timeout context in #221
 * Image closer not required while fetching tags
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v4.8.0...v4.8.1
+**Full Changelog**: [`v4.8.0...v4.8.1`](https://github.com/crazy-max/diun/compare/v4.8.0...v4.8.1)
 
 ## 4.8.0 (2020/11/13)
 
@@ -642,7 +663,7 @@
 * Add hub link for GitHub Container Registry by @crazy-max in #211
 * Update deps
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v4.7.0...v4.8.0
+**Full Changelog**: [`v4.7.0...v4.8.0`](https://github.com/crazy-max/diun/compare/v4.7.0...v4.8.0)
 
 ## 4.7.0 (2020/11/02)
 
@@ -653,7 +674,7 @@
 * Use Docker meta action to handle tags and labels
 * Update deps
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v4.6.1...v4.7.0
+**Full Changelog**: [`v4.6.1...v4.7.0`](https://github.com/crazy-max/diun/compare/v4.6.1...v4.7.0)
 
 ## 4.6.1 (2020/10/22)
 
@@ -664,7 +685,7 @@
 * Bump github.com/panjf2000/ants/v2 to 2.4.3 in #196
 * Bump k8s.io/client-go to 0.19.3 in #199
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v4.6.0...v4.6.1
+**Full Changelog**: [`v4.6.0...v4.6.1`](https://github.com/crazy-max/diun/compare/v4.6.0...v4.6.1)
 
 ## 4.6.0 (2020/10/13)
 
@@ -675,39 +696,39 @@
 * Update deps
 * Switch to [Docker actions](https://github.com/docker/build-push-action)
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v4.5.0...v4.6.0
+**Full Changelog**: [`v4.5.0...v4.6.0`](https://github.com/crazy-max/diun/compare/v4.5.0...v4.6.0)
 
 ## 4.5.0 (2020/08/29)
 
 * Allow setting the hostname sent to the SMTP server with the HELO command for mail notification in #165
 * Fix Telegram notification error in #162
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v4.4.1...v4.5.0
+**Full Changelog**: [`v4.4.1...v4.5.0`](https://github.com/crazy-max/diun/compare/v4.4.1...v4.5.0)
 
 ## 4.4.1 (2020/08/20)
 
 * Allow using `--test-notif` without providers and DB connection in #157 #150
 * Update deps
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v4.4.0...v4.4.1
+**Full Changelog**: [`v4.4.0...v4.4.1`](https://github.com/crazy-max/diun/compare/v4.4.0...v4.4.1)
 
 ## 4.4.0 (2020/08/08)
 
 * Allow customizing message type for Matrix notifications in #143
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v4.3.1...v4.4.0
+**Full Changelog**: [`v4.3.1...v4.4.0`](https://github.com/crazy-max/diun/compare/v4.3.1...v4.4.0)
 
 ## 4.3.1 (2020/07/30)
 
 * Hostname not taken into account for Matrix notifications
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v4.3.0...v4.3.1
+**Full Changelog**: [`v4.3.0...v4.3.1`](https://github.com/crazy-max/diun/compare/v4.3.0...v4.3.1)
 
 ## 4.3.0 (2020/07/29)
 
 * Add Matrix notification in #124
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v4.2.0...v4.3.0
+**Full Changelog**: [`v4.2.0...v4.3.0`](https://github.com/crazy-max/diun/compare/v4.2.0...v4.3.0)
 
 ## 4.2.0 (2020/07/16)
 
@@ -715,13 +736,13 @@
 * Switch to [gonfig](https://github.com/crazy-max/gonfig)
 * Update deps
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v4.1.1...v4.2.0
+**Full Changelog**: [`v4.1.1...v4.2.0`](https://github.com/crazy-max/diun/compare/v4.1.1...v4.2.0)
 
 ## 4.1.1 (2020/06/26)
 
 * Small typo
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v4.1.0...v4.1.1
+**Full Changelog**: [`v4.1.0...v4.1.1`](https://github.com/crazy-max/diun/compare/v4.1.0...v4.1.1)
 
 ## 4.1.0 (2020/06/26)
 
@@ -730,7 +751,7 @@
 * Logging when configuration file or `DIUN_` env vars not found in #107
 * Bump github.com/containers/image/v5 to 5.5.1 in #96
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v4.0.0...v4.1.0
+**Full Changelog**: [`v4.0.0...v4.1.0`](https://github.com/crazy-max/diun/compare/v4.0.0...v4.1.0)
 
 ## 4.0.0 (2020/06/22)
 
@@ -760,7 +781,7 @@
 * Add Mattermost compatibility via Slack webhooks by @Twilek-de in #80
 * Update deps
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v3.0.0...v4.0.0
+**Full Changelog**: [`v3.0.0...v4.0.0`](https://github.com/crazy-max/diun/compare/v3.0.0...v4.0.0)
 
 ## 3.0.0 (2020/05/27)
 
@@ -787,13 +808,13 @@
 * Add upgrade notes
 * Update deps
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v2.6.1...v3.0.0
+**Full Changelog**: [`v2.6.1...v3.0.0`](https://github.com/crazy-max/diun/compare/v2.6.1...v3.0.0)
 
 ## 2.6.1 (2020/03/26)
 
 * Downgrade containers/image to 5.2.1 in #54
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v2.6.0...v2.6.1
+**Full Changelog**: [`v2.6.0...v2.6.1`](https://github.com/crazy-max/diun/compare/v2.6.0...v2.6.1)
 
 ## 2.6.0 (2020/03/26)
 
@@ -801,20 +822,20 @@
 * Docker client v19.03.8
 * Update deps
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v2.5.0...v2.6.0
+**Full Changelog**: [`v2.5.0...v2.6.0`](https://github.com/crazy-max/diun/compare/v2.5.0...v2.6.0)
 
 ## 2.5.0 (2020/03/01)
 
 * Add Rocket.Chat notifier by @crazy-max in #44
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v2.4.0...v2.5.0
+**Full Changelog**: [`v2.4.0...v2.5.0`](https://github.com/crazy-max/diun/compare/v2.4.0...v2.5.0)
 
 ## 2.4.0 (2020/02/17)
 
 * Add Gotify notification client by @crazy-max in #36
 * Bump containers/image v5 by @crazy-max in #35
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v2.3.0...v2.4.0
+**Full Changelog**: [`v2.3.0...v2.4.0`](https://github.com/crazy-max/diun/compare/v2.3.0...v2.4.0)
 
 ## 2.3.0 (2020/01/28)
 
@@ -822,27 +843,27 @@
 * Docker client struct options
 * Move registry client to a dedicated package
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v2.2.1...v2.3.0
+**Full Changelog**: [`v2.2.1...v2.3.0`](https://github.com/crazy-max/diun/compare/v2.2.1...v2.3.0)
 
 ## 2.2.1 (2020/01/07)
 
 * Set user agent for Docker registry client
 * Update deps
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v2.2.0...v2.2.1
+**Full Changelog**: [`v2.2.0...v2.2.1`](https://github.com/crazy-max/diun/compare/v2.2.0...v2.2.1)
 
 ## 2.2.0 (2019/12/22)
 
 * Add option to skip notification at the very first analysis of an image in #10
 * Skip analysis of locally built image
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v2.1.0...v2.2.0
+**Full Changelog**: [`v2.1.0...v2.2.0`](https://github.com/crazy-max/diun/compare/v2.1.0...v2.2.0)
 
 ## 2.1.0 (2019/12/17)
 
 * Add Slack notifier in #8
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v2.0.0...v2.1.0
+**Full Changelog**: [`v2.0.0...v2.1.0`](https://github.com/crazy-max/diun/compare/v2.0.0...v2.1.0)
 
 ## 2.0.0 (2019/12/14)
 
@@ -860,14 +881,14 @@
 * Go 1.13.5
 * Seconds field optional for schedule
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v1.4.1...v2.0.0
+**Full Changelog**: [`v1.4.1...v2.0.0`](https://github.com/crazy-max/diun/compare/v1.4.1...v2.0.0)
 
 ## 1.4.1 (2019/10/20)
 
 * Update deps
 * Fix Docker labels
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v1.4.0...v1.4.1
+**Full Changelog**: [`v1.4.0...v1.4.1`](https://github.com/crazy-max/diun/compare/v1.4.0...v1.4.1)
 
 ## 1.4.0 (2019/10/01)
 
@@ -877,7 +898,7 @@
 * Go 1.12.10
 * Use GOPROXY
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v1.3.0...v1.4.0
+**Full Changelog**: [`v1.3.0...v1.4.0`](https://github.com/crazy-max/diun/compare/v1.3.0...v1.4.0)
 
 ## 1.3.0 (2019/08/22)
 
@@ -887,7 +908,7 @@
 * Remove `--docker` flag
 * Allow overriding database path through `DIUN_DB` env var
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v1.2.0...v1.3.0
+**Full Changelog**: [`v1.2.0...v1.3.0`](https://github.com/crazy-max/diun/compare/v1.2.0...v1.3.0)
 
 ## 1.2.0 (2019/08/18)
 
@@ -895,25 +916,25 @@
 * Display containers/image logs
 * Fix registry options not setted in #5
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v1.1.0...v1.2.0
+**Full Changelog**: [`v1.1.0...v1.2.0`](https://github.com/crazy-max/diun/compare/v1.1.0...v1.2.0)
 
 ## 1.1.0 (2019/07/24)
 
 * Update deps
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v1.0.2...v1.1.0
+**Full Changelog**: [`v1.0.2...v1.1.0`](https://github.com/crazy-max/diun/compare/v1.0.2...v1.1.0)
 
 ## 1.0.2 (2019/07/01)
 
 * Worker pool can be full while retrieving tags
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v1.0.1...v1.0.2
+**Full Changelog**: [`v1.0.1...v1.0.2`](https://github.com/crazy-max/diun/compare/v1.0.1...v1.0.2)
 
 ## 1.0.1 (2019/07/01)
 
 * Fix runtime error
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v1.0.0...v1.0.1
+**Full Changelog**: [`v1.0.0...v1.0.1`](https://github.com/crazy-max/diun/compare/v1.0.0...v1.0.1)
 
 ## 1.0.0 (2019/07/01)
 
@@ -927,38 +948,38 @@
 * Review config file structure
 * Improve worker pool
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v0.5.0...v1.0.0
+**Full Changelog**: [`v0.5.0...v1.0.0`](https://github.com/crazy-max/diun/compare/v0.5.0...v1.0.0)
 
 ## 0.5.0 (2019/06/09)
 
 * Add worker pool to parallelize analyses
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v0.4.1...v0.5.0
+**Full Changelog**: [`v0.4.1...v0.5.0`](https://github.com/crazy-max/diun/compare/v0.4.1...v0.5.0)
 
 ## 0.4.1 (2019/06/08)
 
 * Filter tags before return them
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v0.4.0...v0.4.1
+**Full Changelog**: [`v0.4.0...v0.4.1`](https://github.com/crazy-max/diun/compare/v0.4.0...v0.4.1)
 
 ## 0.4.0 (2019/06/08)
 
 * Add option to set the maximum number of tags to watch for an item if `watch_repo` is enabled
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v0.3.2...v0.4.0
+**Full Changelog**: [`v0.3.2...v0.4.0`](https://github.com/crazy-max/diun/compare/v0.3.2...v0.4.0)
 
 ## 0.3.2 (2019/06/08)
 
 * Fix registry client context
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v0.3.1...v0.3.2
+**Full Changelog**: [`v0.3.1...v0.3.2`](https://github.com/crazy-max/diun/compare/v0.3.1...v0.3.2)
 
 ## 0.3.1 (2019/06/08)
 
 * Fix email template
 * Add flag to log caller
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v0.3.0...v0.3.1
+**Full Changelog**: [`v0.3.0...v0.3.1`](https://github.com/crazy-max/diun/compare/v0.3.0...v0.3.1)
 
 ## 0.3.0 (2019/06/08)
 
@@ -968,21 +989,21 @@
 * Change default schedule
 * Review registry client
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v0.2.0...v0.3.0
+**Full Changelog**: [`v0.2.0...v0.3.0`](https://github.com/crazy-max/diun/compare/v0.2.0...v0.3.0)
 
 ## 0.2.0 (2019/06/05)
 
 * Don't skip repo analysis if default tag not found
 * Docker engine 18.09.6
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v0.1.1...v0.2.0
+**Full Changelog**: [`v0.1.1...v0.2.0`](https://github.com/crazy-max/diun/compare/v0.1.1...v0.2.0)
 
 ## 0.1.1 (2019/06/04)
 
 * Increase default timeout
 * Fix `data` volume mount
 
-**Full Changelog**: https://github.com/crazy-max/diun/compare/v0.1.0...v0.1.1
+**Full Changelog**: [`v0.1.0...v0.1.1`](https://github.com/crazy-max/diun/compare/v0.1.0...v0.1.1)
 
 ## 0.1.0 (2019/06/04)
 
