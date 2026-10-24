@@ -96,7 +96,21 @@ func SortTags(tags []string, sortTag SortTag) []string {
 			s = strings.TrimLeftFunc(s, func(r rune) bool {
 				return !unicode.IsNumber(r)
 			})
-			if vt := fmt.Sprintf("v%s", s); semver.IsValid(vt) {
+			vt := fmt.Sprintf("v%s", s)
+			if semver.IsValid(vt) {
+				return vt
+			}
+			core, suffix := vt, ""
+			if i := strings.IndexAny(vt, "-+"); i >= 0 {
+				core, suffix = vt[:i], vt[i:]
+			}
+			switch strings.Count(core, ".") {
+			case 0:
+				core += ".0.0"
+			case 1:
+				core += ".0"
+			}
+			if vt = core + suffix; semver.IsValid(vt) {
 				return vt
 			}
 			return ""

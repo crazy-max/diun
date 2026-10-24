@@ -300,3 +300,104 @@ func TestTagsSort(t *testing.T) {
 		})
 	}
 }
+
+func TestTagsSortSemverShorthandWithSuffix(t *testing.T) {
+	testCases := []struct {
+		name     string
+		input    []string
+		expected []string
+	}{
+		{
+			name: "postgres style major minor alpine tags",
+			input: []string{
+				"17.0-alpine",
+				"17.1-alpine",
+				"17.10-alpine",
+				"17.11-alpine",
+				"17.2-alpine",
+				"17.9-alpine",
+			},
+			expected: []string{
+				"17.11-alpine",
+				"17.10-alpine",
+				"17.9-alpine",
+				"17.2-alpine",
+				"17.1-alpine",
+				"17.0-alpine",
+			},
+		},
+		{
+			name: "major only shorthand with suffix",
+			input: []string{
+				"7-alpine",
+				"8-alpine",
+				"10-alpine",
+				"9-alpine",
+			},
+			expected: []string{
+				"10-alpine",
+				"9-alpine",
+				"8-alpine",
+				"7-alpine",
+			},
+		},
+		{
+			name: "mixed major, major minor, and full semver with suffixes",
+			input: []string{
+				"17-alpine",
+				"17.1-alpine",
+				"17.1.0-alpine",
+				"17.1.1-alpine",
+				"17.2-alpine",
+				"17.10-alpine",
+			},
+			expected: []string{
+				"17.10-alpine",
+				"17.2-alpine",
+				"17.1.1-alpine",
+				"17.1.0-alpine",
+				"17.1-alpine",
+				"17-alpine",
+			},
+		},
+		{
+			name: "release tags precede suffixed tags of same version",
+			input: []string{
+				"17.11-alpine",
+				"17.11",
+				"17.10-alpine",
+				"17.10",
+			},
+			expected: []string{
+				"17.11",
+				"17.11-alpine",
+				"17.10",
+				"17.10-alpine",
+			},
+		},
+		{
+			name: "semver with suffix mixed with non-semver tags",
+			input: []string{
+				"latest",
+				"17.0-alpine",
+				"edge",
+				"17.10-alpine",
+			},
+			expected: []string{
+				"17.10-alpine",
+				"17.0-alpine",
+				"edge",
+				"latest",
+			},
+		},
+	}
+
+	for _, tt := range testCases {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			tags := SortTags(tt.input, SortTagSemver)
+			assert.Equal(t, tt.expected, tags)
+		})
+	}
+}
+
