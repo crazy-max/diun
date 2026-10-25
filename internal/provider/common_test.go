@@ -699,3 +699,26 @@ func TestValidateImage(t *testing.T) {
 		})
 	}
 }
+
+func TestValidateImageDefaultsMetadataNotShared(t *testing.T) {
+	defaults := &model.Defaults{
+		Metadata: map[string]string{"env": "prod"},
+	}
+
+	first, err := ValidateImage("alpine", nil, map[string]string{
+		"diun.metadata.ctn_id": "aaa",
+	}, true, defaults)
+	require.NoError(t, err)
+
+	second, err := ValidateImage("busybox", nil, map[string]string{
+		"diun.metadata.ctn_id": "bbb",
+	}, true, defaults)
+	require.NoError(t, err)
+
+	// each image keeps its own metadata on top of the defaults
+	require.Equal(t, map[string]string{"env": "prod", "ctn_id": "aaa"}, first.Metadata)
+	require.Equal(t, map[string]string{"env": "prod", "ctn_id": "bbb"}, second.Metadata)
+
+	// and the defaults themselves stay untouched
+	require.Equal(t, map[string]string{"env": "prod"}, defaults.Metadata)
+}
