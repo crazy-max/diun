@@ -1,0 +1,8 @@
+db:
+  path: diun.db
+
+watch:
+  exitOnFailure: true
+
+providers:
+  docker: {}
