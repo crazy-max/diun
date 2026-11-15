@@ -41,11 +41,12 @@ type Diun struct {
 	metricsServer *metrics.Server
 	notif         *notif.Client
 
-	cron   *cron.Cron
-	jobID  cron.EntryID
-	locker uint32
-	pool   *ants.PoolWithFunc
-	wg     *sync.WaitGroup
+	cron       *cron.Cron
+	jobID      cron.EntryID
+	locker     uint32
+	failedJobs atomic.Int64
+	pool       *ants.PoolWithFunc
+	wg         *sync.WaitGroup
 }
 
 func New(meta model.Meta, cfg *config.Config, grpcAuthority string) (*Diun, error) {
@@ -174,7 +175,15 @@ func (di *Diun) Start(ctx context.Context) error {
 	}
 
 	if len(di.cfg.Watch.Schedule) == 0 {
+		if *di.cfg.Watch.ExitOnFailure {
+			if failed := di.failedJobs.Load(); failed > 0 {
+				return errors.Errorf("%d job(s) failed", failed)
+			}
+		}
 		return nil
+	}
+	if *di.cfg.Watch.ExitOnFailure {
+		log.Warn().Msg("exitOnFailure only applies to one-shot runs and is ignored when a schedule is set")
 	}
 	di.jobID, err = di.cron.AddJobWithJitter(di.cfg.Watch.Schedule, di, *di.cfg.Watch.Jitter)
 	if err != nil {
@@ -241,6 +250,7 @@ func (di *Diun) Run() {
 	if di.metrics != nil {
 		di.metrics.RecordRun(entries, completedAt.Sub(startedAt), completedAt)
 	}
+	di.failedJobs.Store(int64(entries.CountError))
 	log.Info().
 		Int("added", entries.CountNew).
 		Int("updated", entries.CountUpdate).

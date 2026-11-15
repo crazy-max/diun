@@ -11,6 +11,7 @@ type Watch struct {
 	Jitter          *time.Duration `yaml:"jitter,omitempty" json:"jitter,omitempty" validate:"required"`
 	FirstCheckNotif *bool          `yaml:"firstCheckNotif,omitempty" json:"firstCheckNotif,omitempty" validate:"required"`
 	RunOnStartup    *bool          `yaml:"runOnStartup,omitempty" json:"runOnStartup,omitempty" validate:"required"`
+	ExitOnFailure   *bool          `yaml:"exitOnFailure,omitempty" json:"exitOnFailure,omitempty" validate:"required"`
 	CompareDigest   *bool          `yaml:"compareDigest,omitempty" json:"compareDigest,omitempty" validate:"required"`
 	Healthchecks    *Healthchecks  `yaml:"healthchecks,omitempty" json:"healthchecks,omitempty"`
 }
@@ -28,5 +29,6 @@ func (s *Watch) SetDefaults() {
 	s.Jitter = new(30 * time.Second)
 	s.FirstCheckNotif = new(false)
 	s.RunOnStartup = new(true)
+	s.ExitOnFailure = new(false)
 	s.CompareDigest = new(true)
 }

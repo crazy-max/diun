@@ -45,6 +45,7 @@ func TestLoadFile(t *testing.T) {
 					Jitter:          new(30 * time.Second),
 					FirstCheckNotif: new(false),
 					RunOnStartup:    new(true),
+					ExitOnFailure:   new(false),
 					CompareDigest:   new(true),
 					Healthchecks: &model.Healthchecks{
 						BaseURL:  "https://hc-ping.com/",
@@ -80,6 +81,7 @@ func TestLoadFile(t *testing.T) {
 					Jitter:          new(30 * time.Second),
 					FirstCheckNotif: new(true),
 					RunOnStartup:    new(false),
+					ExitOnFailure:   new(false),
 					CompareDigest:   new(true),
 					Healthchecks: &model.Healthchecks{
 						BaseURL: "https://hc-ping.com/",
@@ -332,6 +334,7 @@ func TestLoadEnv(t *testing.T) {
 					Jitter:          new(30 * time.Second),
 					FirstCheckNotif: new(false),
 					RunOnStartup:    new(true),
+					ExitOnFailure:   new(false),
 					CompareDigest:   new(true),
 					Healthchecks: &model.Healthchecks{
 						UUIDFile: "./fixtures/run_secrets_uuid",
@@ -713,4 +716,14 @@ func TestValidation(t *testing.T) {
 			require.NoError(t, err)
 		})
 	}
+}
+
+func TestExitOnFailure(t *testing.T) {
+	cfg, err := Load("./fixtures/config.exitonfailure.yml")
+	require.NoError(t, err)
+	require.Equal(t, true, *cfg.Watch.ExitOnFailure)
+
+	cfg, err = Load("./fixtures/config.hc.uuidfile.yml")
+	require.NoError(t, err)
+	require.Equal(t, false, *cfg.Watch.ExitOnFailure)
 }

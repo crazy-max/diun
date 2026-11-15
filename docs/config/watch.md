@@ -9,6 +9,7 @@ watch:
   jitter: 30s
   firstCheckNotif: false
   runOnStartup: true
+  exitOnFailure: false
   compareDigest: true
   healthchecks:
     baseURL: https://hc-ping.com/
@@ -89,6 +90,25 @@ Check for updates on startup. (default `true`)
 
 !!! abstract "Environment variables"
     * `DIUN_WATCH_RUNONSTARTUP`
+
+### `exitOnFailure`
+
+Exit with a non-zero status code when one or more image jobs failed during
+a run. (default `false`)
+
+!!! note
+    Only applies to one-shot runs (i.e. when `schedule` is not set). A
+    long-running watcher keeps running even if some jobs fail; a warning is
+    logged at startup if `exitOnFailure` is set together with `schedule`.
+
+!!! example "Config file"
+    ```yaml
+    watch:
+      exitOnFailure: true
+    ```
+
+!!! abstract "Environment variables"
+    * `DIUN_WATCH_EXITONFAILURE`
 
 ### `compareDigest`
 
