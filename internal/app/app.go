@@ -215,13 +215,17 @@ func (di *Diun) Run() {
 
 	log.Info().Msg("Cron triggered")
 	entries := new(model.NotifEntries)
+	var entriesMu sync.Mutex
 	di.HealthchecksStart()
 	defer di.HealthchecksSuccess(entries)
 
 	di.wg = new(sync.WaitGroup)
 	di.pool, _ = ants.NewPoolWithFunc(di.cfg.Watch.Workers, func(i any) {
 		job := i.(model.Job)
-		entries.Add(di.runJob(job))
+		entry := di.runJob(job)
+		entriesMu.Lock()
+		entries.Add(entry)
+		entriesMu.Unlock()
 		di.wg.Done()
 	}, ants.WithLogger(new(logging.AntsLogger)))
 	defer di.pool.Release()

@@ -24,6 +24,17 @@ RUN --mount=target=. <<EOT
   echo "$version" | tee /tmp/.version
 EOT
 
+FROM base AS build
+ARG TARGETPLATFORM
+RUN --mount=type=bind,target=. \
+    --mount=type=bind,from=version,source=/tmp/.version,target=/tmp/.version \
+    --mount=type=cache,target=/root/.cache \
+    --mount=type=cache,target=/go/pkg/mod <<EOT
+  set -ex
+  xx-go build -trimpath -ldflags "-s -w -X main.version=$(cat /tmp/.version)" -o /usr/bin/diun ./cmd
+  xx-verify --static /usr/bin/diun
+EOT
+
 FROM base AS test
 ENV CGO_ENABLED=1
 RUN apk add --no-cache gcc linux-headers musl-dev
@@ -38,16 +49,12 @@ EOT
 FROM scratch AS test-coverage
 COPY --from=test /tmp/coverage.txt /coverage.txt
 
-FROM base AS build
-ARG TARGETPLATFORM
-RUN --mount=type=bind,target=. \
-    --mount=type=bind,from=version,source=/tmp/.version,target=/tmp/.version \
-    --mount=type=cache,target=/root/.cache \
-    --mount=type=cache,target=/go/pkg/mod <<EOT
-  set -ex
-  xx-go build -trimpath -ldflags "-s -w -X main.version=$(cat /tmp/.version)" -o /usr/bin/diun ./cmd
-  xx-verify --static /usr/bin/diun
-EOT
+FROM base AS test-integration
+ENV CGO_ENABLED=1
+RUN apk add --no-cache docker-cli gcc linux-headers musl-dev
+COPY . .
+COPY --from=build /usr/bin/diun /usr/local/bin/diun
+CMD ["sh", "-c", "exec go test -tags=integration -count=1 -race -v -timeout=20m -run \"${TEST_RUN:-.}\" -coverpkg=./internal/...,./pkg/... -coverprofile=/coverage/coverage.txt ./test/integration"]
 
 FROM scratch AS binary-unix
 COPY --link --from=build /usr/bin/diun /

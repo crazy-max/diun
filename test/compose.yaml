@@ -1,0 +1,65 @@
+services:
+  docker:
+    image: docker:29-dind
+    privileged: true
+    environment:
+      DOCKER_TLS_CERTDIR: ""
+    command: ["--host=tcp://0.0.0.0:2375", "--tls=false"]
+    healthcheck:
+      test: ["CMD", "docker", "info"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+    volumes:
+      - docker-data:/var/lib/docker
+
+  containerd:
+    build:
+      context: ..
+      dockerfile: test/containerd.Dockerfile
+    privileged: true
+    volumes:
+      - containerd-socket:/run/containerd
+    healthcheck:
+      test: ["CMD-SHELL", "ctr --namespace diun-e2e tasks list | grep -q 'watched.*RUNNING'"]
+      interval: 2s
+      timeout: 5s
+      retries: 60
+
+  nomad:
+    image: hashicorp/nomad:2.0.2
+    command: ["agent", "-config=/fixtures/nomad.hcl"]
+    environment:
+      NOMAD_SKIP_DOCKER_IMAGE_WARN: "1"
+    volumes:
+      - ./fixtures/nomad1:/fixtures:ro
+    healthcheck:
+      test: ["CMD", "nomad", "status"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+
+  tests:
+    build:
+      context: ..
+      target: test-integration
+    environment:
+      DOCKER_HOST: tcp://docker:2375
+      NOMAD_ADDR: http://nomad:4646
+      TEST_RUN: ${TEST_RUN:-.}
+    depends_on:
+      docker:
+        condition: service_healthy
+      containerd:
+        condition: service_healthy
+      nomad:
+        condition: service_healthy
+    volumes:
+      - ../bin/coverage/integration:/coverage
+      - containerd-socket:/run/containerd
+      - go-cache:/root/.cache/go-build
+
+volumes:
+  docker-data:
+  containerd-socket:
+  go-cache:
