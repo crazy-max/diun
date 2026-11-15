@@ -339,8 +339,8 @@ func (mw *msgWriter) addFiles(files []*File, isAttachment bool) {
 			if file.ContentType != "" {
 				mimeType = string(file.ContentType)
 			}
-			file.setHeader(HeaderContentType, fmt.Sprintf(`%s; name="%s"`, mimeType,
-				mw.encoder.Encode(mw.charset.String(), sanitizeFilename(file.Name))))
+			file.setHeader(HeaderContentType, fmt.Sprintf("%s; %s", mimeType,
+				encodeMIMEParam("name", mw.charset.String(), sanitizeFilename(file.Name))))
 		}
 
 		if _, ok := file.getHeader(HeaderContentTransferEnc); !ok {
@@ -361,8 +361,8 @@ func (mw *msgWriter) addFiles(files []*File, isAttachment bool) {
 			if isAttachment {
 				disposition = "attachment"
 			}
-			file.setHeader(HeaderContentDisposition, fmt.Sprintf(`%s; filename="%s"`,
-				disposition, mw.encoder.Encode(mw.charset.String(), sanitizeFilename(file.Name))))
+			file.setHeader(HeaderContentDisposition, fmt.Sprintf("%s; %s",
+				disposition, encodeMIMEParam("filename", mw.charset.String(), sanitizeFilename(file.Name))))
 		}
 
 		if !isAttachment {
@@ -606,4 +606,54 @@ func sanitizeFilename(input string) string {
 		sanitized.WriteByte(input[i])
 	}
 	return sanitized.String()
+}
+
+// encodeMIMEParam formats a Content-Type/Content-Disposition parameter. A value made up
+// solely of US-ASCII octets is emitted as a quoted-string (key="value"); a value with
+// non-ASCII octets uses RFC 2231 extended notation (key*=charset”pct-encoded), because
+// RFC 2047 encoded-words are not permitted inside a MIME parameter value (RFC 2047 sec. 5;
+// RFC 2231; RFC 6266 sec. 4.3).
+func encodeMIMEParam(key, charset, value string) string {
+	if isASCII(value) {
+		return fmt.Sprintf(`%s="%s"`, key, value)
+	}
+	return fmt.Sprintf("%s*=%s''%s", key, strings.ToLower(charset), encodeRFC2231Value(value))
+}
+
+// isASCII reports whether s consists solely of US-ASCII octets.
+func isASCII(s string) bool {
+	for i := 0; i < len(s); i++ {
+		if s[i] > 0x7f {
+			return false
+		}
+	}
+	return true
+}
+
+// encodeRFC2231Value percent-encodes value for an RFC 2231 extended parameter, escaping
+// every octet that is not an attribute-char. The rule matches the standard library's
+// mime.FormatMediaType so the output is byte-identical to Go's own encoder.
+func encodeRFC2231Value(value string) string {
+	const upperhex = "0123456789ABCDEF"
+	var b strings.Builder
+	for i := 0; i < len(value); i++ {
+		c := value[i]
+		if c <= ' ' || c >= 0x7f || c == '*' || c == '\'' || c == '%' || isTSpecial(c) {
+			b.WriteByte('%')
+			b.WriteByte(upperhex[c>>4])
+			b.WriteByte(upperhex[c&0x0f])
+			continue
+		}
+		b.WriteByte(c)
+	}
+	return b.String()
+}
+
+// isTSpecial reports whether c is an RFC 2045 tspecial character.
+func isTSpecial(c byte) bool {
+	switch c {
+	case '(', ')', '<', '>', '@', ',', ';', ':', '\\', '"', '/', '[', ']', '?', '=':
+		return true
+	}
+	return false
 }

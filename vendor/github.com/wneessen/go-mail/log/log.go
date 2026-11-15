@@ -41,7 +41,7 @@ type Level int
 type Log struct {
 	Direction Direction
 	Format    string
-	Messages  []interface{}
+	Messages  []any
 }
 
 // Logger is the log interface for go-mail

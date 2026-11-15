@@ -12,3 +12,15 @@ path = ["testdata/**"]
 precedence = "aggregate"
 SPDX-FileCopyrightText = "The go-mail Authors"
 SPDX-License-Identifier = "MIT"
+
+[[annotations]]
+path = ["flake.nix"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "The go-mail Authors"
+SPDX-License-Identifier = "MIT"
+
+[[annotations]]
+path = ["flake.lock"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "The go-mail Authors"
+SPDX-License-Identifier = "MIT"
