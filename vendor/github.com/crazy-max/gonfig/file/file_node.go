@@ -9,7 +9,7 @@ import (
 
 	"github.com/BurntSushi/toml"
 	"github.com/crazy-max/gonfig/parser"
-	"gopkg.in/yaml.v3"
+	"go.yaml.in/yaml/v3"
 )
 
 // decodeFileToNode decodes the configuration in filePath in a tree of untyped nodes.

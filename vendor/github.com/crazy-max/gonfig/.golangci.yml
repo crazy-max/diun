@@ -1,9 +1,11 @@
 version: "2"
 
 linters:
+  default: none
   enable:
     - bodyclose
     - depguard
+    - errcheck
     - forbidigo
     - gocritic
     - gosec
