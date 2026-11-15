@@ -409,7 +409,7 @@ func TestLoadEnv(t *testing.T) {
 				RegOpts:  nil,
 				Providers: &model.Providers{
 					Nomad: &model.PrdNomad{
-						Namespace:      "legacy",
+						Namespace:      "legacy", //nolint:staticcheck // Test backward compatibility with the deprecated field.
 						Namespaces:     []string{"dev", "prod"},
 						TLSInsecure:    new(false),
 						WatchByDefault: new(false),

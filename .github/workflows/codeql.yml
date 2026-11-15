@@ -8,16 +8,16 @@ permissions:
   contents: read
 
 on:
+  schedule:
+    - cron: '0 12 * * 6'
   push:
     branches:
       - 'master'
-    tags:
-      - '*'
+      - 'v[0-9]*'
   pull_request:
-    branches:
-      - 'master'
-  schedule:
-    - cron: '0 12 * * 6'
+
+env:
+  GO_VERSION: "1.27"
 
 jobs:
   codeql:
@@ -29,13 +29,12 @@ jobs:
       -
         name: Checkout
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-        with:
-          fetch-depth: 2
       -
-        name: Checkout HEAD on PR
-        if: ${{ github.event_name == 'pull_request' }}
-        run: |
-          git checkout HEAD^2
+        name: Set up Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          check-latest: true
       -
         name: Initialize CodeQL
         uses: github/codeql-action/init@99df26d4f13ea111d4ec1a7dddef6063f76b97e9 # v4.37.0
