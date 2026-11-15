@@ -59,8 +59,8 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	if err := json.NewEncoder(dataBuf).Encode(struct {
 		Message string   `json:"body"`
 		Title   string   `json:"title"`
-		Tags    []string `json:"tags"`
-		URLs    []string `json:"urls"`
+		Tags    []string `json:"tags,omitempty"`
+		URLs    []string `json:"urls,omitempty"`
 	}{
 		Message: string(body),
 		Title:   string(title),

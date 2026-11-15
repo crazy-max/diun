@@ -53,6 +53,50 @@ func TestSendPostsNotifyPayload(t *testing.T) {
 	assert.Equal(t, []string{"mailto://ops@example.com"}, gotPayload.URLs)
 }
 
+func TestSendOmitsEmptyTagsAndURLs(t *testing.T) {
+	testCases := []struct {
+		name string
+		tags []string
+		urls []string
+	}{
+		{
+			name: "nil slices",
+		},
+		{
+			name: "empty slices",
+			tags: []string{},
+			urls: []string{},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			var gotPath string
+			var gotPayload map[string]any
+			var gotPayloadErr error
+			ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				gotPath = r.URL.Path
+				gotPayloadErr = json.NewDecoder(r.Body).Decode(&gotPayload)
+				w.WriteHeader(http.StatusOK)
+			}))
+			defer ts.Close()
+
+			client := newTestClient(ts.URL)
+			client.cfg.Tags = tc.tags
+			client.cfg.URLs = tc.urls
+
+			err := client.Send(testEntry(t))
+			require.NoError(t, err)
+			require.NoError(t, gotPayloadErr)
+			assert.Equal(t, "/notify/apprise-token", gotPath)
+			assert.Equal(t, "file update", gotPayload["body"])
+			assert.Equal(t, "docker.io/library/alpine:latest", gotPayload["title"])
+			assert.NotContains(t, gotPayload, "tags")
+			assert.NotContains(t, gotPayload, "urls")
+		})
+	}
+}
+
 func TestSendReturnsAppriseError(t *testing.T) {
 	var encodeErr error
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
