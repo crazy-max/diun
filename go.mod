@@ -5,7 +5,7 @@ go 1.27.0
 require (
 	dario.cat/mergo v1.0.2
 	github.com/AlecAivazis/survey/v2 v2.3.7
-	github.com/Microsoft/go-winio v0.6.2
+	github.com/Microsoft/go-winio v0.6.4
 	github.com/PaulSonOfLars/gotgbot/v2 v2.0.0-rc.35
 	github.com/alecthomas/kong v1.15.0
 	github.com/bmatcuk/doublestar/v4 v4.10.4
@@ -36,7 +36,7 @@ require (
 	github.com/rabbitmq/amqp091-go v1.14.0
 	github.com/rs/zerolog v1.35.1
 	github.com/russross/blackfriday/v2 v2.1.0
-	github.com/sirupsen/logrus v1.9.4
+	github.com/sirupsen/logrus v1.10.2
 	github.com/slack-go/slack v0.35.0
 	github.com/stretchr/testify v1.12.1
 	github.com/tidwall/pretty v1.2.1
