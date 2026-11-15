@@ -72,14 +72,14 @@ func TestNamespaces(t *testing.T) {
 		{
 			name: "legacy namespace",
 			config: &model.PrdNomad{
-				Namespace: "legacy",
+				Namespace: "legacy", //nolint:staticcheck // Test backward compatibility with the deprecated field.
 			},
 			expected: []string{"legacy"},
 		},
 		{
 			name: "namespaces",
 			config: &model.PrdNomad{
-				Namespace:  "legacy",
+				Namespace:  "legacy", //nolint:staticcheck // Test backward compatibility with the deprecated field.
 				Namespaces: []string{" dev ", "", "prod"},
 			},
 			expected: []string{"dev", "prod"},
@@ -95,7 +95,7 @@ func TestNamespaces(t *testing.T) {
 }
 
 func TestDeprecatedNamespace(t *testing.T) {
-	namespace, ok := (&Client{config: &model.PrdNomad{Namespace: "legacy"}}).deprecatedNamespace()
+	namespace, ok := (&Client{config: &model.PrdNomad{Namespace: "legacy"}}).deprecatedNamespace() //nolint:staticcheck // Test backward compatibility with the deprecated field.
 	assert.True(t, ok)
 	assert.Equal(t, "legacy", namespace)
 
@@ -103,7 +103,7 @@ func TestDeprecatedNamespace(t *testing.T) {
 	assert.False(t, ok)
 	assert.Empty(t, namespace)
 
-	namespace, ok = (&Client{config: &model.PrdNomad{Namespace: "legacy", Namespaces: []string{"dev"}}}).deprecatedNamespace()
+	namespace, ok = (&Client{config: &model.PrdNomad{Namespace: "legacy", Namespaces: []string{"dev"}}}).deprecatedNamespace() //nolint:staticcheck // Test backward compatibility with the deprecated field.
 	assert.False(t, ok)
 	assert.Empty(t, namespace)
 }
@@ -179,7 +179,7 @@ func TestListTaskImagesQueriesConfiguredNamespaces(t *testing.T) {
 	client := &Client{
 		config: &model.PrdNomad{
 			Address:        server.URL,
-			Namespace:      "legacy",
+			Namespace:      "legacy", //nolint:staticcheck // Test backward compatibility with the deprecated field.
 			Namespaces:     []string{" dev ", "", "prod"},
 			TLSInsecure:    ptr(false),
 			WatchByDefault: ptr(true),

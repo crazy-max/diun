@@ -41,7 +41,7 @@ func TestSendRetriesAfterTelegramRateLimit(t *testing.T) {
 		case strings.HasSuffix(r.URL.Path, "/sendMessage"):
 			sendCount++
 			r.Body = http.MaxBytesReader(w, r.Body, 1<<20)
-			if err := r.ParseMultipartForm(32 << 20); err != nil && gotParseErr == nil {
+			if err := r.ParseMultipartForm(32 << 20); err != nil && gotParseErr == nil { //nolint:gosec // Request body is bounded by MaxBytesReader above.
 				gotParseErr = err
 			}
 			gotTexts = append(gotTexts, r.FormValue("text"))
