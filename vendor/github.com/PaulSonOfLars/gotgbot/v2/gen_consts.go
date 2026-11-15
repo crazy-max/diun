@@ -5,31 +5,33 @@ package gotgbot
 
 // The consts listed below represent all the update types that can be requested from telegram.
 const (
-	UpdateTypeMessage                 = "message"
-	UpdateTypeEditedMessage           = "edited_message"
-	UpdateTypeChannelPost             = "channel_post"
-	UpdateTypeEditedChannelPost       = "edited_channel_post"
-	UpdateTypeBusinessConnection      = "business_connection"
-	UpdateTypeBusinessMessage         = "business_message"
-	UpdateTypeEditedBusinessMessage   = "edited_business_message"
-	UpdateTypeDeletedBusinessMessages = "deleted_business_messages"
-	UpdateTypeGuestMessage            = "guest_message"
-	UpdateTypeMessageReaction         = "message_reaction"
-	UpdateTypeMessageReactionCount    = "message_reaction_count"
-	UpdateTypeInlineQuery             = "inline_query"
-	UpdateTypeChosenInlineResult      = "chosen_inline_result"
-	UpdateTypeCallbackQuery           = "callback_query"
-	UpdateTypeShippingQuery           = "shipping_query"
-	UpdateTypePreCheckoutQuery        = "pre_checkout_query"
-	UpdateTypePurchasedPaidMedia      = "purchased_paid_media"
-	UpdateTypePoll                    = "poll"
-	UpdateTypePollAnswer              = "poll_answer"
-	UpdateTypeMyChatMember            = "my_chat_member"
-	UpdateTypeChatMember              = "chat_member"
-	UpdateTypeChatJoinRequest         = "chat_join_request"
-	UpdateTypeChatBoost               = "chat_boost"
-	UpdateTypeRemovedChatBoost        = "removed_chat_boost"
-	UpdateTypeManagedBot              = "managed_bot"
+	UpdateTypeMessage                  = "message"
+	UpdateTypeEditedMessage            = "edited_message"
+	UpdateTypeChannelPost              = "channel_post"
+	UpdateTypeEditedChannelPost        = "edited_channel_post"
+	UpdateTypeBusinessConnection       = "business_connection"
+	UpdateTypeBusinessMessage          = "business_message"
+	UpdateTypeEditedBusinessMessage    = "edited_business_message"
+	UpdateTypeDeletedBusinessMessages  = "deleted_business_messages"
+	UpdateTypeGuestMessage             = "guest_message"
+	UpdateTypeMessageReaction          = "message_reaction"
+	UpdateTypeMessageReactionCount     = "message_reaction_count"
+	UpdateTypeInlineQuery              = "inline_query"
+	UpdateTypeChosenInlineResult       = "chosen_inline_result"
+	UpdateTypeCallbackQuery            = "callback_query"
+	UpdateTypeShippingQuery            = "shipping_query"
+	UpdateTypePreCheckoutQuery         = "pre_checkout_query"
+	UpdateTypePurchasedPaidMedia       = "purchased_paid_media"
+	UpdateTypePoll                     = "poll"
+	UpdateTypePollAnswer               = "poll_answer"
+	UpdateTypeMyChatMember             = "my_chat_member"
+	UpdateTypeChatMember               = "chat_member"
+	UpdateTypeChatJoinRequest          = "chat_join_request"
+	UpdateTypeChatBoost                = "chat_boost"
+	UpdateTypeRemovedChatBoost         = "removed_chat_boost"
+	UpdateTypeManagedBot               = "managed_bot"
+	UpdateTypeSubscription             = "subscription"
+	UpdateTypeStoppedMessageGeneration = "stopped_message_generation"
 )
 
 // GetType is a helper method to easily identify the type of update that is being received.
@@ -110,18 +112,16 @@ func (u Update) GetType() string {
 	case u.ManagedBot != nil:
 		return UpdateTypeManagedBot
 
+	case u.Subscription != nil:
+		return UpdateTypeSubscription
+
+	case u.StoppedMessageGeneration != nil:
+		return UpdateTypeStoppedMessageGeneration
+
 	default:
 		return "unknown"
 	}
 }
-
-// The consts listed below represent all the parse_mode options that can be sent to telegram.
-const (
-	ParseModeHTML       = "HTML"
-	ParseModeMarkdownV2 = "MarkdownV2"
-	ParseModeMarkdown   = "Markdown"
-	ParseModeNone       = ""
-)
 
 // The consts listed below represent all the chat action options that can be sent to telegram.
 const (
@@ -160,12 +160,302 @@ const (
 	KeyboardButtonStylePrimary = "primary"
 )
 
-// The consts below represent possible status values for a ChatMember.
+// The consts listed below represent all the messageentity types that can be obtained from telegram.
 const (
-	ChatMemberStatusOwner         = "creator"
+	MessageEntityTypeMention              = "mention"
+	MessageEntityTypeHashtag              = "hashtag"
+	MessageEntityTypeCashtag              = "cashtag"
+	MessageEntityTypeBotCommand           = "bot_command"
+	MessageEntityTypeUrl                  = "url"
+	MessageEntityTypeEmail                = "email"
+	MessageEntityTypePhoneNumber          = "phone_number"
+	MessageEntityTypeBold                 = "bold"
+	MessageEntityTypeItalic               = "italic"
+	MessageEntityTypeUnderline            = "underline"
+	MessageEntityTypeStrikethrough        = "strikethrough"
+	MessageEntityTypeSpoiler              = "spoiler"
+	MessageEntityTypeBlockquote           = "blockquote"
+	MessageEntityTypeExpandableBlockquote = "expandable_blockquote"
+	MessageEntityTypeCode                 = "code"
+	MessageEntityTypePre                  = "pre"
+	MessageEntityTypeTextLink             = "text_link"
+	MessageEntityTypeTextMention          = "text_mention"
+	MessageEntityTypeCustomEmoji          = "custom_emoji"
+	MessageEntityTypeDateTime             = "date_time"
+)
+
+// The consts listed below represent all the BackgroundFill types.
+const (
+	BackgroundFillTypeSolid            = "solid"
+	BackgroundFillTypeGradient         = "gradient"
+	BackgroundFillTypeFreeformGradient = "freeform_gradient"
+)
+
+// The consts listed below represent all the BackgroundType types.
+const (
+	BackgroundTypeTypeFill      = "fill"
+	BackgroundTypeTypeWallpaper = "wallpaper"
+	BackgroundTypeTypePattern   = "pattern"
+	BackgroundTypeTypeChatTheme = "chat_theme"
+)
+
+// The consts listed below represent all the BotCommandScope types.
+const (
+	BotCommandScopeTypeDefault               = "default"
+	BotCommandScopeTypeAllPrivateChats       = "all_private_chats"
+	BotCommandScopeTypeAllGroupChats         = "all_group_chats"
+	BotCommandScopeTypeAllChatAdministrators = "all_chat_administrators"
+	BotCommandScopeTypeChat                  = "chat"
+	BotCommandScopeTypeChatAdministrators    = "chat_administrators"
+	BotCommandScopeTypeChatMember            = "chat_member"
+)
+
+// The consts listed below represent all the ChatBoostSource types.
+const (
+	ChatBoostSourceSourcePremium  = "premium"
+	ChatBoostSourceSourceGiftCode = "gift_code"
+	ChatBoostSourceSourceGiveaway = "giveaway"
+)
+
+// The consts listed below represent all the ChatMember types.
+const (
+	ChatMemberStatusCreator       = "creator"
 	ChatMemberStatusAdministrator = "administrator"
 	ChatMemberStatusMember        = "member"
 	ChatMemberStatusRestricted    = "restricted"
 	ChatMemberStatusLeft          = "left"
-	ChatMemberStatusBanned        = "kicked"
+	ChatMemberStatusKicked        = "kicked"
+)
+
+// The consts listed below represent all the InlineQueryResult types.
+const (
+	InlineQueryResultTypeAudio    = "audio"
+	InlineQueryResultTypeDocument = "document"
+	InlineQueryResultTypeGif      = "gif"
+	InlineQueryResultTypeMpeg4Gif = "mpeg4_gif"
+	InlineQueryResultTypePhoto    = "photo"
+	InlineQueryResultTypeSticker  = "sticker"
+	InlineQueryResultTypeVideo    = "video"
+	InlineQueryResultTypeVoice    = "voice"
+	InlineQueryResultTypeArticle  = "article"
+	InlineQueryResultTypeContact  = "contact"
+	InlineQueryResultTypeGame     = "game"
+	InlineQueryResultTypeLocation = "location"
+	InlineQueryResultTypeVenue    = "venue"
+)
+
+// The consts listed below represent all the InputMedia types.
+const (
+	InputMediaTypeAnimation = "animation"
+	InputMediaTypeAudio     = "audio"
+	InputMediaTypeDocument  = "document"
+	InputMediaTypeLivePhoto = "live_photo"
+	InputMediaTypePhoto     = "photo"
+	InputMediaTypeVideo     = "video"
+)
+
+// The consts listed below represent all the InputPaidMedia types.
+const (
+	InputPaidMediaTypeLivePhoto = "live_photo"
+	InputPaidMediaTypePhoto     = "photo"
+	InputPaidMediaTypeVideo     = "video"
+)
+
+// The consts listed below represent all the InputPollMedia types.
+const (
+	InputPollMediaTypeAnimation = "animation"
+	InputPollMediaTypeAudio     = "audio"
+	InputPollMediaTypeDocument  = "document"
+	InputPollMediaTypeLivePhoto = "live_photo"
+	InputPollMediaTypeLocation  = "location"
+	InputPollMediaTypePhoto     = "photo"
+	InputPollMediaTypeVenue     = "venue"
+	InputPollMediaTypeVideo     = "video"
+)
+
+// The consts listed below represent all the InputPollOptionMedia types.
+const (
+	InputPollOptionMediaTypeAnimation = "animation"
+	InputPollOptionMediaTypeLink      = "link"
+	InputPollOptionMediaTypeLivePhoto = "live_photo"
+	InputPollOptionMediaTypeLocation  = "location"
+	InputPollOptionMediaTypePhoto     = "photo"
+	InputPollOptionMediaTypeSticker   = "sticker"
+	InputPollOptionMediaTypeVenue     = "venue"
+	InputPollOptionMediaTypeVideo     = "video"
+)
+
+// The consts listed below represent all the InputProfilePhoto types.
+const (
+	InputProfilePhotoTypeStatic   = "static"
+	InputProfilePhotoTypeAnimated = "animated"
+)
+
+// The consts listed below represent all the InputRichBlock types.
+const (
+	InputRichBlockTypeParagraph              = "paragraph"
+	InputRichBlockTypeHeading                = "heading"
+	InputRichBlockTypePre                    = "pre"
+	InputRichBlockTypeFooter                 = "footer"
+	InputRichBlockTypeDivider                = "divider"
+	InputRichBlockTypeMathematicalExpression = "mathematical_expression"
+	InputRichBlockTypeAnchor                 = "anchor"
+	InputRichBlockTypeList                   = "list"
+	InputRichBlockTypeBlockquote             = "blockquote"
+	InputRichBlockTypeExpandableBlockquote   = "expandable_blockquote"
+	InputRichBlockTypePullquote              = "pullquote"
+	InputRichBlockTypeCollage                = "collage"
+	InputRichBlockTypeSlideshow              = "slideshow"
+	InputRichBlockTypeTable                  = "table"
+	InputRichBlockTypeDetails                = "details"
+	InputRichBlockTypeMap                    = "map"
+	InputRichBlockTypeButtons                = "buttons"
+	InputRichBlockTypeAnimation              = "animation"
+	InputRichBlockTypeAudio                  = "audio"
+	InputRichBlockTypeDocument               = "document"
+	InputRichBlockTypePhoto                  = "photo"
+	InputRichBlockTypeVideo                  = "video"
+	InputRichBlockTypeVoiceNote              = "voice_note"
+	InputRichBlockTypeThinking               = "thinking"
+)
+
+// The consts listed below represent all the InputStoryContent types.
+const (
+	InputStoryContentTypePhoto = "photo"
+	InputStoryContentTypeVideo = "video"
+)
+
+// The consts listed below represent all the MenuButton types.
+const (
+	MenuButtonTypeCommands = "commands"
+	MenuButtonTypeWebApp   = "web_app"
+	MenuButtonTypeDefault  = "default"
+)
+
+// The consts listed below represent all the MessageOrigin types.
+const (
+	MessageOriginTypeUser       = "user"
+	MessageOriginTypeHiddenUser = "hidden_user"
+	MessageOriginTypeChat       = "chat"
+	MessageOriginTypeChannel    = "channel"
+)
+
+// The consts listed below represent all the OwnedGift types.
+const (
+	OwnedGiftTypeRegular = "regular"
+	OwnedGiftTypeUnique  = "unique"
+)
+
+// The consts listed below represent all the PaidMedia types.
+const (
+	PaidMediaTypeLivePhoto = "live_photo"
+	PaidMediaTypePhoto     = "photo"
+	PaidMediaTypePreview   = "preview"
+	PaidMediaTypeVideo     = "video"
+)
+
+// The consts listed below represent all the PassportElementError types.
+const (
+	PassportElementErrorSourceData             = "data"
+	PassportElementErrorSourceFrontSide        = "front_side"
+	PassportElementErrorSourceReverseSide      = "reverse_side"
+	PassportElementErrorSourceSelfie           = "selfie"
+	PassportElementErrorSourceFile             = "file"
+	PassportElementErrorSourceFiles            = "files"
+	PassportElementErrorSourceTranslationFile  = "translation_file"
+	PassportElementErrorSourceTranslationFiles = "translation_files"
+	PassportElementErrorSourceUnspecified      = "unspecified"
+)
+
+// The consts listed below represent all the ReactionType types.
+const (
+	ReactionTypeTypeEmoji       = "emoji"
+	ReactionTypeTypeCustomEmoji = "custom_emoji"
+	ReactionTypeTypePaid        = "paid"
+)
+
+// The consts listed below represent all the RevenueWithdrawalState types.
+const (
+	RevenueWithdrawalStateTypePending   = "pending"
+	RevenueWithdrawalStateTypeSucceeded = "succeeded"
+	RevenueWithdrawalStateTypeFailed    = "failed"
+)
+
+// The consts listed below represent all the RichBlock types.
+const (
+	RichBlockTypeParagraph              = "paragraph"
+	RichBlockTypeHeading                = "heading"
+	RichBlockTypePre                    = "pre"
+	RichBlockTypeFooter                 = "footer"
+	RichBlockTypeDivider                = "divider"
+	RichBlockTypeMathematicalExpression = "mathematical_expression"
+	RichBlockTypeAnchor                 = "anchor"
+	RichBlockTypeList                   = "list"
+	RichBlockTypeBlockquote             = "blockquote"
+	RichBlockTypeExpandableBlockquote   = "expandable_blockquote"
+	RichBlockTypePullquote              = "pullquote"
+	RichBlockTypeCollage                = "collage"
+	RichBlockTypeSlideshow              = "slideshow"
+	RichBlockTypeTable                  = "table"
+	RichBlockTypeDetails                = "details"
+	RichBlockTypeMap                    = "map"
+	RichBlockTypeButtons                = "buttons"
+	RichBlockTypeAnimation              = "animation"
+	RichBlockTypeAudio                  = "audio"
+	RichBlockTypeDocument               = "document"
+	RichBlockTypePhoto                  = "photo"
+	RichBlockTypeVideo                  = "video"
+	RichBlockTypeVoiceNote              = "voice_note"
+	RichBlockTypeThinking               = "thinking"
+)
+
+// The consts listed below represent all the RichText types.
+const (
+	RichTextTypeString                 = "string"
+	RichTextTypeBold                   = "bold"
+	RichTextTypeItalic                 = "italic"
+	RichTextTypeUnderline              = "underline"
+	RichTextTypeStrikethrough          = "strikethrough"
+	RichTextTypeSpoiler                = "spoiler"
+	RichTextTypeDateTime               = "date_time"
+	RichTextTypeTextMention            = "text_mention"
+	RichTextTypeSubscript              = "subscript"
+	RichTextTypeSuperscript            = "superscript"
+	RichTextTypeMarked                 = "marked"
+	RichTextTypeCode                   = "code"
+	RichTextTypeCustomEmoji            = "custom_emoji"
+	RichTextTypeMathematicalExpression = "mathematical_expression"
+	RichTextTypeUrl                    = "url"
+	RichTextTypeEmailAddress           = "email_address"
+	RichTextTypePhoneNumber            = "phone_number"
+	RichTextTypeBankCardNumber         = "bank_card_number"
+	RichTextTypeMention                = "mention"
+	RichTextTypeHashtag                = "hashtag"
+	RichTextTypeCashtag                = "cashtag"
+	RichTextTypeBotCommand             = "bot_command"
+	RichTextTypeButton                 = "button"
+	RichTextTypeAnchor                 = "anchor"
+	RichTextTypeAnchorLink             = "anchor_link"
+	RichTextTypeReference              = "reference"
+	RichTextTypeReferenceLink          = "reference_link"
+)
+
+// The consts listed below represent all the StoryAreaType types.
+const (
+	StoryAreaTypeTypeLocation          = "location"
+	StoryAreaTypeTypeSuggestedReaction = "suggested_reaction"
+	StoryAreaTypeTypeLink              = "link"
+	StoryAreaTypeTypeWeather           = "weather"
+	StoryAreaTypeTypeUniqueGift        = "unique_gift"
+)
+
+// The consts listed below represent all the TransactionPartner types.
+const (
+	TransactionPartnerTypeUser             = "user"
+	TransactionPartnerTypeChat             = "chat"
+	TransactionPartnerTypeAffiliateProgram = "affiliate_program"
+	TransactionPartnerTypeFragment         = "fragment"
+	TransactionPartnerTypeTelegramAds      = "telegram_ads"
+	TransactionPartnerTypeTelegramApi      = "telegram_api"
+	TransactionPartnerTypeOther            = "other"
 )

@@ -21,11 +21,21 @@ func (m Message) GetLink() string {
 }
 
 // GetText returns the message text, for both text messages and media messages. (Why is this not the telegram default!)
+// NOTE: Does NOT handle RichMessage text - use GetRawText() for this.
 func (m Message) GetText() string {
 	if m.Caption != "" {
 		return m.Caption
 	}
 	return m.Text
+}
+
+// GetRawText returns any text content from a message; be it text, media, or rich.
+// Note: output depends on the rich message structure and so may not be stable.
+func (m Message) GetRawText() string {
+	if m.RichMessage != nil {
+		return m.RichMessage.PlainText()
+	}
+	return m.GetText()
 }
 
 // GetEntities returns the message entities, for both text messages and media messages. (Why is this not the telegram default!)
@@ -189,22 +199,6 @@ func (mru MessageReactionUpdated) DeleteReaction(b *Bot, opts *DeleteMessageReac
 	return b.DeleteMessageReaction(mru.Chat.Id, mru.MessageId, opts)
 }
 
-func (mcm ChatMemberAdministrator) GetCanManageTags() bool {
-	return mcm.MergeChatMember().GetCanManageTags()
-}
-
-func (mcm MergedChatMember) GetCanManageTags() bool {
-	if mcm.Status != "administrator" {
-		return false
-	}
-
-	if mcm.CanManageTags == nil {
-		return mcm.CanPinMessages
-	}
-
-	return *mcm.CanManageTags
-}
-
 func (cp ChatPermissions) GetCanReactToMessages() bool {
 	if cp.CanReactToMessages == nil {
 		return cp.CanSendMessages
@@ -227,4 +221,28 @@ func (cp ChatPermissions) GetCanManageTopics() bool {
 	}
 
 	return *cp.CanManageTopics
+}
+
+func (m RichMessage) PlainText() string {
+	var sb strings.Builder
+	for _, block := range m.Blocks {
+		sb.WriteString(RichBlockContent(block))
+	}
+	return sb.String()
+}
+
+func (m RichMessage) HTML() (string, []InputRichMessageMedia) {
+	var r renderCtx
+	for _, block := range m.Blocks {
+		r.renderBlockHTML(block)
+	}
+	return r.sb.String(), r.media
+}
+
+func (m RichMessage) Markdown() (string, []InputRichMessageMedia) {
+	var r renderCtx
+	for _, block := range m.Blocks {
+		r.renderBlockMarkdown(block, 0)
+	}
+	return r.sb.String(), r.media
 }

@@ -6,7 +6,7 @@ require (
 	dario.cat/mergo v1.0.2
 	github.com/AlecAivazis/survey/v2 v2.3.7
 	github.com/Microsoft/go-winio v0.6.4
-	github.com/PaulSonOfLars/gotgbot/v2 v2.0.0-rc.35
+	github.com/PaulSonOfLars/gotgbot/v2 v2.0.0-rc.37
 	github.com/alecthomas/kong v1.17.0
 	github.com/bmatcuk/doublestar/v4 v4.10.4
 	github.com/containerd/containerd/api v1.12.0
