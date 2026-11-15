@@ -20,12 +20,12 @@ tests: ## Run all tests and requires a running rabbitmq-server. Use GO_TEST_FLAG
 	go test -race -v -tags integration $(GO_TEST_FLAGS)
 
 .PHONY: tests-docker
-tests-docker: rabbitmq-server
+tests-docker: rabbitmq-server ## Run integration tests against a Dockerized RabbitMQ
 	RABBITMQ_RABBITMQCTL_PATH="DOCKER:$(CONTAINER_NAME)" go test -race -v -tags integration $(GO_TEST_FLAGS)
 	$(MAKE) stop-rabbitmq-server
 
-.PHONY: check
-check:
+.PHONY: checks
+checks: ## Run static checks (golangci-lint)
 	golangci-lint run ./...
 
 CONTAINER_NAME ?= amqp091-go-rabbitmq
@@ -40,11 +40,11 @@ rabbitmq-server: ## Start a RabbitMQ server using Docker. Container name can be 
 stop-rabbitmq-server: ## Stop a RabbitMQ server using Docker. Container name can be customised with CONTAINER_NAME=some-rabbit
 	docker stop $(CONTAINER_NAME)
 
-certs:
+certs: ## Generate TLS certificates under ./certs/ via certs.sh
 	./certs.sh
 
 .PHONY: certs-rm
-certs-rm:
+certs-rm: ## Remove the generated ./certs/ directory
 	rm -r ./certs/
 
 .PHONY: rabbitmq-server-tls
@@ -54,4 +54,4 @@ rabbitmq-server-tls: | certs ## Start a RabbitMQ server using Docker. Container 
 		--mount type=bind,src=./certs/server,dst=/certs \
 		--mount type=bind,src=./certs/ca/cacert.pem,dst=/certs/cacert.pem,readonly \
 		--mount type=bind,src=./rabbitmq-confs/tls/90-tls.conf,dst=/etc/rabbitmq/conf.d/90-tls.conf \
-		--pull always rabbitmq:3-management
+		--pull always rabbitmq:4-management

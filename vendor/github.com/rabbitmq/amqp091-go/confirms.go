@@ -61,9 +61,7 @@ func (c *confirms) unpublish() {
 func (c *confirms) confirm(confirmation Confirmation) {
 	delete(c.sequencer, c.expecting)
 	c.expecting++
-	for _, l := range c.listeners {
-		l <- confirmation
-	}
+	notifyAll(c.listeners, confirmation)
 }
 
 // resequence confirms any out of order delivered confirmations
@@ -121,6 +119,21 @@ func (c *confirms) Close() error {
 	}
 	c.listeners = nil
 	return nil
+}
+
+// reset clears any pending deferred confirmations and resets the sequencer
+// state for recovery, while keeping the listeners intact.
+func (c *confirms) reset() {
+	c.m.Lock()
+	defer c.m.Unlock()
+
+	c.publishedMut.Lock()
+	defer c.publishedMut.Unlock()
+
+	c.published = 0
+	c.expecting = 1
+	c.deferredConfirmations.Close()
+	c.sequencer = map[uint64]Confirmation{}
 }
 
 type deferredConfirmations struct {

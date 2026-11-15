@@ -242,6 +242,9 @@ func writeFrame(w io.Writer, typ uint8, channel uint16, payload []byte) (err err
 
 func writeShortstr(w io.Writer, s string) (err error) {
 	b := []byte(s)
+	if len(b) > 255 {
+		return fmt.Errorf("amqp: shortstr %q exceeds 255 bytes", s)
+	}
 
 	length := uint8(len(b))
 

@@ -19,7 +19,7 @@ Here is the recommended workflow:
 ## Running Static Checks
 
 golangci-lint must be installed to run the static checks. See [installation
-docs](https://golangci-lint.run/usage/install/) for more information.
+docs](https://golangci-lint.run/docs/welcome/install/local/) for more information.
 
 The static checks can be run via:
 
@@ -31,13 +31,12 @@ make checks
 
 ### Integration Tests
 
-Running the Integration tests require:
+Running the Integration tests requires:
 
-* A running RabbitMQ node with all defaults:
-  [https://www.rabbitmq.com/download.html](https://www.rabbitmq.com/download.html)
-* That the server is either reachable via `amqp://guest:guest@127.0.0.1:5672/`
-  or the environment variable `AMQP_URL` set to it's URL
-  (e.g.: `export AMQP_URL="amqp://guest:verysecretpasswd@rabbitmq-host:5772/`)
+* A running [RabbitMQ](https://www.rabbitmq.com/download.html) node with all defaults
+* The server is either reachable via `amqp://guest:guest@127.0.0.1:5672/`
+  or the environment variable `AMQP_URL` is set to its URL
+  (e.g.: `export AMQP_URL="amqp://guest:verysecretpasswd@rabbitmq-host:5672/"`)
 
 The integration tests can be run via:
 
@@ -46,7 +45,7 @@ make tests
 ```
 
 Some tests require access to `rabbitmqctl` CLI. Use the environment variable
-`RABBITMQ_RABBITMQCTL_PATH=/some/path/to/rabbitmqctl` to run those tests. 
+`RABBITMQ_RABBITMQCTL_PATH=/some/path/to/rabbitmqctl` to run those tests.
 
 If you have Docker available in your machine, you can run:
 
