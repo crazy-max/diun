@@ -39,6 +39,22 @@ services:
       timeout: 5s
       retries: 30
 
+  kubernetes:
+    image: rancher/k3s:v1.35.3-k3s1
+    command:
+      - server
+      - --disable-agent
+      - --disable=traefik,servicelb,coredns,local-storage,metrics-server
+      - --tls-san=kubernetes
+      - --write-kubeconfig=/kubeconfig/config.yaml
+    volumes:
+      - kubeconfig:/kubeconfig
+    healthcheck:
+      test: ["CMD", "kubectl", "--kubeconfig=/kubeconfig/config.yaml", "get", "--raw=/readyz"]
+      interval: 2s
+      timeout: 5s
+      retries: 60
+
   tests:
     build:
       context: ..
@@ -54,12 +70,16 @@ services:
         condition: service_healthy
       nomad:
         condition: service_healthy
+      kubernetes:
+        condition: service_healthy
     volumes:
       - ../bin/coverage/integration:/coverage
       - containerd-socket:/run/containerd
       - go-cache:/root/.cache/go-build
+      - kubeconfig:/kubeconfig:ro
 
 volumes:
   docker-data:
   containerd-socket:
   go-cache:
+  kubeconfig:

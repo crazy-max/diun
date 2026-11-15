@@ -132,6 +132,9 @@ jobs:
             run: '^TestNomadProvider$'
           - suite: metrics
             run: '^TestMetrics$'
+          - suite: kubernetes
+            service: kubernetes
+            run: '^TestKubernetesProvider$'
     env:
       TEST_RUN: ${{ matrix.run }}
       TEST_SERVICE: ${{ matrix.service }}
