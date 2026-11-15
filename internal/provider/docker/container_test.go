@@ -38,8 +38,8 @@ func TestMetadataFormatsContainerSummary(t *testing.T) {
 
 func TestMetadataImageTagParsing(t *testing.T) {
 	testCases := []struct {
-		name       string
-		image      string
+		name        string
+		image       string
 		expectedTag string
 	}{
 		{
@@ -61,6 +61,31 @@ func TestMetadataImageTagParsing(t *testing.T) {
 			name:        "empty image name",
 			image:       "",
 			expectedTag: "",
+		},
+		{
+			name:        "image ID has no tag",
+			image:       "sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+			expectedTag: "",
+		},
+		{
+			name:        "bare image ID has no tag",
+			image:       "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+			expectedTag: "",
+		},
+		{
+			name:        "digest reference has no tag",
+			image:       "nginx@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+			expectedTag: "",
+		},
+		{
+			name:        "tagged digest reference preserves tag",
+			image:       "nginx:1.25@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+			expectedTag: "1.25",
+		},
+		{
+			name:        "digest algorithm as repository name",
+			image:       "sha256:v1",
+			expectedTag: "v1",
 		},
 	}
 
