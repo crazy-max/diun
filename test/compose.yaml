@@ -27,7 +27,7 @@ services:
       retries: 60
 
   nomad:
-    image: hashicorp/nomad:2.0.2
+    image: hashicorp/nomad:2.1.1
     command: ["agent", "-config=/fixtures/nomad.hcl"]
     environment:
       NOMAD_SKIP_DOCKER_IMAGE_WARN: "1"

@@ -1,4 +1,4 @@
-// Copyright IBM Corp. 2015, 2025
+// Copyright IBM Corp. 2015, 2026
 // SPDX-License-Identifier: MPL-2.0
 
 package api
@@ -147,7 +147,7 @@ func (c *CheckRestart) Canonicalize() {
 	}
 
 	if c.Grace == nil {
-		c.Grace = pointerOf(1 * time.Second)
+		c.Grace = new(1 * time.Second)
 	}
 }
 

@@ -1,4 +1,4 @@
-// Copyright IBM Corp. 2015, 2025
+// Copyright IBM Corp. 2015, 2026
 // SPDX-License-Identifier: MPL-2.0
 
 package api
@@ -7,6 +7,7 @@ import (
 	"context"
 	"errors"
 	"io"
+	"slices"
 	"sort"
 	"strings"
 	"time"
@@ -252,17 +253,22 @@ func (a *Allocations) Services(allocID string, q *QueryOptions) ([]*ServiceRegis
 
 // Allocation is used for serialization of allocations.
 type Allocation struct {
-	ID                    string
-	Namespace             string
-	EvalID                string
-	Name                  string
-	NodeID                string
-	NodeName              string
-	JobID                 string
-	Job                   *Job
-	TaskGroup             string
-	Resources             *Resources
-	TaskResources         map[string]*Resources
+	ID        string
+	Namespace string
+	EvalID    string
+	Name      string
+	NodeID    string
+	NodeName  string
+	JobID     string
+	Job       *Job
+	TaskGroup string
+
+	// Deprecated: will be removed in a future version of the API. Use AllocatedResources.
+	Resources *Resources
+
+	// Deprecated: will be removed in a future version of the API. Use AllocatedResources.
+	TaskResources map[string]*Resources
+
 	AllocatedResources    *AllocatedResources
 	Services              map[string]string
 	Metrics               *AllocationMetric
@@ -452,7 +458,8 @@ type PortMapping struct {
 }
 
 type AllocatedCpuResources struct {
-	CpuShares int64
+	CpuShares     int64
+	ReservedCores []uint16
 }
 
 type AllocatedMemoryResources struct {
@@ -505,8 +512,8 @@ func (a Allocation) RescheduleInfo(t time.Time) (int, int) {
 
 	// Loop over reschedule tracker to find attempts within the restart policy's interval
 	if a.RescheduleTracker != nil && availableAttempts > 0 && interval > 0 {
-		for j := len(a.RescheduleTracker.Events) - 1; j >= 0; j-- {
-			lastAttempt := a.RescheduleTracker.Events[j].RescheduleTime
+		for _, v := range slices.Backward(a.RescheduleTracker.Events) {
+			lastAttempt := v.RescheduleTime
 			timeDiff := t.UTC().UnixNano() - lastAttempt
 			if timeDiff < interval.Nanoseconds() {
 				attempted += 1

@@ -1,4 +1,4 @@
-// Copyright IBM Corp. 2015, 2025
+// Copyright IBM Corp. 2015, 2026
 // SPDX-License-Identifier: MPL-2.0
 
 package api
@@ -84,7 +84,7 @@ type Recommendation struct {
 	Resource       string
 	Value          int
 	Current        int
-	Meta           map[string]interface{}
+	Meta           map[string]any
 	Stats          map[string]float64
 	EnforceVersion bool
 
