@@ -120,6 +120,9 @@ jobs:
           - suite: docker
             service: docker
             run: '^TestDocker(Provider|Discovery)$'
+          - suite: swarm
+            service: docker
+            run: '^TestSwarmProvider$'
           - suite: dockerfile
             run: '^TestDockerfileProvider$'
           - suite: file

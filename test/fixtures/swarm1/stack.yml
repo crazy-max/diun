@@ -1,0 +1,25 @@
+version: "3.8"
+
+services:
+  enabled:
+    image: busybox:1.36.1
+    deploy:
+      replicas: 0
+      labels:
+        diun.enable: "true"
+  disabled:
+    image: busybox:1.36.1
+    deploy:
+      replicas: 0
+      labels:
+        diun.enable: "false"
+  unlabeled:
+    image: busybox:1.36.1
+    deploy:
+      replicas: 0
+  container-label:
+    image: busybox:1.36.1
+    labels:
+      diun.enable: "true"
+    deploy:
+      replicas: 0
