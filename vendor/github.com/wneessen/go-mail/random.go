@@ -13,7 +13,7 @@ import (
 )
 
 // Range of characters for the secure string generation
-const cr = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789._-"
+const cr = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789._"
 
 // Bitmask sizes for the string generators (based on 93 chars total)
 //

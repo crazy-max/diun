@@ -11,10 +11,13 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"slices"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
 
+	"github.com/wneessen/go-mail/internal/dkim"
 	"github.com/wneessen/go-mail/log"
 	"github.com/wneessen/go-mail/smtp"
 )
@@ -128,6 +131,9 @@ type (
 		// dialContextFunc is the DialContextFunc that is used by the Client to connect to the SMTP server.
 		dialContextFunc DialContextFunc
 
+		// dkim is the DKIM configuration for the Client.
+		dkim *dkim.Signer
+
 		// dsnRcptNotifyType represents the different types of notifications for DSN (Delivery Status Notifications)
 		// receipts.
 		dsnRcptNotifyType []string
@@ -166,11 +172,24 @@ type (
 		// other than AUTH.
 		noNoop bool
 
+		// noRset indicates that the Client should skip the "RSET" at the end of the mail delivery
+		//
+		// This is useful for servers for custom MTAs that have not implemented the "RSET" SMTP
+		// command and would issue an "unknown command" error after successful delivery
+		noRset bool
+
+		// ntDomain represents a NT domain name used for the SMTP authentication (NTLM only).
+		ntDomain string
+
 		// pass represents a password or a secret token used for the SMTP authentication.
 		pass string
 
 		// port specifies the network port that is used to establish the connection with the SMTP server.
 		port int
+
+		// preferredAuthTypes specifies the preferred authentication types to use when opportunistic
+		// authentication is enabled.
+		preferredAuthTypes []SMTPAuthType
 
 		// requestDSN indicates wether we want to request DSN (Delivery Status Notifications).
 		requestDSN bool
@@ -181,6 +200,10 @@ type (
 		// skipUTF8 indicates that the Client should skip the "SMTPUTF8" in a "MAIL FROM" even if the server
 		// claims to support it
 		skipUTF8 bool
+
+		// skipEhlo indicates that the Client should skip the "EHLO" command during the dial, for legacy
+		// servers that misbehave when receiving EHLO instead of HELO
+		skipEhlo bool
 
 		// smtpAuth is the authentication type that is used to authenticate the user with SMTP server. It
 		// satisfies the smtp.Auth interface.
@@ -266,6 +289,10 @@ var (
 
 	// ErrClientIsNil indicates that a required smtp client is not provided.
 	ErrClientIsNil = errors.New("client is nil")
+
+	// ErrNoPreferredAuthMechanism indicates that no preferred authentication
+	// mechanism was provided.
+	ErrNoPreferredAuthMechanism = errors.New("no preferred auth mechanism provided")
 )
 
 // NewClient creates a new Client instance with the provided host and optional configuration Option functions.
@@ -596,6 +623,29 @@ func WithPassword(password string) Option {
 	}
 }
 
+// WithDomain sets the domain that the Client will use for SMTP authentication (NTLM only).
+//
+// This function configures the Client with the specified domain for SMTP authentication.
+//
+// Important:
+//   - Specifying a domain name with this option alone does NOT enable SMTP authentication.
+//   - To actually perform authentication with the server, you must also configure an
+//     authentication mechanism by using either WithSMTPAuth() or WithSMTPAuthCustom().
+//   - If you only call WithDomain() without setting an SMTP authentication method,
+//     the provided username will be stored but never used.
+//
+// Parameters:
+//   - domain: The NT domain name to be used for SMTP authentication.
+//
+// Returns:
+//   - An Option function that sets the NT domain name for the Client.
+func WithDomain(domain string) Option {
+	return func(c *Client) error {
+		c.ntDomain = domain
+		return nil
+	}
+}
+
 // WithDSN enables DSN (Delivery Status Notifications) for the Client as described in RFC 1891.
 //
 // This function configures the Client to request DSN, which provides status notifications for email delivery.
@@ -707,6 +757,21 @@ func WithoutNoop() Option {
 	}
 }
 
+// WithoutRset indicates that the Client should not send a "RSET" command after successful mail
+// delivery.
+//
+// This option is useful for servers have not implemented the "RSET" SMTP command and would return
+// an "unknown command" error after successful delivery.
+//
+// Returns:
+//   - An Option function that configures the Client to skip the "RSET" command.
+func WithoutRset() Option {
+	return func(c *Client) error {
+		c.noRset = true
+		return nil
+	}
+}
+
 // WithDialContextFunc sets the provided DialContextFunc as the DialContext for connecting to the SMTP server.
 //
 // This function overrides the default DialContext function used by the Client when establishing a connection
@@ -757,6 +822,69 @@ func WithoutSMTPUTF8() Option {
 	}
 }
 
+// WithoutEhlo indicates that the Client should skip the "EHLO" command during the dial and only
+// attempt to use the "HELO" command instead.
+//
+// This option is useful for legacy servers that misbehave when receiving EHLO instead of HELO.
+// Returns:
+//   - An Option function that configures the Client to skip the "EHLO" command.
+func WithoutEhlo() Option {
+	return func(c *Client) error {
+		c.skipEhlo = true
+		return nil
+	}
+}
+
+// WithAlwaysDKIMSign instructs the Client to sign every Msg that is sent with it using DKIM.
+//
+// This option is useful if you are planning to send multiple Msgs via the same client and don't
+// want to reconfigure DKIM for each Msg.
+//
+// Note: This will always take precedence over any DKIM configuration set on the Msg itself, if
+// used on the Client. If the Msg is not sent via the Client, the Msg's DKIM configuration will
+// be used instead.
+//
+// Parameters:
+//   - config: The DKIMConfig holding all the required options needed to DKIM sign a mail.
+//
+// Returns:
+//   - An Option function that configures the Client to always sign messages using DKIM.
+func WithAlwaysDKIMSign(signer *dkim.Signer) Option {
+	return func(c *Client) error {
+		if signer == nil {
+			return errors.New("DKIM config must not be nil")
+		}
+		if err := signer.ValidateConfig(); err != nil {
+			return err
+		}
+		c.dkim = signer
+		return nil
+	}
+}
+
+// WithOpportunisticSMTPAuth instructs the Client to use opportunistic SMTP authentication,
+// with the provided list of preferred authentication mechanisms.
+//
+// This option is useful if the user wants SMTP authentication to be based on a list of preferred
+// mechanisms, without needing to configure each mechanism individually.
+//
+// Parameters:
+//   - preferredMechs: The list of preferred SMTP authentication mechanisms to use.
+//
+// Returns:
+//   - An Option function that configures the Client to use opportunistic SMTP authentication
+//     with the provided mechanisms.
+func WithOpportunisticSMTPAuth(preferredMechs ...SMTPAuthType) Option {
+	return func(c *Client) error {
+		if len(preferredMechs) == 0 {
+			return ErrNoPreferredAuthMechanism
+		}
+		c.smtpAuthType = SMTPAuthOpportunistic
+		c.preferredAuthTypes = preferredMechs
+		return nil
+	}
+}
+
 // TLSPolicy returns the TLSPolicy that is currently set on the Client as a string.
 //
 // This method retrieves the current TLSPolicy configured for the Client and returns it as a string representation.
@@ -778,7 +906,11 @@ func (c *Client) ServerAddr() string {
 	if c.useUnixSocket {
 		return c.host
 	}
-	return fmt.Sprintf("%s:%d", c.host, c.port)
+	host := c.host
+	if strings.HasPrefix(host, "[") && strings.HasSuffix(host, "]") {
+		host = host[1 : len(host)-1]
+	}
+	return net.JoinHostPort(host, strconv.Itoa(c.port))
 }
 
 // SetTLSPolicy sets or overrides the TLSPolicy currently configured on the Client with the given TLSPolicy.
@@ -960,6 +1092,16 @@ func (c *Client) SetPassword(password string) {
 	c.pass = password
 }
 
+// SetDomain sets or overrides the domain that the Client will use for SMTP authentication (NTLM only).
+//
+// This method updates the NT domain name used by the Client for authenticating with the SMTP server.
+//
+// Parameters:
+//   - domain: The NT domain name to be set for SMTP authentication.
+func (c *Client) SetDomain(domain string) {
+	c.ntDomain = domain
+}
+
 // SetSMTPAuth sets or overrides the SMTPAuthType currently configured on the Client for SMTP
 // authentication.
 //
@@ -1000,6 +1142,34 @@ func (c *Client) SetLogAuthData(logAuth bool) {
 	c.logAuthData = logAuth
 }
 
+// SetAlwaysDKIMSign sets or overrides the Client to sign every Msg that is sent with it using DKIM.
+//
+// This option is useful if you are planning to send multiple Msgs via the same client and don't
+// want to reconfigure DKIM for each Msg.
+//
+// Note: This will always take precedence over any DKIM configuration set on the Msg itself, if
+// used on the Client. If the Msg is not sent via the Client, the Msg's DKIM configuration will
+// be used instead.
+//
+// Parameters:
+//   - config: The DKIMConfig holding all the required options needed to DKIM sign a mail.
+//
+// Returns:
+//   - An error if the provided DKIMConfig is invalid or nil.
+func (c *Client) SetAlwaysDKIMSign(signer *dkim.Signer) error {
+	if signer == nil {
+		return errors.New("DKIM signer must not be nil")
+	}
+	if err := signer.ValidateConfig(); err != nil {
+		return fmt.Errorf("invalid DKIM signer: %w", err)
+	}
+
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+	c.dkim = signer
+	return nil
+}
+
 // DialWithContext establishes a connection to the server using the provided context.Context.
 //
 // This function adds a deadline based on the Client's timeout to the provided context.Context
@@ -1034,7 +1204,7 @@ func (c *Client) DialWithContext(ctxDial context.Context) error {
 // If SSL is enabled, it uses a TLS connection. After successfully connecting, it initializes
 // an smtp.Client, sends the HELO/EHLO command, and optionally performs STARTTLS and SMTP AUTH
 // based on the Client's configuration. Debug and authentication logging are enabled if
-// configured.
+// configured. err is named so a deferred cleanup below can see it.
 //
 // Parameters:
 //   - ctxDial: The context used to control the connection timeout and cancellation.
@@ -1042,7 +1212,7 @@ func (c *Client) DialWithContext(ctxDial context.Context) error {
 // Returns:
 //   - A pointer to the initialized smtp.Client.
 //   - An error if the connection fails, the smtp.Client cannot be created, or any subsequent commands fail.
-func (c *Client) DialToSMTPClientWithContext(ctxDial context.Context) (*smtp.Client, error) {
+func (c *Client) DialToSMTPClientWithContext(ctxDial context.Context) (_ *smtp.Client, err error) {
 	c.mutex.RLock()
 	defer c.mutex.RUnlock()
 
@@ -1075,6 +1245,15 @@ func (c *Client) DialToSMTPClientWithContext(ctxDial context.Context) (*smtp.Cli
 		return nil, err
 	}
 
+	// If anything below fails, we return nil instead of an [*smtp.Client], so
+	// the caller never gets a handle to the [net.Conn] we just dialed. We close it
+	// here so it doesn't leak.
+	defer func() {
+		if err != nil {
+			_ = connection.Close()
+		}
+	}()
+
 	err = connection.SetDeadline(time.Now().Add(c.connTimeout))
 	if err != nil {
 		return nil, err
@@ -1101,6 +1280,8 @@ func (c *Client) DialToSMTPClientWithContext(ctxDial context.Context) (*smtp.Cli
 		client.SetLogAuthData()
 	}
 	client.SkipSMTPUTF8(c.skipUTF8)
+	client.SkipEhlo(c.skipEhlo)
+
 	if err = client.Hello(c.helo); err != nil {
 		return nil, err
 	}
@@ -1147,6 +1328,11 @@ func (c *Client) CloseWithSMTPClient(client *smtp.Client) error {
 		return nil
 	}
 	if err := client.Quit(); err != nil {
+		if client.HasConnection() {
+			if closeErr := client.Close(); closeErr != nil {
+				err = errors.Join(err, fmt.Errorf("failed to close SMTP connection after QUIT failure: %w", closeErr))
+			}
+		}
 		return fmt.Errorf("failed to close SMTP client: %w", err)
 	}
 
@@ -1179,6 +1365,9 @@ func (c *Client) Reset() error {
 // Returns:
 //   - An error if the connection check fails or if sending the RSET command fails; otherwise, returns nil.
 func (c *Client) ResetWithSMTPClient(client *smtp.Client) error {
+	if c.noRset {
+		return nil
+	}
 	if err := c.checkConn(client); err != nil {
 		return err
 	}
@@ -1346,6 +1535,13 @@ func (c *Client) auth(client *smtp.Client, isEnc bool) error {
 		}
 
 		authType := c.smtpAuthType
+		if c.smtpAuthType == SMTPAuthOpportunistic {
+			selectedAuth := c.authTypeSelectPreferred(smtpAuthType)
+			if selectedAuth == "" {
+				c.smtpAuthType = SMTPAuthAutoDiscover
+			}
+			authType = selectedAuth
+		}
 		if c.smtpAuthType == SMTPAuthAutoDiscover {
 			discoveredType, err := c.authTypeAutoDiscover(smtpAuthType, isEnc)
 			if err != nil {
@@ -1380,6 +1576,11 @@ func (c *Client) auth(client *smtp.Client, isEnc bool) error {
 				return ErrCramMD5AuthNotSupported
 			}
 			smtpAuth = smtp.CRAMMD5Auth(c.user, c.pass)
+		case SMTPAuthNTLM:
+			if !strings.Contains(smtpAuthType, string(SMTPAuthNTLM)) {
+				return ErrNTLMAuthNotSupported
+			}
+			smtpAuth = smtp.NTLMAuth(c.user, c.pass, c.ntDomain)
 		case SMTPAuthXOAUTH2:
 			if !strings.Contains(smtpAuthType, string(SMTPAuthXOAUTH2)) {
 				return ErrXOauth2AuthNotSupported
@@ -1432,28 +1633,63 @@ func (c *Client) authTypeAutoDiscover(supported string, isEnc bool) (SMTPAuthTyp
 	}
 	preferList := []SMTPAuthType{
 		SMTPAuthSCRAMSHA256PLUS, SMTPAuthSCRAMSHA256, SMTPAuthSCRAMSHA1PLUS, SMTPAuthSCRAMSHA1,
-		SMTPAuthCramMD5, SMTPAuthPlain, SMTPAuthLogin,
+		SMTPAuthNTLM, SMTPAuthCramMD5, SMTPAuthPlain, SMTPAuthLogin,
 	}
 	if !isEnc {
-		preferList = []SMTPAuthType{SMTPAuthSCRAMSHA256, SMTPAuthSCRAMSHA1, SMTPAuthCramMD5}
+		preferList = []SMTPAuthType{SMTPAuthSCRAMSHA256, SMTPAuthSCRAMSHA1, SMTPAuthNTLM, SMTPAuthCramMD5}
 	}
 	mechs := strings.Split(supported, " ")
 
 	for _, item := range preferList {
-		if sliceContains(mechs, string(item)) {
+		if slices.Contains(mechs, string(item)) {
 			return item, nil
 		}
 	}
 	return "", ErrNoSupportedAuthDiscovered
 }
 
-func sliceContains(slice []string, item string) bool {
-	for _, s := range slice {
-		if s == item {
-			return true
+func (c *Client) authTypeSelectPreferred(supported string) SMTPAuthType {
+	mechs := strings.Split(supported, " ")
+	for _, auth := range c.preferredAuthTypes {
+		var noEnc bool
+		if strings.HasSuffix(string(auth), "-NOENC") {
+			noEnc = true
+			switch strings.TrimSuffix(string(auth), "-NOENC") {
+			case "LOGIN":
+				auth = SMTPAuthLogin
+			case "PLAIN":
+				auth = SMTPAuthPlain
+			}
+		}
+		if slices.Contains(mechs, string(auth)) {
+			switch auth {
+			case SMTPAuthSCRAMSHA256PLUS:
+				return SMTPAuthSCRAMSHA256PLUS
+			case SMTPAuthSCRAMSHA256:
+				return SMTPAuthSCRAMSHA256
+			case SMTPAuthSCRAMSHA1PLUS:
+				return SMTPAuthSCRAMSHA1PLUS
+			case SMTPAuthSCRAMSHA1:
+				return SMTPAuthSCRAMSHA1
+			case SMTPAuthNTLM:
+				return SMTPAuthNTLM
+			case SMTPAuthCramMD5:
+				return SMTPAuthCramMD5
+			case SMTPAuthPlain:
+				if !noEnc {
+					return SMTPAuthPlain
+				}
+				return SMTPAuthPlainNoEnc
+			case SMTPAuthLogin:
+				if !noEnc {
+					return SMTPAuthLogin
+				}
+				return SMTPAuthLoginNoEnc
+			}
 		}
 	}
-	return false
+
+	return ""
 }
 
 // sendSingleMsg sends out a single message and returns an error if the transmission or
@@ -1545,6 +1781,12 @@ func (c *Client) sendSingleMsg(client *smtp.Client, message *Msg) error {
 			enhancedStatusCode: enhancedStatusCode(err, escSupport),
 		}
 	}
+
+	// the Client is instructed to always DKIM sign the Msg, this will override the
+	// Msg's own DKIM configuration if set
+	if c.dkim != nil {
+		message.dkim = c.dkim
+	}
 	_, err = message.WriteTo(writer)
 	if err != nil {
 		return &SendError{
@@ -1619,7 +1861,11 @@ func (c *Client) checkConn(client *smtp.Client) error {
 // Returns:
 //   - A string representing the server address in the format "host:fallbackPort".
 func (c *Client) serverFallbackAddr() string {
-	return fmt.Sprintf("%s:%d", c.host, c.fallbackPort)
+	host := c.host
+	if strings.HasPrefix(host, "[") && strings.HasSuffix(host, "]") {
+		host = host[1 : len(host)-1]
+	}
+	return net.JoinHostPort(host, strconv.Itoa(c.fallbackPort))
 }
 
 // setDefaultHelo sets the HELO/EHLO hostname to the local machine's hostname.

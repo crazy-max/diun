@@ -361,8 +361,8 @@ github.com/vanng822/go-premailer v0.0.0-20191214114701-be27abe028fe h1:9YnI5plmy
 github.com/vanng822/go-premailer v0.0.0-20191214114701-be27abe028fe/go.mod h1:JTFJA/t820uFDoyPpErFQ3rb3amdZoPtxcKervG0OE4=
 github.com/vbatts/tar-split v0.12.3 h1:Cd46rkGXI3Td4yrVNwU8ripbxFaQbmesqhjBUUYAJSw=
 github.com/vbatts/tar-split v0.12.3/go.mod h1:sQOc6OlqGCr7HkGx/IDBeKiTIvqhmj8KffNhEXG4Nq0=
-github.com/wneessen/go-mail v0.7.3 h1:g3DravXC5SMlVdboFrQA8Jx95A8sOzoBeS5F+vzNRK0=
-github.com/wneessen/go-mail v0.7.3/go.mod h1:QGhBX0yNbc1J+Mkjcu7z2rpj4B4l+BmDY8gYznPC9sk=
+github.com/wneessen/go-mail v0.8.2 h1:JVeSmRX9oPjYFH77irWIFy8t1vJRDU/+ri4H38FMAK8=
+github.com/wneessen/go-mail v0.8.2/go.mod h1:rJb+LDvSMcOzSeNZ4rFyS7PLMy0DEFz/uU3A0T5JY50=
 github.com/x448/float16 v0.8.4 h1:qLwI1I70+NjRFUR3zs1JPUCgaCXSh3SW62uAKT1mSBM=
 github.com/x448/float16 v0.8.4/go.mod h1:14CWIYCyZA/cWjXOioeEpHeN/83MdbZDRQHoFcYsOfg=
 github.com/yuin/goldmark v1.4.13/go.mod h1:6yULJ656Px+3vBD8DxQVa3kxgyrAnzto9xy5taEt/CY=

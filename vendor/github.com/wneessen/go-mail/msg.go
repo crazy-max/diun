@@ -19,12 +19,15 @@ import (
 	"io/fs"
 	"mime"
 	"net/mail"
+	"net/url"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
 	"syscall"
 	"time"
+
+	"github.com/wneessen/go-mail/internal/dkim"
 )
 
 var (
@@ -33,6 +36,11 @@ var (
 
 	// ErrNoRcptAddresses indicates that no recipient addresses have been set.
 	ErrNoRcptAddresses = errors.New("no recipient addresses set")
+
+	// ErrNoHTTPSUnsubURL is returned when one-click unsubscribe is requested
+	// without a usable HTTPS URL, which RFC 8058 requires.
+	ErrNoHTTPSUnsubURL = errors.New("one-click unsubscribe requires at least one HTTPS " +
+		"URI in List-Unsubscribe")
 )
 
 const (
@@ -61,6 +69,12 @@ const (
 	// the corresponding go-mail-middleware.
 	PGPSignature
 )
+
+// oneClickPostValue is the fixed token required by RFC 8058 for the
+// List-Unsubscribe-Post header field.
+//
+// See: https://datatracker.ietf.org/doc/html/rfc8058#section-3.2
+const oneClickPostValue = "List-Unsubscribe=One-Click"
 
 // MiddlewareType is a type wrapper for a string. It describes the type of the Middleware and needs to be
 // returned by the Middleware.Type method to satisfy the Middleware interface.
@@ -163,6 +177,9 @@ type Msg struct {
 
 	// sMIME holds a SMIME type to sign a Msg using S/MIME
 	sMIME *SMIME
+
+	// dkim holds the DKIM configuration for signing the Msg
+	dkim *dkim.Signer
 }
 
 // SendmailPath is the default system path to the sendmail binary - at least on standard Unix-like OS.
@@ -337,6 +354,25 @@ func WithPGPType(pgptype PGPType) MsgOption {
 	}
 }
 
+// WithDKIM sets the DKIM signer for the Msg during its creation or initialization,
+//
+// This MsgOption function allows you to specify the DKIM signer to be used for digitally
+// signing the message header and body.
+//
+// Parameters:
+//   - signer: The dkim.Signer instance to be used for signing the message.
+//
+// Returns:
+//   - A MsgOption function that can be used to customize the Msg instance.
+//
+// References:
+//   - https://datatracker.ietf.org/doc/html/rfc6376
+func WithDKIM(signer *dkim.Signer) MsgOption {
+	return func(m *Msg) {
+		m.dkim = signer
+	}
+}
+
 // WithNoDefaultUserAgent disables the inclusion of a default User-Agent header in the Msg during
 // its creation or initialization.
 //
@@ -433,6 +469,23 @@ func (m *Msg) SetMIMEVersion(version MIMEVersion) {
 //     or signature method used for the email message.
 func (m *Msg) SetPGPType(pgptype PGPType) {
 	m.pgptype = pgptype
+}
+
+// SetDKIM sets or overrides the currently set DKIM signer for the Msg.
+//
+// This method allows the user to assign a DKIMSigner to a Msg to be used for digitally
+// signing the message header and body.
+//
+// Parameters:
+//   - signer: The dkim.Signer instance to be used for signing the message.
+//
+// Returns:
+//   - A MsgOption function that can be used to customize the Msg instance.
+//
+// References:
+//   - https://datatracker.ietf.org/doc/html/rfc6376
+func (m *Msg) SetDKIM(signer *dkim.Signer) {
+	m.dkim = signer
 }
 
 // Encoding returns the currently set Encoding of the Msg as a string.
@@ -704,7 +757,12 @@ func (m *Msg) EnvelopeFrom(from string) error {
 // References:
 //   - https://datatracker.ietf.org/doc/html/rfc5322#section-3.4
 func (m *Msg) EnvelopeFromFormat(name, addr string) error {
-	return m.SetAddrHeader(HeaderEnvelopeFrom, fmt.Sprintf(`"%s" <%s>`, name, addr))
+	mailAddr, err := mailAddrFromNameAddr(name, addr)
+	if err != nil {
+		return err
+	}
+	m.EnvelopeFromMailAddress(mailAddr)
+	return nil
 }
 
 // EnvelopeFromMailAddress sets the "FROM" address in the mail body for the Msg using a mail.Address instance.
@@ -772,7 +830,12 @@ func (m *Msg) FromMailAddress(from *mail.Address) {
 // References:
 //   - https://datatracker.ietf.org/doc/html/rfc5322#section-3.6.2
 func (m *Msg) FromFormat(name, addr string) error {
-	return m.SetAddrHeader(HeaderFrom, fmt.Sprintf(`"%s" <%s>`, name, addr))
+	mailAddr, err := mailAddrFromNameAddr(name, addr)
+	if err != nil {
+		return err
+	}
+	m.FromMailAddress(mailAddr)
+	return nil
 }
 
 // To sets one or more "TO" addresses in the mail body for the Msg.
@@ -853,9 +916,15 @@ func (m *Msg) AddToMailAddress(rcpt *mail.Address) {
 //   - addr: The email address of the recipient to add to the "TO" field.
 //
 // References:
+//
 //   - https://datatracker.ietf.org/doc/html/rfc5322#section-3.6.3
 func (m *Msg) AddToFormat(name, addr string) error {
-	return m.addAddr(HeaderTo, fmt.Sprintf(`"%s" <%s>`, name, addr))
+	mailAddr, err := mailAddrFromNameAddr(name, addr)
+	if err != nil {
+		return err
+	}
+	m.AddToMailAddress(mailAddr)
+	return nil
 }
 
 // ToIgnoreInvalid sets one or more "TO" addresses in the mail body for the Msg, ignoring any invalid addresses.
@@ -981,7 +1050,12 @@ func (m *Msg) AddCcMailAddress(rcpt *mail.Address) {
 // References:
 //   - https://datatracker.ietf.org/doc/html/rfc5322#section-3.6.3
 func (m *Msg) AddCcFormat(name, addr string) error {
-	return m.addAddr(HeaderCc, fmt.Sprintf(`"%s" <%s>`, name, addr))
+	mailAddr, err := mailAddrFromNameAddr(name, addr)
+	if err != nil {
+		return err
+	}
+	m.AddCcMailAddress(mailAddr)
+	return nil
 }
 
 // CcIgnoreInvalid sets one or more "CC" (carbon copy) addresses in the mail body for the Msg, ignoring any
@@ -1108,7 +1182,12 @@ func (m *Msg) AddBccMailAddress(rcpt *mail.Address) {
 // References:
 //   - https://datatracker.ietf.org/doc/html/rfc5322#section-3.6.3
 func (m *Msg) AddBccFormat(name, addr string) error {
-	return m.addAddr(HeaderBcc, fmt.Sprintf(`"%s" <%s>`, name, addr))
+	mailAddr, err := mailAddrFromNameAddr(name, addr)
+	if err != nil {
+		return err
+	}
+	m.AddBccMailAddress(mailAddr)
+	return nil
 }
 
 // BccIgnoreInvalid sets one or more "BCC" (blind carbon copy) addresses in the mail body for the Msg,
@@ -1199,7 +1278,12 @@ func (m *Msg) ReplyToMailAddress(addrs ...*mail.Address) {
 // References:
 //   - https://datatracker.ietf.org/doc/html/rfc5322#section-3.6.2
 func (m *Msg) ReplyToFormat(name, addr string) error {
-	return m.ReplyTo(fmt.Sprintf(`"%s" <%s>`, name, addr))
+	mailAddr, err := mailAddrFromNameAddr(name, addr)
+	if err != nil {
+		return err
+	}
+	m.ReplyToMailAddress(mailAddr)
+	return nil
 }
 
 // Subject sets the "Subject" header for the Msg, specifying the topic of the message.
@@ -1370,6 +1454,70 @@ func (m *Msg) SetUserAgent(userAgent string) {
 	m.SetGenHeader(HeaderXMailer, userAgent)
 }
 
+// SetListUnsubscribe sets the "List-Unsubscribe" header field (RFC 2369) of the
+// Msg to the provided list of URIs. Each URI is wrapped in angle brackets and
+// the entries are comma-separated as required by the RFC. Typical values are a
+// "mailto:" URI and/or an "https" URL.
+//
+// This only advertises an unsubscribe method; it does not enable one-click
+// functionality. For one-click support use SetListUnsubscribeOneClick()
+//
+// References:
+//   - https://datatracker.ietf.org/doc/html/rfc2369#section-3.2
+func (m *Msg) SetListUnsubscribe(uris ...string) {
+	valid := make([]string, 0, len(uris))
+	for _, uri := range uris {
+		uri = strings.TrimSpace(uri)
+		uri = strings.TrimPrefix(strings.TrimSuffix(uri, ">"), "<")
+		if !isValidListUnsubscribeURI(uri) {
+			continue
+		}
+		valid = append(valid, uri)
+	}
+
+	if len(valid) > 0 {
+		m.SetGenHeaderPreformatted(HeaderListUnsubscribe, formatUnsubURIs(valid))
+	}
+}
+
+// SetListUnsubscribePost sets the "List-Unsubscribe-Post" header field to the
+// fixed value "List-Unsubscribe=One-Click" as defined in RFC 8058. It should
+// only be set together with a List-Unsubscribe header that contains at least
+// an HTTPS URI.
+//
+// It is preferred to use SetListUnsubscribeOneClick(), which sets both headers
+// and validates the input.
+//
+// References:
+//   - https://datatracker.ietf.org/doc/html/rfc8058#section-3.2
+func (m *Msg) SetListUnsubscribePost() {
+	m.SetGenHeaderPreformatted(HeaderListUnsubscribePost, oneClickPostValue)
+}
+
+// SetListUnsubscribeOneClick configures RFC 8058 compliant one-click unsubscribe
+// headers for the Msg. It sets both the "List-Unsubscribe" and
+// "List-Unsubscribe-Post" header fields.
+//
+// httpsURL is the endpoint that will receive the one-click HTTP POST and must
+// use the "https" scheme. Any additionalURIs (e.g. a "mailto:" fallback) are
+// appended to the List-Unsubscribe header.
+//
+// An error is returned if the required httpsURL is not a valid https URL.
+//
+// References:
+//   - https://datatracker.ietf.org/doc/html/rfc8058
+func (m *Msg) SetListUnsubscribeOneClick(httpsURL string, additionalURIs ...string) error {
+	parsed, err := url.Parse(strings.TrimSpace(httpsURL))
+	if err != nil || parsed.Scheme != "https" || parsed.Host == "" {
+		return fmt.Errorf("failed to parse HTTPS URI %q: %w", httpsURL, ErrNoHTTPSUnsubURL)
+	}
+
+	uris := append([]string{parsed.String()}, additionalURIs...)
+	m.SetGenHeaderPreformatted(HeaderListUnsubscribe, formatUnsubURIs(uris))
+	m.SetGenHeaderPreformatted(HeaderListUnsubscribePost, oneClickPostValue)
+	return nil
+}
+
 // IsDelivered indicates whether the Msg has been delivered.
 //
 // This method checks the internal state of the message to determine if it has been successfully
@@ -1411,6 +1559,30 @@ func (m *Msg) RequestMDNTo(rcpts ...string) error {
 	return nil
 }
 
+// RequestMDNToMailAddr adds the "Disposition-Notification-To" header to the Msg to request a
+// Message Disposition Notification (MDN) from the receiving end, as specified in RFC 8098.
+//
+// This method allows to provide a list of recipient addresses as [*mail.Address] type to receive
+// the MDN. Since [mail.Address] types are already validated, no further syntax validation is
+// performed. If the "Disposition-Notification-To" header is already set, the provided addresses
+// will override the already set values.
+//
+// Parameters:
+//   - rcpts: One or more recipient email addresses to request the MDN from.
+//
+// References:
+//   - https://datatracker.ietf.org/doc/html/rfc8098
+func (m *Msg) RequestMDNToMailAddr(rcpts ...*mail.Address) {
+	if m.genHeader == nil {
+		m.genHeader = make(map[Header][]string)
+	}
+	var addresses []string
+	for _, address := range rcpts {
+		addresses = append(addresses, address.String())
+	}
+	m.genHeader[HeaderDispositionNotificationTo] = addresses
+}
+
 // RequestMDNToFormat adds the "Disposition-Notification-To" header to the Msg to request a Message Disposition
 // Notification (MDN) from the receiving end, as specified in RFC 8098.
 //
@@ -1425,7 +1597,12 @@ func (m *Msg) RequestMDNTo(rcpts ...string) error {
 // References:
 //   - https://datatracker.ietf.org/doc/html/rfc8098
 func (m *Msg) RequestMDNToFormat(name, addr string) error {
-	return m.RequestMDNTo(fmt.Sprintf(`%s <%s>`, name, addr))
+	mailAddr, err := mailAddrFromNameAddr(name, addr)
+	if err != nil {
+		return err
+	}
+	m.RequestMDNToMailAddr(mailAddr)
+	return nil
 }
 
 // RequestMDNAddTo adds an additional recipient to the "Disposition-Notification-To" header for the Msg.
@@ -1454,6 +1631,28 @@ func (m *Msg) RequestMDNAddTo(rcpt string) error {
 	return nil
 }
 
+// RequestMDNAddToMailAddr adds an additional recipient to the "Disposition-Notification-To" header
+// for the Msg.
+//
+// This method allows to append a new recipient address as [*mail.Address] types to the existing
+// list of recipients for the MDN. Since [mail.Address] types are already validated, no further
+// validation or syntax checking is performed. If the "Disposition-Notification-To"
+// header is already set, the new recipient will be appended to the existing list.
+//
+// Parameters:
+//   - rcpt: The recipient email address to add to the "Disposition-Notification-To" header.
+//
+// References:
+//   - https://datatracker.ietf.org/doc/html/rfc8098
+func (m *Msg) RequestMDNAddToMailAddr(rcpt *mail.Address) {
+	var addresses []string
+	if current, ok := m.genHeader[HeaderDispositionNotificationTo]; ok {
+		addresses = current
+	}
+	addresses = append(addresses, rcpt.String())
+	m.genHeader[HeaderDispositionNotificationTo] = addresses
+}
+
 // RequestMDNAddToFormat adds an additional formatted recipient to the "Disposition-Notification-To"
 // header for the Msg.
 //
@@ -1469,7 +1668,12 @@ func (m *Msg) RequestMDNAddTo(rcpt string) error {
 // References:
 //   - https://datatracker.ietf.org/doc/html/rfc8098
 func (m *Msg) RequestMDNAddToFormat(name, addr string) error {
-	return m.RequestMDNAddTo(fmt.Sprintf(`"%s" <%s>`, name, addr))
+	mailAddr, err := mailAddrFromNameAddr(name, addr)
+	if err != nil {
+		return err
+	}
+	m.RequestMDNAddToMailAddr(mailAddr)
+	return nil
 }
 
 // GetSender returns the currently set envelope "FROM" address for the Msg. If no envelope
@@ -2213,19 +2417,33 @@ func (m *Msg) applyMiddlewares(msg *Msg) *Msg {
 //
 // References:
 //   - https://datatracker.ietf.org/doc/html/rfc5322
-func (m *Msg) WriteTo(writer io.Writer) (int64, error) {
-	mw := &msgWriter{writer: writer, charset: m.charset, encoder: m.encoder}
-	msg := m.applyMiddlewares(m)
-
-	if m.hasSMIME() {
-		if err := m.signMessage(); err != nil {
-			return 0, err
-		}
+func (m *Msg) WriteTo(w io.Writer) (int64, error) {
+	if !m.hasDKIM() {
+		return m.writeToInner(w)
+	}
+	if err := m.dkim.ValidateConfig(); err != nil {
+		return 0, err
 	}
 
-	mw.writeMsg(msg)
-	m.headerCount = 0
-	return mw.bytesWritten, mw.err
+	buffer := bytes.NewBuffer(nil)
+	if _, err := m.writeToInner(buffer); err != nil {
+		return 0, err
+	}
+
+	headers, body := splitMessage(buffer.Bytes())
+	signature, err := m.dkim.Sign(headers, body)
+	if err != nil {
+		return 0, fmt.Errorf("failed to DKIM sign message: %w", err)
+	}
+
+	var total int64
+	length, err := io.WriteString(w, signature)
+	total += int64(length)
+	if err != nil {
+		return total, err
+	}
+	n2, err := w.Write(buffer.Bytes())
+	return total + int64(n2), err
 }
 
 // WriteToSkipMiddleware writes the formatted Msg into the given io.Writer, but skips the specified
@@ -3030,6 +3248,21 @@ func (m *Msg) signMessage() error {
 	return nil
 }
 
+func (m *Msg) writeToInner(writer io.Writer) (int64, error) {
+	mw := &msgWriter{writer: writer, charset: m.charset, encoder: m.encoder}
+	msg := m.applyMiddlewares(m)
+
+	if m.hasSMIME() {
+		if err := m.signMessage(); err != nil {
+			return 0, err
+		}
+	}
+
+	mw.writeMsg(msg)
+	m.headerCount = 0
+	return mw.bytesWritten, mw.err
+}
+
 // writeFuncFromBuffer converts a byte buffer into a writeFunc, which is commonly required by go-mail.
 //
 // This function wraps a byte buffer into a write function that can be used to write the buffer's content
@@ -3053,7 +3286,84 @@ func writeFuncFromBuffer(buffer *bytes.Buffer) func(io.Writer) (int64, error) {
 	return writeFunc
 }
 
+// mailAddressStringWithoutName returns the string representation of a mail address without the name.
 func mailAddressStringWithoutName(addr mail.Address) string {
 	addr.Name = ""
 	return addr.String()
+}
+
+// hasDKIM returns true if the Msg has a DKIM config.
+func (m *Msg) hasDKIM() bool {
+	return m.dkim != nil
+}
+
+// splitMessage returns bytes before, and bytes after, the first blank line.
+func splitMessage(b []byte) (headers, body []byte) {
+	if i := bytes.Index(b, []byte("\r\n\r\n")); i >= 0 {
+		// keep trailing CRLF on the header block
+		return b[:i+2], b[i+4:]
+	}
+	return b, nil
+}
+
+// formatUnsubURIs wraps each URI in angle brackets and joins them with ", "
+// per the RFC 2369 header syntax.
+func formatUnsubURIs(uris []string) string {
+	parts := make([]string, 0, len(uris))
+	for _, url := range uris {
+		url = strings.TrimSpace(url)
+		if url == "" {
+			continue
+		}
+		url = strings.TrimPrefix(strings.TrimSuffix(url, ">"), "<")
+		parts = append(parts, "<"+url+">")
+	}
+	return strings.Join(parts, ", ")
+}
+
+// mailAddrFromNameAddr returns a [mail.Address] pointer based on the given name and address.
+// It tries to parse the mail address string that would be output to validate that the
+// provided data is valid. An error is returned if the provided data does not parse correctly.
+func mailAddrFromNameAddr(name, addr string) (*mail.Address, error) {
+	mailAddr := mail.Address{Name: name, Address: addr}
+	if _, err := mail.ParseAddress(mailAddr.String()); err != nil {
+		return nil, fmt.Errorf("failed to parse mail address: %w", err)
+	}
+	return &mailAddr, nil
+}
+
+// isValidListUnsubscribeURI checks if a provided raw string is a valid
+// URL for a List-Unsubscribe URI
+func isValidListUnsubscribeURI(raw string) bool {
+	if raw == "" {
+		return false
+	}
+	u, err := url.Parse(raw)
+	if err != nil {
+		return false
+	}
+	if !u.IsAbs() {
+		return false
+	}
+	if u.String() != raw {
+		return false
+	}
+	switch u.Scheme {
+	case "https":
+		if u.Host == "" {
+			return false
+		}
+	case "mailto", "http":
+	default:
+		return false
+	}
+	for _, s := range []string{u.Opaque, u.Path, u.Fragment, u.Host} {
+		if strings.ContainsFunc(s, func(r rune) bool { return r < 0x20 || r == 0x7f }) {
+			return false
+		}
+	}
+	if q, err := url.QueryUnescape(u.RawQuery); err == nil && strings.ContainsAny(q, "\r\n\x00") {
+		return false
+	}
+	return true
 }

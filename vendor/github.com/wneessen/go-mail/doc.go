@@ -11,4 +11,4 @@ package mail
 
 // VERSION indicates the current version of the package. It is also attached to the default user
 // agent string.
-const VERSION = "0.7.3"
+const VERSION = "0.8.2"

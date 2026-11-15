@@ -5,7 +5,7 @@
 version = '2'
 
 [run]
-go = '1.24'
+go = '1.27'
 tests = true
 
 [linters]
@@ -144,6 +144,84 @@ linters = [
 ]
 path = 'smtp/smtp_test.go'
 text = 'G101:'
+
+## MD5 and RC4 are both required for NTLM
+[[linters.exclusions.rules]]
+linters = [
+  'gosec'
+]
+path = 'internal/ntlm/ntlm_session.go'
+text = 'G503:'
+[[linters.exclusions.rules]]
+linters = [
+  'gosec'
+]
+path = 'internal/ntlm/ntlm_session.go'
+text = 'G405:'
+
+## MD5 is required for NTLM
+[[linters.exclusions.rules]]
+linters = [
+  'gosec'
+]
+path = 'internal/ntlm/ntlm_session.go'
+text = 'G501:'
+
+## MD5 is required for NTLM
+[[linters.exclusions.rules]]
+linters = [
+  'gosec'
+]
+path = 'internal/ntlm/ntlm.go'
+text = 'G501:'
+
+## MD4 is required for NTLM
+[[linters.exclusions.rules]]
+linters = [
+  'gosec'
+]
+path = 'internal/ntlm/ntlm.go'
+text = 'G406:'
+[[linters.exclusions.rules]]
+linters = [
+  'gosec'
+]
+path = 'internal/ntlm/ntlm.go'
+text = 'G506:'
+[[linters.exclusions.rules]]
+linters = [
+  'staticcheck'
+]
+path = 'internal/ntlm/ntlm.go'
+text = 'SA1019:'
+
+## MD5 is required for NTLM
+[[linters.exclusions.rules]]
+linters = [
+  'gosec'
+]
+path = 'smtp/smtp_test.go'
+text = 'G501:'
+
+## MD4 is required for NTLM
+[[linters.exclusions.rules]]
+linters = [
+  'gosec'
+]
+path = 'smtp/smtp_test.go'
+text = 'G506:'
+[[linters.exclusions.rules]]
+linters = [
+  'gosec'
+]
+path = 'smtp/smtp_test.go'
+text = 'G406:'
+[[linters.exclusions.rules]]
+linters = [
+  'staticcheck'
+]
+path = 'smtp/smtp_test.go'
+text = 'SA1019:'
 
 [formatters]
 enable = [

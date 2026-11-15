@@ -59,3 +59,8 @@ fabric.properties
 ## Coverage data
 coverage.coverprofile
 coverage.html
+lcov.info
+
+## Mise
+mise.toml
+mise.local.toml

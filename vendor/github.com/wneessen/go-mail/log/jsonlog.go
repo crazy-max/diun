@@ -39,7 +39,7 @@ func NewJSON(output io.Writer, level Level) *JSONlog {
 }
 
 // logMessage is a helper function to handle different log levels and formats.
-func logMessage(level Level, log *slog.Logger, logData Log, formatFunc func(string, ...interface{}) string) {
+func logMessage(level Level, log *slog.Logger, logData Log, formatFunc func(string, ...any) string) {
 	lGroup := log.WithGroup(DirString).With(
 		slog.String(DirFromString, logData.directionFrom()),
 		slog.String(DirToString, logData.directionTo()),

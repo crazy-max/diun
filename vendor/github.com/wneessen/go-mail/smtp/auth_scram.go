@@ -263,7 +263,7 @@ func (a *scramAuth) computeClientProof() []byte {
 	storedKey := a.computeHash(clientKey)
 	clientSignature := a.computeHMAC(storedKey[:], a.authMessage)
 	clientProof := make([]byte, len(clientSignature))
-	for i := 0; i < len(clientSignature); i++ {
+	for i := range clientSignature {
 		clientProof[i] = clientKey[i] ^ clientSignature[i]
 	}
 	buf := make([]byte, base64.StdEncoding.EncodedLen(len(clientProof)))
