@@ -122,6 +122,55 @@ func TestSendStopsAfterSlackRateLimitAttempts(t *testing.T) {
 	assert.Equal(t, slackMaxRateLimitAttempts, requestCount)
 }
 
+func TestSendReturnsDeliveryErrors(t *testing.T) {
+	tests := []struct {
+		name       string
+		status     int
+		retryAfter string
+		wantError  string
+	}{
+		{
+			name:      "bad request",
+			status:    http.StatusBadRequest,
+			wantError: "400 Bad Request",
+		},
+		{
+			name:      "server error",
+			status:    http.StatusInternalServerError,
+			wantError: "500 Internal Server Error",
+		},
+		{
+			name:      "missing retry header",
+			status:    http.StatusTooManyRequests,
+			wantError: "429 Too Many Requests",
+		},
+		{
+			name:       "invalid retry header",
+			status:     http.StatusTooManyRequests,
+			retryAfter: "invalid",
+			wantError:  "invalid syntax",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var requestCount int
+			ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				requestCount++
+				if tt.retryAfter != "" {
+					w.Header().Set("Retry-After", tt.retryAfter)
+				}
+				w.WriteHeader(tt.status)
+			}))
+			defer ts.Close()
+
+			err := newTestClient(ts.URL).Send(testEntry(t))
+
+			require.ErrorContains(t, err, tt.wantError)
+			assert.Equal(t, 1, requestCount)
+		})
+	}
+}
+
 func newTestClient(webhookURL string) *Client {
 	return &Client{
 		cfg: &model.NotifSlack{
