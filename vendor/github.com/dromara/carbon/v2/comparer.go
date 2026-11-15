@@ -282,7 +282,7 @@ func (c *Carbon) IsSameDecade(t *Carbon) bool {
 	if c.IsInvalid() || t.IsInvalid() {
 		return false
 	}
-	return c.Decade() == t.Decade()
+	return c.Century() == t.Century() && c.Decade() == t.Decade()
 }
 
 // IsSameYear reports whether it is same year.
@@ -299,6 +299,18 @@ func (c *Carbon) IsSameQuarter(t *Carbon) bool {
 		return false
 	}
 	return c.Year() == t.Year() && c.Quarter() == t.Quarter()
+}
+
+// IsSameWeek reports whether it is same week.
+// The week starts on the day set by SetWeekStartsAt, so two dates that share
+// a week under one setting may not share it under another.
+func (c *Carbon) IsSameWeek(t *Carbon) bool {
+	if c.IsInvalid() || t.IsInvalid() {
+		return false
+	}
+	cYear, cMonth, cDay := c.startOfWeekDate()
+	tYear, tMonth, tDay := t.startOfWeekDate()
+	return cYear == tYear && cMonth == tMonth && cDay == tDay
 }
 
 // IsSameMonth reports whether it is same month.
@@ -363,6 +375,28 @@ func (c *Carbon) IsSameSecond(t *Carbon) bool {
 		cTime.Hour() == tTime.Hour() &&
 		cTime.Minute() == tTime.Minute() &&
 		cTime.Second() == tTime.Second()
+}
+
+// IsBirthday reports whether it is a birthday, comparing only the month and
+// the day with the given date, or with now if no date is given.
+// As in PHP Carbon, February 29 only matches February 29,
+// so it is never a birthday in a common year.
+func (c *Carbon) IsBirthday(carbon ...*Carbon) bool {
+	if c.IsInvalid() {
+		return false
+	}
+	var t *Carbon
+	if len(carbon) > 0 {
+		t = carbon[0]
+	} else {
+		t = Now().SetLocation(c.loc)
+	}
+	if t.IsInvalid() {
+		return false
+	}
+	cTime := c.StdTime()
+	tTime := t.StdTime()
+	return cTime.Month() == tTime.Month() && cTime.Day() == tTime.Day()
 }
 
 // Compare compares by an operator.
@@ -507,6 +541,15 @@ func (c *Carbon) isMonth(month time.Month) bool {
 		return false
 	}
 	return c.StdTime().Month() == month
+}
+
+// startOfWeekDate returns the date the current week starts on, honouring the
+// weekday set by SetWeekStartsAt. It does the same arithmetic as StartOfWeek
+// without copying the instance.
+func (c *Carbon) startOfWeekDate() (int, time.Month, int) {
+	stdTime := c.StdTime()
+	offset := (DaysPerWeek + int(stdTime.Weekday()) - int(c.WeekStartsAt())) % DaysPerWeek
+	return stdTime.AddDate(0, 0, -offset).Date()
 }
 
 // isWeekday reports whether the current weekday matches the given weekday.

@@ -96,8 +96,8 @@ github.com/docker/go-connections v0.8.2 h1:9d9DEokx5W7qlr0shkFXIxEA7+TTD+llwzcyk
 github.com/docker/go-connections v0.8.2/go.mod h1:no1qkHdjq7kLMGUXYAduOhYPSJxxvgWBh7ogVvptn3Q=
 github.com/docker/go-units v0.5.0 h1:69rxXcBk27SvSaaxTtLh/8llcHD8vYHT7WSdRZ/jvr4=
 github.com/docker/go-units v0.5.0/go.mod h1:fgPhTUdO+D/Jk86RDLlptpiXQzgHJF7gydDDbaIK4Dk=
-github.com/dromara/carbon/v2 v2.6.16 h1:AbxrnW1kJhR3KHdS8G96NFmxDwPFyre+t+xSiJIUD1I=
-github.com/dromara/carbon/v2 v2.6.16/go.mod h1:NGo3reeV5vhWCYWcSqbJRZm46MEwyfYI5EJRdVFoLJo=
+github.com/dromara/carbon/v2 v2.7.1 h1:cSwhxTOfzVyQYO2NUuEJJ8/uS7ynbJKDVnr38OGCfAU=
+github.com/dromara/carbon/v2 v2.7.1/go.mod h1:GHBwozp4XxEhCri2PaInUwMi7C2QwqulfFjxC0qx6TA=
 github.com/eclipse/paho.mqtt.golang v1.5.1 h1:/VSOv3oDLlpqR2Epjn1Q7b2bSTplJIeV2ISgCl2W7nE=
 github.com/eclipse/paho.mqtt.golang v1.5.1/go.mod h1:1/yJCneuyOoCOzKSsOTUc0AJfpsItBGWvYpBLimhArU=
 github.com/emicklei/go-restful/v3 v3.13.0 h1:C4Bl2xDndpU6nJ4bc1jXd+uTmYPVUwkD6bFY/oTyCes=

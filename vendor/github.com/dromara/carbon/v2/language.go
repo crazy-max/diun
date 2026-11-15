@@ -22,11 +22,29 @@ type cachedResources struct {
 	err       error
 }
 
+// defaultLanguages caches one ready-to-use Language per locale. The cached
+// resources are never written to, so every Carbon can share the same instance.
+var defaultLanguages sync.Map
+
+// returns a shared Language for the given locale.
+func defaultLanguage(locale string) *Language {
+	if cached, exists := defaultLanguages.Load(locale); exists {
+		return cached.(*Language)
+	}
+	lang := NewLanguage().SetLocale(locale)
+	if lang.Error != nil {
+		return lang
+	}
+	actual, _ := defaultLanguages.LoadOrStore(locale, lang)
+	return actual.(*Language)
+}
+
 // Language defines a Language struct.
 type Language struct {
 	dir       string
 	locale    string
 	resources map[string]string
+	shared    bool
 	Error     error
 	rw        *sync.RWMutex
 }
@@ -34,10 +52,9 @@ type Language struct {
 // NewLanguage returns a new Language instance.
 func NewLanguage() *Language {
 	return &Language{
-		dir:       "lang",
-		locale:    DefaultLocale,
-		resources: make(map[string]string),
-		rw:        new(sync.RWMutex),
+		dir:    "lang",
+		locale: DefaultLocale,
+		rw:     new(sync.RWMutex),
 	}
 }
 
@@ -57,8 +74,14 @@ func (lang *Language) Copy() *Language {
 	}
 
 	lang.rw.RLock()
-	resources := lang.resources
+	resources, shared := lang.resources, lang.shared
 	lang.rw.RUnlock()
+
+	// The cached resources are immutable, so a shared copy can stay shared.
+	if shared {
+		newLang.resources, newLang.shared = resources, true
+		return newLang
+	}
 
 	newLang.resources = make(map[string]string, len(resources))
 	for k, v := range resources {
@@ -85,8 +108,11 @@ func (lang *Language) SetLocale(locale string) *Language {
 	}
 	lang.rw.RUnlock()
 
-	fileName := fmt.Sprintf("%s/%s.json", lang.dir, locale)
-	load, _ := localeCache.LoadOrStore(fileName, new(cachedResources))
+	fileName := lang.dir + "/" + locale + ".json"
+	load, ok := localeCache.Load(fileName)
+	if !ok {
+		load, _ = localeCache.LoadOrStore(fileName, new(cachedResources))
+	}
 	entry := load.(*cachedResources)
 
 	entry.once.Do(func() {
@@ -106,16 +132,12 @@ func (lang *Language) SetLocale(locale string) *Language {
 		return lang
 	}
 
-	// Create a copy of the cached resources to avoid modifying the cache
-	// Pre-allocate with exact capacity for better memory efficiency
-	newResources := make(map[string]string, len(entry.resources))
-	for k, v := range entry.resources {
-		newResources[k] = v
-	}
-
+	// Share the cached resources instead of copying them, and mark them shared so
+	// that SetResources copies before it writes. This keeps the cache unmodified.
 	lang.rw.Lock()
 	lang.locale = locale
-	lang.resources = newResources
+	lang.resources = entry.resources
+	lang.shared = true
 	lang.rw.Unlock()
 
 	return lang
@@ -134,6 +156,15 @@ func (lang *Language) SetResources(resources map[string]string) *Language {
 	lang.rw.Lock()
 	defer lang.rw.Unlock()
 
+	// Copy on write: the resources may be shared with the cache or another instance.
+	if lang.shared || lang.resources == nil {
+		newResources := make(map[string]string, len(lang.resources)+len(resources))
+		for k, v := range lang.resources {
+			newResources[k] = v
+		}
+		lang.resources = newResources
+		lang.shared = false
+	}
 	for k, v := range resources {
 		lang.resources[k] = v
 	}
@@ -157,7 +188,7 @@ func (lang *Language) translate(unit string, value int64) string {
 		resources = lang.resources
 		lang.rw.RUnlock()
 	}
-	if resources == nil || len(resources) == 0 {
+	if len(resources) == 0 {
 		return ""
 	}
 	resource, exists := resources[unit]
