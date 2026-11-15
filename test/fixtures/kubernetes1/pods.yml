@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: PodList
+items:
+  - metadata:
+      name: enabled
+      annotations:
+        diun.enable: "true"
+    spec:
+      serviceAccountName: diun
+      automountServiceAccountToken: false
+      containers:
+        - name: busybox
+          image: busybox:1.36.1
+        - name: alpine
+          image: alpine:3.21
+  - metadata:
+      name: disabled
+      annotations:
+        diun.enable: "false"
+    spec:
+      serviceAccountName: diun
+      automountServiceAccountToken: false
+      containers:
+        - name: busybox
+          image: busybox:1.36.1
+  - metadata:
+      name: unlabeled
+    spec:
+      serviceAccountName: diun
+      automountServiceAccountToken: false
+      containers:
+        - name: busybox
+          image: busybox:1.36.1
