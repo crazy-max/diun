@@ -3,6 +3,7 @@ package dockerfile
 import (
 	"bytes"
 	"os"
+	"strings"
 
 	"github.com/moby/buildkit/frontend/dockerfile/instructions"
 	"github.com/moby/buildkit/frontend/dockerfile/parser"
@@ -63,7 +64,7 @@ func New(opts Options) (*Client, error) {
 
 func (c *Client) isStageName(name string) bool {
 	for _, stage := range c.stages {
-		if stage.Name == name {
+		if strings.EqualFold(stage.Name, name) {
 			return true
 		}
 	}
