@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"encoding"
 	"fmt"
 	"math"
 	"reflect"
@@ -63,6 +64,14 @@ func (f filler) fill(field reflect.Value, node *Node) error {
 	if node.Disabled {
 		return nil
 	}
+	if field.Kind() == reflect.Pointer {
+		return f.setPtr(field, node)
+	}
+	if len(node.Children) == 0 && field.CanAddr() {
+		if unmarshaler, ok := field.Addr().Interface().(encoding.TextUnmarshaler); ok {
+			return unmarshaler.UnmarshalText([]byte(node.Value))
+		}
+	}
 
 	switch field.Kind() {
 	case reflect.String:
@@ -97,8 +106,6 @@ func (f filler) fill(field reflect.Value, node *Node) error {
 		return setFloat(field, node.Value, 64)
 	case reflect.Struct:
 		return f.setStruct(field, node)
-	case reflect.Pointer:
-		return f.setPtr(field, node)
 	case reflect.Map:
 		return f.setMap(field, node)
 	case reflect.Slice:
@@ -142,8 +149,8 @@ func (f filler) setStruct(field reflect.Value, node *Node) error {
 }
 
 func (f filler) setSlice(field reflect.Value, node *Node) error {
-	if field.Type().Elem().Kind() == reflect.Struct ||
-		field.Type().Elem().Kind() == reflect.Pointer && field.Type().Elem().Elem().Kind() == reflect.Struct {
+	if (len(node.Children) > 0 || !isTextUnmarshaler(field.Type().Elem())) && (field.Type().Elem().Kind() == reflect.Struct ||
+		field.Type().Elem().Kind() == reflect.Pointer && field.Type().Elem().Elem().Kind() == reflect.Struct) {
 		return f.setSliceStruct(field, node)
 	}
 
@@ -171,6 +178,12 @@ func makeSlice(field reflect.Value, values []string) error {
 
 	for i := 0; i < len(values); i++ {
 		value := strings.TrimSpace(values[i])
+		if isTextUnmarshaler(field.Type().Elem()) {
+			if err := newFiller(FillerOpts{}).fill(field.Index(i), &Node{Value: value}); err != nil {
+				return err
+			}
+			continue
+		}
 
 		switch field.Type().Elem().Kind() {
 		case reflect.String:
@@ -322,7 +335,7 @@ func (f filler) setMap(field reflect.Value, node *Node) error {
 		return nil
 	}
 
-	if field.Type().Elem().Kind() == reflect.String {
+	if field.Type().Elem().Kind() == reflect.String && !isTextUnmarshaler(field.Type().Elem()) {
 		for _, child := range node.Children {
 			f.fillRecursively(child.Name, child, field)
 		}

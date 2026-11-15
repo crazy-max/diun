@@ -1,11 +1,11 @@
 package parser
 
 import (
+	"encoding"
 	"errors"
 	"fmt"
 	"reflect"
 	"strings"
-	"time"
 )
 
 // MetadataOpts Options for the metadata.
@@ -77,7 +77,7 @@ func (m metadata) add(rootType reflect.Type, node *Node) error {
 	node.Tag = field.Tag
 	tagValue := field.Tag.Get(m.TagName)
 
-	if fType != reflect.TypeOf(time.Time{}) {
+	if !isTextUnmarshaler(fType) {
 		if fType.Kind() == reflect.Struct || fType.Kind() == reflect.Pointer && fType.Elem().Kind() == reflect.Struct ||
 			fType.Kind() == reflect.Map {
 			if len(node.Children) == 0 && tagValue != TagLabelAllowEmpty && tagValue != "-" {
@@ -94,10 +94,8 @@ func (m metadata) add(rootType reflect.Type, node *Node) error {
 		return nil
 	}
 
-	if fType != reflect.TypeOf(time.Time{}) {
-		if fType.Kind() == reflect.Struct || fType.Kind() == reflect.Pointer && fType.Elem().Kind() == reflect.Struct {
-			return m.browseChildren(fType, node)
-		}
+	if fType.Kind() == reflect.Struct || fType.Kind() == reflect.Pointer && fType.Elem().Kind() == reflect.Struct {
+		return m.browseChildren(fType, node)
 	}
 
 	if fType.Kind() == reflect.Map {
@@ -136,6 +134,13 @@ func (m metadata) add(rootType reflect.Type, node *Node) error {
 	}
 
 	return fmt.Errorf("invalid node %s: %v", node.Name, fType.Kind())
+}
+
+func isTextUnmarshaler(t reflect.Type) bool {
+	for t.Kind() == reflect.Pointer {
+		t = t.Elem()
+	}
+	return reflect.PointerTo(t).Implements(reflect.TypeFor[encoding.TextUnmarshaler]())
 }
 
 func (m metadata) findTypedField(rType reflect.Type, node *Node) (reflect.StructField, error) {
@@ -182,6 +187,9 @@ func isSupportedType(field reflect.StructField) error {
 	fType := field.Type
 
 	if fType.Kind() == reflect.Slice {
+		if isTextUnmarshaler(fType.Elem()) {
+			return nil
+		}
 		switch fType.Elem().Kind() {
 		case reflect.String,
 			reflect.Bool,
@@ -283,5 +291,5 @@ func typedRawMap(m map[string]interface{}, k string) map[string]interface{} {
 }
 
 func isArrayKey(name string) bool {
-	return name[0] == '[' && name[len(name)-1] == ']'
+	return len(name) > 0 && name[0] == '[' && name[len(name)-1] == ']'
 }

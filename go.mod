@@ -13,7 +13,7 @@ require (
 	github.com/containerd/platforms v1.0.0-rc.5
 	github.com/crazy-max/cron/v3 v3.1.1
 	github.com/crazy-max/gohealthchecks v0.6.0
-	github.com/crazy-max/gonfig v0.8.0
+	github.com/crazy-max/gonfig v0.10.0
 	github.com/distribution/reference v0.6.0
 	github.com/docker/go-connections v0.8.2
 	github.com/docker/go-units v0.5.0
@@ -157,7 +157,7 @@ require (
 	go.opentelemetry.io/otel/trace v1.47.0 // indirect
 	go.podman.io/storage v1.65.1 // indirect
 	go.yaml.in/yaml/v2 v2.4.4 // indirect
-	go.yaml.in/yaml/v3 v3.0.5 // indirect
+	go.yaml.in/yaml/v3 v3.0.6 // indirect
 	golang.org/x/crypto v0.58.0 // indirect
 	golang.org/x/exp v0.0.0-20261014143641-f0251eb4aa3e // indirect
 	golang.org/x/net v0.61.0 // indirect
