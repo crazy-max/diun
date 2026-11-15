@@ -15,7 +15,7 @@ require (
 	github.com/crazy-max/gohealthchecks v0.6.0
 	github.com/crazy-max/gonfig v0.8.0
 	github.com/distribution/reference v0.6.0
-	github.com/docker/go-connections v0.7.0
+	github.com/docker/go-connections v0.8.2
 	github.com/docker/go-units v0.5.0
 	github.com/dromara/carbon/v2 v2.6.16
 	github.com/eclipse/paho.mqtt.golang v1.5.1
@@ -25,8 +25,8 @@ require (
 	github.com/matcornic/hermes/v2 v2.1.0
 	github.com/microcosm-cc/bluemonday v1.0.27
 	github.com/moby/buildkit v0.30.0
-	github.com/moby/moby/api v1.54.2
-	github.com/moby/moby/client v0.4.1
+	github.com/moby/moby/api v1.57.0
+	github.com/moby/moby/client v0.6.3
 	github.com/opencontainers/go-digest v1.0.0
 	github.com/opencontainers/image-spec v1.1.1
 	github.com/panjf2000/ants/v2 v2.12.1
