@@ -46,7 +46,7 @@ type Endpoint struct {
 	Insecure bool `toml:"insecure,omitempty"`
 	// PullFromMirror is used for adding restrictions to image pull through the mirror.
 	// Set to "all", "digest-only", or "tag-only".
-	// If "digest-only"， mirrors will only be used for digest pulls. Pulling images by
+	// If "digest-only", mirrors will only be used for digest pulls. Pulling images by
 	// tag can potentially yield different images, depending on which endpoint
 	// we pull from.  Restricting mirrors to pulls by digest avoids that issue.
 	// If "tag-only", mirrors will only be used for tag pulls.  For a more up-to-date and expensive mirror
@@ -56,6 +56,11 @@ type Endpoint struct {
 	// This can only be set in a registry's Mirror field, not in the registry's primary Endpoint.
 	// This per-mirror setting is allowed only when mirror-by-digest-only is not configured for the primary registry.
 	PullFromMirror string `toml:"pull-from-mirror,omitempty"`
+	// NamespaceProxy enables OCI distribution-spec registry proxying.
+	// When set, an "ns" query parameter with this value is appended to all requests,
+	// allowing a single proxy to route to multiple upstream registries.
+	// See https://github.com/opencontainers/distribution-spec/blob/main/spec.md#registry-proxying
+	NamespaceProxy string `toml:"namespace-proxy,omitempty"`
 }
 
 // rewriteReference will substitute the provided reference `prefix` to the

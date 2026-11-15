@@ -19,9 +19,11 @@ const (
 // in the given namespace and associated with the given path in the file system.
 // If the path is a symbolic link, the extended attribute is retrieved from the link itself.
 // Returns a []byte slice if the extattr is set and nil otherwise.
+//
+// Deprecated: This has no known users and the implementation is violating unsafe.Pointer rules.
+// Use system.L{get,set,list}xattr instead.
 func ExtattrGetLink(path string, attrnamespace int, attrname string) ([]byte, error) {
-	size, errno := unix.ExtattrGetLink(path, attrnamespace, attrname,
-		uintptr(unsafe.Pointer(nil)), 0)
+	size, errno := unix.ExtattrGetLink(path, attrnamespace, attrname, uintptr(unsafe.Pointer(nil)), 0)
 	if errno != nil {
 		if errno == unix.ENOATTR {
 			return nil, nil
@@ -33,8 +35,7 @@ func ExtattrGetLink(path string, attrnamespace int, attrname string) ([]byte, er
 	}
 
 	dest := make([]byte, size)
-	size, errno = unix.ExtattrGetLink(path, attrnamespace, attrname,
-		uintptr(unsafe.Pointer(&dest[0])), size)
+	size, errno = unix.ExtattrGetLink(path, attrnamespace, attrname, uintptr(unsafe.Pointer(&dest[0])), size)
 	if errno != nil {
 		return nil, &os.PathError{Op: "extattr_get_link", Path: path, Err: errno}
 	}
@@ -45,6 +46,9 @@ func ExtattrGetLink(path string, attrnamespace int, attrname string) ([]byte, er
 // ExtattrSetLink sets the value of extended attribute identified by attrname
 // in the given namespace and associated with the given path in the file system.
 // If the path is a symbolic link, the extended attribute is set on the link itself.
+//
+// Deprecated: This has no known users and the implementation is violating unsafe.Pointer rules.
+// Use system.L{get,set,list}xattr instead.
 func ExtattrSetLink(path string, attrnamespace int, attrname string, data []byte) error {
 	if len(data) == 0 {
 		data = []byte{} // ensure non-nil for empty data
@@ -60,9 +64,11 @@ func ExtattrSetLink(path string, attrnamespace int, attrname string, data []byte
 // ExtattrListLink lists extended attributes associated with the given path
 // in the specified namespace. If the path is a symbolic link, the attributes
 // are listed from the link itself.
+//
+// Deprecated: This has no known users and the implementation is violating unsafe.Pointer rules.
+// Use system.L{get,set,list}xattr instead.
 func ExtattrListLink(path string, attrnamespace int) ([]string, error) {
-	size, errno := unix.ExtattrListLink(path, attrnamespace,
-		uintptr(unsafe.Pointer(nil)), 0)
+	size, errno := unix.ExtattrListLink(path, attrnamespace, uintptr(unsafe.Pointer(nil)), 0)
 	if errno != nil {
 		return nil, &os.PathError{Op: "extattr_list_link", Path: path, Err: errno}
 	}
@@ -71,8 +77,7 @@ func ExtattrListLink(path string, attrnamespace int) ([]string, error) {
 	}
 
 	dest := make([]byte, size)
-	size, errno = unix.ExtattrListLink(path, attrnamespace,
-		uintptr(unsafe.Pointer(&dest[0])), size)
+	size, errno = unix.ExtattrListLink(path, attrnamespace, uintptr(unsafe.Pointer(&dest[0])), size)
 	if errno != nil {
 		return nil, &os.PathError{Op: "extattr_list_link", Path: path, Err: errno}
 	}
