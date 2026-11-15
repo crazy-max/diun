@@ -8,16 +8,13 @@ Choose the archive matching the destination platform:
 
 * [diun_[[ latest_stable_tag | trim('v') ]]_darwin_amd64.tar.gz]([[ config.repo_url ]]/releases/download/[[ latest_stable_tag ]]/diun_[[ latest_stable_tag | trim('v') ]]_darwin_amd64.tar.gz)
 * [diun_[[ latest_stable_tag | trim('v') ]]_darwin_arm64.tar.gz]([[ config.repo_url ]]/releases/download/[[ latest_stable_tag ]]/diun_[[ latest_stable_tag | trim('v') ]]_darwin_arm64.tar.gz)
-* [diun_[[ latest_stable_tag | trim('v') ]]_linux_386.tar.gz]([[ config.repo_url ]]/releases/download/[[ latest_stable_tag ]]/diun_[[ latest_stable_tag | trim('v') ]]_linux_386.tar.gz)
 * [diun_[[ latest_stable_tag | trim('v') ]]_linux_amd64.tar.gz]([[ config.repo_url ]]/releases/download/[[ latest_stable_tag ]]/diun_[[ latest_stable_tag | trim('v') ]]_linux_amd64.tar.gz)
 * [diun_[[ latest_stable_tag | trim('v') ]]_linux_arm64.tar.gz]([[ config.repo_url ]]/releases/download/[[ latest_stable_tag ]]/diun_[[ latest_stable_tag | trim('v') ]]_linux_arm64.tar.gz)
-* [diun_[[ latest_stable_tag | trim('v') ]]_linux_armv5.tar.gz]([[ config.repo_url ]]/releases/download/[[ latest_stable_tag ]]/diun_[[ latest_stable_tag | trim('v') ]]_linux_armv5.tar.gz)
 * [diun_[[ latest_stable_tag | trim('v') ]]_linux_armv6.tar.gz]([[ config.repo_url ]]/releases/download/[[ latest_stable_tag ]]/diun_[[ latest_stable_tag | trim('v') ]]_linux_armv6.tar.gz)
 * [diun_[[ latest_stable_tag | trim('v') ]]_linux_armv7.tar.gz]([[ config.repo_url ]]/releases/download/[[ latest_stable_tag ]]/diun_[[ latest_stable_tag | trim('v') ]]_linux_armv7.tar.gz)
 * [diun_[[ latest_stable_tag | trim('v') ]]_linux_ppc64le.tar.gz]([[ config.repo_url ]]/releases/download/[[ latest_stable_tag ]]/diun_[[ latest_stable_tag | trim('v') ]]_linux_ppc64le.tar.gz)
 * [diun_[[ latest_stable_tag | trim('v') ]]_linux_riscv64.tar.gz]([[ config.repo_url ]]/releases/download/[[ latest_stable_tag ]]/diun_[[ latest_stable_tag | trim('v') ]]_linux_riscv64.tar.gz)
 * [diun_[[ latest_stable_tag | trim('v') ]]_linux_s390x.tar.gz]([[ config.repo_url ]]/releases/download/[[ latest_stable_tag ]]/diun_[[ latest_stable_tag | trim('v') ]]_linux_s390x.tar.gz)
-* [diun_[[ latest_stable_tag | trim('v') ]]_windows_386.zip]([[ config.repo_url ]]/releases/download/[[ latest_stable_tag ]]/diun_[[ latest_stable_tag | trim('v') ]]_windows_386.zip)
 * [diun_[[ latest_stable_tag | trim('v') ]]_windows_amd64.zip]([[ config.repo_url ]]/releases/download/[[ latest_stable_tag ]]/diun_[[ latest_stable_tag | trim('v') ]]_windows_amd64.zip)
 * [diun_[[ latest_stable_tag | trim('v') ]]_windows_arm64.zip]([[ config.repo_url ]]/releases/download/[[ latest_stable_tag ]]/diun_[[ latest_stable_tag | trim('v') ]]_windows_arm64.zip)
 
