@@ -35,6 +35,34 @@ func TestTags(t *testing.T) {
 	}, tags)
 }
 
+func TestTagsSemverShorthandWithMax(t *testing.T) {
+	registry := newTestRegistry(t, "acme/diun")
+	registry.addTagsPage("", []string{
+		"17.0-alpine", "17.1-alpine", "17.10-alpine", "17.11-alpine",
+		"17.2-alpine", "17.9-alpine", "17.12", "latest",
+	}, "")
+
+	image, err := ParseImage(ParseImageOptions{
+		Name: registry.imageName("17.10-alpine"),
+	})
+	require.NoError(t, err)
+
+	client := newTestRegistryClient(t, Options{})
+	tags, err := client.Tags(TagsOptions{
+		Image:   image,
+		Max:     2,
+		Sort:    SortTagSemver,
+		Include: []string{`^17\.\d+-alpine$`},
+	})
+	require.NoError(t, err)
+
+	assert.Equal(t, &Tags{
+		List:        []string{"17.11-alpine", "17.10-alpine"},
+		NotIncluded: 2,
+		Total:       8,
+	}, tags)
+}
+
 func TestTagsWithDigest(t *testing.T) {
 	t.Parallel()
 
@@ -85,6 +113,57 @@ func TestTagsSkipsGeneratedArtifactTags(t *testing.T) {
 		Artifacts: 4,
 		Total:     6,
 	}, tags)
+}
+
+func TestTagsSortSemverShorthandWithSuffix(t *testing.T) {
+	testCases := []struct {
+		name     string
+		input    []string
+		expected []string
+	}{
+		{
+			name:     "major minor",
+			input:    []string{"17.0-alpine", "17.1-alpine", "17.10-alpine", "17.11-alpine", "17.2-alpine", "17.9-alpine"},
+			expected: []string{"17.11-alpine", "17.10-alpine", "17.9-alpine", "17.2-alpine", "17.1-alpine", "17.0-alpine"},
+		},
+		{
+			name:     "major only",
+			input:    []string{"7-alpine", "8-alpine", "10-alpine", "9-alpine"},
+			expected: []string{"10-alpine", "9-alpine", "8-alpine", "7-alpine"},
+		},
+		{
+			name:     "mixed shorthand and full versions",
+			input:    []string{"17-alpine", "17.1-alpine", "17.1.0-alpine", "17.1.1-alpine", "17.2-alpine", "17.10-alpine"},
+			expected: []string{"17.10-alpine", "17.2-alpine", "17.1.1-alpine", "17.1.0-alpine", "17.1-alpine", "17-alpine"},
+		},
+		{
+			name:     "release before prerelease",
+			input:    []string{"17.11-alpine", "17.11", "17.10-alpine", "17.10"},
+			expected: []string{"17.11", "17.11-alpine", "17.10", "17.10-alpine"},
+		},
+		{
+			name:     "prefixes and dotted suffixes",
+			input:    []string{"v17.9-alpine3.22", "postgres-17.11-alpine3.22", "17.10-alpine3.22"},
+			expected: []string{"postgres-17.11-alpine3.22", "17.10-alpine3.22", "v17.9-alpine3.22"},
+		},
+		{
+			name:     "build suffixes",
+			input:    []string{"17.9+build.1", "17.11+build.1", "17.10+build.1"},
+			expected: []string{"17.11+build.1", "17.10+build.1", "17.9+build.1"},
+		},
+		{
+			name:     "invalid versions retain fallback order",
+			input:    []string{"latest", "2025.04-alpine", "17.10-alpine", "17.01-alpine", "17.11-", "17.11.0.1-alpine", "edge"},
+			expected: []string{"17.10-alpine", "17.11.0.1-alpine", "17.01-alpine", "17.11-", "2025.04-alpine", "edge", "latest"},
+		},
+	}
+
+	for _, tt := range testCases {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			assert.Equal(t, tt.expected, SortTags(tt.input, SortTagSemver))
+		})
+	}
 }
 
 func TestTagsSort(t *testing.T) {
