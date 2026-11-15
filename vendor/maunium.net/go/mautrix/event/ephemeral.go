@@ -72,7 +72,7 @@ type ReadReceipt struct {
 
 	// Extra contains any unknown fields in the read receipt event.
 	// Most servers don't allow clients to set them, so this will be empty in most cases.
-	Extra map[string]interface{}
+	Extra map[string]any
 }
 
 func (rr *ReadReceipt) UnmarshalJSON(data []byte) error {
@@ -87,7 +87,7 @@ func (rr *ReadReceipt) UnmarshalJSON(data []byte) error {
 		data = []byte(strData)
 	}
 
-	var parsed map[string]interface{}
+	var parsed map[string]any
 	err := json.Unmarshal(data, &parsed)
 	if err != nil {
 		return err
@@ -109,7 +109,7 @@ func (rr *ReadReceipt) UnmarshalJSON(data []byte) error {
 func (rr ReadReceipt) MarshalJSON() ([]byte, error) {
 	data := rr.Extra
 	if data == nil {
-		data = make(map[string]interface{})
+		data = make(map[string]any)
 	}
 	if rr.ThreadID != "" {
 		data["thread_id"] = rr.ThreadID
@@ -134,7 +134,7 @@ type PresenceEventContent struct {
 	Presence        Presence            `json:"presence"`
 	Displayname     string              `json:"displayname,omitempty"`
 	AvatarURL       id.ContentURIString `json:"avatar_url,omitempty"`
-	LastActiveAgo   int64               `json:"last_active_ago,omitempty"`
-	CurrentlyActive bool                `json:"currently_active,omitempty"`
+	LastActiveAgo   int64               `json:"last_active_ago,omitzero"`
+	CurrentlyActive bool                `json:"currently_active,omitzero"`
 	StatusMessage   string              `json:"status_msg,omitempty"`
 }

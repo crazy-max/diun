@@ -83,13 +83,15 @@ func (e *Event) IsSet() bool {
 }
 
 // Set sets the event, notifying all waiters.
-func (e *Event) Set() {
+func (e *Event) Set() bool {
 	e.l.Lock()
 	defer e.l.Unlock()
 	if !e.set {
 		close(e.ch)
 		e.set = true
+		return true
 	}
+	return false
 }
 
 // Notify notifies all waiters, but doesn't set the event.

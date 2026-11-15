@@ -133,7 +133,7 @@ func hackyNestedGet(data map[string]any, path []string) (any, bool) {
 	return hackyNestedGet(data, path[1:])
 }
 
-func stringifyForPushCondition(val interface{}) string {
+func stringifyForPushCondition(val any) string {
 	// Implement MSC3862 to allow matching any type of field
 	// https://github.com/matrix-org/matrix-spec-proposals/pull/3862
 	switch typedVal := val.(type) {

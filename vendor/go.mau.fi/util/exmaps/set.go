@@ -40,6 +40,20 @@ func NewSetWithItems[T comparable](items []T) Set[T] {
 	return s
 }
 
+func NewSetWithSeq[T comparable](items iter.Seq[T]) Set[T] {
+	s := make(Set[T])
+	s.AddSeq(items)
+	return s
+}
+
+func NewSetWithKeys[T comparable, V any](items map[T]V) Set[T] {
+	s := make(Set[T], len(items))
+	for item := range items {
+		s[item] = emptyVal
+	}
+	return s
+}
+
 func (s Set[T]) Size() int {
 	return len(s)
 }

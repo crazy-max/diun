@@ -1,4 +1,4 @@
-//go:build !goexperiment.jsonv2
+//go:build !goexperiment.jsonv2 && !go1.27
 
 /* Copyright 2016-2017 Vector Creations Ltd
  *

@@ -114,6 +114,14 @@ func (sm *Map[Key, Value]) GetOrSet(key Key, value Value) (actual Value, wasGet 
 	return
 }
 
+// Has returns true if the map contains the given key.
+func (sm *Map[Key, Value]) Has(key Key) bool {
+	sm.lock.RLock()
+	_, ok := sm.data[key]
+	sm.lock.RUnlock()
+	return ok
+}
+
 // Clear removes all items from the map.
 func (sm *Map[Key, Value]) Clear() {
 	sm.lock.Lock()

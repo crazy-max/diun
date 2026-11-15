@@ -16,8 +16,10 @@ func Clone[T any](val *T) *T {
 }
 
 // Ptr returns a pointer to the given value.
+//
+//go:fix inline
 func Ptr[T any](val T) *T {
-	return &val
+	return new(val)
 }
 
 // NonZero returns a pointer to the given comparable value, unless the value is the type's zero value.

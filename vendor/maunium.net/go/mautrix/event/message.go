@@ -51,9 +51,9 @@ const (
 	MsgAudio    MessageType = "m.audio"
 	MsgFile     MessageType = "m.file"
 
-	MsgVerificationRequest MessageType = "m.key.verification.request"
+	MsgUnstableGallery MessageType = "dm.filament.gallery"
 
-	MsgBeeperGallery MessageType = "com.beeper.gallery"
+	MsgVerificationRequest MessageType = "m.key.verification.request"
 )
 
 // Format specifies the format of the formatted_body in m.room.message events.
@@ -73,6 +73,8 @@ type RedactionEventContent struct {
 
 	// The event ID is here as of room v11. In old servers it may only be at the top level.
 	Redacts id.EventID `json:"redacts,omitempty"`
+
+	DontRenderPlaceholder bool `json:"com.beeper.dont_render_redacted_placeholder,omitzero"`
 }
 
 // ReactionEventContent represents the content of a m.reaction message event.
@@ -112,37 +114,38 @@ type MessageEventContent struct {
 	GeoURI string `json:"geo_uri,omitempty"`
 
 	// Extra fields for media types
-	URL  id.ContentURIString `json:"url,omitempty"`
-	Info *FileInfo           `json:"info,omitempty"`
-	File *EncryptedFileInfo  `json:"file,omitempty"`
+	URL      id.ContentURIString `json:"url,omitempty"`
+	Info     *FileInfo           `json:"info,omitempty"`
+	File     *EncryptedFileInfo  `json:"file,omitempty"`
+	FileName string              `json:"filename,omitempty"`
 
-	FileName string `json:"filename,omitempty"`
-
-	Mentions *Mentions `json:"m.mentions,omitempty"`
+	UnstableGalleryItemType MessageType            `json:"itemtype,omitempty"`
+	UnstableGalleryItems    []*MessageEventContent `json:"itemtypes,omitempty"`
+	GalleryItems            []*MessageEventContent `json:"items,omitempty"`
 
 	// Edits and relations
 	NewContent *MessageEventContent `json:"m.new_content,omitempty"`
 	RelatesTo  *RelatesTo           `json:"m.relates_to,omitempty"`
+	Mentions   *Mentions            `json:"m.mentions,omitempty"`
+
+	replyFallbackRemoved bool
 
 	// In-room verification
 	To         id.UserID            `json:"to,omitempty"`
 	FromDevice id.DeviceID          `json:"from_device,omitempty"`
 	Methods    []VerificationMethod `json:"methods,omitempty"`
 
-	replyFallbackRemoved bool
-
 	ImageSourcePacks map[id.ContentURIString]*ImageSource    `json:"com.beeper.msc4459.image_source_packs,omitempty"`
 	BridgedEmojis    map[id.ContentURIString]*BridgedSticker `json:"com.beeper.bridged_emojis,omitempty"`
 
-	MessageSendRetry         *BeeperRetryMetadata     `json:"com.beeper.message_send_retry,omitempty"`
-	BeeperGalleryImages      []*MessageEventContent   `json:"com.beeper.gallery.images,omitempty"`
-	BeeperGalleryCaption     string                   `json:"com.beeper.gallery.caption,omitempty"`
-	BeeperGalleryCaptionHTML string                   `json:"com.beeper.gallery.caption_html,omitempty"`
-	BeeperPerMessageProfile  *BeeperPerMessageProfile `json:"com.beeper.per_message_profile,omitempty"`
-	BeeperActionMessage      *BeeperActionMessage     `json:"com.beeper.action_message,omitempty"`
-	BeeperLinkPreviews       []*BeeperLinkPreview     `json:"com.beeper.linkpreviews,omitempty"`
-	BeeperStream             *BeeperStreamInfo        `json:"com.beeper.stream,omitempty"`
-	BeeperDisappearingTimer  *BeeperDisappearingTimer `json:"com.beeper.disappearing_timer,omitempty"`
+	MessageSendRetry             *BeeperRetryMetadata     `json:"com.beeper.message_send_retry,omitempty"`
+	BeeperPerMessageProfile      *BeeperPerMessageProfile `json:"com.beeper.per_message_profile,omitempty"`
+	BeeperActionMessage          *BeeperActionMessage     `json:"com.beeper.action_message,omitempty"`
+	BeeperLinkPreviews           []*BeeperLinkPreview     `json:"com.beeper.linkpreviews,omitzero"`
+	BeeperStream                 *BeeperStreamInfo        `json:"com.beeper.stream,omitempty"`
+	BeeperDisappearingTimer      *BeeperDisappearingTimer `json:"com.beeper.disappearing_timer,omitempty"`
+	BeeperViewLimited            *BeeperViewLimitedMedia  `json:"com.beeper.view_limited,omitempty"`
+	BeeperBroadcastOutsideThread bool                     `json:"com.beeper.broadcast_outside_thread,omitzero"`
 
 	MSC1767Audio *MSC1767Audio `json:"org.matrix.msc1767.audio,omitempty"`
 	MSC3245Voice *MSC3245Voice `json:"org.matrix.msc3245.voice,omitempty"`
@@ -214,20 +217,22 @@ func (content *MessageEventContent) SetRelatesTo(rel *RelatesTo) {
 
 func (content *MessageEventContent) SetEdit(original id.EventID) {
 	newContent := *content
-	content.NewContent = &newContent
-	content.RelatesTo = (&RelatesTo{}).SetReplace(original)
+	*content = MessageEventContent{
+		MsgType:    content.MsgType,
+		Body:       content.Body,
+		GeoURI:     content.GeoURI,
+		URL:        content.URL,
+		File:       content.File,
+		FileName:   content.FileName,
+		Mentions:   &Mentions{},
+		NewContent: &newContent,
+		RelatesTo:  (&RelatesTo{}).SetReplace(original),
+	}
 	if content.MsgType == MsgText || content.MsgType == MsgNotice {
 		content.Body = "* " + content.Body
-		content.Mentions = &Mentions{}
-		if content.Format == FormatHTML && len(content.FormattedBody) > 0 {
-			content.FormattedBody = "* " + content.FormattedBody
-		}
-		// If the message is long, remove most of the useless edit fallback to avoid event size issues.
-		if len(content.Body) > 10000 {
-			content.FormattedBody = ""
-			content.Format = ""
-			content.Body = content.Body[:50] + "[edit fallback cut…]"
-		}
+	}
+	if len(content.Body) > 100 {
+		content.Body = content.Body[:min(len(content.Body), 50)] + "[edit fallback cut…]"
 	}
 }
 
@@ -270,7 +275,7 @@ func (content *MessageEventContent) GetInfo() *FileInfo {
 
 type Mentions struct {
 	UserIDs []id.UserID `json:"user_ids,omitempty"`
-	Room    bool        `json:"room,omitempty"`
+	Room    bool        `json:"room,omitzero"`
 }
 
 func (m *Mentions) Add(userID id.UserID) {
@@ -338,13 +343,13 @@ type serializableFileInfo struct {
 	Blurhash     string `json:"blurhash,omitempty"`
 	AnoaBlurhash string `json:"xyz.amorgan.blurhash,omitempty"`
 
-	MauGIF     bool `json:"fi.mau.gif,omitempty"`
-	IsAnimated bool `json:"is_animated,omitempty"`
+	MauGIF     bool `json:"fi.mau.gif,omitzero"`
+	IsAnimated bool `json:"is_animated,omitzero"`
 
-	Width    json.Number `json:"w,omitempty"`
-	Height   json.Number `json:"h,omitempty"`
-	Duration json.Number `json:"duration,omitempty"`
-	Size     json.Number `json:"size,omitempty"`
+	Width    json.Number `json:"w,omitempty,omitzero"`
+	Height   json.Number `json:"h,omitempty,omitzero"`
+	Duration json.Number `json:"duration,omitempty,omitzero"`
+	Size     json.Number `json:"size,omitempty,omitzero"`
 
 	BridgedSticker *BridgedSticker `json:"fi.mau.bridged_sticker,omitempty"`
 }

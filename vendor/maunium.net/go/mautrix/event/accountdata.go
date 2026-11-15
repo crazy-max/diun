@@ -7,6 +7,7 @@
 package event
 
 import (
+	"cmp"
 	"encoding/json"
 	"strings"
 	"time"
@@ -58,7 +59,7 @@ func (rt RoomTag) Name() string {
 type Tag = TagMetadata
 
 type TagMetadata struct {
-	Order json.Number `json:"order,omitempty"`
+	Order json.Number `json:"order,omitempty,omitzero"`
 
 	MauDoublePuppetSource string `json:"fi.mau.double_puppet_source,omitempty"`
 }
@@ -88,7 +89,7 @@ type MarkedUnreadEventContent struct {
 }
 
 type BeeperMuteEventContent struct {
-	MutedUntil int64 `json:"muted_until,omitempty"`
+	MutedUntil int64 `json:"muted_until,omitzero"`
 }
 
 func (bmec *BeeperMuteEventContent) IsMuted() bool {
@@ -116,4 +117,83 @@ func (bmec *BeeperMuteEventContent) GetMuteDuration() time.Duration {
 	} else {
 		return ts.Sub(now)
 	}
+}
+
+type StoredPerMessageProfileTrigger struct {
+	Prefix      string `json:"prefix,omitempty"`
+	Suffix      string `json:"suffix,omitempty"`
+	KeepTrigger bool   `json:"keep_trigger,omitzero"`
+}
+
+type StoredPerMessageProfile struct {
+	BeeperPerMessageProfile
+	Triggers []StoredPerMessageProfileTrigger `json:"triggers,omitempty"`
+}
+
+type PerMessageProfilesEventContent struct {
+	DefaultProfileID *string `json:"default_profile_id,omitempty"`
+
+	Profiles []*StoredPerMessageProfile `json:"profiles,omitempty"`
+}
+
+func PickPerMessageProfile(globalData, roomData *PerMessageProfilesEventContent, input string) (string, *BeeperPerMessageProfile) {
+	if text, profile := roomData.Match(input); profile != nil {
+		return text, profile
+	} else if text, profile = globalData.Match(input); profile != nil {
+		return text, profile
+	}
+	defaultProfile := cmp.Or(roomData.GetDefaultProfileID(), globalData.GetDefaultProfileID())
+	if defaultProfile != nil && *defaultProfile != "" {
+		if profile := roomData.GetByID(*defaultProfile); profile != nil {
+			return input, profile
+		} else if profile = globalData.GetByID(*defaultProfile); profile != nil {
+			return input, profile
+		}
+	}
+	return input, nil
+}
+
+func (spec *PerMessageProfilesEventContent) GetDefaultProfileID() *string {
+	if spec == nil {
+		return nil
+	}
+	return spec.DefaultProfileID
+}
+
+func (spec *PerMessageProfilesEventContent) GetByID(id string) *BeeperPerMessageProfile {
+	if spec == nil || id == "" {
+		return nil
+	}
+	for _, profile := range spec.Profiles {
+		if profile != nil && profile.ID == id {
+			profileCopy := profile.BeeperPerMessageProfile
+			profileCopy.HasFallback = false
+			return &profileCopy
+		}
+	}
+	return nil
+}
+
+func (spec *PerMessageProfilesEventContent) Match(input string) (string, *BeeperPerMessageProfile) {
+	if spec == nil || len(spec.Profiles) == 0 {
+		return input, nil
+	}
+	for _, profile := range spec.Profiles {
+		if profile == nil || profile.ID == "" {
+			continue
+		}
+		for _, trigger := range profile.Triggers {
+			if len(input) >= len(trigger.Prefix)+len(trigger.Suffix) &&
+				strings.HasPrefix(input, trigger.Prefix) &&
+				strings.HasSuffix(input, trigger.Suffix) {
+				if !trigger.KeepTrigger {
+					input = input[len(trigger.Prefix) : len(input)-len(trigger.Suffix)]
+				}
+				profileCopy := profile.BeeperPerMessageProfile
+				profileCopy.HasFallback = false
+				return input, &profileCopy
+			}
+		}
+	}
+	return input, nil
 }

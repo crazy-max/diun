@@ -33,12 +33,12 @@ func AppendSequence[T any](n int, charset, output []T) []T {
 	// If risk of modulo bias is too high, use 32-bit integers as source instead of 16-bit.
 	if 65536%len(charset) < 200 {
 		input := Bytes(n * 2)
-		for i := 0; i < n; i++ {
+		for i := range n {
 			output = append(output, charset[binary.BigEndian.Uint16(input[i*2:])%uint16(len(charset))])
 		}
 	} else {
 		input := Bytes(n * 4)
-		for i := 0; i < n; i++ {
+		for i := range n {
 			output = append(output, charset[binary.BigEndian.Uint32(input[i*4:])%uint32(len(charset))])
 		}
 	}
@@ -52,7 +52,7 @@ func StringBytesCharset(n int, charset string) []byte {
 		return []byte{}
 	}
 	input := Bytes(n * 2)
-	for i := 0; i < n; i++ {
+	for i := range n {
 		// The risk of modulo bias is (65536 % len(charset)) / 65536.
 		// For the default charset, that's 2 in 65536 or 0.003 %.
 		input[i] = charset[binary.BigEndian.Uint16(input[i*2:])%uint16(len(charset))]

@@ -1,3 +1,200 @@
+## v0.32.0 (2026-10-16)
+
+* **Breaking change *(bridgev2)*** Added portal parameter to the
+  `GetChatInfoChange` method.
+* *(bridgev2)* Removed deprecated SimpleRemoteEvent type.
+* *(event)* Removed unstable MSC4284 types, as policy servers have been
+  stabilized.
+* *(event)* Removed unused Beeper gallery types.
+* *(bridgev2)* Added support for disappearing message timers based on when the
+  recipient reads the message.
+* *(bridgev2)* Added fingerprint ID option for client HTTP requests.
+* *(bridgev2)* Added `optional` flag to login user input fields.
+* *(bridgev2)* Added body size limit for incoming provisioning API requests.
+* *(bridgev2)* Added interface for media that can only be viewed for a certain
+  amount of time and/or certain number of times.
+* *(bridgev2)* Added interface for blocking/unblocking users on the remote
+  network.
+* *(bridgev2)* Added alternate pre-handle methods for events that allow
+  cancelling the event.
+* *(appservice)* Added support for h2c in the HTTP server.
+* *(appservice)* Added support for global middleware in the HTTP server.
+* *(client)* Added wrappers for MatrixRTC livekit token endpoints.
+* *(client)* Added wrapper for report user endpoint.
+* *(client)* Added support for reading the full own invite/knock event in sync
+  added by [MSC4319].
+* *(event)* Added [MSC4274] gallery types.
+* *(federation)* Added cap for key fetch backoff.
+* *(federation)* Added context parameters for cache to allow persistent caches.
+* *(federation)* Added validation when getting OpenID user info so that callers
+  don't need to remember to do it separately.
+* *(crypto)* Added backoff for fetching device lists that fail repeatedly.
+* *(crypto)* Added option to schedule Olm session unwedging manually instead of
+  having it happen automatically in a goroutine.
+* *(crypto)* Changed Megolm session sharing to reuse the previous attempt if
+  sharing fails.
+* *(event)* Updated unsigned relations struct to match reality.
+* *(event)* Updated edit fallback to always be cut to a few dozen bytes.
+* *(client)* Changed displayname and avatar updates getters to ignore
+  `M_NOT_FOUND` errors, as the spec allows returning that instead of an empty
+  object.
+* *(format)* Changed short emphasis extension to have higher priority to allow
+  combining it with the standard emphasis syntax.
+* *(mediaproxy)* Changed network errors to return 502 instead of 404.
+* *(bridgev2)* Changed login provisioning API to allow returning initial cookies
+  to use when opening a webview.
+* *(bridgev2)* Changed reaction sync to keep existing database entries if
+  removing a reaction fails.
+* *(bridgev2)* Fixed old client not being disconnected when an existing login
+  is recreated.
+* *(bridgev2)* Fixed avatar and topic set flags being flipped on save.
+* *(bridgev2)* Fixed fake message MXID generation not being sufficiently unique.
+* *(bridgev2)* Fixed various panics and missing recovers.
+* *(bridgev2)* Fixed bridge state loop not stopping on bridge stop.
+* *(bridgev2)* Fixed deadlock when overwriting existing portal.
+* *(bridgev2)* Fixed `bridgev2.RespError` not being castable to
+  `mautrix.RespError` using `errors.As`.
+* *(bridgev2)* Fixed split portal migration leaving behind incorrect
+  `user_portal` rows.
+* *(client)* Fixed method used for get pushers endpoint.
+* *(client)* Fixed OAuth token expiry times only being counted in monotonic
+  time, which would stop when the system is suspended.
+* *(client)* Fixed expired OAuth token not attempting refresh when making request.
+* *(crypto)* Fixed JSON encoding using HTML escapes unnecessarily, which lead
+  to events being bigger than necessary, especially if they had formatting.
+* *(federation)* Fixed incorrect request path on SendInvite.
+* *(federation/pdu)* Fixed top-level `redacts` being incorrectly protected from
+  redaction.
+
+[MSC4274]: https://github.com/matrix-org/matrix-spec-proposals/pull/4274
+[MSC4319]: https://github.com/matrix-org/matrix-spec-proposals/pull/4319
+
+## v0.31.0 (2026-09-16)
+
+* Bumped minimum Go version to 1.26.
+* *(client)* Added support for creating pushers (including [MSC4174] web push).
+* *(client)* Added support for [MSC4491]: invite reasons in room creation
+  (thanks to [@timedoutuk] in [#515]).
+* *(event)* Added helper for getting poll question text.
+* *(event)* Added support for parsing custom fields in per-message profiles.
+* *(bridgev2)* Added mechanism for unresolved media messages that can be
+  resolved using a provisioning API call.
+* *(bridgev2)* Added mechanism for canceling a single login step to go back
+  and choose another option. This can be used for things like 2FA flows that
+  the user can choose.
+* *(bridgev2)* Added min/max length hints to login input fields.
+* *(bridgev2)* Added config option to wait a few seconds for the login to be
+  connected before failing when handling messages from Matrix.
+* *(bridgev2)* Added disappearing message mode that starts after the recipient
+  reads the message.
+* *(bridgev2)* Added support for remaining pprof endpoints when debug endpoints
+  are enabled.
+* *(bridgev2)* Added custom error interface to let downstream libraries define
+  human-readable error messages for message send failures without having to wrap
+  errors in the message status struct.
+* *(bridgev2)* Added hacky ghost profile reconciliation to handle cases where
+  the profile on the homeserver doesn't match the profile in the bridge DB.
+* *(bridgev2)* Improved various error responses in the provisioning API backfill
+  endpoint.
+* *(crypto)* Added support for [MSC4385]: pushing secrets to other devices.
+  * Note that the support won't do anything with received secrets unless a
+    secret push callback is set.
+* *(crypto)* Fixed OTK corruption when running with jsonv2 enabled.
+* *(crypto)* Added `RepairOneTimeKeys` for clearing all one-time keys on the
+  server and uploading new ones.
+* *(crypto)* Fixed receiving Megolm sessions after initially storing a withheld
+  code for the session ID.
+* *(crypto)* Fixed Megolm session requests not being accepted if the original
+  share failed due to an Olm session establishment failure.
+* *(crypto)* Fixed devices being marked as deleted if validation fails for a
+  device that was previously successfully validated.
+* *(bridgev2)* Fixed DM room avatars not being cleared in some cases after
+  ghost avatar is cleared when using `direct_chat_portal_meta`.
+* *(federation/pdu)* Fixed MSC4354 sticky events not being signed correctly.
+* *(event)* Fixed per-message profile fallback regex not handling `=""` as the
+  attribute value correctly.
+
+[MSC4491]: https://github.com/matrix-org/matrix-spec-proposals/pull/4491
+[MSC4385]: https://github.com/matrix-org/matrix-spec-proposals/pull/4385
+[MSC4174]: https://github.com/matrix-org/matrix-spec-proposals/pull/4174
+[#515]: https://github.com/mautrix/go/pull/515
+
+## v0.30.0 (2026-08-16)
+
+* *(crypto)* Added support for room history sharing.
+* *(crypto)* Added more consistent Megolm session saving and locking.
+* *(federation)* Added option to block outgoing requests by server name.
+* *(federation/eventauth)* Added option to provide precomputed auth events to
+  make it easier to use the method for state resolution.
+* *(federation/pdu)* Added MSC4354 sticky field to federation PDUs.
+* *(event)* Added types for latest v3 revision of [MSC4461].
+* *(bridgev2)* Added check to prevent starting the bridge if `split_portals` is
+  unset after being set before.
+* *(bridgev2)* Added interface for providing alternate target message IDs for
+  things like replies and reactions. This is used for WhatsApp where the message
+  ID is ambiguous due to an ongoing migration to a different user ID format.
+* *(bridgev2)* Added configurable debounce for transient disconnects to avoid
+  sending unnecessary bridge state updates.
+* *(bridgev2)* Added distinguisher option to relay message formatting
+  (thanks to [@Katze-942] in [#536]).
+* *(bridgev2)* Added optional interface for suppressing pending message timeouts.
+* *(bridgev2)* Added bridge capability flag to use the immediate parent instead
+  of the top-level parent for the `network` field in the `m.bridge` event.
+* *(bridgev2/provisioning)* Added client HTTP to provisioning API logins, which
+  allows proxying requests via the user's device.
+* *(bridgev2/provisioning)* Added config options to customize request ID logging
+  and passthrough.
+* *(bridgev2/matrix)* Added `FormatGhostMXID` to Matrix connector interface.
+* *(bridgev2)* Fixed room capabilities not being updated correctly in some cases.
+* *(bridgev2)* Fixed backfill message cutoff leaving existing messages in some
+  edge cases where multiple messages have the same timestamp.
+* *(bridgev2)* Fixed backfill queue done flag not being cleared properly when
+  marking a portal as having more data to backfill.
+* *(bridgev2)* Fixed DM portal info updates failing due to context cancellation
+  if triggered by another portal being created.
+* *(bridgev2)* Fixed `m.space.parent` event not being removed when portal parent
+  space changes.
+* *(client)* Fixed automatic OAuth token refresh to only happen on proper
+  `M_UNKNOWN_TOKEN` errors instead of any 401 response.
+* *(format)* Fixed duplicate user IDs in `m.mentions` when generating it based
+  on mentions in HTML.
+
+[@Katze-942]: https://github.com/Katze-942
+[#536]: https://github.com/mautrix/go/pull/536
+[MSC4461]: https://github.com/matrix-org/matrix-spec-proposals/pull/4461
+
+## v0.29.0 (2026-07-16)
+
+* *(client)* Added support for OAuth login and refresh tokens.
+* *(bridgev2)* Added WebAuthn login type.
+* *(bridgev2)* Added hook for fetching full portal key when uncertain portal
+  key isn't found.
+* *(bridgev2)* Added option to force sending edit as the original sender.
+* *(bridgev2)* Changed send message error to use latest bridge state message
+  instead of a generic "you're not logged in" if applicable.
+
+## v0.28.1 (2026-06-16)
+
+* *(pushrules)* Removed deprecated `NotifySpecified` field in `Should()`.
+* *(pushrules)* Deprecated `ActionDontNotify` and `ActionCoalesce` constants.
+* *(client)* Added wrapper for `/search` endpoint.
+* *(client)* Added wrappers for the `/enabled` and `/actions` sub-endpoints
+  for modifying push rules.
+* *(bridgev2/commands)* Added warning when using the login command in a
+  non-management room.
+* *(bridgev2/matrix)* Added `ParseContentURI` method for parsing a `mxc://` URI
+  previously generated for direct media.
+* *(bridgev2/provisioning)* Changed request handling to allow retrying requests.
+  * Requests can be retried as long as the next step hasn't been completed.
+  * Cancellation is now done with a separate API call.
+* *(bridgev2/provisioning)* Changed group creation to ignore self in participants
+  list instead of rejecting the request.
+* *(bridgev2/provisioning)* Changed error responses to include internal error in
+  a separate field.
+* *(bridgev2)* Fixed `m.bridge` event in child portals not being updated when
+  the parent portal name or avatar changes.
+* *(client)* Fixed request retry trigger not working correctly in some cases.
+
 ## v0.28.0 (2026-05-16)
 
 * **Breaking change *(federation)*** Changed `NewClient` to take HTTP client
@@ -46,7 +243,7 @@
   (thanks to [@timedoutuk] in [#496]).
 * *(crypto/goolm)* Fixed various small issues.
 
-[MSC445]: https://github.com/matrix-org/matrix-spec-proposals/pull/4459
+[MSC4459]: https://github.com/matrix-org/matrix-spec-proposals/pull/4459
 [#491]: https://github.com/mautrix/go/pull/491
 [#496]: https://github.com/mautrix/go/pull/496
 [#497]: https://github.com/mautrix/go/pull/497

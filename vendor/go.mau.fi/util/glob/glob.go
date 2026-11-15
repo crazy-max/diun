@@ -31,8 +31,11 @@ func Compile(pattern string) Glob {
 	if g != nil {
 		return g
 	}
-	g, _ = CompileRegex(pattern)
-	return g
+	rg, _ := CompileRegex(pattern)
+	if rg == nil {
+		return nil
+	}
+	return rg
 }
 
 // CompileWithImplicitContains is a wrapper for Compile which will replace exact matches with contains matches.

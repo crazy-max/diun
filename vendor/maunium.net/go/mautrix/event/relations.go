@@ -9,6 +9,9 @@ package event
 import (
 	"encoding/json"
 
+	"go.mau.fi/util/exslices"
+	"go.mau.fi/util/ptr"
+
 	"maunium.net/go/mautrix/id"
 )
 
@@ -28,7 +31,7 @@ type RelatesTo struct {
 	Key     string       `json:"key,omitempty"`
 
 	InReplyTo     *InReplyTo `json:"m.in_reply_to,omitempty"`
-	IsFallingBack bool       `json:"is_falling_back,omitempty"`
+	IsFallingBack bool       `json:"is_falling_back,omitzero"`
 }
 
 type InReplyTo struct {
@@ -42,8 +45,9 @@ func (rel *RelatesTo) Copy() *RelatesTo {
 	if rel == nil {
 		return nil
 	}
-	cp := *rel
-	return &cp
+	clone := ptr.Clone(rel)
+	clone.InReplyTo = ptr.Clone(clone.InReplyTo)
+	return clone
 }
 
 func (rel *RelatesTo) GetReplaceID() id.EventID {
@@ -128,113 +132,73 @@ func (rel *RelatesTo) SetAnnotation(mxid id.EventID, key string) *RelatesTo {
 	return rel
 }
 
-type RelationChunkItem struct {
-	Type    RelationType `json:"type"`
-	EventID string       `json:"event_id,omitempty"`
-	Key     string       `json:"key,omitempty"`
-	Count   int          `json:"count,omitempty"`
+type ReferenceAggregationItem struct {
+	EventID id.EventID `json:"event_id"`
 }
 
-type RelationChunk struct {
-	Chunk []RelationChunkItem `json:"chunk"`
-
-	Limited bool `json:"limited"`
-	Count   int  `json:"count"`
+type ReferenceAggregation struct {
+	Chunk []ReferenceAggregationItem `json:"chunk"`
 }
 
-type AnnotationChunk struct {
-	RelationChunk
-	Map map[string]int `json:"-"`
-}
-
-type serializableAnnotationChunk AnnotationChunk
-
-func (ac *AnnotationChunk) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, (*serializableAnnotationChunk)(ac)); err != nil {
-		return err
-	}
-	ac.Map = make(map[string]int)
-	for _, item := range ac.Chunk {
-		if item.Key != "" {
-			ac.Map[item.Key] += item.Count
-		}
+func (ra *ReferenceAggregation) GetEventIDs() []id.EventID {
+	if ra != nil && len(ra.Chunk) > 0 {
+		return exslices.CastFunc(ra.Chunk, func(item ReferenceAggregationItem) id.EventID {
+			return item.EventID
+		})
 	}
 	return nil
 }
 
-func (ac *AnnotationChunk) Serialize() RelationChunk {
-	ac.Chunk = make([]RelationChunkItem, len(ac.Map))
-	i := 0
-	for key, count := range ac.Map {
-		ac.Chunk[i] = RelationChunkItem{
-			Type:  RelAnnotation,
-			Key:   key,
-			Count: count,
-		}
-		i++
-	}
-	return ac.RelationChunk
+type ThreadAggregation struct {
+	LatestEvent             *Event `json:"latest_event"`
+	Count                   int    `json:"count"`
+	CurrentUserParticipated bool   `json:"current_user_participated"`
 }
 
-type EventIDChunk struct {
-	RelationChunk
-	List []string `json:"-"`
+func (ta *ThreadAggregation) GetCount() int {
+	if ta != nil {
+		return ta.Count
+	}
+	return 0
 }
 
-type serializableEventIDChunk EventIDChunk
-
-func (ec *EventIDChunk) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, (*serializableEventIDChunk)(ec)); err != nil {
-		return err
+func (ta *ThreadAggregation) GetCurrentUserParticipated() bool {
+	if ta != nil {
+		return ta.CurrentUserParticipated
 	}
-	for _, item := range ec.Chunk {
-		ec.List = append(ec.List, item.EventID)
+	return false
+}
+
+func (ta *ThreadAggregation) GetLatestEvent() *Event {
+	if ta != nil {
+		return ta.LatestEvent
 	}
 	return nil
-}
-
-func (ec *EventIDChunk) Serialize(typ RelationType) RelationChunk {
-	ec.Chunk = make([]RelationChunkItem, len(ec.List))
-	for i, eventID := range ec.List {
-		ec.Chunk[i] = RelationChunkItem{
-			Type:    typ,
-			EventID: eventID,
-		}
-	}
-	return ec.RelationChunk
 }
 
 type Relations struct {
-	Raw map[RelationType]RelationChunk `json:"-"`
-
-	Annotations AnnotationChunk `json:"m.annotation,omitempty"`
-	References  EventIDChunk    `json:"m.reference,omitempty"`
-	Replaces    EventIDChunk    `json:"m.replace,omitempty"`
+	Thread     *ThreadAggregation    `json:"m.thread,omitempty"`
+	References *ReferenceAggregation `json:"m.reference,omitempty"`
+	LatestEdit *Event                `json:"m.replace,omitempty"`
 }
 
-type serializableRelations Relations
-
-func (relations *Relations) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &relations.Raw); err != nil {
-		return err
+func (rel *Relations) GetLatestEdit() *Event {
+	if rel != nil {
+		return rel.LatestEdit
 	}
-	return json.Unmarshal(data, (*serializableRelations)(relations))
+	return nil
 }
 
-func (relations *Relations) MarshalJSON() ([]byte, error) {
-	if relations.Raw == nil {
-		relations.Raw = make(map[RelationType]RelationChunk)
+func (rel *Relations) GetThread() *ThreadAggregation {
+	if rel != nil {
+		return rel.Thread
 	}
-	relations.Raw[RelAnnotation] = relations.Annotations.Serialize()
-	relations.Raw[RelReference] = relations.References.Serialize(RelReference)
-	relations.Raw[RelReplace] = relations.Replaces.Serialize(RelReplace)
-	for key, item := range relations.Raw {
-		if !item.Limited {
-			item.Count = len(item.Chunk)
-		}
-		if item.Count == 0 {
-			delete(relations.Raw, key)
-		}
+	return nil
+}
+
+func (rel *Relations) GetReferences() *ReferenceAggregation {
+	if rel != nil {
+		return rel.References
 	}
-	return json.Marshal(relations.Raw)
+	return nil
 }

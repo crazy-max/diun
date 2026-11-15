@@ -6,6 +6,10 @@
 
 package exerrors
 
+import (
+	"fmt"
+)
+
 func Must[T any](val T, err error) T {
 	PanicIfNotNil(err)
 	return val
@@ -20,4 +24,11 @@ func PanicIfNotNil(err error) {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func RecoverToError(v any) error {
+	if err, ok := v.(error); ok {
+		return err
+	}
+	return fmt.Errorf("%v", v)
 }

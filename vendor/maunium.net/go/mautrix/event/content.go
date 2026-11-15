@@ -11,122 +11,127 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"maps"
 	"reflect"
 )
 
 // TypeMap is a mapping from event type to the content struct type.
 // This is used by Content.ParseRaw() for creating the correct type of struct.
 var TypeMap = map[Type]reflect.Type{
-	StateMember:            reflect.TypeOf(MemberEventContent{}),
-	StateThirdPartyInvite:  reflect.TypeOf(ThirdPartyInviteEventContent{}),
-	StatePowerLevels:       reflect.TypeOf(PowerLevelsEventContent{}),
-	StateCanonicalAlias:    reflect.TypeOf(CanonicalAliasEventContent{}),
-	StateRoomName:          reflect.TypeOf(RoomNameEventContent{}),
-	StateRoomAvatar:        reflect.TypeOf(RoomAvatarEventContent{}),
-	StateServerACL:         reflect.TypeOf(ServerACLEventContent{}),
-	StateTopic:             reflect.TypeOf(TopicEventContent{}),
-	StateTombstone:         reflect.TypeOf(TombstoneEventContent{}),
-	StateCreate:            reflect.TypeOf(CreateEventContent{}),
-	StateJoinRules:         reflect.TypeOf(JoinRulesEventContent{}),
-	StateHistoryVisibility: reflect.TypeOf(HistoryVisibilityEventContent{}),
-	StateGuestAccess:       reflect.TypeOf(GuestAccessEventContent{}),
-	StatePinnedEvents:      reflect.TypeOf(PinnedEventsEventContent{}),
-	StatePolicyRoom:        reflect.TypeOf(ModPolicyContent{}),
-	StatePolicyServer:      reflect.TypeOf(ModPolicyContent{}),
-	StatePolicyUser:        reflect.TypeOf(ModPolicyContent{}),
-	StateEncryption:        reflect.TypeOf(EncryptionEventContent{}),
-	StateBridge:            reflect.TypeOf(BridgeEventContent{}),
-	StateHalfShotBridge:    reflect.TypeOf(BridgeEventContent{}),
-	StateSpaceParent:       reflect.TypeOf(SpaceParentEventContent{}),
-	StateSpaceChild:        reflect.TypeOf(SpaceChildEventContent{}),
+	StateMember:            reflect.TypeFor[MemberEventContent](),
+	StateThirdPartyInvite:  reflect.TypeFor[ThirdPartyInviteEventContent](),
+	StatePowerLevels:       reflect.TypeFor[PowerLevelsEventContent](),
+	StateCanonicalAlias:    reflect.TypeFor[CanonicalAliasEventContent](),
+	StateRoomName:          reflect.TypeFor[RoomNameEventContent](),
+	StateRoomAvatar:        reflect.TypeFor[RoomAvatarEventContent](),
+	StateServerACL:         reflect.TypeFor[ServerACLEventContent](),
+	StateTopic:             reflect.TypeFor[TopicEventContent](),
+	StateTombstone:         reflect.TypeFor[TombstoneEventContent](),
+	StateCreate:            reflect.TypeFor[CreateEventContent](),
+	StateJoinRules:         reflect.TypeFor[JoinRulesEventContent](),
+	StateHistoryVisibility: reflect.TypeFor[HistoryVisibilityEventContent](),
+	StateGuestAccess:       reflect.TypeFor[GuestAccessEventContent](),
+	StatePinnedEvents:      reflect.TypeFor[PinnedEventsEventContent](),
+	StatePolicyRoom:        reflect.TypeFor[ModPolicyContent](),
+	StatePolicyServer:      reflect.TypeFor[ModPolicyContent](),
+	StatePolicyUser:        reflect.TypeFor[ModPolicyContent](),
+	StateEncryption:        reflect.TypeFor[EncryptionEventContent](),
+	StateBridge:            reflect.TypeFor[BridgeEventContent](),
+	StateHalfShotBridge:    reflect.TypeFor[BridgeEventContent](),
+	StateSpaceParent:       reflect.TypeFor[SpaceParentEventContent](),
+	StateSpaceChild:        reflect.TypeFor[SpaceChildEventContent](),
 
-	StateRoomPolicy:         reflect.TypeOf(RoomPolicyEventContent{}),
-	StateUnstableRoomPolicy: reflect.TypeOf(RoomPolicyEventContent{}),
+	StateRoomPolicy: reflect.TypeFor[RoomPolicyEventContent](),
 
-	StateImagePack:         reflect.TypeOf(ImagePackEventContent{}),
-	StateUnstableImagePack: reflect.TypeOf(ImagePackEventContent{}),
+	StateImagePack:         reflect.TypeFor[ImagePackEventContent](),
+	StateUnstableImagePack: reflect.TypeFor[ImagePackEventContent](),
 
-	StateLegacyPolicyRoom:     reflect.TypeOf(ModPolicyContent{}),
-	StateLegacyPolicyServer:   reflect.TypeOf(ModPolicyContent{}),
-	StateLegacyPolicyUser:     reflect.TypeOf(ModPolicyContent{}),
-	StateUnstablePolicyRoom:   reflect.TypeOf(ModPolicyContent{}),
-	StateUnstablePolicyServer: reflect.TypeOf(ModPolicyContent{}),
-	StateUnstablePolicyUser:   reflect.TypeOf(ModPolicyContent{}),
+	StateLegacyPolicyRoom:     reflect.TypeFor[ModPolicyContent](),
+	StateLegacyPolicyServer:   reflect.TypeFor[ModPolicyContent](),
+	StateLegacyPolicyUser:     reflect.TypeFor[ModPolicyContent](),
+	StateUnstablePolicyRoom:   reflect.TypeFor[ModPolicyContent](),
+	StateUnstablePolicyServer: reflect.TypeFor[ModPolicyContent](),
+	StateUnstablePolicyUser:   reflect.TypeFor[ModPolicyContent](),
 
-	StateElementFunctionalMembers: reflect.TypeOf(ElementFunctionalMembersContent{}),
-	StateBeeperRoomFeatures:       reflect.TypeOf(RoomFeatures{}),
-	StateBeeperDisappearingTimer:  reflect.TypeOf(BeeperDisappearingTimer{}),
+	StateElementFunctionalMembers: reflect.TypeFor[ElementFunctionalMembersContent](),
+	StateBeeperRoomFeatures:       reflect.TypeFor[RoomFeatures](),
+	StateBeeperDisappearingTimer:  reflect.TypeFor[BeeperDisappearingTimer](),
 
-	EventMessage:   reflect.TypeOf(MessageEventContent{}),
-	EventSticker:   reflect.TypeOf(MessageEventContent{}),
-	EventEncrypted: reflect.TypeOf(EncryptedEventContent{}),
-	EventRedaction: reflect.TypeOf(RedactionEventContent{}),
-	EventReaction:  reflect.TypeOf(ReactionEventContent{}),
+	EventMessage:   reflect.TypeFor[MessageEventContent](),
+	EventSticker:   reflect.TypeFor[MessageEventContent](),
+	EventEncrypted: reflect.TypeFor[EncryptedEventContent](),
+	EventRedaction: reflect.TypeFor[RedactionEventContent](),
+	EventReaction:  reflect.TypeFor[ReactionEventContent](),
 
-	EventUnstablePollStart:    reflect.TypeOf(PollStartEventContent{}),
-	EventUnstablePollResponse: reflect.TypeOf(PollResponseEventContent{}),
+	EventUnstablePollStart:    reflect.TypeFor[PollStartEventContent](),
+	EventUnstablePollResponse: reflect.TypeFor[PollResponseEventContent](),
 
-	BeeperMessageStatus:        reflect.TypeOf(BeeperMessageStatusEventContent{}),
-	BeeperTranscription:        reflect.TypeOf(BeeperTranscriptionEventContent{}),
-	BeeperDeleteChat:           reflect.TypeOf(BeeperChatDeleteEventContent{}),
-	BeeperAcceptMessageRequest: reflect.TypeOf(BeeperAcceptMessageRequestEventContent{}),
-	BeeperSendState:            reflect.TypeOf(BeeperSendStateEventContent{}),
+	BeeperMessageStatus:          reflect.TypeFor[BeeperMessageStatusEventContent](),
+	BeeperTranscription:          reflect.TypeFor[BeeperTranscriptionEventContent](),
+	BeeperViewLimitedMediaUpdate: reflect.TypeFor[BeeperViewLimitedMediaUpdateContent](),
+	BeeperDeleteChat:             reflect.TypeFor[BeeperChatDeleteEventContent](),
+	BeeperBlockUser:              reflect.TypeFor[BeeperBlockUserEventContent](),
+	BeeperAcceptMessageRequest:   reflect.TypeFor[BeeperAcceptMessageRequestEventContent](),
+	BeeperSendState:              reflect.TypeFor[BeeperSendStateEventContent](),
 
-	AccountDataRoomTags:        reflect.TypeOf(TagEventContent{}),
-	AccountDataDirectChats:     reflect.TypeOf(DirectChatsEventContent{}),
-	AccountDataFullyRead:       reflect.TypeOf(FullyReadEventContent{}),
-	AccountDataIgnoredUserList: reflect.TypeOf(IgnoredUserListEventContent{}),
-	AccountDataMarkedUnread:    reflect.TypeOf(MarkedUnreadEventContent{}),
-	AccountDataBeeperMute:      reflect.TypeOf(BeeperMuteEventContent{}),
+	AccountDataRoomTags:           reflect.TypeFor[TagEventContent](),
+	AccountDataDirectChats:        reflect.TypeFor[DirectChatsEventContent](),
+	AccountDataFullyRead:          reflect.TypeFor[FullyReadEventContent](),
+	AccountDataIgnoredUserList:    reflect.TypeFor[IgnoredUserListEventContent](),
+	AccountDataMarkedUnread:       reflect.TypeFor[MarkedUnreadEventContent](),
+	AccountDataBeeperMute:         reflect.TypeFor[BeeperMuteEventContent](),
+	AccountDataPerMessageProfiles: reflect.TypeFor[PerMessageProfilesEventContent](),
 
-	AccountDataImagePackRooms:         reflect.TypeOf(ImagePackRoomsEventContent{}),
-	AccountDataUnstableImagePackRooms: reflect.TypeOf(ImagePackRoomsEventContent{}),
+	AccountDataImagePackRooms:         reflect.TypeFor[ImagePackRoomsEventContent](),
+	AccountDataUnstableImagePackRooms: reflect.TypeFor[ImagePackRoomsEventContent](),
 
-	EphemeralEventTyping:   reflect.TypeOf(TypingEventContent{}),
-	EphemeralEventReceipt:  reflect.TypeOf(ReceiptEventContent{}),
-	EphemeralEventPresence: reflect.TypeOf(PresenceEventContent{}),
+	EphemeralEventTyping:   reflect.TypeFor[TypingEventContent](),
+	EphemeralEventReceipt:  reflect.TypeFor[ReceiptEventContent](),
+	EphemeralEventPresence: reflect.TypeFor[PresenceEventContent](),
 
-	InRoomVerificationReady:  reflect.TypeOf(VerificationReadyEventContent{}),
-	InRoomVerificationStart:  reflect.TypeOf(VerificationStartEventContent{}),
-	InRoomVerificationDone:   reflect.TypeOf(VerificationDoneEventContent{}),
-	InRoomVerificationCancel: reflect.TypeOf(VerificationCancelEventContent{}),
+	InRoomVerificationReady:  reflect.TypeFor[VerificationReadyEventContent](),
+	InRoomVerificationStart:  reflect.TypeFor[VerificationStartEventContent](),
+	InRoomVerificationDone:   reflect.TypeFor[VerificationDoneEventContent](),
+	InRoomVerificationCancel: reflect.TypeFor[VerificationCancelEventContent](),
 
-	InRoomVerificationAccept: reflect.TypeOf(VerificationAcceptEventContent{}),
-	InRoomVerificationKey:    reflect.TypeOf(VerificationKeyEventContent{}),
-	InRoomVerificationMAC:    reflect.TypeOf(VerificationMACEventContent{}),
+	InRoomVerificationAccept: reflect.TypeFor[VerificationAcceptEventContent](),
+	InRoomVerificationKey:    reflect.TypeFor[VerificationKeyEventContent](),
+	InRoomVerificationMAC:    reflect.TypeFor[VerificationMACEventContent](),
 
-	ToDeviceRoomKey:          reflect.TypeOf(RoomKeyEventContent{}),
-	ToDeviceForwardedRoomKey: reflect.TypeOf(ForwardedRoomKeyEventContent{}),
-	ToDeviceRoomKeyRequest:   reflect.TypeOf(RoomKeyRequestEventContent{}),
-	ToDeviceEncrypted:        reflect.TypeOf(EncryptedEventContent{}),
-	ToDeviceRoomKeyWithheld:  reflect.TypeOf(RoomKeyWithheldEventContent{}),
-	ToDeviceSecretRequest:    reflect.TypeOf(SecretRequestEventContent{}),
-	ToDeviceSecretSend:       reflect.TypeOf(SecretSendEventContent{}),
-	ToDeviceDummy:            reflect.TypeOf(DummyEventContent{}),
+	ToDeviceRoomKey:          reflect.TypeFor[RoomKeyEventContent](),
+	ToDeviceForwardedRoomKey: reflect.TypeFor[ForwardedRoomKeyEventContent](),
+	ToDeviceRoomKeyBundle:    reflect.TypeFor[RoomKeyBundleEventContent](),
+	ToDeviceRoomKeyRequest:   reflect.TypeFor[RoomKeyRequestEventContent](),
+	ToDeviceEncrypted:        reflect.TypeFor[EncryptedEventContent](),
+	ToDeviceRoomKeyWithheld:  reflect.TypeFor[RoomKeyWithheldEventContent](),
+	ToDeviceSecretRequest:    reflect.TypeFor[SecretRequestEventContent](),
+	ToDeviceSecretSend:       reflect.TypeFor[SecretSendEventContent](),
+	ToDeviceSecretPush:       reflect.TypeFor[SecretPushEventContent](),
+	ToDeviceDummy:            reflect.TypeFor[DummyEventContent](),
 
-	ToDeviceVerificationRequest: reflect.TypeOf(VerificationRequestEventContent{}),
-	ToDeviceVerificationReady:   reflect.TypeOf(VerificationReadyEventContent{}),
-	ToDeviceVerificationStart:   reflect.TypeOf(VerificationStartEventContent{}),
-	ToDeviceVerificationDone:    reflect.TypeOf(VerificationDoneEventContent{}),
-	ToDeviceVerificationCancel:  reflect.TypeOf(VerificationCancelEventContent{}),
+	ToDeviceVerificationRequest: reflect.TypeFor[VerificationRequestEventContent](),
+	ToDeviceVerificationReady:   reflect.TypeFor[VerificationReadyEventContent](),
+	ToDeviceVerificationStart:   reflect.TypeFor[VerificationStartEventContent](),
+	ToDeviceVerificationDone:    reflect.TypeFor[VerificationDoneEventContent](),
+	ToDeviceVerificationCancel:  reflect.TypeFor[VerificationCancelEventContent](),
 
-	ToDeviceVerificationAccept: reflect.TypeOf(VerificationAcceptEventContent{}),
-	ToDeviceVerificationKey:    reflect.TypeOf(VerificationKeyEventContent{}),
-	ToDeviceVerificationMAC:    reflect.TypeOf(VerificationMACEventContent{}),
+	ToDeviceVerificationAccept: reflect.TypeFor[VerificationAcceptEventContent](),
+	ToDeviceVerificationKey:    reflect.TypeFor[VerificationKeyEventContent](),
+	ToDeviceVerificationMAC:    reflect.TypeFor[VerificationMACEventContent](),
 
-	ToDeviceOrgMatrixRoomKeyWithheld: reflect.TypeOf(RoomKeyWithheldEventContent{}),
+	ToDeviceOrgMatrixRoomKeyWithheld: reflect.TypeFor[RoomKeyWithheldEventContent](),
 
-	ToDeviceBeeperRoomKeyAck:      reflect.TypeOf(BeeperRoomKeyAckEventContent{}),
-	ToDeviceBeeperStreamSubscribe: reflect.TypeOf(BeeperStreamSubscribeEventContent{}),
-	ToDeviceBeeperStreamUpdate:    reflect.TypeOf(BeeperStreamUpdateEventContent{}),
+	ToDeviceBeeperRoomKeyAck:      reflect.TypeFor[BeeperRoomKeyAckEventContent](),
+	ToDeviceBeeperStreamSubscribe: reflect.TypeFor[BeeperStreamSubscribeEventContent](),
+	ToDeviceBeeperStreamUpdate:    reflect.TypeFor[BeeperStreamUpdateEventContent](),
 
-	CallInvite:       reflect.TypeOf(CallInviteEventContent{}),
-	CallCandidates:   reflect.TypeOf(CallCandidatesEventContent{}),
-	CallAnswer:       reflect.TypeOf(CallAnswerEventContent{}),
-	CallReject:       reflect.TypeOf(CallRejectEventContent{}),
-	CallSelectAnswer: reflect.TypeOf(CallSelectAnswerEventContent{}),
-	CallNegotiate:    reflect.TypeOf(CallNegotiateEventContent{}),
-	CallHangup:       reflect.TypeOf(CallHangupEventContent{}),
+	CallInvite:       reflect.TypeFor[CallInviteEventContent](),
+	CallCandidates:   reflect.TypeFor[CallCandidatesEventContent](),
+	CallAnswer:       reflect.TypeFor[CallAnswerEventContent](),
+	CallReject:       reflect.TypeFor[CallRejectEventContent](),
+	CallSelectAnswer: reflect.TypeFor[CallSelectAnswerEventContent](),
+	CallNegotiate:    reflect.TypeFor[CallNegotiateEventContent](),
+	CallHangup:       reflect.TypeFor[CallHangupEventContent](),
 }
 
 // Content stores the content of a Matrix event.
@@ -141,8 +146,8 @@ var TypeMap = map[Type]reflect.Type{
 // If one of them is nil, then only the other is used. If both (Parsed and Raw) are nil, VeryRaw is used instead.
 type Content struct {
 	VeryRaw json.RawMessage
-	Raw     map[string]interface{}
-	Parsed  interface{}
+	Raw     map[string]any
+	Parsed  any
 }
 
 type Relatable interface {
@@ -180,16 +185,14 @@ func (content *Content) MarshalJSON() ([]byte, error) {
 			return nil, err
 		}
 
-		var rawParsed map[string]interface{}
+		var rawParsed map[string]any
 		err = json.Unmarshal(unparsed, &rawParsed)
 		if err != nil {
 			return nil, err
 		}
 
-		output := make(map[string]interface{})
-		for key, value := range content.Raw {
-			output[key] = value
-		}
+		output := make(map[string]any)
+		maps.Copy(output, content.Raw)
 
 		mergeMaps(output, rawParsed)
 		return json.Marshal(output)
@@ -205,9 +208,9 @@ func IsUnsupportedContentType(err error) bool {
 var ErrContentAlreadyParsed = errors.New("content is already parsed")
 var ErrUnsupportedContentType = errors.New("unsupported event type")
 
-func (content *Content) GetRaw() map[string]interface{} {
+func (content *Content) GetRaw() map[string]any {
 	if content.Raw == nil {
-		content.Raw = make(map[string]interface{})
+		content.Raw = make(map[string]any)
 	}
 	return content.Raw
 }
@@ -224,15 +227,15 @@ func (content *Content) ParseRaw(evtType Type) error {
 	return json.Unmarshal(content.VeryRaw, &content.Parsed)
 }
 
-func mergeMaps(into, from map[string]interface{}) {
+func mergeMaps(into, from map[string]any) {
 	for key, newValue := range from {
 		existingValue, ok := into[key]
 		if !ok {
 			into[key] = newValue
 			continue
 		}
-		existingValueMap, okEx := existingValue.(map[string]interface{})
-		newValueMap, okNew := newValue.(map[string]interface{})
+		existingValueMap, okEx := existingValue.(map[string]any)
+		newValueMap, okNew := newValue.(map[string]any)
 		if okEx && okNew {
 			mergeMaps(existingValueMap, newValueMap)
 		} else {
