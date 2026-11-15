@@ -3,7 +3,7 @@
 ARG GO_VERSION="1.27"
 ARG ALPINE_VERSION="3.24"
 
-ARG GOVULNCHECK_VERSION="v1.1.4"
+ARG GOVULNCHECK_VERSION="v1.9.0"
 ARG FORMAT="text"
 
 FROM golang:${GO_VERSION}-alpine${ALPINE_VERSION} AS base
@@ -17,7 +17,7 @@ RUN --mount=type=cache,target=/root/.cache \
 FROM base AS run
 ARG FORMAT
 RUN --mount=type=bind,target=. <<EOT
-  set -ex
+  set -ex -o pipefail
   mkdir /out
   govulncheck -format ${FORMAT} ./... | tee /out/govulncheck.out
 EOT
