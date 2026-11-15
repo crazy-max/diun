@@ -2,6 +2,8 @@ package table
 
 import (
 	"fmt"
+	"math"
+	"math/big"
 	"regexp"
 	"strconv"
 	"strings"
@@ -42,6 +44,11 @@ type FilterBy struct {
 	//
 	// Use this when the default filtering logic is not sufficient.
 	CustomFilter func(cellValue string) bool
+
+	// compiledRegex caches the compiled pattern for RegexMatch and
+	// RegexNotMatch; populated once by parseFilterBy instead of compiling
+	// the pattern again for every row
+	compiledRegex *regexp.Regexp
 }
 
 // FilterOperator defines how to filter.
@@ -91,12 +98,13 @@ func (t *Table) parseFilterBy(filterBy []FilterBy) []FilterBy {
 		}
 		if colNum > 0 {
 			resFilterBy = append(resFilterBy, FilterBy{
-				Name:         filter.Name,
-				Number:       colNum,
-				Operator:     filter.Operator,
-				Value:        filter.Value,
-				IgnoreCase:   filter.IgnoreCase,
-				CustomFilter: filter.CustomFilter,
+				Name:          filter.Name,
+				Number:        colNum,
+				Operator:      filter.Operator,
+				Value:         filter.Value,
+				IgnoreCase:    filter.IgnoreCase,
+				CustomFilter:  filter.CustomFilter,
+				compiledRegex: compileFilterRegex(filter),
 			})
 		}
 	}
@@ -154,9 +162,9 @@ func (t *Table) matchesOperator(cellValue string, filter FilterBy) bool {
 	case EndsWith:
 		return t.compareEndsWith(cellValue, filter.Value, filter.IgnoreCase)
 	case RegexMatch:
-		return t.compareRegexMatch(cellValue, filter.Value, filter.IgnoreCase)
+		return t.compareRegexMatch(cellValue, filter)
 	case RegexNotMatch:
-		return !t.compareRegexMatch(cellValue, filter.Value, filter.IgnoreCase)
+		return !t.compareRegexMatch(cellValue, filter)
 	default:
 		return false
 	}
@@ -202,6 +210,17 @@ func (t *Table) compareNumeric(cellValue string, filterValue interface{}, compar
 		}
 	}
 
+	if math.Abs(cellNum) < 1<<53 && math.Abs(filterNum) < 1<<53 {
+		return compareFunc(cellNum, filterNum)
+	}
+
+	cellInt, cellIsInt := new(big.Int).SetString(cellValue, 10)
+	filterInt, filterIsInt := new(big.Int).SetString(fmt.Sprint(filterValue), 10)
+	if cellIsInt && filterIsInt {
+		// Compare integers exactly, then apply the ordering predicate to the sign.
+		return compareFunc(float64(cellInt.Cmp(filterInt)), 0)
+	}
+
 	return compareFunc(cellNum, filterNum)
 }
 
@@ -229,22 +248,33 @@ func (t *Table) compareEndsWith(cellValue string, filterValue interface{}, ignor
 	return strings.HasSuffix(cellValue, filterStr)
 }
 
-func (t *Table) compareRegexMatch(cellValue string, filterValue interface{}, ignoreCase bool) bool {
-	filterStr := fmt.Sprint(filterValue)
-
-	// Compile the regex pattern
-	var pattern *regexp.Regexp
-	var err error
-	if ignoreCase {
-		pattern, err = regexp.Compile("(?i)" + filterStr)
-	} else {
-		pattern, err = regexp.Compile(filterStr)
+func (t *Table) compareRegexMatch(cellValue string, filter FilterBy) bool {
+	pattern := filter.compiledRegex
+	if pattern == nil {
+		pattern = compileFilterRegex(filter)
 	}
-
-	if err != nil {
+	if pattern == nil {
 		// If regex compilation fails, fall back to simple string matching
-		return t.compareEqual(cellValue, filterValue, ignoreCase)
+		return t.compareEqual(cellValue, filter.Value, filter.IgnoreCase)
 	}
 
 	return pattern.MatchString(cellValue)
+}
+
+// compileFilterRegex compiles the pattern for a RegexMatch/RegexNotMatch
+// filter; returns nil for other operators or when the pattern is invalid.
+func compileFilterRegex(filter FilterBy) *regexp.Regexp {
+	if filter.Operator != RegexMatch && filter.Operator != RegexNotMatch {
+		return nil
+	}
+
+	filterStr := fmt.Sprint(filter.Value)
+	if filter.IgnoreCase {
+		filterStr = "(?i)" + filterStr
+	}
+	pattern, err := regexp.Compile(filterStr)
+	if err != nil {
+		return nil
+	}
+	return pattern
 }
