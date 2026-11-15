@@ -1,4 +1,4 @@
-// Copyright IBM Corp. 2015, 2025
+// Copyright IBM Corp. 2015, 2026
 // SPDX-License-Identifier: MPL-2.0
 
 package api
@@ -333,7 +333,7 @@ type License struct {
 	Product string
 
 	// License Specific Flags
-	Flags map[string]interface{}
+	Flags map[string]any
 
 	// Modules is a list of the licensed enterprise modules
 	Modules []string

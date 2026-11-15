@@ -1,4 +1,4 @@
-// Copyright IBM Corp. 2015, 2025
+// Copyright IBM Corp. 2015, 2026
 // SPDX-License-Identifier: MPL-2.0
 
 package api
@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"maps"
 	"net/http"
 	"strings"
 )
@@ -439,9 +440,7 @@ func NewVariable(path string) *Variable {
 func (v *Variable) Copy() *Variable {
 	var out = *v
 	out.Items = make(VariableItems)
-	for key, value := range v.Items {
-		out.Items[key] = value
-	}
+	maps.Copy(out.Items, v.Items)
 	return &out
 }
 

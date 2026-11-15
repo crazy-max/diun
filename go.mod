@@ -20,7 +20,7 @@ require (
 	github.com/dromara/carbon/v2 v2.7.1
 	github.com/eclipse/paho.mqtt.golang v1.5.1
 	github.com/go-playground/validator/v10 v10.30.6
-	github.com/hashicorp/nomad/api v0.0.0-20260522124601-26ed559e8bc8 // v2.0.2
+	github.com/hashicorp/nomad/api v0.0.0-20261029144823-d0f210429976 // v2.1.1
 	github.com/jedib0t/go-pretty/v6 v6.9.1
 	github.com/matcornic/hermes/v2 v2.1.0
 	github.com/microcosm-cc/bluemonday v1.0.27
@@ -109,9 +109,7 @@ require (
 	github.com/gorilla/mux v1.8.1 // indirect
 	github.com/gorilla/websocket v1.5.4-0.20250319132907-e064f32e3674 // indirect
 	github.com/hashicorp/cronexpr v1.1.3 // indirect
-	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
-	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/hashicorp/go-rootcerts v1.0.2 // indirect
 	github.com/huandu/xstrings v1.2.0 // indirect
 	github.com/imdario/mergo v0.3.6 // indirect

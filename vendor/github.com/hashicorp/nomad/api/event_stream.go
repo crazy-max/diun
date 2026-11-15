@@ -1,4 +1,4 @@
-// Copyright IBM Corp. 2015, 2025
+// Copyright IBM Corp. 2015, 2026
 // SPDX-License-Identifier: MPL-2.0
 
 package api
@@ -47,7 +47,7 @@ type Event struct {
 	Key        string
 	FilterKeys []string
 	Index      uint64
-	Payload    map[string]interface{}
+	Payload    map[string]any
 }
 
 // Deployment returns a Deployment struct from a given event payload. If the

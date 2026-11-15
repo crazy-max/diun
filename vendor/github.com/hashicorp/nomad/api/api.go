@@ -1,4 +1,4 @@
-// Copyright IBM Corp. 2015, 2025
+// Copyright IBM Corp. 2015, 2026
 // SPDX-License-Identifier: MPL-2.0
 
 package api
@@ -12,6 +12,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"maps"
 	"math"
 	"net"
 	"net/http"
@@ -44,6 +45,13 @@ const (
 	// by the API which indicates the caller does not have permission to
 	// perform the action.
 	PermissionDeniedErrorContent = "Permission denied"
+
+	// ResultPaginatorErrorContent is the string content of an error returned by
+	// the API when it cannot build the paginator for a list query, for example
+	// when the server is unable to evaluate the requested filter expression.
+	// This duplicates the message of structs.ErrResultPaginatorCreation, which
+	// the server emits. The api module cannot import structs, so keep them in sync.
+	ResultPaginatorErrorContent = "failed to create result paginator"
 )
 
 // QueryOptions are used to parametrize a query
@@ -672,7 +680,7 @@ type request struct {
 	params url.Values
 	token  string
 	body   io.Reader
-	obj    interface{}
+	obj    any
 	ctx    context.Context
 	header http.Header
 }
@@ -853,9 +861,7 @@ func (c *Client) newRequest(method, path string) (*request, error) {
 		}
 	}
 
-	for key, values := range c.config.Headers {
-		r.header[key] = values
-	}
+	maps.Copy(r.header, c.config.Headers)
 
 	return r, nil
 }
@@ -1217,7 +1223,7 @@ func parseWriteMeta(resp *http.Response, q *WriteMeta) error {
 }
 
 // decodeBody is used to JSON decode a body
-func decodeBody(resp *http.Response, out interface{}) error {
+func decodeBody(resp *http.Response, out any) error {
 	switch resp.ContentLength {
 	case 0:
 		if out == nil {
@@ -1234,7 +1240,7 @@ func decodeBody(resp *http.Response, out interface{}) error {
 //
 // Returns the `obj` input if it is a raw io.Reader object; otherwise
 // returns a reader of the json format of the passed argument.
-func encodeBody(obj interface{}) (io.Reader, error) {
+func encodeBody(obj any) (io.Reader, error) {
 	if reader, ok := obj.(io.Reader); ok {
 		return reader, nil
 	}
