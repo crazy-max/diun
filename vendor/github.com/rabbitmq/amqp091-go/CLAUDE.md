@@ -109,3 +109,9 @@ The library supports automatic connection and channel recovery (reconnection) wh
 - `Table` is `map[string]interface{}` with a restricted set of allowed value types enumerated in `types.go`.
 - Mutexes follow a strict order: `Connection.m` → `Channel.m` (never the reverse) to avoid deadlock. Within `Connection` itself, teardown acquires `destructorM` → `closeM` → `m` in that order (see `connection.go`); `topologyM` is acquired independently and must not be held while calling back into code that re-enters `record*`/`remove*` topology methods.
 - `atomic.Bool` flags (`Connection.closed`, `Channel.closed`) allow lock-free early-exit checks on the hot path.
+
+## Comments
+- Raise the bar very high for new comments: only add very important comments, both in tests and in the implementation
+- Keep comments concise and to the point
+- Add comments above the line they are referring to, not at the end of the line (an example of what's not to do: 1 + 1. %% equals 2)
+- Make sure to use proper English grammar, in particular articles, punctuation and full stops at the end of sentences except for Markdown list items

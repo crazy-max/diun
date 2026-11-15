@@ -19,6 +19,15 @@ fmt: ## Run go fmt against code
 tests: ## Run all tests and requires a running rabbitmq-server. Use GO_TEST_FLAGS to add extra flags to go test
 	go test -race -v -tags integration $(GO_TEST_FLAGS)
 
+FUZZTIME ?= 60s
+
+.PHONY: fuzz
+fuzz: ## Run each fuzz test for FUZZTIME (default 60s), one after another
+	@set -e; for target in $$(go test -list '^Fuzz' . | grep '^Fuzz'); do \
+		echo "==> $$target"; \
+		go test -run '^$$' -fuzz "^$$target\$$" -fuzztime $(FUZZTIME) .; \
+	done
+
 .PHONY: tests-docker
 tests-docker: rabbitmq-server ## Run integration tests against a Dockerized RabbitMQ
 	RABBITMQ_RABBITMQCTL_PATH="DOCKER:$(CONTAINER_NAME)" go test -race -v -tags integration $(GO_TEST_FLAGS)

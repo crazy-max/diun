@@ -29,12 +29,39 @@ const (
 	defaultHeartbeat         = 10 * time.Second
 	defaultConnectionTimeout = 30 * time.Second
 	defaultProduct           = "AMQP 0.9.1 Client"
-	buildVersion             = "1.14.0"
+	buildVersion             = "1.16.0"
 	platform                 = "golang"
 	// Safer default that makes channel leaks a lot easier to spot
 	// before they create operational headaches. See https://github.com/rabbitmq/rabbitmq-server/issues/1593.
 	defaultChannelMax = uint16((2 << 10) - 1)
 	defaultLocale     = "en_US"
+	// defaultFrameSize matches RabbitMQ broker's own default frame_max, used
+	// whenever a caller leaves Config.FrameSize unset (0) so that "didn't
+	// specify" doesn't silently become "request unlimited frame size" against
+	// a broker that also proposes 0. Callers that explicitly want unlimited
+	// must set Config.FrameSize to a negative value instead.
+	defaultFrameSize = 131072
+)
+
+// Known server capabilities advertised in the connection.start properties table.
+const (
+	serverCapabilityPublisherConfirms          = "publisher_confirms"
+	serverCapabilityExchangeExchangeBindings   = "exchange_exchange_bindings"
+	serverCapabilityBasicNack                  = "basic.nack"
+	serverCapabilityConsumerCancelNotify       = "consumer_cancel_notify"
+	serverCapabilityConnectionBlocked          = "connection.blocked"
+	serverCapabilityConsumerPriorities         = "consumer_priorities"
+	serverCapabilityAuthenticationFailureClose = "authentication_failure_close"
+	serverCapabilityPerConsumerQos             = "per_consumer_qos"
+	serverCapabilityDirectReplyTo              = "direct_reply_to"
+	serverCapabilityAcceptConsumerCancelOk     = "accept_consumer_cancel_ok"
+)
+
+const (
+	// FrameSizeUnlimited is a canonical value to use in Config.FrameSize to intentionally
+	// request unlimited frame size. Note that the server has to agree in Tune.
+	FrameSizeUnlimited int = iota - 1
+	frameSizeUnset
 )
 
 // Config is used in DialConfig and Open to specify the desired tuning
@@ -50,9 +77,22 @@ type Config struct {
 	// bindings on the server.  Dial sets this to the path parsed from the URL.
 	Vhost string
 
-	ChannelMax uint16        // 0 max channels means 2^16 - 1
-	FrameSize  int           // 0 max bytes means unlimited
-	Heartbeat  time.Duration // less than 1s uses the server's interval
+	// ChannelMax caps the number of channels. 0 means 2^16 - 1.
+	ChannelMax uint16
+
+	// FrameSize caps the max AMQP frame size in bytes.
+	//   0 (default/unset): DialConfig fills in a sane default (defaultFrameSize,
+	//     matching RabbitMQ's own broker default) rather than requesting
+	//     unlimited frame size from the broker.
+	//   < 0 (canonically -1): explicitly request unlimited frame size. Only
+	//     takes effect if the broker also proposes no limit; a malicious or
+	//     misbehaving broker can then send arbitrarily large frames.
+	//   > 0: explicit cap, negotiated down to the broker's max if lower.
+	FrameSize int
+
+	// Heartbeat is the interval between keep-alive frames. Less than 1s uses
+	// the server's interval.
+	Heartbeat time.Duration
 
 	// TLSClientConfig specifies the client configuration of the TLS connection
 	// when establishing a tls transport.
@@ -174,6 +214,14 @@ type Connection struct {
 
 	Config Config // The negotiated Config after connection.open
 
+	// originalSASL is a clone of the caller-provided Config.SASL candidates,
+	// captured once at initial Open, before openStart narrows Config.SASL
+	// down to the single chosen (and cloned) mechanism and before
+	// openComplete zeroes its credentials. Reconnect() restores Config.SASL
+	// from this instead of re-deriving credentials from the URL, so it
+	// honors whatever Authentication the caller actually configured.
+	originalSASL []Authentication
+
 	url string // Connection URL stored for recovery
 
 	Major      int      // Server's major version
@@ -224,6 +272,9 @@ func DefaultDial(connectionTimeout time.Duration) func(network, addr string) (ne
 //
 // Dial uses the zero value of tls.Config when it encounters an amqps://
 // scheme.  It is equivalent to calling DialTLS(amqp, nil).
+//
+// See ParseURI for the URI format, including the percent-encoding required
+// for a username or password containing reserved characters.
 func Dial(url string) (*Connection, error) {
 	return DialConfig(url, Config{
 		Locale: defaultLocale,
@@ -303,6 +354,10 @@ func DialConfig(url string, config Config) (*Connection, error) {
 		config.ChannelMax = uri.ChannelMax
 	}
 
+	if config.FrameSize == frameSizeUnset {
+		config.FrameSize = defaultFrameSize
+	}
+
 	connectionTimeout := defaultConnectionTimeout
 	if uri.ConnectionTimeout != 0 {
 		connectionTimeout = time.Duration(uri.ConnectionTimeout) * time.Millisecond
@@ -357,7 +412,7 @@ func DialConfig(url string, config Config) (*Connection, error) {
 	}
 
 	c, err := Open(conn, config)
-	if c != nil && c.IsRecoveryEnabled() {
+	if err == nil && c.IsRecoveryEnabled() {
 		c.url = url
 		c.watchConnection()
 	}
@@ -387,6 +442,7 @@ func Open(conn io.ReadWriteCloser, config Config) (*Connection, error) {
 	}
 	// Before max frame size is negotiated in Tune, the spec sets a ceiling of 4096 bytes
 	c.maxFrameSize.Store(frameMinSize)
+	c.originalSASL = cloneAuthentications(config.SASL)
 	go c.reader(conn)
 	err := c.open(config)
 	if err == nil {
@@ -1169,7 +1225,22 @@ func (c *Connection) call(req message, res ...message) error {
 			return e
 		}
 		return ErrClosed
-	case msg = <-rpc:
+	case m, ok := <-rpc:
+		if !ok {
+			// The reader has exited, so shutdown already ran and left its reason
+			// (if any) buffered in errors. When both channels are ready select
+			// may pick this one; report the shutdown reason rather than
+			// mistaking the nil message for an unexpected command.
+			select {
+			case e, ok := <-errors:
+				if ok {
+					return e
+				}
+			default:
+			}
+			return ErrClosed
+		}
+		msg = m
 	}
 
 	// Try to match one of the result types
@@ -1229,7 +1300,11 @@ func (c *Connection) openStart(config Config) error {
 		return ErrSASL
 	}
 
-	// Save this mechanism off as the one we chose
+	// Save this mechanism off as the one we chose. Clone it so that the
+	// credential zeroing in openComplete does not mutate the caller-owned
+	// Authentication stored in the original Config.SASL, which callers may
+	// reuse across DialConfig calls (e.g. on reconnect).
+	auth = cloneAuthentication(auth)
 	c.Config.SASL = []Authentication{auth}
 
 	// Set the connection locale to client locale
@@ -1244,10 +1319,10 @@ func (c *Connection) openTune(config Config, auth Authentication) error {
 	}
 
 	config.Properties["capabilities"] = Table{
-		"connection.blocked":     true,
-		"consumer_cancel_notify": true,
-		"basic.nack":             true,
-		"publisher_confirms":     true,
+		serverCapabilityConnectionBlocked:    true,
+		serverCapabilityConsumerCancelNotify: true,
+		serverCapabilityBasicNack:            true,
+		serverCapabilityPublisherConfirms:    true,
 	}
 
 	ok := &connectionStartOk{
@@ -1259,10 +1334,12 @@ func (c *Connection) openTune(config Config, auth Authentication) error {
 	tune := &connectionTune{}
 
 	if err := c.call(ok, tune); err != nil {
-		// per spec, a connection can only be closed when it has been opened
-		// so at this point, we know it's an auth error, but the socket
-		// was closed instead.  Return a meaningful error.
-		return ErrCredentials
+		// The broker either answered start-ok with a connection.close (RabbitMQ
+		// does so when the client advertises authentication_failure_close) or,
+		// as the spec originally allowed, dropped the socket without a word.
+		// Surface the broker's own reply when there is one; otherwise assume
+		// bad credentials, the only thing that can go wrong at this step.
+		return handshakeError(err, ErrCredentials)
 	}
 
 	// Edge case that may race with c.shutdown()
@@ -1289,7 +1366,20 @@ func (c *Connection) openTune(config Config, auth Authentication) error {
 	// Frame size includes headers and end byte (len(payload)+8). Enforce the spec
 	// minimum floor of frameMinSize (4096 bytes) to prevent malicious servers
 	// from forcing extreme fragmentation and CPU overhead.
-	c.Config.FrameSize = negotiateFrameSize(config.FrameSize, int(tune.FrameMax))
+	//
+	// A negative config.FrameSize is the caller's explicit "unlimited" opt-in
+	// (see the Config.FrameSize doc); translate it to the wire value 0 so
+	// negotiateFrameSize/pick never see a negative input.
+	//
+	// This runs before any channel exists, so c.Config.FrameSize is always 0
+	// or a positive cap by the time channel.go reads it, never the raw
+	// negative sentinel. Keep it that way: channel.go converts this field to
+	// uint64, where a raw -1 would wrap around instead of meaning "no limit".
+	wireFrameSize := config.FrameSize
+	if wireFrameSize < 0 {
+		wireFrameSize = 0
+	}
+	c.Config.FrameSize = negotiateFrameSize(wireFrameSize, int(tune.FrameMax))
 	// reader.ReadFrame relies on
 	// any nonzero value here being >= frameMinSize (negotiateFrameSize's floor)
 	// to safely subtract frameHeaderSize without underflow — keep it that way if
@@ -1324,13 +1414,27 @@ func (c *Connection) openVhost(config Config) error {
 	res := &connectionOpenOk{}
 
 	if err := c.call(req, res); err != nil {
-		// Cannot be closed yet, but we know it's a vhost problem
-		return ErrVhost
+		// RabbitMQ rejects connection.open with a connection.close whose code and
+		// text say why: 530 NOT_ALLOWED for a vhost the user may not access or
+		// for a reached per-user or per-vhost connection limit. Surface that
+		// reply; only fall back to ErrVhost when the socket was closed without
+		// one.
+		return handshakeError(err, ErrVhost)
 	}
 
 	c.Config.Vhost = config.Vhost
 
 	return c.openComplete()
+}
+
+// Only trust err as the failure reason if the broker actually sent it;
+// a locally constructed *Error must not be mistaken for the broker's reply.
+func handshakeError(err error, fallback *Error) error {
+	var amqpErr *Error
+	if errors.As(err, &amqpErr) && amqpErr.Server {
+		return err
+	}
+	return fallback
 }
 
 // openComplete performs any final Connection initialization dependent on the
@@ -1598,11 +1702,26 @@ func (c *Connection) Reconnect() (err error) {
 			return err
 		}
 
-		// Reset SASL to recover from zeroed out credentials
-		c.Config.SASL = nil
-		if err = c.Config.setSASL(uri); err != nil {
-			Logger.Printf("Connection recovery failed to set SASL: %v", err)
-			return err
+		// Restore SASL from the clone captured at initial Open, before the
+		// caller-provided credentials were narrowed/zeroed out, so recovery
+		// honors whatever Authentication the caller actually configured.
+		// Only fall back to deriving credentials from the URL if none was
+		// ever configured, matching setSASL's own "if not already set"
+		// contract.
+		if len(c.originalSASL) > 0 {
+			// Clone again rather than aliasing c.originalSASL directly:
+			// Config.SASL is a public field, so external code (or a future
+			// change here) could read/mutate conn.Config.SASL in place. If
+			// that slice were originalSASL itself, such a mutation would
+			// permanently corrupt the retained original and break every
+			// later reconnect, not just this attempt.
+			c.Config.SASL = cloneAuthentications(c.originalSASL)
+		} else {
+			c.Config.SASL = nil
+			if err = c.Config.setSASL(uri); err != nil {
+				Logger.Printf("Connection recovery failed to set SASL: %v", err)
+				return err
+			}
 		}
 
 		addr := net.JoinHostPort(uri.Host, strconv.FormatInt(int64(uri.Port), 10))

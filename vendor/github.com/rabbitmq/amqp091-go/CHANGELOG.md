@@ -1,5 +1,59 @@
 # Changelog
 
+## [v1.16.0](https://github.com/rabbitmq/amqp091-go/tree/v1.16.0) (2026-10-19)
+
+[Full Changelog](https://github.com/rabbitmq/amqp091-go/compare/v1.15.0...v1.16.0)
+
+**Implemented enhancements:**
+
+- Add support for basic cancel ok response [\#405](https://github.com/rabbitmq/amqp091-go/pull/405) ([Zerpet](https://github.com/Zerpet))
+
+**Fixed bugs:**
+
+- Start recovery watcher only after a successful handshake [\#409](https://github.com/rabbitmq/amqp091-go/pull/409) ([suchitd](https://github.com/suchitd))
+- Reject out-of-range heartbeat in ParseURI [\#407](https://github.com/rabbitmq/amqp091-go/pull/407) ([suchitd](https://github.com/suchitd))
+- Reject heartbeat frames sent on a non-zero channel [\#402](https://github.com/rabbitmq/amqp091-go/pull/402) ([suchitd](https://github.com/suchitd))
+
+**Closed issues:**
+
+- DialConfig leaks a watchConnection goroutine when the AMQP handshake fails with Recovery enabled [\#408](https://github.com/rabbitmq/amqp091-go/issues/408)
+- panic: unexpected frame type [\#400](https://github.com/rabbitmq/amqp091-go/issues/400)
+- v1.13.0: openComplete\(\) zeroes caller-owned SASL credentials, breaking Config reuse across dials [\#394](https://github.com/rabbitmq/amqp091-go/issues/394)
+- Dial returns 403 "no access to this vhost" when the broker refuses connection.open with 530 NOT\_ALLOWED \(e.g. user connection limit reached\) [\#392](https://github.com/rabbitmq/amqp091-go/issues/392)
+- Question mark in password breaks connection string parsing [\#305](https://github.com/rabbitmq/amqp091-go/issues/305)
+
+**Merged pull requests:**
+
+- Fix golangci-lint v2.15.0 errcheck failures [\#411](https://github.com/rabbitmq/amqp091-go/pull/411) ([suchitd](https://github.com/suchitd))
+- chore\(deps\): bump github/codeql-action from 4.38.2 to 4.38.3 in the github-actions group [\#410](https://github.com/rabbitmq/amqp091-go/pull/410) ([dependabot[bot]](https://github.com/apps/dependabot))
+- chore\(deps\): bump github/codeql-action from 4.38.1 to 4.38.2 in the github-actions group [\#401](https://github.com/rabbitmq/amqp091-go/pull/401) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Add Fuzzy tests for reader [\#399](https://github.com/rabbitmq/amqp091-go/pull/399) ([Zerpet](https://github.com/Zerpet))
+- chore\(deps\): bump github/codeql-action from 4.38.0 to 4.38.1 in the github-actions group [\#398](https://github.com/rabbitmq/amqp091-go/pull/398) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Reader hardening [\#397](https://github.com/rabbitmq/amqp091-go/pull/397) ([Zerpet](https://github.com/Zerpet))
+- docs: document URI credential percent-encoding requirement \(\#305\) [\#396](https://github.com/rabbitmq/amqp091-go/pull/396) ([cipherprofessor](https://github.com/cipherprofessor))
+- chore: remove redundant legacy +build tag from fuzz.go [\#395](https://github.com/rabbitmq/amqp091-go/pull/395) ([cipherprofessor](https://github.com/cipherprofessor))
+- Surface the broker's connection.close reason from Dial instead of a hardcoded 403 [\#393](https://github.com/rabbitmq/amqp091-go/pull/393) ([mohammadkshn](https://github.com/mohammadkshn))
+- chore\(deps\): bump github/codeql-action from 4.37.9 to 4.38.0 in the github-actions group [\#391](https://github.com/rabbitmq/amqp091-go/pull/391) ([dependabot[bot]](https://github.com/apps/dependabot))
+
+## [v1.15.0](https://github.com/rabbitmq/amqp091-go/tree/v1.15.0) (2026-09-15)
+
+[Full Changelog](https://github.com/rabbitmq/amqp091-go/compare/v1.14.0...v1.15.0)
+
+**Fixed bugs:**
+
+- fix: preserve caller-provided SASL credentials across Reconnect\(\) [\#389](https://github.com/rabbitmq/amqp091-go/pull/389) ([suchitd](https://github.com/suchitd))
+- fix: clone SASL authentication before zeroing credentials post-handshake [\#388](https://github.com/rabbitmq/amqp091-go/pull/388) ([suchitd](https://github.com/suchitd))
+
+**Closed issues:**
+
+- v1.13.0 \(\#350\) zeroes caller-provided PlainAuth.Password, breaking auth on any reconnect that reuses the Config [\#387](https://github.com/rabbitmq/amqp091-go/issues/387)
+
+**Merged pull requests:**
+
+- chore\(deps\): bump github/codeql-action from 4.37.8 to 4.37.9 in the github-actions group [\#390](https://github.com/rabbitmq/amqp091-go/pull/390) ([dependabot[bot]](https://github.com/apps/dependabot))
+- chore\(deps\): bump github/codeql-action from 4.37.7 to 4.37.8 in the github-actions group [\#386](https://github.com/rabbitmq/amqp091-go/pull/386) ([dependabot[bot]](https://github.com/apps/dependabot))
+- chore\(deps\): bump github/codeql-action from 4.37.6 to 4.37.7 in the github-actions group [\#385](https://github.com/rabbitmq/amqp091-go/pull/385) ([dependabot[bot]](https://github.com/apps/dependabot))
+
 ## [v1.14.0](https://github.com/rabbitmq/amqp091-go/tree/v1.14.0) (2026-08-18)
 
 [Full Changelog](https://github.com/rabbitmq/amqp091-go/compare/v1.13.0...v1.14.0)

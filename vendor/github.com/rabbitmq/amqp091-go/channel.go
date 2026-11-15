@@ -504,6 +504,15 @@ func (ch *Channel) dispatch(msg message) {
 		notifyAll(ch.cancels, m.ConsumerTag)
 		ch.notifyM.RUnlock()
 		ch.consumers.cancel(m.ConsumerTag)
+		if ch.connection.isCapable(serverCapabilityAcceptConsumerCancelOk) {
+			// Older servers cannot handle client-sent basic.cancel-ok.
+			// Serialize the response with concurrent basic.publish frames.
+			ch.m.Lock()
+			if err := ch.send(&basicCancelOk{ConsumerTag: m.ConsumerTag}); err != nil {
+				Logger.Printf("error sending basicCancelOk, channel id: %d error: %+v", ch.id, err)
+			}
+			ch.m.Unlock()
+		}
 		if queueName != "" {
 			ch.connection.maybeDeleteRecordedAutoDeleteQueue(queueName)
 		}
