@@ -1,6 +1,7 @@
 package dockerfile
 
 import (
+	"strconv"
 	"strings"
 
 	"github.com/moby/buildkit/frontend/dockerfile/command"
@@ -59,6 +60,12 @@ func (c *Client) FromImages() (Images, error) {
 				return nil, errors.Wrapf(err, "cannot parse command")
 			}
 			if copyFrom := cmd.(*instructions.CopyCommand).From; copyFrom != "" {
+				if index, err := strconv.Atoi(copyFrom); err == nil {
+					if index < 0 || index >= len(c.stages) {
+						return nil, errors.Errorf("invalid stage index %d", index)
+					}
+					continue
+				}
 				name, _, err := c.shlex.ProcessWord(copyFrom, c.metaArgs)
 				if err != nil {
 					return nil, err

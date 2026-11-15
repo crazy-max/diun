@@ -1,6 +1,8 @@
 package dockerfile
 
 import (
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -51,4 +53,104 @@ func TestFromImagesMultiStage(t *testing.T) {
 
 	assert.Equal(t, "crazymax/yasu", img[1].Name)
 	assert.Equal(t, 6, img[1].Line)
+}
+
+func TestFromImagesStageReferences(t *testing.T) {
+	cases := []struct {
+		name       string
+		dockerfile string
+		want       []string
+		wantErr    string
+	}{
+		{
+			name: "copy from first stage",
+			dockerfile: `FROM alpine:3.14 AS base
+FROM scratch AS final
+COPY --from=0 /etc/os-release /os-release
+`,
+			want: []string{"alpine:3.14"},
+		},
+		{
+			name: "copy from second stage",
+			dockerfile: `FROM scratch AS first
+FROM alpine:3.14 AS second
+FROM scratch AS final
+COPY --from=1 /etc/os-release /os-release
+`,
+			want: []string{"alpine:3.14"},
+		},
+		{
+			name: "copy from mixed case stage",
+			dockerfile: `FROM alpine:3.14 AS Base
+FROM scratch AS final
+COPY --from=bAsE /etc/os-release /os-release
+`,
+			want: []string{"alpine:3.14"},
+		},
+		{
+			name: "mount from mixed case stage",
+			dockerfile: `FROM alpine:3.14 AS Base
+FROM alpine:3.14 AS final
+RUN --mount=type=bind,from=bAsE,target=/base true
+`,
+			want: []string{"alpine:3.14", "alpine:3.14"},
+		},
+		{
+			name: "numeric base image",
+			dockerfile: `FROM 0 AS base
+FROM scratch AS final
+COPY --from=base /etc/os-release /os-release
+`,
+			want: []string{"0"},
+		},
+		{
+			name: "numeric mount image",
+			dockerfile: `FROM alpine:3.14
+RUN --mount=type=bind,from=0,target=/base true
+`,
+			want: []string{"alpine:3.14", "0"},
+		},
+		{
+			name: "external copy image",
+			dockerfile: `FROM alpine:3.14 AS base
+COPY --from=0:latest /etc/os-release /os-release
+`,
+			want: []string{"alpine:3.14", "0:latest"},
+		},
+		{
+			name: "out of range stage index",
+			dockerfile: `FROM alpine:3.14 AS base
+COPY --from=1 /etc/os-release /os-release
+`,
+			wantErr: "invalid stage index 1",
+		},
+		{
+			name: "negative stage index",
+			dockerfile: `FROM alpine:3.14 AS base
+COPY --from=-1 /etc/os-release /os-release
+`,
+			wantErr: "invalid stage index -1",
+		},
+	}
+	for _, tt := range cases {
+		t.Run(tt.name, func(t *testing.T) {
+			filename := filepath.Join(t.TempDir(), "Dockerfile")
+			require.NoError(t, os.WriteFile(filename, []byte(tt.dockerfile), 0600))
+			c, err := New(Options{
+				Filename: filename,
+			})
+			require.NoError(t, err)
+
+			images, err := c.FromImages()
+			if tt.wantErr != "" {
+				require.EqualError(t, err, tt.wantErr)
+				return
+			}
+			require.NoError(t, err)
+			require.Len(t, images, len(tt.want))
+			for i, name := range tt.want {
+				assert.Equal(t, name, images[i].Name)
+			}
+		})
+	}
 }
