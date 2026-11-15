@@ -84,6 +84,16 @@ func (m Message) OriginalTextHTML() string {
 	return getOrigMsgHTML(utf16.Encode([]rune(m.GetText())), m.GetEntities())
 }
 
+// GetRichMessage returns the RichMessage representation of the message - converting any MessageEntity types to the
+// new RichText/RichBlock syntax, for consistent usage.
+// NOTE: Does not include media (since documents cannot be expressed in RichText, it would be inconsistent).
+func (m Message) GetRichMessage() *RichMessage {
+	if m.RichMessage != nil {
+		return m.RichMessage
+	}
+	return &RichMessage{Blocks: entitiesToRichBlocks(m.GetText(), m.GetEntities())}
+}
+
 // Does not support nesting. only look at upper entities.
 func getOrigMsgMD(utf16Data []uint16, ents []MessageEntity) string {
 	out := strings.Builder{}
@@ -386,4 +396,170 @@ func escapeContainedMDV1(data []rune, mdType []rune) string {
 		out.WriteRune(x)
 	}
 	return out.String()
+}
+
+type utf16Text struct {
+	units []uint16
+}
+
+func newUTF16Text(s string) utf16Text {
+	return utf16Text{units: utf16.Encode([]rune(s))}
+}
+
+func (t utf16Text) slice(start, end int64) string {
+	s, e := int(start), int(end)
+	if s < 0 {
+		s = 0
+	}
+	if e > len(t.units) {
+		e = len(t.units)
+	}
+	if s >= e {
+		return ""
+	}
+	return string(utf16.Decode(t.units[s:e]))
+}
+
+var blockLevelEntityTypes = map[string]bool{
+	"pre":                   true,
+	"blockquote":            true,
+	"expandable_blockquote": true,
+}
+
+// entitiesToRichBlocks converts classic text + MessageEntity input into the
+// same []RichBlock shape native RichMessage uses.
+// entities are assumed sorted ascending by Offset, with ties broken by descending
+// Length (i.e. a wider entity starting at the same offset as a narrower one comes first) - this
+// matches what getUpperEntities/getChildEntities already assume, and is how
+// Telegram emits entities for properly-nested formatting.
+func entitiesToRichBlocks(text string, entities []MessageEntity) []RichBlock {
+	t := newUTF16Text(text)
+	top := getUpperEntities(entities)
+
+	var blocks []RichBlock
+	var run []RichText
+	pos := int64(0)
+
+	flush := func() {
+		if content := joinRichText(run); content != nil {
+			blocks = append(blocks, RichBlockParagraph{Text: content})
+		}
+		run = nil
+	}
+
+	for _, e := range top {
+		if gap := t.slice(pos, e.Offset); gap != "" {
+			run = append(run, RichTextString(gap))
+		}
+
+		if blockLevelEntityTypes[e.Type] {
+			flush()
+			blocks = append(blocks, entityToRichBlock(t, entities, e))
+		} else {
+			run = append(run, richTextFromEntity(t, entities, e))
+		}
+		pos = e.Offset + e.Length
+	}
+	if tail := t.slice(pos, int64(len(t.units))); tail != "" {
+		run = append(run, RichTextString(tail))
+	}
+	flush()
+
+	return blocks
+}
+
+// richTextFromEntity converts one entity - including its nested descendants
+// and the plain-text gaps between them - into a single wrapped RichText node.
+func richTextFromEntity(t utf16Text, all []MessageEntity, ent MessageEntity) RichText {
+	children := getUpperEntities(getChildEntities(ent, all))
+	content := richTextSequence(t, ent.Offset, ent.Offset+ent.Length, children, all)
+	return wrapEntity(ent, content)
+}
+
+// richTextSequence builds the RichText content for [start,end), given the
+// direct-child entities within that span, filling gaps with plain text.
+func richTextSequence(t utf16Text, start, end int64, directChildren, all []MessageEntity) RichText {
+	var nodes []RichText
+	pos := start
+	for _, e := range directChildren {
+		if gap := t.slice(pos, e.Offset); gap != "" {
+			nodes = append(nodes, RichTextString(gap))
+		}
+		nodes = append(nodes, richTextFromEntity(t, all, e))
+		pos = e.Offset + e.Length
+	}
+	if gap := t.slice(pos, end); gap != "" {
+		nodes = append(nodes, RichTextString(gap))
+	}
+	return joinRichText(nodes)
+}
+
+func joinRichText(nodes []RichText) RichText {
+	switch len(nodes) {
+	case 0:
+		return nil
+	case 1:
+		return nodes[0]
+	default:
+		return RichTextArray(nodes)
+	}
+}
+
+func wrapEntity(e MessageEntity, content RichText) RichText {
+	switch e.Type {
+	case MessageEntityTypeBold:
+		return RichTextBold{Text: content}
+	case MessageEntityTypeItalic:
+		return RichTextItalic{Text: content}
+	case MessageEntityTypeUnderline:
+		return RichTextUnderline{Text: content}
+	case MessageEntityTypeStrikethrough:
+		return RichTextStrikethrough{Text: content}
+	case MessageEntityTypeSpoiler:
+		return RichTextSpoiler{Text: content}
+	case MessageEntityTypeCode:
+		return RichTextCode{Text: content}
+	case MessageEntityTypeTextLink:
+		return RichTextUrl{Text: content, Url: e.Url}
+	case MessageEntityTypeUrl:
+		return RichTextUrl{Text: content, Url: RichTextContent(content)}
+	case MessageEntityTypeMention:
+		return RichTextMention{Text: content, Username: strings.TrimPrefix(RichTextContent(content), "@")}
+	case MessageEntityTypeHashtag:
+		return RichTextHashtag{Text: content, Hashtag: strings.TrimPrefix(RichTextContent(content), "#")}
+	case MessageEntityTypeCashtag:
+		return RichTextCashtag{Text: content, Cashtag: strings.TrimPrefix(RichTextContent(content), "$")}
+	case MessageEntityTypeBotCommand:
+		return RichTextBotCommand{Text: content, BotCommand: strings.TrimPrefix(RichTextContent(content), "/")}
+	case MessageEntityTypeEmail:
+		return RichTextEmailAddress{Text: content, EmailAddress: RichTextContent(content)}
+	case MessageEntityTypePhoneNumber:
+		return RichTextPhoneNumber{Text: content, PhoneNumber: RichTextContent(content)}
+	case MessageEntityTypeTextMention:
+		return RichTextTextMention{Text: content, User: *e.User}
+	case MessageEntityTypeCustomEmoji:
+		return RichTextCustomEmoji{CustomEmojiId: e.CustomEmojiId, AlternativeText: RichTextContent(content)}
+	case MessageEntityTypeDateTime:
+		return RichTextDateTime{Text: content, UnixTime: e.UnixTime, DateTimeFormat: e.DateTimeFormat}
+	default:
+		// No match? treat it as plain text.
+		return content
+	}
+}
+
+func entityToRichBlock(t utf16Text, all []MessageEntity, ent MessageEntity) RichBlock {
+	children := getUpperEntities(getChildEntities(ent, all))
+	inner := richTextSequence(t, ent.Offset, ent.Offset+ent.Length, children, all)
+
+	switch ent.Type {
+	case MessageEntityTypePre:
+		return RichBlockPreformatted{Text: inner, Language: ent.Language}
+	case MessageEntityTypeBlockquote, MessageEntityTypeExpandableBlockquote:
+		// note: richtext does not support collapsible blockquotes.
+		return RichBlockBlockQuotation{
+			Blocks: []RichBlock{RichBlockParagraph{Text: inner}},
+		}
+	default:
+		return RichBlockParagraph{Text: inner}
+	}
 }

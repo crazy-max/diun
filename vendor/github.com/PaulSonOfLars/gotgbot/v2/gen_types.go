@@ -148,10 +148,31 @@ func (v MergedBackgroundFill) GetType() string {
 // MergedBackgroundFill.backgroundFill is a dummy method to avoid interface implementation.
 func (v MergedBackgroundFill) backgroundFill() {}
 
-// MergeBackgroundFill returns a MergedBackgroundFill struct to simplify working with types in a non-generic world.
+// MergeBackgroundFill returns itself, as it is already merged.
 func (v MergedBackgroundFill) MergeBackgroundFill() MergedBackgroundFill {
 	return v
 }
+
+type BackgroundFillUnknown struct {
+	RawType string
+	Data    json.RawMessage
+}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v BackgroundFillUnknown) GetType() string {
+	return v.RawType
+}
+
+// MergeBackgroundFill returns a MergedBackgroundFill struct to simplify working with types in a non-generic world.
+func (v BackgroundFillUnknown) MergeBackgroundFill() MergedBackgroundFill {
+	return MergedBackgroundFill{}
+}
+func (v BackgroundFillUnknown) MarshalJSON() ([]byte, error) {
+	return v.Data, nil
+}
+
+// BackgroundFillUnknown.backgroundFill is a dummy method to avoid interface implementation.
+func (v BackgroundFillUnknown) backgroundFill() {}
 
 // unmarshalBackgroundFillArray is a JSON unmarshalling helper which allows unmarshalling an array of interfaces
 // using unmarshalBackgroundFill.
@@ -219,7 +240,7 @@ func unmarshalBackgroundFill(d json.RawMessage) (BackgroundFill, error) {
 		return s, nil
 
 	}
-	return nil, fmt.Errorf("unknown interface for BackgroundFill with Type %v", t.Type)
+	return BackgroundFillUnknown{RawType: t.Type, Data: d}, nil
 }
 
 // BackgroundFillFreeformGradient (https://core.telegram.org/bots/api#backgroundfillfreeformgradient)
@@ -235,7 +256,7 @@ func (v BackgroundFillFreeformGradient) backgroundFill() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v BackgroundFillFreeformGradient) GetType() string {
-	return "freeform_gradient"
+	return BackgroundFillTypeFreeformGradient
 }
 
 // MergeBackgroundFill returns a MergedBackgroundFill struct to simplify working with types in a non-generic world.
@@ -253,7 +274,7 @@ func (v BackgroundFillFreeformGradient) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "freeform_gradient",
+		Type:  BackgroundFillTypeFreeformGradient,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -276,7 +297,7 @@ func (v BackgroundFillGradient) backgroundFill() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v BackgroundFillGradient) GetType() string {
-	return "gradient"
+	return BackgroundFillTypeGradient
 }
 
 // MergeBackgroundFill returns a MergedBackgroundFill struct to simplify working with types in a non-generic world.
@@ -296,7 +317,7 @@ func (v BackgroundFillGradient) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "gradient",
+		Type:  BackgroundFillTypeGradient,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -315,7 +336,7 @@ func (v BackgroundFillSolid) backgroundFill() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v BackgroundFillSolid) GetType() string {
-	return "solid"
+	return BackgroundFillTypeSolid
 }
 
 // MergeBackgroundFill returns a MergedBackgroundFill struct to simplify working with types in a non-generic world.
@@ -333,7 +354,7 @@ func (v BackgroundFillSolid) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "solid",
+		Type:  BackgroundFillTypeSolid,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -392,10 +413,31 @@ func (v MergedBackgroundType) GetType() string {
 // MergedBackgroundType.backgroundType is a dummy method to avoid interface implementation.
 func (v MergedBackgroundType) backgroundType() {}
 
-// MergeBackgroundType returns a MergedBackgroundType struct to simplify working with types in a non-generic world.
+// MergeBackgroundType returns itself, as it is already merged.
 func (v MergedBackgroundType) MergeBackgroundType() MergedBackgroundType {
 	return v
 }
+
+type BackgroundTypeUnknown struct {
+	RawType string
+	Data    json.RawMessage
+}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v BackgroundTypeUnknown) GetType() string {
+	return v.RawType
+}
+
+// MergeBackgroundType returns a MergedBackgroundType struct to simplify working with types in a non-generic world.
+func (v BackgroundTypeUnknown) MergeBackgroundType() MergedBackgroundType {
+	return MergedBackgroundType{}
+}
+func (v BackgroundTypeUnknown) MarshalJSON() ([]byte, error) {
+	return v.Data, nil
+}
+
+// BackgroundTypeUnknown.backgroundType is a dummy method to avoid interface implementation.
+func (v BackgroundTypeUnknown) backgroundType() {}
 
 // unmarshalBackgroundTypeArray is a JSON unmarshalling helper which allows unmarshalling an array of interfaces
 // using unmarshalBackgroundType.
@@ -471,7 +513,7 @@ func unmarshalBackgroundType(d json.RawMessage) (BackgroundType, error) {
 		return s, nil
 
 	}
-	return nil, fmt.Errorf("unknown interface for BackgroundType with Type %v", t.Type)
+	return BackgroundTypeUnknown{RawType: t.Type, Data: d}, nil
 }
 
 // BackgroundTypeChatTheme (https://core.telegram.org/bots/api#backgroundtypechattheme)
@@ -487,7 +529,7 @@ func (v BackgroundTypeChatTheme) backgroundType() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v BackgroundTypeChatTheme) GetType() string {
-	return "chat_theme"
+	return BackgroundTypeTypeChatTheme
 }
 
 // MergeBackgroundType returns a MergedBackgroundType struct to simplify working with types in a non-generic world.
@@ -505,7 +547,7 @@ func (v BackgroundTypeChatTheme) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "chat_theme",
+		Type:  BackgroundTypeTypeChatTheme,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -548,7 +590,7 @@ func (v BackgroundTypeFill) backgroundType() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v BackgroundTypeFill) GetType() string {
-	return "fill"
+	return BackgroundTypeTypeFill
 }
 
 // MergeBackgroundType returns a MergedBackgroundType struct to simplify working with types in a non-generic world.
@@ -567,7 +609,7 @@ func (v BackgroundTypeFill) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "fill",
+		Type:  BackgroundTypeTypeFill,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -622,7 +664,7 @@ func (v BackgroundTypePattern) backgroundType() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v BackgroundTypePattern) GetType() string {
-	return "pattern"
+	return BackgroundTypeTypePattern
 }
 
 // MergeBackgroundType returns a MergedBackgroundType struct to simplify working with types in a non-generic world.
@@ -644,7 +686,7 @@ func (v BackgroundTypePattern) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "pattern",
+		Type:  BackgroundTypeTypePattern,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -669,7 +711,7 @@ func (v BackgroundTypeWallpaper) backgroundType() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v BackgroundTypeWallpaper) GetType() string {
-	return "wallpaper"
+	return BackgroundTypeTypeWallpaper
 }
 
 // MergeBackgroundType returns a MergedBackgroundType struct to simplify working with types in a non-generic world.
@@ -690,7 +732,7 @@ func (v BackgroundTypeWallpaper) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "wallpaper",
+		Type:  BackgroundTypeTypeWallpaper,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -726,6 +768,8 @@ type BotCommand struct {
 	Command string `json:"command"`
 	// Description of the command; 1-256 characters
 	Description string `json:"description"`
+	// Optional. True, if the command sends an ephemeral message, which can be seen only by the sender of the message and the bot
+	IsEphemeral bool `json:"is_ephemeral,omitempty"`
 }
 
 // BotCommandScope (https://core.telegram.org/bots/api#botcommandscope)
@@ -775,7 +819,7 @@ func (v MergedBotCommandScope) GetType() string {
 // MergedBotCommandScope.botCommandScope is a dummy method to avoid interface implementation.
 func (v MergedBotCommandScope) botCommandScope() {}
 
-// MergeBotCommandScope returns a MergedBotCommandScope struct to simplify working with types in a non-generic world.
+// MergeBotCommandScope returns itself, as it is already merged.
 func (v MergedBotCommandScope) MergeBotCommandScope() MergedBotCommandScope {
 	return v
 }
@@ -790,7 +834,7 @@ func (v BotCommandScopeAllChatAdministrators) botCommandScope() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v BotCommandScopeAllChatAdministrators) GetType() string {
-	return "all_chat_administrators"
+	return BotCommandScopeTypeAllChatAdministrators
 }
 
 // MergeBotCommandScope returns a MergedBotCommandScope struct to simplify working with types in a non-generic world.
@@ -807,7 +851,7 @@ func (v BotCommandScopeAllChatAdministrators) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "all_chat_administrators",
+		Type:  BotCommandScopeTypeAllChatAdministrators,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -823,7 +867,7 @@ func (v BotCommandScopeAllGroupChats) botCommandScope() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v BotCommandScopeAllGroupChats) GetType() string {
-	return "all_group_chats"
+	return BotCommandScopeTypeAllGroupChats
 }
 
 // MergeBotCommandScope returns a MergedBotCommandScope struct to simplify working with types in a non-generic world.
@@ -840,7 +884,7 @@ func (v BotCommandScopeAllGroupChats) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "all_group_chats",
+		Type:  BotCommandScopeTypeAllGroupChats,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -856,7 +900,7 @@ func (v BotCommandScopeAllPrivateChats) botCommandScope() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v BotCommandScopeAllPrivateChats) GetType() string {
-	return "all_private_chats"
+	return BotCommandScopeTypeAllPrivateChats
 }
 
 // MergeBotCommandScope returns a MergedBotCommandScope struct to simplify working with types in a non-generic world.
@@ -873,7 +917,7 @@ func (v BotCommandScopeAllPrivateChats) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "all_private_chats",
+		Type:  BotCommandScopeTypeAllPrivateChats,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -892,7 +936,7 @@ func (v BotCommandScopeChat) botCommandScope() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v BotCommandScopeChat) GetType() string {
-	return "chat"
+	return BotCommandScopeTypeChat
 }
 
 // MergeBotCommandScope returns a MergedBotCommandScope struct to simplify working with types in a non-generic world.
@@ -910,7 +954,7 @@ func (v BotCommandScopeChat) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "chat",
+		Type:  BotCommandScopeTypeChat,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -929,7 +973,7 @@ func (v BotCommandScopeChatAdministrators) botCommandScope() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v BotCommandScopeChatAdministrators) GetType() string {
-	return "chat_administrators"
+	return BotCommandScopeTypeChatAdministrators
 }
 
 // MergeBotCommandScope returns a MergedBotCommandScope struct to simplify working with types in a non-generic world.
@@ -947,7 +991,7 @@ func (v BotCommandScopeChatAdministrators) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "chat_administrators",
+		Type:  BotCommandScopeTypeChatAdministrators,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -968,7 +1012,7 @@ func (v BotCommandScopeChatMember) botCommandScope() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v BotCommandScopeChatMember) GetType() string {
-	return "chat_member"
+	return BotCommandScopeTypeChatMember
 }
 
 // MergeBotCommandScope returns a MergedBotCommandScope struct to simplify working with types in a non-generic world.
@@ -987,7 +1031,7 @@ func (v BotCommandScopeChatMember) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "chat_member",
+		Type:  BotCommandScopeTypeChatMember,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -1003,7 +1047,7 @@ func (v BotCommandScopeDefault) botCommandScope() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v BotCommandScopeDefault) GetType() string {
-	return "default"
+	return BotCommandScopeTypeDefault
 }
 
 // MergeBotCommandScope returns a MergedBotCommandScope struct to simplify working with types in a non-generic world.
@@ -1020,7 +1064,7 @@ func (v BotCommandScopeDefault) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "default",
+		Type:  BotCommandScopeTypeDefault,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -1048,6 +1092,18 @@ type BotName struct {
 type BotShortDescription struct {
 	// The bot's short description
 	ShortDescription string `json:"short_description"`
+}
+
+// BotSubscriptionUpdated (https://core.telegram.org/bots/api#botsubscriptionupdated)
+//
+// This object contains information about changes to a user payment subscription toward the current bot.
+type BotSubscriptionUpdated struct {
+	// User who subscribed for payments toward the bot
+	User User `json:"user"`
+	// Bot-specified invoice payload
+	InvoicePayload string `json:"invoice_payload"`
+	// The new state of the subscription. Currently, it can be one of "canceled" if the user canceled the subscription, "active" if the user re-enabled a previously canceled subscription, or "failed" if payment for the subscription failed.
+	State string `json:"state"`
 }
 
 // BusinessBotRights (https://core.telegram.org/bots/api#businessbotrights)
@@ -1271,8 +1327,10 @@ type ChatAdministratorRights struct {
 	CanManageTopics bool `json:"can_manage_topics,omitempty"`
 	// Optional. True, if the administrator can manage direct messages of the channel and decline suggested posts; for channels only
 	CanManageDirectMessages bool `json:"can_manage_direct_messages,omitempty"`
-	// Optional. True, if the administrator can edit the tags of regular members; for groups and supergroups only. If omitted defaults to the value of can_pin_messages.
-	CanManageTags *bool `json:"can_manage_tags,omitempty"`
+	// Optional. True, if the administrator can edit the tags of regular members; for groups and supergroups only
+	CanManageTags bool `json:"can_manage_tags,omitempty"`
+	// True, if the administrator can manage chat welcome messages or directly send them in the case of bots
+	CanSendWelcomeMessages bool `json:"can_send_welcome_messages"`
 }
 
 // ChatBackground (https://core.telegram.org/bots/api#chatbackground)
@@ -1434,10 +1492,31 @@ func (v MergedChatBoostSource) GetSource() string {
 // MergedChatBoostSource.chatBoostSource is a dummy method to avoid interface implementation.
 func (v MergedChatBoostSource) chatBoostSource() {}
 
-// MergeChatBoostSource returns a MergedChatBoostSource struct to simplify working with types in a non-generic world.
+// MergeChatBoostSource returns itself, as it is already merged.
 func (v MergedChatBoostSource) MergeChatBoostSource() MergedChatBoostSource {
 	return v
 }
+
+type ChatBoostSourceUnknown struct {
+	RawSource string
+	Data      json.RawMessage
+}
+
+// GetSource is a helper method to easily access the common fields of an interface.
+func (v ChatBoostSourceUnknown) GetSource() string {
+	return v.RawSource
+}
+
+// MergeChatBoostSource returns a MergedChatBoostSource struct to simplify working with types in a non-generic world.
+func (v ChatBoostSourceUnknown) MergeChatBoostSource() MergedChatBoostSource {
+	return MergedChatBoostSource{}
+}
+func (v ChatBoostSourceUnknown) MarshalJSON() ([]byte, error) {
+	return v.Data, nil
+}
+
+// ChatBoostSourceUnknown.chatBoostSource is a dummy method to avoid interface implementation.
+func (v ChatBoostSourceUnknown) chatBoostSource() {}
 
 // unmarshalChatBoostSourceArray is a JSON unmarshalling helper which allows unmarshalling an array of interfaces
 // using unmarshalChatBoostSource.
@@ -1505,7 +1584,7 @@ func unmarshalChatBoostSource(d json.RawMessage) (ChatBoostSource, error) {
 		return s, nil
 
 	}
-	return nil, fmt.Errorf("unknown interface for ChatBoostSource with Source %v", t.Source)
+	return ChatBoostSourceUnknown{RawSource: t.Source, Data: d}, nil
 }
 
 // ChatBoostSourceGiftCode (https://core.telegram.org/bots/api#chatboostsourcegiftcode)
@@ -1521,7 +1600,7 @@ func (v ChatBoostSourceGiftCode) chatBoostSource() {}
 
 // GetSource is a helper method to easily access the common fields of an interface.
 func (v ChatBoostSourceGiftCode) GetSource() string {
-	return "gift_code"
+	return ChatBoostSourceSourceGiftCode
 }
 
 // MergeChatBoostSource returns a MergedChatBoostSource struct to simplify working with types in a non-generic world.
@@ -1539,7 +1618,7 @@ func (v ChatBoostSourceGiftCode) MarshalJSON() ([]byte, error) {
 		Source string `json:"source"`
 		alias
 	}{
-		Source: "gift_code",
+		Source: ChatBoostSourceSourceGiftCode,
 		alias:  (alias)(v),
 	}
 	return json.Marshal(a)
@@ -1564,7 +1643,7 @@ func (v ChatBoostSourceGiveaway) chatBoostSource() {}
 
 // GetSource is a helper method to easily access the common fields of an interface.
 func (v ChatBoostSourceGiveaway) GetSource() string {
-	return "giveaway"
+	return ChatBoostSourceSourceGiveaway
 }
 
 // MergeChatBoostSource returns a MergedChatBoostSource struct to simplify working with types in a non-generic world.
@@ -1585,7 +1664,7 @@ func (v ChatBoostSourceGiveaway) MarshalJSON() ([]byte, error) {
 		Source string `json:"source"`
 		alias
 	}{
-		Source: "giveaway",
+		Source: ChatBoostSourceSourceGiveaway,
 		alias:  (alias)(v),
 	}
 	return json.Marshal(a)
@@ -1604,7 +1683,7 @@ func (v ChatBoostSourcePremium) chatBoostSource() {}
 
 // GetSource is a helper method to easily access the common fields of an interface.
 func (v ChatBoostSourcePremium) GetSource() string {
-	return "premium"
+	return ChatBoostSourceSourcePremium
 }
 
 // MergeChatBoostSource returns a MergedChatBoostSource struct to simplify working with types in a non-generic world.
@@ -1622,7 +1701,7 @@ func (v ChatBoostSourcePremium) MarshalJSON() ([]byte, error) {
 		Source string `json:"source"`
 		alias
 	}{
-		Source: "premium",
+		Source: ChatBoostSourceSourcePremium,
 		alias:  (alias)(v),
 	}
 	return json.Marshal(a)
@@ -1744,6 +1823,10 @@ type ChatFullInfo struct {
 	UniqueGiftColors *UniqueGiftColors `json:"unique_gift_colors,omitempty"`
 	// Optional. The number of Telegram Stars a general user has to pay to send a message to the chat
 	PaidMessageStarCount int64 `json:"paid_message_star_count,omitempty"`
+	// Optional. The bot that processes join request queries in the chat. The field is only available to chat administrators.
+	GuardBot *User `json:"guard_bot,omitempty"`
+	// Optional. The Community to which the chat belongs
+	Community *Community `json:"community,omitempty"`
 }
 
 // UnmarshalJSON is a custom JSON unmarshaller to use the helpers which allow for unmarshalling structs into interfaces.
@@ -1801,6 +1884,8 @@ func (v *ChatFullInfo) UnmarshalJSON(b []byte) error {
 		FirstProfileAudio                  *Audio                `json:"first_profile_audio"`
 		UniqueGiftColors                   *UniqueGiftColors     `json:"unique_gift_colors"`
 		PaidMessageStarCount               int64                 `json:"paid_message_star_count"`
+		GuardBot                           *User                 `json:"guard_bot"`
+		Community                          *Community            `json:"community"`
 	}
 	t := tmp{}
 	err := json.Unmarshal(b, &t)
@@ -1862,6 +1947,8 @@ func (v *ChatFullInfo) UnmarshalJSON(b []byte) error {
 	v.FirstProfileAudio = t.FirstProfileAudio
 	v.UniqueGiftColors = t.UniqueGiftColors
 	v.PaidMessageStarCount = t.PaidMessageStarCount
+	v.GuardBot = t.GuardBot
+	v.Community = t.Community
 
 	return nil
 }
@@ -1910,6 +1997,8 @@ type ChatJoinRequest struct {
 	Bio string `json:"bio,omitempty"`
 	// Optional. Chat invite link that was used by the user to send the join request
 	InviteLink *ChatInviteLink `json:"invite_link,omitempty"`
+	// Optional. Identifier of the join request query; for bots assigned to process join requests only. If present, then the bot must call sendChatJoinRequestWebApp or directly call answerChatJoinRequestQuery within 10 seconds.
+	QueryId string `json:"query_id,omitempty"`
 }
 
 // ChatLocation (https://core.telegram.org/bots/api#chatlocation)
@@ -1992,15 +2081,17 @@ type MergedChatMember struct {
 	CanManageTopics bool `json:"can_manage_topics,omitempty"`
 	// Optional. True, if the administrator can manage direct messages of the channel and decline suggested posts; for channels only (Only for administrator)
 	CanManageDirectMessages bool `json:"can_manage_direct_messages,omitempty"`
-	// Optional. True, if the administrator can edit the tags of regular members; for groups and supergroups only. If omitted defaults to the value of can_pin_messages. (Only for administrator)
-	CanManageTags *bool `json:"can_manage_tags,omitempty"`
+	// Optional. True, if the administrator can edit the tags of regular members; for groups and supergroups only (Only for administrator)
+	CanManageTags bool `json:"can_manage_tags,omitempty"`
+	// Optional. True, if the administrator can manage chat welcome messages or directly send them in the case of bots (Only for administrator)
+	CanSendWelcomeMessages bool `json:"can_send_welcome_messages,omitempty"`
 	// Optional. Tag of the member (Only for member, restricted)
 	Tag string `json:"tag,omitempty"`
 	// Optional. Date when the user's subscription will expire; Unix time (Only for member, restricted, kicked)
 	UntilDate int64 `json:"until_date,omitempty"`
 	// Optional. True, if the user is a member of the chat at the moment of the request (Only for restricted)
 	IsMember bool `json:"is_member,omitempty"`
-	// Optional. True, if the user is allowed to send text messages, contacts, giveaways, giveaway winners, invoices, locations and venues (Only for restricted)
+	// Optional. True, if the user is allowed to send text messages, rich messages, contacts, giveaways, giveaway winners, invoices, locations and venues (Only for restricted)
 	CanSendMessages bool `json:"can_send_messages,omitempty"`
 	// Optional. True, if the user is allowed to send audios (Only for restricted)
 	CanSendAudios bool `json:"can_send_audios,omitempty"`
@@ -2039,10 +2130,36 @@ func (v MergedChatMember) GetUser() User {
 // MergedChatMember.chatMember is a dummy method to avoid interface implementation.
 func (v MergedChatMember) chatMember() {}
 
-// MergeChatMember returns a MergedChatMember struct to simplify working with types in a non-generic world.
+// MergeChatMember returns itself, as it is already merged.
 func (v MergedChatMember) MergeChatMember() MergedChatMember {
 	return v
 }
+
+type ChatMemberUnknown struct {
+	RawStatus string
+	Data      json.RawMessage
+}
+
+// GetStatus is a helper method to easily access the common fields of an interface.
+func (v ChatMemberUnknown) GetStatus() string {
+	return v.RawStatus
+}
+
+// GetUser is a helper method to easily access the common fields of an interface.
+func (v ChatMemberUnknown) GetUser() User {
+	return User{} // Return empty data for unknown entries.
+}
+
+// MergeChatMember returns a MergedChatMember struct to simplify working with types in a non-generic world.
+func (v ChatMemberUnknown) MergeChatMember() MergedChatMember {
+	return MergedChatMember{}
+}
+func (v ChatMemberUnknown) MarshalJSON() ([]byte, error) {
+	return v.Data, nil
+}
+
+// ChatMemberUnknown.chatMember is a dummy method to avoid interface implementation.
+func (v ChatMemberUnknown) chatMember() {}
 
 // unmarshalChatMemberArray is a JSON unmarshalling helper which allows unmarshalling an array of interfaces
 // using unmarshalChatMember.
@@ -2134,7 +2251,7 @@ func unmarshalChatMember(d json.RawMessage) (ChatMember, error) {
 		return s, nil
 
 	}
-	return nil, fmt.Errorf("unknown interface for ChatMember with Status %v", t.Status)
+	return ChatMemberUnknown{RawStatus: t.Status, Data: d}, nil
 }
 
 // ChatMemberAdministrator (https://core.telegram.org/bots/api#chatmemberadministrator)
@@ -2177,8 +2294,10 @@ type ChatMemberAdministrator struct {
 	CanManageTopics bool `json:"can_manage_topics,omitempty"`
 	// Optional. True, if the administrator can manage direct messages of the channel and decline suggested posts; for channels only
 	CanManageDirectMessages bool `json:"can_manage_direct_messages,omitempty"`
-	// Optional. True, if the administrator can edit the tags of regular members; for groups and supergroups only. If omitted defaults to the value of can_pin_messages.
-	CanManageTags *bool `json:"can_manage_tags,omitempty"`
+	// Optional. True, if the administrator can edit the tags of regular members; for groups and supergroups only
+	CanManageTags bool `json:"can_manage_tags,omitempty"`
+	// True, if the administrator can manage chat welcome messages or directly send them in the case of bots
+	CanSendWelcomeMessages bool `json:"can_send_welcome_messages"`
 	// Optional. Custom title for this user
 	CustomTitle string `json:"custom_title,omitempty"`
 }
@@ -2188,7 +2307,7 @@ func (v ChatMemberAdministrator) chatMember() {}
 
 // GetStatus is a helper method to easily access the common fields of an interface.
 func (v ChatMemberAdministrator) GetStatus() string {
-	return "administrator"
+	return ChatMemberStatusAdministrator
 }
 
 // GetUser is a helper method to easily access the common fields of an interface.
@@ -2219,6 +2338,7 @@ func (v ChatMemberAdministrator) MergeChatMember() MergedChatMember {
 		CanManageTopics:         v.CanManageTopics,
 		CanManageDirectMessages: v.CanManageDirectMessages,
 		CanManageTags:           v.CanManageTags,
+		CanSendWelcomeMessages:  v.CanSendWelcomeMessages,
 		CustomTitle:             v.CustomTitle,
 	}
 }
@@ -2230,7 +2350,7 @@ func (v ChatMemberAdministrator) MarshalJSON() ([]byte, error) {
 		Status string `json:"status"`
 		alias
 	}{
-		Status: "administrator",
+		Status: ChatMemberStatusAdministrator,
 		alias:  (alias)(v),
 	}
 	return json.Marshal(a)
@@ -2251,7 +2371,7 @@ func (v ChatMemberBanned) chatMember() {}
 
 // GetStatus is a helper method to easily access the common fields of an interface.
 func (v ChatMemberBanned) GetStatus() string {
-	return "kicked"
+	return ChatMemberStatusKicked
 }
 
 // GetUser is a helper method to easily access the common fields of an interface.
@@ -2275,7 +2395,7 @@ func (v ChatMemberBanned) MarshalJSON() ([]byte, error) {
 		Status string `json:"status"`
 		alias
 	}{
-		Status: "kicked",
+		Status: ChatMemberStatusKicked,
 		alias:  (alias)(v),
 	}
 	return json.Marshal(a)
@@ -2294,7 +2414,7 @@ func (v ChatMemberLeft) chatMember() {}
 
 // GetStatus is a helper method to easily access the common fields of an interface.
 func (v ChatMemberLeft) GetStatus() string {
-	return "left"
+	return ChatMemberStatusLeft
 }
 
 // GetUser is a helper method to easily access the common fields of an interface.
@@ -2317,7 +2437,7 @@ func (v ChatMemberLeft) MarshalJSON() ([]byte, error) {
 		Status string `json:"status"`
 		alias
 	}{
-		Status: "left",
+		Status: ChatMemberStatusLeft,
 		alias:  (alias)(v),
 	}
 	return json.Marshal(a)
@@ -2340,7 +2460,7 @@ func (v ChatMemberMember) chatMember() {}
 
 // GetStatus is a helper method to easily access the common fields of an interface.
 func (v ChatMemberMember) GetStatus() string {
-	return "member"
+	return ChatMemberStatusMember
 }
 
 // GetUser is a helper method to easily access the common fields of an interface.
@@ -2365,7 +2485,7 @@ func (v ChatMemberMember) MarshalJSON() ([]byte, error) {
 		Status string `json:"status"`
 		alias
 	}{
-		Status: "member",
+		Status: ChatMemberStatusMember,
 		alias:  (alias)(v),
 	}
 	return json.Marshal(a)
@@ -2388,7 +2508,7 @@ func (v ChatMemberOwner) chatMember() {}
 
 // GetStatus is a helper method to easily access the common fields of an interface.
 func (v ChatMemberOwner) GetStatus() string {
-	return "creator"
+	return ChatMemberStatusCreator
 }
 
 // GetUser is a helper method to easily access the common fields of an interface.
@@ -2413,7 +2533,7 @@ func (v ChatMemberOwner) MarshalJSON() ([]byte, error) {
 		Status string `json:"status"`
 		alias
 	}{
-		Status: "creator",
+		Status: ChatMemberStatusCreator,
 		alias:  (alias)(v),
 	}
 	return json.Marshal(a)
@@ -2429,7 +2549,7 @@ type ChatMemberRestricted struct {
 	User User `json:"user"`
 	// True, if the user is a member of the chat at the moment of the request
 	IsMember bool `json:"is_member"`
-	// True, if the user is allowed to send text messages, contacts, giveaways, giveaway winners, invoices, locations and venues
+	// True, if the user is allowed to send text messages, rich messages, contacts, giveaways, giveaway winners, invoices, locations and venues
 	CanSendMessages bool `json:"can_send_messages"`
 	// True, if the user is allowed to send audios
 	CanSendAudios bool `json:"can_send_audios"`
@@ -2470,7 +2590,7 @@ func (v ChatMemberRestricted) chatMember() {}
 
 // GetStatus is a helper method to easily access the common fields of an interface.
 func (v ChatMemberRestricted) GetStatus() string {
-	return "restricted"
+	return ChatMemberStatusRestricted
 }
 
 // GetUser is a helper method to easily access the common fields of an interface.
@@ -2512,7 +2632,7 @@ func (v ChatMemberRestricted) MarshalJSON() ([]byte, error) {
 		Status string `json:"status"`
 		alias
 	}{
-		Status: "restricted",
+		Status: ChatMemberStatusRestricted,
 		alias:  (alias)(v),
 	}
 	return json.Marshal(a)
@@ -2597,7 +2717,7 @@ type ChatOwnerLeft struct {
 //
 // Describes actions that a non-administrator user is allowed to take in a chat.
 type ChatPermissions struct {
-	// Optional. True, if the user is allowed to send text messages, contacts, giveaways, giveaway winners, invoices, locations and venues
+	// Optional. True, if the user is allowed to send text messages, rich messages, contacts, giveaways, giveaway winners, invoices, locations and venues
 	CanSendMessages bool `json:"can_send_messages,omitempty"`
 	// Optional. True, if the user is allowed to send audios
 	CanSendAudios bool `json:"can_send_audios,omitempty"`
@@ -2627,7 +2747,7 @@ type ChatPermissions struct {
 	CanInviteUsers bool `json:"can_invite_users,omitempty"`
 	// Optional. True, if the user is allowed to pin messages. Ignored in public supergroups.
 	CanPinMessages bool `json:"can_pin_messages,omitempty"`
-	// Optional. True, if the user is allowed to create forum topics. If omitted defaults to the value of can_pin_messages.
+	// Optional. True, if the user is allowed to create forum topics. If omitted, defaults to the value of can_pin_messages.
 	CanManageTopics *bool `json:"can_manage_topics,omitempty"`
 }
 
@@ -2734,6 +2854,37 @@ type ChosenInlineResult struct {
 	Query string `json:"query"`
 }
 
+// Community (https://core.telegram.org/bots/api#community)
+//
+// Represents a community (a group of chats).
+type Community struct {
+	// Unique identifier for this community. This number may have more than 32 significant bits and some programming languages may have difficulty/silent defects in interpreting it. But it has at most 52 significant bits, so a signed 64-bit integer or double-precision float type are safe for storing this identifier.
+	Id int64 `json:"id"`
+	// Name of the community
+	Name string `json:"name"`
+}
+
+// CommunityChatAdded (https://core.telegram.org/bots/api#communitychatadded)
+//
+// Describes a service message about a chat or a bot being added to a community.
+type CommunityChatAdded struct {
+	// The new community to which the chat or the bot belongs
+	Community Community `json:"community"`
+}
+
+// CommunityChatJoined (https://core.telegram.org/bots/api#communitychatjoined)
+//
+// Describes a service message about a chat being joined by a user from a community.
+type CommunityChatJoined struct {
+	// The community from which the chat was joined
+	Community Community `json:"community"`
+}
+
+// CommunityChatRemoved (https://core.telegram.org/bots/api#communitychatremoved)
+//
+// Describes a service message about a chat or a bot being removed from a community. Currently holds no information.
+type CommunityChatRemoved struct{}
+
 // Contact (https://core.telegram.org/bots/api#contact)
 //
 // This object represents a phone contact.
@@ -2772,7 +2923,7 @@ type Dice struct {
 //
 // Describes a service message about a change in the price of direct messages sent to a channel chat.
 type DirectMessagePriceChanged struct {
-	// True, if direct messages are enabled for the channel chat; false otherwise
+	// True, if direct messages are enabled for the channel chat; False otherwise
 	AreDirectMessagesEnabled bool `json:"are_direct_messages_enabled"`
 	// Optional. The new number of Telegram Stars that must be paid by users for each direct message sent to the channel. Does not apply to users who have been exempted by administrators. Defaults to 0.
 	DirectMessageStarCount int64 `json:"direct_message_star_count,omitempty"`
@@ -2787,6 +2938,11 @@ type DirectMessagesTopic struct {
 	// Optional. Information about the user that created the topic. Currently, it is always present.
 	User *User `json:"user,omitempty"`
 }
+
+// DisabledButton (https://core.telegram.org/bots/api#disabledbutton)
+//
+// This object represents a disabled button which does nothing. Currently holds no information.
+type DisabledButton struct{}
 
 // Document (https://core.telegram.org/bots/api#document)
 //
@@ -2842,6 +2998,16 @@ type EncryptedPassportElement struct {
 	Translation []PassportFile `json:"translation,omitempty"`
 	// Base64-encoded element hash for using in PassportElementErrorUnspecified
 	Hash string `json:"hash"`
+}
+
+// EphemeralMessageParameters (https://core.telegram.org/bots/api#ephemeralmessageparameters)
+type EphemeralMessageParameters struct {
+	// Identifier of the user who will receive the message. It is not guaranteed that the user will receive the message, especially if they are offline. See here for more details.
+	ReceiverUserId int64 `json:"receiver_user_id"`
+	// Optional. Identifier of the callback query which triggered the message, if any
+	CallbackQueryId string `json:"callback_query_id,omitempty"`
+	// Optional. Pass True if the ephemeral message must be shown in place of the original message. Must be False for callback queries from ephemeral messages, which must be edited using regular editEphemeralMessage... methods.
+	ReplaceCallbackQueryMessage bool `json:"replace_callback_query_message,omitempty"`
 }
 
 // ExternalReplyInfo (https://core.telegram.org/bots/api#externalreplyinfo)
@@ -2990,7 +3156,7 @@ type File struct {
 //
 // Upon receiving a message with this object, Telegram clients will display a reply interface to the user (act as if the user has selected the bot's message and tapped 'Reply'). This can be extremely useful if you want to create user-friendly step-by-step interfaces without having to sacrifice privacy mode. Not supported in channels and for messages sent on behalf of a user account.
 type ForceReply struct {
-	// Shows reply interface to the user, as if they manually selected the bot's message and tapped 'Reply'
+	// Shows reply interface to the user, as if they had manually selected the bot's message and tapped 'Reply'
 	ForceReply bool `json:"force_reply"`
 	// Optional. The placeholder to be shown in the input field when the reply is active; 1-64 characters
 	InputFieldPlaceholder string `json:"input_field_placeholder,omitempty"`
@@ -3291,7 +3457,7 @@ type InlineKeyboardButton struct {
 	CallbackData string `json:"callback_data,omitempty"`
 	// Optional. Description of the Web App that will be launched when the user presses the button. The Web App will be able to send an arbitrary message on behalf of the user using the method answerWebAppQuery. Available only in private chats between a user and the bot. Not supported for messages sent on behalf of a business account.
 	WebApp *WebAppInfo `json:"web_app,omitempty"`
-	// Optional. An HTTPS URL used to automatically authorize the user. Can be used as a replacement for the Telegram Login Widget.
+	// Optional. An HTTPS URL used to automatically authorize the user. Can be used as a replacement for the Telegram Login Widget. Not supported for ephemeral messages.
 	LoginUrl *LoginUrl `json:"login_url,omitempty"`
 	// Optional. If set, pressing the button will prompt the user to select one of their chats, open that chat and insert the bot's username and the specified inline query in the input field. May be empty, in which case just the bot's username will be inserted. Not supported for messages sent in channel direct messages chats and on behalf of a business account.
 	SwitchInlineQuery *string `json:"switch_inline_query,omitempty"`
@@ -3305,6 +3471,8 @@ type InlineKeyboardButton struct {
 	CallbackGame *CallbackGame `json:"callback_game,omitempty"`
 	// Optional. Specify True, to send a Pay button. Substrings "⭐" and "XTR" in the buttons's text will be replaced with a Telegram Star icon. NOTE: This type of button must always be the first button in the first row and can only be used in invoice messages.
 	Pay bool `json:"pay,omitempty"`
+	// Optional. If set, then the button is disabled and does nothing
+	Disabled *DisabledButton `json:"disabled,omitempty"`
 }
 
 // InlineKeyboardMarkup (https://core.telegram.org/bots/api#inlinekeyboardmarkup)
@@ -3313,6 +3481,8 @@ type InlineKeyboardButton struct {
 type InlineKeyboardMarkup struct {
 	// Array of button rows, each represented by an Array of InlineKeyboardButton objects
 	InlineKeyboard [][]InlineKeyboardButton `json:"inline_keyboard,omitempty"`
+	// Optional. Pass True if the reply interface must be shown to the user, as if they had manually selected the bot's message and tapped 'Reply'. The value of the field can't be changed when the inline keyboard is edited.
+	ForceReply bool `json:"force_reply,omitempty"`
 }
 
 // InlineKeyboardMarkup.replyMarkup is a dummy method to avoid interface implementation.
@@ -3420,7 +3590,7 @@ type MergedInlineQueryResult struct {
 	Description string `json:"description,omitempty"`
 	// Optional. A valid file identifier for the GIF file (Only for gif)
 	GifFileId string `json:"gif_file_id,omitempty"`
-	// Optional. Pass True, if the caption must be shown above the message media (Only for gif, mpeg4_gif, photo, video, gif, mpeg4_gif, photo, video)
+	// Optional. Pass True if the caption must be shown above the message media (Only for gif, mpeg4_gif, photo, video, gif, mpeg4_gif, photo, video)
 	ShowCaptionAboveMedia bool `json:"show_caption_above_media,omitempty"`
 	// Optional. A valid file identifier for the MPEG4 file (Only for mpeg4_gif)
 	Mpeg4FileId string `json:"mpeg4_file_id,omitempty"`
@@ -3533,7 +3703,7 @@ func (v MergedInlineQueryResult) GetId() string {
 // MergedInlineQueryResult.inlineQueryResult is a dummy method to avoid interface implementation.
 func (v MergedInlineQueryResult) inlineQueryResult() {}
 
-// MergeInlineQueryResult returns a MergedInlineQueryResult struct to simplify working with types in a non-generic world.
+// MergeInlineQueryResult returns itself, as it is already merged.
 func (v MergedInlineQueryResult) MergeInlineQueryResult() MergedInlineQueryResult {
 	return v
 }
@@ -3567,7 +3737,7 @@ func (v InlineQueryResultArticle) inlineQueryResult() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v InlineQueryResultArticle) GetType() string {
-	return "article"
+	return InlineQueryResultTypeArticle
 }
 
 // GetId is a helper method to easily access the common fields of an interface.
@@ -3598,7 +3768,7 @@ func (v InlineQueryResultArticle) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "article",
+		Type:  InlineQueryResultTypeArticle,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -3635,7 +3805,7 @@ func (v InlineQueryResultAudio) inlineQueryResult() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v InlineQueryResultAudio) GetType() string {
-	return "audio"
+	return InlineQueryResultTypeAudio
 }
 
 // GetId is a helper method to easily access the common fields of an interface.
@@ -3667,7 +3837,7 @@ func (v InlineQueryResultAudio) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "audio",
+		Type:  InlineQueryResultTypeAudio,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -3698,7 +3868,7 @@ func (v InlineQueryResultCachedAudio) inlineQueryResult() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v InlineQueryResultCachedAudio) GetType() string {
-	return "audio"
+	return InlineQueryResultTypeAudio
 }
 
 // GetId is a helper method to easily access the common fields of an interface.
@@ -3727,7 +3897,7 @@ func (v InlineQueryResultCachedAudio) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "audio",
+		Type:  InlineQueryResultTypeAudio,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -3762,7 +3932,7 @@ func (v InlineQueryResultCachedDocument) inlineQueryResult() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v InlineQueryResultCachedDocument) GetType() string {
-	return "document"
+	return InlineQueryResultTypeDocument
 }
 
 // GetId is a helper method to easily access the common fields of an interface.
@@ -3793,7 +3963,7 @@ func (v InlineQueryResultCachedDocument) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "document",
+		Type:  InlineQueryResultTypeDocument,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -3815,7 +3985,7 @@ type InlineQueryResultCachedGif struct {
 	ParseMode string `json:"parse_mode,omitempty"`
 	// Optional. List of special entities that appear in the caption, which can be specified instead of parse_mode
 	CaptionEntities []MessageEntity `json:"caption_entities,omitempty"`
-	// Optional. Pass True, if the caption must be shown above the message media
+	// Optional. Pass True if the caption must be shown above the message media
 	ShowCaptionAboveMedia bool `json:"show_caption_above_media,omitempty"`
 	// Optional. Inline keyboard attached to the message
 	ReplyMarkup *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
@@ -3828,7 +3998,7 @@ func (v InlineQueryResultCachedGif) inlineQueryResult() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v InlineQueryResultCachedGif) GetType() string {
-	return "gif"
+	return InlineQueryResultTypeGif
 }
 
 // GetId is a helper method to easily access the common fields of an interface.
@@ -3859,7 +4029,7 @@ func (v InlineQueryResultCachedGif) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "gif",
+		Type:  InlineQueryResultTypeGif,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -3881,7 +4051,7 @@ type InlineQueryResultCachedMpeg4Gif struct {
 	ParseMode string `json:"parse_mode,omitempty"`
 	// Optional. List of special entities that appear in the caption, which can be specified instead of parse_mode
 	CaptionEntities []MessageEntity `json:"caption_entities,omitempty"`
-	// Optional. Pass True, if the caption must be shown above the message media
+	// Optional. Pass True if the caption must be shown above the message media
 	ShowCaptionAboveMedia bool `json:"show_caption_above_media,omitempty"`
 	// Optional. Inline keyboard attached to the message
 	ReplyMarkup *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
@@ -3894,7 +4064,7 @@ func (v InlineQueryResultCachedMpeg4Gif) inlineQueryResult() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v InlineQueryResultCachedMpeg4Gif) GetType() string {
-	return "mpeg4_gif"
+	return InlineQueryResultTypeMpeg4Gif
 }
 
 // GetId is a helper method to easily access the common fields of an interface.
@@ -3925,7 +4095,7 @@ func (v InlineQueryResultCachedMpeg4Gif) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "mpeg4_gif",
+		Type:  InlineQueryResultTypeMpeg4Gif,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -3949,7 +4119,7 @@ type InlineQueryResultCachedPhoto struct {
 	ParseMode string `json:"parse_mode,omitempty"`
 	// Optional. List of special entities that appear in the caption, which can be specified instead of parse_mode
 	CaptionEntities []MessageEntity `json:"caption_entities,omitempty"`
-	// Optional. Pass True, if the caption must be shown above the message media
+	// Optional. Pass True if the caption must be shown above the message media
 	ShowCaptionAboveMedia bool `json:"show_caption_above_media,omitempty"`
 	// Optional. Inline keyboard attached to the message
 	ReplyMarkup *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
@@ -3962,7 +4132,7 @@ func (v InlineQueryResultCachedPhoto) inlineQueryResult() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v InlineQueryResultCachedPhoto) GetType() string {
-	return "photo"
+	return InlineQueryResultTypePhoto
 }
 
 // GetId is a helper method to easily access the common fields of an interface.
@@ -3994,7 +4164,7 @@ func (v InlineQueryResultCachedPhoto) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "photo",
+		Type:  InlineQueryResultTypePhoto,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -4019,7 +4189,7 @@ func (v InlineQueryResultCachedSticker) inlineQueryResult() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v InlineQueryResultCachedSticker) GetType() string {
-	return "sticker"
+	return InlineQueryResultTypeSticker
 }
 
 // GetId is a helper method to easily access the common fields of an interface.
@@ -4045,7 +4215,7 @@ func (v InlineQueryResultCachedSticker) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "sticker",
+		Type:  InlineQueryResultTypeSticker,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -4069,7 +4239,7 @@ type InlineQueryResultCachedVideo struct {
 	ParseMode string `json:"parse_mode,omitempty"`
 	// Optional. List of special entities that appear in the caption, which can be specified instead of parse_mode
 	CaptionEntities []MessageEntity `json:"caption_entities,omitempty"`
-	// Optional. Pass True, if the caption must be shown above the message media
+	// Optional. Pass True if the caption must be shown above the message media
 	ShowCaptionAboveMedia bool `json:"show_caption_above_media,omitempty"`
 	// Optional. Inline keyboard attached to the message
 	ReplyMarkup *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
@@ -4082,7 +4252,7 @@ func (v InlineQueryResultCachedVideo) inlineQueryResult() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v InlineQueryResultCachedVideo) GetType() string {
-	return "video"
+	return InlineQueryResultTypeVideo
 }
 
 // GetId is a helper method to easily access the common fields of an interface.
@@ -4114,7 +4284,7 @@ func (v InlineQueryResultCachedVideo) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "video",
+		Type:  InlineQueryResultTypeVideo,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -4147,7 +4317,7 @@ func (v InlineQueryResultCachedVoice) inlineQueryResult() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v InlineQueryResultCachedVoice) GetType() string {
-	return "voice"
+	return InlineQueryResultTypeVoice
 }
 
 // GetId is a helper method to easily access the common fields of an interface.
@@ -4177,7 +4347,7 @@ func (v InlineQueryResultCachedVoice) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "voice",
+		Type:  InlineQueryResultTypeVoice,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -4214,7 +4384,7 @@ func (v InlineQueryResultContact) inlineQueryResult() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v InlineQueryResultContact) GetType() string {
-	return "contact"
+	return InlineQueryResultTypeContact
 }
 
 // GetId is a helper method to easily access the common fields of an interface.
@@ -4246,7 +4416,7 @@ func (v InlineQueryResultContact) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "contact",
+		Type:  InlineQueryResultTypeContact,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -4289,7 +4459,7 @@ func (v InlineQueryResultDocument) inlineQueryResult() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v InlineQueryResultDocument) GetType() string {
-	return "document"
+	return InlineQueryResultTypeDocument
 }
 
 // GetId is a helper method to easily access the common fields of an interface.
@@ -4324,7 +4494,7 @@ func (v InlineQueryResultDocument) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "document",
+		Type:  InlineQueryResultTypeDocument,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -4347,7 +4517,7 @@ func (v InlineQueryResultGame) inlineQueryResult() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v InlineQueryResultGame) GetType() string {
-	return "game"
+	return InlineQueryResultTypeGame
 }
 
 // GetId is a helper method to easily access the common fields of an interface.
@@ -4372,7 +4542,7 @@ func (v InlineQueryResultGame) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "game",
+		Type:  InlineQueryResultTypeGame,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -4404,7 +4574,7 @@ type InlineQueryResultGif struct {
 	ParseMode string `json:"parse_mode,omitempty"`
 	// Optional. List of special entities that appear in the caption, which can be specified instead of parse_mode
 	CaptionEntities []MessageEntity `json:"caption_entities,omitempty"`
-	// Optional. Pass True, if the caption must be shown above the message media
+	// Optional. Pass True if the caption must be shown above the message media
 	ShowCaptionAboveMedia bool `json:"show_caption_above_media,omitempty"`
 	// Optional. Inline keyboard attached to the message
 	ReplyMarkup *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
@@ -4417,7 +4587,7 @@ func (v InlineQueryResultGif) inlineQueryResult() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v InlineQueryResultGif) GetType() string {
-	return "gif"
+	return InlineQueryResultTypeGif
 }
 
 // GetId is a helper method to easily access the common fields of an interface.
@@ -4453,7 +4623,7 @@ func (v InlineQueryResultGif) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "gif",
+		Type:  InlineQueryResultTypeGif,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -4496,7 +4666,7 @@ func (v InlineQueryResultLocation) inlineQueryResult() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v InlineQueryResultLocation) GetType() string {
-	return "location"
+	return InlineQueryResultTypeLocation
 }
 
 // GetId is a helper method to easily access the common fields of an interface.
@@ -4531,7 +4701,7 @@ func (v InlineQueryResultLocation) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "location",
+		Type:  InlineQueryResultTypeLocation,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -4563,7 +4733,7 @@ type InlineQueryResultMpeg4Gif struct {
 	ParseMode string `json:"parse_mode,omitempty"`
 	// Optional. List of special entities that appear in the caption, which can be specified instead of parse_mode
 	CaptionEntities []MessageEntity `json:"caption_entities,omitempty"`
-	// Optional. Pass True, if the caption must be shown above the message media
+	// Optional. Pass True if the caption must be shown above the message media
 	ShowCaptionAboveMedia bool `json:"show_caption_above_media,omitempty"`
 	// Optional. Inline keyboard attached to the message
 	ReplyMarkup *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
@@ -4576,7 +4746,7 @@ func (v InlineQueryResultMpeg4Gif) inlineQueryResult() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v InlineQueryResultMpeg4Gif) GetType() string {
-	return "mpeg4_gif"
+	return InlineQueryResultTypeMpeg4Gif
 }
 
 // GetId is a helper method to easily access the common fields of an interface.
@@ -4612,7 +4782,7 @@ func (v InlineQueryResultMpeg4Gif) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "mpeg4_gif",
+		Type:  InlineQueryResultTypeMpeg4Gif,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -4642,7 +4812,7 @@ type InlineQueryResultPhoto struct {
 	ParseMode string `json:"parse_mode,omitempty"`
 	// Optional. List of special entities that appear in the caption, which can be specified instead of parse_mode
 	CaptionEntities []MessageEntity `json:"caption_entities,omitempty"`
-	// Optional. Pass True, if the caption must be shown above the message media
+	// Optional. Pass True if the caption must be shown above the message media
 	ShowCaptionAboveMedia bool `json:"show_caption_above_media,omitempty"`
 	// Optional. Inline keyboard attached to the message
 	ReplyMarkup *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
@@ -4655,7 +4825,7 @@ func (v InlineQueryResultPhoto) inlineQueryResult() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v InlineQueryResultPhoto) GetType() string {
-	return "photo"
+	return InlineQueryResultTypePhoto
 }
 
 // GetId is a helper method to easily access the common fields of an interface.
@@ -4690,7 +4860,7 @@ func (v InlineQueryResultPhoto) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "photo",
+		Type:  InlineQueryResultTypePhoto,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -4735,7 +4905,7 @@ func (v InlineQueryResultVenue) inlineQueryResult() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v InlineQueryResultVenue) GetType() string {
-	return "venue"
+	return InlineQueryResultTypeVenue
 }
 
 // GetId is a helper method to easily access the common fields of an interface.
@@ -4771,7 +4941,7 @@ func (v InlineQueryResultVenue) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "venue",
+		Type:  InlineQueryResultTypeVenue,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -4797,7 +4967,7 @@ type InlineQueryResultVideo struct {
 	ParseMode string `json:"parse_mode,omitempty"`
 	// Optional. List of special entities that appear in the caption, which can be specified instead of parse_mode
 	CaptionEntities []MessageEntity `json:"caption_entities,omitempty"`
-	// Optional. Pass True, if the caption must be shown above the message media
+	// Optional. Pass True if the caption must be shown above the message media
 	ShowCaptionAboveMedia bool `json:"show_caption_above_media,omitempty"`
 	// Optional. Video width
 	VideoWidth int64 `json:"video_width,omitempty"`
@@ -4818,7 +4988,7 @@ func (v InlineQueryResultVideo) inlineQueryResult() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v InlineQueryResultVideo) GetType() string {
-	return "video"
+	return InlineQueryResultTypeVideo
 }
 
 // GetId is a helper method to easily access the common fields of an interface.
@@ -4855,7 +5025,7 @@ func (v InlineQueryResultVideo) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "video",
+		Type:  InlineQueryResultTypeVideo,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -4890,7 +5060,7 @@ func (v InlineQueryResultVoice) inlineQueryResult() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v InlineQueryResultVoice) GetType() string {
-	return "voice"
+	return InlineQueryResultTypeVoice
 }
 
 // GetId is a helper method to easily access the common fields of an interface.
@@ -4921,7 +5091,7 @@ func (v InlineQueryResultVoice) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "voice",
+		Type:  InlineQueryResultTypeVoice,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -5009,7 +5179,7 @@ type InputInvoiceMessageContent struct {
 	Prices []LabeledPrice `json:"prices,omitempty"`
 	// Optional. The maximum accepted amount for tips in the smallest units of the currency (integer, not float/double). For example, for a maximum tip of US$ 1.45 pass max_tip_amount = 145. See the exp parameter in currencies.json, it shows the number of digits past the decimal point for each currency (2 for the majority of currencies). Defaults to 0. Not supported for payments in Telegram Stars.
 	MaxTipAmount int64 `json:"max_tip_amount,omitempty"`
-	// Optional. A JSON-serialized array of suggested amounts of tip in the smallest units of the currency (integer, not float/double). At most 4 suggested tip amounts can be specified. The suggested tip amounts must be positive, passed in a strictly increased order and must not exceed max_tip_amount.
+	// Optional. A JSON-serialized Array of suggested amounts of tip in the smallest units of the currency (integer, not float/double). At most 4 suggested tip amounts can be specified. The suggested tip amounts must be positive, passed in a strictly increased order and must not exceed max_tip_amount.
 	SuggestedTipAmounts []int64 `json:"suggested_tip_amounts,omitempty"`
 	// Optional. A JSON-serialized object for data about the invoice, which will be shared with the payment provider. A detailed description of the required fields should be provided by the payment provider.
 	ProviderData string `json:"provider_data,omitempty"`
@@ -5116,7 +5286,7 @@ type InputMediaAnimation struct {
 	ParseMode string `json:"parse_mode,omitempty"`
 	// Optional. List of special entities that appear in the caption, which can be specified instead of parse_mode
 	CaptionEntities []MessageEntity `json:"caption_entities,omitempty"`
-	// Optional. Pass True, if the caption must be shown above the message media
+	// Optional. Pass True if the caption must be shown above the message media
 	ShowCaptionAboveMedia bool `json:"show_caption_above_media,omitempty"`
 	// Optional. Animation width
 	Width int64 `json:"width,omitempty"`
@@ -5139,7 +5309,7 @@ func (v InputMediaAnimation) inputMedia() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v InputMediaAnimation) GetType() string {
-	return "animation"
+	return InputMediaTypeAnimation
 }
 
 // GetMedia is a helper method to easily access the common fields of an interface.
@@ -5154,7 +5324,7 @@ func (v InputMediaAnimation) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "animation",
+		Type:  InputMediaTypeAnimation,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -5208,7 +5378,7 @@ func (v InputMediaAudio) inputMedia() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v InputMediaAudio) GetType() string {
-	return "audio"
+	return InputMediaTypeAudio
 }
 
 // GetMedia is a helper method to easily access the common fields of an interface.
@@ -5223,7 +5393,7 @@ func (v InputMediaAudio) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "audio",
+		Type:  InputMediaTypeAudio,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -5273,7 +5443,7 @@ func (v InputMediaDocument) inputMedia() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v InputMediaDocument) GetType() string {
-	return "document"
+	return InputMediaTypeDocument
 }
 
 // GetMedia is a helper method to easily access the common fields of an interface.
@@ -5288,7 +5458,7 @@ func (v InputMediaDocument) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "document",
+		Type:  InputMediaTypeDocument,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -5312,6 +5482,35 @@ func (v InputMediaDocument) Attach(mediaName string, w *multipart.Writer) error 
 	return nil
 }
 
+// InputMediaLink (https://core.telegram.org/bots/api#inputmedialink)
+//
+// Represents an HTTP link to be sent.
+type InputMediaLink struct {
+	// HTTP URL of the link
+	Url string `json:"url"`
+}
+
+// InputMediaLink.inputPollOptionMedia is a dummy method to avoid interface implementation.
+func (v InputMediaLink) inputPollOptionMedia() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v InputMediaLink) GetType() string {
+	return InputPollOptionMediaTypeLink
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v InputMediaLink) MarshalJSON() ([]byte, error) {
+	type alias InputMediaLink
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  InputPollOptionMediaTypeLink,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
 // InputMediaLivePhoto (https://core.telegram.org/bots/api#inputmedialivephoto)
 //
 // Represents a live photo to be sent.
@@ -5326,7 +5525,7 @@ type InputMediaLivePhoto struct {
 	ParseMode string `json:"parse_mode,omitempty"`
 	// Optional. List of special entities that appear in the caption, which can be specified instead of parse_mode
 	CaptionEntities []MessageEntity `json:"caption_entities,omitempty"`
-	// Optional. Pass True, if the caption must be shown above the message media
+	// Optional. Pass True if the caption must be shown above the message media
 	ShowCaptionAboveMedia bool `json:"show_caption_above_media,omitempty"`
 	// Optional. Pass True if the live photo needs to be covered with a spoiler animation
 	HasSpoiler bool `json:"has_spoiler,omitempty"`
@@ -5343,7 +5542,7 @@ func (v InputMediaLivePhoto) inputMedia() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v InputMediaLivePhoto) GetType() string {
-	return "live_photo"
+	return InputMediaTypeLivePhoto
 }
 
 // GetMedia is a helper method to easily access the common fields of an interface.
@@ -5358,7 +5557,7 @@ func (v InputMediaLivePhoto) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "live_photo",
+		Type:  InputMediaTypeLivePhoto,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -5392,7 +5591,7 @@ func (v InputMediaLocation) inputPollMedia() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v InputMediaLocation) GetType() string {
-	return "input_media_location"
+	return InputPollMediaTypeLocation
 }
 
 // MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
@@ -5402,7 +5601,7 @@ func (v InputMediaLocation) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "input_media_location",
+		Type:  InputPollMediaTypeLocation,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -5423,7 +5622,7 @@ type InputMediaPhoto struct {
 	ParseMode string `json:"parse_mode,omitempty"`
 	// Optional. List of special entities that appear in the caption, which can be specified instead of parse_mode
 	CaptionEntities []MessageEntity `json:"caption_entities,omitempty"`
-	// Optional. Pass True, if the caption must be shown above the message media
+	// Optional. Pass True if the caption must be shown above the message media
 	ShowCaptionAboveMedia bool `json:"show_caption_above_media,omitempty"`
 	// Optional. Pass True if the photo needs to be covered with a spoiler animation
 	HasSpoiler bool `json:"has_spoiler,omitempty"`
@@ -5440,7 +5639,7 @@ func (v InputMediaPhoto) inputMedia() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v InputMediaPhoto) GetType() string {
-	return "photo"
+	return InputMediaTypePhoto
 }
 
 // GetMedia is a helper method to easily access the common fields of an interface.
@@ -5455,7 +5654,7 @@ func (v InputMediaPhoto) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "photo",
+		Type:  InputMediaTypePhoto,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -5487,7 +5686,7 @@ func (v InputMediaSticker) inputPollOptionMedia() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v InputMediaSticker) GetType() string {
-	return "input_media_sticker"
+	return InputPollOptionMediaTypeSticker
 }
 
 // MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
@@ -5497,7 +5696,7 @@ func (v InputMediaSticker) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "input_media_sticker",
+		Type:  InputPollOptionMediaTypeSticker,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -5541,7 +5740,7 @@ func (v InputMediaVenue) inputPollMedia() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v InputMediaVenue) GetType() string {
-	return "input_media_venue"
+	return InputPollMediaTypeVenue
 }
 
 // MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
@@ -5551,7 +5750,7 @@ func (v InputMediaVenue) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "input_media_venue",
+		Type:  InputPollMediaTypeVenue,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -5578,7 +5777,7 @@ type InputMediaVideo struct {
 	ParseMode string `json:"parse_mode,omitempty"`
 	// Optional. List of special entities that appear in the caption, which can be specified instead of parse_mode
 	CaptionEntities []MessageEntity `json:"caption_entities,omitempty"`
-	// Optional. Pass True, if the caption must be shown above the message media
+	// Optional. Pass True if the caption must be shown above the message media
 	ShowCaptionAboveMedia bool `json:"show_caption_above_media,omitempty"`
 	// Optional. Video width
 	Width int64 `json:"width,omitempty"`
@@ -5603,7 +5802,7 @@ func (v InputMediaVideo) inputMedia() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v InputMediaVideo) GetType() string {
-	return "video"
+	return InputMediaTypeVideo
 }
 
 // GetMedia is a helper method to easily access the common fields of an interface.
@@ -5618,7 +5817,7 @@ func (v InputMediaVideo) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "video",
+		Type:  InputMediaTypeVideo,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -5642,10 +5841,40 @@ func (v InputMediaVideo) Attach(mediaName string, w *multipart.Writer) error {
 	return nil
 }
 
+// InputMediaVoiceNote (https://core.telegram.org/bots/api#inputmediavoicenote)
+//
+// Represents a voice message file to be sent.
+type InputMediaVoiceNote struct {
+	// Type of the media, must be voice_note
+	Type string `json:"type"`
+	// File to send. Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass "attach://<file_attach_name>" to upload a new one using multipart/form-data under <file_attach_name> name. More information on Sending Files: https://core.telegram.org/bots/api#sending-files
+	Media InputFileOrString `json:"media"`
+	// Optional. Caption of the voice message to be sent, 0-1024 characters after entities parsing
+	Caption string `json:"caption,omitempty"`
+	// Optional. Mode for parsing entities in the voice message caption. See formatting options for more details.
+	ParseMode string `json:"parse_mode,omitempty"`
+	// Optional. List of special entities that appear in the caption, which can be specified instead of parse_mode
+	CaptionEntities []MessageEntity `json:"caption_entities,omitempty"`
+	// Optional. Duration of the voice message in seconds
+	Duration int64 `json:"duration,omitempty"`
+}
+
+func (v InputMediaVoiceNote) Attach(mediaName string, w *multipart.Writer) error {
+	if v.Media != nil {
+		err := v.Media.Attach(mediaName, w)
+		if err != nil {
+			return fmt.Errorf("failed to attach input file for %s: %w", mediaName, err)
+		}
+	}
+
+	return nil
+}
+
 // InputMessageContent (https://core.telegram.org/bots/api#inputmessagecontent)
 //
-// This object represents the content of a message to be sent as a result of an inline query. Telegram clients currently support the following 5 types:
+// This object represents the content of a message to be sent as a result of an inline query. Telegram clients currently support the following types:
 //   - InputTextMessageContent
+//   - InputRichMessageContent
 //   - InputLocationMessageContent
 //   - InputVenueMessageContent
 //   - InputContactMessageContent
@@ -5658,6 +5887,7 @@ type InputMessageContent interface {
 // Ensure that all subtypes correctly implement the parent interface.
 var (
 	_ InputMessageContent = InputTextMessageContent{}
+	_ InputMessageContent = InputRichMessageContent{}
 	_ InputMessageContent = InputLocationMessageContent{}
 	_ InputMessageContent = InputVenueMessageContent{}
 	_ InputMessageContent = InputContactMessageContent{}
@@ -5714,7 +5944,7 @@ func (v InputPaidMediaLivePhoto) inputPaidMedia() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v InputPaidMediaLivePhoto) GetType() string {
-	return "live_photo"
+	return InputPaidMediaTypeLivePhoto
 }
 
 // GetMedia is a helper method to easily access the common fields of an interface.
@@ -5729,7 +5959,7 @@ func (v InputPaidMediaLivePhoto) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "live_photo",
+		Type:  InputPaidMediaTypeLivePhoto,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -5759,7 +5989,7 @@ func (v InputPaidMediaPhoto) inputPaidMedia() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v InputPaidMediaPhoto) GetType() string {
-	return "photo"
+	return InputPaidMediaTypePhoto
 }
 
 // GetMedia is a helper method to easily access the common fields of an interface.
@@ -5774,7 +6004,7 @@ func (v InputPaidMediaPhoto) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "photo",
+		Type:  InputPaidMediaTypePhoto,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -5818,7 +6048,7 @@ func (v InputPaidMediaVideo) inputPaidMedia() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v InputPaidMediaVideo) GetType() string {
-	return "video"
+	return InputPaidMediaTypeVideo
 }
 
 // GetMedia is a helper method to easily access the common fields of an interface.
@@ -5833,7 +6063,7 @@ func (v InputPaidMediaVideo) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "video",
+		Type:  InputPaidMediaTypeVideo,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -5904,6 +6134,7 @@ type InputPollOption struct {
 //
 // This object represents the content of a poll option to be sent. It should be one of
 //   - InputMediaAnimation
+//   - InputMediaLink
 //   - InputMediaLivePhoto
 //   - InputMediaLocation
 //   - InputMediaPhoto
@@ -5919,6 +6150,7 @@ type InputPollOptionMedia interface {
 // Ensure that all subtypes correctly implement the parent interface.
 var (
 	_ InputPollOptionMedia = InputMediaAnimation{}
+	_ InputPollOptionMedia = InputMediaLink{}
 	_ InputPollOptionMedia = InputMediaLivePhoto{}
 	_ InputPollOptionMedia = InputMediaLocation{}
 	_ InputPollOptionMedia = InputMediaPhoto{}
@@ -5966,7 +6198,7 @@ func (v MergedInputProfilePhoto) GetType() string {
 // MergedInputProfilePhoto.inputProfilePhoto is a dummy method to avoid interface implementation.
 func (v MergedInputProfilePhoto) inputProfilePhoto() {}
 
-// MergeInputProfilePhoto returns a MergedInputProfilePhoto struct to simplify working with types in a non-generic world.
+// MergeInputProfilePhoto returns itself, as it is already merged.
 func (v MergedInputProfilePhoto) MergeInputProfilePhoto() MergedInputProfilePhoto {
 	return v
 }
@@ -5986,7 +6218,7 @@ func (v InputProfilePhotoAnimated) inputProfilePhoto() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v InputProfilePhotoAnimated) GetType() string {
-	return "animated"
+	return InputProfilePhotoTypeAnimated
 }
 
 // MergeInputProfilePhoto returns a MergedInputProfilePhoto struct to simplify working with types in a non-generic world.
@@ -6005,7 +6237,7 @@ func (v InputProfilePhotoAnimated) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "animated",
+		Type:  InputProfilePhotoTypeAnimated,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -6024,7 +6256,7 @@ func (v InputProfilePhotoStatic) inputProfilePhoto() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v InputProfilePhotoStatic) GetType() string {
-	return "static"
+	return InputProfilePhotoTypeStatic
 }
 
 // MergeInputProfilePhoto returns a MergedInputProfilePhoto struct to simplify working with types in a non-generic world.
@@ -6042,10 +6274,921 @@ func (v InputProfilePhotoStatic) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "static",
+		Type:  InputProfilePhotoTypeStatic,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
+}
+
+// InputRichBlock (https://core.telegram.org/bots/api#inputrichblock)
+//
+// This object represents a block in a rich formatted message to be sent. Currently, it can be any of the following types:
+//   - InputRichBlockParagraph
+//   - InputRichBlockSectionHeading
+//   - InputRichBlockPreformatted
+//   - InputRichBlockFooter
+//   - InputRichBlockDivider
+//   - InputRichBlockMathematicalExpression
+//   - InputRichBlockAnchor
+//   - InputRichBlockList
+//   - InputRichBlockBlockQuotation
+//   - InputRichBlockExpandableBlockQuotation
+//   - InputRichBlockPullQuotation
+//   - InputRichBlockCollage
+//   - InputRichBlockSlideshow
+//   - InputRichBlockTable
+//   - InputRichBlockDetails
+//   - InputRichBlockMap
+//   - InputRichBlockButtons
+//   - InputRichBlockAnimation
+//   - InputRichBlockAudio
+//   - InputRichBlockDocument
+//   - InputRichBlockPhoto
+//   - InputRichBlockVideo
+//   - InputRichBlockVoiceNote
+//   - InputRichBlockThinking
+type InputRichBlock interface {
+	GetType() string
+	// inputRichBlock exists to avoid external types implementing this interface.
+	inputRichBlock()
+}
+
+// Ensure that all subtypes correctly implement the parent interface.
+var (
+	_ InputRichBlock = InputRichBlockParagraph{}
+	_ InputRichBlock = InputRichBlockSectionHeading{}
+	_ InputRichBlock = InputRichBlockPreformatted{}
+	_ InputRichBlock = InputRichBlockFooter{}
+	_ InputRichBlock = InputRichBlockDivider{}
+	_ InputRichBlock = InputRichBlockMathematicalExpression{}
+	_ InputRichBlock = InputRichBlockAnchor{}
+	_ InputRichBlock = InputRichBlockList{}
+	_ InputRichBlock = InputRichBlockBlockQuotation{}
+	_ InputRichBlock = InputRichBlockExpandableBlockQuotation{}
+	_ InputRichBlock = InputRichBlockPullQuotation{}
+	_ InputRichBlock = InputRichBlockCollage{}
+	_ InputRichBlock = InputRichBlockSlideshow{}
+	_ InputRichBlock = InputRichBlockTable{}
+	_ InputRichBlock = InputRichBlockDetails{}
+	_ InputRichBlock = InputRichBlockMap{}
+	_ InputRichBlock = InputRichBlockButtons{}
+	_ InputRichBlock = InputRichBlockAnimation{}
+	_ InputRichBlock = InputRichBlockAudio{}
+	_ InputRichBlock = InputRichBlockDocument{}
+	_ InputRichBlock = InputRichBlockPhoto{}
+	_ InputRichBlock = InputRichBlockVideo{}
+	_ InputRichBlock = InputRichBlockVoiceNote{}
+	_ InputRichBlock = InputRichBlockThinking{}
+)
+
+// InputRichBlockAnchor (https://core.telegram.org/bots/api#inputrichblockanchor)
+//
+// A block with an anchor, corresponding to the HTML tag <a> with the attribute name.
+type InputRichBlockAnchor struct {
+	// The name of the anchor
+	Name string `json:"name"`
+}
+
+// InputRichBlockAnchor.inputRichBlock is a dummy method to avoid interface implementation.
+func (v InputRichBlockAnchor) inputRichBlock() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v InputRichBlockAnchor) GetType() string {
+	return InputRichBlockTypeAnchor
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v InputRichBlockAnchor) MarshalJSON() ([]byte, error) {
+	type alias InputRichBlockAnchor
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  InputRichBlockTypeAnchor,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// InputRichBlockAnimation (https://core.telegram.org/bots/api#inputrichblockanimation)
+//
+// A block with an animation, corresponding to the HTML tag <video>.
+type InputRichBlockAnimation struct {
+	// The animation. Caption is ignored.
+	Animation InputMediaAnimation `json:"animation"`
+	// Optional. Caption of the block
+	Caption *RichBlockCaption `json:"caption,omitempty"`
+}
+
+// InputRichBlockAnimation.inputRichBlock is a dummy method to avoid interface implementation.
+func (v InputRichBlockAnimation) inputRichBlock() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v InputRichBlockAnimation) GetType() string {
+	return InputRichBlockTypeAnimation
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v InputRichBlockAnimation) MarshalJSON() ([]byte, error) {
+	type alias InputRichBlockAnimation
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  InputRichBlockTypeAnimation,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+func (v InputRichBlockAnimation) Attach(mediaName string, w *multipart.Writer) error {
+	err := v.Animation.Attach(mediaName, w)
+	if err != nil {
+		return fmt.Errorf("failed to attach input file for %s: %w", mediaName, err)
+	}
+
+	return nil
+}
+
+// InputRichBlockAudio (https://core.telegram.org/bots/api#inputrichblockaudio)
+//
+// A block with a music file, corresponding to the HTML tag <audio>.
+type InputRichBlockAudio struct {
+	// The audio. Caption is ignored.
+	Audio InputMediaAudio `json:"audio"`
+	// Optional. Caption of the block
+	Caption *RichBlockCaption `json:"caption,omitempty"`
+}
+
+// InputRichBlockAudio.inputRichBlock is a dummy method to avoid interface implementation.
+func (v InputRichBlockAudio) inputRichBlock() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v InputRichBlockAudio) GetType() string {
+	return InputRichBlockTypeAudio
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v InputRichBlockAudio) MarshalJSON() ([]byte, error) {
+	type alias InputRichBlockAudio
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  InputRichBlockTypeAudio,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+func (v InputRichBlockAudio) Attach(mediaName string, w *multipart.Writer) error {
+	err := v.Audio.Attach(mediaName, w)
+	if err != nil {
+		return fmt.Errorf("failed to attach input file for %s: %w", mediaName, err)
+	}
+
+	return nil
+}
+
+// InputRichBlockBlockQuotation (https://core.telegram.org/bots/api#inputrichblockblockquotation)
+//
+// A block quotation, corresponding to the HTML tag <blockquote>.
+type InputRichBlockBlockQuotation struct {
+	// Content of the block
+	Blocks []InputRichBlock `json:"blocks,omitempty"`
+	// Optional. Credit of the block
+	Credit RichText `json:"credit,omitempty"`
+}
+
+// InputRichBlockBlockQuotation.inputRichBlock is a dummy method to avoid interface implementation.
+func (v InputRichBlockBlockQuotation) inputRichBlock() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v InputRichBlockBlockQuotation) GetType() string {
+	return InputRichBlockTypeBlockquote
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v InputRichBlockBlockQuotation) MarshalJSON() ([]byte, error) {
+	type alias InputRichBlockBlockQuotation
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  InputRichBlockTypeBlockquote,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// InputRichBlockButtons (https://core.telegram.org/bots/api#inputrichblockbuttons)
+//
+// A block containing a list of buttons that are shown in one row, corresponding to the custom HTML tag <tg-button-row>.
+type InputRichBlockButtons struct {
+	// List of 1-8 buttons to send
+	Buttons []RichMessageButton `json:"buttons,omitempty"`
+	// Optional. Horizontal alignment of the buttons. Currently, must be one of "left", "center", or "right".
+	Align string `json:"align,omitempty"`
+}
+
+// InputRichBlockButtons.inputRichBlock is a dummy method to avoid interface implementation.
+func (v InputRichBlockButtons) inputRichBlock() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v InputRichBlockButtons) GetType() string {
+	return InputRichBlockTypeButtons
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v InputRichBlockButtons) MarshalJSON() ([]byte, error) {
+	type alias InputRichBlockButtons
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  InputRichBlockTypeButtons,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// InputRichBlockCollage (https://core.telegram.org/bots/api#inputrichblockcollage)
+//
+// A collage, corresponding to the custom HTML tag <tg-collage>.
+type InputRichBlockCollage struct {
+	// Elements of the collage
+	Blocks []InputRichBlock `json:"blocks,omitempty"`
+	// Optional. Caption of the block
+	Caption *RichBlockCaption `json:"caption,omitempty"`
+}
+
+// InputRichBlockCollage.inputRichBlock is a dummy method to avoid interface implementation.
+func (v InputRichBlockCollage) inputRichBlock() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v InputRichBlockCollage) GetType() string {
+	return InputRichBlockTypeCollage
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v InputRichBlockCollage) MarshalJSON() ([]byte, error) {
+	type alias InputRichBlockCollage
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  InputRichBlockTypeCollage,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// InputRichBlockDetails (https://core.telegram.org/bots/api#inputrichblockdetails)
+//
+// An expandable block for details disclosure, corresponding to the HTML tag <details>.
+type InputRichBlockDetails struct {
+	// Always shown summary of the block
+	Summary RichText `json:"summary"`
+	// Content of the block
+	Blocks []InputRichBlock `json:"blocks,omitempty"`
+	// Optional. Pass True if the content of the block is visible by default
+	IsOpen bool `json:"is_open,omitempty"`
+}
+
+// InputRichBlockDetails.inputRichBlock is a dummy method to avoid interface implementation.
+func (v InputRichBlockDetails) inputRichBlock() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v InputRichBlockDetails) GetType() string {
+	return InputRichBlockTypeDetails
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v InputRichBlockDetails) MarshalJSON() ([]byte, error) {
+	type alias InputRichBlockDetails
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  InputRichBlockTypeDetails,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// InputRichBlockDivider (https://core.telegram.org/bots/api#inputrichblockdivider)
+//
+// A divider, corresponding to the HTML tag <hr/>.
+type InputRichBlockDivider struct{}
+
+// InputRichBlockDivider.inputRichBlock is a dummy method to avoid interface implementation.
+func (v InputRichBlockDivider) inputRichBlock() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v InputRichBlockDivider) GetType() string {
+	return InputRichBlockTypeDivider
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v InputRichBlockDivider) MarshalJSON() ([]byte, error) {
+	type alias InputRichBlockDivider
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  InputRichBlockTypeDivider,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// InputRichBlockDocument (https://core.telegram.org/bots/api#inputrichblockdocument)
+//
+// A block with a general file, corresponding to the custom HTML tag <tg-document>.
+type InputRichBlockDocument struct {
+	// The document. Caption is ignored.
+	Document InputMediaDocument `json:"document"`
+	// Optional. Caption of the block
+	Caption *RichBlockCaption `json:"caption,omitempty"`
+}
+
+// InputRichBlockDocument.inputRichBlock is a dummy method to avoid interface implementation.
+func (v InputRichBlockDocument) inputRichBlock() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v InputRichBlockDocument) GetType() string {
+	return InputRichBlockTypeDocument
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v InputRichBlockDocument) MarshalJSON() ([]byte, error) {
+	type alias InputRichBlockDocument
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  InputRichBlockTypeDocument,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+func (v InputRichBlockDocument) Attach(mediaName string, w *multipart.Writer) error {
+	err := v.Document.Attach(mediaName, w)
+	if err != nil {
+		return fmt.Errorf("failed to attach input file for %s: %w", mediaName, err)
+	}
+
+	return nil
+}
+
+// InputRichBlockExpandableBlockQuotation (https://core.telegram.org/bots/api#inputrichblockexpandableblockquotation)
+//
+// A block quotation, corresponding to the HTML tag <blockquote> with custom attribute "expandable".
+type InputRichBlockExpandableBlockQuotation struct {
+	// Content of the block
+	Text RichText `json:"text"`
+	// Optional. Credit of the block
+	Credit RichText `json:"credit,omitempty"`
+}
+
+// InputRichBlockExpandableBlockQuotation.inputRichBlock is a dummy method to avoid interface implementation.
+func (v InputRichBlockExpandableBlockQuotation) inputRichBlock() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v InputRichBlockExpandableBlockQuotation) GetType() string {
+	return InputRichBlockTypeExpandableBlockquote
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v InputRichBlockExpandableBlockQuotation) MarshalJSON() ([]byte, error) {
+	type alias InputRichBlockExpandableBlockQuotation
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  InputRichBlockTypeExpandableBlockquote,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// InputRichBlockFooter (https://core.telegram.org/bots/api#inputrichblockfooter)
+//
+// A footer, corresponding to the HTML tag <footer>.
+type InputRichBlockFooter struct {
+	// Text of the block
+	Text RichText `json:"text"`
+}
+
+// InputRichBlockFooter.inputRichBlock is a dummy method to avoid interface implementation.
+func (v InputRichBlockFooter) inputRichBlock() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v InputRichBlockFooter) GetType() string {
+	return InputRichBlockTypeFooter
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v InputRichBlockFooter) MarshalJSON() ([]byte, error) {
+	type alias InputRichBlockFooter
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  InputRichBlockTypeFooter,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// InputRichBlockList (https://core.telegram.org/bots/api#inputrichblocklist)
+//
+// A list of blocks, corresponding to the HTML tag <ul> or <ol> with multiple nested tags <li>.
+type InputRichBlockList struct {
+	// Items of the list
+	Items []InputRichBlockListItem `json:"items,omitempty"`
+}
+
+// InputRichBlockList.inputRichBlock is a dummy method to avoid interface implementation.
+func (v InputRichBlockList) inputRichBlock() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v InputRichBlockList) GetType() string {
+	return InputRichBlockTypeList
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v InputRichBlockList) MarshalJSON() ([]byte, error) {
+	type alias InputRichBlockList
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  InputRichBlockTypeList,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// InputRichBlockListItem (https://core.telegram.org/bots/api#inputrichblocklistitem)
+//
+// An item of a list to be sent.
+type InputRichBlockListItem struct {
+	// The content of the item
+	Blocks []InputRichBlock `json:"blocks,omitempty"`
+	// Optional. Pass True if the item has a checkbox
+	HasCheckbox bool `json:"has_checkbox,omitempty"`
+	// Optional. Pass True if the item has a checked checkbox
+	IsChecked bool `json:"is_checked,omitempty"`
+	// Optional. For ordered lists, the numeric value of the item label
+	Value int64 `json:"value,omitempty"`
+	// Optional. For ordered lists, the type of the item label; must be one of "a" for lowercase letters, "A" for uppercase letters, "i" for lowercase Roman numerals, "I" for uppercase Roman numerals, or "1" for decimal numbers
+	Type string `json:"type,omitempty"`
+}
+
+// InputRichBlockMap (https://core.telegram.org/bots/api#inputrichblockmap)
+//
+// A block with a map, corresponding to the custom HTML tag <tg-map>. The map's width and height must not exceed 10000 in total. The width and height ratio must be at most 20.
+type InputRichBlockMap struct {
+	// Location of the center of the map
+	Location Location `json:"location"`
+	// Optional. Map zoom level; 0-24
+	Zoom int64 `json:"zoom,omitempty"`
+	// Optional. Map width; 0-10000
+	Width int64 `json:"width,omitempty"`
+	// Optional. Map height; 0-10000
+	Height int64 `json:"height,omitempty"`
+	// Optional. Caption of the block
+	Caption *RichBlockCaption `json:"caption,omitempty"`
+}
+
+// InputRichBlockMap.inputRichBlock is a dummy method to avoid interface implementation.
+func (v InputRichBlockMap) inputRichBlock() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v InputRichBlockMap) GetType() string {
+	return InputRichBlockTypeMap
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v InputRichBlockMap) MarshalJSON() ([]byte, error) {
+	type alias InputRichBlockMap
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  InputRichBlockTypeMap,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// InputRichBlockMathematicalExpression (https://core.telegram.org/bots/api#inputrichblockmathematicalexpression)
+//
+// A block with a mathematical expression in LaTeX format, corresponding to the custom HTML tag <tg-math-block>.
+type InputRichBlockMathematicalExpression struct {
+	// The mathematical expression in LaTeX format
+	Expression string `json:"expression"`
+}
+
+// InputRichBlockMathematicalExpression.inputRichBlock is a dummy method to avoid interface implementation.
+func (v InputRichBlockMathematicalExpression) inputRichBlock() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v InputRichBlockMathematicalExpression) GetType() string {
+	return InputRichBlockTypeMathematicalExpression
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v InputRichBlockMathematicalExpression) MarshalJSON() ([]byte, error) {
+	type alias InputRichBlockMathematicalExpression
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  InputRichBlockTypeMathematicalExpression,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// InputRichBlockParagraph (https://core.telegram.org/bots/api#inputrichblockparagraph)
+//
+// A text paragraph, corresponding to the HTML tag <p>.
+type InputRichBlockParagraph struct {
+	// Text of the block
+	Text RichText `json:"text"`
+}
+
+// InputRichBlockParagraph.inputRichBlock is a dummy method to avoid interface implementation.
+func (v InputRichBlockParagraph) inputRichBlock() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v InputRichBlockParagraph) GetType() string {
+	return InputRichBlockTypeParagraph
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v InputRichBlockParagraph) MarshalJSON() ([]byte, error) {
+	type alias InputRichBlockParagraph
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  InputRichBlockTypeParagraph,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// InputRichBlockPhoto (https://core.telegram.org/bots/api#inputrichblockphoto)
+//
+// A block with a photo, corresponding to the HTML tag <img>.
+type InputRichBlockPhoto struct {
+	// The photo. Caption is ignored.
+	Photo InputMediaPhoto `json:"photo"`
+	// Optional. Caption of the block
+	Caption *RichBlockCaption `json:"caption,omitempty"`
+}
+
+// InputRichBlockPhoto.inputRichBlock is a dummy method to avoid interface implementation.
+func (v InputRichBlockPhoto) inputRichBlock() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v InputRichBlockPhoto) GetType() string {
+	return InputRichBlockTypePhoto
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v InputRichBlockPhoto) MarshalJSON() ([]byte, error) {
+	type alias InputRichBlockPhoto
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  InputRichBlockTypePhoto,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+func (v InputRichBlockPhoto) Attach(mediaName string, w *multipart.Writer) error {
+	err := v.Photo.Attach(mediaName, w)
+	if err != nil {
+		return fmt.Errorf("failed to attach input file for %s: %w", mediaName, err)
+	}
+
+	return nil
+}
+
+// InputRichBlockPreformatted (https://core.telegram.org/bots/api#inputrichblockpreformatted)
+//
+// A preformatted text block, corresponding to the nested HTML tags <pre> and <code>.
+type InputRichBlockPreformatted struct {
+	// Text of the block
+	Text RichText `json:"text"`
+	// Optional. The programming language of the text
+	Language string `json:"language,omitempty"`
+}
+
+// InputRichBlockPreformatted.inputRichBlock is a dummy method to avoid interface implementation.
+func (v InputRichBlockPreformatted) inputRichBlock() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v InputRichBlockPreformatted) GetType() string {
+	return InputRichBlockTypePre
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v InputRichBlockPreformatted) MarshalJSON() ([]byte, error) {
+	type alias InputRichBlockPreformatted
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  InputRichBlockTypePre,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// InputRichBlockPullQuotation (https://core.telegram.org/bots/api#inputrichblockpullquotation)
+//
+// A quotation with centered text, loosely corresponding to the HTML tag <aside>.
+type InputRichBlockPullQuotation struct {
+	// Text of the block
+	Text RichText `json:"text"`
+	// Optional. Credit of the block
+	Credit RichText `json:"credit,omitempty"`
+}
+
+// InputRichBlockPullQuotation.inputRichBlock is a dummy method to avoid interface implementation.
+func (v InputRichBlockPullQuotation) inputRichBlock() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v InputRichBlockPullQuotation) GetType() string {
+	return InputRichBlockTypePullquote
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v InputRichBlockPullQuotation) MarshalJSON() ([]byte, error) {
+	type alias InputRichBlockPullQuotation
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  InputRichBlockTypePullquote,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// InputRichBlockSectionHeading (https://core.telegram.org/bots/api#inputrichblocksectionheading)
+//
+// A section heading, corresponding to the HTML tags <h1>, <h2>, <h3>, <h4>, <h5>, or <h6>.
+type InputRichBlockSectionHeading struct {
+	// Text of the block
+	Text RichText `json:"text"`
+	// Relative size of the text font; 1-6, 1 is the largest, 6 is the smallest
+	Size int64 `json:"size"`
+}
+
+// InputRichBlockSectionHeading.inputRichBlock is a dummy method to avoid interface implementation.
+func (v InputRichBlockSectionHeading) inputRichBlock() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v InputRichBlockSectionHeading) GetType() string {
+	return InputRichBlockTypeHeading
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v InputRichBlockSectionHeading) MarshalJSON() ([]byte, error) {
+	type alias InputRichBlockSectionHeading
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  InputRichBlockTypeHeading,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// InputRichBlockSlideshow (https://core.telegram.org/bots/api#inputrichblockslideshow)
+//
+// A slideshow, corresponding to the custom HTML tag <tg-slideshow>.
+type InputRichBlockSlideshow struct {
+	// Elements of the slideshow
+	Blocks []InputRichBlock `json:"blocks,omitempty"`
+	// Optional. Caption of the block
+	Caption *RichBlockCaption `json:"caption,omitempty"`
+}
+
+// InputRichBlockSlideshow.inputRichBlock is a dummy method to avoid interface implementation.
+func (v InputRichBlockSlideshow) inputRichBlock() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v InputRichBlockSlideshow) GetType() string {
+	return InputRichBlockTypeSlideshow
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v InputRichBlockSlideshow) MarshalJSON() ([]byte, error) {
+	type alias InputRichBlockSlideshow
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  InputRichBlockTypeSlideshow,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// InputRichBlockTable (https://core.telegram.org/bots/api#inputrichblocktable)
+//
+// A table, corresponding to the HTML tag <table>.
+type InputRichBlockTable struct {
+	// Cells of the table
+	Cells [][]RichBlockTableCell `json:"cells,omitempty"`
+	// Optional. Pass True if the table has borders
+	IsBordered bool `json:"is_bordered,omitempty"`
+	// Optional. Pass True if the table is striped
+	IsStriped bool `json:"is_striped,omitempty"`
+	// Optional. Pass True if table cells must have smaller indents
+	IsCompact bool `json:"is_compact,omitempty"`
+	// Optional. Caption of the table
+	Caption RichText `json:"caption,omitempty"`
+}
+
+// InputRichBlockTable.inputRichBlock is a dummy method to avoid interface implementation.
+func (v InputRichBlockTable) inputRichBlock() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v InputRichBlockTable) GetType() string {
+	return InputRichBlockTypeTable
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v InputRichBlockTable) MarshalJSON() ([]byte, error) {
+	type alias InputRichBlockTable
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  InputRichBlockTypeTable,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// InputRichBlockThinking (https://core.telegram.org/bots/api#inputrichblockthinking)
+//
+// A block with a "Thinking..." placeholder, corresponding to the custom HTML tag <tg-thinking>. The block may be used only in sendRichMessageDraft, therefore it can't be received in messages. See https://t.me/addemoji/AIActions for examples of custom emoji that are recommended for usage in the block.
+type InputRichBlockThinking struct {
+	// Text of the block. See https://t.me/addemoji/AIActions for examples of custom emoji that are recommended for usage in the block.
+	Text RichText `json:"text"`
+}
+
+// InputRichBlockThinking.inputRichBlock is a dummy method to avoid interface implementation.
+func (v InputRichBlockThinking) inputRichBlock() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v InputRichBlockThinking) GetType() string {
+	return InputRichBlockTypeThinking
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v InputRichBlockThinking) MarshalJSON() ([]byte, error) {
+	type alias InputRichBlockThinking
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  InputRichBlockTypeThinking,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// InputRichBlockVideo (https://core.telegram.org/bots/api#inputrichblockvideo)
+//
+// A block with a video, corresponding to the HTML tag <video>.
+type InputRichBlockVideo struct {
+	// The video. Caption is ignored.
+	Video InputMediaVideo `json:"video"`
+	// Optional. Caption of the block
+	Caption *RichBlockCaption `json:"caption,omitempty"`
+}
+
+// InputRichBlockVideo.inputRichBlock is a dummy method to avoid interface implementation.
+func (v InputRichBlockVideo) inputRichBlock() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v InputRichBlockVideo) GetType() string {
+	return InputRichBlockTypeVideo
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v InputRichBlockVideo) MarshalJSON() ([]byte, error) {
+	type alias InputRichBlockVideo
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  InputRichBlockTypeVideo,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+func (v InputRichBlockVideo) Attach(mediaName string, w *multipart.Writer) error {
+	err := v.Video.Attach(mediaName, w)
+	if err != nil {
+		return fmt.Errorf("failed to attach input file for %s: %w", mediaName, err)
+	}
+
+	return nil
+}
+
+// InputRichBlockVoiceNote (https://core.telegram.org/bots/api#inputrichblockvoicenote)
+//
+// A block with a voice note, corresponding to the HTML tag <audio>.
+type InputRichBlockVoiceNote struct {
+	// The voice note. Caption is ignored.
+	VoiceNote InputMediaVoiceNote `json:"voice_note"`
+	// Optional. Caption of the block
+	Caption *RichBlockCaption `json:"caption,omitempty"`
+}
+
+// InputRichBlockVoiceNote.inputRichBlock is a dummy method to avoid interface implementation.
+func (v InputRichBlockVoiceNote) inputRichBlock() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v InputRichBlockVoiceNote) GetType() string {
+	return InputRichBlockTypeVoiceNote
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v InputRichBlockVoiceNote) MarshalJSON() ([]byte, error) {
+	type alias InputRichBlockVoiceNote
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  InputRichBlockTypeVoiceNote,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+func (v InputRichBlockVoiceNote) Attach(mediaName string, w *multipart.Writer) error {
+	err := v.VoiceNote.Attach(mediaName, w)
+	if err != nil {
+		return fmt.Errorf("failed to attach input file for %s: %w", mediaName, err)
+	}
+
+	return nil
+}
+
+// InputRichMessage (https://core.telegram.org/bots/api#inputrichmessage)
+//
+// Describes a rich message to be sent. Exactly one of the fields html, markdown, or blocks must be used.
+type InputRichMessage struct {
+	// Optional. Content of the rich message to send described as a list of blocks
+	Blocks []InputRichBlock `json:"blocks,omitempty"`
+	// Optional. Content of the rich message to send described using HTML formatting. See rich message formatting options for more details. Use media field to specify the media used in the message.
+	Html string `json:"html,omitempty"`
+	// Optional. Content of the rich message to send described using Markdown formatting. See rich message formatting options for more details. Use media field to specify the media used in the message.
+	Markdown string `json:"markdown,omitempty"`
+	// Optional. List of media that are specified in the markdown or html fields using tg://photo?id=, tg://video?id=, tg://document?id=, and tg://audio?id= links
+	Media []InputRichMessageMedia `json:"media,omitempty"`
+	// Optional. Pass True if the rich message must be shown right-to-left
+	IsRtl bool `json:"is_rtl,omitempty"`
+	// Optional. Pass True to skip automatic detection of entities (e.g., URLs, email addresses, username mentions, hashtags, cashtags, bot commands, or phone numbers) in the text
+	SkipEntityDetection bool `json:"skip_entity_detection,omitempty"`
+}
+
+// InputRichMessageContent (https://core.telegram.org/bots/api#inputrichmessagecontent)
+//
+// Represents the content of a rich message to be sent as the result of an inline query.
+type InputRichMessageContent struct {
+	// The message to be sent. Only previously uploaded files may be used in the message.
+	RichMessage InputRichMessage `json:"rich_message"`
+}
+
+// InputRichMessageContent.inputMessageContent is a dummy method to avoid interface implementation.
+func (v InputRichMessageContent) inputMessageContent() {}
+
+// InputRichMessageMedia (https://core.telegram.org/bots/api#inputrichmessagemedia)
+//
+// Describes a media element embedded in an outgoing rich message.
+type InputRichMessageMedia struct {
+	// Unique identifier of the media used in a tg://photo?id=, tg://video?id=, tg://document?id=, or tg://audio?id= link. 1-64 characters, only A-Z, a-z, 0-9, _ and - are allowed.
+	Id string `json:"id"`
+	// The media to be sent. Everything except the media itself and its properties is ignored.
+	Media InputMedia `json:"media"`
 }
 
 // InputSticker (https://core.telegram.org/bots/api#inputsticker)
@@ -6131,7 +7274,7 @@ func (v MergedInputStoryContent) GetType() string {
 // MergedInputStoryContent.inputStoryContent is a dummy method to avoid interface implementation.
 func (v MergedInputStoryContent) inputStoryContent() {}
 
-// MergeInputStoryContent returns a MergedInputStoryContent struct to simplify working with types in a non-generic world.
+// MergeInputStoryContent returns itself, as it is already merged.
 func (v MergedInputStoryContent) MergeInputStoryContent() MergedInputStoryContent {
 	return v
 }
@@ -6149,7 +7292,7 @@ func (v InputStoryContentPhoto) inputStoryContent() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v InputStoryContentPhoto) GetType() string {
-	return "photo"
+	return InputStoryContentTypePhoto
 }
 
 // MergeInputStoryContent returns a MergedInputStoryContent struct to simplify working with types in a non-generic world.
@@ -6167,7 +7310,7 @@ func (v InputStoryContentPhoto) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "photo",
+		Type:  InputStoryContentTypePhoto,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -6192,7 +7335,7 @@ func (v InputStoryContentVideo) inputStoryContent() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v InputStoryContentVideo) GetType() string {
-	return "video"
+	return InputStoryContentTypeVideo
 }
 
 // MergeInputStoryContent returns a MergedInputStoryContent struct to simplify working with types in a non-generic world.
@@ -6213,7 +7356,7 @@ func (v InputStoryContentVideo) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "video",
+		Type:  InputStoryContentTypeVideo,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -6381,6 +7524,14 @@ type LabeledPrice struct {
 	Amount int64 `json:"amount"`
 }
 
+// Link (https://core.telegram.org/bots/api#link)
+//
+// Represents an HTTP link.
+type Link struct {
+	// URL of the link
+	Url string `json:"url"`
+}
+
 // LinkPreviewOptions (https://core.telegram.org/bots/api#linkpreviewoptions)
 //
 // Describes the options used for link preview generation.
@@ -6453,14 +7604,13 @@ type LocationAddress struct {
 
 // LoginUrl (https://core.telegram.org/bots/api#loginurl)
 //
-// This object represents a parameter of the inline keyboard button used to automatically authorize a user. Serves as a great replacement for the Telegram Login Widget when the user is coming from Telegram. All the user needs to do is tap/click a button and confirm that they want to log in:
-// Telegram apps support these buttons as of version 5.7.
+// This object represents a parameter of the inline keyboard button used to automatically authorize a user. It serves as a great replacement for the Telegram Login Widget when the user is coming from Telegram. All the user needs to do is tap/click a button and confirm that they want to log in:
 type LoginUrl struct {
 	// An HTTPS URL to be opened with user authorization data added to the query string when the button is pressed. If the user refuses to provide authorization data, the original URL without information about the user will be opened. The data added is the same as described in Receiving authorization data. NOTE: You must always check the hash of the received data to verify the authentication and the integrity of the data as described in Checking authorization.
 	Url string `json:"url"`
 	// Optional. New text of the button in forwarded messages
 	ForwardText string `json:"forward_text,omitempty"`
-	// Optional. Username of a bot, which will be used for user authorization. See Setting up a bot for more details. If not specified, the current bot's username will be assumed. The url's domain must be the same as the domain linked with the bot. See Linking your domain to the bot for more details.
+	// Optional. Username of a bot, which will be used for user authorization; not supported in RichMessageButton. See Setting up a bot for more details. If not specified, the current bot's username will be assumed. The url's domain must be the same as the domain linked with the bot. See Linking your domain to the bot for more details.
 	BotUsername *string `json:"bot_username,omitempty"`
 	// Optional. Pass True to request the permission for your bot to send messages to the user
 	RequestWriteAccess bool `json:"request_write_access,omitempty"`
@@ -6528,7 +7678,7 @@ type MaybeInaccessibleMessage interface {
 	// EditReplyMarkup is a helper method for Bot.EditMessageReplyMarkup.
 	EditReplyMarkup(b *Bot, opts *EditMessageReplyMarkupOpts) (*Message, bool, error)
 	// EditText is a helper method for Bot.EditMessageText.
-	EditText(b *Bot, text string, opts *EditMessageTextOpts) (*Message, bool, error)
+	EditText(b *Bot, opts *EditMessageTextOpts) (*Message, bool, error)
 	// Forward is a helper method for Bot.ForwardMessage.
 	Forward(b *Bot, chatId int64, opts *ForwardMessageOpts) (*Message, error)
 	// Pin is a helper method for Bot.PinChatMessage.
@@ -6590,10 +7740,31 @@ func (v MergedMenuButton) GetType() string {
 // MergedMenuButton.menuButton is a dummy method to avoid interface implementation.
 func (v MergedMenuButton) menuButton() {}
 
-// MergeMenuButton returns a MergedMenuButton struct to simplify working with types in a non-generic world.
+// MergeMenuButton returns itself, as it is already merged.
 func (v MergedMenuButton) MergeMenuButton() MergedMenuButton {
 	return v
 }
+
+type MenuButtonUnknown struct {
+	RawType string
+	Data    json.RawMessage
+}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v MenuButtonUnknown) GetType() string {
+	return v.RawType
+}
+
+// MergeMenuButton returns a MergedMenuButton struct to simplify working with types in a non-generic world.
+func (v MenuButtonUnknown) MergeMenuButton() MergedMenuButton {
+	return MergedMenuButton{}
+}
+func (v MenuButtonUnknown) MarshalJSON() ([]byte, error) {
+	return v.Data, nil
+}
+
+// MenuButtonUnknown.menuButton is a dummy method to avoid interface implementation.
+func (v MenuButtonUnknown) menuButton() {}
 
 // unmarshalMenuButtonArray is a JSON unmarshalling helper which allows unmarshalling an array of interfaces
 // using unmarshalMenuButton.
@@ -6661,7 +7832,7 @@ func unmarshalMenuButton(d json.RawMessage) (MenuButton, error) {
 		return s, nil
 
 	}
-	return nil, fmt.Errorf("unknown interface for MenuButton with Type %v", t.Type)
+	return MenuButtonUnknown{RawType: t.Type, Data: d}, nil
 }
 
 // MenuButtonCommands (https://core.telegram.org/bots/api#menubuttoncommands)
@@ -6674,7 +7845,7 @@ func (v MenuButtonCommands) menuButton() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v MenuButtonCommands) GetType() string {
-	return "commands"
+	return MenuButtonTypeCommands
 }
 
 // MergeMenuButton returns a MergedMenuButton struct to simplify working with types in a non-generic world.
@@ -6691,7 +7862,7 @@ func (v MenuButtonCommands) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "commands",
+		Type:  MenuButtonTypeCommands,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -6707,7 +7878,7 @@ func (v MenuButtonDefault) menuButton() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v MenuButtonDefault) GetType() string {
-	return "default"
+	return MenuButtonTypeDefault
 }
 
 // MergeMenuButton returns a MergedMenuButton struct to simplify working with types in a non-generic world.
@@ -6724,7 +7895,7 @@ func (v MenuButtonDefault) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "default",
+		Type:  MenuButtonTypeDefault,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -6745,7 +7916,7 @@ func (v MenuButtonWebApp) menuButton() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v MenuButtonWebApp) GetType() string {
-	return "web_app"
+	return MenuButtonTypeWebApp
 }
 
 // MergeMenuButton returns a MergedMenuButton struct to simplify working with types in a non-generic world.
@@ -6764,7 +7935,7 @@ func (v MenuButtonWebApp) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "web_app",
+		Type:  MenuButtonTypeWebApp,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -6774,7 +7945,7 @@ func (v MenuButtonWebApp) MarshalJSON() ([]byte, error) {
 //
 // This object represents a message.
 type Message struct {
-	// Unique message identifier inside this chat. In specific instances (e.g., message containing a video sent to a big chat), the server might automatically schedule a message instead of sending it immediately. In such cases, this field will be 0 and the relevant message will be unusable until it is actually sent.
+	// Unique message identifier inside this chat; 0 for ephemeral messages. In specific instances (e.g., a message containing a video sent to a big chat), the server might automatically schedule a message instead of sending it immediately. In such cases, this field will be 0 and the relevant message will be unusable until it is actually sent.
 	MessageId int64 `json:"message_id"`
 	// Optional. Unique identifier of a message thread or forum topic to which the message belongs; for supergroups and private chats only
 	MessageThreadId int64 `json:"message_thread_id,omitempty"`
@@ -6790,6 +7961,10 @@ type Message struct {
 	SenderBusinessBot *User `json:"sender_business_bot,omitempty"`
 	// Optional. Tag or custom title of the sender of the message; for supergroups only
 	SenderTag string `json:"sender_tag,omitempty"`
+	// Optional. For ephemeral messages, the user who received the message
+	ReceiverUser *User `json:"receiver_user,omitempty"`
+	// Optional. For ephemeral messages, identifier of the ephemeral message inside this chat. The identifier may be reused for another ephemeral message after the message is deleted or expires.
+	EphemeralMessageId int64 `json:"ephemeral_message_id,omitempty"`
 	// Date the message was sent in Unix time. It is always a positive number, representing a valid date.
 	Date int64 `json:"date"`
 	// Optional. The unique identifier for the guest query. Use this identifier with the method answerGuestQuery to send a response message. If non-empty, the message belongs to the chat where the guest bot was summoned, which may not coincide with other existing bot chats sharing the same identifier.
@@ -6804,7 +7979,7 @@ type Message struct {
 	IsTopicMessage bool `json:"is_topic_message,omitempty"`
 	// Optional. True, if the message is a channel post that was automatically forwarded to the connected discussion group
 	IsAutomaticForward bool `json:"is_automatic_forward,omitempty"`
-	// Optional. For replies in the same chat and message thread, the original message. Note that the Message object in this field will not contain further reply_to_message fields even if it itself is a reply.
+	// Optional. For replies in the same chat and message thread, the original message. Note that the Message object in this field will not contain further reply_to_message fields even if it itself is a reply. If the message is a reply to an ephemeral message, then this field may be omitted.
 	ReplyToMessage *Message `json:"reply_to_message,omitempty"`
 	// Optional. Information about the message that is being replied to, which may come from another chat or forum topic
 	ExternalReply *ExternalReplyInfo `json:"external_reply,omitempty"`
@@ -6846,6 +8021,8 @@ type Message struct {
 	SuggestedPostInfo *SuggestedPostInfo `json:"suggested_post_info,omitempty"`
 	// Optional. Unique identifier of the message effect added to the message
 	EffectId string `json:"effect_id,omitempty"`
+	// Optional. Message is a rich formatted message
+	RichMessage *RichMessage `json:"rich_message,omitempty"`
 	// Optional. Message is an animation, information about the animation. For backward compatibility, when this field is set, the document field will also be set.
 	Animation *Animation `json:"animation,omitempty"`
 	// Optional. Message is an audio file, information about the file
@@ -6940,7 +8117,7 @@ type Message struct {
 	WriteAccessAllowed *WriteAccessAllowed `json:"write_access_allowed,omitempty"`
 	// Optional. Telegram Passport data
 	PassportData *PassportData `json:"passport_data,omitempty"`
-	// Optional. Service message. A user in the chat triggered another user's proximity alert while sharing Live Location.
+	// Optional. Service message: a user in the chat triggered another user's proximity alert while sharing Live Location
 	ProximityAlertTriggered *ProximityAlertTriggered `json:"proximity_alert_triggered,omitempty"`
 	// Optional. Service message: user boosted the chat
 	BoostAdded *ChatBoostAdded `json:"boost_added,omitempty"`
@@ -6950,6 +8127,12 @@ type Message struct {
 	ChecklistTasksDone *ChecklistTasksDone `json:"checklist_tasks_done,omitempty"`
 	// Optional. Service message: tasks were added to a checklist
 	ChecklistTasksAdded *ChecklistTasksAdded `json:"checklist_tasks_added,omitempty"`
+	// Optional. Service message: chat or bot added to a Community
+	CommunityChatAdded *CommunityChatAdded `json:"community_chat_added,omitempty"`
+	// Optional. Service message: chat was joined by a user from a Community
+	CommunityChatJoined *CommunityChatJoined `json:"community_chat_joined,omitempty"`
+	// Optional. Service message: chat or bot removed from a Community
+	CommunityChatRemoved *CommunityChatRemoved `json:"community_chat_removed,omitempty"`
 	// Optional. Service message: the price for paid messages in the corresponding direct messages chat of a channel has changed
 	DirectMessagePriceChanged *DirectMessagePriceChanged `json:"direct_message_price_changed,omitempty"`
 	// Optional. Service message: forum topic created
@@ -7016,6 +8199,8 @@ func (v *Message) UnmarshalJSON(b []byte) error {
 		SenderBoostCount              int64                          `json:"sender_boost_count"`
 		SenderBusinessBot             *User                          `json:"sender_business_bot"`
 		SenderTag                     string                         `json:"sender_tag"`
+		ReceiverUser                  *User                          `json:"receiver_user"`
+		EphemeralMessageId            int64                          `json:"ephemeral_message_id"`
 		Date                          int64                          `json:"date"`
 		GuestQueryId                  string                         `json:"guest_query_id"`
 		BusinessConnectionId          string                         `json:"business_connection_id"`
@@ -7044,6 +8229,7 @@ func (v *Message) UnmarshalJSON(b []byte) error {
 		LinkPreviewOptions            *LinkPreviewOptions            `json:"link_preview_options"`
 		SuggestedPostInfo             *SuggestedPostInfo             `json:"suggested_post_info"`
 		EffectId                      string                         `json:"effect_id"`
+		RichMessage                   *RichMessage                   `json:"rich_message"`
 		Animation                     *Animation                     `json:"animation"`
 		Audio                         *Audio                         `json:"audio"`
 		Document                      *Document                      `json:"document"`
@@ -7096,6 +8282,9 @@ func (v *Message) UnmarshalJSON(b []byte) error {
 		ChatBackgroundSet             *ChatBackground                `json:"chat_background_set"`
 		ChecklistTasksDone            *ChecklistTasksDone            `json:"checklist_tasks_done"`
 		ChecklistTasksAdded           *ChecklistTasksAdded           `json:"checklist_tasks_added"`
+		CommunityChatAdded            *CommunityChatAdded            `json:"community_chat_added"`
+		CommunityChatJoined           *CommunityChatJoined           `json:"community_chat_joined"`
+		CommunityChatRemoved          *CommunityChatRemoved          `json:"community_chat_removed"`
 		DirectMessagePriceChanged     *DirectMessagePriceChanged     `json:"direct_message_price_changed"`
 		ForumTopicCreated             *ForumTopicCreated             `json:"forum_topic_created"`
 		ForumTopicEdited              *ForumTopicEdited              `json:"forum_topic_edited"`
@@ -7137,6 +8326,8 @@ func (v *Message) UnmarshalJSON(b []byte) error {
 	v.SenderBoostCount = t.SenderBoostCount
 	v.SenderBusinessBot = t.SenderBusinessBot
 	v.SenderTag = t.SenderTag
+	v.ReceiverUser = t.ReceiverUser
+	v.EphemeralMessageId = t.EphemeralMessageId
 	v.Date = t.Date
 	v.GuestQueryId = t.GuestQueryId
 	v.BusinessConnectionId = t.BusinessConnectionId
@@ -7168,6 +8359,7 @@ func (v *Message) UnmarshalJSON(b []byte) error {
 	v.LinkPreviewOptions = t.LinkPreviewOptions
 	v.SuggestedPostInfo = t.SuggestedPostInfo
 	v.EffectId = t.EffectId
+	v.RichMessage = t.RichMessage
 	v.Animation = t.Animation
 	v.Audio = t.Audio
 	v.Document = t.Document
@@ -7223,6 +8415,9 @@ func (v *Message) UnmarshalJSON(b []byte) error {
 	v.ChatBackgroundSet = t.ChatBackgroundSet
 	v.ChecklistTasksDone = t.ChecklistTasksDone
 	v.ChecklistTasksAdded = t.ChecklistTasksAdded
+	v.CommunityChatAdded = t.CommunityChatAdded
+	v.CommunityChatJoined = t.CommunityChatJoined
+	v.CommunityChatRemoved = t.CommunityChatRemoved
 	v.DirectMessagePriceChanged = t.DirectMessagePriceChanged
 	v.ForumTopicCreated = t.ForumTopicCreated
 	v.ForumTopicEdited = t.ForumTopicEdited
@@ -7303,6 +8498,18 @@ type MessageEntity struct {
 	DateTimeFormat string `json:"date_time_format,omitempty"`
 }
 
+// MessageGenerationStopped (https://core.telegram.org/bots/api#messagegenerationstopped)
+//
+// This object describes an update about a user stopping message generation.
+type MessageGenerationStopped struct {
+	// Chat in which the message is generated
+	Chat Chat `json:"chat"`
+	// Optional. Unique identifier of the message thread in which the message is generated
+	MessageThreadId int64 `json:"message_thread_id,omitempty"`
+	// Unique identifier of the message draft which was stopped
+	DraftId int64 `json:"draft_id"`
+}
+
 // MessageId (https://core.telegram.org/bots/api#messageid)
 //
 // This object represents a unique message identifier.
@@ -7368,10 +8575,36 @@ func (v MergedMessageOrigin) GetDate() int64 {
 // MergedMessageOrigin.messageOrigin is a dummy method to avoid interface implementation.
 func (v MergedMessageOrigin) messageOrigin() {}
 
-// MergeMessageOrigin returns a MergedMessageOrigin struct to simplify working with types in a non-generic world.
+// MergeMessageOrigin returns itself, as it is already merged.
 func (v MergedMessageOrigin) MergeMessageOrigin() MergedMessageOrigin {
 	return v
 }
+
+type MessageOriginUnknown struct {
+	RawType string
+	Data    json.RawMessage
+}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v MessageOriginUnknown) GetType() string {
+	return v.RawType
+}
+
+// GetDate is a helper method to easily access the common fields of an interface.
+func (v MessageOriginUnknown) GetDate() int64 {
+	return 0 // Return empty data for unknown entries.
+}
+
+// MergeMessageOrigin returns a MergedMessageOrigin struct to simplify working with types in a non-generic world.
+func (v MessageOriginUnknown) MergeMessageOrigin() MergedMessageOrigin {
+	return MergedMessageOrigin{}
+}
+func (v MessageOriginUnknown) MarshalJSON() ([]byte, error) {
+	return v.Data, nil
+}
+
+// MessageOriginUnknown.messageOrigin is a dummy method to avoid interface implementation.
+func (v MessageOriginUnknown) messageOrigin() {}
 
 // unmarshalMessageOriginArray is a JSON unmarshalling helper which allows unmarshalling an array of interfaces
 // using unmarshalMessageOrigin.
@@ -7447,7 +8680,7 @@ func unmarshalMessageOrigin(d json.RawMessage) (MessageOrigin, error) {
 		return s, nil
 
 	}
-	return nil, fmt.Errorf("unknown interface for MessageOrigin with Type %v", t.Type)
+	return MessageOriginUnknown{RawType: t.Type, Data: d}, nil
 }
 
 // MessageOriginChannel (https://core.telegram.org/bots/api#messageoriginchannel)
@@ -7469,7 +8702,7 @@ func (v MessageOriginChannel) messageOrigin() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v MessageOriginChannel) GetType() string {
-	return "channel"
+	return MessageOriginTypeChannel
 }
 
 // GetDate is a helper method to easily access the common fields of an interface.
@@ -7495,7 +8728,7 @@ func (v MessageOriginChannel) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "channel",
+		Type:  MessageOriginTypeChannel,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -7518,7 +8751,7 @@ func (v MessageOriginChat) messageOrigin() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v MessageOriginChat) GetType() string {
-	return "chat"
+	return MessageOriginTypeChat
 }
 
 // GetDate is a helper method to easily access the common fields of an interface.
@@ -7543,7 +8776,7 @@ func (v MessageOriginChat) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "chat",
+		Type:  MessageOriginTypeChat,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -7564,7 +8797,7 @@ func (v MessageOriginHiddenUser) messageOrigin() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v MessageOriginHiddenUser) GetType() string {
-	return "hidden_user"
+	return MessageOriginTypeHiddenUser
 }
 
 // GetDate is a helper method to easily access the common fields of an interface.
@@ -7588,7 +8821,7 @@ func (v MessageOriginHiddenUser) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "hidden_user",
+		Type:  MessageOriginTypeHiddenUser,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -7609,7 +8842,7 @@ func (v MessageOriginUser) messageOrigin() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v MessageOriginUser) GetType() string {
-	return "user"
+	return MessageOriginTypeUser
 }
 
 // GetDate is a helper method to easily access the common fields of an interface.
@@ -7633,7 +8866,7 @@ func (v MessageOriginUser) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "user",
+		Type:  MessageOriginTypeUser,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -7740,6 +8973,27 @@ var (
 	_ OwnedGift = OwnedGiftUnique{}
 )
 
+type OwnedGiftUnknown struct {
+	RawType string
+	Data    json.RawMessage
+}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v OwnedGiftUnknown) GetType() string {
+	return v.RawType
+}
+
+// GetSendDate is a helper method to easily access the common fields of an interface.
+func (v OwnedGiftUnknown) GetSendDate() int64 {
+	return 0 // Return empty data for unknown entries.
+}
+func (v OwnedGiftUnknown) MarshalJSON() ([]byte, error) {
+	return v.Data, nil
+}
+
+// OwnedGiftUnknown.ownedGift is a dummy method to avoid interface implementation.
+func (v OwnedGiftUnknown) ownedGift() {}
+
 // unmarshalOwnedGiftArray is a JSON unmarshalling helper which allows unmarshalling an array of interfaces
 // using unmarshalOwnedGift.
 func unmarshalOwnedGiftArray(d json.RawMessage) ([]OwnedGift, error) {
@@ -7798,7 +9052,7 @@ func unmarshalOwnedGift(d json.RawMessage) (OwnedGift, error) {
 		return s, nil
 
 	}
-	return nil, fmt.Errorf("unknown interface for OwnedGift with Type %v", t.Type)
+	return OwnedGiftUnknown{RawType: t.Type, Data: d}, nil
 }
 
 // OwnedGiftRegular (https://core.telegram.org/bots/api#ownedgiftregular)
@@ -7840,7 +9094,7 @@ func (v OwnedGiftRegular) ownedGift() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v OwnedGiftRegular) GetType() string {
-	return "regular"
+	return OwnedGiftTypeRegular
 }
 
 // GetSendDate is a helper method to easily access the common fields of an interface.
@@ -7855,7 +9109,7 @@ func (v OwnedGiftRegular) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "regular",
+		Type:  OwnedGiftTypeRegular,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -7888,7 +9142,7 @@ func (v OwnedGiftUnique) ownedGift() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v OwnedGiftUnique) GetType() string {
-	return "unique"
+	return OwnedGiftTypeUnique
 }
 
 // GetSendDate is a helper method to easily access the common fields of an interface.
@@ -7903,7 +9157,7 @@ func (v OwnedGiftUnique) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "unique",
+		Type:  OwnedGiftTypeUnique,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -7965,6 +9219,22 @@ var (
 	_ PaidMedia = PaidMediaPreview{}
 	_ PaidMedia = PaidMediaVideo{}
 )
+
+type PaidMediaUnknown struct {
+	RawType string
+	Data    json.RawMessage
+}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v PaidMediaUnknown) GetType() string {
+	return v.RawType
+}
+func (v PaidMediaUnknown) MarshalJSON() ([]byte, error) {
+	return v.Data, nil
+}
+
+// PaidMediaUnknown.paidMedia is a dummy method to avoid interface implementation.
+func (v PaidMediaUnknown) paidMedia() {}
 
 // unmarshalPaidMediaArray is a JSON unmarshalling helper which allows unmarshalling an array of interfaces
 // using unmarshalPaidMedia.
@@ -8040,7 +9310,7 @@ func unmarshalPaidMedia(d json.RawMessage) (PaidMedia, error) {
 		return s, nil
 
 	}
-	return nil, fmt.Errorf("unknown interface for PaidMedia with Type %v", t.Type)
+	return PaidMediaUnknown{RawType: t.Type, Data: d}, nil
 }
 
 // PaidMediaInfo (https://core.telegram.org/bots/api#paidmediainfo)
@@ -8088,7 +9358,7 @@ func (v PaidMediaLivePhoto) paidMedia() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v PaidMediaLivePhoto) GetType() string {
-	return "live_photo"
+	return PaidMediaTypeLivePhoto
 }
 
 // MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
@@ -8098,7 +9368,7 @@ func (v PaidMediaLivePhoto) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "live_photo",
+		Type:  PaidMediaTypeLivePhoto,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -8117,7 +9387,7 @@ func (v PaidMediaPhoto) paidMedia() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v PaidMediaPhoto) GetType() string {
-	return "photo"
+	return PaidMediaTypePhoto
 }
 
 // MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
@@ -8127,7 +9397,7 @@ func (v PaidMediaPhoto) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "photo",
+		Type:  PaidMediaTypePhoto,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -8150,7 +9420,7 @@ func (v PaidMediaPreview) paidMedia() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v PaidMediaPreview) GetType() string {
-	return "preview"
+	return PaidMediaTypePreview
 }
 
 // MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
@@ -8160,7 +9430,7 @@ func (v PaidMediaPreview) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "preview",
+		Type:  PaidMediaTypePreview,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -8189,7 +9459,7 @@ func (v PaidMediaVideo) paidMedia() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v PaidMediaVideo) GetType() string {
-	return "video"
+	return PaidMediaTypeVideo
 }
 
 // MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
@@ -8199,7 +9469,7 @@ func (v PaidMediaVideo) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "video",
+		Type:  PaidMediaTypeVideo,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -8296,7 +9566,7 @@ func (v MergedPassportElementError) GetMessage() string {
 // MergedPassportElementError.passportElementError is a dummy method to avoid interface implementation.
 func (v MergedPassportElementError) passportElementError() {}
 
-// MergePassportElementError returns a MergedPassportElementError struct to simplify working with types in a non-generic world.
+// MergePassportElementError returns itself, as it is already merged.
 func (v MergedPassportElementError) MergePassportElementError() MergedPassportElementError {
 	return v
 }
@@ -8320,7 +9590,7 @@ func (v PassportElementErrorDataField) passportElementError() {}
 
 // GetSource is a helper method to easily access the common fields of an interface.
 func (v PassportElementErrorDataField) GetSource() string {
-	return "data"
+	return PassportElementErrorSourceData
 }
 
 // GetType is a helper method to easily access the common fields of an interface.
@@ -8351,7 +9621,7 @@ func (v PassportElementErrorDataField) MarshalJSON() ([]byte, error) {
 		Source string `json:"source"`
 		alias
 	}{
-		Source: "data",
+		Source: PassportElementErrorSourceData,
 		alias:  (alias)(v),
 	}
 	return json.Marshal(a)
@@ -8374,7 +9644,7 @@ func (v PassportElementErrorFile) passportElementError() {}
 
 // GetSource is a helper method to easily access the common fields of an interface.
 func (v PassportElementErrorFile) GetSource() string {
-	return "file"
+	return PassportElementErrorSourceFile
 }
 
 // GetType is a helper method to easily access the common fields of an interface.
@@ -8404,7 +9674,7 @@ func (v PassportElementErrorFile) MarshalJSON() ([]byte, error) {
 		Source string `json:"source"`
 		alias
 	}{
-		Source: "file",
+		Source: PassportElementErrorSourceFile,
 		alias:  (alias)(v),
 	}
 	return json.Marshal(a)
@@ -8427,7 +9697,7 @@ func (v PassportElementErrorFiles) passportElementError() {}
 
 // GetSource is a helper method to easily access the common fields of an interface.
 func (v PassportElementErrorFiles) GetSource() string {
-	return "files"
+	return PassportElementErrorSourceFiles
 }
 
 // GetType is a helper method to easily access the common fields of an interface.
@@ -8457,7 +9727,7 @@ func (v PassportElementErrorFiles) MarshalJSON() ([]byte, error) {
 		Source string `json:"source"`
 		alias
 	}{
-		Source: "files",
+		Source: PassportElementErrorSourceFiles,
 		alias:  (alias)(v),
 	}
 	return json.Marshal(a)
@@ -8480,7 +9750,7 @@ func (v PassportElementErrorFrontSide) passportElementError() {}
 
 // GetSource is a helper method to easily access the common fields of an interface.
 func (v PassportElementErrorFrontSide) GetSource() string {
-	return "front_side"
+	return PassportElementErrorSourceFrontSide
 }
 
 // GetType is a helper method to easily access the common fields of an interface.
@@ -8510,7 +9780,7 @@ func (v PassportElementErrorFrontSide) MarshalJSON() ([]byte, error) {
 		Source string `json:"source"`
 		alias
 	}{
-		Source: "front_side",
+		Source: PassportElementErrorSourceFrontSide,
 		alias:  (alias)(v),
 	}
 	return json.Marshal(a)
@@ -8533,7 +9803,7 @@ func (v PassportElementErrorReverseSide) passportElementError() {}
 
 // GetSource is a helper method to easily access the common fields of an interface.
 func (v PassportElementErrorReverseSide) GetSource() string {
-	return "reverse_side"
+	return PassportElementErrorSourceReverseSide
 }
 
 // GetType is a helper method to easily access the common fields of an interface.
@@ -8563,7 +9833,7 @@ func (v PassportElementErrorReverseSide) MarshalJSON() ([]byte, error) {
 		Source string `json:"source"`
 		alias
 	}{
-		Source: "reverse_side",
+		Source: PassportElementErrorSourceReverseSide,
 		alias:  (alias)(v),
 	}
 	return json.Marshal(a)
@@ -8586,7 +9856,7 @@ func (v PassportElementErrorSelfie) passportElementError() {}
 
 // GetSource is a helper method to easily access the common fields of an interface.
 func (v PassportElementErrorSelfie) GetSource() string {
-	return "selfie"
+	return PassportElementErrorSourceSelfie
 }
 
 // GetType is a helper method to easily access the common fields of an interface.
@@ -8616,7 +9886,7 @@ func (v PassportElementErrorSelfie) MarshalJSON() ([]byte, error) {
 		Source string `json:"source"`
 		alias
 	}{
-		Source: "selfie",
+		Source: PassportElementErrorSourceSelfie,
 		alias:  (alias)(v),
 	}
 	return json.Marshal(a)
@@ -8639,7 +9909,7 @@ func (v PassportElementErrorTranslationFile) passportElementError() {}
 
 // GetSource is a helper method to easily access the common fields of an interface.
 func (v PassportElementErrorTranslationFile) GetSource() string {
-	return "translation_file"
+	return PassportElementErrorSourceTranslationFile
 }
 
 // GetType is a helper method to easily access the common fields of an interface.
@@ -8669,7 +9939,7 @@ func (v PassportElementErrorTranslationFile) MarshalJSON() ([]byte, error) {
 		Source string `json:"source"`
 		alias
 	}{
-		Source: "translation_file",
+		Source: PassportElementErrorSourceTranslationFile,
 		alias:  (alias)(v),
 	}
 	return json.Marshal(a)
@@ -8692,7 +9962,7 @@ func (v PassportElementErrorTranslationFiles) passportElementError() {}
 
 // GetSource is a helper method to easily access the common fields of an interface.
 func (v PassportElementErrorTranslationFiles) GetSource() string {
-	return "translation_files"
+	return PassportElementErrorSourceTranslationFiles
 }
 
 // GetType is a helper method to easily access the common fields of an interface.
@@ -8722,7 +9992,7 @@ func (v PassportElementErrorTranslationFiles) MarshalJSON() ([]byte, error) {
 		Source string `json:"source"`
 		alias
 	}{
-		Source: "translation_files",
+		Source: PassportElementErrorSourceTranslationFiles,
 		alias:  (alias)(v),
 	}
 	return json.Marshal(a)
@@ -8745,7 +10015,7 @@ func (v PassportElementErrorUnspecified) passportElementError() {}
 
 // GetSource is a helper method to easily access the common fields of an interface.
 func (v PassportElementErrorUnspecified) GetSource() string {
-	return "unspecified"
+	return PassportElementErrorSourceUnspecified
 }
 
 // GetType is a helper method to easily access the common fields of an interface.
@@ -8775,7 +10045,7 @@ func (v PassportElementErrorUnspecified) MarshalJSON() ([]byte, error) {
 		Source string `json:"source"`
 		alias
 	}{
-		Source: "unspecified",
+		Source: PassportElementErrorSourceUnspecified,
 		alias:  (alias)(v),
 	}
 	return json.Marshal(a)
@@ -8885,6 +10155,8 @@ type PollMedia struct {
 	Audio *Audio `json:"audio,omitempty"`
 	// Optional. Media is a general file, information about the file; currently, can't be received in a poll option
 	Document *Document `json:"document,omitempty"`
+	// Optional. The HTTP link attached to the poll option
+	Link *Link `json:"link,omitempty"`
 	// Optional. Media is a live photo, information about the live photo
 	LivePhoto *LivePhoto `json:"live_photo,omitempty"`
 	// Optional. Media is a shared location, information about the location
@@ -9122,10 +10394,31 @@ func (v MergedReactionType) GetType() string {
 // MergedReactionType.reactionType is a dummy method to avoid interface implementation.
 func (v MergedReactionType) reactionType() {}
 
-// MergeReactionType returns a MergedReactionType struct to simplify working with types in a non-generic world.
+// MergeReactionType returns itself, as it is already merged.
 func (v MergedReactionType) MergeReactionType() MergedReactionType {
 	return v
 }
+
+type ReactionTypeUnknown struct {
+	RawType string
+	Data    json.RawMessage
+}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v ReactionTypeUnknown) GetType() string {
+	return v.RawType
+}
+
+// MergeReactionType returns a MergedReactionType struct to simplify working with types in a non-generic world.
+func (v ReactionTypeUnknown) MergeReactionType() MergedReactionType {
+	return MergedReactionType{}
+}
+func (v ReactionTypeUnknown) MarshalJSON() ([]byte, error) {
+	return v.Data, nil
+}
+
+// ReactionTypeUnknown.reactionType is a dummy method to avoid interface implementation.
+func (v ReactionTypeUnknown) reactionType() {}
 
 // unmarshalReactionTypeArray is a JSON unmarshalling helper which allows unmarshalling an array of interfaces
 // using unmarshalReactionType.
@@ -9193,7 +10486,7 @@ func unmarshalReactionType(d json.RawMessage) (ReactionType, error) {
 		return s, nil
 
 	}
-	return nil, fmt.Errorf("unknown interface for ReactionType with Type %v", t.Type)
+	return ReactionTypeUnknown{RawType: t.Type, Data: d}, nil
 }
 
 // ReactionTypeCustomEmoji (https://core.telegram.org/bots/api#reactiontypecustomemoji)
@@ -9209,7 +10502,7 @@ func (v ReactionTypeCustomEmoji) reactionType() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v ReactionTypeCustomEmoji) GetType() string {
-	return "custom_emoji"
+	return ReactionTypeTypeCustomEmoji
 }
 
 // MergeReactionType returns a MergedReactionType struct to simplify working with types in a non-generic world.
@@ -9227,7 +10520,7 @@ func (v ReactionTypeCustomEmoji) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "custom_emoji",
+		Type:  ReactionTypeTypeCustomEmoji,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -9246,7 +10539,7 @@ func (v ReactionTypeEmoji) reactionType() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v ReactionTypeEmoji) GetType() string {
-	return "emoji"
+	return ReactionTypeTypeEmoji
 }
 
 // MergeReactionType returns a MergedReactionType struct to simplify working with types in a non-generic world.
@@ -9264,7 +10557,7 @@ func (v ReactionTypeEmoji) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "emoji",
+		Type:  ReactionTypeTypeEmoji,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -9280,7 +10573,7 @@ func (v ReactionTypePaid) reactionType() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v ReactionTypePaid) GetType() string {
-	return "paid"
+	return ReactionTypeTypePaid
 }
 
 // MergeReactionType returns a MergedReactionType struct to simplify working with types in a non-generic world.
@@ -9297,7 +10590,7 @@ func (v ReactionTypePaid) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "paid",
+		Type:  ReactionTypeTypePaid,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -9325,16 +10618,18 @@ type RefundedPayment struct {
 type ReplyKeyboardMarkup struct {
 	// Array of button rows, each represented by an Array of KeyboardButton objects
 	Keyboard [][]KeyboardButton `json:"keyboard,omitempty"`
-	// Optional. Requests clients to always show the keyboard when the regular keyboard is hidden. Defaults to false, in which case the custom keyboard can be hidden and opened with a keyboard icon.
+	// Optional. Requests clients to always show the keyboard when the regular keyboard is hidden. Defaults to False, in which case the custom keyboard can be hidden and opened with a keyboard icon.
 	IsPersistent bool `json:"is_persistent,omitempty"`
-	// Optional. Requests clients to resize the keyboard vertically for optimal fit (e.g., make the keyboard smaller if there are just two rows of buttons). Defaults to false, in which case the custom keyboard is always of the same height as the app's standard keyboard.
+	// Optional. Requests clients to resize the keyboard vertically for optimal fit (e.g., make the keyboard smaller if there are just two rows of buttons). Defaults to False, in which case the custom keyboard is always of the same height as the app's standard keyboard.
 	ResizeKeyboard bool `json:"resize_keyboard,omitempty"`
-	// Optional. Requests clients to hide the keyboard as soon as it's been used. The keyboard will still be available, but clients will automatically display the usual letter-keyboard in the chat - the user can press a special button in the input field to see the custom keyboard again. Defaults to false.
+	// Optional. Requests clients to hide the keyboard as soon as it's been used. The keyboard will still be available, but clients will automatically display the usual letter-keyboard in the chat - the user can press a special button in the input field to see the custom keyboard again. Defaults to False.
 	OneTimeKeyboard bool `json:"one_time_keyboard,omitempty"`
 	// Optional. The placeholder to be shown in the input field when the keyboard is active; 1-64 characters
 	InputFieldPlaceholder string `json:"input_field_placeholder,omitempty"`
 	// Optional. Use this parameter if you want to show the keyboard to specific users only. Targets: 1) users that are @mentioned in the text of the Message object; 2) if the bot's message is a reply to a message in the same chat and forum topic, sender of the original message. Example: A user requests to change the bot's language, bot replies to the request with a keyboard to select the new language. Other users in the group don't see the keyboard.
 	Selective bool `json:"selective,omitempty"`
+	// Optional. Pass True if the reply interface must be shown to the user, as if they had manually selected the bot's message and tapped 'Reply'
+	ForceReply bool `json:"force_reply,omitempty"`
 }
 
 // ReplyKeyboardMarkup.replyMarkup is a dummy method to avoid interface implementation.
@@ -9357,13 +10652,15 @@ func (v ReplyKeyboardRemove) replyMarkup() {}
 //
 // Describes reply parameters for the message that is being sent.
 type ReplyParameters struct {
-	// Identifier of the message that will be replied to in the current chat, or in the chat chat_id if it is specified
-	MessageId int64 `json:"message_id"`
-	// Optional. If the message to be replied to is from a different chat, unique identifier for the chat or username of the bot, supergroup or channel in the format @username. Not supported for messages sent on behalf of a business account and messages from channel direct messages chats.
+	// Optional. Identifier of the message that will be replied to in the current chat, or in the chat chat_id if it is specified. Required if ephemeral_message_id isn't specified.
+	MessageId int64 `json:"message_id,omitempty"`
+	// Optional. If the message to be replied to is from a different chat, unique identifier for the chat or username of the bot, supergroup or channel in the format @username. Not supported for messages sent on behalf of a business account, messages from channel direct messages chats and ephemeral messages.
 	ChatId int64 `json:"chat_id,omitempty"`
-	// Optional. Pass True if the message should be sent even if the specified message to be replied to is not found. Always False for replies in another chat or forum topic. Always True for messages sent on behalf of a business account.
+	// Optional. Identifier of the incoming ephemeral message that will be replied to in the current chat. A reply to an ephemeral message must itself be an ephemeral message. An ephemeral message may only be replied to within 15 seconds of being sent. Required if message_id isn't specified.
+	EphemeralMessageId int64 `json:"ephemeral_message_id,omitempty"`
+	// Optional. Pass True if the message should be sent even if the specified message to be replied to is not found. Always False for replies in another chat or forum topic, and sent ephemeral messages. Always True for messages sent on behalf of a business account.
 	AllowSendingWithoutReply bool `json:"allow_sending_without_reply,omitempty"`
-	// Optional. Quoted part of the message to be replied to; 0-1024 characters after entities parsing. The quote must be an exact substring of the message to be replied to, including bold, italic, underline, strikethrough, spoiler, custom_emoji, and date_time entities. The message will fail to send if the quote isn't found in the original message.
+	// Optional. Quoted part of the message to be replied to; 0-1024 characters after entities parsing. The quote must be an exact substring of the message to be replied to, including bold, italic, underline, strikethrough, spoiler, custom_emoji, and date_time entities. The message will fail to send if the quote isn't found in the original message. Ignored for ephemeral messages.
 	Quote string `json:"quote,omitempty"`
 	// Optional. Mode for parsing entities in the quote. See formatting options for more details.
 	QuoteParseMode string `json:"quote_parse_mode,omitempty"`
@@ -9426,10 +10723,31 @@ func (v MergedRevenueWithdrawalState) GetType() string {
 // MergedRevenueWithdrawalState.revenueWithdrawalState is a dummy method to avoid interface implementation.
 func (v MergedRevenueWithdrawalState) revenueWithdrawalState() {}
 
-// MergeRevenueWithdrawalState returns a MergedRevenueWithdrawalState struct to simplify working with types in a non-generic world.
+// MergeRevenueWithdrawalState returns itself, as it is already merged.
 func (v MergedRevenueWithdrawalState) MergeRevenueWithdrawalState() MergedRevenueWithdrawalState {
 	return v
 }
+
+type RevenueWithdrawalStateUnknown struct {
+	RawType string
+	Data    json.RawMessage
+}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v RevenueWithdrawalStateUnknown) GetType() string {
+	return v.RawType
+}
+
+// MergeRevenueWithdrawalState returns a MergedRevenueWithdrawalState struct to simplify working with types in a non-generic world.
+func (v RevenueWithdrawalStateUnknown) MergeRevenueWithdrawalState() MergedRevenueWithdrawalState {
+	return MergedRevenueWithdrawalState{}
+}
+func (v RevenueWithdrawalStateUnknown) MarshalJSON() ([]byte, error) {
+	return v.Data, nil
+}
+
+// RevenueWithdrawalStateUnknown.revenueWithdrawalState is a dummy method to avoid interface implementation.
+func (v RevenueWithdrawalStateUnknown) revenueWithdrawalState() {}
 
 // unmarshalRevenueWithdrawalStateArray is a JSON unmarshalling helper which allows unmarshalling an array of interfaces
 // using unmarshalRevenueWithdrawalState.
@@ -9497,7 +10815,7 @@ func unmarshalRevenueWithdrawalState(d json.RawMessage) (RevenueWithdrawalState,
 		return s, nil
 
 	}
-	return nil, fmt.Errorf("unknown interface for RevenueWithdrawalState with Type %v", t.Type)
+	return RevenueWithdrawalStateUnknown{RawType: t.Type, Data: d}, nil
 }
 
 // RevenueWithdrawalStateFailed (https://core.telegram.org/bots/api#revenuewithdrawalstatefailed)
@@ -9510,7 +10828,7 @@ func (v RevenueWithdrawalStateFailed) revenueWithdrawalState() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v RevenueWithdrawalStateFailed) GetType() string {
-	return "failed"
+	return RevenueWithdrawalStateTypeFailed
 }
 
 // MergeRevenueWithdrawalState returns a MergedRevenueWithdrawalState struct to simplify working with types in a non-generic world.
@@ -9527,7 +10845,7 @@ func (v RevenueWithdrawalStateFailed) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "failed",
+		Type:  RevenueWithdrawalStateTypeFailed,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -9543,7 +10861,7 @@ func (v RevenueWithdrawalStatePending) revenueWithdrawalState() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v RevenueWithdrawalStatePending) GetType() string {
-	return "pending"
+	return RevenueWithdrawalStateTypePending
 }
 
 // MergeRevenueWithdrawalState returns a MergedRevenueWithdrawalState struct to simplify working with types in a non-generic world.
@@ -9560,7 +10878,7 @@ func (v RevenueWithdrawalStatePending) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "pending",
+		Type:  RevenueWithdrawalStateTypePending,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -9581,7 +10899,7 @@ func (v RevenueWithdrawalStateSucceeded) revenueWithdrawalState() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v RevenueWithdrawalStateSucceeded) GetType() string {
-	return "succeeded"
+	return RevenueWithdrawalStateTypeSucceeded
 }
 
 // MergeRevenueWithdrawalState returns a MergedRevenueWithdrawalState struct to simplify working with types in a non-generic world.
@@ -9600,7 +10918,3192 @@ func (v RevenueWithdrawalStateSucceeded) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "succeeded",
+		Type:  RevenueWithdrawalStateTypeSucceeded,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// RichBlock (https://core.telegram.org/bots/api#richblock)
+//
+// This object represents a block in a rich formatted message. Currently, it can be any of the following types:
+//   - RichBlockParagraph
+//   - RichBlockSectionHeading
+//   - RichBlockPreformatted
+//   - RichBlockFooter
+//   - RichBlockDivider
+//   - RichBlockMathematicalExpression
+//   - RichBlockAnchor
+//   - RichBlockList
+//   - RichBlockBlockQuotation
+//   - RichBlockExpandableBlockQuotation
+//   - RichBlockPullQuotation
+//   - RichBlockCollage
+//   - RichBlockSlideshow
+//   - RichBlockTable
+//   - RichBlockDetails
+//   - RichBlockMap
+//   - RichBlockButtons
+//   - RichBlockAnimation
+//   - RichBlockAudio
+//   - RichBlockDocument
+//   - RichBlockPhoto
+//   - RichBlockVideo
+//   - RichBlockVoiceNote
+//   - RichBlockThinking
+type RichBlock interface {
+	GetType() string
+	RichTextChildren() []RichText
+	RichBlockChildren() []RichBlock
+	// richBlock exists to avoid external types implementing this interface.
+	richBlock()
+}
+
+// Ensure that all subtypes correctly implement the parent interface.
+var (
+	_ RichBlock = RichBlockParagraph{}
+	_ RichBlock = RichBlockSectionHeading{}
+	_ RichBlock = RichBlockPreformatted{}
+	_ RichBlock = RichBlockFooter{}
+	_ RichBlock = RichBlockDivider{}
+	_ RichBlock = RichBlockMathematicalExpression{}
+	_ RichBlock = RichBlockAnchor{}
+	_ RichBlock = RichBlockList{}
+	_ RichBlock = RichBlockBlockQuotation{}
+	_ RichBlock = RichBlockExpandableBlockQuotation{}
+	_ RichBlock = RichBlockPullQuotation{}
+	_ RichBlock = RichBlockCollage{}
+	_ RichBlock = RichBlockSlideshow{}
+	_ RichBlock = RichBlockTable{}
+	_ RichBlock = RichBlockDetails{}
+	_ RichBlock = RichBlockMap{}
+	_ RichBlock = RichBlockButtons{}
+	_ RichBlock = RichBlockAnimation{}
+	_ RichBlock = RichBlockAudio{}
+	_ RichBlock = RichBlockDocument{}
+	_ RichBlock = RichBlockPhoto{}
+	_ RichBlock = RichBlockVideo{}
+	_ RichBlock = RichBlockVoiceNote{}
+	_ RichBlock = RichBlockThinking{}
+)
+
+type RichBlockUnknown struct {
+	RawType string
+	Data    json.RawMessage
+}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v RichBlockUnknown) GetType() string {
+	return v.RawType
+}
+func (v RichBlockUnknown) MarshalJSON() ([]byte, error) {
+	return v.Data, nil
+}
+
+// RichBlockUnknown.richBlock is a dummy method to avoid interface implementation.
+func (v RichBlockUnknown) richBlock() {}
+
+// unmarshalRichBlockArray is a JSON unmarshalling helper which allows unmarshalling an array of interfaces
+// using unmarshalRichBlock.
+func unmarshalRichBlockArray(d json.RawMessage) ([]RichBlock, error) {
+	if len(d) == 0 {
+		return nil, nil
+	}
+
+	var ds []json.RawMessage
+	err := json.Unmarshal(d, &ds)
+	if err != nil {
+		return nil, fmt.Errorf("failed to unmarshal initial RichBlock JSON into an array: %w", err)
+	}
+
+	var vs []RichBlock
+	for idx, d := range ds {
+		v, err := unmarshalRichBlock(d)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal RichBlock on array item %d: %w", idx, err)
+		}
+		vs = append(vs, v)
+	}
+
+	return vs, nil
+}
+
+// unmarshalRichBlock is a JSON unmarshal helper to marshal the right structs into a RichBlock interface
+// based on the Type field.
+func unmarshalRichBlock(d json.RawMessage) (RichBlock, error) {
+	if len(d) == 0 {
+		return nil, nil
+	}
+
+	t := struct {
+		Type string
+	}{}
+	err := json.Unmarshal(d, &t)
+	if err != nil {
+		return nil, fmt.Errorf("failed to unmarshal RichBlock for constant field 'Type': %w", err)
+	}
+
+	switch t.Type {
+	case "paragraph":
+		s := RichBlockParagraph{}
+		err := json.Unmarshal(d, &s)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal RichBlock for value 'paragraph': %w", err)
+		}
+		return s, nil
+
+	case "heading":
+		s := RichBlockSectionHeading{}
+		err := json.Unmarshal(d, &s)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal RichBlock for value 'heading': %w", err)
+		}
+		return s, nil
+
+	case "pre":
+		s := RichBlockPreformatted{}
+		err := json.Unmarshal(d, &s)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal RichBlock for value 'pre': %w", err)
+		}
+		return s, nil
+
+	case "footer":
+		s := RichBlockFooter{}
+		err := json.Unmarshal(d, &s)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal RichBlock for value 'footer': %w", err)
+		}
+		return s, nil
+
+	case "divider":
+		s := RichBlockDivider{}
+		err := json.Unmarshal(d, &s)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal RichBlock for value 'divider': %w", err)
+		}
+		return s, nil
+
+	case "mathematical_expression":
+		s := RichBlockMathematicalExpression{}
+		err := json.Unmarshal(d, &s)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal RichBlock for value 'mathematical_expression': %w", err)
+		}
+		return s, nil
+
+	case "anchor":
+		s := RichBlockAnchor{}
+		err := json.Unmarshal(d, &s)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal RichBlock for value 'anchor': %w", err)
+		}
+		return s, nil
+
+	case "list":
+		s := RichBlockList{}
+		err := json.Unmarshal(d, &s)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal RichBlock for value 'list': %w", err)
+		}
+		return s, nil
+
+	case "blockquote":
+		s := RichBlockBlockQuotation{}
+		err := json.Unmarshal(d, &s)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal RichBlock for value 'blockquote': %w", err)
+		}
+		return s, nil
+
+	case "expandable_blockquote":
+		s := RichBlockExpandableBlockQuotation{}
+		err := json.Unmarshal(d, &s)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal RichBlock for value 'expandable_blockquote': %w", err)
+		}
+		return s, nil
+
+	case "pullquote":
+		s := RichBlockPullQuotation{}
+		err := json.Unmarshal(d, &s)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal RichBlock for value 'pullquote': %w", err)
+		}
+		return s, nil
+
+	case "collage":
+		s := RichBlockCollage{}
+		err := json.Unmarshal(d, &s)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal RichBlock for value 'collage': %w", err)
+		}
+		return s, nil
+
+	case "slideshow":
+		s := RichBlockSlideshow{}
+		err := json.Unmarshal(d, &s)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal RichBlock for value 'slideshow': %w", err)
+		}
+		return s, nil
+
+	case "table":
+		s := RichBlockTable{}
+		err := json.Unmarshal(d, &s)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal RichBlock for value 'table': %w", err)
+		}
+		return s, nil
+
+	case "details":
+		s := RichBlockDetails{}
+		err := json.Unmarshal(d, &s)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal RichBlock for value 'details': %w", err)
+		}
+		return s, nil
+
+	case "map":
+		s := RichBlockMap{}
+		err := json.Unmarshal(d, &s)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal RichBlock for value 'map': %w", err)
+		}
+		return s, nil
+
+	case "buttons":
+		s := RichBlockButtons{}
+		err := json.Unmarshal(d, &s)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal RichBlock for value 'buttons': %w", err)
+		}
+		return s, nil
+
+	case "animation":
+		s := RichBlockAnimation{}
+		err := json.Unmarshal(d, &s)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal RichBlock for value 'animation': %w", err)
+		}
+		return s, nil
+
+	case "audio":
+		s := RichBlockAudio{}
+		err := json.Unmarshal(d, &s)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal RichBlock for value 'audio': %w", err)
+		}
+		return s, nil
+
+	case "document":
+		s := RichBlockDocument{}
+		err := json.Unmarshal(d, &s)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal RichBlock for value 'document': %w", err)
+		}
+		return s, nil
+
+	case "photo":
+		s := RichBlockPhoto{}
+		err := json.Unmarshal(d, &s)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal RichBlock for value 'photo': %w", err)
+		}
+		return s, nil
+
+	case "video":
+		s := RichBlockVideo{}
+		err := json.Unmarshal(d, &s)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal RichBlock for value 'video': %w", err)
+		}
+		return s, nil
+
+	case "voice_note":
+		s := RichBlockVoiceNote{}
+		err := json.Unmarshal(d, &s)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal RichBlock for value 'voice_note': %w", err)
+		}
+		return s, nil
+
+	case "thinking":
+		s := RichBlockThinking{}
+		err := json.Unmarshal(d, &s)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal RichBlock for value 'thinking': %w", err)
+		}
+		return s, nil
+
+	}
+	return RichBlockUnknown{RawType: t.Type, Data: d}, nil
+}
+
+// RichBlockAnchor (https://core.telegram.org/bots/api#richblockanchor)
+//
+// A block with an anchor, corresponding to the HTML tag <a> with the attribute name.
+type RichBlockAnchor struct {
+	// The name of the anchor
+	Name string `json:"name"`
+}
+
+// RichBlockAnchor.richBlock is a dummy method to avoid interface implementation.
+func (v RichBlockAnchor) richBlock() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v RichBlockAnchor) GetType() string {
+	return RichBlockTypeAnchor
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v RichBlockAnchor) MarshalJSON() ([]byte, error) {
+	type alias RichBlockAnchor
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  RichBlockTypeAnchor,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// RichBlockAnimation (https://core.telegram.org/bots/api#richblockanimation)
+//
+// A block with an animation, corresponding to the HTML tag <video>.
+type RichBlockAnimation struct {
+	// The animation
+	Animation Animation `json:"animation"`
+	// Optional. True, if the media preview is covered by a spoiler animation
+	HasSpoiler bool `json:"has_spoiler,omitempty"`
+	// Optional. Caption of the block
+	Caption *RichBlockCaption `json:"caption,omitempty"`
+}
+
+// RichBlockAnimation.richBlock is a dummy method to avoid interface implementation.
+func (v RichBlockAnimation) richBlock() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v RichBlockAnimation) GetType() string {
+	return RichBlockTypeAnimation
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v RichBlockAnimation) MarshalJSON() ([]byte, error) {
+	type alias RichBlockAnimation
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  RichBlockTypeAnimation,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// RichBlockAudio (https://core.telegram.org/bots/api#richblockaudio)
+//
+// A block with a music file, corresponding to the HTML tag <audio>.
+type RichBlockAudio struct {
+	// The audio
+	Audio Audio `json:"audio"`
+	// Optional. Caption of the block
+	Caption *RichBlockCaption `json:"caption,omitempty"`
+}
+
+// RichBlockAudio.richBlock is a dummy method to avoid interface implementation.
+func (v RichBlockAudio) richBlock() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v RichBlockAudio) GetType() string {
+	return RichBlockTypeAudio
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v RichBlockAudio) MarshalJSON() ([]byte, error) {
+	type alias RichBlockAudio
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  RichBlockTypeAudio,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// RichBlockBlockQuotation (https://core.telegram.org/bots/api#richblockblockquotation)
+//
+// A block quotation, corresponding to the HTML tag <blockquote>.
+type RichBlockBlockQuotation struct {
+	// Content of the block
+	Blocks RichBlockArray `json:"blocks"`
+	// Optional. Credit of the block
+	Credit RichText `json:"credit,omitempty"`
+}
+
+// UnmarshalJSON is a custom JSON unmarshaller to use the helpers which allow for unmarshalling structs into interfaces.
+func (v *RichBlockBlockQuotation) UnmarshalJSON(b []byte) error {
+	// All fields in RichBlockBlockQuotation, with interface fields as json.RawMessage
+	type tmp struct {
+		Blocks json.RawMessage `json:"blocks"`
+		Credit json.RawMessage `json:"credit"`
+	}
+	t := tmp{}
+	err := json.Unmarshal(b, &t)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal RichBlockBlockQuotation JSON into tmp struct: %w", err)
+	}
+
+	v.Blocks, err = unmarshalRichBlockArray(t.Blocks)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal custom JSON field Blocks: %w", err)
+	}
+	v.Credit, err = unmarshalRichText(t.Credit)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal custom JSON field Credit: %w", err)
+	}
+
+	return nil
+}
+
+// RichBlockBlockQuotation.richBlock is a dummy method to avoid interface implementation.
+func (v RichBlockBlockQuotation) richBlock() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v RichBlockBlockQuotation) GetType() string {
+	return RichBlockTypeBlockquote
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v RichBlockBlockQuotation) MarshalJSON() ([]byte, error) {
+	type alias RichBlockBlockQuotation
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  RichBlockTypeBlockquote,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// RichBlockButtons (https://core.telegram.org/bots/api#richblockbuttons)
+//
+// A block containing a list of buttons that are shown in one row, corresponding to the custom HTML tag <tg-button-row>.
+type RichBlockButtons struct {
+	// The buttons
+	Buttons []RichMessageButton `json:"buttons,omitempty"`
+	// Optional. Horizontal alignment of the buttons. Currently, must be one of "left", "center", or "right".
+	Align string `json:"align,omitempty"`
+}
+
+// RichBlockButtons.richBlock is a dummy method to avoid interface implementation.
+func (v RichBlockButtons) richBlock() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v RichBlockButtons) GetType() string {
+	return RichBlockTypeButtons
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v RichBlockButtons) MarshalJSON() ([]byte, error) {
+	type alias RichBlockButtons
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  RichBlockTypeButtons,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// RichBlockCaption (https://core.telegram.org/bots/api#richblockcaption)
+//
+// Caption of a rich formatted block.
+type RichBlockCaption struct {
+	// Block caption
+	Text RichText `json:"text"`
+	// Optional. Block credit which corresponds to the HTML tag <cite>
+	Credit RichText `json:"credit,omitempty"`
+}
+
+// UnmarshalJSON is a custom JSON unmarshaller to use the helpers which allow for unmarshalling structs into interfaces.
+func (v *RichBlockCaption) UnmarshalJSON(b []byte) error {
+	// All fields in RichBlockCaption, with interface fields as json.RawMessage
+	type tmp struct {
+		Text   json.RawMessage `json:"text"`
+		Credit json.RawMessage `json:"credit"`
+	}
+	t := tmp{}
+	err := json.Unmarshal(b, &t)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal RichBlockCaption JSON into tmp struct: %w", err)
+	}
+
+	v.Text, err = unmarshalRichText(t.Text)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal custom JSON field Text: %w", err)
+	}
+	v.Credit, err = unmarshalRichText(t.Credit)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal custom JSON field Credit: %w", err)
+	}
+
+	return nil
+}
+
+// RichBlockCollage (https://core.telegram.org/bots/api#richblockcollage)
+//
+// A collage, corresponding to the custom HTML tag <tg-collage>.
+type RichBlockCollage struct {
+	// Elements of the collage
+	Blocks RichBlockArray `json:"blocks"`
+	// Optional. Caption of the block
+	Caption *RichBlockCaption `json:"caption,omitempty"`
+}
+
+// UnmarshalJSON is a custom JSON unmarshaller to use the helpers which allow for unmarshalling structs into interfaces.
+func (v *RichBlockCollage) UnmarshalJSON(b []byte) error {
+	// All fields in RichBlockCollage, with interface fields as json.RawMessage
+	type tmp struct {
+		Blocks  json.RawMessage   `json:"blocks"`
+		Caption *RichBlockCaption `json:"caption"`
+	}
+	t := tmp{}
+	err := json.Unmarshal(b, &t)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal RichBlockCollage JSON into tmp struct: %w", err)
+	}
+
+	v.Blocks, err = unmarshalRichBlockArray(t.Blocks)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal custom JSON field Blocks: %w", err)
+	}
+	v.Caption = t.Caption
+
+	return nil
+}
+
+// RichBlockCollage.richBlock is a dummy method to avoid interface implementation.
+func (v RichBlockCollage) richBlock() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v RichBlockCollage) GetType() string {
+	return RichBlockTypeCollage
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v RichBlockCollage) MarshalJSON() ([]byte, error) {
+	type alias RichBlockCollage
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  RichBlockTypeCollage,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// RichBlockDetails (https://core.telegram.org/bots/api#richblockdetails)
+//
+// An expandable block for details disclosure, corresponding to the HTML tag <details>.
+type RichBlockDetails struct {
+	// Always shown summary of the block
+	Summary RichText `json:"summary"`
+	// Content of the block
+	Blocks RichBlockArray `json:"blocks"`
+	// Optional. True, if the content of the block is visible by default
+	IsOpen bool `json:"is_open,omitempty"`
+}
+
+// UnmarshalJSON is a custom JSON unmarshaller to use the helpers which allow for unmarshalling structs into interfaces.
+func (v *RichBlockDetails) UnmarshalJSON(b []byte) error {
+	// All fields in RichBlockDetails, with interface fields as json.RawMessage
+	type tmp struct {
+		Summary json.RawMessage `json:"summary"`
+		Blocks  json.RawMessage `json:"blocks"`
+		IsOpen  bool            `json:"is_open"`
+	}
+	t := tmp{}
+	err := json.Unmarshal(b, &t)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal RichBlockDetails JSON into tmp struct: %w", err)
+	}
+
+	v.Summary, err = unmarshalRichText(t.Summary)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal custom JSON field Summary: %w", err)
+	}
+	v.Blocks, err = unmarshalRichBlockArray(t.Blocks)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal custom JSON field Blocks: %w", err)
+	}
+	v.IsOpen = t.IsOpen
+
+	return nil
+}
+
+// RichBlockDetails.richBlock is a dummy method to avoid interface implementation.
+func (v RichBlockDetails) richBlock() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v RichBlockDetails) GetType() string {
+	return RichBlockTypeDetails
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v RichBlockDetails) MarshalJSON() ([]byte, error) {
+	type alias RichBlockDetails
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  RichBlockTypeDetails,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// RichBlockDivider (https://core.telegram.org/bots/api#richblockdivider)
+//
+// A divider, corresponding to the HTML tag <hr/>.
+type RichBlockDivider struct{}
+
+// RichBlockDivider.richBlock is a dummy method to avoid interface implementation.
+func (v RichBlockDivider) richBlock() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v RichBlockDivider) GetType() string {
+	return RichBlockTypeDivider
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v RichBlockDivider) MarshalJSON() ([]byte, error) {
+	type alias RichBlockDivider
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  RichBlockTypeDivider,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// RichBlockDocument (https://core.telegram.org/bots/api#richblockdocument)
+//
+// A block with a general file, corresponding to the custom HTML tag <tg-document>.
+type RichBlockDocument struct {
+	// The document
+	Document Document `json:"document"`
+	// Optional. Caption of the block
+	Caption *RichBlockCaption `json:"caption,omitempty"`
+}
+
+// RichBlockDocument.richBlock is a dummy method to avoid interface implementation.
+func (v RichBlockDocument) richBlock() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v RichBlockDocument) GetType() string {
+	return RichBlockTypeDocument
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v RichBlockDocument) MarshalJSON() ([]byte, error) {
+	type alias RichBlockDocument
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  RichBlockTypeDocument,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// RichBlockExpandableBlockQuotation (https://core.telegram.org/bots/api#richblockexpandableblockquotation)
+//
+// A block quotation, corresponding to the HTML tag <blockquote> with custom attribute "expandable".
+type RichBlockExpandableBlockQuotation struct {
+	// Content of the block
+	Text RichText `json:"text"`
+	// Optional. Credit of the block
+	Credit RichText `json:"credit,omitempty"`
+}
+
+// UnmarshalJSON is a custom JSON unmarshaller to use the helpers which allow for unmarshalling structs into interfaces.
+func (v *RichBlockExpandableBlockQuotation) UnmarshalJSON(b []byte) error {
+	// All fields in RichBlockExpandableBlockQuotation, with interface fields as json.RawMessage
+	type tmp struct {
+		Text   json.RawMessage `json:"text"`
+		Credit json.RawMessage `json:"credit"`
+	}
+	t := tmp{}
+	err := json.Unmarshal(b, &t)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal RichBlockExpandableBlockQuotation JSON into tmp struct: %w", err)
+	}
+
+	v.Text, err = unmarshalRichText(t.Text)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal custom JSON field Text: %w", err)
+	}
+	v.Credit, err = unmarshalRichText(t.Credit)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal custom JSON field Credit: %w", err)
+	}
+
+	return nil
+}
+
+// RichBlockExpandableBlockQuotation.richBlock is a dummy method to avoid interface implementation.
+func (v RichBlockExpandableBlockQuotation) richBlock() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v RichBlockExpandableBlockQuotation) GetType() string {
+	return RichBlockTypeExpandableBlockquote
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v RichBlockExpandableBlockQuotation) MarshalJSON() ([]byte, error) {
+	type alias RichBlockExpandableBlockQuotation
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  RichBlockTypeExpandableBlockquote,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// RichBlockFooter (https://core.telegram.org/bots/api#richblockfooter)
+//
+// A footer, corresponding to the HTML tag <footer>.
+type RichBlockFooter struct {
+	// Text of the block
+	Text RichText `json:"text"`
+}
+
+// UnmarshalJSON is a custom JSON unmarshaller to use the helpers which allow for unmarshalling structs into interfaces.
+func (v *RichBlockFooter) UnmarshalJSON(b []byte) error {
+	// All fields in RichBlockFooter, with interface fields as json.RawMessage
+	type tmp struct {
+		Text json.RawMessage `json:"text"`
+	}
+	t := tmp{}
+	err := json.Unmarshal(b, &t)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal RichBlockFooter JSON into tmp struct: %w", err)
+	}
+
+	v.Text, err = unmarshalRichText(t.Text)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal custom JSON field Text: %w", err)
+	}
+
+	return nil
+}
+
+// RichBlockFooter.richBlock is a dummy method to avoid interface implementation.
+func (v RichBlockFooter) richBlock() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v RichBlockFooter) GetType() string {
+	return RichBlockTypeFooter
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v RichBlockFooter) MarshalJSON() ([]byte, error) {
+	type alias RichBlockFooter
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  RichBlockTypeFooter,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// RichBlockList (https://core.telegram.org/bots/api#richblocklist)
+//
+// A list of blocks, corresponding to the HTML tag <ul> or <ol> with multiple nested tags <li>.
+type RichBlockList struct {
+	// Items of the list
+	Items RichBlockListItemArray `json:"items"`
+}
+
+// RichBlockList.richBlock is a dummy method to avoid interface implementation.
+func (v RichBlockList) richBlock() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v RichBlockList) GetType() string {
+	return RichBlockTypeList
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v RichBlockList) MarshalJSON() ([]byte, error) {
+	type alias RichBlockList
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  RichBlockTypeList,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// RichBlockListItem (https://core.telegram.org/bots/api#richblocklistitem)
+//
+// An item of a list.
+type RichBlockListItem struct {
+	// Label of the item
+	Label string `json:"label"`
+	// The content of the item
+	Blocks RichBlockArray `json:"blocks"`
+	// Optional. True, if the item has a checkbox
+	HasCheckbox bool `json:"has_checkbox,omitempty"`
+	// Optional. True, if the item has a checked checkbox
+	IsChecked bool `json:"is_checked,omitempty"`
+	// Optional. For ordered lists, the numeric value of the item label
+	Value int64 `json:"value,omitempty"`
+	// Optional. For ordered lists, the type of the item label; must be one of "a" for lowercase letters, "A" for uppercase letters, "i" for lowercase Roman numerals, "I" for uppercase Roman numerals, or "1" for decimal numbers
+	Type string `json:"type,omitempty"`
+}
+
+// UnmarshalJSON is a custom JSON unmarshaller to use the helpers which allow for unmarshalling structs into interfaces.
+func (v *RichBlockListItem) UnmarshalJSON(b []byte) error {
+	// All fields in RichBlockListItem, with interface fields as json.RawMessage
+	type tmp struct {
+		Label       string          `json:"label"`
+		Blocks      json.RawMessage `json:"blocks"`
+		HasCheckbox bool            `json:"has_checkbox"`
+		IsChecked   bool            `json:"is_checked"`
+		Value       int64           `json:"value"`
+		Type        string          `json:"type"`
+	}
+	t := tmp{}
+	err := json.Unmarshal(b, &t)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal RichBlockListItem JSON into tmp struct: %w", err)
+	}
+
+	v.Label = t.Label
+	v.Blocks, err = unmarshalRichBlockArray(t.Blocks)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal custom JSON field Blocks: %w", err)
+	}
+	v.HasCheckbox = t.HasCheckbox
+	v.IsChecked = t.IsChecked
+	v.Value = t.Value
+	v.Type = t.Type
+
+	return nil
+}
+
+// RichBlockMap (https://core.telegram.org/bots/api#richblockmap)
+//
+// A block with a map, corresponding to the custom HTML tag <tg-map>.
+type RichBlockMap struct {
+	// Location of the center of the map
+	Location Location `json:"location"`
+	// Map zoom level
+	Zoom int64 `json:"zoom"`
+	// Expected width of the map
+	Width int64 `json:"width"`
+	// Expected height of the map
+	Height int64 `json:"height"`
+	// Optional. Caption of the block
+	Caption *RichBlockCaption `json:"caption,omitempty"`
+}
+
+// RichBlockMap.richBlock is a dummy method to avoid interface implementation.
+func (v RichBlockMap) richBlock() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v RichBlockMap) GetType() string {
+	return RichBlockTypeMap
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v RichBlockMap) MarshalJSON() ([]byte, error) {
+	type alias RichBlockMap
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  RichBlockTypeMap,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// RichBlockMathematicalExpression (https://core.telegram.org/bots/api#richblockmathematicalexpression)
+//
+// A block with a mathematical expression in LaTeX format, corresponding to the custom HTML tag <tg-math-block>.
+type RichBlockMathematicalExpression struct {
+	// The mathematical expression in LaTeX format
+	Expression string `json:"expression"`
+}
+
+// RichBlockMathematicalExpression.richBlock is a dummy method to avoid interface implementation.
+func (v RichBlockMathematicalExpression) richBlock() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v RichBlockMathematicalExpression) GetType() string {
+	return RichBlockTypeMathematicalExpression
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v RichBlockMathematicalExpression) MarshalJSON() ([]byte, error) {
+	type alias RichBlockMathematicalExpression
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  RichBlockTypeMathematicalExpression,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// RichBlockParagraph (https://core.telegram.org/bots/api#richblockparagraph)
+//
+// A text paragraph, corresponding to the HTML tag <p>.
+type RichBlockParagraph struct {
+	// Text of the block
+	Text RichText `json:"text"`
+}
+
+// UnmarshalJSON is a custom JSON unmarshaller to use the helpers which allow for unmarshalling structs into interfaces.
+func (v *RichBlockParagraph) UnmarshalJSON(b []byte) error {
+	// All fields in RichBlockParagraph, with interface fields as json.RawMessage
+	type tmp struct {
+		Text json.RawMessage `json:"text"`
+	}
+	t := tmp{}
+	err := json.Unmarshal(b, &t)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal RichBlockParagraph JSON into tmp struct: %w", err)
+	}
+
+	v.Text, err = unmarshalRichText(t.Text)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal custom JSON field Text: %w", err)
+	}
+
+	return nil
+}
+
+// RichBlockParagraph.richBlock is a dummy method to avoid interface implementation.
+func (v RichBlockParagraph) richBlock() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v RichBlockParagraph) GetType() string {
+	return RichBlockTypeParagraph
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v RichBlockParagraph) MarshalJSON() ([]byte, error) {
+	type alias RichBlockParagraph
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  RichBlockTypeParagraph,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// RichBlockPhoto (https://core.telegram.org/bots/api#richblockphoto)
+//
+// A block with a photo, corresponding to the HTML tag <img>.
+type RichBlockPhoto struct {
+	// Available sizes of the photo
+	Photo []PhotoSize `json:"photo,omitempty"`
+	// Optional. True, if the media preview is covered by a spoiler animation
+	HasSpoiler bool `json:"has_spoiler,omitempty"`
+	// Optional. Caption of the block
+	Caption *RichBlockCaption `json:"caption,omitempty"`
+}
+
+// RichBlockPhoto.richBlock is a dummy method to avoid interface implementation.
+func (v RichBlockPhoto) richBlock() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v RichBlockPhoto) GetType() string {
+	return RichBlockTypePhoto
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v RichBlockPhoto) MarshalJSON() ([]byte, error) {
+	type alias RichBlockPhoto
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  RichBlockTypePhoto,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// RichBlockPreformatted (https://core.telegram.org/bots/api#richblockpreformatted)
+//
+// A preformatted text block, corresponding to the nested HTML tags <pre> and <code>.
+type RichBlockPreformatted struct {
+	// Text of the block
+	Text RichText `json:"text"`
+	// Optional. The programming language of the text
+	Language string `json:"language,omitempty"`
+}
+
+// UnmarshalJSON is a custom JSON unmarshaller to use the helpers which allow for unmarshalling structs into interfaces.
+func (v *RichBlockPreformatted) UnmarshalJSON(b []byte) error {
+	// All fields in RichBlockPreformatted, with interface fields as json.RawMessage
+	type tmp struct {
+		Text     json.RawMessage `json:"text"`
+		Language string          `json:"language"`
+	}
+	t := tmp{}
+	err := json.Unmarshal(b, &t)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal RichBlockPreformatted JSON into tmp struct: %w", err)
+	}
+
+	v.Text, err = unmarshalRichText(t.Text)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal custom JSON field Text: %w", err)
+	}
+	v.Language = t.Language
+
+	return nil
+}
+
+// RichBlockPreformatted.richBlock is a dummy method to avoid interface implementation.
+func (v RichBlockPreformatted) richBlock() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v RichBlockPreformatted) GetType() string {
+	return RichBlockTypePre
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v RichBlockPreformatted) MarshalJSON() ([]byte, error) {
+	type alias RichBlockPreformatted
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  RichBlockTypePre,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// RichBlockPullQuotation (https://core.telegram.org/bots/api#richblockpullquotation)
+//
+// A quotation with centered text, loosely corresponding to the HTML tag <aside>.
+type RichBlockPullQuotation struct {
+	// Text of the block
+	Text RichText `json:"text"`
+	// Optional. Credit of the block
+	Credit RichText `json:"credit,omitempty"`
+}
+
+// UnmarshalJSON is a custom JSON unmarshaller to use the helpers which allow for unmarshalling structs into interfaces.
+func (v *RichBlockPullQuotation) UnmarshalJSON(b []byte) error {
+	// All fields in RichBlockPullQuotation, with interface fields as json.RawMessage
+	type tmp struct {
+		Text   json.RawMessage `json:"text"`
+		Credit json.RawMessage `json:"credit"`
+	}
+	t := tmp{}
+	err := json.Unmarshal(b, &t)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal RichBlockPullQuotation JSON into tmp struct: %w", err)
+	}
+
+	v.Text, err = unmarshalRichText(t.Text)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal custom JSON field Text: %w", err)
+	}
+	v.Credit, err = unmarshalRichText(t.Credit)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal custom JSON field Credit: %w", err)
+	}
+
+	return nil
+}
+
+// RichBlockPullQuotation.richBlock is a dummy method to avoid interface implementation.
+func (v RichBlockPullQuotation) richBlock() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v RichBlockPullQuotation) GetType() string {
+	return RichBlockTypePullquote
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v RichBlockPullQuotation) MarshalJSON() ([]byte, error) {
+	type alias RichBlockPullQuotation
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  RichBlockTypePullquote,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// RichBlockSectionHeading (https://core.telegram.org/bots/api#richblocksectionheading)
+//
+// A section heading, corresponding to the HTML tags <h1>, <h2>, <h3>, <h4>, <h5>, or <h6>.
+type RichBlockSectionHeading struct {
+	// Text of the block
+	Text RichText `json:"text"`
+	// Relative size of the text font; 1-6, 1 is the largest, 6 is the smallest
+	Size int64 `json:"size"`
+}
+
+// UnmarshalJSON is a custom JSON unmarshaller to use the helpers which allow for unmarshalling structs into interfaces.
+func (v *RichBlockSectionHeading) UnmarshalJSON(b []byte) error {
+	// All fields in RichBlockSectionHeading, with interface fields as json.RawMessage
+	type tmp struct {
+		Text json.RawMessage `json:"text"`
+		Size int64           `json:"size"`
+	}
+	t := tmp{}
+	err := json.Unmarshal(b, &t)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal RichBlockSectionHeading JSON into tmp struct: %w", err)
+	}
+
+	v.Text, err = unmarshalRichText(t.Text)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal custom JSON field Text: %w", err)
+	}
+	v.Size = t.Size
+
+	return nil
+}
+
+// RichBlockSectionHeading.richBlock is a dummy method to avoid interface implementation.
+func (v RichBlockSectionHeading) richBlock() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v RichBlockSectionHeading) GetType() string {
+	return RichBlockTypeHeading
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v RichBlockSectionHeading) MarshalJSON() ([]byte, error) {
+	type alias RichBlockSectionHeading
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  RichBlockTypeHeading,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// RichBlockSlideshow (https://core.telegram.org/bots/api#richblockslideshow)
+//
+// A slideshow, corresponding to the custom HTML tag <tg-slideshow>.
+type RichBlockSlideshow struct {
+	// Elements of the slideshow
+	Blocks RichBlockArray `json:"blocks"`
+	// Optional. Caption of the block
+	Caption *RichBlockCaption `json:"caption,omitempty"`
+}
+
+// UnmarshalJSON is a custom JSON unmarshaller to use the helpers which allow for unmarshalling structs into interfaces.
+func (v *RichBlockSlideshow) UnmarshalJSON(b []byte) error {
+	// All fields in RichBlockSlideshow, with interface fields as json.RawMessage
+	type tmp struct {
+		Blocks  json.RawMessage   `json:"blocks"`
+		Caption *RichBlockCaption `json:"caption"`
+	}
+	t := tmp{}
+	err := json.Unmarshal(b, &t)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal RichBlockSlideshow JSON into tmp struct: %w", err)
+	}
+
+	v.Blocks, err = unmarshalRichBlockArray(t.Blocks)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal custom JSON field Blocks: %w", err)
+	}
+	v.Caption = t.Caption
+
+	return nil
+}
+
+// RichBlockSlideshow.richBlock is a dummy method to avoid interface implementation.
+func (v RichBlockSlideshow) richBlock() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v RichBlockSlideshow) GetType() string {
+	return RichBlockTypeSlideshow
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v RichBlockSlideshow) MarshalJSON() ([]byte, error) {
+	type alias RichBlockSlideshow
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  RichBlockTypeSlideshow,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// RichBlockTable (https://core.telegram.org/bots/api#richblocktable)
+//
+// A table, corresponding to the HTML tag <table>.
+type RichBlockTable struct {
+	// Cells of the table
+	Cells [][]RichBlockTableCell `json:"cells,omitempty"`
+	// Optional. True, if the table has borders
+	IsBordered bool `json:"is_bordered,omitempty"`
+	// Optional. True, if the table is striped
+	IsStriped bool `json:"is_striped,omitempty"`
+	// Optional. True, if table cells have smaller indents
+	IsCompact bool `json:"is_compact,omitempty"`
+	// Optional. Caption of the table
+	Caption RichText `json:"caption,omitempty"`
+}
+
+// UnmarshalJSON is a custom JSON unmarshaller to use the helpers which allow for unmarshalling structs into interfaces.
+func (v *RichBlockTable) UnmarshalJSON(b []byte) error {
+	// All fields in RichBlockTable, with interface fields as json.RawMessage
+	type tmp struct {
+		Cells      [][]RichBlockTableCell `json:"cells"`
+		IsBordered bool                   `json:"is_bordered"`
+		IsStriped  bool                   `json:"is_striped"`
+		IsCompact  bool                   `json:"is_compact"`
+		Caption    json.RawMessage        `json:"caption"`
+	}
+	t := tmp{}
+	err := json.Unmarshal(b, &t)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal RichBlockTable JSON into tmp struct: %w", err)
+	}
+
+	v.Cells = t.Cells
+	v.IsBordered = t.IsBordered
+	v.IsStriped = t.IsStriped
+	v.IsCompact = t.IsCompact
+	v.Caption, err = unmarshalRichText(t.Caption)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal custom JSON field Caption: %w", err)
+	}
+
+	return nil
+}
+
+// RichBlockTable.richBlock is a dummy method to avoid interface implementation.
+func (v RichBlockTable) richBlock() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v RichBlockTable) GetType() string {
+	return RichBlockTypeTable
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v RichBlockTable) MarshalJSON() ([]byte, error) {
+	type alias RichBlockTable
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  RichBlockTypeTable,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// RichBlockTableCell (https://core.telegram.org/bots/api#richblocktablecell)
+//
+// Cell in a table.
+type RichBlockTableCell struct {
+	// Optional. Text in the cell. If omitted, then the cell is invisible.
+	Text RichText `json:"text,omitempty"`
+	// Optional. True, if the cell is a header cell
+	IsHeader bool `json:"is_header,omitempty"`
+	// Optional. The number of columns the cell spans if it is bigger than 1
+	Colspan int64 `json:"colspan,omitempty"`
+	// Optional. The number of rows the cell spans if it is bigger than 1
+	Rowspan int64 `json:"rowspan,omitempty"`
+	// Horizontal cell content alignment. Currently, must be one of "left", "center", or "right".
+	Align string `json:"align"`
+	// Vertical cell content alignment. Currently, must be one of "top", "middle", or "bottom".
+	Valign string `json:"valign"`
+}
+
+// UnmarshalJSON is a custom JSON unmarshaller to use the helpers which allow for unmarshalling structs into interfaces.
+func (v *RichBlockTableCell) UnmarshalJSON(b []byte) error {
+	// All fields in RichBlockTableCell, with interface fields as json.RawMessage
+	type tmp struct {
+		Text     json.RawMessage `json:"text"`
+		IsHeader bool            `json:"is_header"`
+		Colspan  int64           `json:"colspan"`
+		Rowspan  int64           `json:"rowspan"`
+		Align    string          `json:"align"`
+		Valign   string          `json:"valign"`
+	}
+	t := tmp{}
+	err := json.Unmarshal(b, &t)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal RichBlockTableCell JSON into tmp struct: %w", err)
+	}
+
+	v.Text, err = unmarshalRichText(t.Text)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal custom JSON field Text: %w", err)
+	}
+	v.IsHeader = t.IsHeader
+	v.Colspan = t.Colspan
+	v.Rowspan = t.Rowspan
+	v.Align = t.Align
+	v.Valign = t.Valign
+
+	return nil
+}
+
+// RichBlockThinking (https://core.telegram.org/bots/api#richblockthinking)
+//
+// A block with a "Thinking..." placeholder, corresponding to the custom HTML tag <tg-thinking>. The block may be used only in sendRichMessageDraft, therefore it can't be received in messages. See https://t.me/addemoji/AIActions for examples of custom emoji that are recommended for usage in the block.
+type RichBlockThinking struct {
+	// Text of the block. See https://t.me/addemoji/AIActions for examples of custom emoji that are recommended for usage in the block.
+	Text RichText `json:"text"`
+}
+
+// UnmarshalJSON is a custom JSON unmarshaller to use the helpers which allow for unmarshalling structs into interfaces.
+func (v *RichBlockThinking) UnmarshalJSON(b []byte) error {
+	// All fields in RichBlockThinking, with interface fields as json.RawMessage
+	type tmp struct {
+		Text json.RawMessage `json:"text"`
+	}
+	t := tmp{}
+	err := json.Unmarshal(b, &t)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal RichBlockThinking JSON into tmp struct: %w", err)
+	}
+
+	v.Text, err = unmarshalRichText(t.Text)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal custom JSON field Text: %w", err)
+	}
+
+	return nil
+}
+
+// RichBlockThinking.richBlock is a dummy method to avoid interface implementation.
+func (v RichBlockThinking) richBlock() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v RichBlockThinking) GetType() string {
+	return RichBlockTypeThinking
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v RichBlockThinking) MarshalJSON() ([]byte, error) {
+	type alias RichBlockThinking
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  RichBlockTypeThinking,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// RichBlockVideo (https://core.telegram.org/bots/api#richblockvideo)
+//
+// A block with a video, corresponding to the HTML tag <video>.
+type RichBlockVideo struct {
+	// The video
+	Video Video `json:"video"`
+	// Optional. True, if the media preview is covered by a spoiler animation
+	HasSpoiler bool `json:"has_spoiler,omitempty"`
+	// Optional. Caption of the block
+	Caption *RichBlockCaption `json:"caption,omitempty"`
+}
+
+// RichBlockVideo.richBlock is a dummy method to avoid interface implementation.
+func (v RichBlockVideo) richBlock() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v RichBlockVideo) GetType() string {
+	return RichBlockTypeVideo
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v RichBlockVideo) MarshalJSON() ([]byte, error) {
+	type alias RichBlockVideo
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  RichBlockTypeVideo,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// RichBlockVoiceNote (https://core.telegram.org/bots/api#richblockvoicenote)
+//
+// A block with a voice note, corresponding to the HTML tag <audio>.
+type RichBlockVoiceNote struct {
+	// The voice note
+	VoiceNote Voice `json:"voice_note"`
+	// Optional. Caption of the block
+	Caption *RichBlockCaption `json:"caption,omitempty"`
+}
+
+// RichBlockVoiceNote.richBlock is a dummy method to avoid interface implementation.
+func (v RichBlockVoiceNote) richBlock() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v RichBlockVoiceNote) GetType() string {
+	return RichBlockTypeVoiceNote
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v RichBlockVoiceNote) MarshalJSON() ([]byte, error) {
+	type alias RichBlockVoiceNote
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  RichBlockTypeVoiceNote,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// RichMessage (https://core.telegram.org/bots/api#richmessage)
+//
+// Rich formatted message.
+type RichMessage struct {
+	// Content of the message
+	Blocks RichBlockArray `json:"blocks"`
+	// Optional. True, if the rich message must be shown right-to-left
+	IsRtl bool `json:"is_rtl,omitempty"`
+}
+
+// UnmarshalJSON is a custom JSON unmarshaller to use the helpers which allow for unmarshalling structs into interfaces.
+func (v *RichMessage) UnmarshalJSON(b []byte) error {
+	// All fields in RichMessage, with interface fields as json.RawMessage
+	type tmp struct {
+		Blocks json.RawMessage `json:"blocks"`
+		IsRtl  bool            `json:"is_rtl"`
+	}
+	t := tmp{}
+	err := json.Unmarshal(b, &t)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal RichMessage JSON into tmp struct: %w", err)
+	}
+
+	v.Blocks, err = unmarshalRichBlockArray(t.Blocks)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal custom JSON field Blocks: %w", err)
+	}
+	v.IsRtl = t.IsRtl
+
+	return nil
+}
+
+// RichMessageButton (https://core.telegram.org/bots/api#richmessagebutton)
+//
+// This object represents a button in a RichMessage. Exactly one of the fields other than text and style must be used to specify the type of the button.
+type RichMessageButton struct {
+	// Text of the button. May contain only plain text, RichTextCustomEmoji and RichTextDateTime entities.
+	Text RichText `json:"text"`
+	// Optional. Style of the button. Must be one of "danger", "success", "primary", or "link" (the button is shown as a regular link without borders). Apps may use theme-specific colors for the button background and text based on the style. The style "link" is allowed only for callback buttons.
+	Style string `json:"style,omitempty"`
+	// Optional. HTTP or tg:// URL to be opened when the button is pressed. Links tg://user?id=<user_id> can be used to mention a user by their identifier without using a username, if this is allowed by their privacy settings.
+	Url string `json:"url,omitempty"`
+	// Optional. Data to be sent in a callback query to the bot when the button is pressed, 1-64 bytes
+	CallbackData string `json:"callback_data,omitempty"`
+	// Optional. Description of the Web App that will be launched when the user presses the button. The Web App will be able to send an arbitrary message on behalf of the user using the method answerWebAppQuery. Available only in private chats between a user and the bot. Not supported for messages sent on behalf of a business account.
+	WebApp *WebAppInfo `json:"web_app,omitempty"`
+	// Optional. An HTTPS URL used to automatically authorize the user. Can be used as a replacement for the Telegram Login Widget. Not supported for ephemeral messages.
+	LoginUrl *LoginUrl `json:"login_url,omitempty"`
+	// Optional. If set, pressing the button will prompt the user to select one of their chats, open that chat and insert the bot's username and the specified inline query in the input field. May be empty, in which case just the bot's username will be inserted. Not supported for messages sent in channel direct messages chats and on behalf of a business account.
+	SwitchInlineQuery *string `json:"switch_inline_query,omitempty"`
+	// Optional. If set, pressing the button will insert the bot's username and the specified inline query in the current chat's input field. May be empty, in which case only the bot's username will be inserted. Not supported in channels and for messages sent in channel direct messages chats and on behalf of a business account.
+	SwitchInlineQueryCurrentChat *string `json:"switch_inline_query_current_chat,omitempty"`
+	// Optional. If set, pressing the button will prompt the user to select one of their chats of the specified type, open that chat and insert the bot's username and the specified inline query in the input field. Not supported for messages sent in channel direct messages chats and on behalf of a business account.
+	SwitchInlineQueryChosenChat *SwitchInlineQueryChosenChat `json:"switch_inline_query_chosen_chat,omitempty"`
+	// Optional. A button that copies the specified text to the clipboard
+	CopyText *CopyTextButton `json:"copy_text,omitempty"`
+	// Optional. If set, then the button is disabled and does nothing
+	Disabled *DisabledButton `json:"disabled,omitempty"`
+}
+
+// UnmarshalJSON is a custom JSON unmarshaller to use the helpers which allow for unmarshalling structs into interfaces.
+func (v *RichMessageButton) UnmarshalJSON(b []byte) error {
+	// All fields in RichMessageButton, with interface fields as json.RawMessage
+	type tmp struct {
+		Text                         json.RawMessage              `json:"text"`
+		Style                        string                       `json:"style"`
+		Url                          string                       `json:"url"`
+		CallbackData                 string                       `json:"callback_data"`
+		WebApp                       *WebAppInfo                  `json:"web_app"`
+		LoginUrl                     *LoginUrl                    `json:"login_url"`
+		SwitchInlineQuery            *string                      `json:"switch_inline_query"`
+		SwitchInlineQueryCurrentChat *string                      `json:"switch_inline_query_current_chat"`
+		SwitchInlineQueryChosenChat  *SwitchInlineQueryChosenChat `json:"switch_inline_query_chosen_chat"`
+		CopyText                     *CopyTextButton              `json:"copy_text"`
+		Disabled                     *DisabledButton              `json:"disabled"`
+	}
+	t := tmp{}
+	err := json.Unmarshal(b, &t)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal RichMessageButton JSON into tmp struct: %w", err)
+	}
+
+	v.Text, err = unmarshalRichText(t.Text)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal custom JSON field Text: %w", err)
+	}
+	v.Style = t.Style
+	v.Url = t.Url
+	v.CallbackData = t.CallbackData
+	v.WebApp = t.WebApp
+	v.LoginUrl = t.LoginUrl
+	v.SwitchInlineQuery = t.SwitchInlineQuery
+	v.SwitchInlineQueryCurrentChat = t.SwitchInlineQueryCurrentChat
+	v.SwitchInlineQueryChosenChat = t.SwitchInlineQueryChosenChat
+	v.CopyText = t.CopyText
+	v.Disabled = t.Disabled
+
+	return nil
+}
+
+// RichText (https://core.telegram.org/bots/api#richtext)
+//
+// This object represents a rich formatted text. Currently, it can be either a String for plain text, an Array of RichText, or any of the following types:
+//   - RichTextBold
+//   - RichTextItalic
+//   - RichTextUnderline
+//   - RichTextStrikethrough
+//   - RichTextSpoiler
+//   - RichTextDateTime
+//   - RichTextTextMention
+//   - RichTextSubscript
+//   - RichTextSuperscript
+//   - RichTextMarked
+//   - RichTextCode
+//   - RichTextCustomEmoji
+//   - RichTextMathematicalExpression
+//   - RichTextUrl
+//   - RichTextEmailAddress
+//   - RichTextPhoneNumber
+//   - RichTextBankCardNumber
+//   - RichTextMention
+//   - RichTextHashtag
+//   - RichTextCashtag
+//   - RichTextBotCommand
+//   - RichTextButton
+//   - RichTextAnchor
+//   - RichTextAnchorLink
+//   - RichTextReference
+//   - RichTextReferenceLink
+type RichText interface {
+	GetType() string
+	Children() []RichText
+	// richText exists to avoid external types implementing this interface.
+	richText()
+}
+
+// Ensure that all subtypes correctly implement the parent interface.
+var (
+	_ RichText = RichTextString("")
+	_ RichText = RichTextArray(nil)
+	_ RichText = RichTextBold{}
+	_ RichText = RichTextItalic{}
+	_ RichText = RichTextUnderline{}
+	_ RichText = RichTextStrikethrough{}
+	_ RichText = RichTextSpoiler{}
+	_ RichText = RichTextDateTime{}
+	_ RichText = RichTextTextMention{}
+	_ RichText = RichTextSubscript{}
+	_ RichText = RichTextSuperscript{}
+	_ RichText = RichTextMarked{}
+	_ RichText = RichTextCode{}
+	_ RichText = RichTextCustomEmoji{}
+	_ RichText = RichTextMathematicalExpression{}
+	_ RichText = RichTextUrl{}
+	_ RichText = RichTextEmailAddress{}
+	_ RichText = RichTextPhoneNumber{}
+	_ RichText = RichTextBankCardNumber{}
+	_ RichText = RichTextMention{}
+	_ RichText = RichTextHashtag{}
+	_ RichText = RichTextCashtag{}
+	_ RichText = RichTextBotCommand{}
+	_ RichText = RichTextButton{}
+	_ RichText = RichTextAnchor{}
+	_ RichText = RichTextAnchorLink{}
+	_ RichText = RichTextReference{}
+	_ RichText = RichTextReferenceLink{}
+)
+
+type RichTextUnknown struct {
+	RawType string
+	Data    json.RawMessage
+}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v RichTextUnknown) GetType() string {
+	return v.RawType
+}
+func (v RichTextUnknown) MarshalJSON() ([]byte, error) {
+	return v.Data, nil
+}
+
+// RichTextUnknown.richText is a dummy method to avoid interface implementation.
+func (v RichTextUnknown) richText() {}
+
+// unmarshalRichTextArray is a JSON unmarshalling helper which allows unmarshalling an array of interfaces
+// using unmarshalRichText.
+func unmarshalRichTextArray(d json.RawMessage) ([]RichText, error) {
+	if len(d) == 0 {
+		return nil, nil
+	}
+
+	var ds []json.RawMessage
+	err := json.Unmarshal(d, &ds)
+	if err != nil {
+		return nil, fmt.Errorf("failed to unmarshal initial RichText JSON into an array: %w", err)
+	}
+
+	var vs []RichText
+	for idx, d := range ds {
+		v, err := unmarshalRichText(d)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal RichText on array item %d: %w", idx, err)
+		}
+		vs = append(vs, v)
+	}
+
+	return vs, nil
+}
+
+// unmarshalRichText is a JSON unmarshal helper to marshal the right structs into a RichText interface
+// based on the Type field.
+func unmarshalRichText(d json.RawMessage) (RichText, error) {
+	if len(d) == 0 {
+		return nil, nil
+	}
+
+	// RichText types require special handling to cover the various type structures set up by telegram.
+	// Namely, we need to support unmarshalling into either a string, an array, or a JSON blob.
+	// We do this by doing an small double-unmarshal into an "any" type and letting the json unmarshaller figure it out.
+	var probe any
+	if err := json.Unmarshal(d, &probe); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal RichText: %w", err)
+	}
+
+	switch probe.(type) {
+	case string:
+		var s string
+		if err := json.Unmarshal(d, &s); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal RichText as string: %w", err)
+		}
+		return RichTextString(s), nil
+	case []any:
+		vs, err := unmarshalRichTextArray(d)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal RichText as array: %w", err)
+		}
+		return RichTextArray(vs), nil
+	}
+	// Any other RichText types default to constant-field logic
+
+	t := struct {
+		Type string
+	}{}
+	err := json.Unmarshal(d, &t)
+	if err != nil {
+		return nil, fmt.Errorf("failed to unmarshal RichText for constant field 'Type': %w", err)
+	}
+
+	switch t.Type {
+	case "bold":
+		s := RichTextBold{}
+		err := json.Unmarshal(d, &s)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal RichText for value 'bold': %w", err)
+		}
+		return s, nil
+
+	case "italic":
+		s := RichTextItalic{}
+		err := json.Unmarshal(d, &s)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal RichText for value 'italic': %w", err)
+		}
+		return s, nil
+
+	case "underline":
+		s := RichTextUnderline{}
+		err := json.Unmarshal(d, &s)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal RichText for value 'underline': %w", err)
+		}
+		return s, nil
+
+	case "strikethrough":
+		s := RichTextStrikethrough{}
+		err := json.Unmarshal(d, &s)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal RichText for value 'strikethrough': %w", err)
+		}
+		return s, nil
+
+	case "spoiler":
+		s := RichTextSpoiler{}
+		err := json.Unmarshal(d, &s)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal RichText for value 'spoiler': %w", err)
+		}
+		return s, nil
+
+	case "date_time":
+		s := RichTextDateTime{}
+		err := json.Unmarshal(d, &s)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal RichText for value 'date_time': %w", err)
+		}
+		return s, nil
+
+	case "text_mention":
+		s := RichTextTextMention{}
+		err := json.Unmarshal(d, &s)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal RichText for value 'text_mention': %w", err)
+		}
+		return s, nil
+
+	case "subscript":
+		s := RichTextSubscript{}
+		err := json.Unmarshal(d, &s)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal RichText for value 'subscript': %w", err)
+		}
+		return s, nil
+
+	case "superscript":
+		s := RichTextSuperscript{}
+		err := json.Unmarshal(d, &s)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal RichText for value 'superscript': %w", err)
+		}
+		return s, nil
+
+	case "marked":
+		s := RichTextMarked{}
+		err := json.Unmarshal(d, &s)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal RichText for value 'marked': %w", err)
+		}
+		return s, nil
+
+	case "code":
+		s := RichTextCode{}
+		err := json.Unmarshal(d, &s)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal RichText for value 'code': %w", err)
+		}
+		return s, nil
+
+	case "custom_emoji":
+		s := RichTextCustomEmoji{}
+		err := json.Unmarshal(d, &s)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal RichText for value 'custom_emoji': %w", err)
+		}
+		return s, nil
+
+	case "mathematical_expression":
+		s := RichTextMathematicalExpression{}
+		err := json.Unmarshal(d, &s)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal RichText for value 'mathematical_expression': %w", err)
+		}
+		return s, nil
+
+	case "url":
+		s := RichTextUrl{}
+		err := json.Unmarshal(d, &s)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal RichText for value 'url': %w", err)
+		}
+		return s, nil
+
+	case "email_address":
+		s := RichTextEmailAddress{}
+		err := json.Unmarshal(d, &s)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal RichText for value 'email_address': %w", err)
+		}
+		return s, nil
+
+	case "phone_number":
+		s := RichTextPhoneNumber{}
+		err := json.Unmarshal(d, &s)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal RichText for value 'phone_number': %w", err)
+		}
+		return s, nil
+
+	case "bank_card_number":
+		s := RichTextBankCardNumber{}
+		err := json.Unmarshal(d, &s)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal RichText for value 'bank_card_number': %w", err)
+		}
+		return s, nil
+
+	case "mention":
+		s := RichTextMention{}
+		err := json.Unmarshal(d, &s)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal RichText for value 'mention': %w", err)
+		}
+		return s, nil
+
+	case "hashtag":
+		s := RichTextHashtag{}
+		err := json.Unmarshal(d, &s)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal RichText for value 'hashtag': %w", err)
+		}
+		return s, nil
+
+	case "cashtag":
+		s := RichTextCashtag{}
+		err := json.Unmarshal(d, &s)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal RichText for value 'cashtag': %w", err)
+		}
+		return s, nil
+
+	case "bot_command":
+		s := RichTextBotCommand{}
+		err := json.Unmarshal(d, &s)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal RichText for value 'bot_command': %w", err)
+		}
+		return s, nil
+
+	case "button":
+		s := RichTextButton{}
+		err := json.Unmarshal(d, &s)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal RichText for value 'button': %w", err)
+		}
+		return s, nil
+
+	case "anchor":
+		s := RichTextAnchor{}
+		err := json.Unmarshal(d, &s)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal RichText for value 'anchor': %w", err)
+		}
+		return s, nil
+
+	case "anchor_link":
+		s := RichTextAnchorLink{}
+		err := json.Unmarshal(d, &s)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal RichText for value 'anchor_link': %w", err)
+		}
+		return s, nil
+
+	case "reference":
+		s := RichTextReference{}
+		err := json.Unmarshal(d, &s)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal RichText for value 'reference': %w", err)
+		}
+		return s, nil
+
+	case "reference_link":
+		s := RichTextReferenceLink{}
+		err := json.Unmarshal(d, &s)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal RichText for value 'reference_link': %w", err)
+		}
+		return s, nil
+
+	}
+	return RichTextUnknown{RawType: t.Type, Data: d}, nil
+}
+
+// RichTextAnchor (https://core.telegram.org/bots/api#richtextanchor)
+//
+// An anchor.
+type RichTextAnchor struct {
+	// The name of the anchor
+	Name string `json:"name"`
+}
+
+// RichTextAnchor.richText is a dummy method to avoid interface implementation.
+func (v RichTextAnchor) richText() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v RichTextAnchor) GetType() string {
+	return RichTextTypeAnchor
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v RichTextAnchor) MarshalJSON() ([]byte, error) {
+	type alias RichTextAnchor
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  RichTextTypeAnchor,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// RichTextAnchorLink (https://core.telegram.org/bots/api#richtextanchorlink)
+//
+// A link to an anchor.
+type RichTextAnchorLink struct {
+	// The link text
+	Text RichText `json:"text"`
+	// The name of the anchor. If the name is empty, then the link brings back to the top of the message.
+	AnchorName string `json:"anchor_name"`
+}
+
+// UnmarshalJSON is a custom JSON unmarshaller to use the helpers which allow for unmarshalling structs into interfaces.
+func (v *RichTextAnchorLink) UnmarshalJSON(b []byte) error {
+	// All fields in RichTextAnchorLink, with interface fields as json.RawMessage
+	type tmp struct {
+		Text       json.RawMessage `json:"text"`
+		AnchorName string          `json:"anchor_name"`
+	}
+	t := tmp{}
+	err := json.Unmarshal(b, &t)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal RichTextAnchorLink JSON into tmp struct: %w", err)
+	}
+
+	v.Text, err = unmarshalRichText(t.Text)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal custom JSON field Text: %w", err)
+	}
+	v.AnchorName = t.AnchorName
+
+	return nil
+}
+
+// RichTextAnchorLink.richText is a dummy method to avoid interface implementation.
+func (v RichTextAnchorLink) richText() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v RichTextAnchorLink) GetType() string {
+	return RichTextTypeAnchorLink
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v RichTextAnchorLink) MarshalJSON() ([]byte, error) {
+	type alias RichTextAnchorLink
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  RichTextTypeAnchorLink,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// RichTextBankCardNumber (https://core.telegram.org/bots/api#richtextbankcardnumber)
+//
+// A text with a bank card number.
+type RichTextBankCardNumber struct {
+	// The text
+	Text RichText `json:"text"`
+	// The bank card number
+	BankCardNumber string `json:"bank_card_number"`
+}
+
+// UnmarshalJSON is a custom JSON unmarshaller to use the helpers which allow for unmarshalling structs into interfaces.
+func (v *RichTextBankCardNumber) UnmarshalJSON(b []byte) error {
+	// All fields in RichTextBankCardNumber, with interface fields as json.RawMessage
+	type tmp struct {
+		Text           json.RawMessage `json:"text"`
+		BankCardNumber string          `json:"bank_card_number"`
+	}
+	t := tmp{}
+	err := json.Unmarshal(b, &t)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal RichTextBankCardNumber JSON into tmp struct: %w", err)
+	}
+
+	v.Text, err = unmarshalRichText(t.Text)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal custom JSON field Text: %w", err)
+	}
+	v.BankCardNumber = t.BankCardNumber
+
+	return nil
+}
+
+// RichTextBankCardNumber.richText is a dummy method to avoid interface implementation.
+func (v RichTextBankCardNumber) richText() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v RichTextBankCardNumber) GetType() string {
+	return RichTextTypeBankCardNumber
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v RichTextBankCardNumber) MarshalJSON() ([]byte, error) {
+	type alias RichTextBankCardNumber
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  RichTextTypeBankCardNumber,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// RichTextBold (https://core.telegram.org/bots/api#richtextbold)
+//
+// A bold text.
+type RichTextBold struct {
+	// The text
+	Text RichText `json:"text"`
+}
+
+// UnmarshalJSON is a custom JSON unmarshaller to use the helpers which allow for unmarshalling structs into interfaces.
+func (v *RichTextBold) UnmarshalJSON(b []byte) error {
+	// All fields in RichTextBold, with interface fields as json.RawMessage
+	type tmp struct {
+		Text json.RawMessage `json:"text"`
+	}
+	t := tmp{}
+	err := json.Unmarshal(b, &t)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal RichTextBold JSON into tmp struct: %w", err)
+	}
+
+	v.Text, err = unmarshalRichText(t.Text)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal custom JSON field Text: %w", err)
+	}
+
+	return nil
+}
+
+// RichTextBold.richText is a dummy method to avoid interface implementation.
+func (v RichTextBold) richText() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v RichTextBold) GetType() string {
+	return RichTextTypeBold
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v RichTextBold) MarshalJSON() ([]byte, error) {
+	type alias RichTextBold
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  RichTextTypeBold,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// RichTextBotCommand (https://core.telegram.org/bots/api#richtextbotcommand)
+//
+// A bot command.
+type RichTextBotCommand struct {
+	// The text
+	Text RichText `json:"text"`
+	// The bot command
+	BotCommand string `json:"bot_command"`
+}
+
+// UnmarshalJSON is a custom JSON unmarshaller to use the helpers which allow for unmarshalling structs into interfaces.
+func (v *RichTextBotCommand) UnmarshalJSON(b []byte) error {
+	// All fields in RichTextBotCommand, with interface fields as json.RawMessage
+	type tmp struct {
+		Text       json.RawMessage `json:"text"`
+		BotCommand string          `json:"bot_command"`
+	}
+	t := tmp{}
+	err := json.Unmarshal(b, &t)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal RichTextBotCommand JSON into tmp struct: %w", err)
+	}
+
+	v.Text, err = unmarshalRichText(t.Text)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal custom JSON field Text: %w", err)
+	}
+	v.BotCommand = t.BotCommand
+
+	return nil
+}
+
+// RichTextBotCommand.richText is a dummy method to avoid interface implementation.
+func (v RichTextBotCommand) richText() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v RichTextBotCommand) GetType() string {
+	return RichTextTypeBotCommand
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v RichTextBotCommand) MarshalJSON() ([]byte, error) {
+	type alias RichTextBotCommand
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  RichTextTypeBotCommand,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// RichTextButton (https://core.telegram.org/bots/api#richtextbutton)
+//
+// A button.
+type RichTextButton struct {
+	// The button
+	Button RichMessageButton `json:"button"`
+}
+
+// RichTextButton.richText is a dummy method to avoid interface implementation.
+func (v RichTextButton) richText() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v RichTextButton) GetType() string {
+	return RichTextTypeButton
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v RichTextButton) MarshalJSON() ([]byte, error) {
+	type alias RichTextButton
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  RichTextTypeButton,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// RichTextCashtag (https://core.telegram.org/bots/api#richtextcashtag)
+//
+// A cashtag.
+type RichTextCashtag struct {
+	// The text
+	Text RichText `json:"text"`
+	// The cashtag
+	Cashtag string `json:"cashtag"`
+}
+
+// UnmarshalJSON is a custom JSON unmarshaller to use the helpers which allow for unmarshalling structs into interfaces.
+func (v *RichTextCashtag) UnmarshalJSON(b []byte) error {
+	// All fields in RichTextCashtag, with interface fields as json.RawMessage
+	type tmp struct {
+		Text    json.RawMessage `json:"text"`
+		Cashtag string          `json:"cashtag"`
+	}
+	t := tmp{}
+	err := json.Unmarshal(b, &t)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal RichTextCashtag JSON into tmp struct: %w", err)
+	}
+
+	v.Text, err = unmarshalRichText(t.Text)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal custom JSON field Text: %w", err)
+	}
+	v.Cashtag = t.Cashtag
+
+	return nil
+}
+
+// RichTextCashtag.richText is a dummy method to avoid interface implementation.
+func (v RichTextCashtag) richText() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v RichTextCashtag) GetType() string {
+	return RichTextTypeCashtag
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v RichTextCashtag) MarshalJSON() ([]byte, error) {
+	type alias RichTextCashtag
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  RichTextTypeCashtag,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// RichTextCode (https://core.telegram.org/bots/api#richtextcode)
+//
+// A monowidth text.
+type RichTextCode struct {
+	// The text
+	Text RichText `json:"text"`
+}
+
+// UnmarshalJSON is a custom JSON unmarshaller to use the helpers which allow for unmarshalling structs into interfaces.
+func (v *RichTextCode) UnmarshalJSON(b []byte) error {
+	// All fields in RichTextCode, with interface fields as json.RawMessage
+	type tmp struct {
+		Text json.RawMessage `json:"text"`
+	}
+	t := tmp{}
+	err := json.Unmarshal(b, &t)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal RichTextCode JSON into tmp struct: %w", err)
+	}
+
+	v.Text, err = unmarshalRichText(t.Text)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal custom JSON field Text: %w", err)
+	}
+
+	return nil
+}
+
+// RichTextCode.richText is a dummy method to avoid interface implementation.
+func (v RichTextCode) richText() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v RichTextCode) GetType() string {
+	return RichTextTypeCode
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v RichTextCode) MarshalJSON() ([]byte, error) {
+	type alias RichTextCode
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  RichTextTypeCode,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// RichTextCustomEmoji (https://core.telegram.org/bots/api#richtextcustomemoji)
+//
+// A custom emoji.
+type RichTextCustomEmoji struct {
+	// Unique identifier of the custom emoji. Use getCustomEmojiStickers to get full information about the sticker.
+	CustomEmojiId string `json:"custom_emoji_id"`
+	// Alternative emoji for the custom emoji
+	AlternativeText string `json:"alternative_text"`
+}
+
+// RichTextCustomEmoji.richText is a dummy method to avoid interface implementation.
+func (v RichTextCustomEmoji) richText() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v RichTextCustomEmoji) GetType() string {
+	return RichTextTypeCustomEmoji
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v RichTextCustomEmoji) MarshalJSON() ([]byte, error) {
+	type alias RichTextCustomEmoji
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  RichTextTypeCustomEmoji,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// RichTextDateTime (https://core.telegram.org/bots/api#richtextdatetime)
+//
+// Formatted date and time.
+type RichTextDateTime struct {
+	// The text
+	Text RichText `json:"text"`
+	// The Unix time associated with the entity
+	UnixTime int64 `json:"unix_time"`
+	// The string that defines the formatting of the date and time. See date-time entity formatting for more details.
+	DateTimeFormat string `json:"date_time_format"`
+}
+
+// UnmarshalJSON is a custom JSON unmarshaller to use the helpers which allow for unmarshalling structs into interfaces.
+func (v *RichTextDateTime) UnmarshalJSON(b []byte) error {
+	// All fields in RichTextDateTime, with interface fields as json.RawMessage
+	type tmp struct {
+		Text           json.RawMessage `json:"text"`
+		UnixTime       int64           `json:"unix_time"`
+		DateTimeFormat string          `json:"date_time_format"`
+	}
+	t := tmp{}
+	err := json.Unmarshal(b, &t)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal RichTextDateTime JSON into tmp struct: %w", err)
+	}
+
+	v.Text, err = unmarshalRichText(t.Text)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal custom JSON field Text: %w", err)
+	}
+	v.UnixTime = t.UnixTime
+	v.DateTimeFormat = t.DateTimeFormat
+
+	return nil
+}
+
+// RichTextDateTime.richText is a dummy method to avoid interface implementation.
+func (v RichTextDateTime) richText() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v RichTextDateTime) GetType() string {
+	return RichTextTypeDateTime
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v RichTextDateTime) MarshalJSON() ([]byte, error) {
+	type alias RichTextDateTime
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  RichTextTypeDateTime,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// RichTextEmailAddress (https://core.telegram.org/bots/api#richtextemailaddress)
+//
+// A text with an email address.
+type RichTextEmailAddress struct {
+	// The text
+	Text RichText `json:"text"`
+	// The email address
+	EmailAddress string `json:"email_address"`
+}
+
+// UnmarshalJSON is a custom JSON unmarshaller to use the helpers which allow for unmarshalling structs into interfaces.
+func (v *RichTextEmailAddress) UnmarshalJSON(b []byte) error {
+	// All fields in RichTextEmailAddress, with interface fields as json.RawMessage
+	type tmp struct {
+		Text         json.RawMessage `json:"text"`
+		EmailAddress string          `json:"email_address"`
+	}
+	t := tmp{}
+	err := json.Unmarshal(b, &t)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal RichTextEmailAddress JSON into tmp struct: %w", err)
+	}
+
+	v.Text, err = unmarshalRichText(t.Text)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal custom JSON field Text: %w", err)
+	}
+	v.EmailAddress = t.EmailAddress
+
+	return nil
+}
+
+// RichTextEmailAddress.richText is a dummy method to avoid interface implementation.
+func (v RichTextEmailAddress) richText() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v RichTextEmailAddress) GetType() string {
+	return RichTextTypeEmailAddress
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v RichTextEmailAddress) MarshalJSON() ([]byte, error) {
+	type alias RichTextEmailAddress
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  RichTextTypeEmailAddress,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// RichTextHashtag (https://core.telegram.org/bots/api#richtexthashtag)
+//
+// A hashtag.
+type RichTextHashtag struct {
+	// The text
+	Text RichText `json:"text"`
+	// The hashtag
+	Hashtag string `json:"hashtag"`
+}
+
+// UnmarshalJSON is a custom JSON unmarshaller to use the helpers which allow for unmarshalling structs into interfaces.
+func (v *RichTextHashtag) UnmarshalJSON(b []byte) error {
+	// All fields in RichTextHashtag, with interface fields as json.RawMessage
+	type tmp struct {
+		Text    json.RawMessage `json:"text"`
+		Hashtag string          `json:"hashtag"`
+	}
+	t := tmp{}
+	err := json.Unmarshal(b, &t)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal RichTextHashtag JSON into tmp struct: %w", err)
+	}
+
+	v.Text, err = unmarshalRichText(t.Text)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal custom JSON field Text: %w", err)
+	}
+	v.Hashtag = t.Hashtag
+
+	return nil
+}
+
+// RichTextHashtag.richText is a dummy method to avoid interface implementation.
+func (v RichTextHashtag) richText() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v RichTextHashtag) GetType() string {
+	return RichTextTypeHashtag
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v RichTextHashtag) MarshalJSON() ([]byte, error) {
+	type alias RichTextHashtag
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  RichTextTypeHashtag,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// RichTextItalic (https://core.telegram.org/bots/api#richtextitalic)
+//
+// An italicized text.
+type RichTextItalic struct {
+	// The text
+	Text RichText `json:"text"`
+}
+
+// UnmarshalJSON is a custom JSON unmarshaller to use the helpers which allow for unmarshalling structs into interfaces.
+func (v *RichTextItalic) UnmarshalJSON(b []byte) error {
+	// All fields in RichTextItalic, with interface fields as json.RawMessage
+	type tmp struct {
+		Text json.RawMessage `json:"text"`
+	}
+	t := tmp{}
+	err := json.Unmarshal(b, &t)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal RichTextItalic JSON into tmp struct: %w", err)
+	}
+
+	v.Text, err = unmarshalRichText(t.Text)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal custom JSON field Text: %w", err)
+	}
+
+	return nil
+}
+
+// RichTextItalic.richText is a dummy method to avoid interface implementation.
+func (v RichTextItalic) richText() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v RichTextItalic) GetType() string {
+	return RichTextTypeItalic
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v RichTextItalic) MarshalJSON() ([]byte, error) {
+	type alias RichTextItalic
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  RichTextTypeItalic,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// RichTextMarked (https://core.telegram.org/bots/api#richtextmarked)
+//
+// A marked text.
+type RichTextMarked struct {
+	// The text
+	Text RichText `json:"text"`
+}
+
+// UnmarshalJSON is a custom JSON unmarshaller to use the helpers which allow for unmarshalling structs into interfaces.
+func (v *RichTextMarked) UnmarshalJSON(b []byte) error {
+	// All fields in RichTextMarked, with interface fields as json.RawMessage
+	type tmp struct {
+		Text json.RawMessage `json:"text"`
+	}
+	t := tmp{}
+	err := json.Unmarshal(b, &t)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal RichTextMarked JSON into tmp struct: %w", err)
+	}
+
+	v.Text, err = unmarshalRichText(t.Text)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal custom JSON field Text: %w", err)
+	}
+
+	return nil
+}
+
+// RichTextMarked.richText is a dummy method to avoid interface implementation.
+func (v RichTextMarked) richText() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v RichTextMarked) GetType() string {
+	return RichTextTypeMarked
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v RichTextMarked) MarshalJSON() ([]byte, error) {
+	type alias RichTextMarked
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  RichTextTypeMarked,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// RichTextMathematicalExpression (https://core.telegram.org/bots/api#richtextmathematicalexpression)
+//
+// A mathematical expression.
+type RichTextMathematicalExpression struct {
+	// The expression in LaTeX format
+	Expression string `json:"expression"`
+}
+
+// RichTextMathematicalExpression.richText is a dummy method to avoid interface implementation.
+func (v RichTextMathematicalExpression) richText() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v RichTextMathematicalExpression) GetType() string {
+	return RichTextTypeMathematicalExpression
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v RichTextMathematicalExpression) MarshalJSON() ([]byte, error) {
+	type alias RichTextMathematicalExpression
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  RichTextTypeMathematicalExpression,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// RichTextMention (https://core.telegram.org/bots/api#richtextmention)
+//
+// A mention by a username.
+type RichTextMention struct {
+	// The text
+	Text RichText `json:"text"`
+	// The username
+	Username string `json:"username"`
+}
+
+// UnmarshalJSON is a custom JSON unmarshaller to use the helpers which allow for unmarshalling structs into interfaces.
+func (v *RichTextMention) UnmarshalJSON(b []byte) error {
+	// All fields in RichTextMention, with interface fields as json.RawMessage
+	type tmp struct {
+		Text     json.RawMessage `json:"text"`
+		Username string          `json:"username"`
+	}
+	t := tmp{}
+	err := json.Unmarshal(b, &t)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal RichTextMention JSON into tmp struct: %w", err)
+	}
+
+	v.Text, err = unmarshalRichText(t.Text)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal custom JSON field Text: %w", err)
+	}
+	v.Username = t.Username
+
+	return nil
+}
+
+// RichTextMention.richText is a dummy method to avoid interface implementation.
+func (v RichTextMention) richText() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v RichTextMention) GetType() string {
+	return RichTextTypeMention
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v RichTextMention) MarshalJSON() ([]byte, error) {
+	type alias RichTextMention
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  RichTextTypeMention,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// RichTextPhoneNumber (https://core.telegram.org/bots/api#richtextphonenumber)
+//
+// A text with a phone number.
+type RichTextPhoneNumber struct {
+	// The text
+	Text RichText `json:"text"`
+	// The phone number
+	PhoneNumber string `json:"phone_number"`
+}
+
+// UnmarshalJSON is a custom JSON unmarshaller to use the helpers which allow for unmarshalling structs into interfaces.
+func (v *RichTextPhoneNumber) UnmarshalJSON(b []byte) error {
+	// All fields in RichTextPhoneNumber, with interface fields as json.RawMessage
+	type tmp struct {
+		Text        json.RawMessage `json:"text"`
+		PhoneNumber string          `json:"phone_number"`
+	}
+	t := tmp{}
+	err := json.Unmarshal(b, &t)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal RichTextPhoneNumber JSON into tmp struct: %w", err)
+	}
+
+	v.Text, err = unmarshalRichText(t.Text)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal custom JSON field Text: %w", err)
+	}
+	v.PhoneNumber = t.PhoneNumber
+
+	return nil
+}
+
+// RichTextPhoneNumber.richText is a dummy method to avoid interface implementation.
+func (v RichTextPhoneNumber) richText() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v RichTextPhoneNumber) GetType() string {
+	return RichTextTypePhoneNumber
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v RichTextPhoneNumber) MarshalJSON() ([]byte, error) {
+	type alias RichTextPhoneNumber
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  RichTextTypePhoneNumber,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// RichTextReference (https://core.telegram.org/bots/api#richtextreference)
+//
+// A reference.
+type RichTextReference struct {
+	// Text of the reference
+	Text RichText `json:"text"`
+	// The name of the reference
+	Name string `json:"name"`
+}
+
+// UnmarshalJSON is a custom JSON unmarshaller to use the helpers which allow for unmarshalling structs into interfaces.
+func (v *RichTextReference) UnmarshalJSON(b []byte) error {
+	// All fields in RichTextReference, with interface fields as json.RawMessage
+	type tmp struct {
+		Text json.RawMessage `json:"text"`
+		Name string          `json:"name"`
+	}
+	t := tmp{}
+	err := json.Unmarshal(b, &t)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal RichTextReference JSON into tmp struct: %w", err)
+	}
+
+	v.Text, err = unmarshalRichText(t.Text)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal custom JSON field Text: %w", err)
+	}
+	v.Name = t.Name
+
+	return nil
+}
+
+// RichTextReference.richText is a dummy method to avoid interface implementation.
+func (v RichTextReference) richText() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v RichTextReference) GetType() string {
+	return RichTextTypeReference
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v RichTextReference) MarshalJSON() ([]byte, error) {
+	type alias RichTextReference
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  RichTextTypeReference,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// RichTextReferenceLink (https://core.telegram.org/bots/api#richtextreferencelink)
+//
+// A link to a reference.
+type RichTextReferenceLink struct {
+	// The link text
+	Text RichText `json:"text"`
+	// The name of the reference
+	ReferenceName string `json:"reference_name"`
+}
+
+// UnmarshalJSON is a custom JSON unmarshaller to use the helpers which allow for unmarshalling structs into interfaces.
+func (v *RichTextReferenceLink) UnmarshalJSON(b []byte) error {
+	// All fields in RichTextReferenceLink, with interface fields as json.RawMessage
+	type tmp struct {
+		Text          json.RawMessage `json:"text"`
+		ReferenceName string          `json:"reference_name"`
+	}
+	t := tmp{}
+	err := json.Unmarshal(b, &t)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal RichTextReferenceLink JSON into tmp struct: %w", err)
+	}
+
+	v.Text, err = unmarshalRichText(t.Text)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal custom JSON field Text: %w", err)
+	}
+	v.ReferenceName = t.ReferenceName
+
+	return nil
+}
+
+// RichTextReferenceLink.richText is a dummy method to avoid interface implementation.
+func (v RichTextReferenceLink) richText() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v RichTextReferenceLink) GetType() string {
+	return RichTextTypeReferenceLink
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v RichTextReferenceLink) MarshalJSON() ([]byte, error) {
+	type alias RichTextReferenceLink
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  RichTextTypeReferenceLink,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// RichTextSpoiler (https://core.telegram.org/bots/api#richtextspoiler)
+//
+// A text covered by a spoiler.
+type RichTextSpoiler struct {
+	// The text
+	Text RichText `json:"text"`
+}
+
+// UnmarshalJSON is a custom JSON unmarshaller to use the helpers which allow for unmarshalling structs into interfaces.
+func (v *RichTextSpoiler) UnmarshalJSON(b []byte) error {
+	// All fields in RichTextSpoiler, with interface fields as json.RawMessage
+	type tmp struct {
+		Text json.RawMessage `json:"text"`
+	}
+	t := tmp{}
+	err := json.Unmarshal(b, &t)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal RichTextSpoiler JSON into tmp struct: %w", err)
+	}
+
+	v.Text, err = unmarshalRichText(t.Text)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal custom JSON field Text: %w", err)
+	}
+
+	return nil
+}
+
+// RichTextSpoiler.richText is a dummy method to avoid interface implementation.
+func (v RichTextSpoiler) richText() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v RichTextSpoiler) GetType() string {
+	return RichTextTypeSpoiler
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v RichTextSpoiler) MarshalJSON() ([]byte, error) {
+	type alias RichTextSpoiler
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  RichTextTypeSpoiler,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// RichTextStrikethrough (https://core.telegram.org/bots/api#richtextstrikethrough)
+//
+// A strikethrough text.
+type RichTextStrikethrough struct {
+	// The text
+	Text RichText `json:"text"`
+}
+
+// UnmarshalJSON is a custom JSON unmarshaller to use the helpers which allow for unmarshalling structs into interfaces.
+func (v *RichTextStrikethrough) UnmarshalJSON(b []byte) error {
+	// All fields in RichTextStrikethrough, with interface fields as json.RawMessage
+	type tmp struct {
+		Text json.RawMessage `json:"text"`
+	}
+	t := tmp{}
+	err := json.Unmarshal(b, &t)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal RichTextStrikethrough JSON into tmp struct: %w", err)
+	}
+
+	v.Text, err = unmarshalRichText(t.Text)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal custom JSON field Text: %w", err)
+	}
+
+	return nil
+}
+
+// RichTextStrikethrough.richText is a dummy method to avoid interface implementation.
+func (v RichTextStrikethrough) richText() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v RichTextStrikethrough) GetType() string {
+	return RichTextTypeStrikethrough
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v RichTextStrikethrough) MarshalJSON() ([]byte, error) {
+	type alias RichTextStrikethrough
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  RichTextTypeStrikethrough,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// RichTextSubscript (https://core.telegram.org/bots/api#richtextsubscript)
+//
+// A subscript text.
+type RichTextSubscript struct {
+	// The text
+	Text RichText `json:"text"`
+}
+
+// UnmarshalJSON is a custom JSON unmarshaller to use the helpers which allow for unmarshalling structs into interfaces.
+func (v *RichTextSubscript) UnmarshalJSON(b []byte) error {
+	// All fields in RichTextSubscript, with interface fields as json.RawMessage
+	type tmp struct {
+		Text json.RawMessage `json:"text"`
+	}
+	t := tmp{}
+	err := json.Unmarshal(b, &t)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal RichTextSubscript JSON into tmp struct: %w", err)
+	}
+
+	v.Text, err = unmarshalRichText(t.Text)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal custom JSON field Text: %w", err)
+	}
+
+	return nil
+}
+
+// RichTextSubscript.richText is a dummy method to avoid interface implementation.
+func (v RichTextSubscript) richText() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v RichTextSubscript) GetType() string {
+	return RichTextTypeSubscript
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v RichTextSubscript) MarshalJSON() ([]byte, error) {
+	type alias RichTextSubscript
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  RichTextTypeSubscript,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// RichTextSuperscript (https://core.telegram.org/bots/api#richtextsuperscript)
+//
+// A superscript text.
+type RichTextSuperscript struct {
+	// The text
+	Text RichText `json:"text"`
+}
+
+// UnmarshalJSON is a custom JSON unmarshaller to use the helpers which allow for unmarshalling structs into interfaces.
+func (v *RichTextSuperscript) UnmarshalJSON(b []byte) error {
+	// All fields in RichTextSuperscript, with interface fields as json.RawMessage
+	type tmp struct {
+		Text json.RawMessage `json:"text"`
+	}
+	t := tmp{}
+	err := json.Unmarshal(b, &t)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal RichTextSuperscript JSON into tmp struct: %w", err)
+	}
+
+	v.Text, err = unmarshalRichText(t.Text)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal custom JSON field Text: %w", err)
+	}
+
+	return nil
+}
+
+// RichTextSuperscript.richText is a dummy method to avoid interface implementation.
+func (v RichTextSuperscript) richText() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v RichTextSuperscript) GetType() string {
+	return RichTextTypeSuperscript
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v RichTextSuperscript) MarshalJSON() ([]byte, error) {
+	type alias RichTextSuperscript
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  RichTextTypeSuperscript,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// RichTextTextMention (https://core.telegram.org/bots/api#richtexttextmention)
+//
+// A mention of a Telegram user by their identifier.
+type RichTextTextMention struct {
+	// The text
+	Text RichText `json:"text"`
+	// The mentioned user
+	User User `json:"user"`
+}
+
+// UnmarshalJSON is a custom JSON unmarshaller to use the helpers which allow for unmarshalling structs into interfaces.
+func (v *RichTextTextMention) UnmarshalJSON(b []byte) error {
+	// All fields in RichTextTextMention, with interface fields as json.RawMessage
+	type tmp struct {
+		Text json.RawMessage `json:"text"`
+		User User            `json:"user"`
+	}
+	t := tmp{}
+	err := json.Unmarshal(b, &t)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal RichTextTextMention JSON into tmp struct: %w", err)
+	}
+
+	v.Text, err = unmarshalRichText(t.Text)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal custom JSON field Text: %w", err)
+	}
+	v.User = t.User
+
+	return nil
+}
+
+// RichTextTextMention.richText is a dummy method to avoid interface implementation.
+func (v RichTextTextMention) richText() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v RichTextTextMention) GetType() string {
+	return RichTextTypeTextMention
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v RichTextTextMention) MarshalJSON() ([]byte, error) {
+	type alias RichTextTextMention
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  RichTextTypeTextMention,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// RichTextUnderline (https://core.telegram.org/bots/api#richtextunderline)
+//
+// An underlined text.
+type RichTextUnderline struct {
+	// The text
+	Text RichText `json:"text"`
+}
+
+// UnmarshalJSON is a custom JSON unmarshaller to use the helpers which allow for unmarshalling structs into interfaces.
+func (v *RichTextUnderline) UnmarshalJSON(b []byte) error {
+	// All fields in RichTextUnderline, with interface fields as json.RawMessage
+	type tmp struct {
+		Text json.RawMessage `json:"text"`
+	}
+	t := tmp{}
+	err := json.Unmarshal(b, &t)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal RichTextUnderline JSON into tmp struct: %w", err)
+	}
+
+	v.Text, err = unmarshalRichText(t.Text)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal custom JSON field Text: %w", err)
+	}
+
+	return nil
+}
+
+// RichTextUnderline.richText is a dummy method to avoid interface implementation.
+func (v RichTextUnderline) richText() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v RichTextUnderline) GetType() string {
+	return RichTextTypeUnderline
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v RichTextUnderline) MarshalJSON() ([]byte, error) {
+	type alias RichTextUnderline
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  RichTextTypeUnderline,
+		alias: (alias)(v),
+	}
+	return json.Marshal(a)
+}
+
+// RichTextUrl (https://core.telegram.org/bots/api#richtexturl)
+//
+// A text with a link.
+type RichTextUrl struct {
+	// The text
+	Text RichText `json:"text"`
+	// URL of the link
+	Url string `json:"url"`
+}
+
+// UnmarshalJSON is a custom JSON unmarshaller to use the helpers which allow for unmarshalling structs into interfaces.
+func (v *RichTextUrl) UnmarshalJSON(b []byte) error {
+	// All fields in RichTextUrl, with interface fields as json.RawMessage
+	type tmp struct {
+		Text json.RawMessage `json:"text"`
+		Url  string          `json:"url"`
+	}
+	t := tmp{}
+	err := json.Unmarshal(b, &t)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal RichTextUrl JSON into tmp struct: %w", err)
+	}
+
+	v.Text, err = unmarshalRichText(t.Text)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal custom JSON field Text: %w", err)
+	}
+	v.Url = t.Url
+
+	return nil
+}
+
+// RichTextUrl.richText is a dummy method to avoid interface implementation.
+func (v RichTextUrl) richText() {}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v RichTextUrl) GetType() string {
+	return RichTextTypeUrl
+}
+
+// MarshalJSON is a custom JSON marshaller to allow for enforcing the Type value.
+func (v RichTextUrl) MarshalJSON() ([]byte, error) {
+	type alias RichTextUrl
+	a := struct {
+		Type string `json:"type"`
+		alias
+	}{
+		Type:  RichTextTypeUrl,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -9902,7 +14405,7 @@ func (v MergedStoryAreaType) GetType() string {
 // MergedStoryAreaType.storyAreaType is a dummy method to avoid interface implementation.
 func (v MergedStoryAreaType) storyAreaType() {}
 
-// MergeStoryAreaType returns a MergedStoryAreaType struct to simplify working with types in a non-generic world.
+// MergeStoryAreaType returns itself, as it is already merged.
 func (v MergedStoryAreaType) MergeStoryAreaType() MergedStoryAreaType {
 	return v
 }
@@ -9920,7 +14423,7 @@ func (v StoryAreaTypeLink) storyAreaType() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v StoryAreaTypeLink) GetType() string {
-	return "link"
+	return StoryAreaTypeTypeLink
 }
 
 // MergeStoryAreaType returns a MergedStoryAreaType struct to simplify working with types in a non-generic world.
@@ -9938,7 +14441,7 @@ func (v StoryAreaTypeLink) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "link",
+		Type:  StoryAreaTypeTypeLink,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -9961,7 +14464,7 @@ func (v StoryAreaTypeLocation) storyAreaType() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v StoryAreaTypeLocation) GetType() string {
-	return "location"
+	return StoryAreaTypeTypeLocation
 }
 
 // MergeStoryAreaType returns a MergedStoryAreaType struct to simplify working with types in a non-generic world.
@@ -9981,7 +14484,7 @@ func (v StoryAreaTypeLocation) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "location",
+		Type:  StoryAreaTypeTypeLocation,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -10004,7 +14507,7 @@ func (v StoryAreaTypeSuggestedReaction) storyAreaType() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v StoryAreaTypeSuggestedReaction) GetType() string {
-	return "suggested_reaction"
+	return StoryAreaTypeTypeSuggestedReaction
 }
 
 // MergeStoryAreaType returns a MergedStoryAreaType struct to simplify working with types in a non-generic world.
@@ -10024,7 +14527,7 @@ func (v StoryAreaTypeSuggestedReaction) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "suggested_reaction",
+		Type:  StoryAreaTypeTypeSuggestedReaction,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -10043,7 +14546,7 @@ func (v StoryAreaTypeUniqueGift) storyAreaType() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v StoryAreaTypeUniqueGift) GetType() string {
-	return "unique_gift"
+	return StoryAreaTypeTypeUniqueGift
 }
 
 // MergeStoryAreaType returns a MergedStoryAreaType struct to simplify working with types in a non-generic world.
@@ -10061,7 +14564,7 @@ func (v StoryAreaTypeUniqueGift) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "unique_gift",
+		Type:  StoryAreaTypeTypeUniqueGift,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -10084,7 +14587,7 @@ func (v StoryAreaTypeWeather) storyAreaType() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v StoryAreaTypeWeather) GetType() string {
-	return "weather"
+	return StoryAreaTypeTypeWeather
 }
 
 // MergeStoryAreaType returns a MergedStoryAreaType struct to simplify working with types in a non-generic world.
@@ -10104,7 +14607,7 @@ func (v StoryAreaTypeWeather) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "weather",
+		Type:  StoryAreaTypeTypeWeather,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -10186,9 +14689,9 @@ type SuggestedPostInfo struct {
 type SuggestedPostPaid struct {
 	// Optional. Message containing the suggested post. Note that the Message object in this field will not contain the reply_to_message field even if it itself is a reply.
 	SuggestedPostMessage *Message `json:"suggested_post_message,omitempty"`
-	// Currency in which the payment was made. Currently, one of "XTR" for Telegram Stars or "TON" for toncoins.
+	// Currency in which the payment was made. Currently, one of "XTR" for Telegram Stars or "TON" for TON grams.
 	Currency string `json:"currency"`
-	// Optional. The amount of the currency that was received by the channel in nanotoncoins; for payments in toncoins only
+	// Optional. The amount of the currency that was received by the channel in nanograms; for payments in TON grams only
 	Amount int64 `json:"amount,omitempty"`
 	// Optional. The amount of Telegram Stars that was received by the channel; for payments in Telegram Stars only
 	StarAmount *StarAmount `json:"star_amount,omitempty"`
@@ -10208,9 +14711,9 @@ type SuggestedPostParameters struct {
 //
 // Describes the price of a suggested post.
 type SuggestedPostPrice struct {
-	// Currency in which the post will be paid. Currently, must be one of "XTR" for Telegram Stars or "TON" for toncoins.
+	// Currency in which the post will be paid. Currently, must be one of "XTR" for Telegram Stars or "TON" for TON grams.
 	Currency string `json:"currency"`
-	// The amount of the currency that will be paid for the post in the smallest units of the currency, i.e. Telegram Stars or nanotoncoins. Currently, price in Telegram Stars must be between 5 and 100000, and price in nanotoncoins must be between 10000000 and 10000000000000.
+	// The amount of the currency that will be paid for the post in the smallest units of the currency, i.e. Telegram Stars or nanograms. Currently, price in Telegram Stars must be between 5 and 100000, and price in nanograms must be between 10000000 and 10000000000000.
 	Amount int64 `json:"amount"`
 }
 
@@ -10325,10 +14828,31 @@ func (v MergedTransactionPartner) GetType() string {
 // MergedTransactionPartner.transactionPartner is a dummy method to avoid interface implementation.
 func (v MergedTransactionPartner) transactionPartner() {}
 
-// MergeTransactionPartner returns a MergedTransactionPartner struct to simplify working with types in a non-generic world.
+// MergeTransactionPartner returns itself, as it is already merged.
 func (v MergedTransactionPartner) MergeTransactionPartner() MergedTransactionPartner {
 	return v
 }
+
+type TransactionPartnerUnknown struct {
+	RawType string
+	Data    json.RawMessage
+}
+
+// GetType is a helper method to easily access the common fields of an interface.
+func (v TransactionPartnerUnknown) GetType() string {
+	return v.RawType
+}
+
+// MergeTransactionPartner returns a MergedTransactionPartner struct to simplify working with types in a non-generic world.
+func (v TransactionPartnerUnknown) MergeTransactionPartner() MergedTransactionPartner {
+	return MergedTransactionPartner{}
+}
+func (v TransactionPartnerUnknown) MarshalJSON() ([]byte, error) {
+	return v.Data, nil
+}
+
+// TransactionPartnerUnknown.transactionPartner is a dummy method to avoid interface implementation.
+func (v TransactionPartnerUnknown) transactionPartner() {}
 
 // unmarshalTransactionPartnerArray is a JSON unmarshalling helper which allows unmarshalling an array of interfaces
 // using unmarshalTransactionPartner.
@@ -10428,7 +14952,7 @@ func unmarshalTransactionPartner(d json.RawMessage) (TransactionPartner, error) 
 		return s, nil
 
 	}
-	return nil, fmt.Errorf("unknown interface for TransactionPartner with Type %v", t.Type)
+	return TransactionPartnerUnknown{RawType: t.Type, Data: d}, nil
 }
 
 // TransactionPartnerAffiliateProgram (https://core.telegram.org/bots/api#transactionpartneraffiliateprogram)
@@ -10446,7 +14970,7 @@ func (v TransactionPartnerAffiliateProgram) transactionPartner() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v TransactionPartnerAffiliateProgram) GetType() string {
-	return "affiliate_program"
+	return TransactionPartnerTypeAffiliateProgram
 }
 
 // MergeTransactionPartner returns a MergedTransactionPartner struct to simplify working with types in a non-generic world.
@@ -10465,7 +14989,7 @@ func (v TransactionPartnerAffiliateProgram) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "affiliate_program",
+		Type:  TransactionPartnerTypeAffiliateProgram,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -10486,7 +15010,7 @@ func (v TransactionPartnerChat) transactionPartner() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v TransactionPartnerChat) GetType() string {
-	return "chat"
+	return TransactionPartnerTypeChat
 }
 
 // MergeTransactionPartner returns a MergedTransactionPartner struct to simplify working with types in a non-generic world.
@@ -10505,7 +15029,7 @@ func (v TransactionPartnerChat) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "chat",
+		Type:  TransactionPartnerTypeChat,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -10544,7 +15068,7 @@ func (v TransactionPartnerFragment) transactionPartner() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v TransactionPartnerFragment) GetType() string {
-	return "fragment"
+	return TransactionPartnerTypeFragment
 }
 
 // MergeTransactionPartner returns a MergedTransactionPartner struct to simplify working with types in a non-generic world.
@@ -10562,7 +15086,7 @@ func (v TransactionPartnerFragment) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "fragment",
+		Type:  TransactionPartnerTypeFragment,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -10578,7 +15102,7 @@ func (v TransactionPartnerOther) transactionPartner() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v TransactionPartnerOther) GetType() string {
-	return "other"
+	return TransactionPartnerTypeOther
 }
 
 // MergeTransactionPartner returns a MergedTransactionPartner struct to simplify working with types in a non-generic world.
@@ -10595,7 +15119,7 @@ func (v TransactionPartnerOther) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "other",
+		Type:  TransactionPartnerTypeOther,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -10611,7 +15135,7 @@ func (v TransactionPartnerTelegramAds) transactionPartner() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v TransactionPartnerTelegramAds) GetType() string {
-	return "telegram_ads"
+	return TransactionPartnerTypeTelegramAds
 }
 
 // MergeTransactionPartner returns a MergedTransactionPartner struct to simplify working with types in a non-generic world.
@@ -10628,7 +15152,7 @@ func (v TransactionPartnerTelegramAds) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "telegram_ads",
+		Type:  TransactionPartnerTypeTelegramAds,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -10647,7 +15171,7 @@ func (v TransactionPartnerTelegramApi) transactionPartner() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v TransactionPartnerTelegramApi) GetType() string {
-	return "telegram_api"
+	return TransactionPartnerTypeTelegramApi
 }
 
 // MergeTransactionPartner returns a MergedTransactionPartner struct to simplify working with types in a non-generic world.
@@ -10665,7 +15189,7 @@ func (v TransactionPartnerTelegramApi) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "telegram_api",
+		Type:  TransactionPartnerTypeTelegramApi,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -10736,7 +15260,7 @@ func (v TransactionPartnerUser) transactionPartner() {}
 
 // GetType is a helper method to easily access the common fields of an interface.
 func (v TransactionPartnerUser) GetType() string {
-	return "user"
+	return TransactionPartnerTypeUser
 }
 
 // MergeTransactionPartner returns a MergedTransactionPartner struct to simplify working with types in a non-generic world.
@@ -10762,7 +15286,7 @@ func (v TransactionPartnerUser) MarshalJSON() ([]byte, error) {
 		Type string `json:"type"`
 		alias
 	}{
-		Type:  "user",
+		Type:  TransactionPartnerTypeUser,
 		alias: (alias)(v),
 	}
 	return json.Marshal(a)
@@ -10850,9 +15374,15 @@ type UniqueGiftInfo struct {
 	Gift UniqueGift `json:"gift"`
 	// Origin of the gift. Currently, either "upgrade" for gifts upgraded from regular gifts, "transfer" for gifts transferred from other users or channels, "resale" for gifts bought from other users, "gifted_upgrade" for upgrades purchased after the gift was sent, or "offer" for gifts bought or sold through gift purchase offers.
 	Origin string `json:"origin"`
-	// Optional. For gifts bought from other users, the currency in which the payment for the gift was done. Currently, one of "XTR" for Telegram Stars or "TON" for toncoins.
+	// Optional. Text of the message that was added to the gift
+	Text string `json:"text,omitempty"`
+	// Optional. Special entities that appear in the text
+	Entities []MessageEntity `json:"entities,omitempty"`
+	// Optional. True, if the sender and gift text are shown only to the gift receiver; otherwise, everyone will be able to see them
+	IsPrivate bool `json:"is_private,omitempty"`
+	// Optional. For gifts bought from other users, the currency in which the payment for the gift was done. Currently, one of "XTR" for Telegram Stars or "TON" for TON grams.
 	LastResaleCurrency string `json:"last_resale_currency,omitempty"`
-	// Optional. For gifts bought from other users, the price paid for the gift in either Telegram Stars or nanotoncoins
+	// Optional. For gifts bought from other users, the price paid for the gift in either Telegram Stars or nanograms
 	LastResaleAmount int64 `json:"last_resale_amount,omitempty"`
 	// Optional. Unique identifier of the received gift for the bot; only present for gifts received on behalf of business accounts
 	OwnedGiftId string `json:"owned_gift_id,omitempty"`
@@ -10945,6 +15475,10 @@ type Update struct {
 	RemovedChatBoost *ChatBoostRemoved `json:"removed_chat_boost,omitempty"`
 	// Optional. A new bot was created to be managed by the bot, or token or owner of a managed bot was changed
 	ManagedBot *ManagedBotUpdated `json:"managed_bot,omitempty"`
+	// Optional. User payment subscription has changed
+	Subscription *BotSubscriptionUpdated `json:"subscription,omitempty"`
+	// Optional. A user asked the bot to stop the generation of a message
+	StoppedMessageGeneration *MessageGenerationStopped `json:"stopped_message_generation,omitempty"`
 }
 
 // User (https://core.telegram.org/bots/api#user)
@@ -10985,6 +15519,8 @@ type User struct {
 	AllowsUsersToCreateTopics bool `json:"allows_users_to_create_topics,omitempty"`
 	// Optional. True, if other bots can be created to be controlled by the bot. Returned only in getMe.
 	CanManageBots bool `json:"can_manage_bots,omitempty"`
+	// Optional. True, if the bot supports join request queries and can be assigned to process them. Returned only in getMe.
+	SupportsJoinRequestQueries bool `json:"supports_join_request_queries,omitempty"`
 }
 
 // UserChatBoosts (https://core.telegram.org/bots/api#userchatboosts)
@@ -11120,7 +15656,7 @@ type VideoChatStarted struct{}
 
 // VideoNote (https://core.telegram.org/bots/api#videonote)
 //
-// This object represents a video message (available in Telegram apps as of v.4.0).
+// This object represents a video message.
 type VideoNote struct {
 	// Identifier for this file, which can be used to download or reuse the file
 	FileId string `json:"file_id"`

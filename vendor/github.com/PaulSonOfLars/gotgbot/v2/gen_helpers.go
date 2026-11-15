@@ -309,7 +309,7 @@ func (im InaccessibleMessage) EditReplyMarkup(b *Bot, opts *EditMessageReplyMark
 }
 
 // EditText is a helper method for Bot.EditMessageText.
-func (im InaccessibleMessage) EditText(b *Bot, text string, opts *EditMessageTextOpts) (*Message, bool, error) {
+func (im InaccessibleMessage) EditText(b *Bot, opts *EditMessageTextOpts) (*Message, bool, error) {
 	if opts == nil {
 		opts = &EditMessageTextOpts{}
 	}
@@ -321,7 +321,7 @@ func (im InaccessibleMessage) EditText(b *Bot, text string, opts *EditMessageTex
 		opts.MessageId = im.MessageId
 	}
 
-	return b.EditMessageText(text, opts)
+	return b.EditMessageText(opts)
 }
 
 // Forward is a helper method for Bot.ForwardMessage.
@@ -376,6 +376,62 @@ func (im InaccessibleMessage) Unpin(b *Bot, opts *UnpinChatMessageOpts) (bool, e
 // Answer is a helper method for Bot.AnswerInlineQuery.
 func (iq InlineQuery) Answer(b *Bot, results []InlineQueryResult, opts *AnswerInlineQueryOpts) (bool, error) {
 	return b.AnswerInlineQuery(iq.Id, results, opts)
+}
+
+func (v InputRichBlockBlockQuotation) RichTextChildren() []RichText {
+	if v.Credit == nil {
+		return nil
+	}
+	return []RichText{v.Credit}
+}
+
+func (v InputRichBlockDetails) RichTextChildren() []RichText {
+	return []RichText{v.Summary}
+}
+
+func (v InputRichBlockExpandableBlockQuotation) RichTextChildren() []RichText {
+	var out []RichText
+	out = append(out, v.Text)
+	if v.Credit != nil {
+		out = append(out, v.Credit)
+	}
+	return out
+}
+
+func (v InputRichBlockFooter) RichTextChildren() []RichText {
+	return []RichText{v.Text}
+}
+
+func (v InputRichBlockParagraph) RichTextChildren() []RichText {
+	return []RichText{v.Text}
+}
+
+func (v InputRichBlockPreformatted) RichTextChildren() []RichText {
+	return []RichText{v.Text}
+}
+
+func (v InputRichBlockPullQuotation) RichTextChildren() []RichText {
+	var out []RichText
+	out = append(out, v.Text)
+	if v.Credit != nil {
+		out = append(out, v.Credit)
+	}
+	return out
+}
+
+func (v InputRichBlockSectionHeading) RichTextChildren() []RichText {
+	return []RichText{v.Text}
+}
+
+func (v InputRichBlockTable) RichTextChildren() []RichText {
+	if v.Caption == nil {
+		return nil
+	}
+	return []RichText{v.Caption}
+}
+
+func (v InputRichBlockThinking) RichTextChildren() []RichText {
+	return []RichText{v.Text}
 }
 
 // Copy is a helper method for Bot.CopyMessage.
@@ -463,7 +519,7 @@ func (m Message) EditReplyMarkup(b *Bot, opts *EditMessageReplyMarkupOpts) (*Mes
 }
 
 // EditText is a helper method for Bot.EditMessageText.
-func (m Message) EditText(b *Bot, text string, opts *EditMessageTextOpts) (*Message, bool, error) {
+func (m Message) EditText(b *Bot, opts *EditMessageTextOpts) (*Message, bool, error) {
 	if opts == nil {
 		opts = &EditMessageTextOpts{}
 	}
@@ -475,7 +531,7 @@ func (m Message) EditText(b *Bot, text string, opts *EditMessageTextOpts) (*Mess
 		opts.MessageId = m.MessageId
 	}
 
-	return b.EditMessageText(text, opts)
+	return b.EditMessageText(opts)
 }
 
 // Forward is a helper method for Bot.ForwardMessage.
@@ -703,6 +759,17 @@ func (m Message) ReplyPoll(b *Bot, question string, options []InputPollOption, o
 	return b.SendPoll(m.Chat.Id, question, options, opts)
 }
 
+// ReplyRichMessage is a shortcut to reply to the current message with a specific message type.
+func (m Message) ReplyRichMessage(b *Bot, richMessage InputRichMessage, opts *SendRichMessageOpts) (*Message, error) {
+	if opts == nil {
+		opts = &SendRichMessageOpts{}
+	}
+
+	opts.ReplyParameters = opts.ReplyParameters.replyTo(m)
+
+	return b.SendRichMessage(m.Chat.Id, richMessage, opts)
+}
+
 // ReplySticker is a shortcut to reply to the current message with a specific message type.
 func (m Message) ReplySticker(b *Bot, sticker InputFileOrString, opts *SendStickerOpts) (*Message, error) {
 	if opts == nil {
@@ -761,6 +828,338 @@ func (m Message) ReplyVoice(b *Bot, voice InputFileOrString, opts *SendVoiceOpts
 // Answer is a helper method for Bot.AnswerPreCheckoutQuery.
 func (pcq PreCheckoutQuery) Answer(b *Bot, ok bool, opts *AnswerPreCheckoutQueryOpts) (bool, error) {
 	return b.AnswerPreCheckoutQuery(pcq.Id, ok, opts)
+}
+
+func (v RichBlockAnchor) RichTextChildren() []RichText {
+	return nil
+}
+
+func (v RichBlockAnchor) RichBlockChildren() []RichBlock {
+	return nil
+}
+
+func (v RichBlockAnimation) RichTextChildren() []RichText {
+	return nil
+}
+
+func (v RichBlockAnimation) RichBlockChildren() []RichBlock {
+	return nil
+}
+
+func (v RichBlockAudio) RichTextChildren() []RichText {
+	return nil
+}
+
+func (v RichBlockAudio) RichBlockChildren() []RichBlock {
+	return nil
+}
+
+func (v RichBlockBlockQuotation) RichTextChildren() []RichText {
+	if v.Credit == nil {
+		return nil
+	}
+	return []RichText{v.Credit}
+}
+
+func (v RichBlockBlockQuotation) RichBlockChildren() []RichBlock {
+	return nil
+}
+
+func (v RichBlockButtons) RichTextChildren() []RichText {
+	return nil
+}
+
+func (v RichBlockButtons) RichBlockChildren() []RichBlock {
+	return nil
+}
+
+func (v RichBlockCaption) RichTextChildren() []RichText {
+	var out []RichText
+	out = append(out, v.Text)
+	if v.Credit != nil {
+		out = append(out, v.Credit)
+	}
+	return out
+}
+
+func (v RichBlockCollage) RichTextChildren() []RichText {
+	return nil
+}
+
+func (v RichBlockCollage) RichBlockChildren() []RichBlock {
+	return nil
+}
+
+func (v RichBlockDetails) RichTextChildren() []RichText {
+	return []RichText{v.Summary}
+}
+
+func (v RichBlockDetails) RichBlockChildren() []RichBlock {
+	return nil
+}
+
+func (v RichBlockDivider) RichTextChildren() []RichText {
+	return nil
+}
+
+func (v RichBlockDivider) RichBlockChildren() []RichBlock {
+	return nil
+}
+
+func (v RichBlockDocument) RichTextChildren() []RichText {
+	return nil
+}
+
+func (v RichBlockDocument) RichBlockChildren() []RichBlock {
+	return nil
+}
+
+func (v RichBlockExpandableBlockQuotation) RichTextChildren() []RichText {
+	var out []RichText
+	out = append(out, v.Text)
+	if v.Credit != nil {
+		out = append(out, v.Credit)
+	}
+	return out
+}
+
+func (v RichBlockExpandableBlockQuotation) RichBlockChildren() []RichBlock {
+	return nil
+}
+
+func (v RichBlockFooter) RichTextChildren() []RichText {
+	return []RichText{v.Text}
+}
+
+func (v RichBlockFooter) RichBlockChildren() []RichBlock {
+	return nil
+}
+
+func (v RichBlockList) RichTextChildren() []RichText {
+	return nil
+}
+
+func (v RichBlockList) RichBlockChildren() []RichBlock {
+	return nil
+}
+
+func (v RichBlockMap) RichTextChildren() []RichText {
+	return nil
+}
+
+func (v RichBlockMap) RichBlockChildren() []RichBlock {
+	return nil
+}
+
+func (v RichBlockMathematicalExpression) RichTextChildren() []RichText {
+	return nil
+}
+
+func (v RichBlockMathematicalExpression) RichBlockChildren() []RichBlock {
+	return nil
+}
+
+func (v RichBlockParagraph) RichTextChildren() []RichText {
+	return []RichText{v.Text}
+}
+
+func (v RichBlockParagraph) RichBlockChildren() []RichBlock {
+	return nil
+}
+
+func (v RichBlockPhoto) RichTextChildren() []RichText {
+	return nil
+}
+
+func (v RichBlockPhoto) RichBlockChildren() []RichBlock {
+	return nil
+}
+
+func (v RichBlockPreformatted) RichTextChildren() []RichText {
+	return []RichText{v.Text}
+}
+
+func (v RichBlockPreformatted) RichBlockChildren() []RichBlock {
+	return nil
+}
+
+func (v RichBlockPullQuotation) RichTextChildren() []RichText {
+	var out []RichText
+	out = append(out, v.Text)
+	if v.Credit != nil {
+		out = append(out, v.Credit)
+	}
+	return out
+}
+
+func (v RichBlockPullQuotation) RichBlockChildren() []RichBlock {
+	return nil
+}
+
+func (v RichBlockSectionHeading) RichTextChildren() []RichText {
+	return []RichText{v.Text}
+}
+
+func (v RichBlockSectionHeading) RichBlockChildren() []RichBlock {
+	return nil
+}
+
+func (v RichBlockSlideshow) RichTextChildren() []RichText {
+	return nil
+}
+
+func (v RichBlockSlideshow) RichBlockChildren() []RichBlock {
+	return nil
+}
+
+func (v RichBlockTable) RichTextChildren() []RichText {
+	if v.Caption == nil {
+		return nil
+	}
+	return []RichText{v.Caption}
+}
+
+func (v RichBlockTable) RichBlockChildren() []RichBlock {
+	return nil
+}
+
+func (v RichBlockTableCell) RichTextChildren() []RichText {
+	if v.Text == nil {
+		return nil
+	}
+	return []RichText{v.Text}
+}
+
+func (v RichBlockThinking) RichTextChildren() []RichText {
+	return []RichText{v.Text}
+}
+
+func (v RichBlockThinking) RichBlockChildren() []RichBlock {
+	return nil
+}
+
+func (v RichBlockVideo) RichTextChildren() []RichText {
+	return nil
+}
+
+func (v RichBlockVideo) RichBlockChildren() []RichBlock {
+	return nil
+}
+
+func (v RichBlockVoiceNote) RichTextChildren() []RichText {
+	return nil
+}
+
+func (v RichBlockVoiceNote) RichBlockChildren() []RichBlock {
+	return nil
+}
+
+func (v RichMessageButton) RichTextChildren() []RichText {
+	return []RichText{v.Text}
+}
+
+func (v RichTextAnchor) Children() []RichText {
+	return nil
+}
+
+func (v RichTextAnchorLink) Children() []RichText {
+	return []RichText{v.Text}
+}
+
+func (v RichTextBankCardNumber) Children() []RichText {
+	return []RichText{v.Text}
+}
+
+func (v RichTextBold) Children() []RichText {
+	return []RichText{v.Text}
+}
+
+func (v RichTextBotCommand) Children() []RichText {
+	return []RichText{v.Text}
+}
+
+func (v RichTextButton) Children() []RichText {
+	return nil
+}
+
+func (v RichTextCashtag) Children() []RichText {
+	return []RichText{v.Text}
+}
+
+func (v RichTextCode) Children() []RichText {
+	return []RichText{v.Text}
+}
+
+func (v RichTextCustomEmoji) Children() []RichText {
+	return nil
+}
+
+func (v RichTextDateTime) Children() []RichText {
+	return []RichText{v.Text}
+}
+
+func (v RichTextEmailAddress) Children() []RichText {
+	return []RichText{v.Text}
+}
+
+func (v RichTextHashtag) Children() []RichText {
+	return []RichText{v.Text}
+}
+
+func (v RichTextItalic) Children() []RichText {
+	return []RichText{v.Text}
+}
+
+func (v RichTextMarked) Children() []RichText {
+	return []RichText{v.Text}
+}
+
+func (v RichTextMathematicalExpression) Children() []RichText {
+	return nil
+}
+
+func (v RichTextMention) Children() []RichText {
+	return []RichText{v.Text}
+}
+
+func (v RichTextPhoneNumber) Children() []RichText {
+	return []RichText{v.Text}
+}
+
+func (v RichTextReference) Children() []RichText {
+	return []RichText{v.Text}
+}
+
+func (v RichTextReferenceLink) Children() []RichText {
+	return []RichText{v.Text}
+}
+
+func (v RichTextSpoiler) Children() []RichText {
+	return []RichText{v.Text}
+}
+
+func (v RichTextStrikethrough) Children() []RichText {
+	return []RichText{v.Text}
+}
+
+func (v RichTextSubscript) Children() []RichText {
+	return []RichText{v.Text}
+}
+
+func (v RichTextSuperscript) Children() []RichText {
+	return []RichText{v.Text}
+}
+
+func (v RichTextTextMention) Children() []RichText {
+	return []RichText{v.Text}
+}
+
+func (v RichTextUnderline) Children() []RichText {
+	return []RichText{v.Text}
+}
+
+func (v RichTextUrl) Children() []RichText {
+	return []RichText{v.Text}
 }
 
 // Answer is a helper method for Bot.AnswerShippingQuery.
