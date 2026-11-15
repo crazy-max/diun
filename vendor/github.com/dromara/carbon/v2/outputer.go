@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"strconv"
-	"strings"
 )
 
 // GoString implements "fmt.GoStringer" interface for Carbon struct.
@@ -43,13 +42,7 @@ func (c *Carbon) ToMonthString(timezone ...string) string {
 	lang.rw.RLock()
 	defer lang.rw.RUnlock()
 
-	if resources, ok := lang.resources["months"]; ok {
-		slice := strings.Split(resources, "|")
-		if len(slice) == MonthsPerYear {
-			return slice[c.Month()-1]
-		}
-	}
-	return ""
+	return getResourceItem(lang.resources["months"], c.Month()-1, MonthsPerYear)
 }
 
 // ToShortMonthString outputs a string in short month layout like "Jan", i18n is supported.
@@ -69,13 +62,7 @@ func (c *Carbon) ToShortMonthString(timezone ...string) string {
 	lang.rw.RLock()
 	defer lang.rw.RUnlock()
 
-	if resources, ok := lang.resources["short_months"]; ok {
-		slice := strings.Split(resources, "|")
-		if len(slice) == MonthsPerYear {
-			return slice[c.Month()-1]
-		}
-	}
-	return ""
+	return getResourceItem(lang.resources["short_months"], c.Month()-1, MonthsPerYear)
 }
 
 // ToWeekString outputs a string in week layout like "Sunday", i18n is supported.
@@ -95,13 +82,7 @@ func (c *Carbon) ToWeekString(timezone ...string) string {
 	lang.rw.RLock()
 	defer lang.rw.RUnlock()
 
-	if resources, ok := lang.resources["weeks"]; ok {
-		slice := strings.Split(resources, "|")
-		if len(slice) == DaysPerWeek {
-			return slice[c.DayOfWeek()%DaysPerWeek]
-		}
-	}
-	return ""
+	return getResourceItem(lang.resources["weeks"], int(c.StdTime().Weekday()), DaysPerWeek)
 }
 
 // ToShortWeekString outputs a string in short week layout like "Sun", i18n is supported.
@@ -121,13 +102,7 @@ func (c *Carbon) ToShortWeekString(timezone ...string) string {
 	lang.rw.RLock()
 	defer lang.rw.RUnlock()
 
-	if resources, ok := lang.resources["short_weeks"]; ok {
-		slice := strings.Split(resources, "|")
-		if len(slice) == DaysPerWeek {
-			return slice[c.DayOfWeek()%DaysPerWeek]
-		}
-	}
-	return ""
+	return getResourceItem(lang.resources["short_weeks"], int(c.StdTime().Weekday()), DaysPerWeek)
 }
 
 // ToDayDateTimeString outputs a string in "Mon, Jan 2, 2006 3:04 PM" layout.
@@ -795,19 +770,22 @@ func (c *Carbon) Format(format string, timezone ...string) string {
 			case 'X': // timestamp with nanoseconds, such as 1596604455000000000
 				buffer.WriteString(strconv.FormatInt(c.TimestampNano(), 10))
 			case 'u':
-				buffer.WriteString(fmt.Sprintf("%03d", c.Millisecond()))
+				fmt.Fprintf(buffer, "%03d", c.Millisecond())
 			case 'v':
-				buffer.WriteString(fmt.Sprintf("%06d", c.Microsecond()))
+				fmt.Fprintf(buffer, "%06d", c.Microsecond())
 			case 'x':
-				buffer.WriteString(fmt.Sprintf("%09d", c.Nanosecond()))
+				fmt.Fprintf(buffer, "%09d", c.Nanosecond())
 			default: // common symbols
 				buffer.WriteString(c.StdTime().Format(layout))
 			}
 		} else {
 			switch format[i] {
 			case '\\': // raw output, no parse
-				buffer.WriteByte(format[i+1])
-				i++
+				// Ensure we don't go out of bounds
+				if i+1 < len(format) {
+					buffer.WriteByte(format[i+1])
+					i++
+				}
 				continue
 			case 'W': // week number of the year, ranging from 1-52
 				week := fmt.Sprintf("%d", c.WeekOfYear())

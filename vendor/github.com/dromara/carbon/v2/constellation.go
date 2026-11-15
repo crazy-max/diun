@@ -1,9 +1,5 @@
 package carbon
 
-import (
-	"strings"
-)
-
 var constellations = []struct {
 	startMonth, startDay int
 	endMonth, endDay     int
@@ -48,13 +44,7 @@ func (c *Carbon) Constellation() string {
 	lang.rw.RLock()
 	defer lang.rw.RUnlock()
 
-	if resources, ok := lang.resources["constellations"]; ok {
-		slice := strings.Split(resources, "|")
-		if len(slice) == MonthsPerYear {
-			return slice[index]
-		}
-	}
-	return ""
+	return getResourceItem(lang.resources["constellations"], index, MonthsPerYear)
 }
 
 // IsAries reports whether is Aries.
@@ -183,7 +173,7 @@ func (c *Carbon) IsSagittarius() bool {
 		return false
 	}
 	_, month, day := c.Date()
-	if month == 11 && day >= 22 {
+	if month == 11 && day >= 23 {
 		return true
 	}
 	if month == 12 && day <= 21 {

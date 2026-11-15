@@ -17,7 +17,7 @@ require (
 	github.com/distribution/reference v0.6.0
 	github.com/docker/go-connections v0.8.2
 	github.com/docker/go-units v0.5.0
-	github.com/dromara/carbon/v2 v2.6.16
+	github.com/dromara/carbon/v2 v2.7.1
 	github.com/eclipse/paho.mqtt.golang v1.5.1
 	github.com/go-playground/validator/v10 v10.30.6
 	github.com/hashicorp/nomad/api v0.0.0-20260522124601-26ed559e8bc8 // v2.0.2
