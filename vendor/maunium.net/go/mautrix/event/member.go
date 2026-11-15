@@ -36,13 +36,13 @@ type MemberEventContent struct {
 	Membership                   Membership          `json:"membership"`
 	AvatarURL                    id.ContentURIString `json:"avatar_url,omitempty"`
 	Displayname                  string              `json:"displayname,omitempty"`
-	IsDirect                     bool                `json:"is_direct,omitempty"`
+	IsDirect                     bool                `json:"is_direct,omitzero"`
 	ThirdPartyInvite             *ThirdPartyInvite   `json:"third_party_invite,omitempty"`
 	Reason                       string              `json:"reason,omitempty"`
 	JoinAuthorisedViaUsersServer id.UserID           `json:"join_authorised_via_users_server,omitempty"`
 	MSC3414File                  *EncryptedFileInfo  `json:"org.matrix.msc3414.file,omitempty"`
 
-	MSC4293RedactEvents bool `json:"org.matrix.msc4293.redact_events,omitempty"`
+	MSC4293RedactEvents bool `json:"org.matrix.msc4293.redact_events,omitzero"`
 }
 
 type SignedThirdPartyInvite struct {

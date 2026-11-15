@@ -114,14 +114,14 @@ func EncodeBase58RecoveryKey(key []byte) string {
 	inputBytes[34] = parity
 	recoveryKey := base58.Encode(inputBytes[:])
 
-	var spacedKey string
+	var spacedKey strings.Builder
 	for i, c := range recoveryKey {
 		if i > 0 && i%4 == 0 {
-			spacedKey += " "
+			spacedKey.WriteString(" ")
 		}
-		spacedKey += string(c)
+		spacedKey.WriteString(string(c))
 	}
-	return spacedKey
+	return spacedKey.String()
 }
 
 // HMACSHA256B64 calculates the unpadded base64 of the SHA256 hmac of the input with the given key.

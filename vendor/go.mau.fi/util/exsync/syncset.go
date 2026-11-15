@@ -50,6 +50,20 @@ func NewSetWithItems[T comparable](items []T) *Set[T] {
 	return s
 }
 
+func NewSetWithSeq[T comparable](items iter.Seq[T]) *Set[T] {
+	s := NewSet[T]()
+	s.AddSeq(items)
+	return s
+}
+
+func NewSetWithKeys[T comparable, V any](items map[T]V) *Set[T] {
+	s := NewSetWithSize[T](len(items))
+	for item := range items {
+		s.m[item] = emptyVal
+	}
+	return s
+}
+
 // Add adds an item to the set. The return value is true if the item was added to the set, or false otherwise.
 func (s *Set[T]) Add(item T) bool {
 	if s == nil {

@@ -11,7 +11,7 @@ import (
 type OneTimeKey struct {
 	ID        uint32            `json:"id"`
 	Published bool              `json:"published"`
-	Key       Curve25519KeyPair `json:"key,omitempty"`
+	Key       Curve25519KeyPair `json:"key"`
 }
 
 // Equal compares the one time key to the given one.

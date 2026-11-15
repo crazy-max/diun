@@ -204,6 +204,14 @@ type PinnedEventsEventContent struct {
 // https://spec.matrix.org/v1.2/client-server-api/#mroomhistory_visibility
 type HistoryVisibility string
 
+func (hv HistoryVisibility) SharedHistory() bool {
+	return hv != HistoryVisibilityJoined && hv != HistoryVisibilityInvited
+}
+
+func (hv HistoryVisibility) String() string {
+	return string(hv)
+}
+
 const (
 	HistoryVisibilityInvited       HistoryVisibility = "invited"
 	HistoryVisibilityJoined        HistoryVisibility = "joined"
@@ -215,6 +223,10 @@ const (
 // https://spec.matrix.org/v1.2/client-server-api/#mroomhistory_visibility
 type HistoryVisibilityEventContent struct {
 	HistoryVisibility HistoryVisibility `json:"history_visibility"`
+}
+
+func (hvec *HistoryVisibilityEventContent) SharedHistory() bool {
+	return hvec == nil || hvec.HistoryVisibility.SharedHistory()
 }
 
 // GuestAccess specifies whether or not guest accounts can join.
@@ -239,7 +251,8 @@ type BridgeInfoSection struct {
 	ExternalURL string              `json:"external_url,omitempty"`
 
 	Receiver       string `json:"fi.mau.receiver,omitempty"`
-	MessageRequest bool   `json:"com.beeper.message_request,omitempty"`
+	MessageRequest bool   `json:"com.beeper.message_request,omitzero"`
+	UserBlocked    bool   `json:"com.beeper.user_blocked,omitzero"`
 }
 
 // BridgeEventContent represents the content of a m.bridge state event.
@@ -253,18 +266,16 @@ type BridgeEventContent struct {
 
 	BeeperRoomType   string `json:"com.beeper.room_type,omitempty"`
 	BeeperRoomTypeV2 string `json:"com.beeper.room_type.v2,omitempty"`
-
-	TempSlackRemoteIDMigratedFlag  bool `json:"com.beeper.slack_remote_id_migrated,omitempty"`
-	TempSlackRemoteIDMigratedFlag2 bool `json:"com.beeper.slack_remote_id_really_migrated,omitempty"`
 }
 
 // DisappearingType represents the type of a disappearing message timer.
 type DisappearingType string
 
 const (
-	DisappearingTypeNone      DisappearingType = ""
-	DisappearingTypeAfterRead DisappearingType = "after_read"
-	DisappearingTypeAfterSend DisappearingType = "after_send"
+	DisappearingTypeNone                 DisappearingType = ""
+	DisappearingTypeAfterRead            DisappearingType = "after_read"
+	DisappearingTypeAfterReadByRecipient DisappearingType = "after_read_by_recipient"
+	DisappearingTypeAfterSend            DisappearingType = "after_send"
 )
 
 type BeeperDisappearingTimer struct {
@@ -284,21 +295,26 @@ func (bdt *BeeperDisappearingTimer) MarshalJSON() ([]byte, error) {
 type SpaceChildEventContent struct {
 	Via       []string `json:"via,omitempty"`
 	Order     string   `json:"order,omitempty"`
-	Suggested bool     `json:"suggested,omitempty"`
+	Suggested bool     `json:"suggested,omitzero"`
 }
 
 type SpaceParentEventContent struct {
 	Via       []string `json:"via,omitempty"`
-	Canonical bool     `json:"canonical,omitempty"`
+	Canonical bool     `json:"canonical,omitzero"`
 }
 
 type PolicyRecommendation string
+
+func (pr PolicyRecommendation) IsBanOrTakedown() bool {
+	return pr == PolicyRecommendationBan || pr == PolicyRecommendationUnstableBan || pr == PolicyRecommendationUnstableTakedown
+}
 
 const (
 	PolicyRecommendationBan              PolicyRecommendation = "m.ban"
 	PolicyRecommendationUnstableTakedown PolicyRecommendation = "org.matrix.msc4204.takedown"
 	PolicyRecommendationUnstableBan      PolicyRecommendation = "org.matrix.mjolnir.ban"
 	PolicyRecommendationUnban            PolicyRecommendation = "fi.mau.meowlnir.unban"
+	PolicyRecommendationMute             PolicyRecommendation = "fi.mau.meowlnir.mute"
 )
 
 type PolicyHashes struct {

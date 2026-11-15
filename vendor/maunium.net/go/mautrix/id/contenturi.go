@@ -122,7 +122,7 @@ func (uri ContentURI) MarshalText() ([]byte, error) {
 	return []byte(uri.String()), nil
 }
 
-func (uri *ContentURI) Scan(i interface{}) error {
+func (uri *ContentURI) Scan(i any) error {
 	var parsed ContentURI
 	var err error
 	switch value := i.(type) {

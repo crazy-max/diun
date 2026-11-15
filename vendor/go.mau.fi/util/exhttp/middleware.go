@@ -6,7 +6,10 @@
 
 package exhttp
 
-import "net/http"
+import (
+	"net/http"
+	"slices"
+)
 
 // Middleware represents a middleware that can be applied to an [http.Handler].
 type Middleware func(http.Handler) http.Handler
@@ -16,8 +19,8 @@ type Middleware func(http.Handler) http.Handler
 func ApplyMiddleware(router http.Handler, middlewares ...Middleware) http.Handler {
 	// Apply middlewares in reverse order because the first middleware provided
 	// needs to be the outermost one.
-	for i := len(middlewares) - 1; i >= 0; i-- {
-		router = middlewares[i](router)
+	for _, middleware := range slices.Backward(middlewares) {
+		router = middleware(router)
 	}
 	return router
 }

@@ -87,7 +87,7 @@ type VerificationRequestEventContent struct {
 	// Methods is a list of the verification methods supported by the sender.
 	Methods []VerificationMethod `json:"methods"`
 	// Timestamp is the time at which the request was made.
-	Timestamp jsontime.UnixMilli `json:"timestamp,omitempty"`
+	Timestamp jsontime.UnixMilli `json:"timestamp,omitzero"`
 }
 
 // VerificationRequestEventContentFromMessage converts an in-room verification

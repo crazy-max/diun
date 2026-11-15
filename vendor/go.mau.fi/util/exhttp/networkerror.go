@@ -27,7 +27,8 @@ func IsNetworkError(err error) bool {
 			errno == syscall.ECONNREFUSED ||
 			errno == syscall.EHOSTDOWN ||
 			errno == syscall.EHOSTUNREACH ||
-			errno == syscall.EPIPE
+			errno == syscall.EPIPE ||
+			isWindowsNetworkError(errno)
 	} else if netError := net.Error(nil); errors.As(err, &netError) {
 		return true
 	} else if errors.As(err, &http2.StreamError{}) {

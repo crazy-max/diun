@@ -58,7 +58,7 @@ func (s *Seconds) UnmarshalJSON(data []byte) error {
 	return unmarshalDuration(&s.Duration, data, time.Second)
 }
 
-func (s *Seconds) Scan(src interface{}) error {
+func (s *Seconds) Scan(src any) error {
 	return anyIntegerToDuration(src, time.Second, &s.Duration)
 }
 
@@ -97,7 +97,7 @@ func (s *Milliseconds) UnmarshalJSON(data []byte) error {
 	return unmarshalDuration(&s.Duration, data, time.Millisecond)
 }
 
-func (s *Milliseconds) Scan(src interface{}) error {
+func (s *Milliseconds) Scan(src any) error {
 	return anyIntegerToDuration(src, time.Millisecond, &s.Duration)
 }
 
@@ -128,7 +128,7 @@ func (s *Microseconds) UnmarshalJSON(data []byte) error {
 	return unmarshalDuration(&s.Duration, data, time.Microsecond)
 }
 
-func (s *Microseconds) Scan(src interface{}) error {
+func (s *Microseconds) Scan(src any) error {
 	return anyIntegerToDuration(src, time.Microsecond, &s.Duration)
 }
 
@@ -159,7 +159,7 @@ func (s *Nanoseconds) UnmarshalJSON(data []byte) error {
 	return unmarshalDuration(&s.Duration, data, time.Nanosecond)
 }
 
-func (s *Nanoseconds) Scan(src interface{}) error {
+func (s *Nanoseconds) Scan(src any) error {
 	return anyIntegerToDuration(src, time.Nanosecond, &s.Duration)
 }
 

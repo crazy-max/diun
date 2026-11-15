@@ -17,6 +17,10 @@ repos:
           - "maunium.net/go/mautrix"
           - "-w"
       - id: go-vet-repo-mod
+        args:
+          # This check is broken in Go 1.27.0 https://github.com/golang/go/issues/80691
+          # Remove the arg once a fixed version is shipped
+          - "-stdversion=false"
       - id: go-mod-tidy
       - id: go-staticcheck-repo-mod
 

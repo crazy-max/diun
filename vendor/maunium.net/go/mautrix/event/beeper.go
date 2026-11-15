@@ -7,6 +7,7 @@
 package event
 
 import (
+	"crypto/sha256"
 	"encoding/base32"
 	"encoding/binary"
 	"encoding/json"
@@ -17,6 +18,7 @@ import (
 	"strings"
 
 	"go.mau.fi/util/jsonbytes"
+	"go.mau.fi/util/jsontime"
 
 	"maunium.net/go/mautrix/id"
 )
@@ -59,6 +61,8 @@ type BeeperMessageStatusEventContent struct {
 
 	MutateEventKey string `json:"mutate_event_key,omitempty"`
 
+	DisappearingTimer *BeeperDisappearingTimer `json:"disappearing_timer,omitempty"`
+
 	// Indicates the set of users to whom the event was delivered. If nil, then
 	// the client should not expect delivered status at any later point. If not
 	// nil (even if empty), this field indicates which users the event was
@@ -75,7 +79,41 @@ type BeeperRelatesTo struct {
 type BeeperTranscriptionEventContent struct {
 	Text      []ExtensibleText `json:"m.text,omitempty"`
 	Model     string           `json:"com.beeper.transcription.model,omitempty"`
-	RelatesTo BeeperRelatesTo  `json:"com.beeper.relates_to,omitempty"`
+	RelatesTo BeeperRelatesTo  `json:"com.beeper.relates_to"`
+}
+
+type BeeperViewLimitedMedia struct {
+	Type  string                `json:"type"`
+	Count int                   `json:"count,omitzero"`
+	Time  jsontime.Milliseconds `json:"time,omitzero"`
+}
+
+func (b *BeeperViewLimitedMedia) Hash() []byte {
+	if b == nil || (b.Type == "" && b.Count == 0 && b.Time.IsZero()) {
+		return nil
+	}
+	hasher := sha256.New()
+	hasher.Write([]byte(b.Type))
+	hashInt(hasher, "count", b.Count)
+	hashInt(hasher, "time", b.Time.Milliseconds())
+	return hasher.Sum(nil)
+}
+
+type BeeperViewLimitedMediaUpdateContent struct {
+	RemainingCount int       `json:"remaining_count"`
+	RelatesTo      RelatesTo `json:"m.relates_to"`
+}
+
+func (content *BeeperViewLimitedMediaUpdateContent) GetRelatesTo() *RelatesTo {
+	return &content.RelatesTo
+}
+
+func (content *BeeperViewLimitedMediaUpdateContent) OptionalGetRelatesTo() *RelatesTo {
+	return &content.RelatesTo
+}
+
+func (content *BeeperViewLimitedMediaUpdateContent) SetRelatesTo(rel *RelatesTo) {
+	content.RelatesTo = *rel
 }
 
 type BeeperRetryMetadata struct {
@@ -91,8 +129,13 @@ type BeeperRoomKeyAckEventContent struct {
 }
 
 type BeeperChatDeleteEventContent struct {
-	DeleteForEveryone  bool `json:"delete_for_everyone,omitempty"`
-	FromMessageRequest bool `json:"from_message_request,omitempty"`
+	DeleteForEveryone  bool `json:"delete_for_everyone,omitzero"`
+	FromMessageRequest bool `json:"from_message_request,omitzero"`
+}
+
+type BeeperBlockUserEventContent struct {
+	Block      bool `json:"block"`
+	ReportSpam bool `json:"report_spam,omitzero"`
 }
 
 type BeeperAcceptMessageRequestEventContent struct {
@@ -134,9 +177,9 @@ type LinkPreview struct {
 
 	ImageURL id.ContentURIString `json:"og:image,omitempty"`
 
-	ImageSize   IntOrString `json:"matrix:image:size,omitempty"`
-	ImageWidth  IntOrString `json:"og:image:width,omitempty"`
-	ImageHeight IntOrString `json:"og:image:height,omitempty"`
+	ImageSize   IntOrString `json:"matrix:image:size,omitempty,omitzero"`
+	ImageWidth  IntOrString `json:"og:image:width,omitempty,omitzero"`
+	ImageHeight IntOrString `json:"og:image:height,omitempty,omitzero"`
 	ImageType   string      `json:"og:image:type,omitempty"`
 }
 
@@ -156,8 +199,8 @@ type BeeperProfileExtra struct {
 	Identifiers  []string `json:"com.beeper.bridge.identifiers,omitempty"`
 	Service      string   `json:"com.beeper.bridge.service,omitempty"`
 	Network      string   `json:"com.beeper.bridge.network,omitempty"`
-	IsBridgeBot  bool     `json:"com.beeper.bridge.is_bridge_bot,omitempty"`
-	IsNetworkBot bool     `json:"com.beeper.bridge.is_network_bot,omitempty"`
+	IsBridgeBot  bool     `json:"com.beeper.bridge.is_bridge_bot,omitzero"`
+	IsNetworkBot bool     `json:"com.beeper.bridge.is_network_bot,omitzero"`
 }
 
 type BeeperPerMessageProfile struct {
@@ -165,7 +208,9 @@ type BeeperPerMessageProfile struct {
 	Displayname string               `json:"displayname,omitempty"`
 	AvatarURL   *id.ContentURIString `json:"avatar_url,omitempty"`
 	AvatarFile  *EncryptedFileInfo   `json:"avatar_file,omitempty"`
-	HasFallback bool                 `json:"has_fallback,omitempty"`
+	HasFallback bool                 `json:"has_fallback,omitzero"`
+
+	Unknown json.RawMessage `json:",embed,unknown,omitempty"`
 }
 
 type BeeperActionMessageType string
@@ -200,7 +245,7 @@ func (content *MessageEventContent) AddPerMessageProfileFallback() {
 	)
 }
 
-var HTMLProfileFallbackRegex = regexp.MustCompile(`<strong\s+data-mx-profile-fallback\s*>([^<]+): </strong\s*>`)
+var HTMLProfileFallbackRegex = regexp.MustCompile(`<strong\s+data-mx-profile-fallback(?:="")?\s*>([^<]+): </strong\s*>`)
 
 func (content *MessageEventContent) RemovePerMessageProfileFallback() {
 	if content.NewContent != nil && content.NewContent != content {
@@ -220,8 +265,8 @@ type BeeperStreamInfo struct {
 	UserID             id.UserID                   `json:"user_id"`
 	DeviceID           id.DeviceID                 `json:"device_id,omitempty"`
 	Type               string                      `json:"type"`
-	ExpiryMS           int64                       `json:"expiry_ms,omitempty"`
-	MaxBufferedUpdates int                         `json:"max_buffered_updates,omitempty"`
+	ExpiryMS           int64                       `json:"expiry_ms,omitzero"`
+	MaxBufferedUpdates int                         `json:"max_buffered_updates,omitzero"`
 	Encryption         *BeeperStreamEncryptionInfo `json:"encryption,omitempty"`
 }
 

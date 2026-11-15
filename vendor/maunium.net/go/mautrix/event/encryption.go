@@ -21,9 +21,9 @@ type EncryptionEventContent struct {
 	// The encryption algorithm to be used to encrypt messages sent in this room. Must be 'm.megolm.v1.aes-sha2'.
 	Algorithm id.Algorithm `json:"algorithm"`
 	// How long the session should be used before changing it. 604800000 (a week) is the recommended default.
-	RotationPeriodMillis int64 `json:"rotation_period_ms,omitempty"`
+	RotationPeriodMillis int64 `json:"rotation_period_ms,omitzero"`
 	// How many messages should be sent before changing the session. 100 is the recommended default.
-	RotationPeriodMessages int `json:"rotation_period_msgs,omitempty"`
+	RotationPeriodMessages int `json:"rotation_period_msgs,omitzero"`
 }
 
 // EncryptedEventContent represents the content of a m.room.encrypted message event.
@@ -102,14 +102,15 @@ func (content *EncryptedEventContent) MarshalJSON() ([]byte, error) {
 // RoomKeyEventContent represents the content of a m.room_key to_device event.
 // https://spec.matrix.org/v1.2/client-server-api/#mroom_key
 type RoomKeyEventContent struct {
-	Algorithm  id.Algorithm `json:"algorithm"`
-	RoomID     id.RoomID    `json:"room_id"`
-	SessionID  id.SessionID `json:"session_id"`
-	SessionKey string       `json:"session_key"`
+	Algorithm     id.Algorithm `json:"algorithm"`
+	RoomID        id.RoomID    `json:"room_id"`
+	SessionID     id.SessionID `json:"session_id"`
+	SessionKey    string       `json:"session_key"`
+	SharedHistory *bool        `json:"shared_history,omitempty"`
 
-	MaxAge      int64 `json:"com.beeper.max_age_ms,omitempty"`
-	MaxMessages int   `json:"com.beeper.max_messages,omitempty"`
-	IsScheduled bool  `json:"com.beeper.is_scheduled,omitempty"`
+	MaxAge      int64 `json:"com.beeper.max_age_ms,omitzero"`
+	MaxMessages int   `json:"com.beeper.max_messages,omitzero"`
+	IsScheduled bool  `json:"com.beeper.is_scheduled,omitzero"`
 }
 
 // ForwardedRoomKeyEventContent represents the content of a m.forwarded_room_key to_device event.
@@ -119,6 +120,11 @@ type ForwardedRoomKeyEventContent struct {
 	SenderKey          id.SenderKey `json:"sender_key"`
 	SenderClaimedKey   id.Ed25519   `json:"sender_claimed_ed25519_key"`
 	ForwardingKeyChain []string     `json:"forwarding_curve25519_key_chain"`
+}
+
+type RoomKeyBundleEventContent struct {
+	File   EncryptedFileInfo `json:"file"`
+	RoomID id.RoomID         `json:"room_id"`
 }
 
 type KeyRequestAction string
@@ -206,6 +212,11 @@ type SecretRequestEventContent struct {
 type SecretSendEventContent struct {
 	RequestID string `json:"request_id"`
 	Secret    string `json:"secret"`
+}
+
+type SecretPushEventContent struct {
+	Name   id.Secret `json:"name"`
+	Secret string    `json:"secret"`
 }
 
 type DummyEventContent struct{}

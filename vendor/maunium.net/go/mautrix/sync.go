@@ -11,6 +11,7 @@ import (
 	"errors"
 	"fmt"
 	"runtime/debug"
+	"slices"
 	"time"
 
 	"maunium.net/go/mautrix/event"
@@ -239,8 +240,8 @@ func dontProcessOldEvents(userID id.UserID, resp *RespSync, since string) bool {
 	// exists and is "join" and then discard processing that room entirely if so.
 	// TODO: We probably want to process messages from after the last join event in the timeline.
 	for roomID, roomData := range resp.Rooms.Join {
-		for i := len(roomData.Timeline.Events) - 1; i >= 0; i-- {
-			evt := roomData.Timeline.Events[i]
+		for _, evt := range slices.Backward(roomData.Timeline.Events) {
+
 			if evt.Type == event.StateMember && evt.GetStateKey() == string(userID) {
 				membership, _ := evt.Content.Raw["membership"].(string)
 				if membership == "join" {
@@ -265,9 +266,10 @@ func dontProcessOldEvents(userID id.UserID, resp *RespSync, since string) bool {
 //	cli.Syncer.(mautrix.ExtensibleSyncer).OnSync(cli.MoveInviteState)
 func (cli *Client) MoveInviteState(ctx context.Context, resp *RespSync, _ string) bool {
 	for _, meta := range resp.Rooms.Invite {
-		var inviteState []*event.Event
 		var inviteEvt *event.Event
-		for _, evt := range meta.State.Events {
+		bestState := meta.BestState()
+		inviteState := make([]*event.Event, 0, len(bestState)-1)
+		for _, evt := range bestState {
 			if evt.Type == event.StateMember && evt.GetStateKey() == cli.UserID.String() {
 				inviteEvt = evt
 			} else {
@@ -279,6 +281,7 @@ func (cli *Client) MoveInviteState(ctx context.Context, resp *RespSync, _ string
 		if inviteEvt != nil {
 			inviteEvt.Unsigned.InviteRoomState = inviteState
 			meta.State.Events = []*event.Event{inviteEvt}
+			meta.FullState.Events = nil
 		}
 	}
 	return true

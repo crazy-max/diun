@@ -22,11 +22,11 @@ import (
 type PowerLevelsEventContent struct {
 	usersLock    sync.RWMutex
 	Users        map[id.UserID]int `json:"users,omitempty"`
-	UsersDefault int               `json:"users_default,omitempty"`
+	UsersDefault int               `json:"users_default,omitzero"`
 
 	eventsLock    sync.RWMutex
 	Events        map[string]int `json:"events,omitempty"`
-	EventsDefault int            `json:"events_default,omitempty"`
+	EventsDefault int            `json:"events_default,omitzero"`
 
 	Notifications *NotificationPowerLevels `json:"notifications,omitempty"`
 
