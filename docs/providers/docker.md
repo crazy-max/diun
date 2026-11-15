@@ -197,6 +197,8 @@ You can configure more finely the way to analyze the image of your container thr
 |-------------------------------|-------------------------|
 | `diun.metadata.ctn_id`        | Container ID            |
 | `diun.metadata.ctn_names`     | Container names         |
+| `diun.metadata.ctn_image`     | Container image         |
+| `diun.metadata.ctn_image_tag` | Container image tag     |
 | `diun.metadata.ctn_command`   | Container command       |
 | `diun.metadata.ctn_createdat` | Container creation date |
 | `diun.metadata.ctn_state`     | Container state         |

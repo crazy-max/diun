@@ -12,6 +12,8 @@ import (
 	"github.com/docker/go-units"
 	"github.com/moby/moby/api/types/container"
 	mobyclient "github.com/moby/moby/client"
+	"github.com/opencontainers/go-digest"
+	"go.podman.io/image/v5/docker/reference"
 )
 
 func (c *Client) listContainerImage() []model.Image {
@@ -116,15 +118,29 @@ func (c *Client) listContainerImage() []model.Image {
 }
 
 func metadata(ctn container.Summary) map[string]string {
-	return map[string]string{
+	meta := map[string]string{
 		"ctn_id":        ctn.ID,
 		"ctn_names":     formatNames(ctn.Names),
+		"ctn_image":     ctn.Image,
 		"ctn_command":   ctn.Command,
 		"ctn_createdat": time.Unix(ctn.Created, 0).String(),
 		"ctn_state":     string(ctn.State),
 		"ctn_status":    ctn.Status,
 		"ctn_size":      formatSize(ctn.SizeRw, ctn.SizeRootFs),
 	}
+
+	if _, err := digest.Parse(ctn.Image); err == nil {
+		return meta
+	}
+
+	if ref, err := reference.ParseNormalizedNamed(ctn.Image); err == nil {
+		ref = reference.TagNameOnly(ref)
+		if tagged, ok := ref.(reference.Tagged); ok {
+			meta["ctn_image_tag"] = tagged.Tag()
+		}
+	}
+
+	return meta
 }
 
 func formatNames(names []string) string {
