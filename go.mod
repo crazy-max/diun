@@ -8,7 +8,7 @@ require (
 	github.com/Microsoft/go-winio v0.6.2
 	github.com/PaulSonOfLars/gotgbot/v2 v2.0.0-rc.35
 	github.com/alecthomas/kong v1.15.0
-	github.com/bmatcuk/doublestar/v4 v4.10.0
+	github.com/bmatcuk/doublestar/v4 v4.10.4
 	github.com/containerd/containerd/api v1.11.1
 	github.com/containerd/platforms v1.0.0-rc.2
 	github.com/crazy-max/cron/v3 v3.1.1
