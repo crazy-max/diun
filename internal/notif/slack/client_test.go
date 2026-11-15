@@ -78,12 +78,12 @@ func TestSendPostsWebhookAttachment(t *testing.T) {
 
 func TestSendRetriesAfterSlackRateLimit(t *testing.T) {
 	var requestCount int
-	var gotPayloads []map[string]interface{}
+	var gotPayloads []map[string]any
 	var gotPayloadErr error
 
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		requestCount++
-		var payload map[string]interface{}
+		var payload map[string]any
 		if err := json.NewDecoder(r.Body).Decode(&payload); err != nil && gotPayloadErr == nil {
 			gotPayloadErr = err
 		}

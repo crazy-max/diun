@@ -139,8 +139,8 @@ func TestListTaskImagesQueriesAllNamespacesByDefault(t *testing.T) {
 	client := &Client{
 		config: &model.PrdNomad{
 			Address:        server.URL,
-			TLSInsecure:    ptr(false),
-			WatchByDefault: ptr(true),
+			TLSInsecure:    new(false),
+			WatchByDefault: new(true),
 		},
 		logger: zerolog.Nop(),
 	}
@@ -181,8 +181,8 @@ func TestListTaskImagesQueriesConfiguredNamespaces(t *testing.T) {
 			Address:        server.URL,
 			Namespace:      "legacy", //nolint:staticcheck // Test backward compatibility with the deprecated field.
 			Namespaces:     []string{" dev ", "", "prod"},
-			TLSInsecure:    ptr(false),
-			WatchByDefault: ptr(true),
+			TLSInsecure:    new(false),
+			WatchByDefault: new(true),
 		},
 		logger: zerolog.Nop(),
 	}
@@ -208,12 +208,12 @@ func nomadTestJob(image string) *nomadapi.Job {
 	return &nomadapi.Job{
 		TaskGroups: []*nomadapi.TaskGroup{
 			{
-				Name: ptr("group"),
+				Name: new("group"),
 				Tasks: []*nomadapi.Task{
 					{
 						Name:   "task",
 						Driver: "docker",
-						Config: map[string]interface{}{
+						Config: map[string]any{
 							"image": image,
 						},
 					},
@@ -237,8 +237,4 @@ func imageMetadataValues(images []model.Image, key string) []string {
 		values = append(values, image.Metadata[key])
 	}
 	return values
-}
-
-func ptr[T any](v T) *T {
-	return &v
 }

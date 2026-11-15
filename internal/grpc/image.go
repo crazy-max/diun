@@ -19,7 +19,6 @@ func (c *Client) ImageList(_ context.Context, _ *pb.ImageListRequest) (*pb.Image
 
 	var ilr []*pb.ImageListResponse_Image
 	for name, mfsts := range images {
-		mfsts := mfsts
 		var latest *registry.Manifest
 		for _, mfst := range mfsts {
 			if latest == nil || mfst.Created.After(*latest.Created) {

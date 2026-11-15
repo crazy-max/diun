@@ -1,6 +1,7 @@
 package msg
 
 import (
+	"maps"
 	"regexp"
 	"strings"
 	"text/template"
@@ -28,8 +29,6 @@ func templateFuncs(overrides template.FuncMap) template.FuncMap {
 		},
 		"upper": strings.ToUpper,
 	}
-	for name, fn := range overrides {
-		funcs[name] = fn
-	}
+	maps.Copy(funcs, overrides)
 	return funcs
 }

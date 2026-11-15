@@ -13,11 +13,9 @@ import (
 func TestMetadataFormatsPodContainer(t *testing.T) {
 	created := time.Date(2026, 5, 24, 12, 34, 56, 0, time.UTC)
 	pod := v1.Pod{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:              "api-pod",
-			Namespace:         "prod",
-			CreationTimestamp: metav1.NewTime(created),
-		},
+		Name:              "api-pod",
+		Namespace:         "prod",
+		CreationTimestamp: metav1.NewTime(created),
 		Status: v1.PodStatus{
 			Phase: v1.PodRunning,
 		},

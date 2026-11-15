@@ -25,8 +25,9 @@ func TestAppendPodKeepsPodsWithoutMatchingOwnerReference(t *testing.T) {
 	pods := []v1.Pod{{
 		ObjectMeta: objectMeta("api-1", "replicaset-uid"),
 	}}
-	standalone := v1.Pod{}
-	standalone.Name = "standalone"
+	standalone := v1.Pod{
+		Name: "standalone",
+	}
 
 	got := appendPod(pods, standalone)
 

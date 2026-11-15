@@ -25,8 +25,8 @@ type NotifEntries struct {
 type NotifEntry struct {
 	Status   ImageStatus       `json:"status,omitempty"`
 	Provider string            `json:"provider,omitempty"`
-	Image    registry.Image    `json:"image,omitempty"`
-	Manifest registry.Manifest `json:"manifest,omitempty"`
+	Image    registry.Image    `json:"image"`
+	Manifest registry.Manifest `json:"manifest"`
 	Metadata map[string]string `json:"metadata,omitempty"`
 
 	// updateAvailable records whether this result is an actionable image update.

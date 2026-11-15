@@ -92,7 +92,7 @@ func (c *fakeMQTTClient) Disconnect(uint) {
 	c.connected = false
 }
 
-func (c *fakeMQTTClient) Publish(topic string, qos byte, retained bool, payload interface{}) MQTT.Token {
+func (c *fakeMQTTClient) Publish(topic string, qos byte, retained bool, payload any) MQTT.Token {
 	c.publishCalls++
 	c.topic = topic
 	c.qos = qos

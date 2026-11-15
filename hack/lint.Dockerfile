@@ -5,8 +5,10 @@ ARG XX_VERSION="1.10.0"
 ARG ALPINE_VERSION="3.24"
 ARG GOLANGCI_LINT_VERSION="v2.15.0"
 ARG GOLANGCI_FROM_SOURCE="true"
+ARG GOPLS_ANALYZERS_VERSION="latest"
 
 FROM --platform=$BUILDPLATFORM tonistiigi/xx:${XX_VERSION} AS xx
+FROM --platform=$BUILDPLATFORM crazymax/gopls-analyzers:${GOPLS_ANALYZERS_VERSION} AS gopls-analyzers
 
 FROM --platform=$BUILDPLATFORM golang:${GO_VERSION}-alpine${ALPINE_VERSION} AS base
 ENV GOFLAGS="-buildvcs=false"
@@ -26,6 +28,17 @@ COPY --from=golangci-lint /usr/bin/golangci-lint golangci-lint
 FROM scratch AS golangci-binary-true
 COPY --from=golangci-build /out/golangci-lint golangci-lint
 FROM golangci-binary-${GOLANGCI_FROM_SOURCE} AS golangci-binary
+
+FROM base AS gopls-analyze
+ENV GOFLAGS="-buildvcs=false -mod=vendor -tags=containers_image_openpgp,exclude_graphdriver_btrfs,exclude_graphdriver_devicemapper"
+ARG TARGETPLATFORM
+RUN --mount=type=bind,target=. \
+    --mount=type=cache,target=/root/.cache,id=gopls-cache-$TARGETPLATFORM \
+    --mount=from=gopls-analyzers,source=/usr/local/bin/gopls-analyzers,target=/usr/bin/gopls-analyzers \
+  xx-go --wrap && \
+  go list ./... > /tmp/packages && \
+  # The pb package contains generated protobuf code.
+  go vet -vettool=/usr/bin/gopls-analyzers $(grep -v '/pb$' /tmp/packages)
 
 FROM base AS lint
 ARG TARGETPLATFORM

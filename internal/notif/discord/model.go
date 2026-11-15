@@ -14,10 +14,10 @@ type Embed struct {
 	Description string         `json:"description,omitempty"`
 	URL         string         `json:"url,omitempty"`
 	Color       int            `json:"color,omitempty"`
-	Footer      EmbedFooter    `json:"footer,omitempty"`
-	Image       EmbedImage     `json:"image,omitempty"`
-	Thumbnail   EmbedThumbnail `json:"thumbnail,omitempty"`
-	Author      EmbedAuthor    `json:"author,omitempty"`
+	Footer      EmbedFooter    `json:"footer"`
+	Image       EmbedImage     `json:"image"`
+	Thumbnail   EmbedThumbnail `json:"thumbnail"`
+	Author      EmbedAuthor    `json:"author"`
 	Fields      []EmbedField   `json:"fields,omitempty"`
 }
 

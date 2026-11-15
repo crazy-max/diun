@@ -13,11 +13,9 @@ func TestMetadataFormatsService(t *testing.T) {
 	updated := time.Date(2026, 5, 25, 13, 35, 57, 0, time.UTC)
 
 	got := metadata(mobyswarm.Service{
-		ID: "service-id",
-		Meta: mobyswarm.Meta{
-			CreatedAt: created,
-			UpdatedAt: updated,
-		},
+		ID:        "service-id",
+		CreatedAt: created,
+		UpdatedAt: updated,
 		Spec: mobyswarm.ServiceSpec{
 			Annotations: mobyswarm.Annotations{
 				Name: "api",
