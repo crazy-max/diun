@@ -39,7 +39,7 @@ require (
 	github.com/sirupsen/logrus v1.10.2
 	github.com/slack-go/slack v0.35.0
 	github.com/stretchr/testify v1.12.1
-	github.com/tidwall/pretty v1.2.1
+	github.com/tidwall/pretty v1.3.0
 	github.com/wneessen/go-mail v0.7.3
 	go.etcd.io/bbolt v1.5.0
 	go.podman.io/image/v5 v5.42.1
