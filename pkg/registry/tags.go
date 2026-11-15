@@ -1,7 +1,6 @@
 package registry
 
 import (
-	"fmt"
 	"regexp"
 	"slices"
 	"sort"
@@ -97,7 +96,19 @@ func SortTags(tags []string, sortTag SortTag) []string {
 			s = strings.TrimLeftFunc(s, func(r rune) bool {
 				return !unicode.IsNumber(r)
 			})
-			if vt := fmt.Sprintf("v%s", s); semver.IsValid(vt) {
+			// semver only accepts shorthand versions without suffixes.
+			// Expand the version core while preserving prerelease and build suffixes.
+			if i := strings.IndexAny(s, "-+"); i >= 0 {
+				core, suffix := s[:i], s[i:]
+				switch strings.Count(core, ".") {
+				case 0:
+					core += ".0.0"
+				case 1:
+					core += ".0"
+				}
+				s = core + suffix
+			}
+			if vt := "v" + s; semver.IsValid(vt) {
 				return vt
 			}
 			return ""
