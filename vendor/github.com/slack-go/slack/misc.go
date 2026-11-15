@@ -1,0 +1,622 @@
+package slack
+
+import (
+	"bytes"
+	"context"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"mime"
+	"mime/multipart"
+	"net/http"
+	"net/http/httputil"
+	"net/url"
+	"os"
+	"path/filepath"
+	"slices"
+	"strconv"
+	"strings"
+	"time"
+)
+
+// AppsManifestCreateResponseError ("/apps.manifest.create")
+type AppsManifestCreateResponseError struct {
+	Code             string `json:"code,omitempty"`
+	Message          string `json:"message"`
+	Pointer          string `json:"pointer"`
+	RelatedComponent string `json:"related_component,omitempty"`
+}
+
+// ConversationsInviteResponseError ("/conversations.invite")
+type ConversationsInviteResponseError struct {
+	Error string `json:"error"`
+	Ok    bool   `json:"ok"`
+	User  string `json:"user"`
+}
+
+func (t ConversationsInviteResponseError) Err() error {
+	if !t.Ok {
+		return fmt.Errorf("conversations invite error (user: %s): %s", t.User, t.Error)
+	}
+	return nil
+}
+
+// SlackResponseErrors represents a union type for different error structures
+type SlackResponseErrors struct {
+	AppsManifestCreateResponseError  *AppsManifestCreateResponseError  `json:"-"`
+	ConversationsInviteResponseError *ConversationsInviteResponseError `json:"-"`
+	Message                          *string                           `json:"-"`
+}
+
+// MarshalJSON implements custom marshaling for SlackResponseErrors
+func (e SlackResponseErrors) MarshalJSON() ([]byte, error) {
+	if e.AppsManifestCreateResponseError != nil {
+		return json.Marshal(e.AppsManifestCreateResponseError)
+	}
+	if e.ConversationsInviteResponseError != nil {
+		return json.Marshal(e.ConversationsInviteResponseError)
+	}
+	if e.Message != nil {
+		return json.Marshal(*e.Message)
+	}
+	return []byte("null"), nil
+}
+
+// UnmarshalJSON implements custom unmarshaling for SlackResponseErrors
+func (e *SlackResponseErrors) UnmarshalJSON(data []byte) error {
+	if bytes.Equal(data, []byte("null")) {
+		return nil
+	}
+
+	// Try to determine the error type by checking for unique fields
+	var raw map[string]any
+	if err := json.Unmarshal(data, &raw); err != nil {
+		// If we can't unmarshal as object, try as string (fallback case)
+		//
+		// For more details on this specific problem look up issue
+		// https://github.com/slack-go/slack/issues/1446.
+		var stringError string
+		if stringErr := json.Unmarshal(data, &stringError); stringErr == nil {
+			e.Message = &stringError
+			return nil
+		}
+		return err
+	}
+
+	if _, hasPointer := raw["pointer"]; hasPointer {
+		if _, hasMessage := raw["message"]; hasMessage {
+			var amc AppsManifestCreateResponseError
+			if err := json.Unmarshal(data, &amc); err != nil {
+				return err
+			}
+			e.AppsManifestCreateResponseError = &amc
+			return nil
+		}
+	}
+
+	if _, hasUser := raw["user"]; hasUser {
+		if _, hasError := raw["error"]; hasError {
+			if _, hasOk := raw["ok"]; hasOk {
+				var ci ConversationsInviteResponseError
+				if err := json.Unmarshal(data, &ci); err != nil {
+					return err
+				}
+				e.ConversationsInviteResponseError = &ci
+				return nil
+			}
+		}
+	}
+
+	return fmt.Errorf("unknown error structure: %s", string(data))
+}
+
+// SlackResponse handles parsing out errors from the web api.
+type SlackResponse struct {
+	Ok               bool                  `json:"ok"`
+	Error            string                `json:"error"`
+	Warning          string                `json:"warning"`
+	Errors           []SlackResponseErrors `json:"errors,omitempty"`
+	ResponseMetadata ResponseMetadata      `json:"response_metadata"`
+	Needed           string                `json:"needed,omitempty"`
+	Provided         string                `json:"provided,omitempty"`
+}
+
+// Warn returns warning information from the API response, or nil if there
+// are no warnings.
+func (t SlackResponse) Warn() *Warning {
+	if t.Warning == "" && len(t.ResponseMetadata.Warnings) == 0 {
+		return nil
+	}
+	return &Warning{
+		Codes:    strings.Split(t.Warning, ","),
+		Warnings: t.ResponseMetadata.Warnings,
+	}
+}
+
+// warner is satisfied by any response type that can report warnings.
+type warner interface {
+	Warn() *Warning
+}
+
+// Warning provides warning information from the web API.
+// https://docs.slack.dev/apis/web-api/#responses
+type Warning struct {
+	Codes    []string
+	Warnings []string
+}
+
+// httpHeaderSetter is satisfied by response types that can store HTTP
+// response headers. The response parser checks for this interface and
+// injects headers before JSON decoding.
+type httpHeaderSetter interface {
+	setHTTPResponseHeaders(http.Header)
+}
+
+// responseHeaders is a mix-in for internal response types that need to
+// capture HTTP response headers. Embedded in types like authTestResponseFull
+// so the parser can store headers that are then propagated to the public
+// response type (e.g. AuthTestResponse.Header).
+type responseHeaders struct {
+	header http.Header
+}
+
+func (r *responseHeaders) setHTTPResponseHeaders(h http.Header) { r.header = h }
+
+// KickUserFromConversationSlackResponse is a variant of SlackResponse that can handle the case where
+// "errors" can be either an empty object {} or an array of errors.
+// This addresses issue #1446 where conversations.kick endpoint returns {"ok":true,"errors":{}}
+type KickUserFromConversationSlackResponse struct {
+	Ok               bool                  `json:"ok"`
+	Error            string                `json:"error"`
+	Warning          string                `json:"warning"`
+	Errors           []SlackResponseErrors `json:"-"`
+	ResponseMetadata ResponseMetadata      `json:"response_metadata"`
+	Needed           string                `json:"needed,omitempty"`
+	Provided         string                `json:"provided,omitempty"`
+}
+
+// UnmarshalJSON implements custom unmarshaling for KickUserFromConversationSlackResponse to handle
+// the case where "errors" can be either an empty object {} or an array of errors
+func (s *KickUserFromConversationSlackResponse) UnmarshalJSON(data []byte) error {
+	// First, unmarshal everything except errors
+	type Alias KickUserFromConversationSlackResponse
+	aux := &struct {
+		*Alias
+		ErrorsRaw json.RawMessage `json:"errors,omitempty"`
+	}{
+		Alias: (*Alias)(s),
+	}
+
+	if err := json.Unmarshal(data, aux); err != nil {
+		return err
+	}
+
+	// Handle the errors field
+	if len(aux.ErrorsRaw) > 0 {
+		// Check if it's an empty object by looking for just "{}"
+		trimmed := bytes.TrimSpace(aux.ErrorsRaw)
+		if bytes.Equal(trimmed, []byte("{}")) {
+			// Empty object, leave errors as nil/empty slice
+			s.Errors = nil
+		} else {
+			// Try to unmarshal as array of errors
+			var errors []SlackResponseErrors
+			if err := json.Unmarshal(aux.ErrorsRaw, &errors); err != nil {
+				return err
+			}
+			s.Errors = errors
+		}
+	}
+
+	return nil
+}
+
+// Warn returns warning information from the API response, or nil if there
+// are no warnings.
+func (s KickUserFromConversationSlackResponse) Warn() *Warning {
+	return SlackResponse(s).Warn()
+}
+
+// Err returns any API error present in the response.
+func (s KickUserFromConversationSlackResponse) Err() error {
+	return SlackResponse(s).Err()
+}
+
+func (t SlackResponse) Err() error {
+	if t.Ok {
+		return nil
+	}
+
+	// handle pure text based responses like chat.post
+	// which while they have a slack response in their data structure
+	// it doesn't actually get set during parsing.
+	if strings.TrimSpace(t.Error) == "" {
+		return nil
+	}
+
+	return SlackErrorResponse{Err: t.Error, Errors: t.Errors, ResponseMetadata: t.ResponseMetadata, Needed: t.Needed, Provided: t.Provided}
+}
+
+// SlackErrorResponse brings along the metadata of errors returned by the Slack API.
+type SlackErrorResponse struct {
+	Err              string
+	Errors           []SlackResponseErrors
+	ResponseMetadata ResponseMetadata
+	// Needed and Provided contain Slack's scope diagnostics, when supplied.
+	// Values are preserved verbatim without interpreting separators.
+	Needed   string
+	Provided string
+}
+
+func (r SlackErrorResponse) Error() string { return r.Err }
+
+// RateLimitedError represents the rate limit response from slack
+type RateLimitedError struct {
+	RetryAfter time.Duration
+}
+
+func (e *RateLimitedError) Error() string {
+	return fmt.Sprintf("slack rate limit exceeded, retry after %s", e.RetryAfter)
+}
+
+func (e *RateLimitedError) Retryable() bool {
+	return true
+}
+
+func fileUploadReq(ctx context.Context, path string, r io.Reader) (*http.Request, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, path, r)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// slackDomains are the domains whose hosts serve the Slack files that need the token.
+var slackDomains = []string{"slack.com", "slack-gov.com"}
+
+// ensureURLMayReceiveToken returns an error unless rawURL is an https Slack URL or an
+// API endpoint URL. GetFile and UploadToURL attach the token to a URL the caller passes
+// in, and the url_private of a remote file is whatever external_url its creator chose.
+func ensureURLMayReceiveToken(apiEndpoint, rawURL string) error {
+	u, err := url.Parse(rawURL)
+	if err != nil {
+		return err
+	}
+	api, err := url.Parse(apiEndpoint)
+	if err != nil {
+		return err
+	}
+	if isHTTPSSlackURL(u) || isAPIEndpointURL(api, u) {
+		return nil
+	}
+	return fmt.Errorf("refusing to send the token to %q: not an https Slack URL or the API URL", rawURL)
+}
+
+// isHTTPSSlackURL reports whether u is an https URL on a host in slackDomains or one of
+// their subdomains.
+func isHTTPSSlackURL(u *url.URL) bool {
+	if u.Scheme != "https" {
+		return false
+	}
+	host := strings.ToLower(u.Hostname())
+	return slices.ContainsFunc(slackDomains, func(domain string) bool {
+		return host == domain || strings.HasSuffix(host, "."+domain)
+	})
+}
+
+// isAPIEndpointURL reports whether u has the scheme and host of the API endpoint set
+// with OptionAPIURL. Every API call already sends the token there.
+func isAPIEndpointURL(api, u *url.URL) bool {
+	return api.Host != "" && u.Scheme == api.Scheme && strings.EqualFold(u.Host, api.Host)
+}
+
+func downloadFile(ctx context.Context, client httpClient, token, apiEndpoint, downloadURL string, writer io.Writer, d Debug) error {
+	if downloadURL == "" {
+		return fmt.Errorf("received empty download URL")
+	}
+	if err := ensureURLMayReceiveToken(apiEndpoint, downloadURL); err != nil {
+		return err
+	}
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, downloadURL, &bytes.Buffer{})
+	if err != nil {
+		return err
+	}
+
+	var bearer = "Bearer " + token
+	req.Header.Add("Authorization", bearer)
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+
+	defer resp.Body.Close()
+
+	err = checkStatusCode(resp, d)
+	if err != nil {
+		return err
+	}
+
+	// Without access to the file, files.slack.com redirects to the workspace sign-in
+	// page with redir set to the file path, and the client follows it to an HTML
+	// page. Report that instead of writing the page as the file. A file the token
+	// can read, HTML or not, is served without a redirect.
+	if final := resp.Request; final != nil {
+		if redir := final.URL.Query().Get("redir"); redir != "" && redir == req.URL.Path {
+			return fmt.Errorf("file download was redirected to the sign-in page at %s: the token cannot read this file", final.URL.Host)
+		}
+	}
+
+	_, err = io.Copy(writer, resp.Body)
+
+	return err
+}
+
+func formReq(ctx context.Context, endpoint string, values url.Values) (req *http.Request, err error) {
+	if req, err = http.NewRequestWithContext(ctx, http.MethodPost, endpoint, strings.NewReader(values.Encode())); err != nil {
+		return nil, err
+	}
+
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	return req, nil
+}
+
+func jsonReq(ctx context.Context, endpoint string, body any) (req *http.Request, err error) {
+	buffer := bytes.NewBuffer([]byte{})
+	if err = json.NewEncoder(buffer).Encode(body); err != nil {
+		return nil, err
+	}
+
+	if req, err = http.NewRequestWithContext(ctx, http.MethodPost, endpoint, buffer); err != nil {
+		return nil, err
+	}
+
+	req.Header.Set("Content-Type", "application/json; charset=utf-8")
+	return req, nil
+}
+
+func postLocalWithMultipartResponse(ctx context.Context, client httpClient, method, fpath, fieldname, token string, values url.Values, intf any, d Debug) error {
+	fullpath, err := filepath.Abs(fpath)
+	if err != nil {
+		return err
+	}
+	file, err := os.Open(fullpath)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	return postWithMultipartResponse(ctx, client, method, filepath.Base(fpath), fieldname, token, values, file, intf, d)
+}
+
+func postWithMultipartResponse(ctx context.Context, client httpClient, path, name, fieldname, token string, values url.Values, r io.Reader, intf any, d Debug) error {
+	pipeReader, pipeWriter := io.Pipe()
+	// Unblock multipart writes if the request returns before consuming the body.
+	defer pipeReader.Close()
+	wr := multipart.NewWriter(pipeWriter)
+
+	// The writer must be able to report an error after the request has returned.
+	errc := make(chan error, 1)
+	go func() {
+		defer pipeWriter.Close()
+		defer wr.Close()
+		err := createFormFields(wr, values)
+		if err != nil {
+			errc <- err
+			return
+		}
+		ioWriter, err := wr.CreateFormFile(fieldname, name)
+		if err != nil {
+			errc <- err
+			return
+		}
+		_, err = io.Copy(ioWriter, r)
+		if err != nil {
+			errc <- err
+			return
+		}
+		if err = wr.Close(); err != nil {
+			errc <- err
+			return
+		}
+	}()
+
+	req, err := fileUploadReq(ctx, path, pipeReader)
+	if err != nil {
+		return err
+	}
+	req.Header.Add("Content-Type", wr.FormDataContentType())
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
+	resp, err := client.Do(req)
+
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	err = checkStatusCode(resp, d)
+	if err != nil {
+		return err
+	}
+
+	select {
+	case err = <-errc:
+		return err
+	default:
+		return newJSONParser(intf)(resp)
+	}
+}
+
+func createFormFields(mw *multipart.Writer, values url.Values) error {
+	for key, value := range values {
+		writer, err := mw.CreateFormField(key)
+		if err != nil {
+			return err
+		}
+		_, err = writer.Write([]byte(value[0]))
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func doPost(client httpClient, req *http.Request, parser responseParser, d Debug) (http.Header, error) {
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if err = checkStatusCode(resp, d); err != nil {
+		return nil, err
+	}
+
+	return resp.Header, parser(resp)
+}
+
+// post JSON.
+func postJSON(ctx context.Context, client httpClient, endpoint, token string, jsonBody []byte, intf any, d Debug) (http.Header, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, bytes.NewReader(jsonBody))
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
+	// allow retry client to re-send the request body on 429/5xx.
+	req.GetBody = func() (io.ReadCloser, error) {
+		return io.NopCloser(bytes.NewReader(jsonBody)), nil
+	}
+	return doPost(client, req, newJSONParser(intf), d)
+}
+
+// post a url encoded form.
+func postForm(ctx context.Context, client httpClient, endpoint string, values url.Values, intf any, d Debug) (http.Header, error) {
+	body := values.Encode()
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, strings.NewReader(body))
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	// allow retry client to re-send the request body on 429/5xx.
+	req.GetBody = func() (io.ReadCloser, error) {
+		return io.NopCloser(strings.NewReader(body)), nil
+	}
+	return doPost(client, req, newJSONParser(intf), d)
+}
+
+func getResource(ctx context.Context, client httpClient, endpoint, token string, values url.Values, intf any, d Debug) (http.Header, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
+
+	req.URL.RawQuery = values.Encode()
+
+	return doPost(client, req, newJSONParser(intf), d)
+}
+
+func parseAdminResponse(ctx context.Context, client httpClient, method string, teamName string, values url.Values, intf any, d Debug) error {
+	endpoint := fmt.Sprintf(WEBAPIURLFormat, teamName, method, time.Now().Unix())
+	_, err := postForm(ctx, client, endpoint, values, intf, d)
+	return err
+}
+
+func logResponse(resp *http.Response, d Debug) error {
+	if d.Debug() {
+		text, err := httputil.DumpResponse(resp, true)
+		if err != nil {
+			return err
+		}
+		d.Debugln(string(text))
+	}
+
+	return nil
+}
+
+func okJSONHandler(rw http.ResponseWriter, r *http.Request) {
+	rw.Header().Set("Content-Type", "application/json")
+	response, _ := json.Marshal(SlackResponse{
+		Ok: true,
+	})
+	_, _ = rw.Write(response)
+}
+
+func checkStatusCode(resp *http.Response, d Debug) error {
+	if resp.StatusCode == http.StatusTooManyRequests && resp.Header.Get("Retry-After") != "" {
+		retry, err := strconv.ParseInt(resp.Header.Get("Retry-After"), 10, 64)
+		if err != nil {
+			return err
+		}
+		return &RateLimitedError{time.Duration(retry) * time.Second}
+	}
+
+	// Slack seems to send an HTML body along with 5xx error codes. Don't parse it.
+	if resp.StatusCode != http.StatusOK {
+		_ = logResponse(resp, d)
+		return StatusCodeError{Code: resp.StatusCode, Status: resp.Status}
+	}
+
+	return nil
+}
+
+type responseParser func(*http.Response) error
+
+func newJSONParser(dst any) responseParser {
+	return func(resp *http.Response) error {
+		if dst == nil {
+			return nil
+		}
+		if hs, ok := dst.(httpHeaderSetter); ok {
+			hs.setHTTPResponseHeaders(resp.Header.Clone())
+		}
+		return json.NewDecoder(resp.Body).Decode(dst)
+	}
+}
+
+func newTextParser(dst any) responseParser {
+	return func(resp *http.Response) error {
+		if dst == nil {
+			return nil
+		}
+
+		b, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return err
+		}
+
+		if !bytes.Equal(b, []byte("ok")) {
+			return errors.New(string(b))
+		}
+
+		return nil
+	}
+}
+
+func newContentTypeParser(dst any) responseParser {
+	return func(req *http.Response) (err error) {
+		var (
+			ctype string
+		)
+
+		if ctype, _, err = mime.ParseMediaType(req.Header.Get("Content-Type")); err != nil {
+			return err
+		}
+
+		switch ctype {
+		case "application/json":
+			return newJSONParser(dst)(req)
+		default:
+			// newTextParser doesn't use dst, so capture headers here.
+			if hs, ok := dst.(httpHeaderSetter); ok {
+				hs.setHTTPResponseHeaders(req.Header.Clone())
+			}
+			return newTextParser(dst)(req)
+		}
+	}
+}
