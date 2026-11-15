@@ -1,10 +1,12 @@
 package text
 
 import (
+	"bytes"
 	"fmt"
 	"sort"
 	"strconv"
 	"strings"
+	"unicode/utf8"
 )
 
 // Constants
@@ -64,6 +66,18 @@ const (
 	// conceal OSI sequences
 	escapeStartConcealOSI = "\x1b]8;"
 	escapeStopConcealOSI  = "\x1b\\"
+
+	// escSeqMaxLength bounds the accumulated escape sequence; real terminals
+	// cap sequences in the low KBs, and anything longer here is most likely
+	// malformed input that would otherwise grow the buffer without limit
+	escSeqMaxLength = 2048
+)
+
+// []byte forms of the conceal OSI markers for prefix/suffix checks on the
+// escape sequence buffer without allocating per call
+var (
+	escapeStartConcealOSIBytes = []byte(escapeStartConcealOSI)
+	escapeStopConcealOSIBytes  = []byte(escapeStopConcealOSI)
 )
 
 // 256-color codes
@@ -117,8 +131,14 @@ type EscSeqParser struct {
 	inEscSeq bool
 	// escSeqKind identifies the type of escape sequence being parsed (CSI or OSI).
 	escSeqKind escSeqKind
-	// escapeSeq accumulates the current escape sequence being parsed.
-	escapeSeq string
+	// escapeSeq accumulates the current escape sequence being parsed; it is
+	// bounded by escSeqMaxLength and reused across sequences.
+	escapeSeq []byte
+
+	// skipParse makes Consume track only where escape sequences begin and
+	// end, without parsing the codes in them; meant for the callers that
+	// measure or cut text and never ask for Codes, IsOpen or Sequence.
+	skipParse bool
 }
 
 func (s *EscSeqParser) Codes() []int {
@@ -136,7 +156,7 @@ func (s *EscSeqParser) Consume(char rune) {
 	if !s.inEscSeq && char == EscapeStartRune {
 		s.inEscSeq = true
 		s.escSeqKind = escSeqKindUnknown
-		s.escapeSeq = ""
+		s.escapeSeq = s.escapeSeq[:0]
 	} else if s.inEscSeq && s.escSeqKind == escSeqKindUnknown {
 		switch char {
 		case EscapeStartRuneCSI:
@@ -147,20 +167,27 @@ func (s *EscSeqParser) Consume(char rune) {
 	}
 
 	if s.inEscSeq {
-		s.escapeSeq += string(char)
+		s.escapeSeq = utf8.AppendRune(s.escapeSeq, char)
+
+		// abort on absurdly long (most likely malformed/unterminated)
+		// sequences instead of accumulating them without limit
+		if len(s.escapeSeq) > escSeqMaxLength {
+			s.Reset()
+			return
+		}
 
 		// --- FIX for OSC 8 hyperlinks (e.g. \x1b]8;;url\x07label\x1b]8;;\x07)
 		if s.escSeqKind == escSeqKindOSI &&
-			strings.HasPrefix(s.escapeSeq, escapeStartConcealOSI) &&
+			bytes.HasPrefix(s.escapeSeq, escapeStartConcealOSIBytes) &&
 			char == escRuneBEL { // BEL
 
-			s.ParseSeq(s.escapeSeq, s.escSeqKind)
+			s.parseEscapeSeq()
 			s.Reset()
 			return
 		}
 
 		if s.isEscapeStopRune(char) {
-			s.ParseSeq(s.escapeSeq, s.escSeqKind)
+			s.parseEscapeSeq()
 			s.Reset()
 		}
 	}
@@ -179,6 +206,13 @@ func (s *EscSeqParser) ParseSeq(seq string, seqKind escSeqKind) {
 		s.codes = make(map[int]bool)
 	}
 
+	// only SGR sequences ("CSI ... m") carry character attributes; the other
+	// CSI final bytes (cursor movement, line erasing, ...) carry none, and
+	// their parameter bytes are not attribute codes
+	if seqKind == escSeqKindCSI && !strings.HasSuffix(seq, EscapeStopCSI) {
+		return
+	}
+
 	seq = s.stripEscapeSequence(seq, seqKind)
 	codes := s.splitAndTrimCodes(seq)
 	processed256ColorIndices := s.process256ColorSequences(codes)
@@ -186,7 +220,7 @@ func (s *EscSeqParser) ParseSeq(seq string, seqKind escSeqKind) {
 }
 
 func (s *EscSeqParser) ParseString(str string) string {
-	s.escapeSeq, s.inEscSeq, s.escSeqKind = "", false, escSeqKindUnknown
+	s.escapeSeq, s.inEscSeq, s.escSeqKind = s.escapeSeq[:0], false, escSeqKindUnknown
 	for _, char := range str {
 		s.Consume(char)
 	}
@@ -196,7 +230,7 @@ func (s *EscSeqParser) ParseString(str string) string {
 func (s *EscSeqParser) Reset() {
 	s.inEscSeq = false
 	s.escSeqKind = escSeqKindUnknown
-	s.escapeSeq = ""
+	s.escapeSeq = s.escapeSeq[:0]
 }
 
 func (s *EscSeqParser) Sequence() string {
@@ -275,15 +309,24 @@ func (s *EscSeqParser) clearColorRange(isForeground bool) {
 }
 
 func (s *EscSeqParser) isEscapeStopRune(char rune) bool {
-	if strings.HasPrefix(s.escapeSeq, escapeStartConcealOSI) {
-		if strings.HasSuffix(s.escapeSeq, escapeStopConcealOSI) {
+	if bytes.HasPrefix(s.escapeSeq, escapeStartConcealOSIBytes) {
+		if bytes.HasSuffix(s.escapeSeq, escapeStopConcealOSIBytes) {
 			return true
 		}
-	} else if (s.escSeqKind == escSeqKindCSI && char == EscapeStopRuneCSI) ||
+	} else if (s.escSeqKind == escSeqKindCSI && len(s.escapeSeq) > len(EscapeStartCSI) && isCSIFinalRune(char)) ||
 		(s.escSeqKind == escSeqKindOSI && char == EscapeStopRuneOSI) {
 		return true
 	}
 	return false
+}
+
+// isCSIFinalRune returns true if the given rune ends a CSI sequence. A CSI
+// sequence is "ESC [", followed by parameter bytes (0x30-0x3F) and
+// intermediate bytes (0x20-0x2F), and is terminated by the first byte in the
+// range 0x40-0x7E (ECMA-48, section 5.4). "m" (SGR) is only one of those final
+// bytes; the Cursor type of this package emits others like "A" and "K".
+func isCSIFinalRune(char rune) bool {
+	return char >= 0x40 && char <= 0x7E
 }
 
 // isRegularCode checks if a code is a regular code (not a 256-color encoded value).
@@ -324,6 +367,14 @@ func (s *EscSeqParser) parse256ColorSequence(codes []string, i int) (colorIndex 
 	}
 
 	return colorIndex, expectedBase, true
+}
+
+// parseEscapeSeq parses the escape sequence that was just consumed, unless the
+// parser has been asked to skip that.
+func (s *EscSeqParser) parseEscapeSeq() {
+	if !s.skipParse {
+		s.ParseSeq(string(s.escapeSeq), s.escSeqKind)
+	}
 }
 
 // process256ColorSequences processes 256-color sequences (38;5;n or 48;5;n) and returns
