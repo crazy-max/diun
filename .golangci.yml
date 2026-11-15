@@ -19,6 +19,7 @@ linters:
     - ineffassign
     - makezero
     - misspell
+    - modernize
     - noctx
     - nolintlint
     - revive

@@ -3,6 +3,7 @@ package registry
 import (
 	"fmt"
 	"regexp"
+	"slices"
 	"sort"
 	"strings"
 	"unicode"
@@ -147,10 +148,5 @@ func (st *SortTag) Valid() bool {
 
 // OneOf checks if sort type is one of the values in the list
 func (st *SortTag) OneOf(stl []SortTag) bool {
-	for _, n := range stl {
-		if n == *st {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(stl, *st)
 }

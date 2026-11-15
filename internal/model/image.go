@@ -1,13 +1,15 @@
 package model
 
 import (
+	"slices"
+
 	"github.com/crazy-max/diun/v4/pkg/registry"
 )
 
 // Image holds image configuration
 type Image struct {
 	Name        string            `yaml:"name,omitempty" json:",omitempty"`
-	Platform    ImagePlatform     `yaml:"platform,omitempty" json:",omitempty"`
+	Platform    ImagePlatform     `yaml:"platform,omitempty"`
 	RegOpt      string            `yaml:"regopt,omitempty" json:",omitempty"`
 	WatchRepo   *bool             `yaml:"watch_repo,omitempty" json:",omitempty"`
 	NotifyOn    []NotifyOn        `yaml:"notify_on,omitempty" json:",omitempty"`
@@ -61,10 +63,5 @@ func (ns *NotifyOn) Valid() bool {
 
 // OneOf checks if notify status is one of the values in the list
 func (ns *NotifyOn) OneOf(nsl []NotifyOn) bool {
-	for _, n := range nsl {
-		if n == *ns {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(nsl, *ns)
 }

@@ -64,7 +64,7 @@ type LogrusFormatter struct{}
 
 // Format renders a single log entry from logrus entry to zerolog
 func (f *LogrusFormatter) Format(entry *logrus.Entry) ([]byte, error) {
-	fields := map[string]interface{}(entry.Data)
+	fields := map[string]any(entry.Data)
 	message := fmt.Sprintf("[containers/image] %s", entry.Message)
 	switch entry.Level {
 	case logrus.ErrorLevel:
@@ -85,6 +85,6 @@ func (f *LogrusFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 type AntsLogger struct{}
 
 // Printf must have the same semantics as log.Printf
-func (w *AntsLogger) Printf(format string, args ...interface{}) {
+func (w *AntsLogger) Printf(format string, args ...any) {
 	log.Debug().Msgf(format, args...)
 }

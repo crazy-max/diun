@@ -43,7 +43,7 @@ type Diun struct {
 
 	cron   *cron.Cron
 	jobID  cron.EntryID
-	locker uint32
+	locker atomic.Uint32
 	pool   *ants.PoolWithFunc
 	wg     *sync.WaitGroup
 }
@@ -198,7 +198,7 @@ func (di *Diun) Start(ctx context.Context) error {
 }
 
 func (di *Diun) Run() {
-	if !atomic.CompareAndSwapUint32(&di.locker, 0, 1) {
+	if !di.locker.CompareAndSwap(0, 1) {
 		if di.metrics != nil {
 			di.metrics.RecordSkippedRun()
 		}
@@ -206,7 +206,7 @@ func (di *Diun) Run() {
 		return
 	}
 	startedAt := time.Now()
-	defer atomic.StoreUint32(&di.locker, 0)
+	defer di.locker.Store(0)
 	if di.jobID > 0 {
 		defer log.Info().Msgf("Next run in %s (%s)",
 			carbon.CreateFromStdTime(di.cron.Entry(di.jobID).Next).DiffAbsInString(),
@@ -219,7 +219,7 @@ func (di *Diun) Run() {
 	defer di.HealthchecksSuccess(entries)
 
 	di.wg = new(sync.WaitGroup)
-	di.pool, _ = ants.NewPoolWithFunc(di.cfg.Watch.Workers, func(i interface{}) {
+	di.pool, _ = ants.NewPoolWithFunc(di.cfg.Watch.Workers, func(i any) {
 		job := i.(model.Job)
 		entries.Add(di.runJob(job))
 		di.wg.Done()

@@ -19,51 +19,51 @@ type bridge struct {
 	zerolog.Logger
 }
 
-func (b *bridge) Info(args ...interface{}) {
+func (b *bridge) Info(args ...any) {
 	b.Logger.Info().Msg(fmt.Sprint(args...))
 }
 
-func (b *bridge) Infoln(args ...interface{}) {
+func (b *bridge) Infoln(args ...any) {
 	b.Logger.Info().Msg(fmt.Sprint(args...))
 }
 
-func (b *bridge) Infof(format string, args ...interface{}) {
+func (b *bridge) Infof(format string, args ...any) {
 	b.Logger.Info().Msgf(format, args...)
 }
 
-func (b *bridge) Warning(args ...interface{}) {
+func (b *bridge) Warning(args ...any) {
 	b.Logger.Warn().Msg(fmt.Sprint(args...))
 }
 
-func (b *bridge) Warningln(args ...interface{}) {
+func (b *bridge) Warningln(args ...any) {
 	b.Logger.Warn().Msg(fmt.Sprint(args...))
 }
 
-func (b *bridge) Warningf(format string, args ...interface{}) {
+func (b *bridge) Warningf(format string, args ...any) {
 	b.Logger.Warn().Msgf(format, args...)
 }
 
-func (b *bridge) Error(args ...interface{}) {
+func (b *bridge) Error(args ...any) {
 	b.Logger.Error().Msg(fmt.Sprint(args...))
 }
 
-func (b *bridge) Errorln(args ...interface{}) {
+func (b *bridge) Errorln(args ...any) {
 	b.Logger.Error().Msg(fmt.Sprint(args...))
 }
 
-func (b *bridge) Errorf(format string, args ...interface{}) {
+func (b *bridge) Errorf(format string, args ...any) {
 	b.Logger.Error().Msgf(format, args...)
 }
 
-func (b *bridge) Fatal(args ...interface{}) {
+func (b *bridge) Fatal(args ...any) {
 	b.Logger.Fatal().Msg(fmt.Sprint(args...))
 }
 
-func (b *bridge) Fatalln(args ...interface{}) {
+func (b *bridge) Fatalln(args ...any) {
 	b.Logger.Fatal().Msg(fmt.Sprint(args...))
 }
 
-func (b *bridge) Fatalf(format string, args ...interface{}) {
+func (b *bridge) Fatalf(format string, args ...any) {
 	b.Logger.Fatal().Msgf(format, args...)
 }
 

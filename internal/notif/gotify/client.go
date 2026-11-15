@@ -62,15 +62,15 @@ func (c *Client) Send(entry model.NotifEntry) error {
 	}
 
 	jsonBody, err := json.Marshal(struct {
-		Message  string                 `json:"message"`
-		Title    string                 `json:"title"`
-		Priority int                    `json:"priority"`
-		Extras   map[string]interface{} `json:"extras"`
+		Message  string         `json:"message"`
+		Title    string         `json:"title"`
+		Priority int            `json:"priority"`
+		Extras   map[string]any `json:"extras"`
 	}{
 		Message:  string(body),
 		Title:    string(title),
 		Priority: c.cfg.Priority,
-		Extras: map[string]interface{}{
+		Extras: map[string]any{
 			"client::display": map[string]string{
 				"contentType": "text/markdown",
 			},
