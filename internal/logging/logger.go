@@ -28,20 +28,22 @@ func Configure(opts Options) {
 	_, noColor := os.LookupEnv("NO_COLOR")
 
 	if !opts.LogJSON {
-		w = zerolog.ConsoleWriter{
+		cw := zerolog.ConsoleWriter{
 			Out:        os.Stdout,
 			NoColor:    noColor || opts.LogNoColor,
 			TimeFormat: time.RFC1123,
 		}
+		if !opts.LogTimestamp {
+			cw.PartsExclude = []string{zerolog.TimestampFieldName}
+		}
+		w = cw
 	} else {
 		w = os.Stdout
 	}
 
-	var ctx zerolog.Context
+	ctx := zerolog.New(w).With()
 	if opts.LogTimestamp {
-		ctx = zerolog.New(w).With().Timestamp()
-	} else {
-		ctx = zerolog.New(w).With()
+		ctx = ctx.Timestamp()
 	}
 	if opts.LogCaller {
 		ctx = ctx.Caller()
