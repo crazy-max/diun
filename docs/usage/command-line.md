@@ -26,6 +26,7 @@ Starts Diun server.
 * `--log-json`: Enable JSON logging output
 * `--log-caller`: Add `file:line` of the caller to log output
 * `--log-nocolor`: Disables the colorized output
+* `--log-timestamp=false`: Disable timestamps in log output (default `true`)
 * `--grpc-authority <string>`: Address used to expose the gRPC server (default `:42286`)
 
 Examples:
@@ -45,6 +46,7 @@ Following environment variables can also be used in place:
 | `LOG_JSON`       | `false`  | Enable JSON logging output                                           |
 | `LOG_CALLER`     | `false`  | Enable to add `file:line` of the caller                              |
 | `LOG_NOCOLOR`    | `false`  | Disables the colorized output                                        |
+| `LOG_TIMESTAMP`  | `true`   | Enables timestamps in log output                                     |
 | `GRPC_AUTHORITY` | `:42286` | Address used to expose the gRPC server                               |
 
 ### `healthcheck`
