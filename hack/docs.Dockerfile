@@ -1,5 +1,6 @@
 # syntax=docker/dockerfile:1
 
+# renovate: datasource=docker depName=squidfunk/mkdocs-material versioning=docker
 ARG MKDOCS_VERSION="9.7.5"
 
 FROM squidfunk/mkdocs-material:${MKDOCS_VERSION} AS base

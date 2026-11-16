@@ -1,0 +1,45 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    "helpers:pinGitHubActionDigestsToSemver",
+    "helpers:githubDigestChangelogs"
+  ],
+  "enabledManagers": [
+    "gomod",
+    "github-actions",
+    "custom.regex"
+  ],
+  "postUpdateOptions": ["gomodTidy", "gomodVendor"],
+  "minimumReleaseAge": "2 days",
+  "internalChecksFilter": "strict",
+  "labels": ["kind/dependencies", "bot"],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["/.github/workflows/.*\\.ya?ml$/"],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)(?: versioning=(?<versioning>\\S+))?[ \\t]*\\r?\\n[ \\t]*\\w+:[ \\t]*\"(?<currentValue>[^\"]+)\""
+      ]
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["**/*Dockerfile*"],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)(?: versioning=(?<versioning>\\S+))?[ \\t]*\\r?\\n[ \\t]*ARG[ \\t]+\\w+=\"?(?<currentValue>[^\\s\"]+)\"?"
+      ]
+    }
+  ],
+  "packageRules": [
+    {
+      "matchManagers": ["github-actions"],
+      "matchDepNames": ["github/codeql-action"],
+      "groupName": "codeql-actions"
+    }
+  ],
+  "ignoreDeps": [
+    "github.com/sirupsen/logrus",
+    "k8s.io/api",
+    "k8s.io/apimachinery"
+  ]
+}

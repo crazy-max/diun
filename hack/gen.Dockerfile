@@ -1,6 +1,7 @@
 # syntax=docker/dockerfile:1
 
 ARG GO_VERSION="1.27"
+# renovate: datasource=github-releases depName=protocolbuffers/protobuf
 ARG PROTOC_VERSION="3.17.3"
 
 # protoc is dynamically linked to glibc so can't use alpine base

@@ -21,6 +21,7 @@ env:
   DESTDIR: ./bin
   DOCKER_BUILD_SUMMARY: false
   GO_VERSION: "1.27"
+  # renovate: datasource=docker depName=docker/scout-cli versioning=docker
   SCOUT_VERSION: "1.29.0"
 
 jobs:
