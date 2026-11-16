@@ -46,7 +46,7 @@ RUN --mount=type=bind,target=. \
     --mount=type=cache,target=/go/pkg/mod \
     --mount=type=cache,target=/root/.cache/go-build <<EOT
   set -ex
-  go test -parallel 4 -v -coverprofile=/tmp/coverage.txt -covermode=atomic -race ./...
+  go tool gotestsum --format=standard-verbose --packages=./... -- -parallel=4 -coverprofile=/tmp/coverage.txt -covermode=atomic -race -timeout=10m
   go tool cover -func=/tmp/coverage.txt
 EOT
 
@@ -58,7 +58,7 @@ ENV CGO_ENABLED=1
 RUN apk add --no-cache docker-cli gcc linux-headers musl-dev
 COPY . .
 COPY --from=build /usr/bin/diun /usr/local/bin/diun
-CMD ["sh", "-c", "exec go test -tags=integration -count=1 -race -v -timeout=20m -run \"${TEST_RUN:-.}\" -coverpkg=./internal/...,./pkg/... -coverprofile=/coverage/coverage.txt ./test/integration"]
+CMD ["sh", "-c", "exec go tool gotestsum --format=standard-verbose --jsonfile=/testreports/go-test-report.json --junitfile=/testreports/junit-report.xml --packages=./test/integration -- -tags=integration -count=1 -race -timeout=20m -run \"${TEST_RUN:-.}\" -coverpkg=./internal/...,./pkg/... -coverprofile=/testreports/coverage.txt -covermode=atomic"]
 
 FROM scratch AS binary-unix
 COPY --link --from=build /usr/bin/diun /
