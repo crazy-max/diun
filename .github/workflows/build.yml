@@ -212,6 +212,8 @@ jobs:
       artifact-upload: true
       sbom: true
       sign: ${{ github.event_name != 'pull_request' }}
+      set: |
+        *.args.GIT_FETCH_HISTORY=1
 
   artifacts-finalize:
     runs-on: ubuntu-latest
@@ -343,6 +345,8 @@ jobs:
         org.opencontainers.image.title=Diun
         org.opencontainers.image.description=Docker image update notifier
         org.opencontainers.image.vendor=CrazyMax
+      set: |
+        *.args.GIT_FETCH_HISTORY=1
     secrets:
       registry-auths: |
         - registry: docker.io
