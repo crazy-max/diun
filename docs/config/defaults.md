@@ -10,7 +10,7 @@ other fields that merge instead of replacing defaults.
 
 ```yaml
 defaults:
-  watchRepo: false
+  watchMode: tag
   notifyOn:
     - new
     - update
@@ -26,19 +26,36 @@ defaults:
 
 ## Configuration
 
-### `watchRepo`
+### `watchMode`
 
-Watch all tags of this container image ([be careful](../faq.md#docker-hub-rate-limits)
-with this setting). (default `false`)
+Select which image tags to watch. (default `tag`)
+
+| Value                | Behavior                                        |
+|----------------------|-------------------------------------------------|
+| `tag`                | Watch only the configured tag or digest         |
+| `all`                | Watch all repository tags                       |
+| `semver`             | Watch newer stable semantic version tags        |
+| `semver+prereleases` | Watch newer version tags, including prereleases |
+
+Every mode watches the configured image. Repository tags are sorted and filtered
+before `maxTags` is applied. Manifest checks consume
+[registry quota](../faq.md#docker-hub-rate-limits).
+
+Semver modes require a full version (`1.5.0` or `v1.5.0`) and select strictly
+newer tags. Docker variant suffixes such as `-alpine` are interpreted as
+prereleases; use `semver+prereleases` and tag filters for these images. An invalid
+or missing version logs an error and skips repository tags.
+
+Per-image watch modes override defaults.
 
 !!! example "Config file"
     ```yaml
     defaults:
-      watchRepo: false
+      watchMode: tag
     ```
 
 !!! abstract "Environment variables"
-    * `DIUN_DEFAULTS_WATCHREPO`
+    * `DIUN_DEFAULTS_WATCHMODE=tag`
 
 ### `notifyOn`
 
@@ -61,7 +78,7 @@ List of status to be notified. Can be one of `new` or `update`.
 Maximum number of tags to watch. `0` means all of them. (default `0`)
 
 !!! warning
-    Only works if watch repo is enabled.
+    Only applies when watching repository tags.
 
 !!! example "Config file"
     ```yaml
@@ -74,11 +91,11 @@ Maximum number of tags to watch. `0` means all of them. (default `0`)
 
 ### `sortTags`
 
-[Sort tags method](../faq.md#tags-sorting-when-using-watch_repo). Can be one of
+[Sort tags method](../faq.md#tags-sorting-when-using-watch_mode). Can be one of
 `default`, `reverse`, `semver`, `lexicographical`. (default `reverse`)
 
 !!! warning
-    Only works if watch repo is enabled.
+    Only applies when watching repository tags.
 
 !!! example "Config file"
     ```yaml
@@ -91,8 +108,8 @@ Maximum number of tags to watch. `0` means all of them. (default `0`)
 
 ### `includeTags`
 
-List of regular expressions to include tags. Can be useful if watch repo is
-enabled.
+List of regular expressions to include tags. Can be useful when watching
+repository tags.
 
 !!! example "Config file"
     ```yaml
@@ -106,8 +123,8 @@ enabled.
 
 ### `excludeTags`
 
-List of regular expressions to exclude tags. Can be useful if watch repo is
-enabled.
+List of regular expressions to exclude tags. Can be useful when watching
+repository tags.
 
 The [file provider](../providers/file.md) merges image-level `exclude_tags`
 with these defaults. Default patterns come first, followed by image patterns,

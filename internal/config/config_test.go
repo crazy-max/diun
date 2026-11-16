@@ -1,6 +1,9 @@
 package config
 
 import (
+	"bytes"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 	"time"
@@ -9,6 +12,8 @@ import (
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/pkg/registry"
 	"github.com/crazy-max/gonfig/env"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -87,10 +92,9 @@ func TestLoadFile(t *testing.T) {
 					},
 				},
 				Defaults: &model.Defaults{
-					WatchRepo: new(false),
-					NotifyOn:  []model.NotifyOn{model.NotifyOnNew},
-					MaxTags:   5,
-					SortTags:  registry.SortTagReverse,
+					NotifyOn: []model.NotifyOn{model.NotifyOnNew},
+					MaxTags:  5,
+					SortTags: registry.SortTagReverse,
 				},
 				Metrics: (&model.Metrics{}).GetDefaults(),
 				Notif: &model.Notif{
@@ -691,6 +695,155 @@ for <code>{{ .Entry.Manifest.Platform }}</code> platform.
 
 			require.NoError(t, err)
 			assert.Equal(t, tt.expected, cfg)
+		})
+	}
+}
+
+func TestWatchRepoDeprecationWarning(t *testing.T) {
+	tests := []struct {
+		name     string
+		defaults string
+		env      string
+		warn     bool
+		mode     registry.WatchMode
+	}{
+		{
+			name: "unset",
+			mode: registry.WatchModeTag,
+		},
+		{
+			name:     "null defaults",
+			defaults: "defaults: null\n",
+			mode:     registry.WatchModeTag,
+		},
+		{
+			name:     "modern option",
+			defaults: "defaults:\n  watchMode: semver\n",
+			mode:     registry.WatchModeSemver,
+		},
+		{
+			name:     "legacy true",
+			defaults: "defaults:\n  watchRepo: true\n",
+			warn:     true,
+			mode:     registry.WatchModeAll,
+		},
+		{
+			name:     "legacy false",
+			defaults: "defaults:\n  watchRepo: false\n",
+			warn:     true,
+			mode:     registry.WatchModeTag,
+		},
+		{
+			name: "environment true",
+			env:  "true",
+			warn: true,
+			mode: registry.WatchModeAll,
+		},
+		{
+			name: "environment false",
+			env:  "false",
+			warn: true,
+			mode: registry.WatchModeTag,
+		},
+		{
+			name:     "both options",
+			defaults: "defaults:\n  watchRepo: true\n  watchMode: semver\n",
+			warn:     true,
+			mode:     registry.WatchModeSemver,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var output bytes.Buffer
+			previous := log.Logger
+			log.Logger = zerolog.New(&output)
+			t.Cleanup(func() { log.Logger = previous })
+
+			filename := filepath.Join(t.TempDir(), "diun.yml")
+			data := tt.defaults + "providers:\n  file:\n    filename: ./fixtures/file.yml\n"
+			require.NoError(t, os.WriteFile(filename, []byte(data), 0o600))
+			if tt.env != "" {
+				t.Setenv("DIUN_DEFAULTS_WATCHREPO", tt.env)
+			}
+			cfg, err := Load(filename)
+			require.NoError(t, err)
+			assert.Equal(t, tt.warn, strings.Contains(output.String(), "is deprecated"))
+			if tt.warn {
+				assert.Contains(t, output.String(), `"level":"warn"`)
+				assert.Contains(t, output.String(), "defaults.watchMode / DIUN_DEFAULTS_WATCHMODE")
+			}
+			image := model.Image{}
+			require.NoError(t, image.ResolveWatchMode(cfg.Defaults))
+			assert.Equal(t, tt.mode, image.WatchMode)
+		})
+	}
+}
+
+func TestLegacyWatchRepoConfiguration(t *testing.T) {
+	filename := filepath.Join(t.TempDir(), "diun.yml")
+	data := "defaults:\n  watchRepo: true\nproviders:\n  file:\n    filename: ./fixtures/file.yml\n"
+	require.NoError(t, os.WriteFile(filename, []byte(data), 0o600))
+
+	cfg, err := Load(filename)
+	require.NoError(t, err)
+	assert.Empty(t, cfg.Defaults.WatchMode)
+	require.NotNil(t, cfg.Defaults.WatchRepo)
+	assert.True(t, *cfg.Defaults.WatchRepo)
+
+	image := model.Image{}
+	require.NoError(t, image.ResolveWatchMode(cfg.Defaults))
+	assert.Equal(t, registry.WatchModeAll, image.WatchMode)
+}
+
+func TestWatchModeConfiguration(t *testing.T) {
+	tests := []struct {
+		name    string
+		mode    string
+		env     string
+		want    registry.WatchMode
+		wantErr bool
+	}{
+		{
+			name: "file mode",
+			mode: "semver",
+			want: registry.WatchModeSemver,
+		},
+		{
+			name: "environment overrides file",
+			mode: "all",
+			env:  "semver+prereleases",
+			want: registry.WatchModeSemverPrereleases,
+		},
+		{
+			name:    "invalid file mode",
+			mode:    "invalid",
+			wantErr: true,
+		},
+		{
+			name:    "invalid environment mode",
+			mode:    "all",
+			env:     "invalid",
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			filename := filepath.Join(t.TempDir(), "diun.yml")
+			data := "defaults:\n  watchMode: " + tt.mode + "\n  watchRepo: true\nproviders:\n  file:\n    filename: ./fixtures/file.yml\n"
+			require.NoError(t, os.WriteFile(filename, []byte(data), 0o600))
+			if tt.env != "" {
+				t.Setenv("DIUN_DEFAULTS_WATCHMODE", tt.env)
+			}
+			cfg, err := Load(filename)
+			if tt.wantErr {
+				require.ErrorContains(t, err, "WatchMode")
+				return
+			}
+			require.NoError(t, err)
+			assert.Equal(t, tt.want, cfg.Defaults.WatchMode)
+			image := model.Image{}
+			require.NoError(t, image.ResolveWatchMode(cfg.Defaults))
+			assert.Equal(t, tt.want, image.WatchMode)
 		})
 	}
 }

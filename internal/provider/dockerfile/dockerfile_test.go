@@ -33,6 +33,7 @@ FROM scratch
 	assert.Equal(t, "dockerfile", jobs[0].Provider)
 	assert.Equal(t, model.Image{
 		Name:        "alpine:3.19",
+		WatchMode:   registry.WatchModeTag,
 		MaxTags:     5,
 		SortTags:    registry.SortTagSemver,
 		IncludeTags: []string{"^3\\."},

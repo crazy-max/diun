@@ -115,6 +115,160 @@ func TestTagsSkipsGeneratedArtifactTags(t *testing.T) {
 	}, tags)
 }
 
+func TestTagsWatchMode(t *testing.T) {
+	tests := []struct {
+		name    string
+		mode    WatchMode
+		current string
+		want    []string
+		wantErr string
+	}{
+		{
+			name:    "stable releases",
+			mode:    WatchModeSemver,
+			current: "1.5.0",
+			want:    []string{"v1.5.1", "1.6.0", "2.0.0"},
+		},
+		{
+			name:    "prereleases included",
+			mode:    WatchModeSemverPrereleases,
+			current: "v1.5.0",
+			want:    []string{"v1.5.1", "1.6.0", "2.0.0-rc.1", "2.0.0", "1.6.0-alpine"},
+		},
+		{
+			name:    "prerelease baseline",
+			mode:    WatchModeSemverPrereleases,
+			current: "2.0.0-beta.1",
+			want:    []string{"2.0.0-rc.1", "2.0.0"},
+		},
+		{
+			name:    "stable after prerelease",
+			mode:    WatchModeSemver,
+			current: "2.0.0-beta.1",
+			want:    []string{"2.0.0"},
+		},
+		{
+			name:    "nothing newer",
+			mode:    WatchModeSemver,
+			current: "3.0.0",
+		},
+		{
+			name:    "configured tag only",
+			mode:    WatchModeTag,
+			current: "latest",
+		},
+		{
+			name:    "invalid baseline",
+			mode:    WatchModeSemver,
+			current: "latest",
+			wantErr: "requires a semantic version tag",
+		},
+		{
+			name:    "shorthand baseline",
+			mode:    WatchModeSemver,
+			current: "1.5",
+			wantErr: "requires a semantic version tag",
+		},
+		{
+			name:    "date baseline",
+			mode:    WatchModeSemverPrereleases,
+			current: "20260616",
+			wantErr: "requires a semantic version tag",
+		},
+		{
+			name:    "invalid mode",
+			mode:    "invalid",
+			current: "1.5.0",
+			wantErr: "unknown watch mode",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := newTestRegistry(t, "acme/myapp")
+			allTags := []string{
+				"latest", "edge", "1.4.0", "1.5.0", "v1.5.0", "v1.5.1",
+				"1.6.0", "2.0.0-rc.1", "2.0.0", "20260616", "nightly-20260616",
+				"ubuntu-5.0", "1.6", "3", "1.6.0-alpine",
+			}
+			r.addTagsPage("", allTags, "")
+			image, err := ParseImage(ParseImageOptions{Name: r.imageName(tt.current)})
+			require.NoError(t, err)
+			tags, err := newTestRegistryClient(t, Options{}).Tags(TagsOptions{
+				Image:     image,
+				WatchMode: tt.mode,
+			})
+			if tt.wantErr != "" {
+				require.ErrorContains(t, err, tt.wantErr)
+				assert.Zero(t, r.requestCount("GET", "/v2/acme/myapp/tags/list"))
+				return
+			}
+			require.NoError(t, err)
+			assert.Equal(t, tt.want, tags.List)
+			if tt.mode == WatchModeTag {
+				assert.Zero(t, tags.Total)
+				assert.Zero(t, r.requestCount("GET", "/v2/acme/myapp/tags/list"))
+			} else {
+				assert.Equal(t, len(allTags), tags.Total)
+				assert.Equal(t, len(allTags)-len(tt.want), tags.OutsideWatchMode)
+			}
+		})
+	}
+}
+
+func TestTagsWatchModeFiltersBeforeMax(t *testing.T) {
+	r := newTestRegistry(t, "acme/myapp")
+	r.addTagsPage("", []string{
+		"latest", "1.4.0", "1.5.0", "1.5.1", "1.6.0", "2.0.0-rc.1", "2.0.0",
+		"sha256-64677ff7a877079df86d4a12e80e67a9548ea0facb2acb8c6719e79088e64526.sig",
+	}, "")
+	image, err := ParseImage(ParseImageOptions{Name: r.imageName("1.5.0")})
+	require.NoError(t, err)
+	tags, err := newTestRegistryClient(t, Options{}).Tags(TagsOptions{
+		Image:     image,
+		WatchMode: WatchModeSemver,
+		Sort:      SortTagSemver,
+		Max:       1,
+		Include:   []string{`^\d`},
+		Exclude:   []string{`^2\.0\.0$`},
+	})
+	require.NoError(t, err)
+	assert.Equal(t, &Tags{
+		List:             []string{"1.6.0"},
+		NotIncluded:      1,
+		Excluded:         1,
+		Artifacts:        1,
+		OutsideWatchMode: 3,
+		Total:            8,
+	}, tags)
+}
+
+func TestTagsWatchModeAll(t *testing.T) {
+	r := newTestRegistry(t, "acme/myapp")
+	allTags := []string{"latest", "1.0.0", "edge", "2.0.0-rc.1"}
+	r.addTagsPage("", allTags, "")
+	image, err := ParseImage(ParseImageOptions{Name: r.imageName("latest")})
+	require.NoError(t, err)
+	tags, err := newTestRegistryClient(t, Options{}).Tags(TagsOptions{
+		Image:     image,
+		WatchMode: WatchModeAll,
+	})
+	require.NoError(t, err)
+	assert.Equal(t, allTags, tags.List)
+	assert.Zero(t, tags.OutsideWatchMode)
+}
+
+func TestTagsWatchModeDigestOnly(t *testing.T) {
+	image, err := ParseImage(ParseImageOptions{
+		Name: "example.com/acme/myapp@sha256:3fca3dd86c2710586208b0f92d1ec4ce25382f4cad4ae76a2275db8e8bb24031",
+	})
+	require.NoError(t, err)
+	_, err = newTestRegistryClient(t, Options{}).Tags(TagsOptions{
+		Image:     image,
+		WatchMode: WatchModeSemver,
+	})
+	require.ErrorContains(t, err, "requires a semantic version tag")
+}
+
 func TestTagsSortSemverShorthandWithSuffix(t *testing.T) {
 	testCases := []struct {
 		name     string

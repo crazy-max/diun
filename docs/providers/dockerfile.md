@@ -40,12 +40,12 @@ providers:
 # diun.metadata.foo=bar
 FROM alpine:latest
 
-# diun.watch_repo=true
+# diun.watch_mode=all
 # diun.max_tags=10
 # diun.platform=linux/amd64
 COPY --from=crazymax/yasu / /
 
-# diun.watch_repo=true
+# diun.watch_mode=all
 # diun.include_tags=^\d+\.\d+\.\d+$
 # diun.platform=linux/amd64
 RUN --mount=type=bind,target=.,rw \
@@ -107,15 +107,15 @@ List of path patterns with [matching and globbing supporting patterns](https://g
 
 The following annotations can be added as comments before the target instruction to customize the image analysis:
 
-| Name                | Default      | Description                                                                                                                                             |
-|---------------------|--------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `diun.regopt`       |              | [Registry options](../config/regopts.md) name to use                                                                                                    |
-| `diun.watch_repo`   | `false`      | Watch all tags of this image                                                                                                                            |
-| `diun.notify_on`    | `new;update` | Semicolon separated list of status to be notified: `new`, `update`                                                                                      |
-| `diun.sort_tags`    | `reverse`    | [Sort tags method](../faq.md#tags-sorting-when-using-watch_repo) if `diun.watch_repo` enabled. One of `default`, `reverse`, `semver`, `lexicographical` |
-| `diun.max_tags`     | `0`          | Maximum number of tags to watch if `watch_repo` enabled. `0` means all of them                                                                          |
-| `diun.include_tags` |              | Semicolon separated list of regular expressions to include tags. If set, replaces `defaults.includeTags` for this image. Can be useful if you enable `diun.watch_repo` |
-| `diun.exclude_tags` |              | Semicolon separated list of regular expressions to exclude tags. If set, replaces `defaults.excludeTags` for this image. Can be useful if you enable `diun.watch_repo` |
-| `diun.hub_link`     | _automatic_  | Set registry hub link for this image                                                                                                                    |
-| `diun.platform`     | _automatic_  | Platform to use (e.g. `linux/amd64`)                                                                                                                    |
-| `diun.metadata.*`   |              | Additional metadata that can be used in [notification template](../faq.md#notification-template) (e.g. `metadata.foo=bar`)                              |
+| Name                | Default      | Description                                                                                                                                                          |
+|---------------------|--------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `diun.regopt`       |              | [Registry options](../config/regopts.md) name to use                                                                                                                 |
+| `diun.watch_mode`   | `tag`        | [Watch mode](../config/defaults.md#watchmode): `tag`, `all`, `semver`, or `semver+prereleases`                                                                       |
+| `diun.notify_on`    | `new;update` | Semicolon separated list of status to be notified: `new`, `update`                                                                                                   |
+| `diun.sort_tags`    | `reverse`    | [Sort tags method](../faq.md#tags-sorting-when-using-watch_mode) when watching repository tags. One of `default`, `reverse`, `semver`, `lexicographical`             |
+| `diun.max_tags`     | `0`          | Maximum number of tags to watch when watching repository tags. `0` means all of them                                                                                 |
+| `diun.include_tags` |              | Semicolon separated list of regular expressions to include tags. If set, replaces `defaults.includeTags` for this image. Can be useful when watching repository tags |
+| `diun.exclude_tags` |              | Semicolon separated list of regular expressions to exclude tags. If set, replaces `defaults.excludeTags` for this image. Can be useful when watching repository tags |
+| `diun.hub_link`     | _automatic_  | Set registry hub link for this image                                                                                                                                 |
+| `diun.platform`     | _automatic_  | Platform to use (e.g. `linux/amd64`)                                                                                                                                 |
+| `diun.metadata.*`   |              | Additional metadata that can be used in [notification template](../faq.md#notification-template) (e.g. `metadata.foo=bar`)                                           |

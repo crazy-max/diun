@@ -349,12 +349,15 @@ regopts:
 Or you can tweak the [`schedule` setting](config/watch.md#schedule) with something like `0 */6 * * *` (every 6 hours).
 
 !!! warning
-    Also be careful with the `watch_repo` setting as it will fetch manifest for **ALL** tags available for the image.
+    Repository [watch modes](config/defaults.md#watchmode) fetch manifests for
+    **ALL** selected repository tags. Use filters and `max_tags` to limit
+    requests.
 
-## Tags sorting when using `watch_repo`
+## Tags sorting when using `watch_mode`
 
-When you use the `watch_repo` setting, Diun will fetch all tags available for
-the image. Depending on the registry, order of the tags list can change.
+When [watch mode](config/defaults.md#watchmode) is `all`, `semver`, or
+`semver+prereleases`, Diun lists all repository tags before filtering them.
+Depending on the registry, order of the tags list can change.
 
 You can use the `sort_tags` setting available for each provider to use a
 specific sorting method for the tags list.

@@ -37,7 +37,7 @@ You can override this using the [`--config` flag or `CONFIG` env var with `serve
       runOnStartup: true
 
     defaults:
-      watchRepo: false
+      watchMode: tag
       notifyOn:
         - new
         - update
@@ -153,7 +153,7 @@ All configuration from file can be transposed into environment variables. As an 
       runOnStartup: true
 
     defaults:
-      watchRepo: false
+      watchMode: tag
       notifyOn:
         - new
         - update
@@ -221,7 +221,7 @@ Can be transposed to:
     DIUN_WATCH_FIRSTCHECKNOTIF=false
     DIUN_WATCH_RUNONSTARTUP=true
 
-    DIUN_DEFAULTS_WATCHREPO=false
+    DIUN_DEFAULTS_WATCHMODE=tag
     DIUN_DEFAULTS_NOTIFYON=new,update
     DIUN_DEFAULTS_SORTTAGS=reverse
 

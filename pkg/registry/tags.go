@@ -17,24 +17,44 @@ var generatedArtifactTagRe = regexp.MustCompile(`^sha256-[a-f0-9]{64}(?:\.(?:att
 
 // Tags holds information about image tags.
 type Tags struct {
-	List        []string
-	NotIncluded int
-	Excluded    int
-	Artifacts   int
-	Total       int
+	List             []string
+	NotIncluded      int
+	Excluded         int
+	Artifacts        int
+	OutsideWatchMode int
+	Total            int
 }
 
 // TagsOptions holds docker tags image options
 type TagsOptions struct {
-	Image   Image
-	Max     int
-	Sort    SortTag
-	Include []string
-	Exclude []string
+	WatchMode WatchMode // An empty WatchMode means all.
+	Image     Image
+	Max       int
+	Sort      SortTag
+	Include   []string
+	Exclude   []string
 }
 
 // Tags returns tags of a Docker repository
 func (c *Client) Tags(opts TagsOptions) (*Tags, error) {
+	mode := opts.WatchMode
+	if mode == "" {
+		mode = WatchModeAll
+	}
+	if !mode.Valid() {
+		return nil, errors.Errorf("unknown watch mode %q", mode)
+	}
+	if mode == WatchModeTag {
+		return &Tags{}, nil
+	}
+	var baseline string
+	if mode == WatchModeSemver || mode == WatchModeSemverPrereleases {
+		baseline = versionTag(opts.Image.Tag)
+		if baseline == "" {
+			return nil, errors.Errorf("watch mode %q requires a semantic version tag (major.minor.patch), got %q", mode, opts.Image.Tag)
+		}
+	}
+
 	ctx, cancel := c.timeoutContext()
 	defer cancel()
 
@@ -69,6 +89,13 @@ func (c *Client) Tags(opts TagsOptions) (*Tags, error) {
 			res.Excluded++
 			continue
 		}
+		if baseline != "" {
+			version := versionTag(tag)
+			if version == "" || semver.Compare(version, baseline) <= 0 || (mode == WatchModeSemver && semver.Prerelease(version) != "") {
+				res.OutsideWatchMode++
+				continue
+			}
+		}
 		res.List = append(res.List, tag)
 	}
 
@@ -77,6 +104,41 @@ func (c *Client) Tags(opts TagsOptions) (*Tags, error) {
 	}
 
 	return res, nil
+}
+
+// versionTag accepts full semantic versions with an optional v prefix. Sorting
+// deliberately supports more tag formats than version comparisons do.
+func versionTag(tag string) string {
+	version := "v" + strings.TrimPrefix(tag, "v")
+	core := version
+	if i := strings.IndexAny(core, "-+"); i >= 0 {
+		core = core[:i]
+	}
+	if strings.Count(core, ".") != 2 || !semver.IsValid(version) {
+		return ""
+	}
+	return version
+}
+
+// WatchMode selects which image tags to watch.
+type WatchMode string
+
+// Watch modes.
+const (
+	WatchModeTag               WatchMode = "tag"
+	WatchModeAll               WatchMode = "all"
+	WatchModeSemver            WatchMode = "semver"
+	WatchModeSemverPrereleases WatchMode = "semver+prereleases"
+)
+
+// Valid reports whether the watch mode is supported.
+func (m WatchMode) Valid() bool {
+	switch m {
+	case WatchModeTag, WatchModeAll, WatchModeSemver, WatchModeSemverPrereleases:
+		return true
+	default:
+		return false
+	}
 }
 
 // SortTags sorts tags list

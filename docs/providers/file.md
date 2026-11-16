@@ -57,7 +57,7 @@ providers:
 # with registry options named 'docker.io/crazymax' (image selector).
 # Only include tags matching regexp ^1\.2\..* and only be notified on new tag.
 - name: crazymax/swarm-cronjob
-  watch_repo: true
+  watch_mode: all
   notify_on:
     - new
   include_tags:
@@ -67,7 +67,7 @@ providers:
 # with registry options named 'docker.io' (image selector).
 # Only watch latest 10 tags and include tags matching regexp ^\d+\.\d+\..*
 - name: docker.io/portainer/portainer
-  watch_repo: true
+  watch_mode: all
   max_tags: 10
   include_tags:
     - ^\d+\.\d+\..*
@@ -76,7 +76,7 @@ providers:
 # with registry options named 'docker.io' (image selector).
 # Force linux/arm64/v8 platform for this image
 - name: alpine
-  watch_repo: true
+  watch_mode: all
   platform:
     os: linux
     arch: arm64
@@ -109,7 +109,7 @@ providers:
 ```yaml
 # /path/to/config.yml
 - name: crazymax/cloudflared
-  watch_repo: true
+  watch_mode: all
 - name: docker.bintray.io/jfrog/xray-mongo:3.2.6
 ```
 
@@ -175,18 +175,18 @@ Defines the path to the directory that contains the [configuration files](#yaml-
 
 The configuration file(s) defines a slice of images to analyze with the following fields:
 
-| Name               | Default      | Description                                                                                                                                             |
-|--------------------|--------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `name`             | `latest`     | Docker image name to watch using `registry/path:tag` format. If registry omitted, `docker.io` will be used and if tag omitted, `latest` will be used    |
-| `regopt`           |              | [Registry options](../config/regopts.md) name to use                                                                                                    |
-| `watch_repo`       | `false`      | Watch all tags of this image ([be careful](../faq.md#docker-hub-rate-limits) with this setting)                                                         |
-| `notify_on`        | `new;update` | Semicolon separated list of status to be notified: `new`, `update`                                                                                      |
-| `sort_tags`        | `reverse`    | [Sort tags method](../faq.md#tags-sorting-when-using-watch_repo) if `diun.watch_repo` enabled. One of `default`, `reverse`, `semver`, `lexicographical` |
-| `max_tags`         | `0`          | Maximum number of tags to watch if `watch_repo` enabled. `0` means all of them                                                                          |
-| `include_tags`     |              | List of regular expressions to include tags. If set, replaces `defaults.includeTags` for this image. Can be useful if you enable `watch_repo`           |
-| `exclude_tags`     |              | List of regular expressions to exclude tags. If set, merges with `defaults.excludeTags` for this image. Can be useful if you enable `watch_repo`        |
-| `hub_link`         | _automatic_  | Set registry hub link for this image                                                                                                                    |
-| `platform.os`      | _automatic_  | Operating system to use as custom platform                                                                                                              |
-| `platform.arch`    | _automatic_  | CPU architecture to use as custom platform                                                                                                              |
-| `platform.variant` | _automatic_  | Variant of the CPU to use as custom platform                                                                                                            |
-| `metadata.*`       |              | Additional metadata that can be used in [notification template](../faq.md#notification-template) (e.g. `metadata.foo=bar`)                              |
+| Name               | Default      | Description                                                                                                                                              |
+|--------------------|--------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `name`             | `latest`     | Docker image name to watch using `registry/path:tag` format. If registry omitted, `docker.io` will be used and if tag omitted, `latest` will be used     |
+| `regopt`           |              | [Registry options](../config/regopts.md) name to use                                                                                                     |
+| `watch_mode`       | `tag`        | [Watch mode](../config/defaults.md#watchmode): `tag`, `all`, `semver`, or `semver+prereleases`                                                           |
+| `notify_on`        | `new;update` | Semicolon separated list of status to be notified: `new`, `update`                                                                                       |
+| `sort_tags`        | `reverse`    | [Sort tags method](../faq.md#tags-sorting-when-using-watch_mode) when watching repository tags. One of `default`, `reverse`, `semver`, `lexicographical` |
+| `max_tags`         | `0`          | Maximum number of tags to watch when watching repository tags. `0` means all of them                                                                     |
+| `include_tags`     |              | List of regular expressions to include tags. If set, replaces `defaults.includeTags` for this image. Can be useful when watching repository tags         |
+| `exclude_tags`     |              | List of regular expressions to exclude tags. If set, merges with `defaults.excludeTags` for this image. Can be useful when watching repository tags      |
+| `hub_link`         | _automatic_  | Set registry hub link for this image                                                                                                                     |
+| `platform.os`      | _automatic_  | Operating system to use as custom platform                                                                                                               |
+| `platform.arch`    | _automatic_  | CPU architecture to use as custom platform                                                                                                               |
+| `platform.variant` | _automatic_  | Variant of the CPU to use as custom platform                                                                                                             |
+| `metadata.*`       |              | Additional metadata that can be used in [notification template](../faq.md#notification-template) (e.g. `metadata.foo=bar`)                               |
