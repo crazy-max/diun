@@ -321,6 +321,7 @@ jobs:
     permissions:
       contents: read # same as global permission
       id-token: write # for signing attestation(s) with GitHub OIDC Token
+      packages: write # required to push to GHCR
     needs:
       - image-prepare
       - artifacts-finalize
