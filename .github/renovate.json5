@@ -14,6 +14,8 @@
   "minimumReleaseAge": "2 days",
   "internalChecksFilter": "strict",
   "labels": ["kind/dependencies", "bot"],
+  "semanticCommits": "disabled",
+  "commitMessagePrefix": "deps:",
   "customManagers": [
     {
       "customType": "regex",
@@ -35,6 +37,12 @@
       "matchManagers": ["github-actions"],
       "matchDepNames": ["github/codeql-action"],
       "groupName": "codeql-actions"
+    },
+    {
+      "matchUpdateTypes": ["major", "minor", "patch"],
+      "commitMessageAction": "bump",
+      "commitMessageTopic": "{{{depName}}}",
+      "commitMessageExtra": "from {{{replace '^v' '' currentValue}}} to {{{replace '^v' '' newValue}}}"
     }
   ],
   "ignoreDeps": [
