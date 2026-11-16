@@ -20,6 +20,7 @@ env:
   GHCR_SLUG: ghcr.io/crazy-max/diun
   DESTDIR: ./bin
   DOCKER_BUILD_SUMMARY: false
+  GO_VERSION: "1.27"
   SCOUT_VERSION: "1.29.0"
 
 jobs:
@@ -71,33 +72,82 @@ jobs:
             *.platform=${{ matrix.platforms }}
 
   test-unit:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     permissions:
       contents: read # same as global permissions
       id-token: write # for Codecov authentication
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-26
+          - macos-26-intel
+          - windows-2025
     steps:
+      -
+        name: Setup Git config
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
       -
         name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          fetch-depth: 0
       -
-        name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+        name: Set up Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: "${{ env.GO_VERSION }}"
+          check-latest: true
+      -
+        name: Prepare
+        shell: bash
+        run: |
+          testreportsDir=${{ env.DESTDIR }}/testreports/${{ github.job }}--${{ matrix.os }}
+          echo "TESTREPORTS_DIR=$testreportsDir" >> "$GITHUB_ENV"
+          mkdir -p "$testreportsDir"
       -
         name: Test
-        uses: docker/bake-action@59cb1203cd42bcefd40a1b6d73b589e48c86040e # v7.5.0
-        with:
-          source: .
-          targets: test
-          pull: true
+        shell: bash
+        env:
+          TMPDIR: ${{ runner.temp }}
+        run: |
+          go tool gotestsum \
+            --format=standard-verbose \
+            --jsonfile="${{ env.TESTREPORTS_DIR }}/go-test-report.json" \
+            --junitfile="${{ env.TESTREPORTS_DIR }}/junit-report.xml" \
+            --packages="./..." \
+            -- \
+              -mod=vendor -parallel=4 -race \
+              -coverprofile="${{ env.TESTREPORTS_DIR }}/coverage.txt" \
+              -covermode=atomic -timeout=10m
       -
         name: Upload coverage
+        if: always()
         uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
         with:
-          directory: ${{ env.DESTDIR }}/coverage
+          directory: ${{ env.TESTREPORTS_DIR }}
+          env_vars: RUNNER_OS
+          flags: unit
           use_oidc: true
           disable_file_fixes: true # needed for Go language https://docs.codecov.com/docs/fixing-reports
+      -
+        name: Upload test results
+        if: always()
+        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
+        with:
+          report_type: test_results
+          directory: ${{ env.TESTREPORTS_DIR }}
+          env_vars: RUNNER_OS
+          flags: unit
+          use_oidc: true
+          disable_file_fixes: true # needed for Go language https://docs.codecov.com/docs/fixing-reports
+      -
+        name: Generate annotations
+        if: always()
+        uses: crazy-max/.github/.github/actions/gotest-annotations@f91220cba053bd54299ba645a599ee8ed436f222 # v1.11.0
+        with:
+          directory: ${{ env.TESTREPORTS_DIR }}
 
   test-integration:
     name: test-integration (${{ matrix.suite }})

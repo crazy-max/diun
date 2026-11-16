@@ -46,7 +46,7 @@ RUN --mount=type=bind,target=. \
     --mount=type=cache,target=/go/pkg/mod \
     --mount=type=cache,target=/root/.cache/go-build <<EOT
   set -ex
-  go test -parallel 4 -v -coverprofile=/tmp/coverage.txt -covermode=atomic -race ./...
+  go tool gotestsum --format=standard-verbose --packages=./... -- -parallel=4 -coverprofile=/tmp/coverage.txt -covermode=atomic -race -timeout=10m
   go tool cover -func=/tmp/coverage.txt
 EOT
 
