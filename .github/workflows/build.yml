@@ -20,7 +20,7 @@ env:
   GHCR_SLUG: ghcr.io/crazy-max/diun
   DESTDIR: ./bin
   DOCKER_BUILD_SUMMARY: false
-  SCOUT_VERSION: "1.19.0"
+  SCOUT_VERSION: "1.29.0"
 
 jobs:
   prepare:
@@ -370,7 +370,7 @@ jobs:
         name: Login to DockerHub
         uses: docker/login-action@8aa5831fb8d48d8f76594c7ddde61ae58019f550 # v4.8.0
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
+          username: ${{ vars.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
       -
         name: Scout
