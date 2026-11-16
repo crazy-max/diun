@@ -1,12 +1,15 @@
 package file
 
 import (
+	"bytes"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/pkg/registry"
+	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"gopkg.in/yaml.v3"
@@ -28,11 +31,12 @@ var (
 		{
 			Provider: "file",
 			Image: model.Image{
-				Name:     "jfrog-docker-reg2.bintray.io/jfrog/artifactory-oss:4.0.0",
-				RegOpt:   "bintrayoptions",
-				NotifyOn: model.NotifyOnDefaults,
-				SortTags: registry.SortTagReverse,
-				MaxTags:  25,
+				Name:      "jfrog-docker-reg2.bintray.io/jfrog/artifactory-oss:4.0.0",
+				WatchMode: registry.WatchModeTag,
+				RegOpt:    "bintrayoptions",
+				NotifyOn:  model.NotifyOnDefaults,
+				SortTags:  registry.SortTagReverse,
+				MaxTags:   25,
 				IncludeTags: []string{
 					`^(0|[1-9]\d*)\..*`,
 				},
@@ -45,6 +49,7 @@ var (
 			Provider: "file",
 			Image: model.Image{
 				Name:      "docker.bintray.io/jfrog/xray-server:2.8.6",
+				WatchMode: registry.WatchModeAll,
 				WatchRepo: new(true),
 				NotifyOn: []model.NotifyOn{
 					model.NotifyOnNew,
@@ -64,11 +69,12 @@ var (
 		{
 			Provider: "file",
 			Image: model.Image{
-				Name:     "docker.io/crazymax/nextcloud:latest",
-				RegOpt:   "myregistry",
-				NotifyOn: model.NotifyOnDefaults,
-				SortTags: registry.SortTagReverse,
-				MaxTags:  25,
+				Name:      "docker.io/crazymax/nextcloud:latest",
+				WatchMode: registry.WatchModeTag,
+				RegOpt:    "myregistry",
+				NotifyOn:  model.NotifyOnDefaults,
+				SortTags:  registry.SortTagReverse,
+				MaxTags:   25,
 				IncludeTags: []string{
 					`^(0|[1-9]\d*)\..*`,
 				},
@@ -81,6 +87,7 @@ var (
 			Provider: "file",
 			Image: model.Image{
 				Name:      "crazymax/swarm-cronjob",
+				WatchMode: registry.WatchModeAll,
 				WatchRepo: new(true),
 				NotifyOn:  model.NotifyOnDefaults,
 				SortTags:  registry.SortTagSemver,
@@ -97,6 +104,7 @@ var (
 			Provider: "file",
 			Image: model.Image{
 				Name:      "docker.io/portainer/portainer",
+				WatchMode: registry.WatchModeAll,
 				WatchRepo: new(true),
 				NotifyOn:  model.NotifyOnDefaults,
 				MaxTags:   10,
@@ -113,6 +121,7 @@ var (
 			Provider: "file",
 			Image: model.Image{
 				Name:      "traefik",
+				WatchMode: registry.WatchModeAll,
 				WatchRepo: new(true),
 				NotifyOn:  model.NotifyOnDefaults,
 				SortTags:  registry.SortTagDefault,
@@ -129,9 +138,10 @@ var (
 		{
 			Provider: "file",
 			Image: model.Image{
-				Name:     "alpine",
-				NotifyOn: model.NotifyOnDefaults,
-				SortTags: registry.SortTagReverse,
+				Name:      "alpine",
+				WatchMode: registry.WatchModeTag,
+				NotifyOn:  model.NotifyOnDefaults,
+				SortTags:  registry.SortTagReverse,
 				Platform: model.ImagePlatform{
 					OS:      "linux",
 					Arch:    "arm64",
@@ -149,10 +159,11 @@ var (
 		{
 			Provider: "file",
 			Image: model.Image{
-				Name:     "docker.io/graylog/graylog:3.2.0",
-				NotifyOn: model.NotifyOnDefaults,
-				SortTags: registry.SortTagReverse,
-				MaxTags:  25,
+				Name:      "docker.io/graylog/graylog:3.2.0",
+				WatchMode: registry.WatchModeTag,
+				NotifyOn:  model.NotifyOnDefaults,
+				SortTags:  registry.SortTagReverse,
+				MaxTags:   25,
 				IncludeTags: []string{
 					`^(0|[1-9]\d*)\..*`,
 				},
@@ -164,10 +175,11 @@ var (
 		{
 			Provider: "file",
 			Image: model.Image{
-				Name:     "jacobalberty/unifi:5.9",
-				NotifyOn: model.NotifyOnDefaults,
-				SortTags: registry.SortTagReverse,
-				MaxTags:  25,
+				Name:      "jacobalberty/unifi:5.9",
+				WatchMode: registry.WatchModeTag,
+				NotifyOn:  model.NotifyOnDefaults,
+				SortTags:  registry.SortTagReverse,
+				MaxTags:   25,
 				IncludeTags: []string{
 					`^(0|[1-9]\d*)\..*`,
 				},
@@ -180,6 +192,7 @@ var (
 			Provider: "file",
 			Image: model.Image{
 				Name:      "crazymax/ddns-route53",
+				WatchMode: registry.WatchModeAll,
 				WatchRepo: new(true),
 				NotifyOn:  model.NotifyOnDefaults,
 				SortTags:  registry.SortTagReverse,
@@ -197,10 +210,11 @@ var (
 		{
 			Provider: "file",
 			Image: model.Image{
-				Name:     "quay.io/coreos/hyperkube",
-				NotifyOn: model.NotifyOnDefaults,
-				SortTags: registry.SortTagReverse,
-				MaxTags:  25,
+				Name:      "quay.io/coreos/hyperkube",
+				WatchMode: registry.WatchModeTag,
+				NotifyOn:  model.NotifyOnDefaults,
+				SortTags:  registry.SortTagReverse,
+				MaxTags:   25,
 				IncludeTags: []string{
 					`^(0|[1-9]\d*)\..*`,
 				},
@@ -212,10 +226,11 @@ var (
 		{
 			Provider: "file",
 			Image: model.Image{
-				Name:     "quay.io/coreos/hyperkube:v1.1.7-coreos.1",
-				NotifyOn: model.NotifyOnDefaults,
-				SortTags: registry.SortTagReverse,
-				MaxTags:  25,
+				Name:      "quay.io/coreos/hyperkube:v1.1.7-coreos.1",
+				WatchMode: registry.WatchModeTag,
+				NotifyOn:  model.NotifyOnDefaults,
+				SortTags:  registry.SortTagReverse,
+				MaxTags:   25,
 				IncludeTags: []string{
 					`^(0|[1-9]\d*)\..*`,
 				},
@@ -229,11 +244,12 @@ var (
 		{
 			Provider: "file",
 			Image: model.Image{
-				Name:     "lscr.io/linuxserver/heimdall",
-				NotifyOn: model.NotifyOnDefaults,
-				SortTags: registry.SortTagReverse,
-				HubLink:  "https://fleet.linuxserver.io/image?name=linuxserver/heimdall",
-				MaxTags:  25,
+				Name:      "lscr.io/linuxserver/heimdall",
+				WatchMode: registry.WatchModeTag,
+				NotifyOn:  model.NotifyOnDefaults,
+				SortTags:  registry.SortTagReverse,
+				HubLink:   "https://fleet.linuxserver.io/image?name=linuxserver/heimdall",
+				MaxTags:   25,
 				IncludeTags: []string{
 					`^(0|[1-9]\d*)\..*`,
 				},
@@ -270,6 +286,116 @@ func TestDefaultImageOptions(t *testing.T) {
 
 	for _, job := range fc.ListJob() {
 		assert.True(t, *job.Image.WatchRepo)
+	}
+}
+
+func TestWatchRepoDeprecationWarning(t *testing.T) {
+	tests := []struct {
+		name   string
+		fields string
+		warn   bool
+	}{
+		{
+			name: "inherited legacy default",
+		},
+		{
+			name:   "modern option",
+			fields: "  watch_mode: semver\n",
+		},
+		{
+			name:   "legacy true",
+			fields: "  watch_repo: true\n",
+			warn:   true,
+		},
+		{
+			name:   "legacy false",
+			fields: "  watch_repo: false\n",
+			warn:   true,
+		},
+		{
+			name:   "both options",
+			fields: "  watch_repo: true\n  watch_mode: semver\n",
+			warn:   true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			filename := filepath.Join(t.TempDir(), "images.yml")
+			require.NoError(t, os.WriteFile(filename, []byte("- name: alpine:3.20.0\n"+tt.fields), 0o600))
+			var output bytes.Buffer
+			client := &Client{
+				config:   &model.PrdFile{Filename: filename},
+				defaults: &model.Defaults{WatchRepo: new(true)},
+				logger:   zerolog.New(&output),
+			}
+			require.Len(t, client.listFileImage(), 1)
+			assert.Equal(t, tt.warn, strings.Contains(output.String(), "is deprecated"))
+			if tt.warn {
+				assert.Contains(t, output.String(), `"level":"warn"`)
+				assert.Contains(t, output.String(), "use watch_mode")
+				assert.Contains(t, output.String(), `"img_name":"alpine:3.20.0"`)
+			}
+		})
+	}
+}
+
+func TestListJobWatchMode(t *testing.T) {
+	tests := []struct {
+		name     string
+		fields   string
+		defaults model.Defaults
+		want     registry.WatchMode
+		wantErr  bool
+	}{
+		{
+			name: "default mode",
+			want: registry.WatchModeTag,
+		},
+		{
+			name:   "explicit mode",
+			fields: "  watch_mode: semver+prereleases\n",
+			want:   registry.WatchModeSemverPrereleases,
+		},
+		{
+			name:     "inherit mode",
+			defaults: model.Defaults{WatchMode: registry.WatchModeSemver},
+			want:     registry.WatchModeSemver,
+		},
+		{
+			name:     "legacy item overrides default mode",
+			fields:   "  watch_repo: false\n",
+			defaults: model.Defaults{WatchMode: registry.WatchModeAll},
+			want:     registry.WatchModeTag,
+		},
+		{
+			name:     "mode overrides legacy default",
+			fields:   "  watch_mode: tag\n",
+			defaults: model.Defaults{WatchRepo: new(true)},
+			want:     registry.WatchModeTag,
+		},
+		{
+			name:   "mode wins over legacy item",
+			fields: "  watch_repo: true\n  watch_mode: semver\n",
+			want:   registry.WatchModeSemver,
+		},
+		{
+			name:    "invalid mode",
+			fields:  "  watch_mode: invalid\n",
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			filename := filepath.Join(t.TempDir(), "images.yml")
+			require.NoError(t, os.WriteFile(filename, []byte("- name: alpine:3.20.0\n"+tt.fields), 0o600))
+			jobs := New(&model.PrdFile{Filename: filename}, &tt.defaults).ListJob()
+			if tt.wantErr {
+				assert.Empty(t, jobs)
+				return
+			}
+			require.Len(t, jobs, 1)
+			assert.Equal(t, tt.want, jobs[0].Image.WatchMode)
+		})
 	}
 }
 

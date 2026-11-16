@@ -10,6 +10,7 @@ import (
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/pkg/registry"
 	"github.com/pkg/errors"
+	"github.com/rs/zerolog/log"
 )
 
 var (
@@ -24,7 +25,6 @@ func ValidateImage(image string, metadata, labels map[string]string, watchByDef 
 	}
 
 	if defaults != nil {
-		img.WatchRepo = defaults.WatchRepo
 		img.NotifyOn = defaults.NotifyOn
 		img.MaxTags = defaults.MaxTags
 		img.SortTags = defaults.SortTags
@@ -49,9 +49,18 @@ func ValidateImage(image string, metadata, labels map[string]string, watchByDef 
 		switch {
 		case key == "diun.regopt":
 			img.RegOpt = value
+		case key == "diun.watch_mode":
+			if value == "" {
+				break
+			}
+			img.WatchMode = registry.WatchMode(value)
+			if !img.WatchMode.Valid() {
+				return img, errors.Errorf("unknown watch mode %q", value)
+			}
 		case key == "diun.watch_repo":
 			if watchRepo, err := strconv.ParseBool(value); err == nil {
 				img.WatchRepo = new(watchRepo)
+				log.Warn().Str("image", image).Msg("diun.watch_repo is deprecated; use diun.watch_mode (true: all, false: tag)")
 			} else {
 				return img, errors.Wrapf(err, "cannot parse %q value of label %s", value, key)
 			}
@@ -111,6 +120,13 @@ func ValidateImage(image string, metadata, labels map[string]string, watchByDef 
 			}
 			img.Metadata[mkey] = value
 		}
+	}
+
+	if err := img.ResolveWatchMode(defaults); err != nil {
+		return img, err
+	}
+	if img.WatchRepo == nil && defaults != nil {
+		img.WatchRepo = defaults.WatchRepo
 	}
 
 	// Update provider metadata with metadata from img labels

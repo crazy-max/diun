@@ -44,7 +44,7 @@ services:
 - name: debian:stretch-slim
 - name: nginx:stable-alpine
 - name: traefik
-  watch_repo: true
+  watch_mode: all
   include_tags:
     - ^\d+\.\d+\..*
 ```

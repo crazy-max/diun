@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"regexp"
 
-	"dario.cat/mergo"
 	"github.com/crazy-max/diun/v4/internal/matcher"
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/internal/secret"
@@ -63,16 +62,6 @@ func (di *Diun) createJob(job model.Job) {
 		log.Warn().Err(err).Msgf("Cannot retrieve password secret for regopts %s", reg.Name)
 	}
 
-	// Set defaults
-	if err := mergo.Merge(&job.Image, model.Image{
-		Platform:  model.ImagePlatform{},
-		WatchRepo: new(false),
-		MaxTags:   0,
-	}); err != nil {
-		sublog.Error().Err(err).Msg("Cannot set default values")
-		return
-	}
-
 	// Validate include/exclude tags
 	for _, includeTag := range job.Image.IncludeTags {
 		if _, err := regexp.Compile(includeTag); err != nil {
@@ -121,29 +110,31 @@ func (di *Diun) createJob(job model.Job) {
 		sublog.Error().Err(err).Msgf("Invoking job")
 	}
 
-	if !*job.Image.WatchRepo || len(job.RegImage.Domain) == 0 {
+	if job.Image.WatchMode == registry.WatchModeTag || len(job.RegImage.Domain) == 0 {
 		return
 	}
 
 	tags, err := job.Registry.Tags(registry.TagsOptions{
-		Image:   job.RegImage,
-		Max:     job.Image.MaxTags,
-		Sort:    job.Image.SortTags,
-		Include: job.Image.IncludeTags,
-		Exclude: job.Image.ExcludeTags,
+		WatchMode: job.Image.WatchMode,
+		Image:     job.RegImage,
+		Max:       job.Image.MaxTags,
+		Sort:      job.Image.SortTags,
+		Include:   job.Image.IncludeTags,
+		Exclude:   job.Image.ExcludeTags,
 	})
 	if err != nil {
 		sublog.Error().Err(err).Msg("Cannot list tags from registry")
 		return
 	}
 
-	log.Debug().Str("image", job.RegImage.String()).Msgf("%d tag(s) found in repository. %d will be analyzed (%d max, %d not included, %d excluded, %d artifact tags).",
+	log.Debug().Str("image", job.RegImage.String()).Msgf("%d tag(s) found in repository. %d will be analyzed (%d max, %d not included, %d excluded, %d artifact tags, %d outside watch mode).",
 		tags.Total,
 		len(tags.List),
 		job.Image.MaxTags,
 		tags.NotIncluded,
 		tags.Excluded,
 		tags.Artifacts,
+		tags.OutsideWatchMode,
 	)
 
 	for _, tag := range tags.List {

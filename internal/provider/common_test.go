@@ -1,13 +1,144 @@
 package provider
 
 import (
+	"bytes"
+	"strings"
 	"testing"
 
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/pkg/registry"
 	"github.com/pkg/errors"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/require"
 )
+
+func TestValidateImageWatchRepoDeprecation(t *testing.T) {
+	tests := []struct {
+		name   string
+		labels map[string]string
+		warn   bool
+	}{
+		{
+			name: "unset",
+		},
+		{
+			name:   "modern option",
+			labels: map[string]string{"diun.watch_mode": "semver"},
+		},
+		{
+			name:   "legacy true",
+			labels: map[string]string{"diun.watch_repo": "true"},
+			warn:   true,
+		},
+		{
+			name:   "legacy false",
+			labels: map[string]string{"diun.watch_repo": "false"},
+			warn:   true,
+		},
+		{
+			name: "both options",
+			labels: map[string]string{
+				"diun.watch_repo": "true",
+				"diun.watch_mode": "semver",
+			},
+			warn: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var output bytes.Buffer
+			previous := log.Logger
+			log.Logger = zerolog.New(&output)
+			t.Cleanup(func() { log.Logger = previous })
+
+			_, err := ValidateImage("alpine:3.20.0", nil, tt.labels, true, &model.Defaults{WatchRepo: new(true)})
+			require.NoError(t, err)
+			require.Equal(t, tt.warn, strings.Contains(output.String(), "is deprecated"))
+			if tt.warn {
+				require.Contains(t, output.String(), `"level":"warn"`)
+				require.Contains(t, output.String(), "diun.watch_mode")
+				require.Contains(t, output.String(), `"image":"alpine:3.20.0"`)
+			}
+		})
+	}
+}
+
+func TestValidateImageWatchMode(t *testing.T) {
+	tests := []struct {
+		name     string
+		labels   map[string]string
+		defaults *model.Defaults
+		want     registry.WatchMode
+		wantErr  bool
+	}{
+		{
+			name:   "newer label",
+			labels: map[string]string{"diun.watch_mode": "semver"},
+			want:   registry.WatchModeSemver,
+		},
+		{
+			name:   "prereleases label",
+			labels: map[string]string{"diun.watch_mode": "semver+prereleases"},
+			want:   registry.WatchModeSemverPrereleases,
+		},
+		{
+			name:     "inherit mode",
+			defaults: &model.Defaults{WatchMode: registry.WatchModeSemver},
+			want:     registry.WatchModeSemver,
+		},
+		{
+			name:     "legacy label overrides default mode",
+			labels:   map[string]string{"diun.watch_repo": "false"},
+			defaults: &model.Defaults{WatchMode: registry.WatchModeAll},
+			want:     registry.WatchModeTag,
+		},
+		{
+			name:     "new label overrides legacy default",
+			labels:   map[string]string{"diun.watch_mode": "semver"},
+			defaults: &model.Defaults{WatchRepo: new(true)},
+			want:     registry.WatchModeSemver,
+		},
+		{
+			name: "mode wins when both labels exist",
+			labels: map[string]string{
+				"diun.watch_mode": "tag",
+				"diun.watch_repo": "true",
+			},
+			want: registry.WatchModeTag,
+		},
+		{
+			name:    "invalid mode",
+			labels:  map[string]string{"diun.watch_mode": "invalid"},
+			wantErr: true,
+		},
+		{
+			name:     "empty mode inherits defaults",
+			labels:   map[string]string{"diun.watch_mode": ""},
+			defaults: &model.Defaults{WatchMode: registry.WatchModeSemver},
+			want:     registry.WatchModeSemver,
+		},
+		{
+			name: "empty mode preserves legacy label",
+			labels: map[string]string{
+				"diun.watch_mode": "",
+				"diun.watch_repo": "true",
+			},
+			want: registry.WatchModeAll,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			img, err := ValidateImage("alpine:3.20.0", nil, tt.labels, true, tt.defaults)
+			if tt.wantErr {
+				require.ErrorContains(t, err, "unknown watch mode")
+				return
+			}
+			require.NoError(t, err)
+			require.Equal(t, tt.want, img.WatchMode)
+		})
+	}
+}
 
 func TestValidateImage(t *testing.T) {
 	cases := []struct {
@@ -25,7 +156,8 @@ func TestValidateImage(t *testing.T) {
 			image:      "myimg@sha256:1234567890abcdef",
 			watchByDef: true,
 			expectedImage: model.Image{
-				Name: "myimg@sha256:1234567890abcdef",
+				Name:      "myimg@sha256:1234567890abcdef",
+				WatchMode: registry.WatchModeTag,
 			},
 			expectedErr: nil,
 		},
@@ -40,7 +172,8 @@ func TestValidateImage(t *testing.T) {
 			image:      "myimg",
 			watchByDef: true,
 			expectedImage: model.Image{
-				Name: "myimg",
+				Name:      "myimg",
+				WatchMode: registry.WatchModeTag,
 			},
 			expectedErr: nil,
 		},
@@ -52,7 +185,8 @@ func TestValidateImage(t *testing.T) {
 				"diun.enable": "true",
 			},
 			expectedImage: model.Image{
-				Name: "myimg",
+				Name:      "myimg",
+				WatchMode: registry.WatchModeTag,
 			},
 			expectedErr: nil,
 		},
@@ -74,7 +208,8 @@ func TestValidateImage(t *testing.T) {
 				"diun.enable": "chickens",
 			},
 			expectedImage: model.Image{
-				Name: "myimg",
+				Name:      "myimg",
+				WatchMode: registry.WatchModeTag,
 			},
 			expectedErr: errors.Errorf(`cannot parse "chickens" value of label diun.enable`),
 		},
@@ -87,8 +222,9 @@ func TestValidateImage(t *testing.T) {
 			watchByDef: true,
 			defaults:   &model.Defaults{},
 			expectedImage: model.Image{
-				Name:   "myimg",
-				RegOpt: "foo",
+				Name:      "myimg",
+				WatchMode: registry.WatchModeTag,
+				RegOpt:    "foo",
 			},
 			expectedErr: nil,
 		},
@@ -100,8 +236,9 @@ func TestValidateImage(t *testing.T) {
 			},
 			watchByDef: true,
 			expectedImage: model.Image{
-				Name:   "myimg",
-				RegOpt: "",
+				Name:      "myimg",
+				WatchMode: registry.WatchModeTag,
+				RegOpt:    "",
 			},
 			expectedErr: nil,
 		},
@@ -114,6 +251,7 @@ func TestValidateImage(t *testing.T) {
 			},
 			expectedImage: model.Image{
 				Name:      "myimg",
+				WatchMode: registry.WatchModeAll,
 				WatchRepo: new(true),
 			},
 			expectedErr: nil,
@@ -127,7 +265,8 @@ func TestValidateImage(t *testing.T) {
 			},
 			defaults: &model.Defaults{},
 			expectedImage: model.Image{
-				Name: "myimg",
+				Name:      "myimg",
+				WatchMode: registry.WatchModeTag,
 			},
 			expectedErr: errors.New(`cannot parse "chickens" value of label diun.watch_repo`),
 		},
@@ -143,6 +282,7 @@ func TestValidateImage(t *testing.T) {
 			},
 			expectedImage: model.Image{
 				Name:      "myimg",
+				WatchMode: registry.WatchModeTag,
 				WatchRepo: new(false),
 			},
 			expectedErr: nil,
@@ -159,6 +299,7 @@ func TestValidateImage(t *testing.T) {
 			},
 			expectedImage: model.Image{
 				Name:      "myimg",
+				WatchMode: registry.WatchModeAll,
 				WatchRepo: new(true),
 			},
 			expectedErr: nil,
@@ -171,8 +312,9 @@ func TestValidateImage(t *testing.T) {
 			},
 			watchByDef: true,
 			expectedImage: model.Image{
-				Name:     "myimg",
-				NotifyOn: []model.NotifyOn{model.NotifyOnNew},
+				Name:      "myimg",
+				WatchMode: registry.WatchModeTag,
+				NotifyOn:  []model.NotifyOn{model.NotifyOnNew},
 			},
 			expectedErr: nil,
 		},
@@ -184,8 +326,9 @@ func TestValidateImage(t *testing.T) {
 				"diun.notify_on": "chickens",
 			},
 			expectedImage: model.Image{
-				Name:     "myimg",
-				NotifyOn: []model.NotifyOn{},
+				Name:      "myimg",
+				WatchMode: registry.WatchModeTag,
+				NotifyOn:  []model.NotifyOn{},
 			},
 			expectedErr: errors.New(`unknown notify status "chickens"`),
 		},
@@ -197,7 +340,8 @@ func TestValidateImage(t *testing.T) {
 				"diun.notify_on": "",
 			},
 			expectedImage: model.Image{
-				Name: "myimg",
+				Name:      "myimg",
+				WatchMode: registry.WatchModeTag,
 			},
 			expectedErr: nil,
 		},
@@ -210,8 +354,9 @@ func TestValidateImage(t *testing.T) {
 				NotifyOn: []model.NotifyOn{model.NotifyOnNew},
 			},
 			expectedImage: model.Image{
-				Name:     "myimg",
-				NotifyOn: []model.NotifyOn{model.NotifyOnNew},
+				Name:      "myimg",
+				WatchMode: registry.WatchModeTag,
+				NotifyOn:  []model.NotifyOn{model.NotifyOnNew},
 			},
 			expectedErr: nil,
 		},
@@ -226,8 +371,9 @@ func TestValidateImage(t *testing.T) {
 				NotifyOn: []model.NotifyOn{model.NotifyOnNew},
 			},
 			expectedImage: model.Image{
-				Name:     "myimg",
-				NotifyOn: []model.NotifyOn{model.NotifyOnUpdate},
+				Name:      "myimg",
+				WatchMode: registry.WatchModeTag,
+				NotifyOn:  []model.NotifyOn{model.NotifyOnUpdate},
 			},
 			expectedErr: nil,
 		},
@@ -239,8 +385,9 @@ func TestValidateImage(t *testing.T) {
 			},
 			watchByDef: true,
 			expectedImage: model.Image{
-				Name:     "myimg",
-				SortTags: registry.SortTagSemver,
+				Name:      "myimg",
+				WatchMode: registry.WatchModeTag,
+				SortTags:  registry.SortTagSemver,
 			},
 			expectedErr: nil,
 		},
@@ -252,7 +399,8 @@ func TestValidateImage(t *testing.T) {
 			},
 			watchByDef: true,
 			expectedImage: model.Image{
-				Name: "myimg",
+				Name:      "myimg",
+				WatchMode: registry.WatchModeTag,
 			},
 			expectedErr: errors.New(`unknown sort tags type "chickens"`),
 		},
@@ -264,7 +412,8 @@ func TestValidateImage(t *testing.T) {
 			},
 			watchByDef: true,
 			expectedImage: model.Image{
-				Name: "myimg",
+				Name:      "myimg",
+				WatchMode: registry.WatchModeTag,
 			},
 			expectedErr: nil,
 		},
@@ -277,8 +426,9 @@ func TestValidateImage(t *testing.T) {
 				SortTags: registry.SortTagSemver,
 			},
 			expectedImage: model.Image{
-				Name:     "myimg",
-				SortTags: registry.SortTagSemver,
+				Name:      "myimg",
+				WatchMode: registry.WatchModeTag,
+				SortTags:  registry.SortTagSemver,
 			},
 			expectedErr: nil,
 		},
@@ -293,8 +443,9 @@ func TestValidateImage(t *testing.T) {
 				SortTags: registry.SortTagSemver,
 			},
 			expectedImage: model.Image{
-				Name:     "myimg",
-				SortTags: registry.SortTagReverse,
+				Name:      "myimg",
+				WatchMode: registry.WatchModeTag,
+				SortTags:  registry.SortTagReverse,
 			},
 			expectedErr: nil,
 		},
@@ -306,8 +457,9 @@ func TestValidateImage(t *testing.T) {
 			},
 			watchByDef: true,
 			expectedImage: model.Image{
-				Name:    "myimg",
-				MaxTags: 10,
+				Name:      "myimg",
+				WatchMode: registry.WatchModeTag,
+				MaxTags:   10,
 			},
 			expectedErr: nil,
 		},
@@ -319,7 +471,8 @@ func TestValidateImage(t *testing.T) {
 			},
 			watchByDef: true,
 			expectedImage: model.Image{
-				Name: "myimg",
+				Name:      "myimg",
+				WatchMode: registry.WatchModeTag,
 			},
 			expectedErr: errors.New(`cannot parse "chickens" value of label diun.max_tags`),
 		},
@@ -331,7 +484,8 @@ func TestValidateImage(t *testing.T) {
 			},
 			watchByDef: true,
 			expectedImage: model.Image{
-				Name: "myimg",
+				Name:      "myimg",
+				WatchMode: registry.WatchModeTag,
 			},
 			expectedErr: errors.New(`cannot parse "" value of label diun.max_tags`),
 		},
@@ -344,8 +498,9 @@ func TestValidateImage(t *testing.T) {
 				MaxTags: 10,
 			},
 			expectedImage: model.Image{
-				Name:    "myimg",
-				MaxTags: 10,
+				Name:      "myimg",
+				WatchMode: registry.WatchModeTag,
+				MaxTags:   10,
 			},
 			expectedErr: nil,
 		},
@@ -360,8 +515,9 @@ func TestValidateImage(t *testing.T) {
 				MaxTags: 10,
 			},
 			expectedImage: model.Image{
-				Name:    "myimg",
-				MaxTags: 11,
+				Name:      "myimg",
+				WatchMode: registry.WatchModeTag,
+				MaxTags:   11,
 			},
 			expectedErr: nil,
 		},
@@ -374,6 +530,7 @@ func TestValidateImage(t *testing.T) {
 			watchByDef: true,
 			expectedImage: model.Image{
 				Name:        "myimg",
+				WatchMode:   registry.WatchModeTag,
 				IncludeTags: []string{"alpine", "ubuntu"},
 			},
 			expectedErr: nil,
@@ -387,6 +544,7 @@ func TestValidateImage(t *testing.T) {
 			watchByDef: true,
 			expectedImage: model.Image{
 				Name:        "myimg",
+				WatchMode:   registry.WatchModeTag,
 				IncludeTags: []string{""},
 			},
 			expectedErr: nil,
@@ -401,6 +559,7 @@ func TestValidateImage(t *testing.T) {
 			},
 			expectedImage: model.Image{
 				Name:        "myimg",
+				WatchMode:   registry.WatchModeTag,
 				IncludeTags: []string{"alpine"},
 			},
 			expectedErr: nil,
@@ -417,6 +576,7 @@ func TestValidateImage(t *testing.T) {
 			},
 			expectedImage: model.Image{
 				Name:        "myimg",
+				WatchMode:   registry.WatchModeTag,
 				IncludeTags: []string{"ubuntu"},
 			},
 			expectedErr: nil,
@@ -430,6 +590,7 @@ func TestValidateImage(t *testing.T) {
 			watchByDef: true,
 			expectedImage: model.Image{
 				Name:        "myimg",
+				WatchMode:   registry.WatchModeTag,
 				ExcludeTags: []string{"alpine", "ubuntu"},
 			},
 			expectedErr: nil,
@@ -443,6 +604,7 @@ func TestValidateImage(t *testing.T) {
 			watchByDef: true,
 			expectedImage: model.Image{
 				Name:        "myimg",
+				WatchMode:   registry.WatchModeTag,
 				ExcludeTags: []string{""},
 			},
 			expectedErr: nil,
@@ -457,6 +619,7 @@ func TestValidateImage(t *testing.T) {
 			},
 			expectedImage: model.Image{
 				Name:        "myimg",
+				WatchMode:   registry.WatchModeTag,
 				ExcludeTags: []string{"alpine"},
 			},
 			expectedErr: nil,
@@ -473,6 +636,7 @@ func TestValidateImage(t *testing.T) {
 			},
 			expectedImage: model.Image{
 				Name:        "myimg",
+				WatchMode:   registry.WatchModeTag,
 				ExcludeTags: []string{"ubuntu"},
 			},
 			expectedErr: nil,
@@ -485,8 +649,9 @@ func TestValidateImage(t *testing.T) {
 			},
 			watchByDef: true,
 			expectedImage: model.Image{
-				Name:   "myimg",
-				HubTpl: "foo",
+				Name:      "myimg",
+				WatchMode: registry.WatchModeTag,
+				HubTpl:    "foo",
 			},
 			expectedErr: nil,
 		},
@@ -498,8 +663,9 @@ func TestValidateImage(t *testing.T) {
 			},
 			watchByDef: true,
 			expectedImage: model.Image{
-				Name:   "myimg",
-				HubTpl: "",
+				Name:      "myimg",
+				WatchMode: registry.WatchModeTag,
+				HubTpl:    "",
 			},
 			expectedErr: nil,
 		},
@@ -511,8 +677,9 @@ func TestValidateImage(t *testing.T) {
 			},
 			watchByDef: true,
 			expectedImage: model.Image{
-				Name:    "myimg",
-				HubLink: "foo",
+				Name:      "myimg",
+				WatchMode: registry.WatchModeTag,
+				HubLink:   "foo",
 			},
 			expectedErr: nil,
 		},
@@ -524,8 +691,9 @@ func TestValidateImage(t *testing.T) {
 			},
 			watchByDef: true,
 			expectedImage: model.Image{
-				Name:    "myimg",
-				HubLink: "",
+				Name:      "myimg",
+				WatchMode: registry.WatchModeTag,
+				HubLink:   "",
 			},
 			expectedErr: nil,
 		},
@@ -537,7 +705,8 @@ func TestValidateImage(t *testing.T) {
 			},
 			watchByDef: true,
 			expectedImage: model.Image{
-				Name: "myimg",
+				Name:      "myimg",
+				WatchMode: registry.WatchModeTag,
 				Platform: model.ImagePlatform{
 					OS:      "linux",
 					Arch:    "arm",
@@ -554,7 +723,8 @@ func TestValidateImage(t *testing.T) {
 			},
 			watchByDef: true,
 			expectedImage: model.Image{
-				Name: "myimg",
+				Name:      "myimg",
+				WatchMode: registry.WatchModeTag,
 			},
 			expectedErr: errors.New(`cannot parse "chickens" platform of label diun.platform`),
 		},
@@ -566,8 +736,9 @@ func TestValidateImage(t *testing.T) {
 			},
 			watchByDef: true,
 			expectedImage: model.Image{
-				Name:     "myimg",
-				Platform: model.ImagePlatform{},
+				Name:      "myimg",
+				WatchMode: registry.WatchModeTag,
+				Platform:  model.ImagePlatform{},
 			},
 			expectedErr: errors.New(`cannot parse "" platform of label diun.platform`),
 		},
@@ -579,7 +750,8 @@ func TestValidateImage(t *testing.T) {
 			},
 			watchByDef: true,
 			expectedImage: model.Image{
-				Name: "myimg",
+				Name:      "myimg",
+				WatchMode: registry.WatchModeTag,
 				Metadata: map[string]string{
 					"foo123": "bar",
 				},
@@ -594,7 +766,8 @@ func TestValidateImage(t *testing.T) {
 			},
 			watchByDef: true,
 			expectedImage: model.Image{
-				Name: "myimg",
+				Name:      "myimg",
+				WatchMode: registry.WatchModeTag,
 			},
 			expectedErr: errors.New(`invalid metadata key "lots of chickens"`),
 		},
@@ -606,7 +779,8 @@ func TestValidateImage(t *testing.T) {
 			},
 			watchByDef: true,
 			expectedImage: model.Image{
-				Name: "myimg",
+				Name:      "myimg",
+				WatchMode: registry.WatchModeTag,
 			},
 		},
 		{
@@ -617,7 +791,8 @@ func TestValidateImage(t *testing.T) {
 			},
 			watchByDef: true,
 			expectedImage: model.Image{
-				Name: "myimg",
+				Name:      "myimg",
+				WatchMode: registry.WatchModeTag,
 			},
 		},
 		{
@@ -631,7 +806,8 @@ func TestValidateImage(t *testing.T) {
 				},
 			},
 			expectedImage: model.Image{
-				Name: "myimg",
+				Name:      "myimg",
+				WatchMode: registry.WatchModeTag,
 				Metadata: map[string]string{
 					"foo123": "bar",
 				},
@@ -651,7 +827,8 @@ func TestValidateImage(t *testing.T) {
 				},
 			},
 			expectedImage: model.Image{
-				Name: "myimg",
+				Name:      "myimg",
+				WatchMode: registry.WatchModeTag,
 				Metadata: map[string]string{
 					"foo123": "bar",
 					"biz123": "baz",
@@ -672,7 +849,8 @@ func TestValidateImage(t *testing.T) {
 				},
 			},
 			expectedImage: model.Image{
-				Name: "myimg",
+				Name:      "myimg",
+				WatchMode: registry.WatchModeTag,
 				Metadata: map[string]string{
 					"foo123": "baz",
 				},

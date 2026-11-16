@@ -36,6 +36,13 @@ func (c *Client) listFileImage() []model.Image {
 		}
 
 		for _, item := range items {
+			if item.WatchRepo != nil {
+				c.logger.Warn().Str("file", file).Str("img_name", item.Name).Msg("watch_repo is deprecated; use watch_mode (true: all, false: tag)")
+			}
+			if err := item.ResolveWatchMode(c.defaults); err != nil {
+				c.logger.Error().Err(err).Str("file", file).Str("img_name", item.Name).Msg("Invalid watch mode")
+				continue
+			}
 			// Set default WatchRepo
 			if item.WatchRepo == nil {
 				item.WatchRepo = c.defaults.WatchRepo

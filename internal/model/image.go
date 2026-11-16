@@ -4,22 +4,44 @@ import (
 	"slices"
 
 	"github.com/crazy-max/diun/v4/pkg/registry"
+	"github.com/pkg/errors"
 )
 
 // Image holds image configuration
 type Image struct {
-	Name        string            `yaml:"name,omitempty" json:",omitempty"`
-	Platform    ImagePlatform     `yaml:"platform,omitempty"`
-	RegOpt      string            `yaml:"regopt,omitempty" json:",omitempty"`
-	WatchRepo   *bool             `yaml:"watch_repo,omitempty" json:",omitempty"`
-	NotifyOn    []NotifyOn        `yaml:"notify_on,omitempty" json:",omitempty"`
-	MaxTags     int               `yaml:"max_tags,omitempty" json:",omitempty"`
-	SortTags    registry.SortTag  `yaml:"sort_tags,omitempty" json:",omitempty"`
-	IncludeTags []string          `yaml:"include_tags,omitempty" json:",omitempty"`
-	ExcludeTags []string          `yaml:"exclude_tags,omitempty" json:",omitempty"`
-	HubTpl      string            `yaml:"hub_tpl,omitempty" json:",omitempty"`
-	HubLink     string            `yaml:"hub_link,omitempty" json:",omitempty"`
-	Metadata    map[string]string `yaml:"metadata,omitempty" json:",omitempty"`
+	Name        string             `yaml:"name,omitempty" json:",omitempty"`
+	Platform    ImagePlatform      `yaml:"platform,omitempty"`
+	RegOpt      string             `yaml:"regopt,omitempty" json:",omitempty"`
+	WatchMode   registry.WatchMode `yaml:"watch_mode,omitempty" json:",omitempty"`
+	WatchRepo   *bool              `yaml:"watch_repo,omitempty" json:",omitempty"` // Deprecated: use WatchMode instead.
+	NotifyOn    []NotifyOn         `yaml:"notify_on,omitempty" json:",omitempty"`
+	MaxTags     int                `yaml:"max_tags,omitempty" json:",omitempty"`
+	SortTags    registry.SortTag   `yaml:"sort_tags,omitempty" json:",omitempty"`
+	IncludeTags []string           `yaml:"include_tags,omitempty" json:",omitempty"`
+	ExcludeTags []string           `yaml:"exclude_tags,omitempty" json:",omitempty"`
+	HubTpl      string             `yaml:"hub_tpl,omitempty" json:",omitempty"`
+	HubLink     string             `yaml:"hub_link,omitempty" json:",omitempty"`
+	Metadata    map[string]string  `yaml:"metadata,omitempty" json:",omitempty"`
+}
+
+// ResolveWatchMode applies image settings before defaults, preferring WatchMode
+// over the deprecated WatchRepo setting at each level.
+func (i *Image) ResolveWatchMode(defaults *Defaults) error {
+	mode, watchRepo := i.WatchMode, i.WatchRepo
+	if mode == "" && watchRepo == nil && defaults != nil {
+		mode, watchRepo = defaults.WatchMode, defaults.WatchRepo
+	}
+	if mode == "" {
+		mode = registry.WatchModeTag
+		if watchRepo != nil && *watchRepo {
+			mode = registry.WatchModeAll
+		}
+	}
+	if !mode.Valid() {
+		return errors.Errorf("unknown watch mode %q", mode)
+	}
+	i.WatchMode = mode
+	return nil
 }
 
 // ImagePlatform holds image platform configuration

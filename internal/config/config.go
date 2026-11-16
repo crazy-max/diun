@@ -60,6 +60,9 @@ func Load(config string) (*Config, error) {
 	if err := cfg.validate(); err != nil {
 		return nil, err
 	}
+	if cfg.Defaults != nil && cfg.Defaults.WatchRepo != nil {
+		log.Warn().Msg("defaults.watchRepo / DIUN_DEFAULTS_WATCHREPO is deprecated; use defaults.watchMode / DIUN_DEFAULTS_WATCHMODE (true: all, false: tag)")
+	}
 
 	return new(cfg), nil
 }
