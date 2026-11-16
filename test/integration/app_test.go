@@ -6,6 +6,8 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"io"
+	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -33,6 +35,7 @@ func runApplicationFixture(t *testing.T, fixtureName, imageName, tag string) {
 		cfg.Providers.Docker.Endpoint = os.Getenv("DOCKER_HOST")
 		cfg.Providers.Docker.TLSVerify = new(false)
 	}
+	cfg.Metrics.Enabled = new(true)
 	diun, err := app.New(model.Meta{ID: "diun", Name: "Diun", Version: "integration"}, cfg, ":42286")
 	require.NoError(t, err)
 	ctx, cancel := context.WithCancelCause(t.Context())
@@ -47,29 +50,42 @@ func runApplicationFixture(t *testing.T, fixtureName, imageName, tag string) {
 			t.Error("application did not stop")
 		}
 	})
+	// A saved image does not mean the startup watch has finished its other jobs.
+	client := &http.Client{Timeout: 5 * time.Second}
+	req, err := http.NewRequestWithContext(t.Context(), http.MethodGet, "http://localhost:9090"+cfg.Metrics.Path, nil)
+	require.NoError(t, err)
+	if cfg.Metrics.Token != "" {
+		req.Header.Set("Authorization", "Bearer "+cfg.Metrics.Token)
+	}
 	require.Eventually(t, func() bool {
-		ctx, cancel := context.WithTimeoutCause(t.Context(), 5*time.Second, errors.New("image list timed out"))
-		defer cancel()
-		output, err := exec.CommandContext(ctx, "diun", "image", "list", "--raw").Output()
+		resp, err := client.Do(req)
 		if err != nil {
 			return false
 		}
-		var result struct {
-			Images []struct {
-				Name   string
-				Latest struct{ Tag string }
-			}
+		defer resp.Body.Close()
+		body, err := io.ReadAll(resp.Body)
+		return err == nil && resp.StatusCode == http.StatusOK && strings.Contains(string(body), "diun_watch_runs_total 1\n")
+	}, 4*time.Minute, time.Second, "startup watch did not finish")
+
+	listCtx, listCancel := context.WithTimeoutCause(t.Context(), 5*time.Second, errors.New("image list timed out"))
+	defer listCancel()
+	output, err := exec.CommandContext(listCtx, "diun", "image", "list", "--raw").Output()
+	require.NoError(t, err)
+	var result struct {
+		Images []struct {
+			Name   string
+			Latest struct{ Tag string }
 		}
-		if json.Unmarshal(output, &result) != nil {
-			return false
+	}
+	require.NoError(t, json.Unmarshal(output, &result))
+	var found bool
+	for _, image := range result.Images {
+		if image.Name == imageName && (tag == "" || image.Latest.Tag == tag) {
+			found = true
+			break
 		}
-		for _, image := range result.Images {
-			if image.Name == imageName && (tag == "" || image.Latest.Tag == tag) {
-				return true
-			}
-		}
-		return false
-	}, 4*time.Minute, time.Second, "expected %s:%s in the database", imageName, tag)
+	}
+	require.True(t, found, "expected %s:%s in the database", imageName, tag)
 	runCommand(t, "diun", "healthcheck", "--raw")
 }
 
