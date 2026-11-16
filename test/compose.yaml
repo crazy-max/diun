@@ -73,7 +73,7 @@ services:
       kubernetes:
         condition: service_healthy
     volumes:
-      - ../bin/coverage/integration:/coverage
+      - ../bin/testreports/integration:/testreports
       - containerd-socket:/run/containerd
       - go-cache:/root/.cache/go-build
       - kubeconfig:/kubeconfig:ro

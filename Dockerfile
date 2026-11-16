@@ -58,7 +58,7 @@ ENV CGO_ENABLED=1
 RUN apk add --no-cache docker-cli gcc linux-headers musl-dev
 COPY . .
 COPY --from=build /usr/bin/diun /usr/local/bin/diun
-CMD ["sh", "-c", "exec go test -tags=integration -count=1 -race -v -timeout=20m -run \"${TEST_RUN:-.}\" -coverpkg=./internal/...,./pkg/... -coverprofile=/coverage/coverage.txt ./test/integration"]
+CMD ["sh", "-c", "exec go tool gotestsum --format=standard-verbose --jsonfile=/testreports/go-test-report.json --junitfile=/testreports/junit-report.xml --packages=./test/integration -- -tags=integration -count=1 -race -timeout=20m -run \"${TEST_RUN:-.}\" -coverpkg=./internal/...,./pkg/... -coverprofile=/testreports/coverage.txt -covermode=atomic"]
 
 FROM scratch AS binary-unix
 COPY --link --from=build /usr/bin/diun /
