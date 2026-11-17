@@ -457,7 +457,7 @@ github.com/russross/blackfriday/v2
 ## explicit; go 1.23
 github.com/sirupsen/logrus
 github.com/sirupsen/logrus/hooks/slog
-# github.com/slack-go/slack v0.35.0
+# github.com/slack-go/slack v0.36.0
 ## explicit; go 1.26
 github.com/slack-go/slack
 github.com/slack-go/slack/internal/backoff
