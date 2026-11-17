@@ -168,7 +168,7 @@ func (cli *Client) OAuthExchangeToken(ctx context.Context, params oauth.Exchange
 		"code_verifier": []string{params.CodeVerifier},
 	}, &resp)
 	if err == nil && params.StoreCredentials {
-		cli.oauthSetTokens(resp.RefreshToken, resp.AccessToken, start.Add(resp.ExpiresIn.Duration))
+		err = cli.saveAndSetTokens(ctx, start, resp, false)
 	}
 	return
 }
@@ -194,7 +194,7 @@ func (cli *Client) OAuthPollDeviceCode(ctx context.Context, params oauth.PollDev
 		"client_id":   []string{clientID},
 	}, &resp)
 	if err == nil && params.StoreCredentials {
-		cli.oauthSetTokens(resp.RefreshToken, resp.AccessToken, start.Add(resp.ExpiresIn.Duration))
+		err = cli.saveAndSetTokens(ctx, start, resp, false)
 	}
 	return
 }
@@ -209,6 +209,20 @@ func (cli *Client) OAuthSetTokens(clientID, refreshToken, accessToken string, ex
 	cli.oauthClientID = clientID
 	cli.oauthSetTokens(refreshToken, accessToken, expiry)
 	cli.refreshLock.Unlock()
+}
+
+func (cli *Client) saveAndSetTokens(ctx context.Context, start time.Time, resp *oauth.TokenResponse, alwaysCallSave bool) (err error) {
+	if resp.RefreshToken == "" {
+		resp.RefreshToken = cli.refreshToken
+	}
+	expiry := start.Add(resp.ExpiresIn.Duration)
+	if alwaysCallSave || cli.refreshToken != "" {
+		err = cli.SaveNewToken(ctx, resp.RefreshToken, resp.AccessToken, expiry)
+	}
+	if err == nil {
+		cli.oauthSetTokens(resp.RefreshToken, resp.AccessToken, expiry)
+	}
+	return
 }
 
 func (cli *Client) oauthSetTokens(refreshToken, accessToken string, expiry time.Time) {
@@ -280,7 +294,7 @@ func (cli *Client) OAuthRefreshToken(ctx context.Context, buffer time.Duration) 
 	zerolog.Ctx(ctx).Debug().
 		Time("expires_at", cli.accessTokenExpiry).
 		Msg("Refreshing OAuth token")
-	var resp oauth.TokenResponse
+	var resp *oauth.TokenResponse
 	start := time.Now()
 	err = cli.makeOAuthRequest(ctx, oauthRequestTypeRefresh, authMeta.TokenEndpoint, url.Values{
 		"grant_type":    []string{string(oauth.GrantTypeRefreshToken)},
@@ -288,14 +302,7 @@ func (cli *Client) OAuthRefreshToken(ctx context.Context, buffer time.Duration) 
 		"client_id":     []string{cli.oauthClientID},
 	}, &resp)
 	if err == nil {
-		if resp.RefreshToken == "" {
-			resp.RefreshToken = cli.refreshToken
-		}
-		expiry := start.Add(resp.ExpiresIn.Duration)
-		err = cli.SaveNewToken(ctx, resp.RefreshToken, resp.AccessToken, expiry)
-		if err == nil {
-			cli.oauthSetTokens(resp.RefreshToken, resp.AccessToken, expiry)
-		}
+		err = cli.saveAndSetTokens(ctx, start, resp, true)
 	}
 	return
 }

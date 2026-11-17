@@ -75,6 +75,10 @@ type ReadReceipt struct {
 	Extra map[string]any
 }
 
+func (rr *ReadReceipt) IsThread() bool {
+	return rr.ThreadID != "" && rr.ThreadID != ReadReceiptThreadMain
+}
+
 func (rr *ReadReceipt) UnmarshalJSON(data []byte) error {
 	// Hacky compatibility hack against crappy clients that send double-encoded read receipts.
 	// TODO is this actually needed? clients can't currently set custom content in receipts 🤔

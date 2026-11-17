@@ -31,6 +31,8 @@ type Event struct {
 
 	Mautrix MautrixInfo `json:"-"`
 
+	Unknown json.RawMessage `json:",embed,unknown,omitempty"`
+
 	ToUserID   id.UserID   `json:"to_user_id,omitempty"`   // The user ID that the to-device event was sent to. Only present in MSC2409 appservice transactions.
 	ToDeviceID id.DeviceID `json:"to_device_id,omitempty"` // The device ID that the to-device event was sent to. Only present in MSC2409 appservice transactions.
 }
@@ -50,6 +52,8 @@ type eventForMarshaling struct {
 
 	PrevContent   *Content    `json:"prev_content,omitempty"`
 	ReplacesState *id.EventID `json:"replaces_state,omitempty"`
+
+	Unknown json.RawMessage `json:",embed,unknown,omitempty"`
 
 	ToUserID   id.UserID   `json:"to_user_id,omitempty"`
 	ToDeviceID id.DeviceID `json:"to_device_id,omitempty"`
@@ -80,6 +84,7 @@ func (evt *Event) UnmarshalJSON(data []byte) error {
 	if efm.ReplacesState != nil && *efm.ReplacesState != "" && evt.Unsigned.ReplacesState == "" {
 		evt.Unsigned.ReplacesState = *efm.ReplacesState
 	}
+	evt.Unknown = efm.Unknown
 	evt.ToUserID = efm.ToUserID
 	evt.ToDeviceID = efm.ToDeviceID
 	return nil
@@ -107,6 +112,7 @@ func (evt *Event) MarshalJSON() ([]byte, error) {
 		Redacts:    evt.Redacts,
 		Unsigned:   unsigned,
 		Sticky:     evt.Sticky,
+		Unknown:    evt.Unknown,
 		ToUserID:   evt.ToUserID,
 		ToDeviceID: evt.ToDeviceID,
 	})

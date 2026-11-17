@@ -8,12 +8,13 @@ package exsync
 
 import (
 	"iter"
+	"maps"
 	"sync"
 
 	"go.mau.fi/util/exmaps"
 )
 
-type empty struct{}
+type empty = struct{}
 
 var emptyVal = empty{}
 
@@ -127,17 +128,20 @@ func (s *Set[T]) Remove(item T) {
 }
 
 // ReplaceAll replaces this set with the given set. If the given set is nil, the set is cleared.
-func (s *Set[T]) ReplaceAll(newSet *Set[T]) {
+// The old data is returned as a non-synchronous set.
+func (s *Set[T]) ReplaceAll(newSet *Set[T]) exmaps.Set[T] {
 	if s == nil {
-		return
+		return nil
 	}
 	s.l.Lock()
+	oldData := s.m
 	if newSet == nil {
 		s.m = make(map[T]empty)
 	} else {
 		s.m = newSet.m
 	}
 	s.l.Unlock()
+	return oldData
 }
 
 func (s *Set[T]) Clear() {
@@ -176,6 +180,9 @@ func (s *Set[T]) AsList() []T {
 
 func (s *Set[T]) Iter() iter.Seq[T] {
 	return func(yield func(T) bool) {
+		if s == nil {
+			return
+		}
 		s.l.RLock()
 		defer s.l.RUnlock()
 		for item := range s.m {
@@ -184,4 +191,14 @@ func (s *Set[T]) Iter() iter.Seq[T] {
 			}
 		}
 	}
+}
+
+func (s *Set[T]) Clone() *Set[T] {
+	if s == nil {
+		return nil
+	}
+	s.l.RLock()
+	newSet := NewSetWithMap[T](maps.Clone(s.m))
+	s.l.RUnlock()
+	return newSet
 }

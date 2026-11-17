@@ -95,6 +95,8 @@ export interface RoomFeatures {
 	delete_chat_for_everyone?: boolean
 	/** Whether blocking/unblocking the user is supported. Only applicable to DMs. */
 	block_user?: boolean
+	/** Whether unblocking is unsupported even though blocking is. Only applicable when block_user is set. */
+	no_unblock?: boolean
 	/** Whether block requests can also report the chat as spam. */
 	report_spam?: boolean
 	/** What can be done with message requests? */

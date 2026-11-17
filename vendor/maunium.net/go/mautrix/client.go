@@ -23,6 +23,7 @@ import (
 
 	"github.com/rs/zerolog"
 	"go.mau.fi/util/exsync"
+	"go.mau.fi/util/ptr"
 	"go.mau.fi/util/random"
 	"go.mau.fi/util/retryafter"
 	"golang.org/x/exp/maps"
@@ -1708,6 +1709,13 @@ func (cli *Client) CreateRoom(ctx context.Context, req *ReqCreateRoom) (resp *Re
 	return
 }
 
+// UpgradeRoom upgrades the given room to a new room version. See https://spec.matrix.org/v1.16/client-server-api/#post_matrixclientv3roomsroomidupgrade
+func (cli *Client) UpgradeRoom(ctx context.Context, roomID id.RoomID, req *ReqUpgradeRoom) (resp *RespUpgradeRoom, err error) {
+	urlPath := cli.BuildClientURL("v3", "rooms", roomID, "upgrade")
+	_, err = cli.MakeRequest(ctx, http.MethodPost, urlPath, req, &resp)
+	return
+}
+
 // LeaveRoom leaves the given room. See https://spec.matrix.org/v1.2/client-server-api/#post_matrixclientv3roomsroomidleave
 func (cli *Client) LeaveRoom(ctx context.Context, roomID id.RoomID, optionalReq ...*ReqLeave) (resp *RespLeaveRoom, err error) {
 	req := &ReqLeave{}
@@ -2173,9 +2181,11 @@ type ReqUploadMedia struct {
 	// UnstableUploadURL specifies the URL to upload the content to. MXC must also be set.
 	// see https://github.com/matrix-org/matrix-spec-proposals/pull/3870 for more info
 	UnstableUploadURL string
+
+	Client *http.Client
 }
 
-func (cli *Client) tryUploadMediaToURL(ctx context.Context, url, contentType string, content io.Reader, contentLength int64) (*http.Response, error) {
+func (cli *Client) tryUploadMediaToURL(ctx context.Context, client *http.Client, url, contentType string, content io.Reader, contentLength int64) (*http.Response, error) {
 	cli.Log.Debug().
 		Str("url", url).
 		Int64("content_length", contentLength).
@@ -2190,11 +2200,13 @@ func (cli *Client) tryUploadMediaToURL(ctx context.Context, url, contentType str
 		req.Header.Set("User-Agent", cli.UserAgent+" (external media uploader)")
 	}
 
-	if cli.ExternalClient != nil {
-		return cli.ExternalClient.Do(req)
-	} else {
-		return http.DefaultClient.Do(req)
+	if client == nil {
+		client = cli.ExternalClient
 	}
+	if client == nil {
+		client = http.DefaultClient
+	}
+	return client.Do(req)
 }
 
 func (cli *Client) uploadMediaToURL(ctx context.Context, data ReqUploadMedia) (*RespMediaUpload, error) {
@@ -2212,7 +2224,7 @@ func (cli *Client) uploadMediaToURL(ctx context.Context, data ReqUploadMedia) (*
 		retries = 0
 	}
 	for {
-		resp, err := cli.tryUploadMediaToURL(ctx, data.UnstableUploadURL, data.ContentType, reader, data.ContentLength)
+		resp, err := cli.tryUploadMediaToURL(ctx, data.Client, data.UnstableUploadURL, data.ContentType, reader, data.ContentLength)
 		if err == nil {
 			if resp.StatusCode >= 200 && resp.StatusCode < 300 {
 				// Everything is fine
@@ -2311,6 +2323,7 @@ func (cli *Client) UploadMedia(ctx context.Context, data ReqUploadMedia) (*RespM
 		RequestBody:   data.Content,
 		RequestLength: data.ContentLength,
 		ResponseJSON:  &m,
+		Client:        data.Client,
 	})
 	return &m, err
 }
@@ -2413,9 +2426,37 @@ func (cli *Client) JoinedRooms(ctx context.Context) (resp *RespJoinedRooms, err 
 }
 
 func (cli *Client) PublicRooms(ctx context.Context, req *ReqPublicRooms) (resp *RespPublicRooms, err error) {
-	urlPath := cli.BuildURLWithQuery(ClientURLPath{"v3", "publicRooms"}, req.Query())
-	_, err = cli.MakeRequest(ctx, http.MethodGet, urlPath, nil, &resp)
+	if req.Filter != nil {
+		query := map[string]string{}
+		if req.Server != "" {
+			req = ptr.Clone(req)
+			query["server"] = req.Server
+			req.Server = ""
+		}
+		urlPath := cli.BuildURLWithQuery(ClientURLPath{"v3", "publicRooms"}, query)
+		_, err = cli.MakeRequest(ctx, http.MethodPost, urlPath, req, &resp)
+	} else {
+		urlPath := cli.BuildURLWithQuery(ClientURLPath{"v3", "publicRooms"}, req.Query())
+		_, err = cli.MakeRequest(ctx, http.MethodGet, urlPath, nil, &resp)
+	}
 	return
+}
+
+type roomVisibilityPayload struct {
+	Visibility RoomDirectoryVisibility `json:"visibility"`
+}
+
+func (cli *Client) PublishRoomToDirectory(ctx context.Context, roomID id.RoomID, visibility RoomDirectoryVisibility) error {
+	urlPath := cli.BuildClientURL("v3", "directory", "list", "room", roomID)
+	_, err := cli.MakeRequest(ctx, http.MethodPut, urlPath, roomVisibilityPayload{visibility}, nil)
+	return err
+}
+
+func (cli *Client) GetRoomDirectoryVisibility(ctx context.Context, roomID id.RoomID) (RoomDirectoryVisibility, error) {
+	urlPath := cli.BuildClientURL("v3", "directory", "list", "room", roomID)
+	var resp roomVisibilityPayload
+	_, err := cli.MakeRequest(ctx, http.MethodGet, urlPath, nil, &resp)
+	return resp.Visibility, err
 }
 
 // Hierarchy returns a list of rooms that are in the room's hierarchy. See https://spec.matrix.org/v1.4/client-server-api/#get_matrixclientv1roomsroomidhierarchy
@@ -2518,6 +2559,13 @@ func (cli *Client) GetUnredactedEventContent(ctx context.Context, roomID id.Room
 
 func (cli *Client) GetRelations(ctx context.Context, roomID id.RoomID, eventID id.EventID, req *ReqGetRelations) (resp *RespGetRelations, err error) {
 	urlPath := cli.BuildURLWithQuery(append(ClientURLPath{"v1", "rooms", roomID, "relations", eventID}, req.PathSuffix()...), req.Query())
+	_, err = cli.MakeRequest(ctx, http.MethodGet, urlPath, nil, &resp)
+	return
+}
+
+// GetThreads gets the thread roots in a room. See https://spec.matrix.org/v1.16/client-server-api/#get_matrixclientv1roomsroomidthreads
+func (cli *Client) GetThreads(ctx context.Context, roomID id.RoomID, req *ReqGetThreads) (resp *RespGetThreads, err error) {
+	urlPath := cli.BuildURLWithQuery(ClientURLPath{"v1", "rooms", roomID, "threads"}, req.Query())
 	_, err = cli.MakeRequest(ctx, http.MethodGet, urlPath, nil, &resp)
 	return
 }

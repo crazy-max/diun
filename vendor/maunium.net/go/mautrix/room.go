@@ -6,6 +6,8 @@ import (
 )
 
 // Room represents a single Matrix room.
+//
+// Deprecated: this is not used anywhere and will be removed in a future release.
 type Room struct {
 	ID    id.RoomID
 	State RoomStateMap
@@ -13,6 +15,8 @@ type Room struct {
 
 // UpdateState updates the room's current state with the given Event. This will clobber events based
 // on the type/state_key combination.
+//
+// Deprecated: this is not used anywhere and will be removed in a future release.
 func (room Room) UpdateState(evt *event.Event) {
 	_, exists := room.State[evt.Type]
 	if !exists {
@@ -22,6 +26,8 @@ func (room Room) UpdateState(evt *event.Event) {
 }
 
 // GetStateEvent returns the state event for the given type/state_key combo, or nil.
+//
+// Deprecated: this is not used anywhere and will be removed in a future release.
 func (room Room) GetStateEvent(eventType event.Type, stateKey string) *event.Event {
 	stateEventMap := room.State[eventType]
 	evt := stateEventMap[stateKey]
@@ -30,6 +36,8 @@ func (room Room) GetStateEvent(eventType event.Type, stateKey string) *event.Eve
 
 // GetMembershipState returns the membership state of the given user ID in this room. If there is
 // no entry for this member, 'leave' is returned for consistency with left users.
+//
+// Deprecated: this is not used anywhere and will be removed in a future release.
 func (room Room) GetMembershipState(userID id.UserID) event.Membership {
 	state := event.MembershipLeave
 	evt := room.GetStateEvent(event.StateMember, string(userID))
@@ -43,6 +51,8 @@ func (room Room) GetMembershipState(userID id.UserID) event.Membership {
 }
 
 // NewRoom creates a new Room with the given ID
+//
+// Deprecated: this is not used anywhere and will be removed in a future release.
 func NewRoom(roomID id.RoomID) *Room {
 	// Init the State map and return a pointer to the Room
 	return &Room{
