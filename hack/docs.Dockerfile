@@ -6,10 +6,10 @@ ARG MKDOCS_VERSION="9.8.1"
 FROM squidfunk/mkdocs-material:${MKDOCS_VERSION} AS base
 RUN apk add --no-cache git git-fast-import openssl gcc musl-dev \
   && pip install --no-cache-dir \
-    'lunr==0.8.0' \
+    'lunr==0.8.1' \
     'markdown-include==0.8.1' \
     'mkdocs-exclude==1.0.2' \
-    'mkdocs-git-revision-date-localized-plugin==1.5.1' \
+    'mkdocs-git-revision-date-localized-plugin==1.7.0' \
     'mkdocs-macros-plugin==1.5.0'
 
 FROM base AS generate
