@@ -11,6 +11,7 @@
     "custom.regex"
   ],
   "postUpdateOptions": ["gomodTidy", "gomodVendor"],
+  "prHourlyLimit": 0,
   "minimumReleaseAge": "2 days",
   "internalChecksFilter": "strict",
   "labels": ["kind/dependencies", "bot"],
@@ -46,6 +47,7 @@
     }
   ],
   "ignoreDeps": [
+    "github.com/hashicorp/nomad/api",
     "github.com/sirupsen/logrus",
     "k8s.io/api",
     "k8s.io/apimachinery"
