@@ -329,6 +329,11 @@ type RespCreateRoom struct {
 	RoomID id.RoomID `json:"room_id"`
 }
 
+// RespUpgradeRoom is the JSON response for https://spec.matrix.org/v1.16/client-server-api/#post_matrixclientv3roomsroomidupgrade
+type RespUpgradeRoom struct {
+	ReplacementRoom id.RoomID `json:"replacement_room"`
+}
+
 type RespMembers struct {
 	Chunk []*event.Event `json:"chunk"`
 }
@@ -816,6 +821,12 @@ type RespGetRelations struct {
 	NextBatch      string         `json:"next_batch,omitempty"`
 	PrevBatch      string         `json:"prev_batch,omitempty"`
 	RecursionDepth int            `json:"recursion_depth,omitzero"`
+}
+
+// RespGetThreads is the JSON response for https://spec.matrix.org/v1.16/client-server-api/#get_matrixclientv1roomsroomidthreads
+type RespGetThreads struct {
+	Chunk     []*event.Event `json:"chunk"`
+	NextBatch string         `json:"next_batch,omitempty"`
 }
 
 // RespSuspended is the response body for https://github.com/matrix-org/matrix-spec-proposals/pull/4323

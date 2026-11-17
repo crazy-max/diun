@@ -6,13 +6,7 @@
 
 package olm
 
-var GetVersion func() (major, minor, patch uint8)
 var SetPickleKeyImpl func(key []byte)
-
-// Version returns the version number of the olm library.
-func Version() (major, minor, patch uint8) {
-	return GetVersion()
-}
 
 // SetPickleKey sets the global pickle key used when encoding structs with Gob or JSON.
 func SetPickleKey(key []byte) {

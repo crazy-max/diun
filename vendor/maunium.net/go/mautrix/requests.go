@@ -157,6 +157,12 @@ type ReqCreateRoom struct {
 	BeeperBridgeAccountID string      `json:"com.beeper.bridge_account_id,omitempty"`
 }
 
+// ReqUpgradeRoom is the JSON request for https://spec.matrix.org/v1.16/client-server-api/#post_matrixclientv3roomsroomidupgrade
+type ReqUpgradeRoom struct {
+	NewVersion         id.RoomVersion `json:"new_version"`
+	AdditionalCreators []id.UserID    `json:"additional_creators,omitempty"`
+}
+
 // ReqRedact is the JSON request for https://spec.matrix.org/v1.2/client-server-api/#put_matrixclientv3roomsroomidredacteventidtxnid
 type ReqRedact struct {
 	Reason string
@@ -487,11 +493,18 @@ type ReqSendReceipt struct {
 }
 
 type ReqPublicRooms struct {
-	IncludeAllNetworks   bool
-	Limit                int
-	Since                string
-	ThirdPartyInstanceID string
-	Server               string
+	IncludeAllNetworks   bool   `json:"include_all_networks,omitzero"`
+	Limit                int    `json:"limit,omitzero"`
+	Since                string `json:"since,omitempty"`
+	ThirdPartyInstanceID string `json:"third_party_instance_id,omitempty"`
+	Server               string `json:"server,omitempty"`
+
+	Filter *PublicRoomsFilter `json:"filter,omitempty"`
+}
+
+type PublicRoomsFilter struct {
+	GenericSearchTerm string           `json:"generic_search_term,omitempty"`
+	RoomTypes         []event.RoomType `json:"room_types,omitempty"`
 }
 
 func (req *ReqPublicRooms) Query() map[string]string {
@@ -516,6 +529,13 @@ func (req *ReqPublicRooms) Query() map[string]string {
 	}
 	return query
 }
+
+type RoomDirectoryVisibility string
+
+const (
+	RoomDirectoryVisibilityPublic  RoomDirectoryVisibility = "public"
+	RoomDirectoryVisibilityPrivate RoomDirectoryVisibility = "private"
+)
 
 // ReqHierarchy contains the parameters for https://spec.matrix.org/v1.4/client-server-api/#get_matrixclientv1roomsroomidhierarchy
 //
@@ -646,6 +666,37 @@ func (rgr *ReqGetRelations) Query() map[string]string {
 	}
 	if rgr.Recurse {
 		query["recurse"] = "true"
+	}
+	return query
+}
+
+type ThreadInclude string
+
+const (
+	ThreadIncludeAll          ThreadInclude = "all"
+	ThreadIncludeParticipated ThreadInclude = "participated"
+)
+
+// ReqGetThreads is the request for https://spec.matrix.org/v1.16/client-server-api/#get_matrixclientv1roomsroomidthreads
+type ReqGetThreads struct {
+	Include ThreadInclude
+	From    string
+	Limit   int
+}
+
+func (req *ReqGetThreads) Query() map[string]string {
+	query := map[string]string{}
+	if req == nil {
+		return query
+	}
+	if req.Include != "" {
+		query["include"] = string(req.Include)
+	}
+	if req.From != "" {
+		query["from"] = req.From
+	}
+	if req.Limit > 0 {
+		query["limit"] = strconv.Itoa(req.Limit)
 	}
 	return query
 }

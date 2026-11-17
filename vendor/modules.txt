@@ -515,7 +515,7 @@ go.etcd.io/bbolt
 go.etcd.io/bbolt/errors
 go.etcd.io/bbolt/internal/common
 go.etcd.io/bbolt/internal/freelist
-# go.mau.fi/util v0.11.0
+# go.mau.fi/util v0.11.1
 ## explicit; go 1.26.0
 go.mau.fi/util/base58
 go.mau.fi/util/exbytes
@@ -634,7 +634,7 @@ go.yaml.in/yaml/v2
 # go.yaml.in/yaml/v3 v3.0.6
 ## explicit; go 1.16
 go.yaml.in/yaml/v3
-# golang.org/x/crypto v0.58.0
+# golang.org/x/crypto v0.59.0
 ## explicit; go 1.26.0
 golang.org/x/crypto/curve25519
 golang.org/x/crypto/hkdf
@@ -642,7 +642,7 @@ golang.org/x/crypto/md4
 golang.org/x/crypto/pbkdf2
 golang.org/x/crypto/scrypt
 golang.org/x/crypto/sha3
-# golang.org/x/exp v0.0.0-20261014143641-f0251eb4aa3e
+# golang.org/x/exp v0.0.0-20261113113407-e3970619a1a4
 ## explicit; go 1.26.0
 golang.org/x/exp/constraints
 golang.org/x/exp/maps
@@ -667,7 +667,7 @@ golang.org/x/net/trace
 ## explicit; go 1.26.0
 golang.org/x/oauth2
 golang.org/x/oauth2/internal
-# golang.org/x/sync v0.24.0
+# golang.org/x/sync v0.25.0
 ## explicit; go 1.26.0
 golang.org/x/sync/errgroup
 golang.org/x/sync/semaphore
@@ -677,10 +677,10 @@ golang.org/x/sys/cpu
 golang.org/x/sys/plan9
 golang.org/x/sys/unix
 golang.org/x/sys/windows
-# golang.org/x/term v0.47.0
+# golang.org/x/term v0.48.0
 ## explicit; go 1.26.0
 golang.org/x/term
-# golang.org/x/text v0.43.0
+# golang.org/x/text v0.44.0
 ## explicit; go 1.26.0
 golang.org/x/text/cases
 golang.org/x/text/internal
@@ -698,7 +698,7 @@ golang.org/x/text/width
 # golang.org/x/time v0.16.0
 ## explicit; go 1.26.0
 golang.org/x/time/rate
-# golang.org/x/tools v0.52.0
+# golang.org/x/tools v0.52.1-0.20261106145633-d407941a339a
 ## explicit; go 1.26.0
 golang.org/x/tools/go/ast/edge
 golang.org/x/tools/go/ast/inspector
@@ -1148,7 +1148,7 @@ k8s.io/utils/dump
 k8s.io/utils/internal/third_party/forked/golang/net
 k8s.io/utils/net
 k8s.io/utils/ptr
-# maunium.net/go/mautrix v0.32.0
+# maunium.net/go/mautrix v0.33.0
 ## explicit; go 1.26.0
 maunium.net/go/mautrix
 maunium.net/go/mautrix/crypto/aescbc
@@ -1156,6 +1156,7 @@ maunium.net/go/mautrix/crypto/attachment
 maunium.net/go/mautrix/crypto/backup
 maunium.net/go/mautrix/crypto/canonicaljson
 maunium.net/go/mautrix/crypto/ed25519
+maunium.net/go/mautrix/crypto/floe
 maunium.net/go/mautrix/crypto/goolm/aessha2
 maunium.net/go/mautrix/crypto/goolm/crypto
 maunium.net/go/mautrix/crypto/goolm/goolmbase64

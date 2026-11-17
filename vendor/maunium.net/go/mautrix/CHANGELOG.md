@@ -1,3 +1,109 @@
+## v0.33.0 (2026-11-16)
+
+* *(bridgev2)* Removed `BotIntent()` from Matrix interface as it should never
+  be used outside of bridgev2's `Init` function.
+* *(crypto/olm)* Removed unused `Version` function.
+* *(federation)* Removed server name parameter from Query methods where the
+  entity being queried already includes a server name (thanks to [@timedoutuk]
+  in [#659]).
+* *(client)* Marked the unused `Room` struct as deprecated.
+* *(federation)* Added outgoing request logging.
+* *(federation)* Added dedicated error when trying to make requests to invalid
+  server names.
+* *(client)* Added option to override HTTP client used for media uploads.
+* *(client)* Added SaveNewToken call after exchanging an auth token or device
+  code while already logged in. This allows implementing step-up auth.
+* *(client)* Added support for filter parameter in `PublicRooms`.
+* *(client)* Added wrapper methods for publishing and unpublishing rooms in the
+  room directory.
+* *(client)* Added internals method to access unexported methods of `Client`.
+* *(client)* Added wrapper for room upgrade endpoint
+  (thanks to [@Henry-Hiles] in [#673]).
+* *(client)* Added wrapper for thread list endpoint
+  (thanks to [@Henry-Hiles] in [#677]).
+* *(event)* Added support for custom top-level event fields when using jsonv2.
+* *(crypto)* Added automatic clearing of in-memory cross-signing private key
+  caches when the public keys on the server change.
+* *(crypto)* Added support for attachments encrypted with FLOE as per [MSC4571].
+* *(mediaproxy)* Added support for encrypting proxied media.
+* *(bridgev2)* Added support for encrypting direct media with FLOE.
+* *(bridgev2)* Added support for automatically repeating outgoing typing
+  notifications on networks that have a short timeout.
+* *(bridgev2)* Added automatic Disconnect call after LogoutRemote, as some
+  network connectors forgot to do it internally.
+* *(bridgev2)* Added support for bridging thread-scoped read receipts.
+* *(bridgev2)* Added support for marking forward backfills as partially read.
+* *(bridgev2)* Added provisioning API based interface for fetching poll results
+  on networks where bridging them as events is not practical.
+* *(bridgev2)* Added interface to update global profile on the remote network.
+* *(bridgev2)* Added interface for unregistering push notifications on the
+  remote network.
+* *(bridgev2)* Added flag to bridge states to exclude them from unknown error
+  auto-reconnection.
+* *(bridgev2)* Added room membership check before trying to bridge typing
+  notifications to Matrix.
+* *(bridgev2)* Added interface to let network connectors resync room info when
+  a send fails due to permission issues.
+* *(bridgev2/matrix)* Added option to limit maximum number of parallel
+  connections to the homeserver.
+* *(bridgev2/matrix)* Added option to serve existing direct media while
+  disabling generation of new direct media MXCs.
+* *(bridgev2/matrix)* Added global Matrix media download size limits.
+* *(bridgev2/provisioning)* Added support for gzipping the body in client HTTP
+  response requests.
+* *(bridgev2/provisioning)* Added websocket support for client HTTP in login.
+* *(crypto)* Changed megolm sessions to be keyed by room ID to avoid cross-room
+  session confusion.
+* *(bridgev2)* Optimized memory usage of in-memory ghost caches.
+* *(bridgev2/provisioning)* Changed list contacts endpoint to not create portal
+  rows.
+* *(bridgev2/provisioning)* Changed all start chat methods to return early if
+  the user isn't logged in.
+* *(bridgev2/matrix)* Changed event handling to drop profile change events by
+  default, as network connectors generally can't bridge them anyway.
+* *(bridgev2)* Changed bridge state sending to not deduplicate after an unknown
+  error reconnect, as otherwise it won't try to reconnect again.
+* *(bridgev2)* Changed "delete for me" handling to use the bridge bot instead
+  of the original sender for the redaction.
+* *(bridgev2)* Changed Matrix edit handling to increment the saved edit count
+  if the network connector didn't change it.
+* *(bridgev2)* Disabled implicit read receipts for member events.
+* *(bridgev2)* Improved split portal migration.
+* *(bridgev2)* Fixed outgoing message transaction IDs not being saved.
+* *(bridgev2)* Fixed potential panic if an event is queued in parallel with
+  a portal being deleted.
+* *(bridgev2)* Fixed potential panic if a media upload races with fetching the
+  upload size limit.
+* *(bridgev2)* Fixed message saving failing for double puppeted messages with
+  no sender user ID.
+* *(bridgev2)* Fixed handling parallel portal re-ID calls.
+* *(bridgev2)* Fixed potential deadlock when deleting logins that have event
+  handlers in-flight.
+* *(bridgev2)* Fixed member sync trying to send knocks with the bridge bot.
+* *(bridgev2)* Fixed backfill potentially dropping messages if the last bridged
+  message had the same timestamp as the first message in the batch.
+* *(crypto)* Fixed panic when receiving unexpected QR verification event before
+  the QR verification preparation is completed.
+* *(crypto)* Fixed megolm session trust state not matching source device key if
+  another copy of the same session is received.
+* *(crypto/goolm)* Fixed minor libolm parity issues.
+* *(crypto/sqlstore)* Fixed ratchet safety data not being read from the database
+  properly.
+* *(federation)* Fixed server name resolution not respecting `Cache-Control` on
+  the `.well-known` response properly.
+* *(federation)* Fixed panic when trying to verify a signing key response with
+  no keys.
+* *(federation)* Fixed `GetKeysWithCache` masking errors returned by the fetch
+  request.
+* *(federation)* Fixed `GetKeysWithCache` not checking that the returned server
+  name matches the queried one.
+
+[MSC4571]: https://github.com/matrix-org/matrix-spec-proposals/pull/4571
+[#659]: https://github.com/mautrix/go/pull/659
+[#673]: https://github.com/mautrix/go/pull/673
+[#677]: https://github.com/mautrix/go/pull/677
+[@Henry-Hiles]: https://github.com/Henry-Hiles
+
 ## v0.32.0 (2026-10-16)
 
 * **Breaking change *(bridgev2)*** Added portal parameter to the

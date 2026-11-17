@@ -7,6 +7,7 @@
 package attachment
 
 import (
+	"bytes"
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/hmac"
@@ -16,7 +17,11 @@ import (
 	"fmt"
 	"hash"
 	"io"
+	"math"
 
+	"go.mau.fi/util/exerrors"
+
+	"maunium.net/go/mautrix/crypto/floe"
 	"maunium.net/go/mautrix/crypto/utils"
 )
 
@@ -28,6 +33,14 @@ var (
 	ErrInvalidInitVector    = errors.New("failed to decode initialization vector")
 	ErrInvalidHash          = errors.New("failed to decode SHA-256 hash")
 	ErrReaderClosed         = errors.New("encrypting reader was already closed")
+	ErrInvalidFLOEHeader    = errors.New("failed to decode FLOE header")
+	ErrFLOEInit             = errors.New("failed to prepare FLOE")
+)
+
+const (
+	VersionAES256CTR = "v2"
+	// VersionBeeperFLOE is described at https://github.com/matrix-org/matrix-spec-proposals/pull/4571
+	VersionBeeperFLOE = "com.beeper.floe.v1"
 )
 
 // Deprecated: use variables prefixed with Err
@@ -56,7 +69,7 @@ type JSONWebKey struct {
 }
 
 type EncryptedFileHashes struct {
-	SHA256 string `json:"sha256"`
+	SHA256 string `json:"sha256,omitempty"`
 }
 
 type decodedKeys struct {
@@ -64,13 +77,19 @@ type decodedKeys struct {
 	iv  [utils.AESCTRIVLength]byte
 
 	sha256 [utils.SHAHashLength]byte
+
+	encryptor *floe.FloeEncryptor
+	decryptor *floe.FloeDecryptor
 }
 
 type EncryptedFile struct {
-	Key        JSONWebKey          `json:"key"`
-	InitVector string              `json:"iv"`
-	Hashes     EncryptedFileHashes `json:"hashes"`
+	Key        JSONWebKey          `json:"key,omitzero"`
+	InitVector string              `json:"iv,omitempty"`
+	Hashes     EncryptedFileHashes `json:"hashes,omitzero"`
 	Version    string              `json:"v"`
+
+	FLOEKey    string `json:"floe_key,omitempty"`
+	FLOEHeader string `json:"floe_header,omitempty"`
 
 	decoded *decodedKeys
 }
@@ -86,14 +105,20 @@ func NewEncryptedFile() *EncryptedFile {
 			KeyOps:      []string{"encrypt", "decrypt"},
 		},
 		InitVector: base64.RawStdEncoding.EncodeToString(iv[:]),
-		Version:    "v2",
+		Version:    VersionAES256CTR,
 
 		decoded: &decodedKeys{key: key, iv: iv},
 	}
 }
 
+func (ef *EncryptedFile) ToFLOE() *FLOEFile {
+	return (*FLOEFile)(ef)
+}
+
 func (ef *EncryptedFile) decodeKeys(includeHash bool) error {
-	if ef.decoded != nil {
+	if ef.Version != VersionAES256CTR {
+		return fmt.Errorf("attachments.EncryptedFile: %w: %s", ErrUnsupportedVersion, ef.Version)
+	} else if ef.decoded != nil {
 		return nil
 	} else if len(ef.Key.Key) != keyBase64Length {
 		return ErrInvalidKey
@@ -133,7 +158,7 @@ func (ef *EncryptedFile) Encrypt(plaintext []byte) []byte {
 // EncryptInPlace encrypts the given data in-place (i.e. the provided data is overridden with the ciphertext)
 // and updates the SHA256 hash in the EncryptedFile struct.
 func (ef *EncryptedFile) EncryptInPlace(data []byte) {
-	ef.decodeKeys(false)
+	exerrors.PanicIfNotNil(ef.decodeKeys(false))
 	utils.XorA256CTR(data, ef.decoded.key, ef.decoded.iv)
 	checksum := sha256.Sum256(data)
 	ef.Hashes.SHA256 = base64.RawStdEncoding.EncodeToString(checksum[:])
@@ -177,6 +202,8 @@ func (ef *EncryptedFile) EncryptFile(file ReadWriterAt) error {
 }
 
 type encryptingReader struct {
+	prepErr error
+
 	stream cipher.Stream
 	hash   hash.Hash
 	source io.Reader
@@ -189,6 +216,9 @@ type encryptingReader struct {
 var _ io.ReadSeekCloser = (*encryptingReader)(nil)
 
 func (r *encryptingReader) Seek(offset int64, whence int) (int64, error) {
+	if r.prepErr != nil {
+		return 0, r.prepErr
+	}
 	if r.closed {
 		return 0, ErrReaderClosed
 	}
@@ -210,6 +240,9 @@ func (r *encryptingReader) Seek(offset int64, whence int) (int64, error) {
 }
 
 func (r *encryptingReader) Read(dst []byte) (n int, err error) {
+	if r.prepErr != nil {
+		return 0, r.prepErr
+	}
 	if r.closed {
 		return 0, ErrReaderClosed
 	} else if r.isDecrypting && r.file.decoded == nil {
@@ -229,6 +262,9 @@ func (r *encryptingReader) Read(dst []byte) (n int, err error) {
 }
 
 func (r *encryptingReader) Close() (err error) {
+	if r.prepErr != nil {
+		return r.prepErr
+	}
 	closer, ok := r.source.(io.ReadCloser)
 	if ok {
 		err = closer.Close()
@@ -250,10 +286,22 @@ func (r *encryptingReader) Close() (err error) {
 // in the EncryptedFile struct to be updated. The metadata is not valid before the hash
 // is filled.
 func (ef *EncryptedFile) EncryptStream(reader io.Reader) io.ReadSeekCloser {
-	ef.decodeKeys(false)
-	block, _ := aes.NewCipher(ef.decoded.key[:])
+	if ef.Version == VersionBeeperFLOE {
+		return ef.ToFLOE().EncryptStream(reader)
+	}
+	prepErr := ef.decodeKeys(false)
+	var stream cipher.Stream
+	if prepErr == nil {
+		var block cipher.Block
+		block, prepErr = aes.NewCipher(ef.decoded.key[:])
+		if prepErr == nil {
+			stream = cipher.NewCTR(block, ef.decoded.iv[:])
+		}
+	}
 	return &encryptingReader{
-		stream: cipher.NewCTR(block, ef.decoded.iv[:]),
+		prepErr: prepErr,
+
+		stream: stream,
 		hash:   sha256.New(),
 		source: reader,
 		file:   ef,
@@ -264,9 +312,12 @@ func (ef *EncryptedFile) EncryptStream(reader io.Reader) io.ReadSeekCloser {
 //
 // Deprecated: this makes a copy for the plaintext data, which means 2x memory usage. DecryptInPlace is recommended.
 func (ef *EncryptedFile) Decrypt(ciphertext []byte) ([]byte, error) {
+	if ef.Version == VersionBeeperFLOE {
+		return ef.ToFLOE().DecryptInPlace(bytes.Clone(ciphertext))
+	}
 	plaintext := make([]byte, len(ciphertext))
 	copy(plaintext, ciphertext)
-	return plaintext, ef.DecryptInPlace(plaintext)
+	return ef.DecryptInPlaceReturn(plaintext)
 }
 
 // PrepareForDecryption checks that the version and algorithm are supported and decodes the base64 keys
@@ -275,8 +326,10 @@ func (ef *EncryptedFile) Decrypt(ciphertext []byte) ([]byte, error) {
 //
 // DecryptInPlace will always call this automatically, so calling this manually is not necessary when using that function.
 func (ef *EncryptedFile) PrepareForDecryption() error {
-	if ef.Version != "v2" {
-		return ErrUnsupportedVersion
+	if ef.Version == VersionBeeperFLOE {
+		return ef.ToFLOE().decodeKeys()
+	} else if ef.Version != VersionAES256CTR {
+		return fmt.Errorf("%w: %s", ErrUnsupportedVersion, ef.Version)
 	} else if ef.Key.Algorithm != "A256CTR" {
 		return ErrUnsupportedAlgorithm
 	} else if err := ef.decodeKeys(true); err != nil {
@@ -287,6 +340,9 @@ func (ef *EncryptedFile) PrepareForDecryption() error {
 
 // DecryptInPlace decrypts the given data in-place (i.e. the provided data is overridden with the plaintext).
 func (ef *EncryptedFile) DecryptInPlace(data []byte) error {
+	if ef.Version == VersionBeeperFLOE {
+		return fmt.Errorf("attachments.EncryptedFile: DecryptInPlace doesn't support FLOE, use DecryptInPlaceReturn")
+	}
 	if err := ef.PrepareForDecryption(); err != nil {
 		return err
 	}
@@ -298,6 +354,13 @@ func (ef *EncryptedFile) DecryptInPlace(data []byte) error {
 	return nil
 }
 
+func (ef *EncryptedFile) DecryptInPlaceReturn(data []byte) ([]byte, error) {
+	if ef.Version == VersionBeeperFLOE {
+		return ef.ToFLOE().DecryptInPlace(data)
+	}
+	return data, ef.DecryptInPlace(data)
+}
+
 // DecryptStream wraps the given io.Reader in order to decrypt the data.
 //
 // The first Read call will check the algorithm and decode keys, so it might return an error before actually reading anything.
@@ -306,12 +369,28 @@ func (ef *EncryptedFile) DecryptInPlace(data []byte) error {
 // The Close call will validate the hash and return an error if it doesn't match.
 // In this case, the written data should be considered compromised and should not be used further.
 func (ef *EncryptedFile) DecryptStream(reader io.Reader) io.ReadSeekCloser {
-	block, _ := aes.NewCipher(ef.decoded.key[:])
+	if ef.Version == VersionBeeperFLOE {
+		return ef.ToFLOE().DecryptStream(reader)
+	}
+	block, prepErr := aes.NewCipher(ef.decoded.key[:])
 	return &encryptingReader{
+		prepErr:      prepErr,
 		isDecrypting: true,
 		stream:       cipher.NewCTR(block, ef.decoded.iv[:]),
 		hash:         sha256.New(),
 		source:       reader,
 		file:         ef,
+	}
+}
+
+func (ef *EncryptedFile) EncryptedLength(plaintext int64) int64 {
+	switch ef.Version {
+	case VersionAES256CTR:
+		return plaintext
+	case VersionBeeperFLOE:
+		segments := max(int64(math.Ceil(float64(plaintext)/float64(FLOEParams.PtSegLen()))), 1)
+		return plaintext + segments*int64(FLOEParams.SegOverhead())
+	default:
+		return -1
 	}
 }

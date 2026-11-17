@@ -37,12 +37,14 @@ type RoomFeatures struct {
 
 	LocationMessage CapabilitySupportLevel `json:"location_message,omitzero"`
 
-	Poll                 CapabilitySupportLevel `json:"poll,omitzero"`
-	PollEnd              CapabilitySupportLevel `json:"poll_end,omitzero"`
-	PollHiddenVotes      CapabilitySupportLevel `json:"poll_hidden_votes,omitzero"`
-	PollDuplicateOptions CapabilitySupportLevel `json:"poll_duplicate_options,omitzero"`
-	PollMaxOptions       int                    `json:"poll_max_options,omitzero"`
-	PollOptionMaxLength  int                    `json:"poll_option_max_length,omitzero"`
+	Poll                   CapabilitySupportLevel `json:"poll,omitzero"`
+	PollEnd                CapabilitySupportLevel `json:"poll_end,omitzero"`
+	PollHiddenVotes        CapabilitySupportLevel `json:"poll_hidden_votes,omitzero"`
+	PollDuplicateOptions   CapabilitySupportLevel `json:"poll_duplicate_options,omitzero"`
+	PollMaxOptions         int                    `json:"poll_max_options,omitzero"`
+	PollMultipleChoiceOnly bool                   `json:"poll_multiple_choice_only,omitzero"`
+	PollOptionMaxLength    int                    `json:"poll_option_max_length,omitzero"`
+	PollResultsAPI         bool                   `json:"poll_results_api,omitzero"`
 
 	Thread CapabilitySupportLevel `json:"thread,omitzero"`
 	Reply  CapabilitySupportLevel `json:"reply,omitzero"`
@@ -69,6 +71,7 @@ type RoomFeatures struct {
 	DeleteChat            bool `json:"delete_chat,omitzero"`
 	DeleteChatForEveryone bool `json:"delete_chat_for_everyone,omitzero"`
 	BlockUser             bool `json:"block_user,omitzero"`
+	NoUnblock             bool `json:"no_unblock,omitzero"`
 	ReportSpam            bool `json:"report_spam,omitzero"`
 
 	MessageRequest *MessageRequestFeatures `json:"message_request,omitzero"`
@@ -369,7 +372,9 @@ func (rf *RoomFeatures) Hash() []byte {
 	hashValue(hasher, "poll_hidden_votes", rf.PollHiddenVotes)
 	hashValue(hasher, "poll_duplicate_options", rf.PollDuplicateOptions)
 	hashInt(hasher, "poll_max_options", rf.PollMaxOptions)
+	hashBool(hasher, "poll_multiple_choice_only", rf.PollMultipleChoiceOnly)
 	hashInt(hasher, "poll_option_max_length", rf.PollOptionMaxLength)
+	hashBool(hasher, "poll_results_api", rf.PollResultsAPI)
 	hashValue(hasher, "thread", rf.Thread)
 	hashValue(hasher, "reply", rf.Reply)
 
@@ -398,6 +403,7 @@ func (rf *RoomFeatures) Hash() []byte {
 	hashBool(hasher, "delete_chat", rf.DeleteChat)
 	hashBool(hasher, "delete_chat_for_everyone", rf.DeleteChatForEveryone)
 	hashBool(hasher, "block_user", rf.BlockUser)
+	hashBool(hasher, "no_unblock", rf.NoUnblock)
 	hashBool(hasher, "report_spam", rf.ReportSpam)
 	hashValue(hasher, "message_request", rf.MessageRequest)
 
