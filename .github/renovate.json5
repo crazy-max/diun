@@ -20,6 +20,15 @@
   "customManagers": [
     {
       "customType": "regex",
+      "managerFilePatterns": ["/^\\.github/workflows/.*\\.ya?ml$/"],
+      "matchStrings": [
+        "(?:^|\\r?\\n)[ \\t]*(?:-[ \\t]+|runner:[ \\t]+)(?<depName>ubuntu|macos|windows)-(?<currentValue>[0-9][a-zA-Z0-9.-]*)"
+      ],
+      "datasourceTemplate": "github-runners",
+      "versioningTemplate": "docker"
+    },
+    {
+      "customType": "regex",
       "managerFilePatterns": ["/.github/workflows/.*\\.ya?ml$/"],
       "matchStrings": [
         "# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)(?: versioning=(?<versioning>\\S+))?[ \\t]*\\r?\\n[ \\t]*\\w+:[ \\t]*\"(?<currentValue>[^\"]+)\""
