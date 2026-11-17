@@ -2,7 +2,7 @@
 
 ARG GO_VERSION="1.27"
 # renovate: datasource=github-releases depName=protocolbuffers/protobuf
-ARG PROTOC_VERSION="3.20.3"
+ARG PROTOC_VERSION="36.2"
 
 # protoc is dynamically linked to glibc so can't use alpine base
 FROM golang:${GO_VERSION}-trixie AS base
