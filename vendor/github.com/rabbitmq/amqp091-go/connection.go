@@ -29,7 +29,7 @@ const (
 	defaultHeartbeat         = 10 * time.Second
 	defaultConnectionTimeout = 30 * time.Second
 	defaultProduct           = "AMQP 0.9.1 Client"
-	buildVersion             = "1.16.0"
+	buildVersion             = "1.17.0"
 	platform                 = "golang"
 	// Safer default that makes channel leaks a lot easier to spot
 	// before they create operational headaches. See https://github.com/rabbitmq/rabbitmq-server/issues/1593.
@@ -135,7 +135,8 @@ type Config struct {
 	//     bindings, exchange-to-exchange bindings, and consumers).
 	//   - TopologyRecoveryOnlyTransient: recovers only transient entities
 	//     (exclusive/auto-delete queues, auto-delete exchanges, and bindings to them).
-	//   - TopologyRecoveryDisabled: skips topology and consumer recovery entirely.
+	//   - TopologyRecoveryDisabled: skips topology and consumer recovery entirely. Channel QoS
+	//     and confirm mode are still restored.
 	//
 	// During the recovery process, applications can monitor state changes (such as reconnecting
 	// or closed) by registering a listener using `Connection.NotifyStateChange` and
@@ -258,11 +259,21 @@ func DefaultDial(connectionTimeout time.Duration) func(network, addr string) (ne
 		// A deadline is set for TLS and AMQP handshaking. After AMQP is established,
 		// the deadline is cleared in openComplete.
 		if err := conn.SetDeadline(time.Now().Add(connectionTimeout)); err != nil {
+			conn.Close()
 			return nil, err
 		}
 
 		return conn, nil
 	}
+}
+
+// connectionTimeout returns the dial and handshake timeout set by the URI's
+// connection_timeout parameter, or the default when it is not positive.
+func (uri URI) connectionTimeout() time.Duration {
+	if uri.ConnectionTimeout > 0 {
+		return time.Duration(uri.ConnectionTimeout) * time.Millisecond
+	}
+	return defaultConnectionTimeout
 }
 
 // Dial accepts a string in the AMQP URI format and returns a new Connection
@@ -358,23 +369,14 @@ func DialConfig(url string, config Config) (*Connection, error) {
 		config.FrameSize = defaultFrameSize
 	}
 
-	connectionTimeout := defaultConnectionTimeout
-	if uri.ConnectionTimeout != 0 {
-		connectionTimeout = time.Duration(uri.ConnectionTimeout) * time.Millisecond
-	}
-
 	addr := net.JoinHostPort(uri.Host, strconv.FormatInt(int64(uri.Port), 10))
 
 	dialer := config.Dial
 	if dialer == nil {
-		dialer = DefaultDial(connectionTimeout)
+		dialer = DefaultDial(uri.connectionTimeout())
 	}
 
-	conn, err = dialer("tcp", addr)
-	if err != nil {
-		return nil, err
-	}
-
+	// Build the TLS config before dialing so a failure leaves no socket open.
 	if uri.Scheme == "amqps" {
 		if config.TLSClientConfig == nil {
 			tlsConfig, err := tlsConfigFromURI(uri)
@@ -389,10 +391,21 @@ func DialConfig(url string, config Config) (*Connection, error) {
 		if config.TLSClientConfig.ServerName == "" {
 			config.TLSClientConfig.ServerName = uri.Host
 		}
+	}
 
-		client := tls.Client(conn, config.TLSClientConfig)
-		if err := client.Handshake(); err != nil {
+	conn, err = dialer("tcp", addr)
+	if err != nil {
+		return nil, err
+	}
+	defer func() {
+		if err != nil {
 			conn.Close()
+		}
+	}()
+
+	if uri.Scheme == "amqps" {
+		client := tls.Client(conn, config.TLSClientConfig)
+		if err = client.Handshake(); err != nil {
 			return nil, err
 		}
 
@@ -1687,19 +1700,19 @@ func (c *Connection) Reconnect() (err error) {
 		case <-time.After(c.RetryInterval() + jitter):
 		}
 
-		// Re-dial
-		var conn net.Conn
-		dialer := c.Config.Dial
-		if dialer == nil {
-			dialer = DefaultDial(defaultConnectionTimeout)
-		}
-
 		// We need to parse URL to get addr
 		var uri URI
 		uri, err = ParseURI(c.url)
 		if err != nil {
 			Logger.Printf("Connection recovery failed to parse URI: %v", err)
 			return err
+		}
+
+		// Re-dial
+		var conn net.Conn
+		dialer := c.Config.Dial
+		if dialer == nil {
+			dialer = DefaultDial(uri.connectionTimeout())
 		}
 
 		// Restore SASL from the clone captured at initial Open, before the
@@ -1839,6 +1852,10 @@ func (c *Connection) Reconnect() (err error) {
 func (c *Connection) resetState() {
 	c.closed.Store(false)
 	c.destructed = false
+
+	// Re-apply the spec's pre-negotiation ceiling, as Open() does, so the new
+	// reader does not inherit the frame_max negotiated on the previous connection.
+	c.maxFrameSize.Store(frameMinSize)
 
 	c.errors = make(chan *Error, 1)
 	c.close = make(chan struct{})

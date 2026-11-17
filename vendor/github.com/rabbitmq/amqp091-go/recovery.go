@@ -171,7 +171,7 @@ const (
 
 	// TopologyRecoveryDisabled disables topology recovery completely. Neither
 	// entities nor consumers are recovered. Connection and channel recovery still
-	// occur if otherwise enabled.
+	// occur if otherwise enabled, including the channel's QoS and confirm mode.
 	TopologyRecoveryDisabled
 )
 

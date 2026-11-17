@@ -1,5 +1,33 @@
 # Changelog
 
+## [v1.17.0](https://github.com/rabbitmq/amqp091-go/tree/v1.17.0) (2026-11-17)
+
+[Full Changelog](https://github.com/rabbitmq/amqp091-go/compare/v1.16.0...v1.17.0)
+
+**Fixed bugs:**
+
+- Close the socket on every DialConfig error after dialing [\#448](https://github.com/rabbitmq/amqp091-go/pull/448) ([suchitd](https://github.com/suchitd))
+- Close the socket when DefaultDial fails to set the deadline [\#447](https://github.com/rabbitmq/amqp091-go/pull/447) ([suchitd](https://github.com/suchitd))
+- Restore channel QoS after recovery regardless of topology recovery mode [\#445](https://github.com/rabbitmq/amqp091-go/pull/445) ([suchitd](https://github.com/suchitd))
+- Honor URI connection\_timeout during connection recovery [\#422](https://github.com/rabbitmq/amqp091-go/pull/422) ([fabrianivan](https://github.com/fabrianivan))
+- fix: build TLS config before dialing so config errors leave no open socket [\#421](https://github.com/rabbitmq/amqp091-go/pull/421) ([pcbeingused333](https://github.com/pcbeingused333))
+- Reject prefetchCount above 65535 in Channel.Qos [\#417](https://github.com/rabbitmq/amqp091-go/pull/417) ([suchitd](https://github.com/suchitd))
+- Guard prefetchSize in Channel.Qos and deprecate QosConfig.PrefetchSize [\#413](https://github.com/rabbitmq/amqp091-go/pull/413) ([AdamMagued](https://github.com/AdamMagued))
+
+**Closed issues:**
+
+- QoS \(prefetch\) is not restored after recovery when `TopologyRecoveryMode` is `TopologyRecoveryDisabled` [\#439](https://github.com/rabbitmq/amqp091-go/issues/439)
+
+**Merged pull requests:**
+
+- chore\(deps\): bump github/codeql-action from 4.39.1 to 4.39.3 in the github-actions group [\#432](https://github.com/rabbitmq/amqp091-go/pull/432) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Correct inaccurate statements in CLAUDE.md [\#420](https://github.com/rabbitmq/amqp091-go/pull/420) ([suchitd](https://github.com/suchitd))
+- Deprecate QosConfig.Global and document global QoS in Channel.Qos [\#418](https://github.com/rabbitmq/amqp091-go/pull/418) ([suchitd](https://github.com/suchitd))
+- Bound content body pre-allocation when frame size is unlimited [\#416](https://github.com/rabbitmq/amqp091-go/pull/416) ([suchitd](https://github.com/suchitd))
+- Enforce pre-negotiation frame size on reconnect [\#415](https://github.com/rabbitmq/amqp091-go/pull/415) ([suchitd](https://github.com/suchitd))
+- chore\(deps\): bump github/codeql-action from 4.39.0 to 4.39.1 in the github-actions group [\#414](https://github.com/rabbitmq/amqp091-go/pull/414) ([dependabot[bot]](https://github.com/apps/dependabot))
+- chore\(deps\): bump github/codeql-action from 4.38.3 to 4.39.0 in the github-actions group [\#412](https://github.com/rabbitmq/amqp091-go/pull/412) ([dependabot[bot]](https://github.com/apps/dependabot))
+
 ## [v1.16.0](https://github.com/rabbitmq/amqp091-go/tree/v1.16.0) (2026-10-19)
 
 [Full Changelog](https://github.com/rabbitmq/amqp091-go/compare/v1.15.0...v1.16.0)
