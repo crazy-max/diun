@@ -21,7 +21,7 @@ env:
 
 jobs:
   codeql:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     permissions:
       contents: read # same as global permissions
       security-events: write # required for code scanning

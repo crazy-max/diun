@@ -21,7 +21,7 @@ on:
 
 jobs:
   labeler:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     permissions:
       contents: read # same as global permissions
       issues: write # required to update labels

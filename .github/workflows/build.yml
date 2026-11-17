@@ -26,7 +26,7 @@ env:
 
 jobs:
   prepare:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     outputs:
       validate-includes: ${{ steps.validate.outputs.matrix }}
     steps:
@@ -49,7 +49,7 @@ jobs:
           GOLANGCI_LINT_MULTIPLATFORM: 1
 
   validate:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     needs:
       - prepare
     strategy:
@@ -81,7 +81,7 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - ubuntu-latest
+          - ubuntu-26.04
           - macos-26
           - macos-26-intel
           - windows-2025
@@ -152,7 +152,7 @@ jobs:
 
   test-integration:
     name: test-integration (${{ matrix.suite }})
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     permissions:
       contents: read # same as global permissions
       id-token: write # for Codecov authentication
@@ -243,7 +243,7 @@ jobs:
         run: docker compose -f test/compose.yaml down --volumes --remove-orphans
 
   govulncheck:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     permissions:
       contents: read # same as global permission
       security-events: write # required to write sarif report
@@ -275,7 +275,7 @@ jobs:
       contents: read # same as global permission
       id-token: write # for signing attestation(s) with GitHub OIDC Token
     with:
-      runner: ubuntu-latest
+      runner: ubuntu-26.04
       target: artifact-all
       output: local
       artifact-name: diun
@@ -286,7 +286,7 @@ jobs:
         *.args.GIT_FETCH_HISTORY=1
 
   artifacts-finalize:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     needs:
       - artifacts
     steps:
@@ -333,7 +333,7 @@ jobs:
           if-no-files-found: error
 
   release:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     permissions:
       contents: write # required to create GitHub release
     needs:
@@ -377,7 +377,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   image-prepare:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     outputs:
       repo-slugs: |
         ${{ env.DOCKERHUB_SLUG }}
@@ -398,7 +398,7 @@ jobs:
       - test-unit
       - test-integration
     with:
-      runner: ubuntu-latest
+      runner: ubuntu-26.04
       target: image-all
       output: image
       push: ${{ github.event_name != 'pull_request' }}
@@ -428,7 +428,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
   scout:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     if: ${{ github.ref == 'refs/heads/master' }}
     permissions:
       contents: read # same as global permission
