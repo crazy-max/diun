@@ -308,7 +308,7 @@ jobs:
               mv "sbom-binary.spdx.json" "${filename}.sbom.json"
               find . -name 'sbom*.json' -exec rm {} \;
               if [ -f "provenance.sigstore.json" ]; then
-                mv "provenance.sigstore.json" "${filename}.provenance.sigstore.json"
+                mv "provenance.sigstore.json" "${filename}.sigstore.json"
               fi
             )
           done
