@@ -4,12 +4,42 @@ package integration
 
 import (
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/internal/provider/docker"
 	"github.com/stretchr/testify/require"
 )
+
+func TestLocalDigestDocker(t *testing.T) {
+	requireLocalDigestFixture(t)
+	f := newRegistryFixture(t)
+	publish := runnablePublisher(t, f)
+	publish("A")
+	image := f.image("latest").Name
+	const name = "diun-digest-running"
+	runDocker(t, "run", "-d", "--name", name, "--label", "diun.enable=true", "--label", "diun.regopt=local", image)
+	t.Cleanup(func() { runDocker(t, "rm", "-f", name) })
+	cfg := (&model.PrdDocker{}).GetDefaults()
+	cfg.Endpoint = os.Getenv("DOCKER_HOST")
+	cfg.TLSVerify = new(false)
+	diun := startDigestWatcher(t, f, &model.Providers{Docker: cfg})
+	expectDigestMetric(t, "docker", 0, 1)
+	publish("B")
+	diun.Run()
+	expectDigestMetric(t, "docker", 1, 2)
+	runDocker(t, "pull", image)
+	imageID := strings.TrimSpace(string(runCommand(t, "docker", "inspect", "--format", "{{.Image}}", name)))
+	t.Logf("running image: %s", runCommand(t, "docker", "image", "inspect", "--format", "{{json .RepoDigests}} {{json .Descriptor}}", imageID))
+	t.Logf("container identity: %s", runCommand(t, "docker", "inspect", "--format", "{{.Config.Image}} {{json .ImageManifestDescriptor}}", name))
+	expectDigestMetric(t, "docker", 1, 2)
+	diun.Run()
+	expectDigestMetric(t, "docker", 1, 3)
+	runDocker(t, "rm", "-f", name)
+	runDocker(t, "run", "-d", "--name", name, "--label", "diun.enable=true", "--label", "diun.regopt=local", image)
+	expectDigestMetric(t, "docker", 0, 3)
+}
 
 func TestDockerProvider(t *testing.T) {
 	runDocker(t, "run", "-d", "--name", "watched", "--label", "diun.enable=true", "--label", "diun.watch_repo=true", "--label", "diun.include_tags=^1\\.36\\.1$", "busybox:1.36.1", "sleep", "1800")

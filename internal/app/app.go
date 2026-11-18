@@ -24,6 +24,7 @@ import (
 	nomadPrd "github.com/crazy-max/diun/v4/internal/provider/nomad"
 	swarmPrd "github.com/crazy-max/diun/v4/internal/provider/swarm"
 	"github.com/dromara/carbon/v2"
+	"github.com/opencontainers/go-digest"
 	"github.com/panjf2000/ants/v2"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
@@ -83,6 +84,21 @@ func New(meta model.Meta, cfg *config.Config, grpcAuthority string) (*Diun, erro
 	if cfg.Metrics != nil && cfg.Metrics.Enabled != nil && *cfg.Metrics.Enabled {
 		recorder, registry := metrics.NewRecorder(meta.Version, cfg.Metrics.MetadataLabels)
 		diun.metrics = recorder
+		if cfg.Providers.Swarm != nil {
+			recorder.SetLocalDigests("swarm", func(ctx context.Context) (map[string][][]digest.Digest, error) {
+				return swarmPrd.LocalDigests(ctx, cfg.Providers.Swarm, cfg.Defaults)
+			})
+		}
+		if cfg.Providers.Kubernetes != nil {
+			recorder.SetLocalDigests("kubernetes", func(ctx context.Context) (map[string][][]digest.Digest, error) {
+				return kubernetesPrd.LocalDigests(ctx, cfg.Providers.Kubernetes, cfg.Defaults)
+			})
+		}
+		if cfg.Providers.Docker != nil {
+			recorder.SetLocalDigests("docker", func(ctx context.Context) (map[string][][]digest.Digest, error) {
+				return dockerPrd.LocalDigests(ctx, cfg.Providers.Docker, cfg.Defaults)
+			})
+		}
 		diun.metricsServer, err = metrics.NewServer(cfg.Metrics, registry)
 		if err != nil {
 			return nil, err

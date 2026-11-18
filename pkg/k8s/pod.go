@@ -10,6 +10,15 @@ import (
 
 // PodList returns Kubernetes pods
 func (c *Client) PodList(opts metav1.ListOptions) ([]v1.Pod, error) {
+	return c.podList(opts, true)
+}
+
+// PodListAll preserves replicas so callers can inspect mixed deployments.
+func (c *Client) PodListAll(opts metav1.ListOptions) ([]v1.Pod, error) {
+	return c.podList(opts, false)
+}
+
+func (c *Client) podList(opts metav1.ListOptions, deduplicate bool) ([]v1.Pod, error) {
 	var podList []v1.Pod
 
 	for _, ns := range c.namespaces {
@@ -21,7 +30,11 @@ func (c *Client) PodList(opts metav1.ListOptions) ([]v1.Pod, error) {
 			if slices.Contains(c.namespacesExcludes, pod.Namespace) {
 				continue
 			}
-			podList = appendPod(podList, pod)
+			if deduplicate {
+				podList = appendPod(podList, pod)
+			} else {
+				podList = append(podList, pod)
+			}
 		}
 	}
 

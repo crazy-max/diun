@@ -181,10 +181,16 @@ jobs:
           - suite: kubernetes
             service: kubernetes
             run: '^TestKubernetesProvider$'
+          - suite: localdigest
+            service: registry docker kubernetes
+            compose: test/localdigest.compose.yaml
+            reports: ./bin/testreports/localdigest
+            run: '^TestLocalDigest'
     env:
       TEST_RUN: ${{ matrix.run }}
       TEST_SERVICE: ${{ matrix.service }}
-      TESTREPORTS_DIR: ./bin/testreports/integration
+      TEST_COMPOSE: ${{ matrix.compose || 'test/compose.yaml' }}
+      TESTREPORTS_DIR: ${{ matrix.reports || './bin/testreports/integration' }}
     steps:
       -
         name: Checkout
@@ -203,9 +209,10 @@ jobs:
         name: Integration tests
         run: |
           if [ -n "$TEST_SERVICE" ]; then
-            docker compose -f test/compose.yaml up --build -d --wait "$TEST_SERVICE"
+            read -r -a services <<< "$TEST_SERVICE"
+            docker compose -f "$TEST_COMPOSE" up --build -d --wait "${services[@]}"
           fi
-          docker compose -f test/compose.yaml run --build --rm --no-deps tests
+          docker compose -f "$TEST_COMPOSE" run --build --rm --no-deps tests
       -
         name: Upload coverage
         if: always()
@@ -236,11 +243,11 @@ jobs:
       -
         name: Logs
         if: always()
-        run: docker compose -f test/compose.yaml logs
+        run: docker compose -f "$TEST_COMPOSE" logs
       -
         name: Cleanup
         if: always()
-        run: docker compose -f test/compose.yaml down --volumes --remove-orphans
+        run: docker compose -f "$TEST_COMPOSE" down --volumes --remove-orphans
 
   govulncheck:
     runs-on: ubuntu-26.04

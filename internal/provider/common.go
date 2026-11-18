@@ -12,7 +12,39 @@ import (
 	"github.com/crazy-max/diun/v4/pkg/registry"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
+	"go.podman.io/image/v5/docker/reference"
 )
+
+// LocalImageKey groups deployments of the same tag across digest-pinned
+// rollouts. Digest-only references retain their immutable identity.
+func LocalImageKey(name string) (string, error) {
+	named, err := reference.ParseNormalizedNamed(name)
+	if err != nil {
+		return "", err
+	}
+	if tagged, ok := named.(reference.Tagged); ok {
+		named, err = reference.WithTag(reference.TrimNamed(named), tagged.Tag())
+		if err != nil {
+			return "", err
+		}
+	}
+	return reference.TagNameOnly(named).String(), nil
+}
+
+// LocalImage selects an image for runtime inspection without sharing mutable
+// metadata with watch runs or concurrent scrapes.
+func LocalImage(name string, labels map[string]string, watchByDefault bool, defaults *model.Defaults) (string, error) {
+	if defaults != nil {
+		copy := *defaults
+		copy.Metadata = nil
+		defaults = &copy
+	}
+	img, err := validateImage(name, nil, labels, watchByDefault, defaults, false)
+	if err != nil || img.Name == "" {
+		return "", err
+	}
+	return LocalImageKey(img.Name)
+}
 
 var (
 	metadataKeyChars  = `a-zA-Z0-9_`
@@ -21,6 +53,10 @@ var (
 
 // ValidateImage returns a standard image through Docker labels
 func ValidateImage(image string, metadata, labels map[string]string, watchByDef bool, defaults *model.Defaults) (img model.Image, err error) {
+	return validateImage(image, metadata, labels, watchByDef, defaults, true)
+}
+
+func validateImage(image string, metadata, labels map[string]string, watchByDef bool, defaults *model.Defaults, warnDeprecated bool) (img model.Image, err error) {
 	img = model.Image{
 		Name: image,
 	}
@@ -62,7 +98,9 @@ func ValidateImage(image string, metadata, labels map[string]string, watchByDef 
 		case key == "diun.watch_repo":
 			if watchRepo, err := strconv.ParseBool(value); err == nil {
 				img.WatchRepo = new(watchRepo)
-				log.Warn().Str("image", image).Msg("diun.watch_repo is deprecated; use diun.watch_mode (true: all, false: tag)")
+				if warnDeprecated {
+					log.Warn().Str("image", image).Msg("diun.watch_repo is deprecated; use diun.watch_mode (true: all, false: tag)")
+				}
 			} else {
 				return img, errors.Wrapf(err, "cannot parse %q value of label %s", value, key)
 			}

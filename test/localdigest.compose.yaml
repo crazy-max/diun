@@ -1,0 +1,56 @@
+services:
+  registry:
+    extends:
+      file: registry.compose.yaml
+      service: registry
+
+  docker:
+    extends:
+      file: compose.yaml
+      service: docker
+    command:
+      - --host=tcp://0.0.0.0:2375
+      - --tls=false
+      - --insecure-registry=registry:5000
+
+  kubernetes:
+    extends:
+      file: compose.yaml
+      service: kubernetes
+    privileged: true
+    command:
+      - server
+      - --disable=traefik,servicelb,coredns,local-storage,metrics-server
+      - --tls-san=kubernetes
+      - --write-kubeconfig=/kubeconfig/config.yaml
+      - --snapshotter=native
+    volumes:
+      - ./fixtures/localdigest/registries.yaml:/etc/rancher/k3s/registries.yaml:ro
+      - kubernetes-data:/var/lib/rancher/k3s
+
+  tests:
+    build:
+      context: ..
+      target: test-integration
+    environment:
+      DOCKER_HOST: tcp://docker:2375
+      TEST_REGISTRY: http://registry:5000
+      TEST_LOCAL_DIGEST: "1"
+      TEST_RUN: ${TEST_RUN:-^TestLocalDigest}
+    depends_on:
+      registry:
+        condition: service_healthy
+      docker:
+        condition: service_healthy
+      kubernetes:
+        condition: service_healthy
+    volumes:
+      - ../bin/testreports/localdigest:/testreports
+      - go-cache:/root/.cache/go-build
+      - kubeconfig:/kubeconfig:ro
+
+volumes:
+  docker-data:
+  kubernetes-data:
+  kubeconfig:
+  go-cache:

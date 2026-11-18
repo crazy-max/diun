@@ -150,18 +150,19 @@ scrape_configs:
 Diun exposes Go runtime and process metrics from the Prometheus Go client, plus
 the following application metrics:
 
-| Metric | Type | Labels | Description |
-|--------|------|--------|-------------|
-| `diun_build_info` | Gauge | `version` | Build information for the Diun instance. |
-| `diun_watch_runs_total` | Counter | | Completed watch runs. |
-| `diun_watch_skipped_runs_total` | Counter | | Watch runs skipped because another run was already active. |
-| `diun_watch_last_run_timestamp_seconds` | Gauge | | Unix timestamp of the last completed watch run. |
-| `diun_watch_last_run_duration_seconds` | Gauge | | Duration in seconds of the last completed watch run. |
-| `diun_watch_last_run_images` | Gauge | `status` | Number of images by status in the last completed watch run. |
-| `diun_image_update_available` | Gauge | `provider`, `image` | `1` when the last check found an actionable update for the image, otherwise `0`. First-run baseline `new` results are not treated as actionable updates. |
-| `diun_image_last_check_timestamp_seconds` | Gauge | `provider`, `image` | Unix timestamp of the last completed check for the image. |
-| `diun_image_last_check_status` | Gauge | `provider`, `image`, `status` | Last check status for the image. The active status has value `1`. |
-| `diun_image_created_timestamp_seconds` | Gauge | `provider`, `image` | Unix timestamp of the image manifest creation time reported by the registry. This metric is omitted if the registry does not provide a creation timestamp. |
+| Metric                                    | Type    | Labels                        | Description                                                                                                                                                |
+| ----------------------------------------- | ------- | ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `diun_build_info`                         | Gauge   | `version`                     | Build information for the Diun instance.                                                                                                                   |
+| `diun_watch_runs_total`                   | Counter |                               | Completed watch runs.                                                                                                                                      |
+| `diun_watch_skipped_runs_total`           | Counter |                               | Watch runs skipped because another run was already active.                                                                                                 |
+| `diun_watch_last_run_timestamp_seconds`   | Gauge   |                               | Unix timestamp of the last completed watch run.                                                                                                            |
+| `diun_watch_last_run_duration_seconds`    | Gauge   |                               | Duration in seconds of the last completed watch run.                                                                                                       |
+| `diun_watch_last_run_images`              | Gauge   | `status`                      | Number of images by status in the last completed watch run.                                                                                                |
+| `diun_image_update_available`             | Gauge   | `provider`, `image`           | `1` when the last check found an actionable update for the image, otherwise `0`. First-run baseline `new` results are not treated as actionable updates.   |
+| `diun_image_last_check_timestamp_seconds` | Gauge   | `provider`, `image`           | Unix timestamp of the last completed check for the image.                                                                                                  |
+| `diun_image_last_check_status`            | Gauge   | `provider`, `image`, `status` | Last check status for the image. The active status has value `1`.                                                                                          |
+| `diun_image_created_timestamp_seconds`    | Gauge   | `provider`, `image`           | Unix timestamp of the image manifest creation time reported by the registry. This metric is omitted if the registry does not provide a creation timestamp. |
+| `diun_image_local_digest_mismatch`        | Gauge   | `provider`, `image`           | Runtime digest comparison; see [local comparison](#local-digest-comparison).                                                                               |
 
 By default, the per-image metrics intentionally use only the `provider`,
 `image`, and `status` labels to keep cardinality predictable across Docker,
@@ -171,6 +172,39 @@ per-image metrics.
 
 See [Docker Compose with Prometheus metrics](../faq.md#docker-compose-with-prometheus-metrics)
 for a complete Compose example.
+
+### Local digest comparison
+
+`diun_image_local_digest_mismatch` compares watched deployments with the
+registry digest recorded by Diun's last watch run. It refreshes on every scrape
+without querying the registry:
+
+- `1`: at least one deployed container has a known digest mismatch.
+- `0`: all compared containers match.
+- Absent: no deployment can be compared, or the result is unknown. This does not
+  mean the deployment is up to date.
+
+Pulling and recreating containers to the recorded digest clears the mismatch
+without waiting for another watch run. An unchanged registry poll alone does
+not clear it. `diun_image_update_available` still describes the last registry
+check and is unaffected.
+
+Supported providers honor their existing watch settings:
+
+- **Docker:** compares the images backing watched containers.
+- **Swarm:** compares running tasks, including old tasks during rollouts.
+  Requires permission to list services and tasks.
+- **Kubernetes:** compares regular containers across all selected Pod replicas.
+  Uses existing Pod-list permissions; opaque runtime image IDs are unknown.
+
+Provider lookups share a three-second deadline. A failed lookup does not
+suppress other providers. Unknown digests omit the series unless a known
+mismatch exists. Metadata labels identify the recorded watch entry; the
+comparison still includes all watched deployments of that provider and image.
+
+A mismatch does not prove an image is older: it can also mean the deployment is
+ahead of Diun's last poll, or a multi-platform index changed without changing
+the running platform image.
 
 ## Alert example
 

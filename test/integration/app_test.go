@@ -89,10 +89,11 @@ func runApplicationFixture(t *testing.T, fixtureName, imageName, tag string) {
 	runCommand(t, "diun", "healthcheck", "--raw")
 }
 
-func runCommand(t *testing.T, name string, args ...string) {
+func runCommand(t *testing.T, name string, args ...string) []byte {
 	t.Helper()
 	ctx, cancel := context.WithTimeoutCause(context.Background(), 2*time.Minute, errors.New("fixture command timed out"))
 	defer cancel()
 	output, err := exec.CommandContext(ctx, name, args...).CombinedOutput()
 	require.NoError(t, err, "%s %v: %s", name, args, output)
+	return output
 }
