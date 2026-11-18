@@ -65,8 +65,9 @@ type ImageStatus string
 
 // NotifyOn constants
 const (
-	NotifyOnNew    = NotifyOn(ImageStatusNew)
-	NotifyOnUpdate = NotifyOn(ImageStatusUpdate)
+	NotifyOnNew      = NotifyOn(ImageStatusNew)
+	NotifyOnUpdate   = NotifyOn(ImageStatusUpdate)
+	NotifyOnUnchange = NotifyOn(ImageStatusUnchange)
 )
 
 // NotifyOn holds notify status type
@@ -80,10 +81,5 @@ var NotifyOnDefaults = []NotifyOn{
 
 // Valid checks notify status is valid
 func (ns *NotifyOn) Valid() bool {
-	return ns.OneOf(NotifyOnDefaults)
-}
-
-// OneOf checks if notify status is one of the values in the list
-func (ns *NotifyOn) OneOf(nsl []NotifyOn) bool {
-	return slices.Contains(nsl, *ns)
+	return slices.Contains(NotifyOnDefaults, *ns) || *ns == NotifyOnUnchange
 }

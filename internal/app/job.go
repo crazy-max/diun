@@ -4,6 +4,7 @@ import (
 	stderrors "errors"
 	"fmt"
 	"regexp"
+	"slices"
 
 	"github.com/crazy-max/diun/v4/internal/matcher"
 	"github.com/crazy-max/diun/v4/internal/model"
@@ -226,9 +227,6 @@ func (di *Diun) runJob(job model.Job) (entry model.NotifEntry) {
 		return
 	}
 	sublog.Debug().Msg("Manifest saved to database")
-	if entry.Status == model.ImageStatusUnchange {
-		return
-	}
 
 	if job.FirstCheck && !*di.cfg.Watch.FirstCheckNotif {
 		sublog.Debug().Msg("Skipping notification (first check)")
@@ -236,7 +234,7 @@ func (di *Diun) runJob(job model.Job) (entry model.NotifEntry) {
 	}
 
 	notifyOn := model.NotifyOn(entry.Status)
-	if !notifyOn.OneOf(job.Image.NotifyOn) {
+	if !slices.Contains(job.Image.NotifyOn, notifyOn) {
 		sublog.Debug().Msgf("Skipping notification (%s not part of specified notify status)", entry.Status)
 		return
 	}

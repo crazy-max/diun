@@ -197,3 +197,16 @@ func newTestClient(t *testing.T, overrides Options) *Client {
 	require.NoError(t, err)
 	return client
 }
+
+func TestDefaultTemplatesDescribeUnchangedImage(t *testing.T) {
+	client := newTestClient(t, Options{
+		TemplateTitle: model.NotifDefaultTemplateTitle,
+		TemplateBody:  model.NotifDefaultTemplateBody,
+	})
+	client.opts.Entry.Status = model.ImageStatusUnchange
+	title, body, err := client.RenderMarkdown()
+	require.NoError(t, err)
+	assert.Contains(t, string(title), "has not changed")
+	assert.Contains(t, string(body), "has not changed")
+	assert.NotContains(t, string(body), "has been updated")
+}

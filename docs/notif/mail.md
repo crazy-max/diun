@@ -62,10 +62,10 @@ Notifications can be sent through SMTP.
 
 ```
 Docker tag {{ if .Entry.Image.HubLink }}[**{{ .Entry.Image }}**]({{ .Entry.Image.HubLink }}){{ else }}**{{ .Entry.Image }}**{{ end }}
-which you subscribed to through {{ .Entry.Provider }} provider {{ if (eq .Entry.Status "new") }}is available{{ else }}has been updated{{ end }}
+which you subscribed to through {{ .Entry.Provider }} provider {{ if (eq .Entry.Status "new") }}is available{{ else if (eq .Entry.Status "unchange") }}has not changed{{ else }}has been updated{{ end }}
 on **{{ .Entry.Image.Domain }}** registry (triggered by _{{ escapeMarkdown .Meta.Hostname }}_ host).
 
-This image has been {{ if (eq .Entry.Status "new") }}created{{ else }}updated{{ end }} at
+{{ if (eq .Entry.Status "unchange") }}This image was created at{{ else }}This image has been {{ if (eq .Entry.Status "new") }}created{{ else }}updated{{ end }} at{{ end }}
 <code>{{ .Entry.Manifest.Created.Format "Jan 02, 2006 15:04:05 UTC" }}</code> with digest <code>{{ .Entry.Manifest.Digest }}</code>
 for <code>{{ .Entry.Manifest.Platform }}</code> platform.
 

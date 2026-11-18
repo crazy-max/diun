@@ -59,8 +59,11 @@ Per-image watch modes override defaults.
 
 ### `notifyOn`
 
-List of status to be notified. Can be one of `new` or `update`.
-(default `new,update`)
+List of image statuses that trigger notifications. (default `new,update`)
+
+* `new`: The image is not yet recorded in Diun's database.
+* `update`: The image on the registry has changed since the previous scan.
+* `unchange`: The image on the registry has not changed since the previous scan.
 
 !!! example "Config file"
     ```yaml

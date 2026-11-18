@@ -62,7 +62,7 @@ Allow sending notifications to your Rocket.Chat channel.
 ### Default `templateBody`
 
 ```
-Docker tag {{ .Entry.Image }} which you subscribed to through {{ .Entry.Provider }} provider has been {{ if (eq .Entry.Status "new") }}newly added{{ else }}updated{{ end }} on {{ .Meta.Hostname }}.
+Docker tag {{ .Entry.Image }} which you subscribed to through {{ .Entry.Provider }} provider has been {{ if (eq .Entry.Status "new") }}newly added{{ else if (eq .Entry.Status "unchange") }}unchanged{{ else }}updated{{ end }} on {{ .Meta.Hostname }}.
 ```
 
 ## Sample

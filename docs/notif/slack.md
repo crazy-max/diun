@@ -35,7 +35,7 @@ You can send notifications to your Slack channel using an [incoming webhook URL]
 ### Default `templateBody`
 
 ```
-<!channel> Docker tag {{ if .Entry.Image.HubLink }}<{{ .Entry.Image.HubLink }}|`{{ .Entry.Image }}`>{{ else }}`{{ .Entry.Image }}`{{ end }}  {{ if (eq .Entry.Status "new") }}available{{ else }}updated{{ end }}.
+<!channel> Docker tag {{ if .Entry.Image.HubLink }}<{{ .Entry.Image.HubLink }}|`{{ .Entry.Image }}`>{{ else }}`{{ .Entry.Image }}`{{ end }}  {{ if (eq .Entry.Status "new") }}available{{ else if (eq .Entry.Status "unchange") }}unchanged{{ else }}updated{{ end }}.
 ```
 
 ## Sample
