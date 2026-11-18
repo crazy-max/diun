@@ -83,6 +83,9 @@ notif:
     qos: 0
   ntfy:
     endpoint: https://ntfy.sh
+    headers:
+      P-Access-Token-Id: test-id
+      P-Access-Token: test-token
     topic: diun-acce65a0-b777-46f9-9a11-58c67d1579c4
     priority: 3
     tags:

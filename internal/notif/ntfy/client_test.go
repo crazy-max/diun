@@ -12,6 +12,76 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestSendHeaders(t *testing.T) {
+	tests := []struct {
+		name        string
+		headers     map[string]string
+		token       string
+		wantAuth    string
+		wantTokenID string
+		wantToken   string
+	}{
+		{
+			name: "no custom headers",
+		},
+		{
+			name: "proxy headers and ntfy token",
+			headers: map[string]string{
+				"p-access-token-id": "proxy-id",
+				"p-access-token":    "proxy-token",
+				"authorization":     "custom-auth",
+				"content-type":      "text/plain",
+				"user-agent":        "custom-agent",
+			},
+			token:       "ntfy-token",
+			wantAuth:    "Bearer ntfy-token",
+			wantTokenID: "proxy-id",
+			wantToken:   "proxy-token",
+		},
+		{
+			name: "custom authorization without ntfy token",
+			headers: map[string]string{
+				"authorization": "custom-auth",
+			},
+			wantAuth: "custom-auth",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var gotHeaders http.Header
+			ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				gotHeaders = r.Header.Clone()
+				w.WriteHeader(http.StatusOK)
+			}))
+			defer ts.Close()
+
+			cfg := (&model.NotifNtfy{}).GetDefaults()
+			cfg.Endpoint = ts.URL
+			cfg.Topic = "diun"
+			cfg.Headers = tt.headers
+			cfg.Token = tt.token
+			image, err := registry.ParseImage(registry.ParseImageOptions{Name: "alpine:latest"})
+			require.NoError(t, err)
+
+			err = New(cfg, model.Meta{UserAgent: "diun-test"}).Send(model.NotifEntry{
+				Status:   model.ImageStatusUpdate,
+				Provider: "docker",
+				Image:    image,
+			})
+			require.NoError(t, err)
+			require.Equal(t, tt.wantTokenID, gotHeaders.Get("P-Access-Token-Id"))
+			require.Equal(t, tt.wantToken, gotHeaders.Get("P-Access-Token"))
+			require.Equal(t, tt.wantAuth, gotHeaders.Get("Authorization"))
+			require.Equal(t, "application/json", gotHeaders.Get("Content-Type"))
+			require.Equal(t, "diun-test", gotHeaders.Get("User-Agent"))
+			if tt.wantAuth != "" {
+				require.Equal(t, []string{tt.wantAuth}, gotHeaders.Values("Authorization"))
+			}
+		})
+	}
+}
+
 func TestSendSetsIcon(t *testing.T) {
 	tests := []struct {
 		name     string
