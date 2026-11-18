@@ -13,7 +13,7 @@ import (
 )
 
 func TestServerBearerToken(t *testing.T) {
-	_, registry := NewRecorder("test")
+	_, registry := NewRecorder("test", nil)
 	server, err := NewServer(&model.Metrics{
 		Addr:  "127.0.0.1:0",
 		Path:  "/metrics",
@@ -40,7 +40,7 @@ func TestServerTokenFile(t *testing.T) {
 	err := os.WriteFile(tokenFile, []byte("secret"), 0o600)
 	require.NoError(t, err)
 
-	_, registry := NewRecorder("test")
+	_, registry := NewRecorder("test", nil)
 	server, err := NewServer(&model.Metrics{
 		Addr:      "127.0.0.1:0",
 		Path:      "/metrics",

@@ -1,0 +1,7 @@
+metrics:
+  metadataLabels:
+    - release-channel
+
+providers:
+  file:
+    filename: ./fixtures/file.yml

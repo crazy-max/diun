@@ -3,6 +3,7 @@ package config
 import (
 	"os"
 	"path"
+	"regexp"
 
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/gonfig"
@@ -10,6 +11,8 @@ import (
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 )
+
+var metricsMetadataKeyRegexp = regexp.MustCompile(`^[a-zA-Z0-9_]+$`)
 
 // Config holds configuration details
 type Config struct {
@@ -78,6 +81,11 @@ func (cfg *Config) validate() error {
 	}
 	if cfg.Providers == nil {
 		return errors.New("at least one provider is required")
+	}
+	for _, key := range cfg.Metrics.MetadataLabels {
+		if !metricsMetadataKeyRegexp.MatchString(key) {
+			return errors.Errorf("invalid metrics metadata label key %q: only letters, digits, and underscores are allowed", key)
+		}
 	}
 	return validator.New().Struct(cfg)
 }

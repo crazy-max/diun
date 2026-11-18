@@ -99,6 +99,11 @@ func TestLoadFile(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name:    "Fail on invalid metrics metadata label",
+			cfg:     "./fixtures/config.err.metrics.yml",
+			wantErr: true,
+		},
+		{
 			name: "Success",
 			cfg:  "./fixtures/config.test.yml",
 			wantData: &Config{
@@ -455,6 +460,7 @@ func TestLoadEnv(t *testing.T) {
 				"DIUN_METRICS_ADDR=127.0.0.1:9090",
 				"DIUN_METRICS_PATH=/prometheus",
 				"DIUN_METRICS_TOKENFILE=./fixtures/run_secrets_username",
+				"DIUN_METRICS_METADATALABELS=channel,environment",
 				"DIUN_PROVIDERS_DOCKER=true",
 			},
 			expected: &Config{
@@ -466,6 +472,10 @@ func TestLoadEnv(t *testing.T) {
 					Addr:      "127.0.0.1:9090",
 					Path:      "/prometheus",
 					TokenFile: "./fixtures/run_secrets_username",
+					MetadataLabels: []string{
+						"channel",
+						"environment",
+					},
 				},
 				Notif:   nil,
 				RegOpts: nil,
@@ -870,6 +880,50 @@ func TestWatchModeConfiguration(t *testing.T) {
 			image := model.Image{}
 			require.NoError(t, image.ResolveWatchMode(cfg.Defaults))
 			assert.Equal(t, tt.want, image.WatchMode)
+		})
+	}
+}
+
+func TestValidateMetricsMetadataLabels(t *testing.T) {
+	cases := []struct {
+		name    string
+		labels  []string
+		wantErr string
+	}{
+		{
+			name: "Default labels",
+		},
+		{
+			name:   "Valid labels",
+			labels: []string{"channel", "environment"},
+		},
+		{
+			name:    "Duplicate labels",
+			labels:  []string{"channel", "channel"},
+			wantErr: "'MetadataLabels' failed on the 'unique' tag",
+		},
+		{
+			name:    "Empty label",
+			labels:  []string{""},
+			wantErr: `invalid metrics metadata label key ""`,
+		},
+	}
+	for _, tt := range cases {
+		t.Run(tt.name, func(t *testing.T) {
+			cfg := &Config{
+				Db:        &model.Db{Path: filepath.Join(t.TempDir(), "diun.db")},
+				Watch:     (&model.Watch{}).GetDefaults(),
+				Metrics:   (&model.Metrics{}).GetDefaults(),
+				Providers: &model.Providers{},
+			}
+			cfg.Metrics.MetadataLabels = tt.labels
+
+			err := cfg.validate()
+			if tt.wantErr != "" {
+				require.ErrorContains(t, err, tt.wantErr)
+				return
+			}
+			require.NoError(t, err)
 		})
 	}
 }

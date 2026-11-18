@@ -81,7 +81,7 @@ func New(meta model.Meta, cfg *config.Config, grpcAuthority string) (*Diun, erro
 		}
 	}
 	if cfg.Metrics != nil && cfg.Metrics.Enabled != nil && *cfg.Metrics.Enabled {
-		recorder, registry := metrics.NewRecorder(meta.Version)
+		recorder, registry := metrics.NewRecorder(meta.Version, cfg.Metrics.MetadataLabels)
 		diun.metrics = recorder
 		diun.metricsServer, err = metrics.NewServer(cfg.Metrics, registry)
 		if err != nil {

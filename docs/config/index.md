@@ -163,6 +163,8 @@ All configuration from file can be transposed into environment variables. As an 
       enabled: false
       addr: ":9090"
       path: /metrics
+      metadataLabels:
+        - channel
 
     notif:
       gotify:
@@ -228,6 +230,7 @@ Can be transposed to:
     DIUN_METRICS_ENABLED=false
     DIUN_METRICS_ADDR=:9090
     DIUN_METRICS_PATH=/metrics
+    DIUN_METRICS_METADATALABELS=channel
 
     DIUN_NOTIF_GOTIFY_ENDPOINT=http://gotify.foo.com
     DIUN_NOTIF_GOTIFY_TOKEN=Token123456
