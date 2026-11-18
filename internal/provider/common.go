@@ -1,6 +1,7 @@
 package provider
 
 import (
+	"maps"
 	"regexp"
 	"strconv"
 	"strings"
@@ -30,7 +31,8 @@ func ValidateImage(image string, metadata, labels map[string]string, watchByDef 
 		img.SortTags = defaults.SortTags
 		img.IncludeTags = defaults.IncludeTags
 		img.ExcludeTags = defaults.ExcludeTags
-		img.Metadata = defaults.Metadata
+		// clone so that images never share (and mutate) the defaults map
+		img.Metadata = maps.Clone(defaults.Metadata)
 	}
 
 	if enableStr, ok := labels["diun.enable"]; ok {
