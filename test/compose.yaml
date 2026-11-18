@@ -1,4 +1,9 @@
 services:
+  registry:
+    extends:
+      file: registry.compose.yaml
+      service: registry
+
   docker:
     image: docker:29-dind
     privileged: true
@@ -63,7 +68,10 @@ services:
       DOCKER_HOST: tcp://docker:2375
       NOMAD_ADDR: http://nomad:4646
       TEST_RUN: ${TEST_RUN:-.}
+      TEST_REGISTRY: http://registry:5000
     depends_on:
+      registry:
+        condition: service_healthy
       docker:
         condition: service_healthy
       containerd:

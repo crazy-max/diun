@@ -1,0 +1,27 @@
+services:
+  registry:
+    image: registry:3
+    environment:
+      REGISTRY_STORAGE_DELETE_ENABLED: "true"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:5000/v2/"]
+      interval: 1s
+      timeout: 5s
+      retries: 30
+
+  tests:
+    build:
+      context: ..
+      target: test-integration
+    environment:
+      TEST_REGISTRY: http://registry:5000
+      TEST_RUN: ${TEST_RUN:-^TestRegistry}
+    depends_on:
+      registry:
+        condition: service_healthy
+    volumes:
+      - ../bin/testreports/registry:/testreports
+      - go-cache:/root/.cache/go-build
+
+volumes:
+  go-cache:
