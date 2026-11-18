@@ -10,6 +10,7 @@
     "github-actions",
     "custom.regex"
   ],
+  "ignorePaths": ["vendor/**"],
   "postUpdateOptions": ["gomodTidy", "gomodVendor"],
   "prHourlyLimit": 0,
   "minimumReleaseAge": "2 days",
