@@ -884,6 +884,50 @@ func TestWatchModeConfiguration(t *testing.T) {
 	}
 }
 
+func TestValidateMetricsMetadataLabels(t *testing.T) {
+	cases := []struct {
+		name    string
+		labels  []string
+		wantErr string
+	}{
+		{
+			name: "Default labels",
+		},
+		{
+			name:   "Valid labels",
+			labels: []string{"channel", "environment"},
+		},
+		{
+			name:    "Duplicate labels",
+			labels:  []string{"channel", "channel"},
+			wantErr: "'MetadataLabels' failed on the 'unique' tag",
+		},
+		{
+			name:    "Empty label",
+			labels:  []string{""},
+			wantErr: `invalid metrics metadata label key ""`,
+		},
+	}
+	for _, tt := range cases {
+		t.Run(tt.name, func(t *testing.T) {
+			cfg := &Config{
+				Db:        &model.Db{Path: filepath.Join(t.TempDir(), "diun.db")},
+				Watch:     (&model.Watch{}).GetDefaults(),
+				Metrics:   (&model.Metrics{}).GetDefaults(),
+				Providers: &model.Providers{},
+			}
+			cfg.Metrics.MetadataLabels = tt.labels
+
+			err := cfg.validate()
+			if tt.wantErr != "" {
+				require.ErrorContains(t, err, tt.wantErr)
+				return
+			}
+			require.NoError(t, err)
+		})
+	}
+}
+
 func TestValidation(t *testing.T) {
 	cases := []struct {
 		name string
