@@ -7,6 +7,8 @@ type NotifMatrix struct {
 	UserFile      string             `yaml:"userFile,omitempty" json:"userFile,omitempty" validate:"omitempty,file"`
 	Password      string             `yaml:"password,omitempty" json:"password,omitempty" validate:"omitempty"`
 	PasswordFile  string             `yaml:"passwordFile,omitempty" json:"passwordFile,omitempty" validate:"omitempty,file"`
+	Token         string             `yaml:"token,omitempty" json:"token,omitempty" validate:"omitempty"`
+	TokenFile     string             `yaml:"tokenFile,omitempty" json:"tokenFile,omitempty" validate:"omitempty,file"`
 	RoomID        string             `yaml:"roomID,omitempty" json:"roomID,omitempty" validate:"required"`
 	MsgType       NotifMatrixMsgType `yaml:"msgType,omitempty" json:"msgType,omitempty" validate:"required,oneof=notice text"`
 	TemplateBody  string             `yaml:"templateBody,omitempty" json:"templateBody,omitempty" validate:"required"`
