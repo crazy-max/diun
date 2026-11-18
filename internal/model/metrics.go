@@ -7,7 +7,7 @@ type Metrics struct {
 	Path           string   `yaml:"path,omitempty" json:"path,omitempty" validate:"required,startswith=/"`
 	Token          string   `yaml:"token,omitempty" json:"token,omitempty"`
 	TokenFile      string   `yaml:"tokenFile,omitempty" json:"tokenFile,omitempty" validate:"omitempty,file"`
-	MetadataLabels []string `yaml:"metadataLabels,omitempty" json:"metadataLabels,omitempty" validate:"omitempty,unique,dive,required"`
+	MetadataLabels []string `yaml:"metadataLabels,omitempty" json:"metadataLabels,omitempty" validate:"omitempty,unique"`
 }
 
 // GetDefaults gets the default values.

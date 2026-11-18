@@ -12,6 +12,8 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+var metricsMetadataKeyRegexp = regexp.MustCompile(`^[a-zA-Z0-9_]+$`)
+
 // Config holds configuration details
 type Config struct {
 	Db        *model.Db        `yaml:"db,omitempty" json:"db,omitempty"`
@@ -80,9 +82,8 @@ func (cfg *Config) validate() error {
 	if cfg.Providers == nil {
 		return errors.New("at least one provider is required")
 	}
-	metadataKeyRegexp := regexp.MustCompile(`^[a-zA-Z0-9_]+$`)
 	for _, key := range cfg.Metrics.MetadataLabels {
-		if !metadataKeyRegexp.MatchString(key) {
+		if !metricsMetadataKeyRegexp.MatchString(key) {
 			return errors.Errorf("invalid metrics metadata label key %q: only letters, digits, and underscores are allowed", key)
 		}
 	}
