@@ -177,19 +177,20 @@ Include created and exited containers too (default `false`).
 
 You can configure more finely the way to analyze the image of your container through Docker labels:
 
-| Name                  | Default                          | Description                                                                                                                                                            |
-| --------------------- | -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `diun.enable`         |                                  | Set to true to enable image analysis of this container                                                                                                                 |
-| `diun.regopt`         |                                  | [Registry options](../config/regopts.md) name to use                                                                                                                   |
-| `diun.watch_mode`     | `tag`                            | [Watch mode](../config/defaults.md#watchmode): `tag`, `all`, `semver`, or `semver+prereleases`                                                                         |
-| `diun.notify_on`      | `new;update`                     | Semicolon separated list of status to be notified: `new`, `update`, `unchange`                                                                                         |
-| `diun.sort_tags`      | `reverse`                        | [Sort tags method](../faq.md#tags-sorting-when-using-watch_mode) when watching repository tags. One of `default`, `reverse`, `semver`, `lexicographical`               |
-| `diun.max_tags`       | `0`                              | Maximum number of tags to watch when watching repository tags. `0` means all of them                                                                                   |
-| `diun.include_tags`   |                                  | Semicolon separated list of regular expressions to include tags. If set, replaces `defaults.includeTags` for this image. Can be useful when watching repository tags   |
-| `diun.exclude_tags`   |                                  | Semicolon separated list of regular expressions to exclude tags. If set, replaces `defaults.excludeTags` for this image. Can be useful when watching repository tags   |
-| `diun.hub_link`       | _automatic_                      | Set registry hub link for this image                                                                                                                                   |
-| `diun.platform`       | _automatic_                      | Platform to use (e.g. `linux/amd64`)                                                                                                                                   |
-| `diun.metadata.*`     | See [below](#default-metadata)   | Additional metadata that can be used in [notification template](../faq.md#notification-template) (e.g. `diun.metadata.foo=bar`)                                        |
+| Name                         | Default                          | Description                                                                                                                                                            |
+| ---------------------------- | -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `diun.enable`                |                                  | Set to true to enable image analysis of this container                                                                                                                 |
+| `diun.regopt`                |                                  | [Registry options](../config/regopts.md) name to use                                                                                                                   |
+| `diun.watch_mode`            | `tag`                            | [Watch mode](../config/defaults.md#watchmode): `tag`, `all`, `semver`, or `semver+prereleases`                                                                         |
+| `diun.notify_on`             | `new;update`                     | Semicolon separated list of status to be notified: `new`, `update`, `unchange`                                                                                         |
+| `diun.sort_tags`             | `reverse`                        | [Sort tags method](../faq.md#tags-sorting-when-using-watch_mode) when watching repository tags. One of `default`, `reverse`, `semver`, `lexicographical`               |
+| `diun.max_tags`              | `0`                              | Maximum number of tags to watch when watching repository tags. `0` means all of them                                                                                   |
+| `diun.include_tags`          |                                  | Semicolon separated list of regular expressions to include tags. If set, replaces `defaults.includeTags` for this image. Can be useful when watching repository tags   |
+| `diun.exclude_tags`          |                                  | Semicolon separated list of regular expressions to exclude tags. If set, replaces `defaults.excludeTags` for this image. Can be useful when watching repository tags   |
+| `diun.assume_immutable_tags` | `false`                          | [Assume tags are immutable](../config/defaults.md#assumeimmutabletags) after their first successful scan.                                                              |
+| `diun.hub_link`              | _automatic_                      | Set registry hub link for this image                                                                                                                                   |
+| `diun.platform`              | _automatic_                      | Platform to use (e.g. `linux/amd64`)                                                                                                                                   |
+| `diun.metadata.*`            | See [below](#default-metadata)   | Additional metadata that can be used in [notification template](../faq.md#notification-template) (e.g. `diun.metadata.foo=bar`)                                        |
 
 ## Default metadata
 

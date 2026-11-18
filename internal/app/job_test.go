@@ -94,6 +94,7 @@ func TestRunJobNotifiesUnchangedOnlyWhenRequested(t *testing.T) {
 func TestRunJob(t *testing.T) {
 	for _, tt := range []struct {
 		name             string
+		immutable        *bool
 		cached           string
 		firstCheck       bool
 		firstCheckNotif  bool
@@ -108,6 +109,36 @@ func TestRunJob(t *testing.T) {
 		wantNotification bool
 		wantHubLink      string
 	}{
+		{
+			name:             "immutable new image still fetched",
+			immutable:        new(true),
+			notifyOn:         model.NotifyOnDefaults,
+			wantStatus:       model.ImageStatusNew,
+			wantUpdate:       true,
+			wantNotification: true,
+		},
+		{
+			name:       "immutable known image skipped even with unchanged notifications",
+			immutable:  new(true),
+			cached:     "stale",
+			notifyOn:   []model.NotifyOn{model.NotifyOnUnchange},
+			wantStatus: model.ImageStatusSkip,
+		},
+		{
+			name:             "explicitly mutable image detects updates",
+			immutable:        new(false),
+			cached:           "stale",
+			notifyOn:         model.NotifyOnDefaults,
+			wantStatus:       model.ImageStatusUpdate,
+			wantUpdate:       true,
+			wantNotification: true,
+		},
+		{
+			name:            "immutable unknown image must exist",
+			immutable:       new(true),
+			registryFailure: true,
+			wantStatus:      model.ImageStatusError,
+		},
 		{
 			name:             "new image",
 			cached:           "",
@@ -333,6 +364,9 @@ func TestRunJob(t *testing.T) {
 			var cached registry.Manifest
 			if tt.cached != "" {
 				cached = registry.Manifest{Name: image.Name(), Tag: image.Tag, Digest: digest.FromString("old manifest")}
+				cached.Labels = map[string]string{"example": "preserved"}
+				cached.Platform = "linux/amd64"
+				cached.Created = new(time.Date(2025, 1, 1, 0, 0, 0, 0, time.UTC))
 				if tt.cached == "matching" {
 					cached.Digest = remoteDigest
 				}
@@ -357,9 +391,10 @@ func TestRunJob(t *testing.T) {
 				FirstCheck:      tt.firstCheck,
 				HubLinkOverride: tt.hubLinkOverride,
 				Image: model.Image{
-					NotifyOn:    tt.notifyOn,
-					IncludeTags: tt.include,
-					ExcludeTags: tt.exclude,
+					NotifyOn:            tt.notifyOn,
+					IncludeTags:         tt.include,
+					ExcludeTags:         tt.exclude,
+					AssumeImmutableTags: tt.immutable,
 				},
 			})
 			require.Equal(t, tt.wantStatus, entry.Status)
@@ -378,6 +413,19 @@ func TestRunJob(t *testing.T) {
 			}
 			if tt.wantStatus == model.ImageStatusSkip {
 				require.Zero(t, requests.Load(), "skipped images must not contact the registry")
+			}
+			if tt.immutable != nil && *tt.immutable && tt.cached != "" {
+				require.Equal(t, cached, entry.Manifest)
+				// Disabling the assumption resumes comparison against the preserved digest.
+				resumed := di.runJob(model.Job{
+					Provider: "file",
+					RegImage: image,
+					Registry: client,
+					Image:    model.Image{AssumeImmutableTags: new(false)},
+				})
+				require.Equal(t, model.ImageStatusUpdate, resumed.Status)
+				require.True(t, resumed.UpdateAvailable())
+				require.Equal(t, remoteDigest, resumed.Manifest.Digest)
 			}
 			if tt.wantNotification {
 				require.Len(t, reports, 1)

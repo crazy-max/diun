@@ -20,6 +20,7 @@ defaults:
     - latest
   excludeTags:
     - dev
+  assumeImmutableTags: false
   metadata:
     foo: bar
 ```
@@ -142,6 +143,34 @@ with duplicates removed. Image-level `include_tags` still replace defaults.
 
 !!! abstract "Environment variables"
     * `DIUN_DEFAULTS_EXCLUDETAGS=dev`
+
+### `assumeImmutableTags`
+
+Assume tags never change after their first successful scan (default `false`).
+Images already recorded in Diun's database are skipped without checking their
+remote digest or updating their stored manifest. New images are still fetched
+and validated normally, with complete metadata available to notifications.
+
+Use this for immutable release tags when you only want to discover new tags.
+Combine it with `watchMode: all`, `semver`, or `semver+prereleases` to discover
+tags. Repository tag listing still occurs. With `watchMode: tag`, the selected
+image is checked only until it is successfully recorded.
+
+Republished tags, deleted images, and platform changes are not detected while
+this option is enabled. Known images count as skipped, not unchanged, and do
+not trigger notifications or set the update-available metric. `notifyOn` and
+`firstCheckNotif` still control notifications for newly discovered images.
+Disabling this option resumes checks against the last stored digest.
+
+!!! example "Config file"
+    ```yaml
+    defaults:
+      watchMode: semver
+      assumeImmutableTags: true
+    ```
+
+!!! abstract "Environment variables"
+    * `DIUN_DEFAULTS_ASSUMEIMMUTABLETAGS=true`
 
 ### `metadata`
 
