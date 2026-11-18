@@ -59,6 +59,7 @@ func New(opts Options) (*Client, error) {
 	ctx := context.Background()
 	_, err = cli.ServerVersion(ctx, mobyclient.ServerVersionOptions{})
 	if err != nil {
+		_ = cli.Close()
 		return nil, err
 	}
 
