@@ -26,6 +26,11 @@ type Options struct {
 
 // New initializes a new Docker API client with default values
 func New(opts Options) (*Client, error) {
+	return NewWithContext(context.Background(), opts)
+}
+
+// NewWithContext uses ctx for initialization and subsequent API requests.
+func NewWithContext(ctx context.Context, opts Options) (*Client, error) {
 	var dockerOpts []mobyclient.Opt
 	if opts.Endpoint != "" {
 		dockerOpts = append(dockerOpts, mobyclient.WithHost(opts.Endpoint))
@@ -56,7 +61,6 @@ func New(opts Options) (*Client, error) {
 		return nil, err
 	}
 
-	ctx := context.Background()
 	_, err = cli.ServerVersion(ctx, mobyclient.ServerVersionOptions{})
 	if err != nil {
 		_ = cli.Close()

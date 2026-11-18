@@ -1,11 +1,18 @@
 package metrics
 
 import (
+	"context"
+	"encoding/json"
 	"fmt"
+	"maps"
+	"slices"
 	"sync"
 	"time"
 
 	"github.com/crazy-max/diun/v4/internal/model"
+	"github.com/crazy-max/diun/v4/internal/provider"
+	"github.com/opencontainers/go-digest"
+	ocispecs "github.com/opencontainers/image-spec/specs-go/v1"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/collectors"
 )
@@ -33,18 +40,23 @@ type Recorder struct {
 	lastRunDuration       time.Duration
 	lastRunImages         map[model.ImageStatus]int
 	images                map[imageKey]imageState
+	localDigests          map[string]LocalDigestSource
 
-	buildInfoDesc               *prometheus.Desc
-	watchRunsTotalDesc          *prometheus.Desc
-	watchSkippedRunsTotalDesc   *prometheus.Desc
-	watchLastRunTimestampDesc   *prometheus.Desc
-	watchLastRunDurationDesc    *prometheus.Desc
-	watchLastRunImagesDesc      *prometheus.Desc
-	imageUpdateAvailableDesc    *prometheus.Desc
-	imageLastCheckTimestampDesc *prometheus.Desc
-	imageLastCheckStatusDesc    *prometheus.Desc
-	imageCreatedTimestampDesc   *prometheus.Desc
+	buildInfoDesc                *prometheus.Desc
+	watchRunsTotalDesc           *prometheus.Desc
+	watchSkippedRunsTotalDesc    *prometheus.Desc
+	watchLastRunTimestampDesc    *prometheus.Desc
+	watchLastRunDurationDesc     *prometheus.Desc
+	watchLastRunImagesDesc       *prometheus.Desc
+	imageUpdateAvailableDesc     *prometheus.Desc
+	imageLastCheckTimestampDesc  *prometheus.Desc
+	imageLastCheckStatusDesc     *prometheus.Desc
+	imageCreatedTimestampDesc    *prometheus.Desc
+	imageLocalDigestMismatchDesc *prometheus.Desc
 }
+
+// LocalDigestSource returns candidate digests per deployed instance; an empty set means unknown.
+type LocalDigestSource func(context.Context) (map[string][][]digest.Digest, error)
 
 type imageKey struct {
 	provider string
@@ -60,6 +72,8 @@ type imageState struct {
 	updateAvailable bool
 	lastCheck       time.Time
 	created         *time.Time
+	digest          digest.Digest
+	instances       []digest.Digest
 }
 
 // NewRecorder creates a Prometheus registry and recorder for Diun metrics.
@@ -86,10 +100,11 @@ func newRecorder(version string, metadataKeys []string) *Recorder {
 	}
 
 	return &Recorder{
-		version:       version,
-		metadataKeys:  append([]string(nil), metadataKeys...),
-		lastRunImages: make(map[model.ImageStatus]int, len(imageStatuses)),
-		images:        make(map[imageKey]imageState),
+		version:                      version,
+		metadataKeys:                 append([]string(nil), metadataKeys...),
+		lastRunImages:                make(map[model.ImageStatus]int, len(imageStatuses)),
+		images:                       make(map[imageKey]imageState),
+		imageLocalDigestMismatchDesc: prometheus.NewDesc("diun_image_local_digest_mismatch", "Whether a watched container differs from the last recorded registry digest.", imageLabels, nil),
 
 		buildInfoDesc: prometheus.NewDesc(
 			prometheus.BuildFQName(namespace, "", "build_info"),
@@ -166,10 +181,78 @@ func (r *Recorder) Describe(ch chan<- *prometheus.Desc) {
 	ch <- r.imageLastCheckTimestampDesc
 	ch <- r.imageLastCheckStatusDesc
 	ch <- r.imageCreatedTimestampDesc
+	ch <- r.imageLocalDigestMismatchDesc
 }
 
 // Collect sends metric values to Prometheus.
 func (r *Recorder) Collect(ch chan<- prometheus.Metric) {
+	r.collectRecorded(ch)
+	r.mu.RLock()
+	sources, images := maps.Clone(r.localDigests), r.images
+	r.mu.RUnlock()
+	ctx, cancel := context.WithTimeoutCause(context.Background(), 3*time.Second, context.DeadlineExceeded)
+	defer cancel()
+	var wg sync.WaitGroup
+	for name, source := range sources {
+		watched := make([]imageState, 0)
+		for _, image := range images {
+			if image.provider == name && image.digest != "" {
+				watched = append(watched, image)
+			}
+		}
+		if len(watched) == 0 {
+			continue
+		}
+		wg.Go(func() {
+			local, err := source(ctx)
+			if err != nil {
+				return
+			}
+			for _, image := range watched {
+				key, err := provider.LocalImageKey(image.image)
+				if err != nil {
+					continue
+				}
+				containers := local[key]
+				if len(containers) == 0 {
+					continue
+				}
+				value, known := 0.0, true
+				for _, digests := range containers {
+					if len(digests) == 0 {
+						known = false
+						continue
+					}
+					match := slices.Contains(digests, image.digest)
+					if name == "kubernetes" {
+						for _, dgst := range digests {
+							match = match || slices.Contains(image.instances, dgst)
+						}
+					}
+					if !match {
+						value = 1
+					}
+				}
+				if known || value == 1 {
+					ch <- prometheus.MustNewConstMetric(r.imageLocalDigestMismatchDesc, prometheus.GaugeValue, value, append([]string{image.provider, image.image}, image.metadataValues...)...)
+				}
+			}
+		})
+	}
+	wg.Wait()
+}
+
+// SetLocalDigests configures bounded runtime digest resolution for a provider.
+func (r *Recorder) SetLocalDigests(name string, source LocalDigestSource) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	if r.localDigests == nil {
+		r.localDigests = make(map[string]LocalDigestSource)
+	}
+	r.localDigests[name] = source
+}
+
+func (r *Recorder) collectRecorded(ch chan<- prometheus.Metric) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
@@ -239,7 +322,19 @@ func (r *Recorder) RecordRun(entries *model.NotifEntries, duration time.Duration
 				// Selected metadata values are part of the Prometheus series identity.
 				metadata: fmt.Sprintf("%q", metadataValues),
 			}
+			// Kubernetes runtimes may report the platform manifest rather than
+			// the index digest. Reuse the already-fetched index; no registry I/O.
+			var instances []digest.Digest
+			if entry.Provider == "kubernetes" {
+				var index ocispecs.Index
+				if json.Unmarshal(entry.Manifest.Raw, &index) == nil {
+					for _, descriptor := range index.Manifests {
+						instances = append(instances, descriptor.Digest)
+					}
+				}
+			}
 			images[key] = imageState{
+				instances:       instances,
 				provider:        entry.Provider,
 				image:           imageName,
 				metadataValues:  metadataValues,
@@ -247,6 +342,7 @@ func (r *Recorder) RecordRun(entries *model.NotifEntries, duration time.Duration
 				updateAvailable: entry.UpdateAvailable(),
 				lastCheck:       completedAt,
 				created:         entry.Manifest.Created,
+				digest:          entry.Manifest.Digest,
 			}
 		}
 	}

@@ -33,6 +33,11 @@ type Options struct {
 
 // New initializes a new Kubernetes client
 func New(opts Options) (*Client, error) {
+	return NewWithContext(context.Background(), opts)
+}
+
+// NewWithContext uses ctx for subsequent Kubernetes requests.
+func NewWithContext(ctx context.Context, opts Options) (*Client, error) {
 	var err error
 	var api *kubernetes.Clientset
 
@@ -67,7 +72,7 @@ func New(opts Options) (*Client, error) {
 	}
 
 	return &Client{
-		ctx:                context.Background(),
+		ctx:                ctx,
 		namespaces:         namespaces,
 		namespacesExcludes: namespacesExcluded,
 		API:                api,
