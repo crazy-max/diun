@@ -1,12 +1,81 @@
 package docker
 
 import (
+	"encoding/json"
+	"net/http"
+	"net/http/httptest"
+	"strings"
 	"testing"
 	"time"
 
+	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/moby/moby/api/types/container"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
+
+func TestListContainerPreservesConfiguredTag(t *testing.T) {
+	for _, tc := range []struct {
+		name       string
+		listedID   bool
+		tagMissing bool
+	}{
+		{
+			name: "unchanged tag",
+		},
+		{
+			name:     "tag moved after pull",
+			listedID: true,
+		},
+		{
+			name:       "tag removed",
+			listedID:   true,
+			tagMissing: true,
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			imageID := "sha256:" + strings.Repeat("a", 64)
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Set("Content-Type", "application/json")
+				switch {
+				case strings.HasSuffix(r.URL.Path, "/version"):
+					_, _ = w.Write([]byte(`{"ApiVersion":"1.52"}`))
+				case strings.HasSuffix(r.URL.Path, "/containers/json"):
+					imageName := "alpine:latest"
+					if tc.listedID {
+						imageName = imageID
+					}
+					_ = json.NewEncoder(w).Encode([]container.Summary{{ID: "watched", Image: imageName, ImageID: imageID, Labels: map[string]string{"diun.enable": "true"}}})
+				case strings.HasSuffix(r.URL.Path, "/containers/watched/json"):
+					_, _ = w.Write([]byte(`{"Config":{"Image":"alpine:latest"}}`))
+				case strings.HasSuffix(r.URL.Path, "/images/alpine:latest/json"):
+					if tc.tagMissing {
+						w.WriteHeader(http.StatusNotFound)
+						_, _ = w.Write([]byte(`{"message":"tag missing"}`))
+						return
+					}
+					_, _ = w.Write([]byte(`{"RepoDigests":["alpine@` + imageID + `"]}`))
+				case strings.HasSuffix(r.URL.Path, "/images/"+imageID+"/json"):
+					if tc.tagMissing {
+						_, _ = w.Write([]byte(`{"RepoDigests":["alpine@` + imageID + `"]}`))
+					} else {
+						_, _ = w.Write([]byte(`{"RepoDigests":[]}`))
+					}
+				default:
+					t.Errorf("unexpected request: %s", r.URL.Path)
+					w.WriteHeader(http.StatusNotFound)
+				}
+			}))
+			defer server.Close()
+			cfg := (&model.PrdDocker{}).GetDefaults()
+			cfg.Endpoint = server.URL
+			cfg.APIVersion = "1.52"
+			jobs := New(cfg, nil).ListJob()
+			require.Len(t, jobs, 1)
+			require.Equal(t, "alpine:latest", jobs[0].Image.Name)
+		})
+	}
+}
 
 func TestMetadataFormatsContainerSummary(t *testing.T) {
 	created := time.Date(2026, 5, 24, 12, 34, 56, 0, time.UTC).Unix()

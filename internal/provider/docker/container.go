@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/containerd/errdefs"
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/internal/provider"
 	"github.com/crazy-max/diun/v4/pkg/docker"
@@ -44,8 +45,17 @@ func (c *Client) listContainerImage() []model.Image {
 
 	var list []model.Image
 	for _, ctn := range ctns {
-		imageName := ctn.Image
+		imageName, err := cli.ContainerImageName(ctn)
+		if err != nil {
+			c.logger.Error().Err(err).Str("ctn_id", ctn.ID).Msg("Cannot inspect container image reference")
+			continue
+		}
+		// Validate the registry target. A pull can remove RepoDigests from
+		// the old running image without making the configured tag local.
 		imageInfo, err := cli.ImageInspect(imageName)
+		if errdefs.IsNotFound(err) {
+			imageInfo, err = cli.ImageInspect(ctn.ImageID)
+		}
 		if err != nil {
 			c.logger.Error().Err(err).
 				Str("ctn_id", ctn.ID).

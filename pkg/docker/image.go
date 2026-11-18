@@ -8,6 +8,22 @@ import (
 	mobyclient "github.com/moby/moby/client"
 )
 
+// ContainerImageName preserves the configured reference when Docker lists an
+// image ID after a pull moves the tag away from a running container's image.
+func (c *Client) ContainerImageName(ctn container.Summary) (string, error) {
+	if !c.IsDigest(ctn.Image) {
+		return ctn.Image, nil
+	}
+	info, err := c.ContainerInspect(ctn.ID)
+	if err != nil {
+		return "", err
+	}
+	if info.Config == nil {
+		return ctn.Image, nil
+	}
+	return info.Config.Image, nil
+}
+
 // ContainerInspect returns the container information.
 func (c *Client) ContainerInspect(containerID string) (container.InspectResponse, error) {
 	result, err := c.API.ContainerInspect(c.ctx, containerID, mobyclient.ContainerInspectOptions{})
