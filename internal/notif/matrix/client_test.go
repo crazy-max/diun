@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 	"time"
@@ -134,6 +136,186 @@ func TestSendStopsAfterMatrixRateLimitAttempts(t *testing.T) {
 	require.ErrorContains(t, err, "failed to submit message to Matrix")
 	require.NoError(t, gotEncodeErr)
 	assert.Equal(t, matrixMaxRateLimitAttempts, sendCount)
+}
+
+func TestSendAuthentication(t *testing.T) {
+	tokenFile := filepath.Join(t.TempDir(), "token")
+	require.NoError(t, os.WriteFile(tokenFile, []byte("file-token"), 0o600))
+	missingFile := filepath.Join(t.TempDir(), "missing")
+
+	tests := []struct {
+		name        string
+		credentials model.NotifMatrix
+		failPath    string
+		wantToken   string
+		wantErr     string
+		wantLogin   int
+		wantLogout  int
+	}{
+		{
+			name: "token without username",
+			credentials: model.NotifMatrix{
+				Token: "inline-token",
+			},
+			wantToken: "inline-token",
+		},
+		{
+			name: "token file",
+			credentials: model.NotifMatrix{
+				TokenFile: tokenFile,
+			},
+			wantToken: "file-token",
+		},
+		{
+			name: "token takes precedence over file and password credentials",
+			credentials: model.NotifMatrix{
+				Token:        "inline-token",
+				TokenFile:    missingFile,
+				UserFile:     missingFile,
+				Password:     "unused-password",
+				PasswordFile: missingFile,
+			},
+			wantToken: "inline-token",
+		},
+		{
+			name: "unreadable token file",
+			credentials: model.NotifMatrix{
+				TokenFile: missingFile,
+			},
+			wantErr: "cannot retrieve token secret for Matrix notifier",
+		},
+		{
+			name: "token survives join failure",
+			credentials: model.NotifMatrix{
+				Token: "inline-token",
+			},
+			failPath:  "/join/",
+			wantToken: "inline-token",
+			wantErr:   "failed to join room",
+		},
+		{
+			name: "token survives send failure",
+			credentials: model.NotifMatrix{
+				Token: "inline-token",
+			},
+			failPath:  "/send/",
+			wantToken: "inline-token",
+			wantErr:   "failed to submit message to Matrix",
+		},
+		{
+			name: "password login",
+			credentials: model.NotifMatrix{
+				User:     "@diun:example.com",
+				Password: "password",
+			},
+			wantToken:  "login-token",
+			wantLogin:  1,
+			wantLogout: 1,
+		},
+		{
+			name: "password session logged out after send failure",
+			credentials: model.NotifMatrix{
+				User:     "@diun:example.com",
+				Password: "password",
+			},
+			failPath:   "/send/",
+			wantToken:  "login-token",
+			wantErr:    "failed to submit message to Matrix",
+			wantLogin:  1,
+			wantLogout: 1,
+		},
+		{
+			name: "failed login does not log out",
+			credentials: model.NotifMatrix{
+				User:     "@diun:example.com",
+				Password: "password",
+			},
+			failPath:  "/login",
+			wantErr:   "failed to authenticate Matrix user",
+			wantLogin: 1,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var loginCount, logoutCount, joinCount, sendCount int
+			ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Set("Content-Type", "application/json")
+				var response map[string]any
+				switch {
+				case strings.HasSuffix(r.URL.Path, "/login"):
+					loginCount++
+					var login struct {
+						Identifier struct {
+							User string `json:"user"`
+						} `json:"identifier"`
+						Password string `json:"password"`
+					}
+					assert.NoError(t, json.NewDecoder(r.Body).Decode(&login))
+					assert.Equal(t, tt.credentials.User, login.Identifier.User)
+					assert.Equal(t, tt.credentials.Password, login.Password)
+					response = map[string]any{
+						"access_token": "login-token",
+						"user_id":      "@diun:example.com",
+					}
+				case strings.HasSuffix(r.URL.Path, "/logout"):
+					logoutCount++
+					response = map[string]any{}
+				case strings.Contains(r.URL.Path, "/join/"):
+					joinCount++
+					response = map[string]any{"room_id": "!alerts:example.com"}
+				case strings.Contains(r.URL.Path, "/send/m.room.message/"):
+					sendCount++
+					var payload matrixMessagePayload
+					assert.NoError(t, json.NewDecoder(r.Body).Decode(&payload))
+					assert.Equal(t, matrixMessagePayload{
+						Body:          "file update",
+						MsgType:       "m.notice",
+						Format:        "org.matrix.custom.html",
+						FormattedBody: "file update",
+					}, payload)
+					response = map[string]any{"event_id": "$event"}
+				default:
+					t.Errorf("unexpected Matrix request: %s", r.URL.Path)
+					http.NotFound(w, r)
+					return
+				}
+				if !strings.HasSuffix(r.URL.Path, "/login") {
+					assert.Equal(t, "Bearer "+tt.wantToken, r.Header.Get("Authorization"))
+				}
+				if tt.failPath != "" && strings.Contains(r.URL.Path, tt.failPath) {
+					assert.NoError(t, writeMatrixResponse(w, http.StatusForbidden, map[string]any{
+						"errcode": "M_FORBIDDEN",
+						"error":   "forbidden",
+					}))
+					return
+				}
+				assert.NoError(t, writeMatrixResponse(w, http.StatusOK, response))
+			}))
+			defer ts.Close()
+
+			c := newTestClient(ts.URL)
+			c.cfg.User = tt.credentials.User
+			c.cfg.UserFile = tt.credentials.UserFile
+			c.cfg.Password = tt.credentials.Password
+			c.cfg.PasswordFile = tt.credentials.PasswordFile
+			c.cfg.Token = tt.credentials.Token
+			c.cfg.TokenFile = tt.credentials.TokenFile
+			err := c.Send(testEntry(t))
+			if tt.wantErr != "" {
+				require.ErrorContains(t, err, tt.wantErr)
+			} else {
+				require.NoError(t, err)
+				assert.Equal(t, 1, joinCount)
+				assert.Equal(t, 1, sendCount)
+			}
+			assert.Equal(t, tt.wantLogin, loginCount)
+			assert.Equal(t, tt.wantLogout, logoutCount)
+			if tt.wantToken == "" {
+				assert.Zero(t, joinCount)
+				assert.Zero(t, sendCount)
+			}
+		})
+	}
 }
 
 type matrixMessagePayload struct {

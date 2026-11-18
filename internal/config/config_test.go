@@ -18,6 +18,32 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestLoadMatrixToken(t *testing.T) {
+	tokenFile := filepath.Join(t.TempDir(), "token")
+	require.NoError(t, os.WriteFile(tokenFile, []byte("file-token"), 0o600))
+	for _, source := range []string{"file", "env"} {
+		t.Run(source, func(t *testing.T) {
+			filename := filepath.Join(t.TempDir(), "diun.yml")
+			contents := "providers:\n  docker: {}\nnotif:\n  matrix:\n    roomID: '!alerts:example.com'\n"
+			if source == "file" {
+				contents += "    token: inline-token\n    tokenFile: '" + tokenFile + "'\n"
+			} else {
+				t.Setenv("DIUN_NOTIF_MATRIX_TOKEN", "inline-token")
+				t.Setenv("DIUN_NOTIF_MATRIX_TOKENFILE", tokenFile)
+			}
+			require.NoError(t, os.WriteFile(filename, []byte(contents), 0o600))
+			t.Setenv("DIUN_DB_PATH", filepath.Join(t.TempDir(), "diun.db"))
+			cfg, err := Load(filename)
+			require.NoError(t, err)
+			require.NotNil(t, cfg.Notif.Matrix)
+			assert.Equal(t, "inline-token", cfg.Notif.Matrix.Token)
+			assert.Equal(t, tokenFile, cfg.Notif.Matrix.TokenFile)
+			assert.Empty(t, cfg.Notif.Matrix.User)
+			assert.Empty(t, cfg.Notif.Matrix.Password)
+		})
+	}
+}
+
 func TestLoadFile(t *testing.T) {
 	cases := []struct {
 		name     string
