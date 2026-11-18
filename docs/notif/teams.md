@@ -41,7 +41,7 @@ You can send notifications to your Teams team-channel using an [incoming webhook
 ### Default `templateBody`
 
 ```
-Docker tag {{ if .Entry.Image.HubLink }}[`{{ .Entry.Image }}`]({{ .Entry.Image.HubLink }}){{ else }}`{{ .Entry.Image }}`{{ end }} {{ if (eq .Entry.Status "new") }}available{{ else }}updated{{ end }}.
+Docker tag {{ if .Entry.Image.HubLink }}[`{{ .Entry.Image }}`]({{ .Entry.Image.HubLink }}){{ else }}`{{ .Entry.Image }}`{{ end }} {{ if (eq .Entry.Status "new") }}available{{ else if (eq .Entry.Status "unchange") }}unchanged{{ else }}updated{{ end }}.
 ```
 
 ### Microsoft Teams Workflows

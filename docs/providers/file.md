@@ -175,18 +175,18 @@ Defines the path to the directory that contains the [configuration files](#yaml-
 
 The configuration file(s) defines a slice of images to analyze with the following fields:
 
-| Name               | Default      | Description                                                                                                                                              |
-|--------------------|--------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `name`             | `latest`     | Docker image name to watch using `registry/path:tag` format. If registry omitted, `docker.io` will be used and if tag omitted, `latest` will be used     |
-| `regopt`           |              | [Registry options](../config/regopts.md) name to use                                                                                                     |
-| `watch_mode`       | `tag`        | [Watch mode](../config/defaults.md#watchmode): `tag`, `all`, `semver`, or `semver+prereleases`                                                           |
-| `notify_on`        | `new;update` | Semicolon separated list of status to be notified: `new`, `update`                                                                                       |
-| `sort_tags`        | `reverse`    | [Sort tags method](../faq.md#tags-sorting-when-using-watch_mode) when watching repository tags. One of `default`, `reverse`, `semver`, `lexicographical` |
-| `max_tags`         | `0`          | Maximum number of tags to watch when watching repository tags. `0` means all of them                                                                     |
-| `include_tags`     |              | List of regular expressions to include tags. If set, replaces `defaults.includeTags` for this image. Can be useful when watching repository tags         |
-| `exclude_tags`     |              | List of regular expressions to exclude tags. If set, merges with `defaults.excludeTags` for this image. Can be useful when watching repository tags      |
-| `hub_link`         | _automatic_  | Set registry hub link for this image                                                                                                                     |
-| `platform.os`      | _automatic_  | Operating system to use as custom platform                                                                                                               |
-| `platform.arch`    | _automatic_  | CPU architecture to use as custom platform                                                                                                               |
-| `platform.variant` | _automatic_  | Variant of the CPU to use as custom platform                                                                                                             |
-| `metadata.*`       |              | Additional metadata that can be used in [notification template](../faq.md#notification-template) (e.g. `metadata.foo=bar`)                               |
+| Name                 | Default        | Description                                                                                                                                                |
+| -------------------- | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `name`               | `latest`       | Docker image name to watch using `registry/path:tag` format. If registry omitted, `docker.io` will be used and if tag omitted, `latest` will be used       |
+| `regopt`             |                | [Registry options](../config/regopts.md) name to use                                                                                                       |
+| `watch_mode`         | `tag`          | [Watch mode](../config/defaults.md#watchmode): `tag`, `all`, `semver`, or `semver+prereleases`                                                             |
+| `notify_on`          | `new;update`   | Semicolon separated list of status to be notified: `new`, `update`, `unchange`                                                                             |
+| `sort_tags`          | `reverse`      | [Sort tags method](../faq.md#tags-sorting-when-using-watch_mode) when watching repository tags. One of `default`, `reverse`, `semver`, `lexicographical`   |
+| `max_tags`           | `0`            | Maximum number of tags to watch when watching repository tags. `0` means all of them                                                                       |
+| `include_tags`       |                | List of regular expressions to include tags. If set, replaces `defaults.includeTags` for this image. Can be useful when watching repository tags           |
+| `exclude_tags`       |                | List of regular expressions to exclude tags. If set, merges with `defaults.excludeTags` for this image. Can be useful when watching repository tags        |
+| `hub_link`           | _automatic_    | Set registry hub link for this image                                                                                                                       |
+| `platform.os`        | _automatic_    | Operating system to use as custom platform                                                                                                                 |
+| `platform.arch`      | _automatic_    | CPU architecture to use as custom platform                                                                                                                 |
+| `platform.variant`   | _automatic_    | Variant of the CPU to use as custom platform                                                                                                               |
+| `metadata.*`         |                | Additional metadata that can be used in [notification template](../faq.md#notification-template) (e.g. `metadata.foo=bar`)                                 |
