@@ -18,6 +18,20 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestLoadNtfyHeadersFromEnv(t *testing.T) {
+	t.Setenv("DIUN_NOTIF_NTFY_TOPIC", "diun")
+	t.Setenv("DIUN_NOTIF_NTFY_HEADERS_P-ACCESS-TOKEN-ID", "proxy-id")
+	t.Setenv("DIUN_NOTIF_NTFY_HEADERS_P-ACCESS-TOKEN", "proxy-token")
+
+	cfg, err := Load("./fixtures/config.file.yml")
+	require.NoError(t, err)
+	require.NotNil(t, cfg.Notif.Ntfy)
+	require.Equal(t, map[string]string{
+		"p-access-token-id": "proxy-id",
+		"p-access-token":    "proxy-token",
+	}, cfg.Notif.Ntfy.Headers)
+}
+
 func TestLoadMatrixToken(t *testing.T) {
 	tokenFile := filepath.Join(t.TempDir(), "token")
 	require.NoError(t, os.WriteFile(tokenFile, []byte("file-token"), 0o600))
@@ -212,7 +226,11 @@ for <code>{{ .Entry.Manifest.Platform }}</code> platform.
 						QoS:      0,
 					},
 					Ntfy: &model.NotifNtfy{
-						Endpoint:      "https://ntfy.sh",
+						Endpoint: "https://ntfy.sh",
+						Headers: map[string]string{
+							"P-Access-Token-Id": "test-id",
+							"P-Access-Token":    "test-token",
+						},
 						Topic:         "diun-acce65a0-b777-46f9-9a11-58c67d1579c4",
 						Priority:      3,
 						Tags:          []string{"package"},

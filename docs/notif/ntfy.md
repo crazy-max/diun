@@ -9,6 +9,8 @@ Notifications can be sent using a [ntfy](https://ntfy.sh/) instance.
         notif:
           ntfy:
             endpoint: https://ntfy.sh
+            headers:
+              X-Custom-Header: value
             topic: diun-acce65a0-b777-46f9-9a11-58c67d1579c4
             priority: 3
             tags:
@@ -24,6 +26,7 @@ Notifications can be sent using a [ntfy](https://ntfy.sh/) instance.
 | Name                | Default                             | Description                                                                                                                   |
 |---------------------|-------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|
 | `endpoint`[^1]      | `https://ntfy.sh`                   | Ntfy base URL                                                                                                                 |
+| `headers`           |                                     | Map of additional headers to be sent (key is case insensitive)                                                                |
 | `token`             |                                     | [Access token](https://docs.ntfy.sh/publish/#access-tokens)                                                                   |
 | `tokenFile`         |                                     | Use content of [secret file](../faq.md#secrets-loaded-from-files-and-trailing-newlines) as acess token if `token` not defined |
 | `topic`             |                                     | Ntfy topic                                                                                                                    |
@@ -40,6 +43,7 @@ Notifications can be sent using a [ntfy](https://ntfy.sh/) instance.
 
 !!! abstract "Environment variables"
     * `DIUN_NOTIF_NTFY_ENDPOINT`
+    * `DIUN_NOTIF_NTFY_HEADERS_<KEY>`
     * `DIUN_NOTIF_NTFY_TOKEN`
     * `DIUN_NOTIF_NTFY_TOKENFILE`
     * `DIUN_NOTIF_NTFY_TOPIC`

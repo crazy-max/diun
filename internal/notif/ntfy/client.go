@@ -114,6 +114,10 @@ func (c *Client) Send(entry model.NotifEntry) error {
 		return err
 	}
 
+	for key, value := range c.cfg.Headers {
+		req.Header.Add(key, value)
+	}
+
 	if token, err := secret.GetSecret(c.cfg.Token, c.cfg.TokenFile); err == nil && token != "" {
 		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
 	}
