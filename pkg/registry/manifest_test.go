@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	digest "github.com/opencontainers/go-digest"
-	imgspecv1 "github.com/opencontainers/image-spec/specs-go/v1"
+	ocispecs "github.com/opencontainers/image-spec/specs-go/v1"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	podmanmanifest "go.podman.io/image/v5/manifest"
@@ -15,7 +15,7 @@ import (
 
 func TestManifestReturnsCachedManifestWhenDigestMatches(t *testing.T) {
 	registry := newTestRegistry(t, "acme/diun")
-	remoteImage := newTestRegistryImage(t, imgspecv1.Platform{
+	remoteImage := newTestRegistryImage(t, ocispecs.Platform{
 		Architecture: "amd64",
 		OS:           "linux",
 	}, "25.0.0", nil)
@@ -46,7 +46,7 @@ func TestManifestReturnsCachedManifestWhenDigestMatches(t *testing.T) {
 
 func TestManifest(t *testing.T) {
 	registry := newTestRegistry(t, "acme/diun")
-	remoteImage := newTestRegistryImage(t, imgspecv1.Platform{
+	remoteImage := newTestRegistryImage(t, ocispecs.Platform{
 		Architecture: "amd64",
 		OS:           "linux",
 	}, "25.0.0", map[string]string{
@@ -81,8 +81,8 @@ func TestManifest(t *testing.T) {
 
 func TestManifestListPlatformDigestComparison(t *testing.T) {
 	registry := newTestRegistry(t, "acme/diun")
-	amd64Platform := imgspecv1.Platform{Architecture: "amd64", OS: "linux"}
-	armPlatform := imgspecv1.Platform{Architecture: "arm", OS: "linux", Variant: "v7"}
+	amd64Platform := ocispecs.Platform{Architecture: "amd64", OS: "linux"}
+	armPlatform := ocispecs.Platform{Architecture: "arm", OS: "linux", Variant: "v7"}
 
 	remoteAMD64 := newTestRegistryImage(t, amd64Platform, "25.0.0", nil)
 	remoteARM := newTestRegistryImage(t, armPlatform, "25.0.0", nil)
@@ -155,8 +155,8 @@ func TestManifestListPlatformDigestComparison(t *testing.T) {
 
 func TestManifestVariant(t *testing.T) {
 	registry := newTestRegistry(t, "acme/diun")
-	amd64Platform := imgspecv1.Platform{Architecture: "amd64", OS: "linux"}
-	armPlatform := imgspecv1.Platform{Architecture: "arm", OS: "linux", Variant: "v7"}
+	amd64Platform := ocispecs.Platform{Architecture: "amd64", OS: "linux"}
+	armPlatform := ocispecs.Platform{Architecture: "arm", OS: "linux", Variant: "v7"}
 
 	remoteAMD64 := newTestRegistryImage(t, amd64Platform, "25.0.0", nil)
 	remoteARM := newTestRegistryImage(t, armPlatform, "25.0.0", nil)
@@ -211,7 +211,7 @@ func TestManifestNonImageArtifact(t *testing.T) {
 
 func TestManifestTaggedDigestUnknownTag(t *testing.T) {
 	registry := newTestRegistry(t, "acme/diun")
-	remoteImage := newTestRegistryImage(t, imgspecv1.Platform{
+	remoteImage := newTestRegistryImage(t, ocispecs.Platform{
 		Architecture: "amd64",
 		OS:           "linux",
 	}, "25.0.0", nil)

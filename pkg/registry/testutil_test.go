@@ -10,7 +10,7 @@ import (
 	"testing"
 
 	digest "github.com/opencontainers/go-digest"
-	imgspecv1 "github.com/opencontainers/image-spec/specs-go/v1"
+	ocispecs "github.com/opencontainers/image-spec/specs-go/v1"
 	"github.com/stretchr/testify/require"
 	podmanmanifest "go.podman.io/image/v5/manifest"
 )
@@ -188,7 +188,7 @@ func newTestRegistryClient(t *testing.T, opts Options) *Client {
 	return client
 }
 
-func newTestRegistryImage(t *testing.T, platform imgspecv1.Platform, dockerVersion string, labels map[string]string) testRegistryImage {
+func newTestRegistryImage(t *testing.T, platform ocispecs.Platform, dockerVersion string, labels map[string]string) testRegistryImage {
 	t.Helper()
 
 	configBody, err := json.Marshal(struct {
@@ -306,10 +306,10 @@ func newTestOCIArtifactManifest(t *testing.T, artifactType string) testRegistryB
 		Layers        []testRegistryDescriptor `json:"layers"`
 	}{
 		SchemaVersion: 2,
-		MediaType:     imgspecv1.MediaTypeImageManifest,
+		MediaType:     ocispecs.MediaTypeImageManifest,
 		ArtifactType:  artifactType,
 		Config: testRegistryDescriptor{
-			MediaType: imgspecv1.MediaTypeEmptyJSON,
+			MediaType: ocispecs.MediaTypeEmptyJSON,
 			Size:      int64(len(emptyConfig)),
 			Digest:    digest.FromBytes(emptyConfig),
 		},
@@ -324,7 +324,7 @@ func newTestOCIArtifactManifest(t *testing.T, artifactType string) testRegistryB
 	require.NoError(t, err)
 
 	return testRegistryBlob{
-		mediaType: imgspecv1.MediaTypeImageManifest,
+		mediaType: ocispecs.MediaTypeImageManifest,
 		body:      body,
 		digest:    digest.FromBytes(body),
 	}
@@ -332,12 +332,12 @@ func newTestOCIArtifactManifest(t *testing.T, artifactType string) testRegistryB
 
 type testManifestListInstance struct {
 	manifest testRegistryBlob
-	platform imgspecv1.Platform
+	platform ocispecs.Platform
 }
 
 type testManifestListDescriptor struct {
-	MediaType string             `json:"mediaType"`
-	Size      int64              `json:"size"`
-	Digest    digest.Digest      `json:"digest"`
-	Platform  imgspecv1.Platform `json:"platform"`
+	MediaType string            `json:"mediaType"`
+	Size      int64             `json:"size"`
+	Digest    digest.Digest     `json:"digest"`
+	Platform  ocispecs.Platform `json:"platform"`
 }

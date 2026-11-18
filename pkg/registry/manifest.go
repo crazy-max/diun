@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/opencontainers/go-digest"
-	imgspecv1 "github.com/opencontainers/image-spec/specs-go/v1"
+	ocispecs "github.com/opencontainers/image-spec/specs-go/v1"
 	"github.com/pkg/errors"
 	"go.podman.io/image/v5/docker"
 	"go.podman.io/image/v5/manifest"
@@ -112,5 +112,5 @@ func (m Manifest) isManifestList() bool {
 }
 
 func isManifestList(mimeType string) bool {
-	return mimeType == manifest.DockerV2ListMediaType || mimeType == imgspecv1.MediaTypeImageIndex
+	return mimeType == manifest.DockerV2ListMediaType || mimeType == ocispecs.MediaTypeImageIndex
 }
