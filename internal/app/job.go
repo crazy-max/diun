@@ -189,6 +189,13 @@ func (di *Diun) runJob(job model.Job) (entry model.NotifEntry) {
 		return
 	}
 
+	if job.Image.AssumeImmutableTags != nil && *job.Image.AssumeImmutableTags && dbManifest.Name != "" {
+		entry.Status = model.ImageStatusSkip
+		entry.Manifest = dbManifest
+		sublog.Debug().Msg("Skipping assumed immutable tag")
+		return
+	}
+
 	var updated bool
 	entry.Manifest, updated, err = job.Registry.Manifest(job.RegImage, dbManifest)
 	if err != nil {

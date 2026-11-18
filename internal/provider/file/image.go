@@ -103,6 +103,10 @@ func (c *Client) listFileImage() []model.Image {
 
 			item.ExcludeTags = mergeTags(c.defaults.ExcludeTags, item.ExcludeTags)
 
+			if item.AssumeImmutableTags == nil {
+				item.AssumeImmutableTags = c.defaults.AssumeImmutableTags
+			}
+
 			images = append(images, item)
 		}
 	}

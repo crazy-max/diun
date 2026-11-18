@@ -410,6 +410,22 @@ func TestListJobRejectsUnknownFields(t *testing.T) {
 	assert.Empty(t, fc.ListJob())
 }
 
+func TestListJobAssumeImmutableTags(t *testing.T) {
+	filename := filepath.Join(t.TempDir(), "images.yml")
+	require.NoError(t, os.WriteFile(filename, []byte("- name: alpine\n- name: busybox\n  assume_immutable_tags: false\n- name: ubuntu\n  assume_immutable_tags: true\n"), 0o600))
+	for _, inherited := range []*bool{nil, new(true), new(false)} {
+		imageDefaults := model.Defaults{
+			SortTags:            registry.SortTagReverse,
+			AssumeImmutableTags: inherited,
+		}
+		jobs := New(&model.PrdFile{Filename: filename}, &imageDefaults).ListJob()
+		require.Len(t, jobs, 3)
+		require.Equal(t, inherited, jobs[0].Image.AssumeImmutableTags)
+		require.Equal(t, new(false), jobs[1].Image.AssumeImmutableTags)
+		require.Equal(t, new(true), jobs[2].Image.AssumeImmutableTags)
+	}
+}
+
 func TestListJobTagFilters(t *testing.T) {
 	tests := []struct {
 		name        string

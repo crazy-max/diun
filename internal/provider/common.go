@@ -31,7 +31,7 @@ func ValidateImage(image string, metadata, labels map[string]string, watchByDef 
 		img.SortTags = defaults.SortTags
 		img.IncludeTags = defaults.IncludeTags
 		img.ExcludeTags = defaults.ExcludeTags
-		// clone so that images never share (and mutate) the defaults map
+		img.AssumeImmutableTags = defaults.AssumeImmutableTags
 		img.Metadata = maps.Clone(defaults.Metadata)
 	}
 
@@ -95,6 +95,12 @@ func ValidateImage(image string, metadata, labels map[string]string, watchByDef 
 			img.IncludeTags = strings.Split(value, ";")
 		case key == "diun.exclude_tags":
 			img.ExcludeTags = strings.Split(value, ";")
+		case key == "diun.assume_immutable_tags":
+			assumeImmutableTags, err := strconv.ParseBool(value)
+			if err != nil {
+				return img, errors.Wrapf(err, "cannot parse %q value of label %s", value, key)
+			}
+			img.AssumeImmutableTags = new(assumeImmutableTags)
 		case key == "diun.hub_tpl":
 			img.HubTpl = value
 		case key == "diun.hub_link":

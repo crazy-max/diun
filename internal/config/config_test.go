@@ -18,6 +18,18 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestLoadAssumeImmutableTags(t *testing.T) {
+	filename := filepath.Join(t.TempDir(), "diun.yml")
+	require.NoError(t, os.WriteFile(filename, []byte("providers:\n  docker: {}\ndefaults:\n  assumeImmutableTags: true\n"), 0o600))
+	cfg, err := Load(filename)
+	require.NoError(t, err)
+	require.Equal(t, new(true), cfg.Defaults.AssumeImmutableTags)
+	t.Setenv("DIUN_DEFAULTS_ASSUMEIMMUTABLETAGS", "false")
+	cfg, err = Load(filename)
+	require.NoError(t, err)
+	require.Equal(t, new(false), cfg.Defaults.AssumeImmutableTags)
+}
+
 func TestLoadNtfyHeadersFromEnv(t *testing.T) {
 	t.Setenv("DIUN_NOTIF_NTFY_TOPIC", "diun")
 	t.Setenv("DIUN_NOTIF_NTFY_HEADERS_P-ACCESS-TOKEN-ID", "proxy-id")

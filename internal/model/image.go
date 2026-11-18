@@ -9,19 +9,20 @@ import (
 
 // Image holds image configuration
 type Image struct {
-	Name        string             `yaml:"name,omitempty" json:",omitempty"`
-	Platform    ImagePlatform      `yaml:"platform,omitempty"`
-	RegOpt      string             `yaml:"regopt,omitempty" json:",omitempty"`
-	WatchMode   registry.WatchMode `yaml:"watch_mode,omitempty" json:",omitempty"`
-	WatchRepo   *bool              `yaml:"watch_repo,omitempty" json:",omitempty"` // Deprecated: use WatchMode instead.
-	NotifyOn    []NotifyOn         `yaml:"notify_on,omitempty" json:",omitempty"`
-	MaxTags     int                `yaml:"max_tags,omitempty" json:",omitempty"`
-	SortTags    registry.SortTag   `yaml:"sort_tags,omitempty" json:",omitempty"`
-	IncludeTags []string           `yaml:"include_tags,omitempty" json:",omitempty"`
-	ExcludeTags []string           `yaml:"exclude_tags,omitempty" json:",omitempty"`
-	HubTpl      string             `yaml:"hub_tpl,omitempty" json:",omitempty"`
-	HubLink     string             `yaml:"hub_link,omitempty" json:",omitempty"`
-	Metadata    map[string]string  `yaml:"metadata,omitempty" json:",omitempty"`
+	Name                string             `yaml:"name,omitempty" json:",omitempty"`
+	Platform            ImagePlatform      `yaml:"platform,omitempty"`
+	RegOpt              string             `yaml:"regopt,omitempty" json:",omitempty"`
+	WatchMode           registry.WatchMode `yaml:"watch_mode,omitempty" json:",omitempty"`
+	WatchRepo           *bool              `yaml:"watch_repo,omitempty" json:",omitempty"` // Deprecated: use WatchMode instead.
+	NotifyOn            []NotifyOn         `yaml:"notify_on,omitempty" json:",omitempty"`
+	MaxTags             int                `yaml:"max_tags,omitempty" json:",omitempty"`
+	SortTags            registry.SortTag   `yaml:"sort_tags,omitempty" json:",omitempty"`
+	IncludeTags         []string           `yaml:"include_tags,omitempty" json:",omitempty"`
+	ExcludeTags         []string           `yaml:"exclude_tags,omitempty" json:",omitempty"`
+	AssumeImmutableTags *bool              `yaml:"assume_immutable_tags,omitempty" json:",omitempty"`
+	HubTpl              string             `yaml:"hub_tpl,omitempty" json:",omitempty"`
+	HubLink             string             `yaml:"hub_link,omitempty" json:",omitempty"`
+	Metadata            map[string]string  `yaml:"metadata,omitempty" json:",omitempty"`
 }
 
 // ResolveWatchMode applies image settings before defaults, preferring WatchMode

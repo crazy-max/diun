@@ -13,6 +13,51 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestValidateImageAssumeImmutableTags(t *testing.T) {
+	for _, tt := range []struct {
+		name     string
+		labels   map[string]string
+		defaults *model.Defaults
+		want     *bool
+		wantErr  bool
+	}{
+		{
+			name: "unset",
+		},
+		{
+			name:     "inherited",
+			defaults: &model.Defaults{AssumeImmutableTags: new(true)},
+			want:     new(true),
+		},
+		{
+			name:   "enabled",
+			labels: map[string]string{"diun.assume_immutable_tags": "true"},
+			want:   new(true),
+		},
+		{
+			name:     "explicit false overrides default",
+			labels:   map[string]string{"diun.assume_immutable_tags": "false"},
+			defaults: &model.Defaults{AssumeImmutableTags: new(true)},
+			want:     new(false),
+		},
+		{
+			name:    "invalid",
+			labels:  map[string]string{"diun.assume_immutable_tags": "sometimes"},
+			wantErr: true,
+		},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			image, err := ValidateImage("alpine", nil, tt.labels, true, tt.defaults)
+			if tt.wantErr {
+				require.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
+			require.Equal(t, tt.want, image.AssumeImmutableTags)
+		})
+	}
+}
+
 func TestValidateImageWatchRepoDeprecation(t *testing.T) {
 	tests := []struct {
 		name   string
