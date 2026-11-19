@@ -1,5 +1,68 @@
 # Changelog
 
+## 4.34.0 (2026/11/19)
+
+:warning: See **Migration notes** in the documentation before upgrading.
+
+* Share image analysis across watches and providers by @crazy-max in #1938
+* Preserve independent manifest state for each watched platform by @crazy-max in #1936
+* Add `watchMode` with support for watching newer semantic versions by @crazy-max in #1904
+* Add `assumeImmutableTags` option to assume image tags are immutable by @crazy-max in #1935
+* Expose Docker container image and tag metadata by @crazy-max in #1902
+* Compare deployed image digests at metrics scrape time by @crazy-max in #1930
+* Retry transient registry manifest lookup failures with exponential backoff by @crazy-max in #1944
+* Merge default tag filters with image filters by @crazy-max in #1739
+* Add opt-in metadata labels for metrics by @crazy-max in #1933
+* Add `unchange` to `notifyOn` for opt-in notifications for unchanged images by @crazy-max in #1924
+* Add an option to disable log timestamps by @crazy-max in #1866
+* Add Matrix access token authentication by @crazy-max in #1932
+* Add custom headers for ntfy notifications by @crazy-max in #1934
+* Fix manifest tracking for digest-only image references by @crazy-max in #1867
+* Fix image cleanup to use stored references by @crazy-max in #1937
+* Preserve configured Docker image tags after pulls by @crazy-max in #1929
+* Close the Docker client when initialization fails by @crazy-max in #1928
+* Avoid sharing defaults metadata between images by @chris3713 in #1825
+* Sort shorthand tags with suffixes by semantic version by @crazy-max in #1885
+* Ignore Dockerfile `COPY` instructions without `--from` by @crazy-max in #1886
+* Exclude Dockerfile stage indexes and case-insensitive aliases by @crazy-max in #1892
+* Omit empty URLs and tags from Apprise notification payloads by @crazy-max in #1884
+* Avoid Healthchecks failure pings on normal shutdown by @crazy-max in #1939
+* Migrate Slack notifications to `slack-go/slack` by @crazy-max in #1863
+* Images and artifacts are now built and signed using [Docker Github Builder](https://github.com/docker/github-builder) by @crazy-max in #1544 #1903 #1923
+* Add `linux/riscv64` and `linux/s390x` images by @crazy-max in #1862
+* Drop `386` artifacts and images and `linux/arm/v5` artifacts by @crazy-max in #1862
+* Go 1.27 by @crazy-max in #1861
+* Alpine Linux 3.24 by @crazy-max in #1860
+* Protobuf 36.2 in #1912 #1917
+* MkDocs Material 9.8.1 in #1916
+* Bump github.com/Microsoft/go-winio to 0.6.4 in #1891
+* Bump github.com/PaulSonOfLars/gotgbot/v2 to 2.0.0-rc.37 in #1893
+* Bump github.com/alecthomas/kong to 1.17.0 in #1895
+* Bump github.com/bmatcuk/doublestar/v4 to 4.10.4 in #1873
+* Bump github.com/containerd/containerd/api to 1.12.0 in #1890
+* Bump github.com/containerd/platforms to 1.0.0-rc.5 in #1889
+* Bump github.com/crazy-max/gonfig to 0.10.0 in #1898
+* Bump github.com/dromara/carbon/v2 to 2.7.1 in #1887
+* Bump github.com/go-playground/validator/v10 to 10.30.6 in #1878
+* Bump github.com/hashicorp/nomad/api to 2.1.1 by @crazy-max in #1901
+* Bump github.com/jedib0t/go-pretty/v6 to 6.9.2 in #1880 #1911
+* Bump github.com/moby/buildkit to 0.35.0 by @crazy-max in #1900
+* Bump github.com/moby/moby/client to 0.6.3 in #1881
+* Bump github.com/prometheus/client_golang to 1.25.0 in #1894
+* Bump github.com/rabbitmq/amqp091-go to 1.17.0 in #1844 #1899 #1921
+* Bump github.com/slack-go/slack to 0.36.0 in #1915
+* Bump github.com/tidwall/pretty to 1.3.0 in #1896
+* Bump github.com/wneessen/go-mail to 0.8.2 in #1897
+* Bump go.etcd.io/bbolt to 1.5.0 in #1780
+* Bump go.opentelemetry.io/otel/trace to 1.47.0 in #1859
+* Bump go.podman.io/image/v5 to 5.42.1 in #1888
+* Bump golang.org/x/mod to 0.43.0 in #1807
+* Bump golang.org/x/sys to 0.50.0 in #1805
+* Bump k8s.io/client-go to 0.37.2 in #1879
+* Bump maunium.net/go/mautrix to 0.33.0 in #1776 #1922
+
+**Full Changelog**: [`v4.33.0...v4.34.0`](https://github.com/crazy-max/diun/compare/v4.33.0...v4.34.0)
+
 ## 4.33.1 (2026/10/24)
 
 This release is built with Go 1.26.10 to address [CVE-2026-111943](https://go.dev/issue/82345).
