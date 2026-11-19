@@ -125,11 +125,14 @@ Examples:
 diun image remove --image alpine:latest
 ```
 ```shell
-diun image inspect --image drone/drone
+diun image remove --image drone/drone
 ```
 
 !!! warning
-    All manifest for an image will be removed if no tag is specified
+    A repository without a tag or digest removes all its stored manifests.
+    A tag removes its stored reference and any `tag@digest` references for that
+    tag. A reference containing a digest removes only that exact stored reference,
+    even if the tag now points to a different digest.
 
 ### `image prune`
 

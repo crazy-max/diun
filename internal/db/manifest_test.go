@@ -37,9 +37,19 @@ func TestManifestStore(t *testing.T) {
 
 	images, err := client.ListImage()
 	require.NoError(t, err)
-	assert.Equal(t, map[string][]registry.Manifest{
-		"docker.io/library/alpine":  {alpineManifest},
-		"docker.io/library/alpine2": {alpine2Manifest},
+	assert.Equal(t, map[string][]ManifestEntry{
+		"docker.io/library/alpine": {
+			{
+				Reference: alpine.String(),
+				Manifest:  alpineManifest,
+			},
+		},
+		"docker.io/library/alpine2": {
+			{
+				Reference: alpine2.String(),
+				Manifest:  alpine2Manifest,
+			},
+		},
 	}, images)
 
 	manifests, err := client.ListManifest()
@@ -54,7 +64,7 @@ func TestDeleteManifestRemovesTaggedDigestEntry(t *testing.T) {
 	manifest.Digest = "sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
 
 	require.NoError(t, client.PutManifest(image, manifest))
-	require.NoError(t, client.DeleteManifest(manifest))
+	require.NoError(t, client.DeleteManifest(image.String()))
 
 	manifests, err := client.ListManifest()
 	require.NoError(t, err)
@@ -140,7 +150,7 @@ func TestDeleteManifestRemovesDigestOnlyEntry(t *testing.T) {
 	manifest.Digest = dgst
 
 	require.NoError(t, client.PutManifest(image, manifest))
-	require.NoError(t, client.DeleteManifest(manifest))
+	require.NoError(t, client.DeleteManifest(image.String()))
 
 	manifests, err := client.ListManifest()
 	require.NoError(t, err)
@@ -158,8 +168,43 @@ func TestDeleteManifestPreservesDigestOnlyEntry(t *testing.T) {
 	pinnedManifest.Digest = dgst
 	require.NoError(t, client.PutManifest(tagged, taggedManifest))
 	require.NoError(t, client.PutManifest(pinned, pinnedManifest))
-	require.NoError(t, client.DeleteManifest(taggedManifest))
+	require.NoError(t, client.DeleteManifest(tagged.String()))
 	stored, err := client.GetManifest(pinned)
 	require.NoError(t, err)
 	assert.Equal(t, pinnedManifest, stored, "removing a tag should preserve the separately stored digest-only reference")
+}
+
+func TestManifestEntryPreservesStoredReference(t *testing.T) {
+	client := newTestClient(t)
+	old := digest.FromString("deployed")
+	current := digest.FromString("registry now")
+	refs := []string{
+		"alpine:latest",
+		"alpine:latest@" + old.String(),
+		"alpine@" + old.String(),
+	}
+	// All references resolve to the same current tag. Their original database
+	// keys must remain distinct even though the observed metadata is identical.
+	manifest := testManifest("docker.io/library/alpine", "latest")
+	manifest.Digest = current
+	var want []ManifestEntry
+	for _, ref := range refs {
+		image := parseTestImage(t, ref)
+		require.NoError(t, client.PutManifest(image, manifest))
+		want = append(want, ManifestEntry{Reference: image.String(), Manifest: manifest})
+	}
+	images, err := client.ListImage()
+	require.NoError(t, err)
+	require.ElementsMatch(t, want, images[manifest.Name])
+
+	for i, entry := range want {
+		require.NoError(t, client.DeleteManifest(entry.Reference))
+		require.NoError(t, client.DeleteManifest(entry.Reference), "deleting a missing reference is harmless")
+		images, err = client.ListImage()
+		require.NoError(t, err)
+		require.ElementsMatch(t, want[i+1:], images[manifest.Name], "deletion must preserve other references with identical observations")
+	}
+	first, err := client.First(parseTestImage(t, "alpine:latest"))
+	require.NoError(t, err)
+	require.True(t, first)
 }

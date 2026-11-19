@@ -3,6 +3,7 @@ package grpc
 import (
 	"context"
 	"encoding/json"
+	"strings"
 
 	"github.com/crazy-max/diun/v4/pb"
 	"github.com/crazy-max/diun/v4/pkg/registry"
@@ -20,7 +21,8 @@ func (c *Client) ImageList(_ context.Context, _ *pb.ImageListRequest) (*pb.Image
 	var ilr []*pb.ImageListResponse_Image
 	for name, mfsts := range images {
 		var latest *registry.Manifest
-		for _, mfst := range mfsts {
+		for _, entry := range mfsts {
+			mfst := entry.Manifest
 			if latest == nil || mfst.Created.After(*latest.Created) {
 				latest = new(mfst)
 			}
@@ -63,7 +65,8 @@ func (c *Client) ImageInspect(_ context.Context, request *pb.ImageInspectRequest
 		Name:      ref.Name(),
 		Manifests: []*pb.Manifest{},
 	}
-	for _, manifest := range images[ref.Name()] {
+	for _, entry := range images[ref.Name()] {
+		manifest := entry.Manifest
 		iir.Manifests = append(iir.Manifests, &pb.Manifest{
 			Tag:      manifest.Tag,
 			MimeType: manifest.MIMEType,
@@ -94,28 +97,35 @@ func (c *Client) ImageRemove(_ context.Context, request *pb.ImageRemoveRequest) 
 		return nil, errors.Errorf("%s not found in database", ref.Name())
 	}
 
-	var tag string
-	if tagged, ok := ref.(reference.Tagged); ok {
-		tag = tagged.Tag()
-	}
+	_, tagged := ref.(reference.Tagged)
+	_, digested := ref.(reference.Digested)
 
 	var removed []*pb.Manifest
-	for _, manifest := range images[ref.Name()] {
-		if len(tag) == 0 || manifest.Tag == tag {
-			if err = c.db.DeleteManifest(manifest); err != nil {
-				return nil, err
+	for _, entry := range images[ref.Name()] {
+		switch {
+		case digested:
+			if entry.Reference != ref.String() {
+				continue
 			}
-			b, _ := json.Marshal(manifest)
-			removed = append(removed, &pb.Manifest{
-				Tag:      manifest.Tag,
-				MimeType: manifest.MIMEType,
-				Digest:   manifest.Digest.String(),
-				Created:  timestamppb.New(*manifest.Created),
-				Labels:   manifest.Labels,
-				Platform: manifest.Platform,
-				Size:     int64(len(b)),
-			})
+		case tagged:
+			if entry.Reference != ref.String() && !strings.HasPrefix(entry.Reference, ref.String()+"@") {
+				continue
+			}
 		}
+		manifest := entry.Manifest
+		if err = c.db.DeleteManifest(entry.Reference); err != nil {
+			return nil, err
+		}
+		b, _ := json.Marshal(manifest)
+		removed = append(removed, &pb.Manifest{
+			Tag:      manifest.Tag,
+			MimeType: manifest.MIMEType,
+			Digest:   manifest.Digest.String(),
+			Created:  timestamppb.New(*manifest.Created),
+			Labels:   manifest.Labels,
+			Platform: manifest.Platform,
+			Size:     int64(len(b)),
+		})
 	}
 
 	return &pb.ImageRemoveResponse{
@@ -132,8 +142,9 @@ func (c *Client) ImagePrune(_ context.Context, _ *pb.ImagePruneRequest) (*pb.Ima
 	var removed []*pb.ImagePruneResponse_Image
 	for n, m := range images {
 		var manifests []*pb.Manifest
-		for _, manifest := range m {
-			if err = c.db.DeleteManifest(manifest); err != nil {
+		for _, entry := range m {
+			manifest := entry.Manifest
+			if err = c.db.DeleteManifest(entry.Reference); err != nil {
 				return nil, err
 			}
 			b, _ := json.Marshal(manifest)

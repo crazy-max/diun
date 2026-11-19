@@ -71,7 +71,7 @@ func TestImageRemoveByTag(t *testing.T) {
 	images, err := dbClient.ListImage()
 	require.NoError(t, err)
 	require.Len(t, images["docker.io/crazymax/diun"], 1)
-	assert.Equal(t, "1.2.3", images["docker.io/crazymax/diun"][0].Tag)
+	assert.Equal(t, "1.2.3", images["docker.io/crazymax/diun"][0].Manifest.Tag)
 }
 
 func TestImageRemoveWithoutTagRemovesAllImageManifests(t *testing.T) {
@@ -106,6 +106,99 @@ func TestImagePrune(t *testing.T) {
 	manifests, err := dbClient.ListManifest()
 	require.NoError(t, err)
 	assert.Empty(t, manifests)
+}
+
+func TestImageRemovalUsesStoredReferences(t *testing.T) {
+	old := digest.FromString("deployed").String()
+	other := digest.FromString("another deployment").String()
+	refs := []string{
+		"alpine:latest",
+		"alpine:latest@" + old,
+		"alpine:latest@" + other,
+		"alpine@" + old,
+		"alpine:latest-other",
+		"alpine2:latest",
+	}
+	for _, tt := range []struct {
+		name      string
+		request   string
+		prune     bool
+		remaining []string
+	}{
+		{
+			name:      "repository",
+			request:   "alpine",
+			remaining: refs[5:],
+		},
+		{
+			name:      "tag and its aliases",
+			request:   "alpine:latest",
+			remaining: refs[3:],
+		},
+		{
+			name:      "exact tag plus digest",
+			request:   "alpine:latest@" + old,
+			remaining: []string{refs[0], refs[2], refs[3], refs[4], refs[5]},
+		},
+		{
+			name:      "exact digest only",
+			request:   "alpine@" + old,
+			remaining: []string{refs[0], refs[1], refs[2], refs[4], refs[5]},
+		},
+		{
+			name:      "missing digest does not remove siblings",
+			request:   "alpine@" + digest.FromString("missing").String(),
+			remaining: refs,
+		},
+		{
+			name:  "prune",
+			prune: true,
+		},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			client, store := newTestClient(t)
+			created := time.Date(2026, 5, 24, 12, 0, 0, 0, time.UTC)
+			for _, ref := range refs {
+				manifest := seedManifest(t, client, ref, created)
+				manifest.Tag = "latest"
+				manifest.Digest = digest.FromString("registry now")
+				image, err := registry.ParseImage(registry.ParseImageOptions{Name: ref})
+				require.NoError(t, err)
+				require.NoError(t, store.PutManifest(image, manifest))
+			}
+			var removed []*pb.Manifest
+			if tt.prune {
+				response, err := client.ImagePrune(t.Context(), &pb.ImagePruneRequest{})
+				require.NoError(t, err)
+				for _, image := range response.Images {
+					removed = append(removed, image.Manifests...)
+				}
+			} else {
+				response, err := client.ImageRemove(t.Context(), &pb.ImageRemoveRequest{Name: tt.request})
+				require.NoError(t, err)
+				removed = response.Manifests
+			}
+			require.Len(t, removed, len(refs)-len(tt.remaining))
+			for _, manifest := range removed {
+				require.Equal(t, digest.FromString("registry now").String(), manifest.Digest)
+			}
+			images, err := store.ListImage()
+			require.NoError(t, err)
+			var remaining []string
+			for _, entries := range images {
+				for _, entry := range entries {
+					remaining = append(remaining, entry.Reference)
+				}
+			}
+			var want []string
+			for _, ref := range tt.remaining {
+				image, err := registry.ParseImage(registry.ParseImageOptions{Name: ref})
+				require.NoError(t, err)
+				want = append(want, image.String())
+			}
+			require.ElementsMatch(t, want, remaining)
+		})
+	}
 }
 
 func TestNotifTestWithoutNotifier(t *testing.T) {
