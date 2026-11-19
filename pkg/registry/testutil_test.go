@@ -21,12 +21,13 @@ type testRegistry struct {
 	repo   string
 	server *httptest.Server
 
-	mu          sync.Mutex
-	requests    map[string]int
-	tags        map[string][]string
-	tagLinks    map[string]string
-	manifests   map[string]testRegistryBlob
-	configBlobs map[string][]byte
+	mu               sync.Mutex
+	requests         map[string]int
+	tags             map[string][]string
+	tagLinks         map[string]string
+	manifests        map[string]testRegistryBlob
+	configBlobs      map[string][]byte
+	manifestStatuses map[string][]int
 }
 
 type testRegistryBlob struct {
@@ -137,6 +138,18 @@ func (r *testRegistry) handleTags(w http.ResponseWriter, req *http.Request) {
 }
 
 func (r *testRegistry) handleManifest(w http.ResponseWriter, req *http.Request) {
+	r.mu.Lock()
+	var status int
+	if statuses := r.manifestStatuses[req.Method]; len(statuses) > 0 {
+		status = statuses[0]
+		r.manifestStatuses[req.Method] = statuses[1:]
+	}
+	r.mu.Unlock()
+	if status != 0 {
+		w.WriteHeader(status)
+		return
+	}
+
 	if req.Method != http.MethodHead && req.Method != http.MethodGet {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return

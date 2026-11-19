@@ -1,6 +1,7 @@
 package registry
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -31,6 +32,18 @@ func (c *Client) Manifest(image Image, dbManifest Manifest) (Manifest, bool, err
 	ctx, cancel := c.timeoutContext()
 	defer cancel()
 
+	var result Manifest
+	var updated bool
+	err := retry(ctx, func() error {
+		var err error
+		result, updated, err = c.manifest(ctx, image, dbManifest)
+		return err
+	})
+
+	return result, updated, err
+}
+
+func (c *Client) manifest(ctx context.Context, image Image, dbManifest Manifest) (Manifest, bool, error) {
 	rmRef, err := ImageReference(image.String())
 	if err != nil {
 		return Manifest{}, false, errors.Wrap(err, "cannot parse reference")
