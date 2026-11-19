@@ -203,7 +203,6 @@ func (di *Diun) Start(ctx context.Context) error {
 
 	select {
 	case <-ctx.Done():
-		di.HealthchecksFail("Application closed")
 		return nil
 	case err := <-serverErrCh:
 		di.HealthchecksFail("Application closed")

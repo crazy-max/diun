@@ -2,8 +2,11 @@ package app
 
 import (
 	"context"
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -44,10 +47,24 @@ func TestStartReturnsImmediatelyWithoutSchedule(t *testing.T) {
 }
 
 func TestStartReturnsWhenContextCanceled(t *testing.T) {
+	var healthchecksRequests atomic.Uint32
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		healthchecksRequests.Add(1)
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer server.Close()
+
 	ctx, cancel := context.WithCancelCause(context.Background())
 	t.Cleanup(func() { cancel(nil) })
 
-	diun := newTestDiun(t, "@every 1m")
+	watch := (&model.Watch{}).GetDefaults()
+	watch.RunOnStartup = new(false)
+	watch.Schedule = "@every 1m"
+	watch.Healthchecks = &model.Healthchecks{
+		BaseURL: server.URL,
+		UUID:    "5bf66975-d4c7-4bf5-bcc8-b8d8a82ea278",
+	}
+	diun := newTestDiunWithWatch(t, watch)
 
 	errCh := make(chan error, 1)
 	go func() {
@@ -72,6 +89,7 @@ func TestStartReturnsWhenContextCanceled(t *testing.T) {
 	case <-time.After(time.Second):
 		t.Fatal("timed out waiting for Start to return")
 	}
+	require.Zero(t, healthchecksRequests.Load(), "normal shutdown must not send a Healthchecks ping")
 }
 
 func TestStartReturnsWhenContextAlreadyCanceled(t *testing.T) {
