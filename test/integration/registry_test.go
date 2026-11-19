@@ -776,3 +776,259 @@ func TestRegistryPlatformStateUpgrade(t *testing.T) {
 		require.Equal(t, "linux/"+watch.Platform.Arch, manifest.Platform)
 	}
 }
+
+func TestRegistrySharedAnalysisAcrossProviders(t *testing.T) {
+	f := newRegistryFixture(t)
+	f.push(t, "latest", "first")
+	f.push(t, "1.0.0", "first")
+	target, err := url.Parse(f.url)
+	require.NoError(t, err)
+	proxy := httputil.NewSingleHostReverseProxy(target)
+	var heads, lists atomic.Int32
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodHead && strings.Contains(r.URL.Path, "/manifests/") {
+			heads.Add(1)
+		}
+		if strings.HasSuffix(r.URL.Path, "/tags/list") {
+			lists.Add(1)
+		}
+		proxy.ServeHTTP(w, r)
+	}))
+	defer server.Close()
+	f.url = server.URL
+	first := f.image("latest")
+	first.WatchMode = registry.WatchModeAll
+	first.Metadata = map[string]string{"service": "first"}
+	first.HubLink = "https://first.example"
+	second := f.image("1.0.0")
+	second.Metadata = map[string]string{"service": "second"}
+	second.HubLink = "https://second.example"
+	dockerfile := filepath.Join(t.TempDir(), "Dockerfile")
+	require.NoError(t, os.WriteFile(dockerfile, []byte(
+		"# diun.regopt=local\n# diun.platform=linux/amd64\n# diun.metadata.service=third\n"+
+			"# diun.hub_link=https://third.example\nFROM "+first.Name+"\n"), 0o600))
+	f.cfg.Providers.Dockerfile = &model.PrdDockerfile{Patterns: []string{dockerfile}}
+	f.cfg.Watch.Workers = 1 // Sequential execution used to hide updates from later consumers.
+
+	reports, saved := f.scan(t, first, second)
+	require.Empty(t, reports, "all consumers share first-check suppression")
+	require.Len(t, saved, 2)
+	require.Equal(t, int32(2), heads.Load())
+	require.Equal(t, int32(1), lists.Load())
+
+	f.push(t, "latest", "second")
+	f.push(t, "1.0.0", "second")
+	reports, saved = f.scan(t, first, second)
+	require.Len(t, reports, 4)
+	require.Len(t, saved, 2)
+	require.Equal(t, int32(4), heads.Load())
+	require.Equal(t, int32(2), lists.Load())
+	services := map[string]int{}
+	for _, report := range reports {
+		require.Equal(t, "update", report["status"])
+		service := report["metadata"].(map[string]any)["service"].(string)
+		services[service]++
+		require.Equal(t, "https://"+service+".example", report["hub_link"])
+		if service == "third" {
+			require.Equal(t, "dockerfile", report["provider"])
+		} else {
+			require.Equal(t, "file", report["provider"])
+		}
+	}
+	require.Equal(t, map[string]int{"first": 2, "second": 1, "third": 1}, services)
+
+	first.NotifyOn = []model.NotifyOn{model.NotifyOnUnchange}
+	reports, _ = f.scan(t, first, second)
+	require.Len(t, reports, 2)
+	for _, report := range reports {
+		require.Equal(t, "unchange", report["status"])
+		require.Equal(t, map[string]any{"service": "first"}, report["metadata"])
+	}
+	require.Equal(t, int32(6), heads.Load(), "a new run must check the registry again")
+
+	// Different tags reuse one client and may analyze concurrently.
+	f.cfg.Watch.Workers = 4
+	first.NotifyOn = model.NotifyOnDefaults
+	f.push(t, "latest", "third")
+	f.push(t, "1.0.0", "third")
+	reports, _ = f.scan(t, first, second)
+	require.Len(t, reports, 4)
+	require.Equal(t, int32(8), heads.Load())
+	for _, report := range reports {
+		require.Equal(t, "update", report["status"])
+	}
+}
+
+func TestRegistrySharedAnalysisFailureRecovery(t *testing.T) {
+	f := newRegistryFixture(t)
+	first := f.push(t, "latest", "first")
+	target, err := url.Parse(f.url)
+	require.NoError(t, err)
+	proxy := httputil.NewSingleHostReverseProxy(target)
+	var fail atomic.Bool
+	var heads atomic.Int32
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if strings.Contains(r.URL.Path, "/manifests/") {
+			if r.Method == http.MethodHead {
+				heads.Add(1)
+			}
+			if fail.Load() {
+				w.WriteHeader(http.StatusNotFound)
+				return
+			}
+		}
+		proxy.ServeHTTP(w, r)
+	}))
+	defer server.Close()
+	f.url = server.URL
+	image := f.image("latest")
+	reports, saved := f.scan(t, image, image)
+	require.Empty(t, reports)
+	require.Len(t, saved, 1)
+	require.Equal(t, first, saved[0].Digest)
+	require.Equal(t, int32(1), heads.Load())
+
+	second := f.push(t, "latest", "second")
+	fail.Store(true)
+	reports, saved = f.scan(t, image, image)
+	require.Empty(t, reports)
+	require.Len(t, saved, 1)
+	require.Equal(t, first, saved[0].Digest, "failed analysis must preserve the baseline")
+	require.Equal(t, int32(2), heads.Load(), "consumers must share the failed fetch")
+
+	fail.Store(false)
+	reports, saved = f.scan(t, image, image)
+	require.Len(t, reports, 2)
+	require.Len(t, saved, 1)
+	require.Equal(t, second, saved[0].Digest)
+	require.Equal(t, int32(3), heads.Load(), "the next scan must retry")
+	for _, report := range reports {
+		require.Equal(t, "update", report["status"])
+		require.Equal(t, second.String(), report["digest"])
+	}
+}
+
+func TestRegistrySharedAnalysisCredentialIsolation(t *testing.T) {
+	for _, workers := range []int{1, 4} {
+		t.Run(fmt.Sprintf("workers=%d", workers), func(t *testing.T) {
+			f := newRegistryFixture(t)
+			f.cfg.Watch.Workers = workers
+			f.cfg.Watch.FirstCheckNotif = new(true)
+			f.push(t, "latest", "first")
+			target, err := url.Parse(f.url)
+			require.NoError(t, err)
+			proxy := httputil.NewSingleHostReverseProxy(target)
+			var heads, denied atomic.Int32
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				user, password, ok := r.BasicAuth()
+				if !ok || user != "watcher" || password != "allowed" {
+					if password == "denied" {
+						denied.Add(1)
+					}
+					w.Header().Set("WWW-Authenticate", `Basic realm="registry"`)
+					w.WriteHeader(http.StatusUnauthorized)
+					return
+				}
+				if r.Method == http.MethodHead && strings.Contains(r.URL.Path, "/manifests/") {
+					heads.Add(1)
+				}
+				proxy.ServeHTTP(w, r)
+			}))
+			defer server.Close()
+			f.url = server.URL
+			f.cfg.RegOpts[0].Username = "watcher"
+			f.cfg.RegOpts[0].Password = "allowed"
+			bad := f.cfg.RegOpts[0]
+			bad.Name = "denied"
+			bad.Password = "denied"
+			f.cfg.RegOpts = append(f.cfg.RegOpts, bad)
+			allowed := f.image("latest")
+			allowed.Metadata = map[string]string{"access": "allowed"}
+			allowed.NotifyOn = []model.NotifyOn{model.NotifyOnNew, model.NotifyOnUnchange}
+			rejected := allowed
+			rejected.RegOpt = "denied"
+			rejected.Metadata = map[string]string{"access": "denied"}
+			for i, watches := range [][]model.Image{
+				{allowed, allowed, rejected},
+				{rejected, allowed, allowed},
+			} {
+				before := denied.Load()
+				reports, saved := f.scan(t, watches...)
+				require.Len(t, reports, 2, "only authorized consumers may receive analysis results")
+				require.Len(t, saved, 1)
+				require.Equal(t, int32(i+1), heads.Load(), "equal credentials must still share analysis")
+				require.Greater(t, denied.Load(), before, "each scan must try the rejected credentials independently")
+				for _, report := range reports {
+					require.Equal(t, map[string]any{"access": "allowed"}, report["metadata"])
+				}
+			}
+		})
+	}
+}
+
+func TestRegistrySharedAnalysisPlatformBaselines(t *testing.T) {
+	for _, workers := range []int{1, 4} {
+		t.Run(fmt.Sprintf("workers=%d", workers), func(t *testing.T) {
+			f := newRegistryFixture(t)
+			f.cfg.Watch.Workers = workers
+			f.pushIndex(t, "first", "first")
+			target, err := url.Parse(f.url)
+			require.NoError(t, err)
+			proxy := httputil.NewSingleHostReverseProxy(target)
+			var heads atomic.Int32
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if r.Method == http.MethodHead && strings.Contains(r.URL.Path, "/manifests/") {
+					heads.Add(1)
+				}
+				proxy.ServeHTTP(w, r)
+			}))
+			defer server.Close()
+			f.url = server.URL
+			var watches []model.Image
+			for _, arch := range []string{"amd64", "arm64"} {
+				for _, service := range []string{"first", "second"} {
+					image := f.image("latest")
+					image.Platform.Arch = arch
+					image.Metadata = map[string]string{"service": service}
+					image.NotifyOn = []model.NotifyOn{model.NotifyOnNew, model.NotifyOnUpdate, model.NotifyOnUnchange}
+					watches = append(watches, image)
+				}
+			}
+			reports, saved := f.scan(t, watches...)
+			require.Empty(t, reports)
+			require.Len(t, saved, 1)
+			require.Equal(t, int32(2), heads.Load(), "duplicate watches share one check per platform")
+
+			f.pushIndex(t, "second", "second")
+			before := heads.Load()
+			reports, _ = f.scan(t, watches[:2]...)
+			require.Len(t, reports, 2)
+			require.Equal(t, before+1, heads.Load())
+			for _, report := range reports {
+				require.Equal(t, "update", report["status"])
+			}
+
+			// The arm64 platform was absent from the previous scan. Its own
+			// baseline must survive the amd64 write to shared reference history.
+			reports, _ = f.scan(t, watches...)
+			require.Len(t, reports, 4)
+			require.Equal(t, before+3, heads.Load())
+			var consumers []string
+			for _, report := range reports {
+				want := "unchange"
+				if report["platform"] == "linux/arm64" {
+					want = "update"
+				}
+				require.Equal(t, want, report["status"])
+				consumers = append(consumers, report["platform"].(string)+"/"+report["metadata"].(map[string]any)["service"].(string))
+			}
+			require.ElementsMatch(t, []string{"linux/amd64/first", "linux/amd64/second", "linux/arm64/first", "linux/arm64/second"}, consumers)
+			reports, _ = f.scan(t, watches...)
+			require.Len(t, reports, 4)
+			require.Equal(t, before+5, heads.Load(), "each new scan must check both platforms again")
+			for _, report := range reports {
+				require.Equal(t, "unchange", report["status"])
+			}
+		})
+	}
+}
