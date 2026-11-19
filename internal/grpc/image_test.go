@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"context"
+	"encoding/json"
 	"path/filepath"
 	"testing"
 	"time"
@@ -18,12 +19,18 @@ import (
 )
 
 func TestImageListAndInspect(t *testing.T) {
-	client, _ := newTestClient(t)
+	client, store := newTestClient(t)
 	older := time.Date(2026, 5, 23, 12, 0, 0, 0, time.UTC)
 	newer := time.Date(2026, 5, 24, 12, 0, 0, 0, time.UTC)
 	seedManifest(t, client, "crazymax/diun:1.2.0", older)
-	seedManifest(t, client, "crazymax/diun:1.2.3", newer)
+	latest := seedManifest(t, client, "crazymax/diun:1.2.3", newer)
 	seedManifest(t, client, "alpine:3.20", older)
+	image, err := registry.ParseImage(registry.ParseImageOptions{Name: "crazymax/diun:1.2.3"})
+	require.NoError(t, err)
+	for _, arch := range []string{"amd64", "arm64"} {
+		latest.Platform = "linux/" + arch
+		require.NoError(t, store.PutPlatformManifest(image, model.ImagePlatform{OS: "linux", Arch: arch}, latest))
+	}
 
 	list, err := client.ImageList(context.Background(), &pb.ImageListRequest{})
 	require.NoError(t, err)
@@ -34,6 +41,7 @@ func TestImageListAndInspect(t *testing.T) {
 	require.NotNil(t, diun.Latest)
 	assert.Equal(t, "1.2.3", diun.Latest.Tag)
 	assert.Equal(t, newer, diun.Latest.Created.AsTime())
+	assert.Equal(t, "linux/arm64", diun.Latest.Platform)
 
 	inspect, err := client.ImageInspect(context.Background(), &pb.ImageInspectRequest{
 		Name: "crazymax/diun",
@@ -42,6 +50,11 @@ func TestImageListAndInspect(t *testing.T) {
 	require.NotNil(t, inspect.Image)
 	assert.Equal(t, "docker.io/crazymax/diun", inspect.Image.Name)
 	assert.ElementsMatch(t, []string{"1.2.0", "1.2.3"}, manifestTags(inspect.Image.Manifests))
+	for _, manifest := range inspect.Image.Manifests {
+		if manifest.Tag == "1.2.3" {
+			assert.Equal(t, "linux/arm64", manifest.Platform)
+		}
+	}
 }
 
 func TestImageInspectReturnsNotFound(t *testing.T) {
@@ -52,6 +65,62 @@ func TestImageInspectReturnsNotFound(t *testing.T) {
 	})
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "docker.io/missing/image not found in database")
+}
+
+func TestImageCommandsWithoutCreationTime(t *testing.T) {
+	for _, operation := range []string{"remove", "prune"} {
+		t.Run(operation, func(t *testing.T) {
+			client, store := newTestClient(t)
+			created := time.Date(2026, 5, 24, 12, 0, 0, 0, time.UTC)
+			for _, ref := range []string{"alpine:a", "alpine:b", "alpine:c", "busybox:unknown"} {
+				manifest := seedManifest(t, client, ref, created)
+				if manifest.Tag != "b" {
+					manifest.Created = nil
+				}
+				image, err := registry.ParseImage(registry.ParseImageOptions{Name: ref})
+				require.NoError(t, err)
+				require.NoError(t, store.PutManifest(image, manifest))
+			}
+
+			list, err := client.ImageList(t.Context(), &pb.ImageListRequest{})
+			require.NoError(t, err)
+			alpine := findImageListEntry(t, list.Images, "docker.io/library/alpine")
+			require.Equal(t, "b", alpine.Latest.Tag, "known creation times take precedence over missing ones")
+			require.Equal(t, created, alpine.Latest.Created.AsTime())
+			busybox := findImageListEntry(t, list.Images, "docker.io/library/busybox")
+			require.Nil(t, busybox.Latest.Created)
+
+			inspect, err := client.ImageInspect(t.Context(), &pb.ImageInspectRequest{Name: "alpine"})
+			require.NoError(t, err)
+			require.Len(t, inspect.Image.Manifests, 3)
+			for _, manifest := range inspect.Image.Manifests {
+				if manifest.Tag != "b" {
+					require.Nil(t, manifest.Created)
+				}
+			}
+
+			var removed []*pb.Manifest
+			if operation == "remove" {
+				response, err := client.ImageRemove(t.Context(), &pb.ImageRemoveRequest{Name: "alpine"})
+				require.NoError(t, err)
+				removed = response.Manifests
+				require.Len(t, removed, 3)
+			} else {
+				response, err := client.ImagePrune(t.Context(), &pb.ImagePruneRequest{})
+				require.NoError(t, err)
+				for _, image := range response.Images {
+					removed = append(removed, image.Manifests...)
+				}
+				require.Len(t, removed, 4)
+			}
+			for _, manifest := range removed {
+				if manifest.Tag != "b" {
+					require.Nil(t, manifest.Created)
+				}
+				require.Positive(t, manifest.Size)
+			}
+		})
+	}
 }
 
 func TestImageRemoveByTag(t *testing.T) {
@@ -221,6 +290,53 @@ func TestHealthServiceDefaults(t *testing.T) {
 	})
 	require.NoError(t, err)
 	assert.Equal(t, healthpb.HealthCheckResponse_SERVICE_UNKNOWN, scheduler.Status)
+}
+
+func TestImageRemovalClearsPlatformCache(t *testing.T) {
+	for _, prune := range []bool{false, true} {
+		client, store := newTestClient(t)
+		image, err := registry.ParseImage(registry.ParseImageOptions{Name: "alpine:latest"})
+		require.NoError(t, err)
+		manifest := seedManifest(t, client, image.String(), time.Now())
+		var wantSize int64
+		for _, arch := range []string{"amd64", "arm64"} {
+			manifest.Platform = "linux/" + arch
+			manifest.Raw = append(manifest.Raw, arch...)
+			require.NoError(t, store.PutPlatformManifest(image, model.ImagePlatform{OS: "linux", Arch: arch}, manifest))
+			entry, err := json.Marshal(manifest)
+			require.NoError(t, err)
+			wantSize += int64(len(entry))
+		}
+		entry, err := json.Marshal(manifest)
+		require.NoError(t, err)
+		wantSize += int64(len(entry)) // Reference history contains the last write.
+		alias, err := registry.ParseImage(registry.ParseImageOptions{Name: image.String() + "@" + manifest.Digest.String()})
+		require.NoError(t, err)
+		require.NoError(t, store.PutPlatformManifest(alias, model.ImagePlatform{OS: "linux", Arch: "arm64"}, manifest))
+		wantSize += 2 * int64(len(entry)) // Alias history and its platform state.
+		var removed []*pb.Manifest
+		if prune {
+			response, err := client.ImagePrune(t.Context(), &pb.ImagePruneRequest{})
+			require.NoError(t, err)
+			require.Len(t, response.Images, 1)
+			removed = response.Images[0].Manifests
+		} else {
+			response, err := client.ImageRemove(t.Context(), &pb.ImageRemoveRequest{Name: image.String()})
+			require.NoError(t, err)
+			removed = response.Manifests
+		}
+		require.Len(t, removed, 2)
+		require.Equal(t, wantSize, removed[0].Size+removed[1].Size)
+		require.Positive(t, removed[0].Size, "each reference reports its own removed bytes")
+		require.Equal(t, 2*int64(len(entry)), removed[1].Size, "the alias reports only its history and platform state")
+		for _, ref := range []registry.Image{image, alias} {
+			for _, arch := range []string{"amd64", "arm64"} {
+				stored, err := store.GetPlatformManifest(ref, model.ImagePlatform{OS: "linux", Arch: arch})
+				require.NoError(t, err)
+				require.Empty(t, stored)
+			}
+		}
+	}
 }
 
 func newTestClient(t *testing.T) (*Client, *db.Client) {

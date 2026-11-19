@@ -183,7 +183,7 @@ func (di *Diun) runJob(job model.Job) (entry model.NotifEntry) {
 		return
 	}
 
-	dbManifest, err := di.db.GetManifest(job.RegImage)
+	dbManifest, err := di.db.GetPlatformManifest(job.RegImage, job.Image.Platform)
 	if err != nil {
 		sublog.Error().Err(err).Msg("Cannot get manifest from db")
 		return
@@ -229,7 +229,7 @@ func (di *Diun) runJob(job model.Job) (entry model.NotifEntry) {
 		entry.MarkUpdateAvailable()
 	}
 
-	if err := di.db.PutManifest(job.RegImage, entry.Manifest); err != nil {
+	if err := di.db.PutPlatformManifest(job.RegImage, job.Image.Platform, entry.Manifest); err != nil {
 		sublog.Error().Err(err).Msg("Cannot write manifest to db")
 		return
 	}

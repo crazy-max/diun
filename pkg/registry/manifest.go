@@ -13,16 +13,17 @@ import (
 
 // Manifest is the Docker image manifest information
 type Manifest struct {
-	Name          string
-	Tag           string
-	MIMEType      string
-	Digest        digest.Digest
-	Created       *time.Time
-	DockerVersion string
-	Labels        map[string]string
-	Layers        []string
-	Platform      string
-	Raw           []byte
+	Name           string
+	Tag            string
+	MIMEType       string
+	Digest         digest.Digest
+	InstanceDigest digest.Digest `json:",omitempty"`
+	Created        *time.Time
+	DockerVersion  string
+	Labels         map[string]string
+	Layers         []string
+	Platform       string
+	Raw            []byte
 }
 
 // Manifest returns the manifest for a specific image
@@ -43,7 +44,22 @@ func (c *Client) Manifest(image Image, dbManifest Manifest) (Manifest, bool, err
 
 	// Digest match, returns db manifest
 	if c.opts.CompareDigest && len(dbManifest.Digest) > 0 && dbManifest.Digest == rmDigest {
-		return dbManifest, false, nil
+		if !dbManifest.isManifestList() {
+			return dbManifest, false, nil
+		}
+		// The index digest alone cannot identify the cached platform's metadata.
+		// Older records lack InstanceDigest and are refreshed once.
+		list, err := manifest.ListFromBlob(dbManifest.Raw, dbManifest.MIMEType)
+		if err == nil {
+			selected, err := list.ChooseInstance(c.sysCtx)
+			if err == nil && selected == dbManifest.InstanceDigest {
+				instance, err := list.Instance(selected)
+				// A nested index still needs platform selection within the child.
+				if err == nil && !isManifestList(instance.MediaType) {
+					return dbManifest, false, nil
+				}
+			}
+		}
 	}
 
 	rmCloser, err := rmRef.NewImage(ctx, c.sysCtx)
@@ -57,6 +73,18 @@ func (c *Client) Manifest(image Image, dbManifest Manifest) (Manifest, bool, err
 		return Manifest{}, false, errors.Wrap(err, "cannot get raw manifest")
 	}
 
+	var instanceDigest digest.Digest
+	if isManifestList(rmManifestMimeType) {
+		list, err := manifest.ListFromBlob(rmRawManifest, rmManifestMimeType)
+		if err != nil {
+			return Manifest{}, false, errors.Wrap(err, "cannot parse manifest list")
+		}
+		instanceDigest, err = list.ChooseInstance(c.sysCtx)
+		if err != nil {
+			return Manifest{}, false, errors.Wrap(err, "error choosing image instance")
+		}
+	}
+
 	// For manifests list compare also digest matching the platform
 	updated := dbManifest.Digest != rmDigest
 	if c.opts.CompareDigest && len(dbManifest.Raw) > 0 && dbManifest.isManifestList() && isManifestList(rmManifestMimeType) {
@@ -65,18 +93,9 @@ func (c *Client) Manifest(image Image, dbManifest Manifest) (Manifest, bool, err
 			return Manifest{}, false, errors.Wrap(err, "cannot parse manifest list")
 		}
 		dbManifestPlatformDigest, err := dbManifestList.ChooseInstance(c.sysCtx)
-		if err != nil {
-			return Manifest{}, false, errors.Wrapf(err, "error choosing image instance")
-		}
-		rmManifestList, err := manifest.ListFromBlob(rmRawManifest, rmManifestMimeType)
-		if err != nil {
-			return Manifest{}, false, errors.Wrap(err, "cannot parse manifest list")
-		}
-		rmManifestPlatformDigest, err := rmManifestList.ChooseInstance(c.sysCtx)
-		if err != nil {
-			return Manifest{}, false, errors.Wrapf(err, "error choosing image instance")
-		}
-		updated = dbManifestPlatformDigest != rmManifestPlatformDigest
+		// A newly published platform has no instance in the previous index.
+		// The current index was successfully resolved above, so it is an update.
+		updated = err != nil || dbManifestPlatformDigest != instanceDigest
 	}
 
 	// Metadata describing the Docker image
@@ -94,16 +113,17 @@ func (c *Client) Manifest(image Image, dbManifest Manifest) (Manifest, bool, err
 	}
 
 	return Manifest{
-		Name:          rmCloser.Reference().DockerReference().Name(),
-		Tag:           rmTag,
-		MIMEType:      rmManifestMimeType,
-		Digest:        rmDigest,
-		Created:       rmInspect.Created,
-		DockerVersion: rmInspect.DockerVersion,
-		Labels:        rmInspect.Labels,
-		Layers:        rmInspect.Layers,
-		Platform:      rmPlatform,
-		Raw:           rmRawManifest,
+		Name:           rmCloser.Reference().DockerReference().Name(),
+		Tag:            rmTag,
+		MIMEType:       rmManifestMimeType,
+		Digest:         rmDigest,
+		InstanceDigest: instanceDigest,
+		Created:        rmInspect.Created,
+		DockerVersion:  rmInspect.DockerVersion,
+		Labels:         rmInspect.Labels,
+		Layers:         rmInspect.Layers,
+		Platform:       rmPlatform,
+		Raw:            rmRawManifest,
 	}, updated, nil
 }
 

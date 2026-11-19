@@ -3,6 +3,7 @@ package registry
 import (
 	stderrors "errors"
 	"net/http"
+	"runtime"
 	"strconv"
 	"testing"
 
@@ -101,6 +102,9 @@ func TestManifestListPlatformDigestComparison(t *testing.T) {
 		testManifestListInstance{manifest: oldAMD64.manifest, platform: amd64Platform},
 		testManifestListInstance{manifest: remoteARM.manifest, platform: armPlatform},
 	)
+	dbListWithoutPlatform := newTestManifestList(t,
+		testManifestListInstance{manifest: oldARM.manifest, platform: armPlatform},
+	)
 
 	registry.addImage("linux-amd64", remoteAMD64)
 	registry.addImage("linux-arm-v7", remoteARM)
@@ -132,6 +136,12 @@ func TestManifestListPlatformDigestComparison(t *testing.T) {
 			name:    "different selected platform digest",
 			raw:     dbListWithOldPlatform.body,
 			digest:  dbListWithOldPlatform.digest,
+			updated: true,
+		},
+		{
+			name:    "platform added to index",
+			raw:     dbListWithoutPlatform.body,
+			digest:  dbListWithoutPlatform.digest,
 			updated: true,
 		},
 	} {
@@ -226,4 +236,131 @@ func TestManifestTaggedDigestUnknownTag(t *testing.T) {
 	_, _, err = client.Manifest(image, Manifest{})
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "reading digest missing")
+}
+
+func TestManifestListCacheDoesNotLeakPlatformMetadata(t *testing.T) {
+	r := newTestRegistry(t, "acme/diun")
+	amd64 := ocispecs.Platform{OS: "linux", Architecture: "amd64"}
+	arm := ocispecs.Platform{OS: "linux", Architecture: "arm", Variant: "v7"}
+	amdImage := newTestRegistryImage(t, amd64, "25.0.0", map[string]string{"platform": "amd64"})
+	armImage := newTestRegistryImage(t, arm, "25.0.0", map[string]string{"platform": "arm"})
+	list := newTestManifestList(t,
+		testManifestListInstance{manifest: amdImage.manifest, platform: amd64},
+		testManifestListInstance{manifest: armImage.manifest, platform: arm},
+	)
+	r.addImage("amd64", amdImage)
+	r.addImage("arm", armImage)
+	r.addManifest("multi", list)
+	image, err := ParseImage(ParseImageOptions{Name: r.imageName("multi")})
+	require.NoError(t, err)
+	amdClient := newTestRegistryClient(t, Options{CompareDigest: true, ImageOs: "linux", ImageArch: "amd64"})
+	armClient := newTestRegistryClient(t, Options{CompareDigest: true, ImageOs: "linux", ImageArch: "arm", ImageVariant: "v7"})
+	cached, _, err := amdClient.Manifest(image, Manifest{})
+	require.NoError(t, err)
+	other, updated, err := armClient.Manifest(image, cached)
+	require.NoError(t, err)
+	require.False(t, updated)
+	require.Equal(t, "linux/arm/v7", other.Platform)
+	require.Equal(t, "arm", other.Labels["platform"])
+	require.Equal(t, "amd64", cached.Labels["platform"])
+	before := r.requestCount(http.MethodGet, "/v2/acme/diun/manifests/multi")
+	again, updated, err := armClient.Manifest(image, other)
+	require.NoError(t, err)
+	require.False(t, updated)
+	require.Equal(t, other, again)
+	require.Equal(t, before, r.requestCount(http.MethodGet, "/v2/acme/diun/manifests/multi"))
+}
+
+func TestManifestListCacheUsesSelectedInstance(t *testing.T) {
+	for _, tt := range []struct {
+		name     string
+		platform ocispecs.Platform
+		opts     Options
+	}{
+		{
+			name:     "default host platform",
+			platform: ocispecs.Platform{OS: runtime.GOOS, Architecture: runtime.GOARCH},
+			opts:     Options{CompareDigest: true},
+		},
+		{
+			name:     "ARM without explicit variant",
+			platform: ocispecs.Platform{OS: "linux", Architecture: "arm", Variant: "v7"},
+			opts:     Options{CompareDigest: true, ImageOs: "linux", ImageArch: "arm"},
+		},
+		{
+			name:     "ARM64 without explicit variant",
+			platform: ocispecs.Platform{OS: "linux", Architecture: "arm64", Variant: "v8"},
+			opts:     Options{CompareDigest: true, ImageOs: "linux", ImageArch: "arm64"},
+		},
+		{
+			name:     "ARM compatible fallback variant",
+			platform: ocispecs.Platform{OS: "linux", Architecture: "arm", Variant: "v6"},
+			opts:     Options{CompareDigest: true, ImageOs: "linux", ImageArch: "arm", ImageVariant: "v7"},
+		},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			r := newTestRegistry(t, "acme/diun")
+			remote := newTestRegistryImage(t, tt.platform, "25.0.0", nil)
+			list := newTestManifestList(t, testManifestListInstance{manifest: remote.manifest, platform: tt.platform})
+			r.addImage("platform", remote)
+			r.addManifest("multi", list)
+			image, err := ParseImage(ParseImageOptions{Name: r.imageName("multi")})
+			require.NoError(t, err)
+			opts := tt.opts
+			opts.InsecureTLS = true
+			client, err := New(opts)
+			require.NoError(t, err)
+			cached, _, err := client.Manifest(image, Manifest{})
+			require.NoError(t, err)
+			require.Equal(t, remote.manifest.digest, cached.InstanceDigest)
+			before := r.requestCount(http.MethodGet, "/v2/acme/diun/manifests/multi")
+			again, updated, err := client.Manifest(image, cached)
+			require.NoError(t, err)
+			require.False(t, updated)
+			require.Equal(t, cached, again)
+			require.Equal(t, before, r.requestCount(http.MethodGet, "/v2/acme/diun/manifests/multi"))
+			// Existing databases are upgraded lazily by refreshing their metadata.
+			cached.InstanceDigest = ""
+			refreshed, updated, err := client.Manifest(image, cached)
+			require.NoError(t, err)
+			require.False(t, updated)
+			require.Equal(t, remote.manifest.digest, refreshed.InstanceDigest)
+			require.Greater(t, r.requestCount(http.MethodGet, "/v2/acme/diun/manifests/multi"), before)
+		})
+	}
+}
+
+func TestManifestListCacheSeparatesARMVariants(t *testing.T) {
+	for _, nested := range []bool{false, true} {
+		r := newTestRegistry(t, "acme/diun")
+		v6 := ocispecs.Platform{OS: "linux", Architecture: "arm", Variant: "v6"}
+		v7 := ocispecs.Platform{OS: "linux", Architecture: "arm", Variant: "v7"}
+		image6 := newTestRegistryImage(t, v6, "25.0.0", map[string]string{"variant": "v6"})
+		image7 := newTestRegistryImage(t, v7, "25.0.0", map[string]string{"variant": "v7"})
+		r.addImage("v6", image6)
+		r.addImage("v7", image7)
+		list := newTestManifestList(t,
+			testManifestListInstance{manifest: image6.manifest, platform: v6},
+			testManifestListInstance{manifest: image7.manifest, platform: v7},
+		)
+		if nested {
+			r.addManifest("inner", list)
+			list = newTestManifestList(t,
+				testManifestListInstance{manifest: list, platform: v6},
+				testManifestListInstance{manifest: list, platform: v7},
+			)
+		}
+		r.addManifest("multi", list)
+		image, err := ParseImage(ParseImageOptions{Name: r.imageName("multi")})
+		require.NoError(t, err)
+		client6 := newTestRegistryClient(t, Options{CompareDigest: true, ImageOs: "linux", ImageArch: "arm", ImageVariant: "v6"})
+		client7 := newTestRegistryClient(t, Options{CompareDigest: true, ImageOs: "linux", ImageArch: "arm", ImageVariant: "v7"})
+		cached, _, err := client6.Manifest(image, Manifest{})
+		require.NoError(t, err)
+		other, updated, err := client7.Manifest(image, cached)
+		require.NoError(t, err)
+		require.False(t, updated)
+		require.Equal(t, "v6", cached.Labels["variant"])
+		require.Equal(t, "v7", other.Labels["variant"], "nested=%t", nested)
+	}
 }

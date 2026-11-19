@@ -10,10 +10,14 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"net/http/httputil"
+	"net/url"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -100,6 +104,7 @@ func (f *registryFixture) request(t *testing.T, method, endpoint, contentType st
 	req, err := http.NewRequestWithContext(t.Context(), method, endpoint, bytes.NewReader(body))
 	require.NoError(t, err)
 	req.Header.Set("Content-Type", contentType)
+	req.Header.Set("Accept", "application/vnd.oci.image.manifest.v1+json, application/vnd.oci.image.index.v1+json")
 	resp, err := (&http.Client{Timeout: 10 * time.Second}).Do(req)
 	require.NoError(t, err)
 	defer resp.Body.Close()
@@ -111,9 +116,15 @@ func (f *registryFixture) request(t *testing.T, method, endpoint, contentType st
 
 func (f *registryFixture) push(t *testing.T, tag, revision string) digest.Digest {
 	t.Helper()
+	return f.pushPlatform(t, tag, revision, model.ImagePlatform{OS: "linux", Arch: "amd64"})
+}
+
+func (f *registryFixture) pushPlatform(t *testing.T, tag, revision string, platform model.ImagePlatform) digest.Digest {
+	t.Helper()
 	configBlob, err := json.Marshal(map[string]any{
-		"architecture": "amd64",
-		"os":           "linux",
+		"architecture": platform.Arch,
+		"os":           platform.OS,
+		"variant":      platform.Variant,
 		"created":      "2026-01-01T00:00:00Z",
 		"config": map[string]any{"Labels": map[string]string{
 			"org.opencontainers.image.revision": revision,
@@ -231,22 +242,71 @@ func TestRegistryWebhookLifecycle(t *testing.T) {
 			reports, _ = f.scan(t, image)
 			require.Len(t, reports, 1)
 			require.Equal(t, "update", reports[0]["status"])
+
+			f.pushIndex(t, "index", "index")
+			reports, saved = f.scan(t, image)
+			require.Len(t, reports, 1)
+			require.Equal(t, "update", reports[0]["status"])
+			require.NotEmpty(t, saved[0].InstanceDigest)
+			f.push(t, "latest", "single again")
+			reports, saved = f.scan(t, image)
+			require.Len(t, reports, 1)
+			require.Equal(t, "update", reports[0]["status"])
+			require.Empty(t, saved[0].InstanceDigest, "a single manifest must not retain the old index instance")
+			reports, _ = f.scan(t, image)
+			require.Empty(t, reports)
 		})
 	}
 }
 
 func TestRegistryRemovalAfterTagMoves(t *testing.T) {
-	for _, operation := range []string{"remove", "prune"} {
-		t.Run(operation, func(t *testing.T) {
+	for _, tt := range []struct {
+		name          string
+		prune         bool
+		multiPlatform bool
+	}{
+		{
+			name: "remove single manifest",
+		},
+		{
+			name:  "prune single manifest",
+			prune: true,
+		},
+		{
+			name:          "remove multi-platform index",
+			multiPlatform: true,
+		},
+		{
+			name:          "prune multi-platform index",
+			prune:         true,
+			multiPlatform: true,
+		},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
 			f := newRegistryFixture(t)
-			original := f.push(t, "latest", "first")
+			push := func(revision string) digest.Digest {
+				if !tt.multiPlatform {
+					return f.push(t, "latest", revision)
+				}
+				f.pushIndex(t, revision, revision)
+				headers := f.request(t, http.MethodHead, f.url+"/v2/"+f.repo+"/manifests/latest", "", nil, http.StatusOK)
+				return digest.Digest(headers.Get("Docker-Content-Digest"))
+			}
+			original := push("first")
 			plain := f.image("latest")
 			pinned := plain
 			pinned.Name += "@" + original.String()
-			f.scan(t, pinned, plain)
-			current := f.push(t, "latest", "second")
-			reports, saved := f.scan(t, pinned, plain)
-			require.Len(t, reports, 2)
+			watches := []model.Image{pinned, plain}
+			if tt.multiPlatform {
+				armPinned, armPlain := pinned, plain
+				armPinned.Platform.Arch = "arm64"
+				armPlain.Platform.Arch = "arm64"
+				watches = append(watches, armPinned, armPlain)
+			}
+			f.scan(t, watches...)
+			current := push("second")
+			reports, saved := f.scan(t, watches...)
+			require.Len(t, reports, len(watches))
 			require.Len(t, saved, 2)
 			for _, manifest := range saved {
 				require.Equal(t, current, manifest.Digest)
@@ -268,7 +328,7 @@ func TestRegistryRemovalAfterTagMoves(t *testing.T) {
 			client := pb.NewImageServiceClient(conn)
 			ctx, cancel := context.WithTimeout(t.Context(), 10*time.Second)
 			defer cancel()
-			if operation == "remove" {
+			if !tt.prune {
 				response, err := client.ImageRemove(ctx, &pb.ImageRemoveRequest{Name: pinned.Name})
 				require.NoError(t, err)
 				require.Len(t, response.Manifests, 1)
@@ -281,13 +341,25 @@ func TestRegistryRemovalAfterTagMoves(t *testing.T) {
 			}
 			images, err := store.ListImage()
 			require.NoError(t, err)
-			if operation == "remove" {
+			if !tt.prune {
 				image, err := registry.ParseImage(registry.ParseImageOptions{Name: plain.Name})
 				require.NoError(t, err)
 				require.Len(t, images[image.Name()], 1)
 				require.Equal(t, plain.Name, images[image.Name()][0].Reference)
 			} else {
 				require.Empty(t, images)
+			}
+			for _, watch := range watches {
+				image, err := registry.ParseImage(registry.ParseImageOptions{Name: watch.Name})
+				require.NoError(t, err)
+				cached, err := store.GetPlatformManifest(image, watch.Platform)
+				require.NoError(t, err)
+				if tt.prune || watch.Name == pinned.Name {
+					require.Empty(t, cached, "all platform state for removed references must be gone")
+				} else {
+					require.Equal(t, current, cached.Digest)
+					require.Equal(t, "linux/"+watch.Platform.Arch, cached.Platform)
+				}
 			}
 			require.NoError(t, conn.Close())
 			server.Stop()
@@ -500,5 +572,207 @@ func TestRegistryTagDiscovery(t *testing.T) {
 			reports, _ = f.scan(t, image)
 			require.Empty(t, reports, "discovered tags must not notify twice")
 		})
+	}
+}
+
+func (f *registryFixture) pushIndex(t *testing.T, amdRevision, armRevision string) {
+	t.Helper()
+	var descriptors []map[string]any
+	for _, instance := range []struct {
+		arch     string
+		revision string
+	}{
+		{
+			arch:     "amd64",
+			revision: amdRevision,
+		},
+		{
+			arch:     "arm64",
+			revision: armRevision,
+		},
+	} {
+		if instance.revision == "" {
+			continue
+		}
+		platform := model.ImagePlatform{OS: "linux", Arch: instance.arch}
+		dgst := f.pushPlatform(t, instance.arch, instance.revision, platform)
+		headers := f.request(t, http.MethodHead, f.url+"/v2/"+f.repo+"/manifests/"+instance.arch, "", nil, http.StatusOK)
+		size, err := strconv.Atoi(headers.Get("Content-Length"))
+		require.NoError(t, err)
+		descriptors = append(descriptors, map[string]any{
+			"mediaType": "application/vnd.oci.image.manifest.v1+json",
+			"size":      size,
+			"digest":    dgst,
+			"platform":  map[string]string{"os": "linux", "architecture": instance.arch},
+		})
+	}
+	body, err := json.Marshal(map[string]any{
+		"schemaVersion": 2,
+		"mediaType":     "application/vnd.oci.image.index.v1+json",
+		"manifests":     descriptors,
+	})
+	require.NoError(t, err)
+	f.request(t, http.MethodPut, f.url+"/v2/"+f.repo+"/manifests/latest", "application/vnd.oci.image.index.v1+json", body, http.StatusCreated)
+}
+
+func TestRegistryPlatformCacheAcrossRestarts(t *testing.T) {
+	for _, workers := range []int{1, 4} {
+		t.Run(fmt.Sprintf("workers=%d", workers), func(t *testing.T) {
+			f := newRegistryFixture(t)
+			f.pushIndex(t, "first", "first")
+			target, err := url.Parse(f.url)
+			require.NoError(t, err)
+			proxy := httputil.NewSingleHostReverseProxy(target)
+			var gets, heads atomic.Int32
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if strings.Contains(r.URL.Path, "/manifests/") {
+					if r.Method == http.MethodGet {
+						gets.Add(1)
+					} else if r.Method == http.MethodHead {
+						heads.Add(1)
+					}
+				}
+				proxy.ServeHTTP(w, r)
+			}))
+			defer server.Close()
+			f.url = server.URL
+			amd := f.image("latest")
+			amd.NotifyOn = []model.NotifyOn{model.NotifyOnNew, model.NotifyOnUpdate, model.NotifyOnUnchange}
+			arm := amd
+			arm.Platform.Arch = "arm64"
+			f.cfg.Watch.Workers = workers
+
+			reports, _ := f.scan(t, amd)
+			require.Empty(t, reports)
+			reports, saved := f.scan(t, amd, arm)
+			require.Len(t, reports, 2)
+			require.Len(t, saved, 1, "history still has one entry per reference")
+			for _, report := range reports {
+				require.Equal(t, "unchange", report["status"], "adding a platform must not report a new image")
+			}
+			require.ElementsMatch(t, []any{"linux/amd64", "linux/arm64"}, []any{reports[0]["platform"], reports[1]["platform"]})
+
+			for range 2 {
+				beforeGets, beforeHeads := gets.Load(), heads.Load()
+				reports, _ = f.scan(t, arm, amd)
+				require.Len(t, reports, 2)
+				require.Equal(t, beforeGets, gets.Load(), "both platforms must retain their HEAD-only fast path after restart")
+				require.Equal(t, beforeHeads+2, heads.Load())
+			}
+
+			f.pushIndex(t, "second", "second")
+			reports, _ = f.scan(t, amd, arm)
+			require.Len(t, reports, 2)
+			for _, report := range reports {
+				require.Equal(t, "update", report["status"], "another platform's write must not advance this platform's baseline")
+			}
+			before := gets.Load()
+			reports, _ = f.scan(t, arm, amd)
+			require.Len(t, reports, 2)
+			require.Equal(t, before, gets.Load())
+			for _, report := range reports {
+				require.Equal(t, "unchange", report["status"])
+			}
+		})
+	}
+}
+
+func TestRegistryPlatformUpdatesAndMissingInstance(t *testing.T) {
+	for _, compareDigest := range []bool{true, false} {
+		t.Run(fmt.Sprintf("compareDigest=%t", compareDigest), func(t *testing.T) {
+			f := newRegistryFixture(t)
+			f.cfg.Watch.CompareDigest = new(compareDigest)
+			f.cfg.Watch.Workers = 4
+			amd := f.image("latest")
+			amd.NotifyOn = []model.NotifyOn{model.NotifyOnNew, model.NotifyOnUpdate, model.NotifyOnUnchange}
+			arm := amd
+			arm.Platform.Arch = "arm64"
+			f.pushIndex(t, "first", "first")
+			f.scan(t, amd, arm)
+
+			f.pushIndex(t, "second", "first")
+			reports, _ := f.scan(t, arm, amd)
+			require.Len(t, reports, 2)
+			for _, report := range reports {
+				want := "update"
+				if compareDigest && report["platform"] == "linux/arm64" {
+					want = "unchange"
+				}
+				require.Equal(t, want, report["status"])
+			}
+
+			image, err := registry.ParseImage(registry.ParseImageOptions{Name: arm.Name})
+			require.NoError(t, err)
+			store, err := db.New(*f.cfg.Db)
+			require.NoError(t, err)
+			before, err := store.GetPlatformManifest(image, arm.Platform)
+			require.NoError(t, err)
+			require.NoError(t, store.Close())
+
+			f.pushIndex(t, "second", "")
+			reports, _ = f.scan(t, amd, arm)
+			require.Len(t, reports, 1, "an unavailable platform must not notify")
+			require.Equal(t, "linux/amd64", reports[0]["platform"])
+			store, err = db.New(*f.cfg.Db)
+			require.NoError(t, err)
+			after, err := store.GetPlatformManifest(image, arm.Platform)
+			require.NoError(t, err)
+			require.NoError(t, store.Close())
+			require.Equal(t, before, after, "a failed fetch must preserve the platform baseline")
+
+			f.pushIndex(t, "second", "second")
+			reports, _ = f.scan(t, amd, arm)
+			require.Len(t, reports, 2)
+			for _, report := range reports {
+				want := "update"
+				if compareDigest && report["platform"] == "linux/amd64" {
+					want = "unchange"
+				}
+				require.Equal(t, want, report["status"])
+			}
+		})
+	}
+}
+
+func TestRegistryPlatformStateUpgrade(t *testing.T) {
+	f := newRegistryFixture(t)
+	f.pushIndex(t, "first", "first")
+	amd := f.image("latest")
+	amd.NotifyOn = []model.NotifyOn{model.NotifyOnNew, model.NotifyOnUpdate, model.NotifyOnUnchange}
+	arm := amd
+	arm.Platform.Arch = "arm64"
+	_, saved := f.scan(t, amd)
+	require.Len(t, saved, 1)
+
+	// Use a separate database with only legacy history and version 2 metadata.
+	// This tests application startup migration and the registry refresh together.
+	f.cfg.Db.Path = filepath.Join(t.TempDir(), "legacy.db")
+	store, err := db.New(*f.cfg.Db)
+	require.NoError(t, err)
+	image, err := registry.ParseImage(registry.ParseImageOptions{Name: amd.Name})
+	require.NoError(t, err)
+	legacy := saved[0]
+	legacy.InstanceDigest = ""
+	require.NoError(t, store.PutManifest(image, legacy))
+	require.NoError(t, store.WriteMetadata(db.Metadata{Version: 2}))
+	require.NoError(t, store.Close())
+
+	for range 2 {
+		reports, history := f.scan(t, arm, amd)
+		require.Len(t, reports, 2)
+		require.Len(t, history, 1)
+		require.ElementsMatch(t, []any{"linux/amd64", "linux/arm64"}, []any{reports[0]["platform"], reports[1]["platform"]})
+		for _, report := range reports {
+			require.Equal(t, "unchange", report["status"], "upgrading must not mark existing images new or updated")
+		}
+	}
+	store, err = db.New(*f.cfg.Db)
+	require.NoError(t, err)
+	defer store.Close()
+	for _, watch := range []model.Image{amd, arm} {
+		manifest, err := store.GetPlatformManifest(image, watch.Platform)
+		require.NoError(t, err)
+		require.NotEmpty(t, manifest.InstanceDigest)
+		require.Equal(t, "linux/"+watch.Platform.Arch, manifest.Platform)
 	}
 }
