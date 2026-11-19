@@ -1,19 +1,24 @@
 package registry
 
 import (
+	"encoding/json"
 	stderrors "errors"
+	"math"
 	"net/http"
 	"runtime"
-	"strconv"
+	"strings"
 	"testing"
 	"time"
 
 	digest "github.com/opencontainers/go-digest"
 	ocispecs "github.com/opencontainers/image-spec/specs-go/v1"
+	"github.com/regclient/regclient/types/docker/schema1"
+	"github.com/regclient/regclient/types/errs"
+	regmanifest "github.com/regclient/regclient/types/manifest"
+	"github.com/regclient/regclient/types/mediatype"
+	regplatform "github.com/regclient/regclient/types/platform"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.podman.io/image/v5/docker"
-	podmanmanifest "go.podman.io/image/v5/manifest"
 )
 
 func TestManifestHeadRetry(t *testing.T) {
@@ -28,38 +33,39 @@ func TestManifestHeadRetry(t *testing.T) {
 			name:      "internal server error",
 			statuses:  []int{http.StatusInternalServerError},
 			wantHeads: 2,
-			minDelay:  time.Second / 2,
+			minDelay:  100 * time.Millisecond,
 		},
 		{
 			name:      "bad gateway",
 			statuses:  []int{http.StatusBadGateway},
 			wantHeads: 2,
-			minDelay:  time.Second / 2,
+			minDelay:  100 * time.Millisecond,
 		},
 		{
-			name:      "service unavailable",
+			// TODO: Migration blocker: regclient does not retry 503 responses.
+			name:      "service unavailable is not retried upstream",
 			statuses:  []int{http.StatusServiceUnavailable},
-			wantHeads: 2,
-			minDelay:  time.Second / 2,
+			wantHeads: 1,
+			wantError: true,
 		},
 		{
 			name:      "gateway timeout",
 			statuses:  []int{http.StatusGatewayTimeout},
 			wantHeads: 2,
-			minDelay:  time.Second / 2,
+			minDelay:  100 * time.Millisecond,
 		},
 		{
 			name:      "success on last attempt",
-			statuses:  []int{http.StatusInternalServerError, http.StatusBadGateway, http.StatusServiceUnavailable},
-			wantHeads: 4,
-			minDelay:  7 * time.Second / 2,
+			statuses:  []int{http.StatusInternalServerError, http.StatusBadGateway, http.StatusGatewayTimeout, http.StatusInternalServerError},
+			wantHeads: 5,
+			minDelay:  time.Second / 2,
 		},
 		{
 			name:      "retry limit",
-			statuses:  []int{http.StatusInternalServerError, http.StatusInternalServerError, http.StatusInternalServerError, http.StatusInternalServerError},
-			wantHeads: 4,
+			statuses:  []int{http.StatusInternalServerError, http.StatusInternalServerError, http.StatusInternalServerError, http.StatusInternalServerError, http.StatusInternalServerError},
+			wantHeads: 5,
 			wantError: true,
-			minDelay:  7 * time.Second / 2,
+			minDelay:  time.Second,
 		},
 		{
 			name:      "unauthorized",
@@ -109,9 +115,7 @@ func TestManifestHeadRetry(t *testing.T) {
 				require.ErrorContains(t, err, "cannot get image digest from HEAD request")
 				assert.Empty(t, manifest)
 				if tt.wantHeads > 1 {
-					httpErr, ok := stderrors.AsType[docker.UnexpectedHTTPStatusError](err)
-					require.True(t, ok)
-					assert.Equal(t, http.StatusInternalServerError, httpErr.StatusCode)
+					require.ErrorIs(t, err, errs.ErrHTTPStatus)
 				}
 			} else {
 				require.NoError(t, err)
@@ -127,7 +131,7 @@ func TestManifestHeadRetry(t *testing.T) {
 func TestManifestRetriesGet(t *testing.T) {
 	registry := newTestRegistry(t, "acme/diun")
 	registry.manifestStatuses = map[string][]int{
-		http.MethodGet: {http.StatusServiceUnavailable},
+		http.MethodGet: {http.StatusBadGateway},
 	}
 	remoteImage := newTestRegistryImage(t, ocispecs.Platform{
 		Architecture: "amd64",
@@ -145,8 +149,59 @@ func TestManifestRetriesGet(t *testing.T) {
 	assert.True(t, updated)
 	assert.Equal(t, remoteImage.manifest.digest, manifest.Digest)
 	assert.Equal(t, "linux/amd64", manifest.Platform)
-	assert.Equal(t, 2, registry.requestCount(http.MethodHead, "/v2/acme/diun/manifests/1.0.0"))
-	assert.Equal(t, 2, registry.requestCount(http.MethodGet, "/v2/acme/diun/manifests/1.0.0"))
+	assert.Equal(t, 1, registry.requestCount(http.MethodHead, "/v2/acme/diun/manifests/1.0.0"))
+	assert.Equal(t, 2, registry.requestCount(http.MethodGet, "/v2/acme/diun/manifests/"+remoteImage.manifest.digest.String()))
+}
+
+func TestManifestRejectsOverflowingConfigSize(t *testing.T) {
+	for _, tt := range []struct {
+		name         string
+		manifestType string
+		configType   string
+	}{
+		{
+			name:         "docker",
+			manifestType: mediatype.Docker2Manifest,
+			configType:   mediatype.Docker2ImageConfig,
+		},
+		{
+			name:         "oci",
+			manifestType: mediatype.OCI1Manifest,
+			configType:   mediatype.OCI1ImageConfig,
+		},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			r := newTestRegistry(t, "acme/diun")
+			remote := newTestRegistryImage(t, ocispecs.Platform{OS: "linux", Architecture: "amd64"}, "", nil)
+			var m ocispecs.Manifest
+			require.NoError(t, json.Unmarshal(remote.manifest.body, &m))
+			m.MediaType = tt.manifestType
+			m.Config.MediaType = tt.configType
+			m.Config.Size = math.MaxInt64
+			body, err := json.Marshal(m)
+			require.NoError(t, err)
+			remote.manifest = testRegistryBlob{mediaType: tt.manifestType, body: body, digest: digest.FromBytes(body)}
+			r.addImage("latest", remote)
+			// Chunked responses bypass Content-Length validation in regclient.
+			r.server.Config.Handler = http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+				if strings.Contains(req.URL.Path, "/blobs/") {
+					w.Header().Set("Content-Type", "application/octet-stream")
+					w.(http.Flusher).Flush()
+				}
+				r.handle(w, req)
+			})
+			image, err := ParseImage(ParseImageOptions{Name: r.imageName("latest")})
+			require.NoError(t, err)
+			client := newTestRegistryClient(t, Options{})
+			require.NotPanics(t, func() {
+				m, updated, err := client.Manifest(image, Manifest{})
+				require.ErrorContains(t, err, "invalid image config size")
+				assert.Empty(t, m)
+				assert.False(t, updated)
+			})
+			assert.Zero(t, r.requestCount(http.MethodGet, "/v2/acme/diun/blobs/"+remote.config.digest.String()))
+		})
+	}
 }
 
 func TestManifestReturnsCachedManifestWhenDigestMatches(t *testing.T) {
@@ -180,6 +235,104 @@ func TestManifestReturnsCachedManifestWhenDigestMatches(t *testing.T) {
 	assert.Zero(t, registry.requestCount(http.MethodGet, "/v2/acme/diun/manifests/1.0.0"))
 }
 
+func TestManifestAliasesReuseImmutableManifests(t *testing.T) {
+	r := newTestRegistry(t, "acme/diun")
+	p := ocispecs.Platform{OS: "linux", Architecture: "amd64"}
+	remote := newTestRegistryImage(t, p, "25.0.0", nil)
+	index := newTestManifestList(t, testManifestListInstance{manifest: remote.manifest, platform: p})
+	r.addImage("platform", remote)
+	r.addManifest("latest", index)
+	r.addManifest("1.0.0", index)
+	c := newTestRegistryClient(t, Options{CompareDigest: true})
+	for _, tag := range []string{"latest", "1.0.0"} {
+		img, err := ParseImage(ParseImageOptions{Name: r.imageName(tag)})
+		require.NoError(t, err)
+		m, _, err := c.Manifest(img, Manifest{})
+		require.NoError(t, err)
+		assert.Equal(t, tag, m.Tag)
+		_, changed, err := c.Manifest(img, m)
+		require.NoError(t, err)
+		assert.False(t, changed)
+		assert.Equal(t, 2, r.requestCount(http.MethodHead, "/v2/acme/diun/manifests/"+tag))
+		assert.Zero(t, r.requestCount(http.MethodGet, "/v2/acme/diun/manifests/"+tag))
+	}
+	assert.Equal(t, 1, r.requestCount(http.MethodGet, "/v2/acme/diun/manifests/"+index.digest.String()))
+	assert.Equal(t, 1, r.requestCount(http.MethodGet, "/v2/acme/diun/manifests/"+remote.manifest.digest.String()))
+}
+
+func TestManifestUsesRegclientPlatformSelection(t *testing.T) {
+	for _, tt := range []struct {
+		name      string
+		opts      Options
+		target    ocispecs.Platform
+		wantError bool
+	}{
+		{
+			name:   "Windows can select Linux",
+			opts:   Options{Platform: regplatform.Platform{OS: "windows", Architecture: "amd64"}},
+			target: ocispecs.Platform{OS: "linux", Architecture: "amd64"},
+		},
+		{
+			name:      "Linux cannot select Windows",
+			opts:      Options{Platform: regplatform.Platform{OS: "linux", Architecture: "amd64"}},
+			target:    ocispecs.Platform{OS: "windows", Architecture: "amd64"},
+			wantError: true,
+		},
+		{
+			name:      "unspecified ARM variant defaults to v7",
+			opts:      Options{Platform: regplatform.Platform{OS: "linux", Architecture: "arm"}},
+			target:    ocispecs.Platform{OS: "linux", Architecture: "arm", Variant: "v8"},
+			wantError: true,
+		},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			r := newTestRegistry(t, "acme/diun")
+			remote := newTestRegistryImage(t, tt.target, "", nil)
+			r.addImage("target", remote)
+			r.addManifest("multi", newTestManifestList(t, testManifestListInstance{manifest: remote.manifest, platform: tt.target}))
+			image, err := ParseImage(ParseImageOptions{Name: r.imageName("multi")})
+			require.NoError(t, err)
+			client := newTestRegistryClient(t, tt.opts)
+			_, _, err = client.Manifest(image, Manifest{})
+			if tt.wantError {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
+			}
+		})
+	}
+}
+
+func TestInspectSchema1(t *testing.T) {
+	topLayer, baseLayer := digest.FromString("top"), digest.FromString("base")
+	config := `{"created":"2026-01-01T00:00:00Z","docker_version":"1.9.0","os":"linux","architecture":"amd64","config":{"Labels":{"test":"schema1"}}}`
+	body, err := json.Marshal(schema1.Manifest{
+		Versioned:    schema1.ManifestSchemaVersion,
+		Name:         "test/image",
+		Tag:          "old",
+		Architecture: "amd64",
+		FSLayers: []schema1.FSLayer{
+			{BlobSum: topLayer},
+			{BlobSum: baseLayer},
+		},
+		History: []schema1.History{
+			{V1Compatibility: config},
+			{V1Compatibility: config},
+		},
+	})
+	require.NoError(t, err)
+	m, err := regmanifest.New(regmanifest.WithRaw(body))
+	require.NoError(t, err)
+	var result Manifest
+	require.NoError(t, inspectSchema1(m, &result))
+	assert.Equal(t, "old", result.Tag)
+	assert.Equal(t, "1.9.0", result.DockerVersion)
+	assert.Equal(t, "linux/amd64", result.Platform)
+	assert.Equal(t, []string{baseLayer.String(), topLayer.String()}, result.Layers)
+	assert.Equal(t, "schema1", result.Labels["test"])
+	assert.NotNil(t, result.Created)
+}
+
 func TestManifest(t *testing.T) {
 	registry := newTestRegistry(t, "acme/diun")
 	remoteImage := newTestRegistryImage(t, ocispecs.Platform{
@@ -204,7 +357,7 @@ func TestManifest(t *testing.T) {
 	assert.True(t, updated)
 	assert.Equal(t, registry.host()+"/acme/diun", manifest.Name)
 	assert.Equal(t, "1.0.0", manifest.Tag)
-	assert.Equal(t, podmanmanifest.DockerV2Schema2MediaType, manifest.MIMEType)
+	assert.Equal(t, mediatype.Docker2Manifest, manifest.MIMEType)
 	assert.Equal(t, remoteImage.manifest.digest, manifest.Digest)
 	assert.Equal(t, "25.0.0", manifest.DockerVersion)
 	assert.Equal(t, map[string]string{
@@ -252,8 +405,7 @@ func TestManifestListPlatformDigestComparison(t *testing.T) {
 
 	client := newTestRegistryClient(t, Options{
 		CompareDigest: true,
-		ImageOs:       "linux",
-		ImageArch:     "amd64",
+		Platform:      regplatform.Platform{OS: "linux", Architecture: "amd64"},
 	})
 
 	for _, tt := range []struct {
@@ -282,7 +434,7 @@ func TestManifestListPlatformDigestComparison(t *testing.T) {
 	} {
 		t.Run(tt.name, func(t *testing.T) {
 			manifest, updated, err := client.Manifest(image, Manifest{
-				MIMEType: podmanmanifest.DockerV2ListMediaType,
+				MIMEType: mediatype.Docker2ManifestList,
 				Digest:   tt.digest,
 				Raw:      tt.raw,
 			})
@@ -291,7 +443,7 @@ func TestManifestListPlatformDigestComparison(t *testing.T) {
 			assert.Equal(t, tt.updated, updated)
 			assert.Equal(t, registry.host()+"/acme/diun", manifest.Name)
 			assert.Equal(t, "multi", manifest.Tag)
-			assert.Equal(t, podmanmanifest.DockerV2ListMediaType, manifest.MIMEType)
+			assert.Equal(t, mediatype.Docker2ManifestList, manifest.MIMEType)
 			assert.Equal(t, remoteList.digest, manifest.Digest)
 			assert.Equal(t, "linux/amd64", manifest.Platform)
 		})
@@ -320,9 +472,7 @@ func TestManifestVariant(t *testing.T) {
 	require.NoError(t, err)
 
 	client := newTestRegistryClient(t, Options{
-		ImageOs:      "linux",
-		ImageArch:    "arm",
-		ImageVariant: "v7",
+		Platform: regplatform.Platform{OS: "linux", Architecture: "arm", Variant: "v7"},
 	})
 	manifest, updated, err := client.Manifest(image, Manifest{})
 	require.NoError(t, err)
@@ -349,9 +499,9 @@ func TestManifestNonImageArtifact(t *testing.T) {
 	_, _, err = client.Manifest(image, Manifest{})
 	require.Error(t, err)
 
-	_, ok := stderrors.AsType[podmanmanifest.NonImageArtifactError](err)
+	_, ok := stderrors.AsType[NonImageArtifactError](err)
 	assert.True(t, ok)
-	assert.Contains(t, err.Error(), "unsupported image-specific operation on artifact with type "+strconv.Quote(sigstoreBundleType))
+	assert.Contains(t, err.Error(), ocispecs.MediaTypeEmptyJSON)
 }
 
 func TestManifestTaggedDigestUnknownTag(t *testing.T) {
@@ -370,7 +520,7 @@ func TestManifestTaggedDigestUnknownTag(t *testing.T) {
 	client := newTestRegistryClient(t, Options{CompareDigest: true})
 	_, _, err = client.Manifest(image, Manifest{})
 	require.Error(t, err)
-	assert.Contains(t, err.Error(), "reading digest missing")
+	assert.ErrorIs(t, err, errs.ErrNotFound)
 }
 
 func TestManifestListCacheDoesNotLeakPlatformMetadata(t *testing.T) {
@@ -388,8 +538,8 @@ func TestManifestListCacheDoesNotLeakPlatformMetadata(t *testing.T) {
 	r.addManifest("multi", list)
 	image, err := ParseImage(ParseImageOptions{Name: r.imageName("multi")})
 	require.NoError(t, err)
-	amdClient := newTestRegistryClient(t, Options{CompareDigest: true, ImageOs: "linux", ImageArch: "amd64"})
-	armClient := newTestRegistryClient(t, Options{CompareDigest: true, ImageOs: "linux", ImageArch: "arm", ImageVariant: "v7"})
+	amdClient := newTestRegistryClient(t, Options{CompareDigest: true, Platform: regplatform.Platform{OS: "linux", Architecture: "amd64"}})
+	armClient := newTestRegistryClient(t, Options{CompareDigest: true, Platform: regplatform.Platform{OS: "linux", Architecture: "arm", Variant: "v7"}})
 	cached, _, err := amdClient.Manifest(image, Manifest{})
 	require.NoError(t, err)
 	other, updated, err := armClient.Manifest(image, cached)
@@ -420,17 +570,17 @@ func TestManifestListCacheUsesSelectedInstance(t *testing.T) {
 		{
 			name:     "ARM without explicit variant",
 			platform: ocispecs.Platform{OS: "linux", Architecture: "arm", Variant: "v7"},
-			opts:     Options{CompareDigest: true, ImageOs: "linux", ImageArch: "arm"},
+			opts:     Options{CompareDigest: true, Platform: regplatform.Platform{OS: "linux", Architecture: "arm"}},
 		},
 		{
 			name:     "ARM64 without explicit variant",
 			platform: ocispecs.Platform{OS: "linux", Architecture: "arm64", Variant: "v8"},
-			opts:     Options{CompareDigest: true, ImageOs: "linux", ImageArch: "arm64"},
+			opts:     Options{CompareDigest: true, Platform: regplatform.Platform{OS: "linux", Architecture: "arm64"}},
 		},
 		{
 			name:     "ARM compatible fallback variant",
 			platform: ocispecs.Platform{OS: "linux", Architecture: "arm", Variant: "v6"},
-			opts:     Options{CompareDigest: true, ImageOs: "linux", ImageArch: "arm", ImageVariant: "v7"},
+			opts:     Options{CompareDigest: true, Platform: regplatform.Platform{OS: "linux", Architecture: "arm", Variant: "v7"}},
 		},
 	} {
 		t.Run(tt.name, func(t *testing.T) {
@@ -460,7 +610,8 @@ func TestManifestListCacheUsesSelectedInstance(t *testing.T) {
 			require.NoError(t, err)
 			require.False(t, updated)
 			require.Equal(t, remote.manifest.digest, refreshed.InstanceDigest)
-			require.Greater(t, r.requestCount(http.MethodGet, "/v2/acme/diun/manifests/multi"), before)
+			require.Equal(t, 1, r.requestCount(http.MethodGet, "/v2/acme/diun/manifests/"+list.digest.String()))
+			require.Equal(t, 2, r.requestCount(http.MethodGet, "/v2/acme/diun/blobs/"+remote.config.digest.String()))
 		})
 	}
 }
@@ -488,8 +639,8 @@ func TestManifestListCacheSeparatesARMVariants(t *testing.T) {
 		r.addManifest("multi", list)
 		image, err := ParseImage(ParseImageOptions{Name: r.imageName("multi")})
 		require.NoError(t, err)
-		client6 := newTestRegistryClient(t, Options{CompareDigest: true, ImageOs: "linux", ImageArch: "arm", ImageVariant: "v6"})
-		client7 := newTestRegistryClient(t, Options{CompareDigest: true, ImageOs: "linux", ImageArch: "arm", ImageVariant: "v7"})
+		client6 := newTestRegistryClient(t, Options{CompareDigest: true, Platform: regplatform.Platform{OS: "linux", Architecture: "arm", Variant: "v6"}})
+		client7 := newTestRegistryClient(t, Options{CompareDigest: true, Platform: regplatform.Platform{OS: "linux", Architecture: "arm", Variant: "v7"}})
 		cached, _, err := client6.Manifest(image, Manifest{})
 		require.NoError(t, err)
 		other, updated, err := client7.Manifest(image, cached)

@@ -1,11 +1,99 @@
 package registry
 
 import (
+	"net/http"
+	"net/http/httptest"
+	"strings"
+	"sync/atomic"
 	"testing"
+	"time"
 
+	"github.com/regclient/regclient/types/errs"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
+
+func TestTagsPaginationOrigin(t *testing.T) {
+	for _, tt := range []struct {
+		name      string
+		link      func(string, string) string
+		wantError bool
+	}{
+		{
+			name: "same origin",
+			link: func(origin, _ string) string { return "<" + origin + `/v2/acme/diun/tags/list?page=2>; rel="next"` },
+		},
+		{
+			name: "relative",
+			link: func(_, _ string) string { return `<?page=2>; rel="next"` },
+		},
+		{
+			name:      "cross origin",
+			link:      func(_, target string) string { return "<" + target + `/private>; rel="next"` },
+			wantError: true,
+		},
+		{
+			name: "scheme relative cross origin",
+			link: func(_, target string) string {
+				return "<" + strings.TrimPrefix(target, "http:") + `/private>; rel="next"`
+			},
+			wantError: true,
+		},
+		{
+			name: "plaintext downgrade",
+			link: func(origin, _ string) string {
+				return "<" + strings.Replace(origin, "https:", "http:", 1) + `/v2/acme/diun/tags/list?page=2>; rel="next"`
+			},
+			wantError: true,
+		},
+		{
+			name: "second link cross origin",
+			link: func(_, target string) string {
+				return `<?page=2>; rel="prev"; title="one,two", <` + target + `/private>; rel="next"`
+			},
+			wantError: true,
+		},
+		{
+			name:      "unbracketed link",
+			link:      func(_, target string) string { return target + `/private; rel="next"` },
+			wantError: true,
+		},
+		{
+			name: "userinfo",
+			link: func(origin, _ string) string {
+				return "<" + strings.Replace(origin, "https://", "https://user:secret@", 1) + `/v2/acme/diun/tags/list?page=2>; rel="next"`
+			},
+			wantError: true,
+		},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			var requests atomic.Int32
+			target := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+				requests.Add(1)
+				_, _ = w.Write([]byte(`{"name":"acme/diun","tags":["leaked"]}`))
+			}))
+			t.Cleanup(target.Close)
+			r := newTestRegistry(t, "acme/diun")
+			r.addTagsPage("", []string{"first"}, tt.link(r.server.URL, target.URL))
+			r.addTagsPage("2", []string{"second"}, "")
+			image, err := ParseImage(ParseImageOptions{Name: r.imageName("latest")})
+			require.NoError(t, err)
+			client := newTestRegistryClient(t, Options{Timeout: time.Second})
+			tags, err := client.ListTags(image)
+			if tt.wantError {
+				require.ErrorIs(t, err, errs.ErrNotRetryable)
+				require.Nil(t, tags)
+			} else {
+				require.NoError(t, err)
+				require.Equal(t, []string{"first", "second"}, tags)
+			}
+			assert.Zero(t, requests.Load(), "pagination must not contact another origin")
+			if !tt.wantError {
+				assert.Equal(t, 1, r.requestCount(http.MethodGet, "/v2/acme/diun/tags/list"))
+			}
+		})
+	}
+}
 
 func TestTagsSelectPreservesSharedInput(t *testing.T) {
 	tags := []string{"1.0.0", "3.0.0", "2.0.0"}

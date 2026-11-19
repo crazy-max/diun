@@ -3,6 +3,8 @@ package logging
 import (
 	"bytes"
 	"encoding/json"
+	"log/slog"
+	"net/url"
 	"os"
 	"strings"
 	"testing"
@@ -14,6 +16,47 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
+
+func TestSlogHandler(t *testing.T) {
+	oldLogger, oldLevel := log.Logger, zerolog.GlobalLevel()
+	t.Cleanup(func() { log.Logger = oldLogger; zerolog.SetGlobalLevel(oldLevel) })
+	var output bytes.Buffer
+	log.Logger = zerolog.New(&output)
+	zerolog.SetGlobalLevel(zerolog.TraceLevel)
+	logger := slog.New(SlogHandler{}).With("registry", "example.com").WithGroup("request").With("method", "GET")
+	logger.Debug("fetch", "req-url", "https://user:secret@example.com/blob?signature=secret", "req-headers", map[string]string{"Authorization": "secret"}, "status", 200)
+	var event map[string]any
+	require.NoError(t, json.Unmarshal(output.Bytes(), &event))
+	assert.Equal(t, "debug", event["level"])
+	assert.Equal(t, "example.com", event["registry"])
+	assert.Equal(t, "[regclient] fetch", event["message"])
+	assert.Equal(t, map[string]any{"method": "GET", "req-url": "https://example.com/blob", "status": float64(200)}, event["request"])
+	assert.NotContains(t, output.String(), "secret")
+}
+
+func TestSlogHandlerRedactsURLs(t *testing.T) {
+	oldLogger, oldLevel := log.Logger, zerolog.GlobalLevel()
+	t.Cleanup(func() { log.Logger = oldLogger; zerolog.SetGlobalLevel(oldLevel) })
+	var output bytes.Buffer
+	log.Logger = zerolog.New(&output)
+	zerolog.SetGlobalLevel(zerolog.DebugLevel)
+	logger := slog.New(SlogHandler{}).With("URL", "https://user:secret@cdn.example/blob?signature=secret#secret").WithGroup("request")
+	logger.Debug("failed https://cdn.example/blob?signature=secret",
+		"err", `Get "https://cdn.example/blob?signature=secret": EOF`,
+		"typed", &url.Error{Op: "Get", URL: "https://cdn.example/blob?signature=secret", Err: os.ErrNotExist},
+		"other", "https://cdn.example/blob?signature=secret https://other.example/blob?token=secret",
+		"malformed", "https://cdn.example/%zz?signature=secret")
+	require.NotContains(t, output.String(), "secret")
+	var event map[string]any
+	require.NoError(t, json.Unmarshal(output.Bytes(), &event))
+	assert.Equal(t, "https://cdn.example/blob", event["URL"])
+	assert.Equal(t, "[regclient] failed https://cdn.example/blob", event["message"])
+	fields := event["request"].(map[string]any)
+	assert.Equal(t, `Get "https://cdn.example/blob": EOF`, fields["err"])
+	assert.Contains(t, fields["typed"], "file does not exist")
+	assert.Equal(t, "https://cdn.example/blob https://other.example/blob", fields["other"])
+	assert.Equal(t, "[redacted URL]", fields["malformed"])
+}
 
 func TestConfigureTimestampOutput(t *testing.T) {
 	testCases := []struct {

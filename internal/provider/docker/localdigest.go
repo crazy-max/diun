@@ -6,9 +6,9 @@ import (
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/internal/provider"
 	"github.com/crazy-max/diun/v4/pkg/docker"
+	"github.com/distribution/reference"
 	mobyclient "github.com/moby/moby/client"
 	"github.com/opencontainers/go-digest"
-	"go.podman.io/image/v5/docker/reference"
 )
 
 // LocalDigests resolves watched containers by image reference, including all

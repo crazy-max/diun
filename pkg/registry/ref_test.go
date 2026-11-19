@@ -61,7 +61,7 @@ func TestImageReference(t *testing.T) {
 				return
 			}
 			require.NoError(t, err)
-			assert.Equal(t, tt.expected, ref.DockerReference().String(), tt.input)
+			assert.Equal(t, tt.expected, ref.CommonName(), tt.input)
 		})
 	}
 }

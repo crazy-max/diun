@@ -29,6 +29,15 @@ this registry options will be selected if not referenced as a `regopt` name.
 
 ## Configuration
 
+When no username is configured, Diun looks for credentials in Docker's
+`config.json` (including `DOCKER_CONFIG`), the legacy `~/.dockercfg`, and
+containers `auth.json` files, in that order. Registry-specific credential
+helpers and Docker credential stores are supported. Explicit registry options take
+precedence over discovered credentials.
+
+Certificate directories under `~/.config/containers/certs.d`,
+`/etc/containers/certs.d`, and `/etc/docker/certs.d` are supported.
+
 ### `name`
 
 Unique name for registry options. This name can be used through `diun.regopt`

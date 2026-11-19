@@ -10,9 +10,9 @@ import (
 	"github.com/containerd/platforms"
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/pkg/registry"
+	"github.com/distribution/reference"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
-	"go.podman.io/image/v5/docker/reference"
 )
 
 // LocalImageKey groups deployments of the same tag across digest-pinned
