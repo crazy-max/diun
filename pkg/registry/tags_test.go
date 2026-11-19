@@ -7,6 +7,18 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestTagsSelectPreservesSharedInput(t *testing.T) {
+	tags := []string{"1.0.0", "3.0.0", "2.0.0"}
+	reversed, err := (TagsOptions{Sort: SortTagReverse, Max: 2}).Select(tags)
+	require.NoError(t, err)
+	require.Equal(t, []string{"2.0.0", "3.0.0"}, reversed.List)
+	require.Equal(t, []string{"1.0.0", "3.0.0", "2.0.0"}, tags)
+
+	unchanged, err := (TagsOptions{Sort: SortTagDefault, Max: 1}).Select(tags)
+	require.NoError(t, err)
+	require.Equal(t, []string{"1.0.0"}, unchanged.List)
+}
+
 func TestTags(t *testing.T) {
 	registry := newTestRegistry(t, "acme/diun")
 	registry.addTagsPage("", []string{"latest", "1.0.0", "1.1.0", "1.1.1-beta"}, `</v2/acme/diun/tags/list?page=2>; rel="next"`)

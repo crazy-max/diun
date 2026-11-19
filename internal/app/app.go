@@ -45,8 +45,6 @@ type Diun struct {
 	cron   *cron.Cron
 	jobID  cron.EntryID
 	locker atomic.Uint32
-	pool   *ants.PoolWithFunc
-	wg     *sync.WaitGroup
 }
 
 func New(meta model.Meta, cfg *config.Config, grpcAuthority string) (*Diun, error) {
@@ -235,18 +233,10 @@ func (di *Diun) Run() {
 	di.HealthchecksStart()
 	defer di.HealthchecksSuccess(entries)
 
-	di.wg = new(sync.WaitGroup)
-	di.pool, _ = ants.NewPoolWithFunc(di.cfg.Watch.Workers, func(i any) {
-		job := i.(model.Job)
-		entry := di.runJob(job)
-		entriesMu.Lock()
-		entries.Add(entry)
-		entriesMu.Unlock()
-		di.wg.Done()
-	}, ants.WithLogger(new(logging.AntsLogger)))
-	defer di.pool.Release()
-
-	provider.WalkJobs(di.createJob,
+	var plan jobPlan
+	provider.WalkJobs(func(job model.Job) {
+		di.createJob(job, &plan)
+	},
 		dockerPrd.New(di.cfg.Providers.Docker, di.cfg.Defaults),
 		swarmPrd.New(di.cfg.Providers.Swarm, di.cfg.Defaults),
 		containerdPrd.New(di.cfg.Providers.Containerd, di.cfg.Defaults),
@@ -256,7 +246,30 @@ func (di *Diun) Run() {
 		nomadPrd.New(di.cfg.Providers.Nomad, di.cfg.Defaults),
 	)
 
-	di.wg.Wait()
+	var wg sync.WaitGroup
+	pool, err := ants.NewPoolWithFunc(di.cfg.Watch.Workers, func(i any) {
+		defer wg.Done()
+		results := di.runJobs(i.(*analysisJob))
+		entriesMu.Lock()
+		for _, entry := range results {
+			entries.Add(entry)
+		}
+		entriesMu.Unlock()
+	}, ants.WithLogger(new(logging.AntsLogger)))
+	if err != nil {
+		log.Error().Err(err).Msg("Cannot create analysis pool")
+		return
+	}
+	defer pool.Release()
+	for _, job := range plan.jobs {
+		wg.Add(1)
+		if err := pool.Invoke(job); err != nil {
+			wg.Done()
+			log.Error().Err(err).Msg("Cannot invoke analysis job")
+		}
+	}
+	wg.Wait()
+
 	completedAt := time.Now()
 	if di.metrics != nil {
 		di.metrics.RecordRun(entries, completedAt.Sub(startedAt), completedAt)

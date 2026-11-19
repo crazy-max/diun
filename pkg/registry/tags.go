@@ -37,6 +37,32 @@ type TagsOptions struct {
 
 // Tags returns tags of a Docker repository
 func (c *Client) Tags(opts TagsOptions) (*Tags, error) {
+	if _, err := opts.Select(nil); err != nil {
+		return nil, err
+	}
+	if opts.WatchMode == WatchModeTag {
+		return &Tags{}, nil
+	}
+	tags, err := c.ListTags(opts.Image)
+	if err != nil {
+		return nil, err
+	}
+	return opts.Select(tags)
+}
+
+// ListTags retrieves the unfiltered repository tags. The caller owns the slice.
+func (c *Client) ListTags(image Image) ([]string, error) {
+	ctx, cancel := c.timeoutContext()
+	defer cancel()
+	imgRef, err := ImageReference(image.String())
+	if err != nil {
+		return nil, errors.Wrap(err, "cannot parse reference")
+	}
+	return docker.GetRepositoryTags(ctx, c.sysCtx, imgRef)
+}
+
+// Select applies this watch's selection without modifying the supplied tags.
+func (opts TagsOptions) Select(tags []string) (*Tags, error) {
 	mode := opts.WatchMode
 	if mode == "" {
 		mode = WatchModeAll
@@ -55,19 +81,6 @@ func (c *Client) Tags(opts TagsOptions) (*Tags, error) {
 		}
 	}
 
-	ctx, cancel := c.timeoutContext()
-	defer cancel()
-
-	imgRef, err := ImageReference(opts.Image.String())
-	if err != nil {
-		return nil, errors.Wrap(err, "cannot parse reference")
-	}
-
-	tags, err := docker.GetRepositoryTags(ctx, c.sysCtx, imgRef)
-	if err != nil {
-		return nil, err
-	}
-
 	res := &Tags{
 		NotIncluded: 0,
 		Excluded:    0,
@@ -75,7 +88,7 @@ func (c *Client) Tags(opts TagsOptions) (*Tags, error) {
 	}
 
 	// Sort tags
-	tags = SortTags(tags, opts.Sort)
+	tags = SortTags(slices.Clone(tags), opts.Sort)
 
 	// Filter
 	for _, tag := range tags {

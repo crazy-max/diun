@@ -26,6 +26,18 @@ Or within a container:
 docker compose exec diun diun notif test
 ```
 
+## Images watched more than once
+
+Within a scan, Diun shares image analysis across providers when the image
+reference, platform, and effective registry options match. Overlapping repository
+and tag watches also share the analysis of their common tags. Each scan checks
+the registry again, subject to the configured immutable-tag policy.
+
+Each watch keeps its own notification settings, metadata, and image links. You
+can therefore receive multiple notifications for one image when several watched
+containers or other sources use it. Metrics and scan summaries still include
+each watch's result. Sharing analysis does not aggregate notifications.
+
 ## Docker Compose with Prometheus metrics
 
 You can run Diun and Prometheus in the same Compose project and scrape Diun
