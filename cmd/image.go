@@ -17,6 +17,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // ImageCmd holds image command
@@ -66,7 +67,7 @@ func (s *ImageListCmd) Run(_ *Context) error {
 	t.SetOutputMirror(os.Stdout)
 	t.AppendHeader(table.Row{"Name", "Manifests Count", "Latest Tag", "Latest Created", "Latest Digest"})
 	for _, image := range il.Images {
-		t.AppendRow(table.Row{image.Name, image.ManifestsCount, image.Latest.Tag, image.Latest.Created.AsTime().Format(time.RFC3339), image.Latest.Digest})
+		t.AppendRow(table.Row{image.Name, image.ManifestsCount, image.Latest.Tag, formatImageCreated(image.Latest.Created), image.Latest.Digest})
 	}
 	t.AppendFooter(table.Row{"Total", len(il.Images)})
 	t.Render()
@@ -98,7 +99,8 @@ func (s *ImageInspectCmd) Run(_ *Context) error {
 	}
 
 	sort.Slice(ii.Image.Manifests, func(i, j int) bool {
-		return ii.Image.Manifests[i].Created.AsTime().After(ii.Image.Manifests[j].Created.AsTime())
+		left, right := ii.Image.Manifests[i].Created, ii.Image.Manifests[j].Created
+		return left != nil && (right == nil || left.AsTime().After(right.AsTime()))
 	})
 
 	if s.Raw {
@@ -111,7 +113,7 @@ func (s *ImageInspectCmd) Run(_ *Context) error {
 	t.SetOutputMirror(os.Stdout)
 	t.AppendHeader(table.Row{"Tag", "Created", "Digest"})
 	for _, image := range ii.Image.Manifests {
-		t.AppendRow(table.Row{image.Tag, image.Created.AsTime().Format(time.RFC3339), image.Digest})
+		t.AppendRow(table.Row{image.Tag, formatImageCreated(image.Created), image.Digest})
 	}
 	t.AppendFooter(table.Row{"Total", len(ii.Image.Manifests)})
 	t.Render()
@@ -146,7 +148,7 @@ func (s *ImageRemoveCmd) Run(_ *Context) error {
 	t.AppendHeader(table.Row{"Tag", "Created", "Digest", "Size"})
 	var totalSize int64
 	for _, image := range removed.Manifests {
-		t.AppendRow(table.Row{image.Tag, image.Created.AsTime().Format(time.RFC3339), image.Digest, units.HumanSize(float64(image.Size))})
+		t.AppendRow(table.Row{image.Tag, formatImageCreated(image.Created), image.Digest, units.HumanSize(float64(image.Size))})
 		totalSize += image.Size
 	}
 	t.AppendFooter(table.Row{"Total", fmt.Sprintf("%d (%s)", len(removed.Manifests), units.HumanSize(float64(totalSize)))})
@@ -209,7 +211,7 @@ func (s *ImagePruneCmd) Run(_ *Context) error {
 	var totalManifest int
 	for _, image := range removed.Images {
 		for _, manifest := range image.Manifests {
-			t.AppendRow(table.Row{manifest.Tag, manifest.Created.AsTime().Format(time.RFC3339), manifest.Digest, units.HumanSize(float64(manifest.Size))})
+			t.AppendRow(table.Row{manifest.Tag, formatImageCreated(manifest.Created), manifest.Digest, units.HumanSize(float64(manifest.Size))})
 			totalSize += manifest.Size
 		}
 		totalManifest += len(image.Manifests)
@@ -218,4 +220,11 @@ func (s *ImagePruneCmd) Run(_ *Context) error {
 	t.Render()
 
 	return nil
+}
+
+func formatImageCreated(created *timestamppb.Timestamp) string {
+	if created == nil {
+		return "-"
+	}
+	return created.AsTime().Format(time.RFC3339)
 }

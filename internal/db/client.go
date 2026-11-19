@@ -18,9 +18,10 @@ type Client struct {
 }
 
 const (
-	dbVersion      = 2
-	bucketMetadata = "metadata"
-	bucketManifest = "manifest"
+	dbVersion                   = 3
+	bucketMetadata              = "metadata"
+	bucketManifest              = "manifest"
+	bucketManifestPlatformState = "manifest-platform-state"
 )
 
 // New creates new db instance
@@ -33,15 +34,12 @@ func New(cfg model.Db) (*Client, error) {
 	}
 
 	if err = db.Update(func(tx *bolt.Tx) error {
-		_, err := tx.CreateBucketIfNotExists([]byte(bucketMetadata))
-		return err
-	}); err != nil {
-		return nil, err
-	}
-
-	if err = db.Update(func(tx *bolt.Tx) error {
-		_, err := tx.CreateBucketIfNotExists([]byte(bucketManifest))
-		return err
+		for _, name := range []string{bucketMetadata, bucketManifest, bucketManifestPlatformState} {
+			if _, err := tx.CreateBucketIfNotExists([]byte(name)); err != nil {
+				return err
+			}
+		}
+		return nil
 	}); err != nil {
 		return nil, err
 	}

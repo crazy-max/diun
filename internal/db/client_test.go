@@ -16,6 +16,7 @@ func TestNewInitializesBucketsAndMetadata(t *testing.T) {
 	require.NoError(t, client.View(func(tx *bolt.Tx) error {
 		assert.NotNil(t, tx.Bucket([]byte(bucketMetadata)))
 		assert.NotNil(t, tx.Bucket([]byte(bucketManifest)))
+		assert.NotNil(t, tx.Bucket([]byte(bucketManifestPlatformState)))
 		return nil
 	}))
 }

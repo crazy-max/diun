@@ -2,7 +2,6 @@ package grpc
 
 import (
 	"context"
-	"encoding/json"
 	"strings"
 
 	"github.com/crazy-max/diun/v4/pb"
@@ -20,24 +19,17 @@ func (c *Client) ImageList(_ context.Context, _ *pb.ImageListRequest) (*pb.Image
 
 	var ilr []*pb.ImageListResponse_Image
 	for name, mfsts := range images {
-		var latest *registry.Manifest
-		for _, entry := range mfsts {
+		latest := mfsts[0].Manifest
+		for _, entry := range mfsts[1:] {
 			mfst := entry.Manifest
-			if latest == nil || mfst.Created.After(*latest.Created) {
-				latest = new(mfst)
+			if mfst.Created != nil && (latest.Created == nil || mfst.Created.After(*latest.Created)) {
+				latest = mfst
 			}
 		}
 		ilr = append(ilr, &pb.ImageListResponse_Image{
 			Name:           name,
 			ManifestsCount: int64(len(mfsts)),
-			Latest: &pb.Manifest{
-				Tag:      latest.Tag,
-				MimeType: latest.MIMEType,
-				Digest:   latest.Digest.String(),
-				Created:  timestamppb.New(*latest.Created),
-				Labels:   latest.Labels,
-				Platform: latest.Platform,
-			},
+			Latest:         manifestToProto(latest, 0),
 		})
 	}
 
@@ -66,15 +58,7 @@ func (c *Client) ImageInspect(_ context.Context, request *pb.ImageInspectRequest
 		Manifests: []*pb.Manifest{},
 	}
 	for _, entry := range images[ref.Name()] {
-		manifest := entry.Manifest
-		iir.Manifests = append(iir.Manifests, &pb.Manifest{
-			Tag:      manifest.Tag,
-			MimeType: manifest.MIMEType,
-			Digest:   manifest.Digest.String(),
-			Created:  timestamppb.New(*manifest.Created),
-			Labels:   manifest.Labels,
-			Platform: manifest.Platform,
-		})
+		iir.Manifests = append(iir.Manifests, manifestToProto(entry.Manifest, 0))
 	}
 
 	return &pb.ImageInspectResponse{
@@ -99,7 +83,6 @@ func (c *Client) ImageRemove(_ context.Context, request *pb.ImageRemoveRequest) 
 
 	_, tagged := ref.(reference.Tagged)
 	_, digested := ref.(reference.Digested)
-
 	var removed []*pb.Manifest
 	for _, entry := range images[ref.Name()] {
 		switch {
@@ -112,20 +95,11 @@ func (c *Client) ImageRemove(_ context.Context, request *pb.ImageRemoveRequest) 
 				continue
 			}
 		}
-		manifest := entry.Manifest
-		if err = c.db.DeleteManifest(entry.Reference); err != nil {
+		size, err := c.db.DeleteManifest(entry.Reference)
+		if err != nil {
 			return nil, err
 		}
-		b, _ := json.Marshal(manifest)
-		removed = append(removed, &pb.Manifest{
-			Tag:      manifest.Tag,
-			MimeType: manifest.MIMEType,
-			Digest:   manifest.Digest.String(),
-			Created:  timestamppb.New(*manifest.Created),
-			Labels:   manifest.Labels,
-			Platform: manifest.Platform,
-			Size:     int64(len(b)),
-		})
+		removed = append(removed, manifestToProto(entry.Manifest, size))
 	}
 
 	return &pb.ImageRemoveResponse{
@@ -143,20 +117,11 @@ func (c *Client) ImagePrune(_ context.Context, _ *pb.ImagePruneRequest) (*pb.Ima
 	for n, m := range images {
 		var manifests []*pb.Manifest
 		for _, entry := range m {
-			manifest := entry.Manifest
-			if err = c.db.DeleteManifest(entry.Reference); err != nil {
+			size, err := c.db.DeleteManifest(entry.Reference)
+			if err != nil {
 				return nil, err
 			}
-			b, _ := json.Marshal(manifest)
-			manifests = append(manifests, &pb.Manifest{
-				Tag:      manifest.Tag,
-				MimeType: manifest.MIMEType,
-				Digest:   manifest.Digest.String(),
-				Created:  timestamppb.New(*manifest.Created),
-				Labels:   manifest.Labels,
-				Platform: manifest.Platform,
-				Size:     int64(len(b)),
-			})
+			manifests = append(manifests, manifestToProto(entry.Manifest, size))
 		}
 		removed = append(removed, &pb.ImagePruneResponse_Image{
 			Name:      n,
@@ -167,4 +132,19 @@ func (c *Client) ImagePrune(_ context.Context, _ *pb.ImagePruneRequest) (*pb.Ima
 	return &pb.ImagePruneResponse{
 		Images: removed,
 	}, nil
+}
+
+func manifestToProto(manifest registry.Manifest, size int64) *pb.Manifest {
+	result := &pb.Manifest{
+		Tag:      manifest.Tag,
+		MimeType: manifest.MIMEType,
+		Digest:   manifest.Digest.String(),
+		Labels:   manifest.Labels,
+		Platform: manifest.Platform,
+		Size:     size,
+	}
+	if manifest.Created != nil {
+		result.Created = timestamppb.New(*manifest.Created)
+	}
+	return result
 }

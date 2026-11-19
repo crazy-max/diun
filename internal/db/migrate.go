@@ -7,6 +7,7 @@ import (
 	"github.com/opencontainers/go-digest"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
+	bolt "go.etcd.io/bbolt"
 	bbolterr "go.etcd.io/bbolt/errors"
 )
 
@@ -18,6 +19,7 @@ func (c *Client) Migrate() error {
 
 	migrations := map[int]func(*Client) error{
 		2: (*Client).migration2,
+		3: (*Client).migration3,
 	}
 
 	for version := c.metadata.Version + 1; version <= dbVersion; version++ {
@@ -34,6 +36,19 @@ func (c *Client) Migrate() error {
 
 	return c.WriteMetadata(Metadata{
 		Version: dbVersion,
+	})
+}
+
+func (c *Client) migration3() error {
+	return c.Update(func(tx *bolt.Tx) error {
+		name := []byte(bucketManifestPlatformState)
+		if tx.Bucket(name) != nil {
+			if err := tx.DeleteBucket(name); err != nil {
+				return err
+			}
+		}
+		_, err := tx.CreateBucket(name)
+		return err
 	})
 }
 
@@ -64,11 +79,14 @@ func (c *Client) migration2() error {
 	bucket := tx.Bucket([]byte(bucketManifest))
 	curs := bucket.Cursor()
 	for k, v := curs.First(); k != nil; k, v = curs.Next() {
-		var oldManifest oldManifest
-		if err := json.Unmarshal(v, &oldManifest); err != nil {
+		var entry oldManifest
+		if err := json.Unmarshal(v, &entry); err != nil {
 			return err
 		}
-		entryBytes, _ := json.Marshal(oldManifest)
+		entryBytes, err := json.Marshal(entry)
+		if err != nil {
+			return err
+		}
 		if err := bucket.Put(k, entryBytes); err != nil {
 			return err
 		}
