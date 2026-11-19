@@ -6,13 +6,148 @@ import (
 	"runtime"
 	"strconv"
 	"testing"
+	"time"
 
 	digest "github.com/opencontainers/go-digest"
 	ocispecs "github.com/opencontainers/image-spec/specs-go/v1"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.podman.io/image/v5/docker"
 	podmanmanifest "go.podman.io/image/v5/manifest"
 )
+
+func TestManifestHeadRetry(t *testing.T) {
+	for _, tt := range []struct {
+		name      string
+		statuses  []int
+		wantHeads int
+		wantError bool
+		minDelay  time.Duration
+	}{
+		{
+			name:      "internal server error",
+			statuses:  []int{http.StatusInternalServerError},
+			wantHeads: 2,
+			minDelay:  time.Second / 2,
+		},
+		{
+			name:      "bad gateway",
+			statuses:  []int{http.StatusBadGateway},
+			wantHeads: 2,
+			minDelay:  time.Second / 2,
+		},
+		{
+			name:      "service unavailable",
+			statuses:  []int{http.StatusServiceUnavailable},
+			wantHeads: 2,
+			minDelay:  time.Second / 2,
+		},
+		{
+			name:      "gateway timeout",
+			statuses:  []int{http.StatusGatewayTimeout},
+			wantHeads: 2,
+			minDelay:  time.Second / 2,
+		},
+		{
+			name:      "success on last attempt",
+			statuses:  []int{http.StatusInternalServerError, http.StatusBadGateway, http.StatusServiceUnavailable},
+			wantHeads: 4,
+			minDelay:  7 * time.Second / 2,
+		},
+		{
+			name:      "retry limit",
+			statuses:  []int{http.StatusInternalServerError, http.StatusInternalServerError, http.StatusInternalServerError, http.StatusInternalServerError},
+			wantHeads: 4,
+			wantError: true,
+			minDelay:  7 * time.Second / 2,
+		},
+		{
+			name:      "unauthorized",
+			statuses:  []int{http.StatusUnauthorized},
+			wantHeads: 1,
+			wantError: true,
+		},
+		{
+			name:      "forbidden",
+			statuses:  []int{http.StatusForbidden},
+			wantHeads: 1,
+			wantError: true,
+		},
+		{
+			name:      "not found",
+			statuses:  []int{http.StatusNotFound},
+			wantHeads: 1,
+			wantError: true,
+		},
+		{
+			name:      "not implemented",
+			statuses:  []int{http.StatusNotImplemented},
+			wantHeads: 1,
+			wantError: true,
+		},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			registry := newTestRegistry(t, "acme/diun")
+			registry.manifestStatuses = map[string][]int{http.MethodHead: tt.statuses}
+			remoteImage := newTestRegistryImage(t, ocispecs.Platform{
+				Architecture: "amd64",
+				OS:           "linux",
+			}, "25.0.0", nil)
+			registry.addImage("1.0.0", remoteImage)
+			image, err := ParseImage(ParseImageOptions{
+				Name: registry.imageName("1.0.0"),
+			})
+			require.NoError(t, err)
+			cachedManifest := Manifest{Digest: remoteImage.manifest.digest}
+			client := newTestRegistryClient(t, Options{CompareDigest: true})
+
+			start := time.Now()
+			manifest, updated, err := client.Manifest(image, cachedManifest)
+			assert.GreaterOrEqual(t, time.Since(start), tt.minDelay)
+			if tt.wantError {
+				require.ErrorContains(t, err, "cannot get image digest from HEAD request")
+				assert.Empty(t, manifest)
+				if tt.wantHeads > 1 {
+					httpErr, ok := stderrors.AsType[docker.UnexpectedHTTPStatusError](err)
+					require.True(t, ok)
+					assert.Equal(t, http.StatusInternalServerError, httpErr.StatusCode)
+				}
+			} else {
+				require.NoError(t, err)
+				assert.Equal(t, cachedManifest, manifest)
+			}
+			assert.False(t, updated)
+			assert.Equal(t, tt.wantHeads, registry.requestCount(http.MethodHead, "/v2/acme/diun/manifests/1.0.0"))
+			assert.Zero(t, registry.requestCount(http.MethodGet, "/v2/acme/diun/manifests/1.0.0"))
+		})
+	}
+}
+
+func TestManifestRetriesGet(t *testing.T) {
+	registry := newTestRegistry(t, "acme/diun")
+	registry.manifestStatuses = map[string][]int{
+		http.MethodGet: {http.StatusServiceUnavailable},
+	}
+	remoteImage := newTestRegistryImage(t, ocispecs.Platform{
+		Architecture: "amd64",
+		OS:           "linux",
+	}, "25.0.0", nil)
+	registry.addImage("1.0.0", remoteImage)
+	image, err := ParseImage(ParseImageOptions{
+		Name: registry.imageName("1.0.0"),
+	})
+	require.NoError(t, err)
+	client := newTestRegistryClient(t, Options{})
+
+	manifest, updated, err := client.Manifest(image, Manifest{})
+	require.NoError(t, err)
+	assert.True(t, updated)
+	assert.Equal(t, remoteImage.manifest.digest, manifest.Digest)
+	assert.Equal(t, "linux/amd64", manifest.Platform)
+	assert.Equal(t, 2, registry.requestCount(http.MethodHead, "/v2/acme/diun/manifests/1.0.0"))
+	assert.Equal(t, 2, registry.requestCount(http.MethodGet, "/v2/acme/diun/manifests/1.0.0"))
+}
 
 func TestManifestReturnsCachedManifestWhenDigestMatches(t *testing.T) {
 	registry := newTestRegistry(t, "acme/diun")
