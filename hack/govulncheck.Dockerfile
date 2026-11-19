@@ -5,7 +5,7 @@ ARG GO_VERSION="1.27"
 ARG ALPINE_VERSION="3.24"
 
 # renovate: datasource=go depName=golang.org/x/vuln
-ARG GOVULNCHECK_VERSION="v1.9.0"
+ARG GOVULNCHECK_VERSION="v1.10.0"
 ARG FORMAT="text"
 
 FROM golang:${GO_VERSION}-alpine${ALPINE_VERSION} AS base
