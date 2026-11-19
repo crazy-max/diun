@@ -14,6 +14,7 @@ services:
       context: ..
       target: test-integration
     environment:
+      CI: ${CI:-false}
       TEST_REGISTRY: http://registry:5000
       TEST_RUN: ${TEST_RUN:-^TestRegistry}
     depends_on:

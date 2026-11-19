@@ -163,12 +163,17 @@ func (f *registryFixture) pushPlatform(t *testing.T, tag, revision string, platf
 // Every scan therefore also checks persistence across application restarts.
 func (f *registryFixture) scan(t *testing.T, images ...model.Image) ([]map[string]any, []registry.Manifest) {
 	t.Helper()
+	return f.scanWithTimeout(t, 30*time.Second, images...)
+}
+
+func (f *registryFixture) scanWithTimeout(t *testing.T, timeout time.Duration, images ...model.Image) ([]map[string]any, []registry.Manifest) {
+	t.Helper()
 	data, err := yaml.Marshal(images)
 	require.NoError(t, err)
 	require.NoError(t, os.WriteFile(f.cfg.Providers.File.Filename, data, 0o600))
 	diun, err := app.New(model.Meta{Version: "integration", Hostname: "registry-test"}, f.cfg, "127.0.0.1:0")
 	require.NoError(t, err)
-	ctx, cancel := context.WithTimeout(t.Context(), 30*time.Second)
+	ctx, cancel := context.WithTimeoutCause(t.Context(), timeout, fmt.Errorf("registry scan timed out"))
 	defer cancel()
 	require.NoError(t, diun.Start(ctx))
 	require.NoError(t, ctx.Err(), "scan exceeded deadline")
@@ -575,7 +580,7 @@ func TestRegistryTagDiscovery(t *testing.T) {
 	}
 }
 
-func (f *registryFixture) pushIndex(t *testing.T, amdRevision, armRevision string) {
+func (f *registryFixture) pushIndex(t *testing.T, amdRevision, armRevision string) []byte {
 	t.Helper()
 	var descriptors []map[string]any
 	for _, instance := range []struct {
@@ -613,6 +618,130 @@ func (f *registryFixture) pushIndex(t *testing.T, amdRevision, armRevision strin
 	})
 	require.NoError(t, err)
 	f.request(t, http.MethodPut, f.url+"/v2/"+f.repo+"/manifests/latest", "application/vnd.oci.image.index.v1+json", body, http.StatusCreated)
+	return body
+}
+
+func TestRegistryManyTags(t *testing.T) {
+	const tagCount = 80
+	f := newRegistryFixture(t)
+	f.cfg.Watch.Workers = 20
+	f.cfg.RegOpts[0].Timeout = new(time.Second)
+	var expected []string
+	for i := 0; i < tagCount; i += 2 {
+		body := f.pushIndex(t, fmt.Sprintf("amd-%d", i), fmt.Sprintf("arm-%d", i))
+		for j := range 2 {
+			tag := fmt.Sprintf("v%03d", i+j)
+			expected = append(expected, tag)
+			f.request(t, http.MethodPut, f.url+"/v2/"+f.repo+"/manifests/"+tag, "application/vnd.oci.image.index.v1+json", body, http.StatusCreated)
+		}
+	}
+	target, err := url.Parse(f.url)
+	require.NoError(t, err)
+	proxy := httputil.NewSingleHostReverseProxy(target)
+	var heads, gets atomic.Int32
+	var limited atomic.Bool
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if strings.Contains(r.URL.Path, "/manifests/") {
+			switch r.Method {
+			case http.MethodHead:
+				heads.Add(1)
+			case http.MethodGet:
+				gets.Add(1)
+				if limited.Load() {
+					w.Header().Set("Content-Type", "application/json")
+					w.Header().Set("Retry-After", "60")
+					w.WriteHeader(http.StatusTooManyRequests)
+					_, _ = w.Write([]byte(`{"errors":[{"code":"TOOMANYREQUESTS","message":"test pull quota exhausted"}]}`))
+					return
+				}
+			}
+		}
+		proxy.ServeHTTP(w, r)
+	}))
+	t.Cleanup(server.Close)
+	f.url = server.URL
+	image := f.image(expected[0])
+	image.WatchRepo = new(true)
+	image.IncludeTags = []string{"^v[0-9]+$"}
+	image.NotifyOn = []model.NotifyOn{model.NotifyOnUnchange}
+	reports, saved := f.scan(t, image)
+	require.Empty(t, reports)
+	var actual []string
+	for _, m := range saved {
+		actual = append(actual, m.Tag)
+		require.Equal(t, "linux/amd64", m.Platform)
+		require.NotEmpty(t, m.InstanceDigest)
+	}
+	require.ElementsMatch(t, expected, actual, "every selected tag must succeed")
+	require.Equal(t, int32(tagCount), heads.Load())
+	require.Positive(t, gets.Load())
+	require.LessOrEqual(t, gets.Load(), int32(2*tagCount), "at most an index and a selected manifest per tag")
+
+	limited.Store(true)
+	heads.Store(0)
+	gets.Store(0)
+	reports, _ = f.scan(t, image)
+	require.Len(t, reports, tagCount)
+	require.Equal(t, int32(tagCount), heads.Load())
+	require.Zero(t, gets.Load(), "unchanged repository must not consume pull quota")
+
+	// Change the watched tag so its GET fails while the other tags stay cached.
+	body := f.pushIndex(t, "changed-amd", "changed-arm")
+	f.request(t, http.MethodPut, f.url+"/v2/"+f.repo+"/manifests/"+expected[0], "application/vnd.oci.image.index.v1+json", body, http.StatusCreated)
+	heads.Store(0)
+	gets.Store(0)
+	reports, saved = f.scan(t, image)
+	require.Len(t, reports, tagCount-1, "one throttled pull must not prevent unchanged checks")
+	require.Len(t, saved, tagCount, "a failed pull must retain the prior baseline")
+	require.Equal(t, int32(tagCount), heads.Load())
+	require.Positive(t, gets.Load(), "the changed tag must attempt a pull")
+	for _, report := range reports {
+		require.Equal(t, "unchange", report["status"])
+		require.NotEqual(t, image.Name, report["image"])
+	}
+}
+
+func TestRegistryDockerHubWatchRepo(t *testing.T) {
+	if os.Getenv("CI") != "true" {
+		t.Skip("live Docker Hub repository scan requires CI=true")
+	}
+	f := newRegistryFixture(t)
+	f.cfg.Watch.Workers = 20
+	f.cfg.RegOpts = model.RegOpts{{
+		Name:        "hub",
+		Selector:    model.RegOptSelectorName,
+		Timeout:     new(30 * time.Second),
+		InsecureTLS: new(false),
+	}}
+	image := model.Image{
+		Name:      "docker.io/crazymax/cloudflared:latest",
+		RegOpt:    "hub",
+		Platform:  model.ImagePlatform{OS: "linux", Arch: "amd64"},
+		WatchRepo: new(true),
+		NotifyOn:  []model.NotifyOn{model.NotifyOnUnchange},
+	}
+	ref, err := registry.ParseImage(registry.ParseImageOptions{Name: image.Name})
+	require.NoError(t, err)
+	client, err := registry.New(registry.Options{Timeout: 30 * time.Second})
+	require.NoError(t, err)
+	tags, err := client.Tags(registry.TagsOptions{Image: ref, WatchMode: registry.WatchModeAll})
+	require.NoError(t, err)
+	require.GreaterOrEqual(t, len(tags.List), 20, "fixture must exercise a broad repository scan")
+	t.Logf("Scanning %d Docker Hub tags with 20 workers", len(tags.List))
+	reports, saved := f.scanWithTimeout(t, 4*time.Minute, image)
+	require.Empty(t, reports)
+	var actual []string
+	for _, m := range saved {
+		actual = append(actual, m.Tag)
+	}
+	require.Subset(t, actual, tags.List, "all tags present before the scan must succeed")
+	reports, _ = f.scanWithTimeout(t, 4*time.Minute, image)
+	var unchanged []string
+	for _, report := range reports {
+		require.Equal(t, "unchange", report["status"])
+		unchanged = append(unchanged, strings.TrimPrefix(report["image"].(string), "docker.io/crazymax/cloudflared:"))
+	}
+	require.Subset(t, unchanged, tags.List, "all original tags must complete their repeat checks")
 }
 
 func TestRegistryPlatformCacheAcrossRestarts(t *testing.T) {

@@ -186,6 +186,11 @@ jobs:
             compose: test/localdigest.compose.yaml
             reports: ./bin/testreports/localdigest
             run: '^TestLocalDigest'
+          - suite: registry
+            service: registry
+            compose: test/registry.compose.yaml
+            reports: ./bin/testreports/registry
+            run: '^TestRegistry'
     env:
       TEST_RUN: ${{ matrix.run }}
       TEST_SERVICE: ${{ matrix.service }}
