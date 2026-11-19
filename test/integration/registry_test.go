@@ -20,10 +20,14 @@ import (
 	"github.com/crazy-max/diun/v4/internal/app"
 	"github.com/crazy-max/diun/v4/internal/config"
 	"github.com/crazy-max/diun/v4/internal/db"
+	grpcserver "github.com/crazy-max/diun/v4/internal/grpc"
 	"github.com/crazy-max/diun/v4/internal/model"
+	"github.com/crazy-max/diun/v4/pb"
 	"github.com/crazy-max/diun/v4/pkg/registry"
 	"github.com/opencontainers/go-digest"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	"gopkg.in/yaml.v3"
 )
 
@@ -227,6 +231,73 @@ func TestRegistryWebhookLifecycle(t *testing.T) {
 			reports, _ = f.scan(t, image)
 			require.Len(t, reports, 1)
 			require.Equal(t, "update", reports[0]["status"])
+		})
+	}
+}
+
+func TestRegistryRemovalAfterTagMoves(t *testing.T) {
+	for _, operation := range []string{"remove", "prune"} {
+		t.Run(operation, func(t *testing.T) {
+			f := newRegistryFixture(t)
+			original := f.push(t, "latest", "first")
+			plain := f.image("latest")
+			pinned := plain
+			pinned.Name += "@" + original.String()
+			f.scan(t, pinned, plain)
+			current := f.push(t, "latest", "second")
+			reports, saved := f.scan(t, pinned, plain)
+			require.Len(t, reports, 2)
+			require.Len(t, saved, 2)
+			for _, manifest := range saved {
+				require.Equal(t, current, manifest.Digest)
+			}
+
+			store, err := db.New(*f.cfg.Db)
+			require.NoError(t, err)
+			t.Cleanup(func() { _ = store.Close() })
+			server, err := grpcserver.New("127.0.0.1:0", store, nil)
+			require.NoError(t, err)
+			listener, err := server.Listen()
+			require.NoError(t, err)
+			done := make(chan error, 1)
+			go func() { done <- server.Serve(listener) }()
+			t.Cleanup(server.Stop)
+			conn, err := grpc.NewClient(listener.Addr().String(), grpc.WithTransportCredentials(insecure.NewCredentials()))
+			require.NoError(t, err)
+			t.Cleanup(func() { _ = conn.Close() })
+			client := pb.NewImageServiceClient(conn)
+			ctx, cancel := context.WithTimeout(t.Context(), 10*time.Second)
+			defer cancel()
+			if operation == "remove" {
+				response, err := client.ImageRemove(ctx, &pb.ImageRemoveRequest{Name: pinned.Name})
+				require.NoError(t, err)
+				require.Len(t, response.Manifests, 1)
+				require.Equal(t, current.String(), response.Manifests[0].Digest)
+			} else {
+				response, err := client.ImagePrune(ctx, &pb.ImagePruneRequest{})
+				require.NoError(t, err)
+				require.Len(t, response.Images, 1)
+				require.Len(t, response.Images[0].Manifests, 2)
+			}
+			images, err := store.ListImage()
+			require.NoError(t, err)
+			if operation == "remove" {
+				image, err := registry.ParseImage(registry.ParseImageOptions{Name: plain.Name})
+				require.NoError(t, err)
+				require.Len(t, images[image.Name()], 1)
+				require.Equal(t, plain.Name, images[image.Name()][0].Reference)
+			} else {
+				require.Empty(t, images)
+			}
+			require.NoError(t, conn.Close())
+			server.Stop()
+			require.NoError(t, <-done)
+			require.NoError(t, store.Close())
+
+			f.cfg.Watch.FirstCheckNotif = new(true)
+			reports, _ = f.scan(t, pinned)
+			require.Len(t, reports, 1)
+			require.Equal(t, "new", reports[0]["status"], "the removed reference must be discovered again after restart")
 		})
 	}
 }

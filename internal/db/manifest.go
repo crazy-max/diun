@@ -3,11 +3,17 @@ package db
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 
 	"github.com/crazy-max/diun/v4/pkg/registry"
 	bolt "go.etcd.io/bbolt"
 )
+
+// ManifestEntry pairs the stored image reference with its latest observation.
+// The observed tag and digest cannot be used to reconstruct the stored reference.
+type ManifestEntry struct {
+	Reference string
+	Manifest  registry.Manifest
+}
 
 // First checks if a Docker image has ever been analyzed
 func (c *Client) First(image registry.Image) (bool, error) {
@@ -71,31 +77,16 @@ func (c *Client) PutManifest(image registry.Image, manifest registry.Manifest) e
 	})
 }
 
-// DeleteManifest deletes a Docker image manifest
-func (c *Client) DeleteManifest(manifest registry.Manifest) error {
+// DeleteManifest removes the exact stored reference. Missing entries are ignored.
+func (c *Client) DeleteManifest(reference string) error {
 	return c.Update(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte(bucketManifest))
-		var keys [][]byte
-		if manifest.Tag != "" {
-			keys = append(keys, []byte(fmt.Sprintf("%s:%s", manifest.Name, manifest.Tag)))
-			if manifest.Digest != "" {
-				keys = append(keys, []byte(fmt.Sprintf("%s:%s@%s", manifest.Name, manifest.Tag, manifest.Digest)))
-			}
-		} else if manifest.Digest != "" {
-			keys = append(keys, []byte(fmt.Sprintf("%s@%s", manifest.Name, manifest.Digest)))
-		}
-		for _, key := range keys {
-			if err := b.Delete(key); err != nil {
-				return err
-			}
-		}
-		return nil
+		return tx.Bucket([]byte(bucketManifest)).Delete([]byte(reference))
 	})
 }
 
-// ListImage return a list of Docker images with their linked manifests
-func (c *Client) ListImage() (map[string][]registry.Manifest, error) {
-	images := make(map[string][]registry.Manifest)
+// ListImage groups stored references and their observations by repository name.
+func (c *Client) ListImage() (map[string][]ManifestEntry, error) {
+	images := make(map[string][]ManifestEntry)
 
 	err := c.View(func(tx *bolt.Tx) error {
 		c := tx.Bucket([]byte(bucketManifest)).Cursor()
@@ -104,10 +95,10 @@ func (c *Client) ListImage() (map[string][]registry.Manifest, error) {
 			if err := json.Unmarshal(v, &manifest); err != nil {
 				return err
 			}
-			if _, ok := images[manifest.Name]; !ok {
-				images[manifest.Name] = []registry.Manifest{}
-			}
-			images[manifest.Name] = append(images[manifest.Name], manifest)
+			images[manifest.Name] = append(images[manifest.Name], ManifestEntry{
+				Reference: string(k),
+				Manifest:  manifest,
+			})
 		}
 		return nil
 	})
