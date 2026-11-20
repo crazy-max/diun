@@ -48,7 +48,7 @@ RUN --mount=type=cache,target=/go/pkg/mod \
   GOBIN=/out go install github.com/crazy-max/gopls-analyzers/cmd/gopls-analyzers@${GOPLS_ANALYZERS_VERSION}
 
 FROM base AS gopls-analyze
-ENV GOFLAGS="-buildvcs=false -mod=vendor -tags=containers_image_openpgp,exclude_graphdriver_btrfs,exclude_graphdriver_devicemapper"
+ENV GOFLAGS="-buildvcs=false -mod=vendor"
 ARG TARGETNAME
 ARG TARGETPLATFORM
 RUN --mount=target=. \

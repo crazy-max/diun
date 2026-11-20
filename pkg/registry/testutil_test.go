@@ -11,8 +11,8 @@ import (
 
 	digest "github.com/opencontainers/go-digest"
 	ocispecs "github.com/opencontainers/image-spec/specs-go/v1"
+	"github.com/regclient/regclient/types/mediatype"
 	"github.com/stretchr/testify/require"
-	podmanmanifest "go.podman.io/image/v5/manifest"
 )
 
 type testRegistry struct {
@@ -189,11 +189,11 @@ func newTestRegistryClient(t *testing.T, opts Options) *Client {
 	t.Helper()
 
 	opts.InsecureTLS = true
-	if opts.ImageOs == "" {
-		opts.ImageOs = "linux"
+	if opts.Platform.OS == "" {
+		opts.Platform.OS = "linux"
 	}
-	if opts.ImageArch == "" {
-		opts.ImageArch = "amd64"
+	if opts.Platform.Architecture == "" {
+		opts.Platform.Architecture = "amd64"
 	}
 
 	client, err := New(opts)
@@ -228,7 +228,7 @@ func newTestRegistryImage(t *testing.T, platform ocispecs.Platform, dockerVersio
 	require.NoError(t, err)
 
 	config := testRegistryBlob{
-		mediaType: podmanmanifest.DockerV2Schema2ConfigMediaType,
+		mediaType: mediatype.Docker2ImageConfig,
 		body:      configBody,
 		digest:    digest.FromBytes(configBody),
 	}
@@ -241,15 +241,15 @@ func newTestRegistryImage(t *testing.T, platform ocispecs.Platform, dockerVersio
 		Layers        []testRegistryDescriptor `json:"layers"`
 	}{
 		SchemaVersion: 2,
-		MediaType:     podmanmanifest.DockerV2Schema2MediaType,
+		MediaType:     mediatype.Docker2Manifest,
 		Config: testRegistryDescriptor{
-			MediaType: podmanmanifest.DockerV2Schema2ConfigMediaType,
+			MediaType: mediatype.Docker2ImageConfig,
 			Size:      int64(len(configBody)),
 			Digest:    config.digest,
 		},
 		Layers: []testRegistryDescriptor{
 			{
-				MediaType: podmanmanifest.DockerV2Schema2LayerMediaType,
+				MediaType: mediatype.Docker2Layer,
 				Size:      42,
 				Digest:    layer,
 			},
@@ -259,7 +259,7 @@ func newTestRegistryImage(t *testing.T, platform ocispecs.Platform, dockerVersio
 
 	return testRegistryImage{
 		manifest: testRegistryBlob{
-			mediaType: podmanmanifest.DockerV2Schema2MediaType,
+			mediaType: mediatype.Docker2Manifest,
 			body:      manifestBody,
 			digest:    digest.FromBytes(manifestBody),
 		},
@@ -293,13 +293,13 @@ func newTestManifestList(t *testing.T, instances ...testManifestListInstance) te
 		Manifests     []testManifestListDescriptor `json:"manifests"`
 	}{
 		SchemaVersion: 2,
-		MediaType:     podmanmanifest.DockerV2ListMediaType,
+		MediaType:     mediatype.Docker2ManifestList,
 		Manifests:     descriptors,
 	})
 	require.NoError(t, err)
 
 	return testRegistryBlob{
-		mediaType: podmanmanifest.DockerV2ListMediaType,
+		mediaType: mediatype.Docker2ManifestList,
 		body:      body,
 		digest:    digest.FromBytes(body),
 	}

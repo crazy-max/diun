@@ -7,8 +7,8 @@ import (
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/internal/provider"
 	"github.com/crazy-max/diun/v4/pkg/k8s"
+	"github.com/distribution/reference"
 	"github.com/opencontainers/go-digest"
-	"go.podman.io/image/v5/docker/reference"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )

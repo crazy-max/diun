@@ -12,9 +12,9 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
+	"github.com/regclient/regclient/types/errs"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.podman.io/image/v5/docker"
 )
 
 func TestRetry(t *testing.T) {
@@ -185,11 +185,23 @@ func TestRetryable(t *testing.T) {
 		},
 		{
 			name: "rate limit handled upstream",
-			err:  docker.ErrTooManyRequests,
+			err:  errs.ErrHTTPRateLimit,
 		},
 		{
 			name: "HTTP rate limit handled upstream",
-			err:  docker.UnexpectedHTTPStatusError{StatusCode: http.StatusTooManyRequests},
+			err:  errors.Wrapf(errs.ErrHTTPStatus, "%s [http 429]", http.StatusText(http.StatusTooManyRequests)),
+		},
+		{
+			name: "rate limit body mentions service unavailable",
+			err:  errors.Wrap(errs.ErrHTTPRateLimit, "request failed: Service Unavailable [http 503]"),
+		},
+		{
+			name: "service unavailable needs upstream status support",
+			err:  errors.Wrapf(errs.ErrHTTPStatus, "%s [http 503]", http.StatusText(http.StatusServiceUnavailable)),
+		},
+		{
+			name: "server error handled upstream",
+			err:  errors.Wrapf(errs.ErrHTTPStatus, "%s [http 500]", http.StatusText(http.StatusInternalServerError)),
 		},
 		{
 			name: "canceled",

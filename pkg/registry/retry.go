@@ -6,13 +6,12 @@ import (
 	"io"
 	"math/rand/v2"
 	"net"
-	"net/http"
 	"syscall"
 	"time"
 
 	"github.com/pkg/errors"
+	"github.com/regclient/regclient/types/errs"
 	"github.com/rs/zerolog/log"
-	"go.podman.io/image/v5/docker"
 )
 
 const maxRetryBackoff = 8 * time.Second
@@ -59,11 +58,10 @@ func retryable(err error) bool {
 	if stderrors.Is(err, context.Canceled) || stderrors.Is(err, context.DeadlineExceeded) {
 		return false
 	}
-	if httpErr, ok := stderrors.AsType[docker.UnexpectedHTTPStatusError](err); ok {
-		switch httpErr.StatusCode {
-		case http.StatusInternalServerError, http.StatusBadGateway, http.StatusServiceUnavailable, http.StatusGatewayTimeout:
-			return true
-		}
+	if stderrors.Is(err, errs.ErrHTTPStatus) {
+		// Leave HTTP retries to regclient, especially exhausted pull quotas.
+		// TODO: Preserve 503 retries once regclient retries that status or
+		// exposes a typed HTTP status. Do not classify errors by their text.
 		return false
 	}
 	if stderrors.Is(err, io.EOF) || stderrors.Is(err, io.ErrUnexpectedEOF) || stderrors.Is(err, syscall.ECONNRESET) || stderrors.Is(err, syscall.EPIPE) || stderrors.Is(err, net.ErrClosed) {

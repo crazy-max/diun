@@ -291,6 +291,12 @@ If you encounter this kind of warning, you are probably using the [file provider
 image with an erroneous or empty platform. If the platform is not filled in, it will be deduced automatically from the
 information of your operating system on which Diun is running.
 
+Platform matching follows regclient's compatibility rules. Windows and macOS
+hosts can select compatible Linux images, and an explicit `linux/arm` without a
+variant defaults to ARM v7 compatibility. Set the variant explicitly when
+monitoring a different ARM target. Diun does not restrict Windows images to the
+host's Windows build number.
+
 In the example below, Diun is running (`diun_x.x.x_windows_i386.zip`) on Windows 10 and tries to analyze the
 `crazymax/cloudflared` image with the detected platform (`windows/386)`:
 
@@ -317,8 +323,8 @@ You have to force the platform for this image if you are not on a supported plat
 
 ## Too many requests to registry
 
-The error `Cannot create image closer: too many requests to registry` is returned when the HTTP status code returned
-by the registry is 429.
+The error `rate limit exceeded [http 429]` means the registry rejected a
+request because its rate limit was reached.
 
 This can happen on the DockerHub registry because of the [rate-limited anonymous pulls](https://docs.docker.com/docker-hub/download-rate-limit/).
 

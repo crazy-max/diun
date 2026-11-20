@@ -2,10 +2,6 @@ version: "2"
 
 run:
   modules-download-mode: vendor
-  build-tags:
-    - containers_image_openpgp
-    - exclude_graphdriver_btrfs
-    - exclude_graphdriver_devicemapper
 
 linters:
   default: none
