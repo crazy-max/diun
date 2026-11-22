@@ -25,7 +25,7 @@ require (
 	github.com/jedib0t/go-pretty/v6 v6.9.2
 	github.com/matcornic/hermes/v2 v2.1.0
 	github.com/microcosm-cc/bluemonday v1.0.27
-	github.com/moby/buildkit v0.35.0
+	github.com/moby/buildkit v0.35.1
 	github.com/moby/moby/api v1.57.0
 	github.com/moby/moby/client v0.6.3
 	github.com/opencontainers/go-digest v1.0.0

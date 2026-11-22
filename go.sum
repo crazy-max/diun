@@ -262,8 +262,8 @@ github.com/microcosm-cc/bluemonday v1.0.27 h1:MpEUotklkwCSLeH+Qdx1VJgNqLlpY2KXwX
 github.com/microcosm-cc/bluemonday v1.0.27/go.mod h1:jFi9vgW+H7c3V0lb6nR74Ib/DIB5OBs92Dimizgw2cA=
 github.com/mitchellh/go-homedir v1.1.0 h1:lukF9ziXFxDFPkA1vsr5zpc1XuPDn/wFntq5mG+4E0Y=
 github.com/mitchellh/go-homedir v1.1.0/go.mod h1:SfyaCUpYCn1Vlf4IUYiD9fPX4A5wJrkLzIz1N1q0pr0=
-github.com/moby/buildkit v0.35.0 h1:5o3kpuDfg6n6vCV9vEIhZ/6rOV4CGiPjt6N8Q7KX6Qo=
-github.com/moby/buildkit v0.35.0/go.mod h1:i872EpyI/+sYyZywXAp+fWr1DK6qFDdWVxhoAMG1B6Q=
+github.com/moby/buildkit v0.35.1 h1:5eMfbpfMFsznXL18kdc8JgxbnHtZsXptuRjzgTvyk3A=
+github.com/moby/buildkit v0.35.1/go.mod h1:i872EpyI/+sYyZywXAp+fWr1DK6qFDdWVxhoAMG1B6Q=
 github.com/moby/docker-image-spec v1.3.1 h1:jMKff3w6PgbfSa69GfNg+zN/XLhfXJGnEx3Nl2EsFP0=
 github.com/moby/docker-image-spec v1.3.1/go.mod h1:eKmb5VW8vQEh/BAr2yvVNvuiJuY6UIocYsFu/DxxRpo=
 github.com/moby/moby/api v1.57.0 h1:K2ykv5UZjwFCtmtL486T+SUEVrQ46w3v7isf214RCcw=
