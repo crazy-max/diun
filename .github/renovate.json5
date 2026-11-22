@@ -45,6 +45,18 @@
   ],
   "packageRules": [
     {
+      "matchManagers": ["gomod"],
+      "commitMessagePrefix": "deps(go):"
+    },
+    {
+      "matchFileNames": ["**/*Dockerfile*"],
+      "commitMessagePrefix": "deps(dockerfile):"
+    },
+    {
+      "matchFileNames": [".github/workflows/**"],
+      "commitMessagePrefix": "deps(ci):"
+    },
+    {
       "matchManagers": ["github-actions"],
       "matchDepNames": ["github/codeql-action"],
       "groupName": "codeql-actions"
