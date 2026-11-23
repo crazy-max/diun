@@ -13,7 +13,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 	podmanmanifest "go.podman.io/image/v5/manifest"
-	"go.podman.io/image/v5/pkg/docker/config"
 )
 
 // jobPlan is built on the discovery goroutine before any analysis writes to the
@@ -190,13 +189,8 @@ func (plan *jobPlan) loadAuth(reg *model.RegOpt, domain string) (auth.Provider, 
 		if provider.Username != "" {
 			return provider, nil
 		}
-		credentials, err := config.GetCredentials(nil, domain)
-		provider = auth.Static{
-			Username:      credentials.Username,
-			Password:      credentials.Password,
-			IdentityToken: credentials.IdentityToken,
-		}
-		return provider, errors.Wrap(err, "error seeking Docker credentials")
+		docker, err := auth.NewDocker(domain)
+		return docker, errors.Wrap(err, "error seeking Docker credentials")
 	default:
 		provider, err := auth.NewStatic(*reg.Auth.Static)
 		if err != nil {

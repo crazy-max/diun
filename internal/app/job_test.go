@@ -944,7 +944,7 @@ func TestLoadAuthFailures(t *testing.T) {
 		},
 		{
 			name: "Docker discovery failure continues anonymously",
-			want: auth.Static{},
+			want: auth.Docker{},
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
