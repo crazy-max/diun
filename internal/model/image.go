@@ -28,6 +28,7 @@ type Image struct {
 // ResolveWatchMode applies image settings before defaults, preferring WatchMode
 // over the deprecated WatchRepo setting at each level.
 func (i *Image) ResolveWatchMode(defaults *Defaults) error {
+	// TODO: Remove legacy watchRepo support in a future release. Users should migrate to watchMode (true: all, false: tag).
 	mode, watchRepo := i.WatchMode, i.WatchRepo
 	if mode == "" && watchRepo == nil && defaults != nil {
 		mode, watchRepo = defaults.WatchMode, defaults.WatchRepo

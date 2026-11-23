@@ -8,12 +8,12 @@ import (
 
 	"github.com/crazy-max/diun/v4/internal/matcher"
 	"github.com/crazy-max/diun/v4/internal/model"
-	"github.com/crazy-max/diun/v4/internal/secret"
 	"github.com/crazy-max/diun/v4/pkg/registry"
+	"github.com/crazy-max/diun/v4/pkg/registry/auth"
+	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 	podmanmanifest "go.podman.io/image/v5/manifest"
 	"go.podman.io/image/v5/pkg/docker/config"
-	"go.podman.io/image/v5/types"
 )
 
 // jobPlan is built on the discovery goroutine before any analysis writes to the
@@ -80,15 +80,6 @@ func (di *Diun) createJob(job model.Job, plan *jobPlan) {
 		reg = (&model.RegOpt{}).GetDefaults()
 	}
 
-	regUser, err := secret.GetSecret(reg.Username, reg.UsernameFile)
-	if err != nil {
-		log.Warn().Err(err).Msgf("Cannot retrieve username secret for regopts %s", reg.Name)
-	}
-	regPassword, err := secret.GetSecret(reg.Password, reg.PasswordFile)
-	if err != nil {
-		log.Warn().Err(err).Msgf("Cannot retrieve password secret for regopts %s", reg.Name)
-	}
-
 	// Validate include/exclude tags
 	for _, includeTag := range job.Image.IncludeTags {
 		if _, err := regexp.Compile(includeTag); err != nil {
@@ -103,21 +94,16 @@ func (di *Diun) createJob(job model.Job, plan *jobPlan) {
 		}
 	}
 
-	var auth types.DockerAuthConfig
-	if len(regUser) > 0 {
-		auth = types.DockerAuthConfig{
-			Username: regUser,
-			Password: regPassword,
-		}
-	} else {
-		auth, err = config.GetCredentials(nil, job.RegImage.Domain)
-		if err != nil {
-			sublog.Warn().Err(err).Msg("Error seeking Docker credentials")
+	authProvider, err := plan.loadAuth(reg, job.RegImage.Domain)
+	if err != nil {
+		sublog.Warn().Err(err).Str("regopt", reg.Name).Msg("Cannot load registry credentials")
+		if authProvider == nil {
+			return
 		}
 	}
 
 	opts := registry.Options{
-		Auth:          auth,
+		AuthProvider:  authProvider,
 		Timeout:       *reg.Timeout,
 		InsecureTLS:   *reg.InsecureTLS,
 		UserAgent:     di.meta.UserAgent,
@@ -183,6 +169,40 @@ func (di *Diun) createJob(job model.Job, plan *jobPlan) {
 			continue
 		}
 		di.addJob(job, plan)
+	}
+}
+
+// loadAuth returns nil on configured provider setup failures. Docker discovery
+// failures return an anonymous provider alongside the error for warn-and-continue.
+func (plan *jobPlan) loadAuth(reg *model.RegOpt, domain string) (auth.Provider, error) {
+	switch reg.Auth {
+	case nil:
+		// TODO: Remove legacy top-level credential support in a future release. Users should migrate to auth.static.
+		provider, staticErr := auth.NewStatic(auth.StaticOptions{
+			Username:     reg.Username,
+			UsernameFile: reg.UsernameFile,
+			Password:     reg.Password,
+			PasswordFile: reg.PasswordFile,
+		})
+		if staticErr != nil {
+			return nil, staticErr
+		}
+		if provider.Username != "" {
+			return provider, nil
+		}
+		credentials, err := config.GetCredentials(nil, domain)
+		provider = auth.Static{
+			Username:      credentials.Username,
+			Password:      credentials.Password,
+			IdentityToken: credentials.IdentityToken,
+		}
+		return provider, errors.Wrap(err, "error seeking Docker credentials")
+	default:
+		provider, err := auth.NewStatic(*reg.Auth.Static)
+		if err != nil {
+			return nil, errors.Wrap(err, "cannot configure static credentials")
+		}
+		return provider, nil
 	}
 }
 

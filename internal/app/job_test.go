@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -16,6 +17,7 @@ import (
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/internal/notif"
 	"github.com/crazy-max/diun/v4/pkg/registry"
+	"github.com/crazy-max/diun/v4/pkg/registry/auth"
 	"github.com/opencontainers/go-digest"
 	"github.com/stretchr/testify/require"
 )
@@ -712,6 +714,14 @@ func TestSharedAnalysisRegistryOptions(t *testing.T) {
 			wantGroups: 2,
 		},
 		{
+			name: "nested static credentials match legacy credentials",
+			change: func(r *model.RegOpt, _ *model.Image) {
+				r.Auth = &model.RegistryAuth{Static: &auth.StaticOptions{Username: r.Username, Password: r.Password}}
+				r.Username, r.Password = "", ""
+			},
+			wantGroups: 1,
+		},
+		{
 			name:       "different TLS policy",
 			change:     func(r *model.RegOpt, _ *model.Image) { r.InsecureTLS = new(true) },
 			wantGroups: 2,
@@ -899,4 +909,49 @@ func TestSharedAnalysisDatabaseReadFailure(t *testing.T) {
 	})
 	require.Equal(t, model.ImageStatusError, entries[0].Status)
 	require.Equal(t, model.ImageStatusSkip, entries[1].Status)
+}
+
+func TestLoadAuthFailures(t *testing.T) {
+	dir := t.TempDir()
+	t.Setenv("DOCKER_CONFIG", dir)
+	t.Setenv("XDG_RUNTIME_DIR", dir)
+	t.Setenv("XDG_CONFIG_HOME", dir)
+	require.NoError(t, os.WriteFile(filepath.Join(dir, "config.json"), []byte("{"), 0o600))
+	missing := filepath.Join(dir, "missing")
+	for _, tc := range []struct {
+		name string
+		reg  model.RegOpt
+		want auth.Provider
+	}{
+		{
+			name: "explicit static failure stops",
+			reg: model.RegOpt{
+				Auth: &model.RegistryAuth{Static: &auth.StaticOptions{Username: "user", PasswordFile: missing}},
+			},
+		},
+		{
+			name: "legacy password failure stops",
+			reg: model.RegOpt{
+				Username:     "user",
+				PasswordFile: missing,
+			},
+		},
+		{
+			name: "legacy username failure stops",
+			reg: model.RegOpt{
+				UsernameFile: missing,
+			},
+		},
+		{
+			name: "Docker discovery failure continues anonymously",
+			want: auth.Static{},
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			var plan jobPlan
+			provider, err := plan.loadAuth(&tc.reg, "diun-auth-test.invalid")
+			require.Error(t, err)
+			require.Equal(t, tc.want, provider)
+		})
+	}
 }

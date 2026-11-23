@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/crazy-max/diun/v4/pkg/registry"
+	"github.com/crazy-max/diun/v4/pkg/registry/auth"
 	"github.com/pkg/errors"
 )
 
@@ -13,6 +14,7 @@ type RegOpts []RegOpt
 
 // RegOpt holds registry options configuration
 type RegOpt struct {
+	Auth         *RegistryAuth  `yaml:"auth,omitempty" json:"auth,omitempty" validate:"omitempty,excluded_with=Username UsernameFile Password PasswordFile"`
 	Name         string         `yaml:"name,omitempty" json:"name,omitempty" validate:"required"`
 	Selector     RegOptSelector `yaml:"selector,omitempty" json:"selector,omitempty" validate:"required,oneof=name image"`
 	Username     string         `yaml:"username,omitempty" json:"username,omitempty" validate:"omitempty"`
@@ -21,6 +23,11 @@ type RegOpt struct {
 	PasswordFile string         `yaml:"passwordFile,omitempty" json:"passwordFile,omitempty" validate:"omitempty,file"`
 	InsecureTLS  *bool          `yaml:"insecureTLS,omitempty" json:"insecureTLS,omitempty" validate:"required"`
 	Timeout      *time.Duration `yaml:"timeout,omitempty" json:"timeout,omitempty"`
+}
+
+// RegistryAuth selects an explicit registry credential provider.
+type RegistryAuth struct {
+	Static *auth.StaticOptions `yaml:"static,omitempty" json:"static,omitempty" validate:"required"`
 }
 
 // RegOpt selector constants

@@ -63,6 +63,11 @@ func Load(config string) (*Config, error) {
 	if err := cfg.validate(); err != nil {
 		return nil, err
 	}
+	for _, reg := range cfg.RegOpts {
+		if reg.Username != "" || reg.UsernameFile != "" || reg.Password != "" || reg.PasswordFile != "" {
+			log.Warn().Str("regopt", reg.Name).Msg("top-level registry credentials are deprecated; use auth.static instead")
+		}
+	}
 	if cfg.Defaults != nil && cfg.Defaults.WatchRepo != nil {
 		log.Warn().Msg("defaults.watchRepo / DIUN_DEFAULTS_WATCHREPO is deprecated; use defaults.watchMode / DIUN_DEFAULTS_WATCHMODE (true: all, false: tag)")
 	}
