@@ -22,7 +22,7 @@ require (
 	github.com/eclipse/paho.mqtt.golang v1.5.1
 	github.com/go-playground/validator/v10 v10.30.6
 	github.com/hashicorp/nomad/api v0.0.0-20261029144823-d0f210429976 // v2.1.1
-	github.com/jedib0t/go-pretty/v6 v6.9.2
+	github.com/jedib0t/go-pretty/v6 v6.9.3
 	github.com/matcornic/hermes/v2 v2.1.0
 	github.com/microcosm-cc/bluemonday v1.0.27
 	github.com/moby/buildkit v0.35.1
