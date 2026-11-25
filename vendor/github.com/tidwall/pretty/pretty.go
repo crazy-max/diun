@@ -289,8 +289,6 @@ func appendPrettyObject(buf, json []byte, i int, open, close byte, pretty bool,
 				if buf[len(buf)-1] != open {
 					buf = appendTabs(buf, prefix, indent, tabs)
 				}
-			} else if open == '{' {
-				buf = append(buf, ' ')
 			}
 			buf = append(buf, close)
 			return buf, i + 1, nl, true
@@ -298,10 +296,6 @@ func appendPrettyObject(buf, json []byte, i int, open, close byte, pretty bool,
 		if open == '[' || json[i] == '"' {
 			if n > 0 {
 				buf = append(buf, ',')
-				if width != -1 {
-					buf = append(buf, ' ')
-				}
-			} else if open == '{' {
 				if width != -1 {
 					buf = append(buf, ' ')
 				}
