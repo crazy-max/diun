@@ -169,6 +169,13 @@ func (r *ClientOptionsReader) WriteTimeout() time.Duration {
 	return s
 }
 
+// MaxIncomingPacketSize returns the maximum accepted MQTT Remaining Length.
+// A value of 0 means that no limit is configured.
+func (r *ClientOptionsReader) MaxIncomingPacketSize() uint32 {
+	s := r.options.MaxIncomingPacketSize
+	return s
+}
+
 func (r *ClientOptionsReader) MessageChannelDepth() uint {
 	s := r.options.MessageChannelDepth
 	return s

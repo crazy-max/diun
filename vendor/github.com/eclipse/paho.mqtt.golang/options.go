@@ -23,6 +23,8 @@ package mqtt
 
 import (
 	"crypto/tls"
+	"io"
+	"log/slog"
 	"net"
 	"net/http"
 	"net/url"
@@ -88,7 +90,7 @@ type ClientOptions struct {
 	TLSConfig                *tls.Config
 	KeepAlive                int64 // Warning: Some brokers may reject connections with Keepalive = 0.
 	PingTimeout              time.Duration
-	ConnectTimeout           time.Duration
+	ConnectTimeout           time.Duration // duration of 0 never times out
 	MaxReconnectInterval     time.Duration
 	AutoReconnect            bool
 	ConnectRetryInterval     time.Duration
@@ -100,15 +102,17 @@ type ClientOptions struct {
 	OnReconnecting           ReconnectHandler
 	OnConnectAttempt         ConnectionAttemptHandler
 	OnConnectionNotification ConnectionNotificationHandler
-	WriteTimeout             time.Duration
+	WriteTimeout             time.Duration // duration of 0 never times out
+	MaxIncomingPacketSize    uint32        // 0 = no limit; otherwise maximum accepted MQTT Remaining Length
 	MessageChannelDepth      uint
 	ResumeSubs               bool
 	HTTPHeaders              http.Header
 	WebsocketOptions         *WebsocketOptions
-	MaxResumePubInFlight     int // // 0 = no limit; otherwise this is the maximum simultaneous messages sent while resuming
+	MaxResumePubInFlight     int // 0 = no limit; otherwise this is the maximum simultaneous messages sent while resuming
 	Dialer                   *net.Dialer
 	CustomOpenConnectionFn   OpenConnectionFunc
 	AutoAckDisabled          bool
+	Logger                   *slog.Logger
 }
 
 // NewClientOptions will create a new ClientClientOptions type with some
@@ -149,14 +153,20 @@ func NewClientOptions() *ClientOptions {
 		OnConnectAttempt:         nil,
 		OnConnectionNotification: nil,
 		WriteTimeout:             0, // 0 represents timeout disabled
+		MaxIncomingPacketSize:    0, // 0 represents no limit for backward compatibility
 		ResumeSubs:               false,
 		HTTPHeaders:              make(map[string][]string),
 		WebsocketOptions:         &WebsocketOptions{},
 		Dialer:                   &net.Dialer{Timeout: 30 * time.Second},
 		CustomOpenConnectionFn:   nil,
 		AutoAckDisabled:          false,
+		Logger:                   newDefaultClientLogger(),
 	}
 	return o
+}
+
+func newDefaultClientLogger() *slog.Logger {
+	return slog.New(slog.NewTextHandler(io.Discard, &slog.HandlerOptions{Level: slog.LevelDebug}))
 }
 
 // AddBroker adds a broker URI to the list of brokers to be used. The format should be
@@ -242,6 +252,8 @@ func (o *ClientOptions) SetCleanSession(clean bool) *ClientOptions {
 // Note that setting this to true does not guarantee in-order delivery
 // (this is subject to broker settings like "max_inflight_messages=1" in mosquitto)
 // and if true then handlers must not block.
+// Some stores do not support SetOrderMatters(true) meaning that ordering may be lost
+// upon reconnection (MemoryStore does not, see OrderedMemoryStore or FileStore)
 func (o *ClientOptions) SetOrderMatters(order bool) *ClientOptions {
 	o.Order = order
 	return o
@@ -375,6 +387,15 @@ func (o *ClientOptions) SetWriteTimeout(t time.Duration) *ClientOptions {
 	return o
 }
 
+// SetMaxIncomingPacketSize sets the maximum MQTT Remaining Length, in bytes,
+// that the client will accept from a broker. Packets that exceed the limit are
+// rejected before their payload buffer is allocated. A value of 0 disables the
+// limit, which is the default for backward compatibility.
+func (o *ClientOptions) SetMaxIncomingPacketSize(maxPacketSize uint32) *ClientOptions {
+	o.MaxIncomingPacketSize = maxPacketSize
+	return o
+}
+
 // SetConnectTimeout limits how long the client will wait when trying to open a connection
 // to an MQTT server before timing out. A duration of 0 never times out.
 // Default 30 seconds. Currently only operational on TCP/TLS connections.
@@ -409,8 +430,10 @@ func (o *ClientOptions) SetConnectRetryInterval(t time.Duration) *ClientOptions 
 // SetConnectRetry sets whether the connect function will automatically retry the connection
 // in the event of a failure (when true the token returned by the Connect function will
 // not complete until the connection is up or it is cancelled)
-// If ConnectRetry is true then subscriptions should be requested in OnConnect handler
-// Setting this to TRUE permits messages to be published before the connection is established
+// If ConnectRetry is true:
+//   - subscriptions should be requested in OnConnect handler
+//   - messages may be published (i.e. Publish will not return error) before the connection is established
+//   - disconnect must be called should you wish to abort the connection process
 func (o *ClientOptions) SetConnectRetry(a bool) *ClientOptions {
 	o.ConnectRetry = a
 	return o
@@ -467,5 +490,14 @@ func (o *ClientOptions) SetCustomOpenConnectionFn(customOpenConnectionFn OpenCon
 //	By default it is set to false. Setting it to true will disable the auto-ack globally.
 func (o *ClientOptions) SetAutoAckDisabled(autoAckDisabled bool) *ClientOptions {
 	o.AutoAckDisabled = autoAckDisabled
+	return o
+}
+
+// SetLogger sets the logger instance used by the client.
+//
+// By default, the client produces no log output unless a package-level logger
+// is configured. Passing nil restores this default for the per-client logger.
+func (o *ClientOptions) SetLogger(logger *slog.Logger) *ClientOptions {
+	o.Logger = logger
 	return o
 }

@@ -18,9 +18,13 @@ package packets
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 )
+
+// ErrMalformedSuback indicates that a SUBACK packet is malformed.
+var ErrMalformedSuback = errors.New("malformed SUBACK received")
 
 // SubackPacket is an internal representation of the fields of the
 // Suback MQTT packet
@@ -39,8 +43,10 @@ func (sa *SubackPacket) Write(w io.Writer) error {
 	var err error
 	body.Write(encodeUint16(sa.MessageID))
 	body.Write(sa.ReturnCodes)
-	sa.FixedHeader.RemainingLength = body.Len()
-	packet := sa.FixedHeader.pack()
+	packet, err := sa.FixedHeader.pack(body.Len())
+	if err != nil {
+		return err
+	}
 	packet.Write(body.Bytes())
 	_, err = packet.WriteTo(w)
 
@@ -61,7 +67,15 @@ func (sa *SubackPacket) Unpack(b io.Reader) error {
 	if err != nil {
 		return err
 	}
-	sa.ReturnCodes = qosBuffer.Bytes()
+	returnCodes := qosBuffer.Bytes()
+	for _, code := range returnCodes {
+		// Accept failure (0x80) for both MQTT 3.1 and 3.1.1, as some
+		// brokers use it for either version.
+		if code > 2 && code != 0x80 {
+			return fmt.Errorf("%w: invalid return code 0x%02x", ErrMalformedSuback, code)
+		}
+	}
+	sa.ReturnCodes = returnCodes
 
 	return nil
 }

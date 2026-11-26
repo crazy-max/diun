@@ -37,7 +37,8 @@ type ProxyFunction func(req *http.Request) (*url.URL, error)
 
 // NewWebsocket returns a new websocket and returns a net.Conn compatible interface using the gorilla/websocket package
 func NewWebsocket(host string, tlsc *tls.Config, timeout time.Duration, requestHeader http.Header, options *WebsocketOptions) (net.Conn, error) {
-	if timeout == 0 {
+	if timeout == 0 { // should not happen as client.go now honours the docs "duration of 0 never times out" and sets timeout to max duration
+		WARN.Println(CLI, fmt.Sprintf("Websocket timeout was 0"))
 		timeout = 10 * time.Second
 	}
 

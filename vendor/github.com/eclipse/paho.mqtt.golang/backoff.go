@@ -23,7 +23,7 @@ import (
 )
 
 // Controller for sleep with backoff when the client attempts reconnection
-// It has statuses for each situations cause reconnection.
+// It has statuses for each situation that can cause reconnection.
 type backoffController struct {
 	sync.RWMutex
 	statusMap map[string]*backoffStatus
@@ -40,14 +40,14 @@ func newBackoffController() *backoffController {
 	}
 }
 
-// Calculate next sleep period from the specified parameters.
-// Returned values are next sleep period and whether the error situation is continual.
-// If connection errors continuouslly occurs, its sleep period is exponentially increased.
-// Also if there is a lot of time between last and this error, sleep period is initialized.
+// Calculate the next sleep period from the specified parameters.
+// Returned values are the next sleep period and whether the error situation is continual.
+// If connection errors continuously occur, the sleep period is exponentially increased.
+// Also, if there is a lot of time between last and this error, the sleep period is initialized.
 func (b *backoffController) getBackoffSleepTime(
 	situation string, initSleepPeriod time.Duration, maxSleepPeriod time.Duration, processTime time.Duration, skipFirst bool,
 ) (time.Duration, bool) {
-	// Decide first sleep time if the situation is not continual. 
+	// Decide first sleep time if the situation is not continual.
 	var firstProcess = func(status *backoffStatus, init time.Duration, skip bool) (time.Duration, bool) {
 		if skip {
 			status.lastSleepPeriod = 0
@@ -74,7 +74,7 @@ func (b *backoffController) getBackoffSleepTime(
 	status.lastErrorTime = time.Now()
 
 	// When there is a lot of time between last and this error, sleep period is initialized.
-	if status.lastErrorTime.Sub(oldTime) > (processTime * 2 + status.lastSleepPeriod) {
+	if status.lastErrorTime.Sub(oldTime) > (processTime*2 + status.lastSleepPeriod) {
 		return firstProcess(status, initSleepPeriod, skipFirst)
 	}
 
