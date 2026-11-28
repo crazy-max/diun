@@ -11,13 +11,20 @@
     "custom.regex"
   ],
   "ignorePaths": ["vendor/**"],
-  "postUpdateOptions": ["gomodTidy", "gomodVendor"],
+  "postUpdateOptions": ["gomodTidy", "gomodUpdateImportPaths", "gomodVendor"],
+  "env": {
+    "GOFLAGS": "-mod=mod -modcacherw"
+  },
   "prHourlyLimit": 0,
   "minimumReleaseAge": "2 days",
   "internalChecksFilter": "strict",
+  "vulnerabilityAlerts": {
+    "enabled": true,
+    "commitMessageSuffix": ""
+  },
   "labels": ["kind/dependencies", "bot"],
   "semanticCommits": "disabled",
-  "commitMessagePrefix": "deps:",
+  "commitMessagePrefix": "deps{{#if isVulnerabilityAlert}}(security){{/if}}:",
   "customManagers": [
     {
       "customType": "regex",
@@ -46,20 +53,15 @@
   "packageRules": [
     {
       "matchManagers": ["gomod"],
-      "commitMessagePrefix": "deps(go):"
+      "commitMessagePrefix": "deps(go{{#if isVulnerabilityAlert}},security{{/if}}):"
     },
     {
       "matchFileNames": ["**/*Dockerfile*"],
-      "commitMessagePrefix": "deps(dockerfile):"
+      "commitMessagePrefix": "deps(dockerfile{{#if isVulnerabilityAlert}},security{{/if}}):"
     },
     {
       "matchFileNames": [".github/workflows/**"],
-      "commitMessagePrefix": "deps(ci):"
-    },
-    {
-      "matchManagers": ["github-actions"],
-      "matchDepNames": ["github/codeql-action"],
-      "groupName": "codeql-actions"
+      "commitMessagePrefix": "deps(ci{{#if isVulnerabilityAlert}},security{{/if}}):"
     },
     {
       "matchUpdateTypes": ["major", "minor", "patch"],
