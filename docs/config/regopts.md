@@ -8,17 +8,23 @@ analysis of an image:
 ```yaml
 regopts:
   - name: "myregistry"
-    username: fii
-    password: bor
+    auth:
+      static:
+        username: fii
+        password: bor
     timeout: 30s
   - name: "docker.io"
     selector: image
-    username: foo
-    password: bar
+    auth:
+      static:
+        username: foo
+        password: bar
   - name: "docker.io/crazymax"
     selector: image
-    usernameFile: /run/secrets/username
-    passwordFile: /run/secrets/password
+    auth:
+      static:
+        usernameFile: /run/secrets/username
+        passwordFile: /run/secrets/password
 ```
 
 * `myregistry` will be used as a `name` selector (default) if referenced by its [name](#name).
@@ -70,62 +76,31 @@ What kind of selector to use to retrieve registry options. (default `name`)
 !!! abstract "Environment variables"
     * `DIUN_REGOPTS_<KEY>_SELECTOR`
 
-### `username`
+### `auth.static`
 
-Registry username.
+Use fixed registry credentials, supplied directly or read from secret files.
+`username` takes precedence over `usernameFile`, and `password` takes precedence
+over `passwordFile`. A username or username file is required. File contents
+are read when creating jobs for each scan.
 
-!!! example "Config file"
-    ```yaml
-    regopts:
-      - name: "myregistry"
+```yaml
+regopts:
+  - name: myregistry
+    auth:
+      static:
         username: foo
-    ```
+        passwordFile: /run/secrets/registry-password
+```
 
-!!! abstract "Environment variables"
-    * `DIUN_REGOPTS_<KEY>_USERNAME`
+Environment variables:
 
-### `usernameFile`
+* `DIUN_REGOPTS_<KEY>_AUTH_STATIC_USERNAME`
+* `DIUN_REGOPTS_<KEY>_AUTH_STATIC_USERNAMEFILE`
+* `DIUN_REGOPTS_<KEY>_AUTH_STATIC_PASSWORD`
+* `DIUN_REGOPTS_<KEY>_AUTH_STATIC_PASSWORDFILE`
 
-Use content of secret file as registry username if `username` not defined.
-
-!!! example "Config file"
-    ```yaml
-    regopts:
-      - name: "myregistry"
-        usernameFile: /run/secrets/username
-    ```
-
-!!! abstract "Environment variables"
-    * `DIUN_REGOPTS_<KEY>_USERNAMEFILE`
-
-### `password`
-
-Registry password.
-
-!!! example "Config file"
-    ```yaml
-    regopts:
-      - name: "myregistry"
-        username: foo
-        password: bar
-    ```
-
-!!! abstract "Environment variables"
-    * `DIUN_REGOPTS_<KEY>_PASSWORD`
-
-### `passwordFile`
-
-Use content of secret file as registry password if `password` not defined.
-
-!!! example "Config file"
-    ```yaml
-    regopts:
-      - name: "myregistry"
-        passwordFile: /run/secrets/password
-    ```
-
-!!! abstract "Environment variables"
-    * `DIUN_REGOPTS_<KEY>_PASSWORDFILE`
+When no authentication provider is configured, Diun discovers credentials from
+Docker configuration files and credential helpers.
 
 ### `timeout`
 

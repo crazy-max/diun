@@ -11,12 +11,39 @@ import (
 	"github.com/PaulSonOfLars/gotgbot/v2"
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/pkg/registry"
+	"github.com/crazy-max/diun/v4/pkg/registry/auth"
 	"github.com/crazy-max/gonfig/env"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
+
+func TestLoadStaticAuth(t *testing.T) {
+	filename := filepath.Join(t.TempDir(), "diun.yml")
+	base := "providers:\n  docker: {}\nregopts:\n  - name: registry\n"
+	require.NoError(t, os.WriteFile(filename, []byte(base+"    auth:\n      static:\n        username: user\n        password: password\n"), 0o600))
+	cfg, err := Load(filename)
+	require.NoError(t, err)
+	require.Equal(t, &auth.StaticOptions{Username: "user", Password: "password"}, cfg.RegOpts[0].Auth.Static)
+	t.Run("environment", func(t *testing.T) {
+		t.Setenv("DIUN_REGOPTS_0_NAME", "registry")
+		t.Setenv("DIUN_REGOPTS_0_AUTH_STATIC_USERNAME", "env-user")
+		t.Setenv("DIUN_REGOPTS_0_AUTH_STATIC_PASSWORDFILE", filename)
+		cfg, err := Load(filename)
+		require.NoError(t, err)
+		require.Equal(t, "env-user", cfg.RegOpts[0].Auth.Static.Username)
+		require.Equal(t, filename, cfg.RegOpts[0].Auth.Static.PasswordFile)
+	})
+	for _, block := range []string{
+		"    auth: {static: {}}\n",
+		"    username: legacy\n    auth: {static: {username: user}}\n",
+	} {
+		require.NoError(t, os.WriteFile(filename, []byte(base+block), 0o600))
+		_, err := Load(filename)
+		require.Error(t, err)
+	}
+}
 
 func TestLoadAssumeImmutableTags(t *testing.T) {
 	filename := filepath.Join(t.TempDir(), "diun.yml")

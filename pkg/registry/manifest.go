@@ -44,13 +44,18 @@ func (c *Client) Manifest(image Image, dbManifest Manifest) (Manifest, bool, err
 }
 
 func (c *Client) manifest(ctx context.Context, image Image, dbManifest Manifest) (Manifest, bool, error) {
+	sysCtx, err := c.systemContext(ctx, image.Domain)
+	if err != nil {
+		return Manifest{}, false, err
+	}
+
 	rmRef, err := ImageReference(image.String())
 	if err != nil {
 		return Manifest{}, false, errors.Wrap(err, "cannot parse reference")
 	}
 
 	// Retrieve remote digest through HEAD request
-	rmDigest, err := docker.GetDigest(ctx, c.sysCtx, rmRef)
+	rmDigest, err := docker.GetDigest(ctx, sysCtx, rmRef)
 	if err != nil {
 		return Manifest{}, false, errors.Wrap(err, "cannot get image digest from HEAD request")
 	}
@@ -64,7 +69,7 @@ func (c *Client) manifest(ctx context.Context, image Image, dbManifest Manifest)
 		// Older records lack InstanceDigest and are refreshed once.
 		list, err := manifest.ListFromBlob(dbManifest.Raw, dbManifest.MIMEType)
 		if err == nil {
-			selected, err := list.ChooseInstance(c.sysCtx)
+			selected, err := list.ChooseInstance(sysCtx)
 			if err == nil && selected == dbManifest.InstanceDigest {
 				instance, err := list.Instance(selected)
 				// A nested index still needs platform selection within the child.
@@ -75,7 +80,7 @@ func (c *Client) manifest(ctx context.Context, image Image, dbManifest Manifest)
 		}
 	}
 
-	rmCloser, err := rmRef.NewImage(ctx, c.sysCtx)
+	rmCloser, err := rmRef.NewImage(ctx, sysCtx)
 	if err != nil {
 		return Manifest{}, false, errors.Wrap(err, "cannot create image closer")
 	}
@@ -92,7 +97,7 @@ func (c *Client) manifest(ctx context.Context, image Image, dbManifest Manifest)
 		if err != nil {
 			return Manifest{}, false, errors.Wrap(err, "cannot parse manifest list")
 		}
-		instanceDigest, err = list.ChooseInstance(c.sysCtx)
+		instanceDigest, err = list.ChooseInstance(sysCtx)
 		if err != nil {
 			return Manifest{}, false, errors.Wrap(err, "error choosing image instance")
 		}
@@ -105,7 +110,7 @@ func (c *Client) manifest(ctx context.Context, image Image, dbManifest Manifest)
 		if err != nil {
 			return Manifest{}, false, errors.Wrap(err, "cannot parse manifest list")
 		}
-		dbManifestPlatformDigest, err := dbManifestList.ChooseInstance(c.sysCtx)
+		dbManifestPlatformDigest, err := dbManifestList.ChooseInstance(sysCtx)
 		// A newly published platform has no instance in the previous index.
 		// The current index was successfully resolved above, so it is an update.
 		updated = err != nil || dbManifestPlatformDigest != instanceDigest

@@ -58,7 +58,11 @@ func (c *Client) ListTags(image Image) ([]string, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "cannot parse reference")
 	}
-	return docker.GetRepositoryTags(ctx, c.sysCtx, imgRef)
+	sysCtx, err := c.systemContext(ctx, image.Domain)
+	if err != nil {
+		return nil, err
+	}
+	return docker.GetRepositoryTags(ctx, sysCtx, imgRef)
 }
 
 // Select applies this watch's selection without modifying the supplied tags.
