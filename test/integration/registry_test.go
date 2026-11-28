@@ -5,6 +5,7 @@ package integration
 import (
 	"bytes"
 	"context"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -34,6 +35,101 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 	"gopkg.in/yaml.v3"
 )
+
+func TestRegistryHeadAfterPullRateLimit(t *testing.T) {
+	for _, retryAfter := range []string{"", "60"} {
+		t.Run("retryAfter="+retryAfter, func(t *testing.T) {
+			f := newRegistryFixture(t)
+			d := f.push(t, "latest", "first")
+			target, err := url.Parse(f.url)
+			require.NoError(t, err)
+			proxy := httputil.NewSingleHostReverseProxy(target)
+			var gets, heads atomic.Int32
+			server := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if strings.Contains(r.URL.Path, "/manifests/") {
+					if r.Method == http.MethodGet {
+						gets.Add(1)
+						if retryAfter != "" {
+							w.Header().Set("Retry-After", retryAfter)
+						}
+						w.WriteHeader(http.StatusTooManyRequests)
+						return
+					}
+					heads.Add(1)
+				}
+				proxy.ServeHTTP(w, r)
+			}))
+			t.Cleanup(server.Close)
+			image, err := registry.ParseImage(registry.ParseImageOptions{Name: strings.TrimPrefix(server.URL, "https://") + "/" + f.repo + ":latest"})
+			require.NoError(t, err)
+			client, err := registry.New(registry.Options{InsecureTLS: true, CompareDigest: true, Timeout: time.Second})
+			require.NoError(t, err)
+			_, _, err = client.Manifest(image, registry.Manifest{})
+			require.Error(t, err)
+			require.Positive(t, gets.Load())
+			before := gets.Load()
+			cached := registry.Manifest{Digest: d}
+			var wg sync.WaitGroup
+			for range 4 {
+				wg.Go(func() {
+					got, updated, err := client.Manifest(image, cached)
+					if err != nil {
+						t.Errorf("cached HEAD after rate limit: %v", err)
+						return
+					}
+					if updated || got.Digest != d {
+						t.Errorf("unexpected cached result: updated=%v digest=%s", updated, got.Digest)
+					}
+				})
+			}
+			wg.Wait()
+			require.Equal(t, before, gets.Load(), "unchanged images must not fetch manifests")
+			require.Equal(t, int32(5), heads.Load())
+		})
+	}
+}
+
+func TestRegistryTransientTLSFailureDoesNotDowngrade(t *testing.T) {
+	var handshakes atomic.Int32
+	server := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.TLS == nil {
+			t.Error("credentials must never be sent over HTTP")
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		if r.URL.Path == "/v2/" {
+			return
+		}
+		user, password, ok := r.BasicAuth()
+		if !ok || user != "user" || password != "secret" {
+			w.Header().Set("WWW-Authenticate", `Basic realm="test"`)
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"name":"test","tags":["latest"]}`))
+	}))
+	server.TLS = &tls.Config{
+		MinVersion: tls.VersionTLS12,
+		GetConfigForClient: func(*tls.ClientHelloInfo) (*tls.Config, error) {
+			if handshakes.Add(1) == 1 {
+				return nil, fmt.Errorf("temporary TLS failure")
+			}
+			return nil, nil
+		},
+	}
+	server.StartTLS()
+	t.Cleanup(server.Close)
+	image, err := registry.ParseImage(registry.ParseImageOptions{Name: strings.TrimPrefix(server.URL, "https://") + "/test:latest"})
+	require.NoError(t, err)
+	client, err := registry.New(registry.Options{InsecureTLS: true, Timeout: time.Second, Auth: registry.AuthConfig{Username: "user", Password: "secret"}})
+	require.NoError(t, err)
+	_, err = client.ListTags(image)
+	require.Error(t, err)
+	tags, err := client.ListTags(image)
+	require.NoError(t, err, "a failed probe must not cache a plaintext client")
+	require.Equal(t, []string{"latest"}, tags)
+}
 
 // Each fixture uses a separate repository and database, including across reruns.
 type registryFixture struct {

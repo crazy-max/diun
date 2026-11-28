@@ -9,7 +9,6 @@ import (
 
 	"github.com/crazy-max/diun/v4/internal/matcher"
 	"github.com/pkg/errors"
-	"go.podman.io/image/v5/docker"
 	"golang.org/x/mod/semver"
 )
 
@@ -58,7 +57,16 @@ func (c *Client) ListTags(image Image) ([]string, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "cannot parse reference")
 	}
-	return docker.GetRepositoryTags(ctx, c.sysCtx, imgRef)
+	clients, err := c.registryClient(ctx, imgRef.Registry)
+	if err != nil {
+		return nil, err
+	}
+	list, err := clients.content.TagList(ctx, imgRef)
+	if err != nil {
+		return nil, err
+	}
+	tags, err := list.GetTags()
+	return slices.Clone(tags), err
 }
 
 // Select applies this watch's selection without modifying the supplied tags.

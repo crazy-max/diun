@@ -5,24 +5,32 @@ import (
 	"fmt"
 	"regexp"
 	"slices"
+	"time"
 
 	"github.com/crazy-max/diun/v4/internal/matcher"
 	"github.com/crazy-max/diun/v4/internal/model"
 	"github.com/crazy-max/diun/v4/internal/secret"
 	"github.com/crazy-max/diun/v4/pkg/registry"
+	"github.com/regclient/regclient/types/platform"
 	"github.com/rs/zerolog/log"
-	podmanmanifest "go.podman.io/image/v5/manifest"
-	"go.podman.io/image/v5/pkg/docker/config"
-	"go.podman.io/image/v5/types"
 )
 
 // jobPlan is built on the discovery goroutine before any analysis writes to the
 // database. Clients with identical effective options share concrete targets.
 type jobPlan struct {
-	clients map[registry.Options]*registry.Client
+	clients map[registryClientKey]*registry.Client
 	groups  map[analysisKey]*analysisJob
 	jobs    []*analysisJob
 	tags    map[analysisKey]tagList
+}
+
+type registryClientKey struct {
+	auth          registry.AuthConfig
+	insecureTLS   bool
+	timeout       time.Duration
+	userAgent     string
+	compareDigest bool
+	platform      model.ImagePlatform
 }
 
 type tagList struct {
@@ -103,41 +111,50 @@ func (di *Diun) createJob(job model.Job, plan *jobPlan) {
 		}
 	}
 
-	var auth types.DockerAuthConfig
+	var auth registry.AuthConfig
 	if len(regUser) > 0 {
-		auth = types.DockerAuthConfig{
+		auth = registry.AuthConfig{
 			Username: regUser,
 			Password: regPassword,
 		}
 	} else {
-		auth, err = config.GetCredentials(nil, job.RegImage.Domain)
+		auth, err = registry.GetCredentials(job.RegImage.Domain)
 		if err != nil {
 			sublog.Warn().Err(err).Msg("Error seeking Docker credentials")
 		}
 	}
 
-	opts := registry.Options{
-		Auth:          auth,
-		Timeout:       *reg.Timeout,
-		InsecureTLS:   *reg.InsecureTLS,
-		UserAgent:     di.meta.UserAgent,
-		CompareDigest: *di.cfg.Watch.CompareDigest,
-		ImageOs:       job.Image.Platform.OS,
-		ImageArch:     job.Image.Platform.Arch,
-		ImageVariant:  job.Image.Platform.Variant,
+	key := registryClientKey{
+		auth:          auth,
+		timeout:       *reg.Timeout,
+		insecureTLS:   *reg.InsecureTLS,
+		userAgent:     di.meta.UserAgent,
+		compareDigest: *di.cfg.Watch.CompareDigest,
+		platform:      job.Image.Platform,
 	}
 
 	if plan.clients == nil {
-		plan.clients = make(map[registry.Options]*registry.Client)
+		plan.clients = make(map[registryClientKey]*registry.Client)
 	}
-	job.Registry = plan.clients[opts]
+	job.Registry = plan.clients[key]
 	if job.Registry == nil {
-		job.Registry, err = registry.New(opts)
+		job.Registry, err = registry.New(registry.Options{
+			Auth:          key.auth,
+			Timeout:       key.timeout,
+			InsecureTLS:   key.insecureTLS,
+			UserAgent:     key.userAgent,
+			CompareDigest: key.compareDigest,
+			Platform: platform.Platform{
+				OS:           key.platform.OS,
+				Architecture: key.platform.Arch,
+				Variant:      key.platform.Variant,
+			},
+		})
 		if err != nil {
 			sublog.Error().Err(err).Msg("Cannot create registry client")
 			return
 		}
-		plan.clients[opts] = job.Registry
+		plan.clients[key] = job.Registry
 	}
 
 	di.addJob(job, plan)
@@ -261,7 +278,7 @@ func (di *Diun) runJobs(group *analysisJob) []model.NotifEntry {
 	job := group.consumers[active[0]]
 	manifest, updated, err := job.Registry.Manifest(job.RegImage, group.baseline)
 	if err != nil {
-		if _, ok := stderrors.AsType[podmanmanifest.NonImageArtifactError](err); ok {
+		if _, ok := stderrors.AsType[registry.NonImageArtifactError](err); ok {
 			for _, i := range active {
 				entries[i].Status = model.ImageStatusSkip
 			}

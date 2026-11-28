@@ -321,7 +321,7 @@ func TestRunJob(t *testing.T) {
 				switch r.URL.Path {
 				case "/v2/":
 					w.WriteHeader(http.StatusOK)
-				case "/v2/test/manifests/latest":
+				case "/v2/test/manifests/latest", "/v2/test/manifests/" + remoteDigest.String():
 					if tt.registryFailure {
 						w.WriteHeader(http.StatusNotFound)
 						return
@@ -539,7 +539,7 @@ func TestSharedAnalysis(t *testing.T) {
 				switch r.URL.Path {
 				case "/v2/":
 					w.WriteHeader(http.StatusOK)
-				case "/v2/test/manifests/latest":
+				case "/v2/test/manifests/latest", "/v2/test/manifests/" + remoteDigest.String():
 					if r.Method == http.MethodHead {
 						heads.Add(1)
 					}
@@ -724,6 +724,16 @@ func TestSharedAnalysisRegistryOptions(t *testing.T) {
 		{
 			name:       "different platform",
 			change:     func(_ *model.RegOpt, i *model.Image) { i.Platform.Arch = "arm64" },
+			wantGroups: 2,
+		},
+		{
+			name:       "different platform OS",
+			change:     func(_ *model.RegOpt, i *model.Image) { i.Platform.OS = "windows" },
+			wantGroups: 2,
+		},
+		{
+			name:       "different platform variant",
+			change:     func(_ *model.RegOpt, i *model.Image) { i.Platform.Variant = "v3" },
 			wantGroups: 2,
 		},
 	} {

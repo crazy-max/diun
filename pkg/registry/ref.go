@@ -1,25 +1,19 @@
 package registry
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/distribution/reference"
 	"github.com/pkg/errors"
-	"go.podman.io/image/v5/docker"
-	"go.podman.io/image/v5/types"
+	"github.com/regclient/regclient/types/ref"
 )
 
-func ImageReference(name string) (types.ImageReference, error) {
-	ref, err := namedReference(name)
+func ImageReference(name string) (ref.Ref, error) {
+	named, err := namedReference(name)
 	if err != nil {
-		return nil, errors.Wrap(err, "cannot parse reference")
+		return ref.Ref{}, errors.Wrap(err, "cannot parse reference")
 	}
-	refStr := ref.String()
-	if !strings.HasPrefix(refStr, "//") {
-		refStr = fmt.Sprintf("//%s", refStr)
-	}
-	return docker.ParseReference(refStr)
+	return ref.New(named.String())
 }
 
 func namedReference(name string) (reference.Named, error) {
