@@ -35,16 +35,30 @@ func (p *PublishPacket) String() string {
 	return fmt.Sprintf("%s topicName: %s MessageID: %d payload: %s", p.FixedHeader, p.TopicName, p.MessageID, string(p.Payload))
 }
 
+// Validate checks packet fields against some requirements set in the MQTT spec.
+// Currently, it checks UTF-8 string fields.
+//
+// MessageID will not be checked because validation may run before the client allocates a packet identifier.
+func (p *PublishPacket) Validate() error {
+	return validateString(p.TopicName)
+}
+
 func (p *PublishPacket) Write(w io.Writer) error {
 	var body bytes.Buffer
 	var err error
+
+	if err := p.Validate(); err != nil {
+		return err
+	}
 
 	body.Write(encodeString(p.TopicName))
 	if p.Qos > 0 {
 		body.Write(encodeUint16(p.MessageID))
 	}
-	p.FixedHeader.RemainingLength = body.Len() + len(p.Payload)
-	packet := p.FixedHeader.pack()
+	packet, err := p.FixedHeader.pack(body.Len() + len(p.Payload))
+	if err != nil {
+		return err
+	}
 	packet.Write(body.Bytes())
 	packet.Write(p.Payload)
 	_, err = w.Write(packet.Bytes())
@@ -75,7 +89,7 @@ func (p *PublishPacket) Unpack(b io.Reader) error {
 		return fmt.Errorf("error unpacking publish, payload length < 0")
 	}
 	p.Payload = make([]byte, payloadLength)
-	_, err = b.Read(p.Payload)
+	_, err = io.ReadFull(b, p.Payload)
 
 	return err
 }
@@ -83,7 +97,9 @@ func (p *PublishPacket) Unpack(b io.Reader) error {
 // Copy creates a new PublishPacket with the same topic and payload
 // but an empty fixed header, useful for when you want to deliver
 // a message with different properties such as Qos but the same
-// content
+// content.
+// The payload's backing array is shared with the original packet. Copy the
+// payload separately before modifying its contents.
 func (p *PublishPacket) Copy() *PublishPacket {
 	newP := NewControlPacket(Publish).(*PublishPacket)
 	newP.TopicName = p.TopicName

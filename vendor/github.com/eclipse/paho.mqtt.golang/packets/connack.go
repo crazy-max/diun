@@ -40,8 +40,10 @@ func (ca *ConnackPacket) Write(w io.Writer) error {
 
 	body.WriteByte(boolToByte(ca.SessionPresent))
 	body.WriteByte(ca.ReturnCode)
-	ca.FixedHeader.RemainingLength = 2
-	packet := ca.FixedHeader.pack()
+	packet, err := ca.FixedHeader.pack(2)
+	if err != nil {
+		return err
+	}
 	packet.Write(body.Bytes())
 	_, err = packet.WriteTo(w)
 
@@ -57,8 +59,11 @@ func (ca *ConnackPacket) Unpack(b io.Reader) error {
 	}
 	ca.SessionPresent = 1&flags > 0
 	ca.ReturnCode, err = decodeByte(b)
+	if err != nil {
+		return err
+	}
 
-	return err
+	return nil
 }
 
 // Details returns a Details struct containing the Qos and

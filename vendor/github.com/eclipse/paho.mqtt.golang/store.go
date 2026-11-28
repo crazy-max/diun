@@ -20,6 +20,7 @@ package mqtt
 
 import (
 	"fmt"
+	"log/slog"
 	"strconv"
 
 	"github.com/eclipse/paho.mqtt.golang/packets"
@@ -37,7 +38,15 @@ const (
 // possible by prepending "i." or "o." to each message id
 type Store interface {
 	Open()
+	// Put stores a packet under the given key. Implementations may retain the
+	// packet pointer rather than make a copy. Put does not transfer exclusive
+	// ownership: the caller may still be using the packet. Both callers and
+	// store implementations must follow the shared-data ownership requirements
+	// documented by Get.
 	Put(key string, message packets.ControlPacket)
+	// Get returns the stored packet, or nil if the key is not found.
+	// The returned packet may be shared with other users of the store; callers must not modify shared packet data.
+	// Make an independent copy of fields that need to change.
 	Get(key string) packets.ControlPacket
 	All() []string
 	Del(key string)
@@ -75,7 +84,7 @@ func outboundKeyFromMID(id uint16) string {
 }
 
 // govern which outgoing messages are persisted
-func persistOutbound(s Store, m packets.ControlPacket) {
+func persistOutbound(s Store, m packets.ControlPacket, logger *slog.Logger) {
 	switch m.Details().Qos {
 	case 0:
 		switch m.(type) {
@@ -91,7 +100,7 @@ func persistOutbound(s Store, m packets.ControlPacket) {
 			// until puback received
 			s.Put(outboundKeyFromMID(m.Details().MessageID), m)
 		default:
-			ERROR.Println(STR, "Asked to persist an invalid message type")
+			logger.Error("Asked to persist an invalid message type", slog.String("component", string(STR)))
 		}
 	case 2:
 		switch m.(type) {
@@ -100,13 +109,13 @@ func persistOutbound(s Store, m packets.ControlPacket) {
 			// until pubrel received
 			s.Put(outboundKeyFromMID(m.Details().MessageID), m)
 		default:
-			ERROR.Println(STR, "Asked to persist an invalid message type")
+			logger.Error("Asked to persist an invalid message type", slog.String("component", string(STR)))
 		}
 	}
 }
 
 // govern which incoming messages are persisted
-func persistInbound(s Store, m packets.ControlPacket) {
+func persistInbound(s Store, m packets.ControlPacket, logger *slog.Logger) {
 	switch m.Details().Qos {
 	case 0:
 		switch m.(type) {
@@ -116,7 +125,7 @@ func persistInbound(s Store, m packets.ControlPacket) {
 			s.Del(outboundKeyFromMID(m.Details().MessageID))
 		case *packets.PublishPacket, *packets.PubrecPacket, *packets.PingrespPacket, *packets.ConnackPacket:
 		default:
-			ERROR.Println(STR, "Asked to persist an invalid messages type")
+			logger.Error("Asked to persist an invalid messages type", slog.String("component", string(STR)))
 		}
 	case 1:
 		switch m.(type) {
@@ -125,7 +134,7 @@ func persistInbound(s Store, m packets.ControlPacket) {
 			// until puback sent
 			s.Put(inboundKeyFromMID(m.Details().MessageID), m)
 		default:
-			ERROR.Println(STR, "Asked to persist an invalid messages type")
+			logger.Error("Asked to persist an invalid messages type", slog.String("component", string(STR)))
 		}
 	case 2:
 		switch m.(type) {
@@ -134,7 +143,7 @@ func persistInbound(s Store, m packets.ControlPacket) {
 			// until pubrel received
 			s.Put(inboundKeyFromMID(m.Details().MessageID), m)
 		default:
-			ERROR.Println(STR, "Asked to persist an invalid messages type")
+			logger.Error("Asked to persist an invalid messages type", slog.String("component", string(STR)))
 		}
 	}
 }

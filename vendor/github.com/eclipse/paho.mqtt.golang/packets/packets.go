@@ -22,12 +22,14 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"unicode/utf8"
 )
 
 // ControlPacket defines the interface for structs intended to hold
 // decoded MQTT packets, either from being read or before being
 // written
 type ControlPacket interface {
+	// Write encodes the packet without modifying it (note that `RemainingLength` is not updated).
 	Write(io.Writer) error
 	Unpack(io.Reader) error
 	String() string
@@ -105,6 +107,8 @@ var (
 	ErrorRefusedNotAuthorised         = errors.New("not Authorized")
 	ErrorNetworkError                 = errors.New("network Error")
 	ErrorProtocolViolation            = errors.New("protocol Violation")
+	ErrPacketTooLarge                 = errors.New("incoming packet exceeds configured maximum size")
+	ErrUnexpectedBodyData             = errors.New("unexpected data at end of packet body")
 )
 
 // ConnErrors is a map of the errors codes constants for Connect()
@@ -120,11 +124,34 @@ var ConnErrors = map[byte]error{
 	ErrProtocolViolation:            ErrorProtocolViolation,
 }
 
+// fixedBodyLength maps the packet types whose MQTT 3.1.1 body length is fixed by
+// the specification to that length. A larger RemainingLength cannot describe a valid
+// packet of that type, so it is rejected before the body is allocated; a smaller one
+// is left to the field decoders, which report the truncated read.
+var fixedBodyLength = map[byte]int{
+	Connack:    2,
+	Puback:     2,
+	Pubrec:     2,
+	Pubrel:     2,
+	Pubcomp:    2,
+	Unsuback:   2,
+	Pingreq:    0,
+	Pingresp:   0,
+	Disconnect: 0,
+}
+
 // ReadPacket takes an instance of an io.Reader (such as net.Conn) and attempts
 // to read an MQTT packet from the stream. It returns a ControlPacket
 // representing the decoded MQTT packet and an error. One of these returns will
 // always be nil, a nil ControlPacket indicating an error occurred.
 func ReadPacket(r io.Reader) (ControlPacket, error) {
+	return ReadPacketWithLimit(r, 0)
+}
+
+// ReadPacketWithLimit behaves like ReadPacket, but rejects packets whose MQTT
+// Remaining Length exceeds maxPacketSize before allocating a payload buffer. A
+// maxPacketSize of 0 disables the limit.
+func ReadPacketWithLimit(r io.Reader, maxPacketSize uint32) (ControlPacket, error) {
 	var fh FixedHeader
 	b := make([]byte, 1)
 
@@ -136,6 +163,13 @@ func ReadPacket(r io.Reader) (ControlPacket, error) {
 	err = fh.unpack(b[0], r)
 	if err != nil {
 		return nil, err
+	}
+	if maxPacketSize > 0 && uint32(fh.RemainingLength) > maxPacketSize {
+		return nil, fmt.Errorf("%w: remaining length %d exceeds limit %d", ErrPacketTooLarge, fh.RemainingLength, maxPacketSize)
+	}
+	if want, ok := fixedBodyLength[fh.MessageType]; ok && fh.RemainingLength > want {
+		return nil, fmt.Errorf("%w: %s declares Remaining Length %d, expected %d",
+			ErrUnexpectedBodyData, PacketNames[fh.MessageType], fh.RemainingLength, want)
 	}
 
 	cp, err := NewControlPacketWithHeader(fh)
@@ -152,8 +186,24 @@ func ReadPacket(r io.Reader) (ControlPacket, error) {
 		return nil, errors.New("failed to read expected data")
 	}
 
-	err = cp.Unpack(bytes.NewBuffer(packetBytes))
-	return cp, err
+	body := bytes.NewBuffer(packetBytes)
+	if err = cp.Unpack(body); err != nil {
+		return nil, err
+	}
+	// MQTT 3.1.1 fixes the length of several packet bodies, so bytes left after the
+	// packet's fields mean the Remaining Length (section 2.2.3) does not match the
+	// packet type. Checking the buffer here (Unpack must always consume the whole
+	// body) avoids probing the reader inside every packet and never consumes from
+	// a caller's stream.
+	if body.Len() != 0 {
+		return nil, fmt.Errorf(
+			"%w: %s has %d unread body bytes",
+			ErrUnexpectedBodyData,
+			PacketNames[fh.MessageType],
+			body.Len(),
+		)
+	}
+	return cp, nil
 }
 
 // NewControlPacket is used to create a new ControlPacket of the type specified
@@ -242,10 +292,12 @@ type Details struct {
 // FixedHeader is a struct to hold the decoded information from
 // the fixed header of an MQTT ControlPacket
 type FixedHeader struct {
-	MessageType     byte
-	Dup             bool
-	Qos             byte
-	Retain          bool
+	MessageType byte
+	Dup         bool
+	Qos         byte
+	Retain      bool
+	// RemainingLength is populated when decoding a packet from the wire.
+	// Write calculates the encoded length independently and leaves this field unchanged.
 	RemainingLength int
 }
 
@@ -262,11 +314,15 @@ func boolToByte(b bool) byte {
 	}
 }
 
-func (fh *FixedHeader) pack() bytes.Buffer {
+func (fh FixedHeader) pack(remainingLength int) (bytes.Buffer, error) {
 	var header bytes.Buffer
 	header.WriteByte(fh.MessageType<<4 | boolToByte(fh.Dup)<<3 | fh.Qos<<1 | boolToByte(fh.Retain))
-	header.Write(encodeLength(fh.RemainingLength))
-	return header
+	l, err := encodeLength(remainingLength)
+	if err != nil {
+		return header, err
+	}
+	header.Write(l)
+	return header, nil
 }
 
 func (fh *FixedHeader) unpack(typeAndFlags byte, r io.Reader) error {
@@ -282,7 +338,7 @@ func (fh *FixedHeader) unpack(typeAndFlags byte, r io.Reader) error {
 
 func decodeByte(b io.Reader) (byte, error) {
 	num := make([]byte, 1)
-	_, err := b.Read(num)
+	_, err := io.ReadFull(b, num)
 	if err != nil {
 		return 0, err
 	}
@@ -292,7 +348,7 @@ func decodeByte(b io.Reader) (byte, error) {
 
 func decodeUint16(b io.Reader) (uint16, error) {
 	num := make([]byte, 2)
-	_, err := b.Read(num)
+	_, err := io.ReadFull(b, num)
 	if err != nil {
 		return 0, err
 	}
@@ -309,9 +365,54 @@ func encodeString(field string) []byte {
 	return encodeBytes([]byte(field))
 }
 
+// validateString checks that field is a valid MQTT UTF-8 string as defined by
+// section 1.5.3 of the MQTT 3.1.1 spec: it must be well-formed UTF-8 and must
+// not include the null character U+0000 [MQTT-1.5.3-1, MQTT-1.5.3-2]. Non
+// characters (which the spec only recommends against) and U+FEFF (which a
+// parser must preserve, [MQTT-1.5.3-3]) are accepted.
+//
+// Error messages intentionally do not include the field contents: strings may
+// originate from the network, and echoing a peer-controlled value could
+// interact with error handling that matches on specific error text.
+func validateString(field string) error {
+	if !utf8.ValidString(field) {
+		return fmt.Errorf("invalid UTF-8 string (length %d)", len(field))
+	}
+	for i := 0; i < len(field); i++ {
+		if field[i] == 0 {
+			return fmt.Errorf("invalid MQTT string (length %d): must not include the null character U+0000", len(field))
+		}
+	}
+	// encodeBytes truncates fields to 65,535 bytes. If the truncation point
+	// falls inside a multi-byte character the packet is written successfully
+	// but cannot be decoded again (a persisted message would be archived as
+	// corrupt instead of replayed), so require the prefix that would be
+	// retained to still be a valid UTF-8 string.
+	if len(field) > 65535 && !utf8.ValidString(field[:65535]) {
+		return fmt.Errorf("invalid UTF-8 string (length %d): the first 65535 bytes retained after truncation are not valid UTF-8", len(field))
+	}
+	return nil
+}
+
+// encodeStringChecked encodes field, failing if it is not a valid MQTT UTF-8
+// string rather than writing a malformed packet.
+func encodeStringChecked(field string) ([]byte, error) {
+	if err := validateString(field); err != nil {
+		return nil, err
+	}
+	return encodeString(field), nil
+}
+
 func decodeString(b io.Reader) (string, error) {
 	buf, err := decodeBytes(b)
-	return string(buf), err
+	if err != nil {
+		return "", err
+	}
+	field := string(buf)
+	if err := validateString(field); err != nil {
+		return "", err
+	}
+	return field, nil
 }
 
 func decodeBytes(b io.Reader) ([]byte, error) {
@@ -321,7 +422,7 @@ func decodeBytes(b io.Reader) ([]byte, error) {
 	}
 
 	field := make([]byte, fieldLength)
-	_, err = b.Read(field)
+	_, err = io.ReadFull(b, field)
 	if err != nil {
 		return nil, err
 	}
@@ -340,7 +441,12 @@ func encodeBytes(field []byte) []byte {
 	return append(fieldLength, field...)
 }
 
-func encodeLength(length int) []byte {
+// encodeLength encodes the "Remaining Length" as per 2.2.3 in the spec
+func encodeLength(length int) ([]byte, error) {
+	// Spec states max packet size is 268,435,455 bytes. Sending length outside this range is invalid.
+	if length < 0 || length > 268435455 {
+		return nil, errors.New("invalid packet length")
+	}
 	var encLength []byte
 	for {
 		digit := byte(length % 128)
@@ -353,14 +459,15 @@ func encodeLength(length int) []byte {
 			break
 		}
 	}
-	return encLength
+	return encLength, nil
 }
 
+// decodeLength decodes the "Remaining Length" as per 2.2.3 in the spec
 func decodeLength(r io.Reader) (int, error) {
 	var rLength uint32
 	var multiplier uint32
 	b := make([]byte, 1)
-	for multiplier < 27 { // fix: Infinite '(digit & 128) == 1' will cause the dead loop
+	for {
 		_, err := io.ReadFull(r, b)
 		if err != nil {
 			return 0, err
@@ -372,6 +479,9 @@ func decodeLength(r io.Reader) (int, error) {
 			break
 		}
 		multiplier += 7
+		if multiplier >= 27 {
+			return 0, errors.New("malformed remaining length") // maximum of 4 bytes may be used (see example in spec)
+		}
 	}
 	return int(rLength), nil
 }

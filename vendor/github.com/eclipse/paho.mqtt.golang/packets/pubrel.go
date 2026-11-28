@@ -34,8 +34,10 @@ func (pr *PubrelPacket) String() string {
 
 func (pr *PubrelPacket) Write(w io.Writer) error {
 	var err error
-	pr.FixedHeader.RemainingLength = 2
-	packet := pr.FixedHeader.pack()
+	packet, err := pr.FixedHeader.pack(2)
+	if err != nil {
+		return err
+	}
 	packet.Write(encodeUint16(pr.MessageID))
 	_, err = packet.WriteTo(w)
 
@@ -47,8 +49,11 @@ func (pr *PubrelPacket) Write(w io.Writer) error {
 func (pr *PubrelPacket) Unpack(b io.Reader) error {
 	var err error
 	pr.MessageID, err = decodeUint16(b)
+	if err != nil {
+		return err
+	}
 
-	return err
+	return nil
 }
 
 // Details returns a Details struct containing the Qos and

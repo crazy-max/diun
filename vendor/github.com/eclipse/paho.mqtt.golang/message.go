@@ -34,6 +34,8 @@ type Message interface {
 	Retained() bool
 	Topic() string
 	MessageID() uint16
+	// Payload returns the message payload without copying it. Modifying the
+	// returned slice may lead to a data race.
 	Payload() []byte
 	Ack()
 }

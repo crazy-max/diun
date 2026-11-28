@@ -34,8 +34,10 @@ func (pa *PubackPacket) String() string {
 
 func (pa *PubackPacket) Write(w io.Writer) error {
 	var err error
-	pa.FixedHeader.RemainingLength = 2
-	packet := pa.FixedHeader.pack()
+	packet, err := pa.FixedHeader.pack(2)
+	if err != nil {
+		return err
+	}
 	packet.Write(encodeUint16(pa.MessageID))
 	_, err = packet.WriteTo(w)
 
@@ -47,8 +49,11 @@ func (pa *PubackPacket) Write(w io.Writer) error {
 func (pa *PubackPacket) Unpack(b io.Reader) error {
 	var err error
 	pa.MessageID, err = decodeUint16(b)
+	if err != nil {
+		return err
+	}
 
-	return err
+	return nil
 }
 
 // Details returns a Details struct containing the Qos and
